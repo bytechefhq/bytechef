@@ -1,0 +1,219 @@
+---
+title: "Myob"
+description: "MYOB is an accounting software that helps businesses manage their finances, invoicing, and payroll."
+---
+
+MYOB is an accounting software that helps businesses manage their finances, invoicing, and payroll.
+
+
+Categories: Accounting
+
+
+Type: myob/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+| key | API key | STRING | `The API key registered in https://my.myob.com.au/au/bd/DevAppList.aspx` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Customer
+Name: createCustomer
+
+`Creates a new customer.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| companyFile | Company File | STRING | `The MYOB company file to use.` | true |
+| IsIndividual | Is Individual? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Does customer contact represent an individual or a company?` | true |
+| FirstName | First Name | STRING | `First name for an individual contact.` | true |
+| LastName | Last Name | STRING | `Last name for an individual contact.` | true |
+| CompanyName | Company Name | STRING | `Company name of the customer contact.` | true |
+| IsActive | Is Active? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Is customer contact active?` | true |
+| Addresses | Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)&#125;] </details> | `List of addresses for the customer contact.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Customer",
+  "name" : "createCustomer",
+  "parameters" : {
+    "companyFile" : "",
+    "IsIndividual" : false,
+    "FirstName" : "",
+    "LastName" : "",
+    "CompanyName" : "",
+    "IsActive" : false,
+    "Addresses" : [ {
+      "Street" : "",
+      "City" : "",
+      "State" : "",
+      "PostCode" : "",
+      "Country" : "",
+      "Phone1" : "",
+      "Email" : "",
+      "Website" : ""
+    } ]
+  },
+  "type" : "myob/v1/createCustomer"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Create Customer Payment
+Name: createCustomerPayment
+
+`Creates a new customer payment.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| companyFile | Company File | STRING | `The MYOB company file to use.` | true |
+| PayFrom | Pay From | STRING <details> <summary> Options </summary> Account, ElectronicPayments </details> |  | true |
+| Account | Account | STRING |  | true |
+| Customer | Customer UID | STRING <details> <summary> Depends On </summary> companyFile </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Customer Payment",
+  "name" : "createCustomerPayment",
+  "parameters" : {
+    "companyFile" : "",
+    "PayFrom" : "",
+    "Account" : "",
+    "Customer" : ""
+  },
+  "type" : "myob/v1/createCustomerPayment"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Create Supplier
+Name: createSupplier
+
+`Creates a new supplier.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| companyFile | Company File | STRING | `The MYOB company file to use.` | true |
+| IsIndividual | Is Individual? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Does supplier contact represent an individual or a company?` | true |
+| FirstName | First Name | STRING | `First name for an individual contact.` | true |
+| LastName | Last Name | STRING | `Last name for an individual contact.` | true |
+| CompanyName | Company Name | STRING | `Company name of the supplier contact.` | true |
+| IsActive | Is Active? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Is supplier contact active?` | false |
+| Addresses | Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)&#125;] </details> | `List of addresses for the customer contact.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Supplier",
+  "name" : "createSupplier",
+  "parameters" : {
+    "companyFile" : "",
+    "IsIndividual" : false,
+    "FirstName" : "",
+    "LastName" : "",
+    "CompanyName" : "",
+    "IsActive" : false,
+    "Addresses" : [ {
+      "Street" : "",
+      "City" : "",
+      "State" : "",
+      "PostCode" : "",
+      "Country" : "",
+      "Phone1" : "",
+      "Email" : "",
+      "Website" : ""
+    } ]
+  },
+  "type" : "myob/v1/createSupplier"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Create Supplier Payment
+Name: createSupplierPayment
+
+`Creates a new supplier payment.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| companyFile | Company File | STRING | `The MYOB company file to use.` | true |
+| PayFrom | Pay From | STRING <details> <summary> Options </summary> Account, ElectronicPayments </details> |  | true |
+| Account | Account | STRING |  | true |
+| Supplier | Supplier UID | STRING <details> <summary> Depends On </summary> companyFile </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Supplier Payment",
+  "name" : "createSupplierPayment",
+  "parameters" : {
+    "companyFile" : "",
+    "PayFrom" : "",
+    "Account" : "",
+    "Supplier" : ""
+  },
+  "type" : "myob/v1/createSupplierPayment"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+

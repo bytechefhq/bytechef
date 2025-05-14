@@ -1,0 +1,250 @@
+---
+title: "Zoho Invoice"
+description: "Zoho Invoice is an online invoicing software used to create, send, and manage professional invoices, along with tracking payments and automating billing workflows."
+---
+
+Zoho Invoice is an online invoicing software used to create, send, and manage professional invoices, along with tracking payments and automating billing workflows.
+
+
+Categories: Accounting
+
+
+Type: zohoInvoice/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| region | Region | STRING <details> <summary> Options </summary> zoho.eu, zoho.com, zoho.com.au, zoho.jp, zoho.in, zohocloud.ca </details> |  | true |
+| organization_id | Organization Id | STRING |  | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Contact
+Name: createContact
+
+`Create a contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| contact_name | Contact Name | STRING | `Name of the contact.` | true |
+| company_name | Company Name | STRING | `Name of the contact's company. ` | false |
+| website | Website | STRING | `Website of the contact.` | false |
+| currency_id | Currency ID | STRING | `Currency ID of the customer's currency.` | false |
+| billing_address | Billing Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(attention), STRING\(address), STRING\(street2), STRING\(state_code), STRING\(city), STRING\(state), STRING\(zip), STRING\(country), STRING\(fax), STRING\(phone)&#125; </details> | `Billing address of the contact.` | false |
+| shipping_address | Shipping Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(attention), STRING\(address), STRING\(street2), STRING\(state_code), STRING\(city), STRING\(state), STRING\(zip), STRING\(country), STRING\(fax), STRING\(phone)&#125; </details> | `Customer's shipping address to which the goods must be delivered.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "contact_name" : "",
+    "company_name" : "",
+    "website" : "",
+    "currency_id" : "",
+    "billing_address" : {
+      "attention" : "",
+      "address" : "",
+      "street2" : "",
+      "state_code" : "",
+      "city" : "",
+      "state" : "",
+      "zip" : "",
+      "country" : "",
+      "fax" : "",
+      "phone" : ""
+    },
+    "shipping_address" : {
+      "attention" : "",
+      "address" : "",
+      "street2" : "",
+      "state_code" : "",
+      "city" : "",
+      "state" : "",
+      "zip" : "",
+      "country" : "",
+      "fax" : "",
+      "phone" : ""
+    }
+  },
+  "type" : "zohoInvoice/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| code | NUMBER | Zoho Invoice error code. This will be zero for a success response and non-zero in case of an error. |
+| message | STRING | Message for the invoked API. |
+| contact | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Created contact. |
+
+
+
+
+#### Output Example
+```json
+{
+  "code" : 0.0,
+  "message" : "",
+  "contact" : { }
+}
+```
+
+
+### Create Invoice
+Name: createInvoice
+
+`Create an invoice for your customer.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| customer_id | Customer ID | STRING | `ID of the customer the invoice has to be created.` | true |
+| use_custom_invoice_number | Use Custom Invoice Number | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, create custom invoice number, if false, use auto invoice number generation.` | true |
+| invoice_number | Invoice Number | STRING | `Number of invoice.` | true |
+| line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(item_id), NUMBER\(quantity)&#125;] </details> | `Items in invoice.` | true |
+| date | Invoice Date | DATE | `The date of the invoice.` | false |
+| payment_terms | Payment Terms | INTEGER | `Payment terms in days e.g. 15, 30, 60. Invoice due date will be calculated based on this.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Invoice",
+  "name" : "createInvoice",
+  "parameters" : {
+    "customer_id" : "",
+    "use_custom_invoice_number" : false,
+    "invoice_number" : "",
+    "line_items" : [ {
+      "item_id" : "",
+      "quantity" : 0.0
+    } ],
+    "date" : "2021-01-01",
+    "payment_terms" : 1
+  },
+  "type" : "zohoInvoice/v1/createInvoice"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| code | NUMBER | Zoho Invoice error code. This will be zero for a success response and non-zero in case of an error. |
+| message | STRING | Message for the invoked API. |
+| invoice | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Created invoice. |
+
+
+
+
+#### Output Example
+```json
+{
+  "code" : 0.0,
+  "message" : "",
+  "invoice" : { }
+}
+```
+
+
+### Create Item
+Name: createItem
+
+`Create a item.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Item Name | STRING | `Name of the item.` | true |
+| rate | Rate | NUMBER | `Per unit price of an item.` | true |
+| product_type | Product Type | STRING <details> <summary> Options </summary> goods, service </details> | `Specify the type of an item.` | true |
+| description | Description | STRING | `Description for the item.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Item",
+  "name" : "createItem",
+  "parameters" : {
+    "name" : "",
+    "rate" : 0.0,
+    "product_type" : "",
+    "description" : ""
+  },
+  "type" : "zohoInvoice/v1/createItem"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| code | NUMBER | Zoho Invoice error code. This will be zero for a success response and non-zero in case of an error. |
+| message | STRING | Message for the invoked API. |
+| item | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Created item. |
+
+
+
+
+#### Output Example
+```json
+{
+  "code" : 0.0,
+  "message" : "",
+  "item" : { }
+}
+```
+
+
+
+

@@ -1,0 +1,252 @@
+---
+title: "Infobip"
+description: "Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses."
+---
+
+Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.
+
+
+Categories: Communication
+
+
+Type: infobip/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | API Key | STRING |  | true |
+| baseUrl | Base URL | STRING | `Personalized base URL for API requests.` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Send SMS
+Name: sendSMS
+
+`Send a new SMS message`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sender | From | STRING | `The sender ID. It can be alphanumeric or numeric (e.g., CompanyName).` | true |
+| to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Message recipient numbers.` | true |
+| text | Text | STRING | `Content of the message being sent.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send SMS",
+  "name" : "sendSMS",
+  "parameters" : {
+    "sender" : "",
+    "to" : [ "" ],
+    "text" : ""
+  },
+  "type" : "infobip/v1/sendSMS"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| bulkId | STRING | ID assigned to the request if messaging multiple recipients or sending multiple messages via a single API request. |
+| messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(messageId), &#123;INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)&#125;\(status), STRING\(destination), &#123;INTEGER\(messageCount)&#125;\(details)&#125;] </details> | An array of message objects of a single message or multiple messages sent under one bulk ID. |
+
+
+
+
+#### Output Example
+```json
+{
+  "bulkId" : "",
+  "messages" : [ {
+    "messageId" : "",
+    "status" : {
+      "groupId" : 1,
+      "groupName" : "",
+      "id" : 1,
+      "name" : "",
+      "description" : "",
+      "action" : ""
+    },
+    "destination" : "",
+    "details" : {
+      "messageCount" : 1
+    }
+  } ]
+}
+```
+
+
+### Send Whatsapp Text Message
+Name: sendWhatsappTextMessage
+
+`Send a new SMS message`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from | From | STRING | `Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.` | true |
+| to | To | STRING | `Message recipient number. Must be in international format.` | true |
+| text | Text | STRING | `Content of the message being sent.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Whatsapp Text Message",
+  "name" : "sendWhatsappTextMessage",
+  "parameters" : {
+    "from" : "",
+    "to" : "",
+    "text" : ""
+  },
+  "type" : "infobip/v1/sendWhatsappTextMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| to | STRING | The destination address of the message. |
+| messageCount | INTEGER | Number of messages required to deliver. |
+| messageId | STRING | ID of the message sent. |
+| status | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)&#125; </details> | Status of the message. |
+
+
+
+
+#### Output Example
+```json
+{
+  "to" : "",
+  "messageCount" : 1,
+  "messageId" : "",
+  "status" : {
+    "groupId" : 1,
+    "groupName" : "",
+    "id" : 1,
+    "name" : "",
+    "description" : "",
+    "action" : ""
+  }
+}
+```
+
+
+
+
+## Triggers
+
+
+### New SMS Message
+Name: newSMS
+
+`Triggers when a new SMS message is received.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| numberKey | Number | STRING |  | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New SMS Message",
+  "name" : "newSMS",
+  "parameters" : {
+    "numberKey" : ""
+  },
+  "type" : "infobip/v1/newSMS"
+}
+```
+
+
+### New WhatsApp Message
+Name: newWhatsappMessage
+
+`Triggers when a new WhatsApp message is received.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| numberKey | Number | STRING |  | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New WhatsApp Message",
+  "name" : "newWhatsappMessage",
+  "parameters" : {
+    "numberKey" : ""
+  },
+  "type" : "infobip/v1/newWhatsappMessage"
+}
+```
+
+
+<hr />
+
+<hr />
+
+# Additional instructions
+<hr />
+
+## CONNECTION
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(53.05219207% + 32px)'}}>
+<iframe src="https://www.guidejar.com/embed/7e252985-dce7-48b9-bf79-50e81568ca22?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowfullscreen frameborder="0"></iframe>
+</div>

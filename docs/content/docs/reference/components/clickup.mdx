@@ -1,0 +1,344 @@
+---
+title: "ClickUp"
+description: "ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams."
+---
+
+ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams.
+
+
+Categories: Project Management
+
+
+Type: clickup/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create List
+Name: createList
+
+`Creates a new List in specified Folder.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING |  | true |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> |  | true |
+| folderId | Folder ID | STRING <details> <summary> Depends On </summary> spaceId, workspaceId </details> | `ID of the folder where new list will be created.` | true |
+| name | Name | STRING | `The name of the list.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create List",
+  "name" : "createList",
+  "parameters" : {
+    "workspaceId" : "",
+    "spaceId" : "",
+    "folderId" : "",
+    "name" : ""
+  },
+  "type" : "clickup/v1/createList"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the list. |
+| name | STRING | The name of the list. |
+| folder | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The folder where the list is located. |
+| space | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The space where the folder is located. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : "",
+  "folder" : {
+    "id" : "",
+    "name" : ""
+  },
+  "space" : {
+    "id" : "",
+    "name" : ""
+  }
+}
+```
+
+
+### Create Task
+Name: createTask
+
+`Create a new task in a ClickUp workspace and list.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING |  | true |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> |  | true |
+| folderId | Folder ID | STRING <details> <summary> Depends On </summary> spaceId, workspaceId </details> |  | false |
+| listId | List ID | STRING <details> <summary> Depends On </summary> folderId, spaceId, workspaceId </details> | `ID of the list where new task will be created.` | true |
+| name | Name | STRING | `The name of the task.` | true |
+| description | Description | STRING | `The description of task.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "workspaceId" : "",
+    "spaceId" : "",
+    "folderId" : "",
+    "listId" : "",
+    "name" : "",
+    "description" : ""
+  },
+  "type" : "clickup/v1/createTask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the task. |
+| name | STRING | The name of the task. |
+| description | STRING | The description of the task. |
+| url | STRING | The URL of the task. |
+| list | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The list where the task is located. |
+| folder | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The folder where the list is located. |
+| space | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id)&#125; </details> | The space where the folder is located. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : "",
+  "description" : "",
+  "url" : "",
+  "list" : {
+    "id" : "",
+    "name" : ""
+  },
+  "folder" : {
+    "id" : "",
+    "name" : ""
+  },
+  "space" : {
+    "id" : ""
+  }
+}
+```
+
+
+### Create Folder
+Name: createFolder
+
+`Creates a new folder in a ClickUp workspace.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING |  | true |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | `ID of the space where new folder will be created.` | true |
+| name | Name | STRING | `The name of the folder.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Folder",
+  "name" : "createFolder",
+  "parameters" : {
+    "workspaceId" : "",
+    "spaceId" : "",
+    "name" : ""
+  },
+  "type" : "clickup/v1/createFolder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the folder. |
+| name | STRING | The name of the folder. |
+| space | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The space where the folder is located. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : "",
+  "space" : {
+    "id" : "",
+    "name" : ""
+  }
+}
+```
+
+
+
+
+## Triggers
+
+
+### New List
+Name: newList
+
+`Triggers when new list is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING |  | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the list. |
+| name | STRING | The name of the list. |
+| folder | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The folder the list is in. |
+| space | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The space the list is in. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New List",
+  "name" : "newList",
+  "parameters" : {
+    "workspaceId" : ""
+  },
+  "type" : "clickup/v1/newList"
+}
+```
+
+
+### New Task
+Name: newTask
+
+`Triggers when new task is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING |  | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the task. |
+| name | STRING | The name of the task. |
+| description | STRING | The description of the task. |
+| url | STRING | The URL of the task. |
+| list | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The list the task is in. |
+| folder | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The folder the task is in. |
+| space | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The space the task is in. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Task",
+  "name" : "newTask",
+  "parameters" : {
+    "workspaceId" : ""
+  },
+  "type" : "clickup/v1/newTask"
+}
+```
+
+
+<hr />
+

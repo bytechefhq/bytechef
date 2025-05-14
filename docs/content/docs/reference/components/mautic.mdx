@@ -1,0 +1,343 @@
+---
+title: "Mautic"
+description: "Simplifying campaign design and optimization with a user-friendly click-and-drag interface allowing you to build complex campaigns."
+---
+
+Simplifying campaign design and optimization with a user-friendly click-and-drag interface allowing you to build complex campaigns.
+
+
+Categories: Marketing Automation
+
+
+Type: mautic/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Mautic Basic Auth
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| baseUrl | Base URL | STRING | `Open your Mautic instance and copy the URL from the address bar. If your dashboard link is "https://mautic.ddev.site/s/dashboard", set your base URL as "https://mautic.ddev.site/".` | true |
+| username | Username | STRING |  | true |
+| password | Password | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Company
+Name: createCompany
+
+`Creates a new company.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| companyname | Company Name | STRING |  | true |
+| isPublished | Is Published | INTEGER <details> <summary> Options </summary> 1, 0 </details> | `Will the company be published after creation.` | true |
+| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, then empty values are set to fields.Otherwise empty values are skipped.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Company",
+  "name" : "createCompany",
+  "parameters" : {
+    "companyname" : "",
+    "isPublished" : 1,
+    "overwriteWithBlank" : false
+  },
+  "type" : "mautic/v1/createCompany"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the company. |
+| isPublished | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the company is published. |
+| dateAdded | DATE | Date/time company was created. |
+| createdBy | INTEGER | ID of the user that created the company. |
+| createdByUser | STRING | Name of the user that created the company. |
+| dateModified | DATE | Date/time company was last modified. |
+| modifiedBy | INTEGER | ID of the user that last modified the company. |
+| modifiedByUser | STRING | Name of the user that last modified the company. |
+| fields | ARRAY <details> <summary> Items </summary> [] </details> | Custom fields for the company. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "isPublished" : false,
+  "dateAdded" : "2021-01-01",
+  "createdBy" : 1,
+  "createdByUser" : "",
+  "dateModified" : "2021-01-01",
+  "modifiedBy" : 1,
+  "modifiedByUser" : "",
+  "fields" : [ ]
+}
+```
+
+
+### Create Contact
+Name: createContact
+
+`Creates a new contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstname | First Name | STRING |  | true |
+| lastname | Last Name | STRING |  | true |
+| email | Email | STRING |  | true |
+| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, then empty values are set to fields.Otherwise empty values are skipped.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "firstname" : "",
+    "lastname" : "",
+    "email" : "",
+    "overwriteWithBlank" : false
+  },
+  "type" : "mautic/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the contact. |
+| isPublished | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact is published. |
+| dateAdded | DATE | Date/time contact was created. |
+| createdBy | INTEGER | ID of the user that created the contact. |
+| createdByUser | STRING | Name of the user that created the contact. |
+| dateModified | DATE | Date/time company was last modified. |
+| modifiedBy | INTEGER | ID of the user that last modified the contact. |
+| modifiedByUser | STRING | Name of the user that last modified the contact. |
+| owner | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | User object that owns the contact. |
+| points | INTEGER | Contact's current number of points. |
+| lastActive | DATE | Date/time for when the contact was last recorded as active. |
+| dateIdentified | DATE | Date/time when the contact identified themselves. |
+| color | STRING | Hex value given to contact from Point Trigger definitions based on the number of points the contact has been awarded. |
+| ipAddresses | ARRAY <details> <summary> Items </summary> [] </details> | Array of IPs currently associated with this contact. |
+| fields | ARRAY <details> <summary> Items </summary> [] </details> | Custom fields for the contact. |
+| tags | ARRAY <details> <summary> Items </summary> [] </details> | Array of tags associated with this contact. |
+| utmtags | ARRAY <details> <summary> Items </summary> [] </details> | Array of UTM Tags associated with this contact. |
+| doNotContact | ARRAY <details> <summary> Items </summary> [] </details> | Array of Do Not Contact objects. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "isPublished" : false,
+  "dateAdded" : "2021-01-01",
+  "createdBy" : 1,
+  "createdByUser" : "",
+  "dateModified" : "2021-01-01",
+  "modifiedBy" : 1,
+  "modifiedByUser" : "",
+  "owner" : { },
+  "points" : 1,
+  "lastActive" : "2021-01-01",
+  "dateIdentified" : "2021-01-01",
+  "color" : "",
+  "ipAddresses" : [ ],
+  "fields" : [ ],
+  "tags" : [ ],
+  "utmtags" : [ ],
+  "doNotContact" : [ ]
+}
+```
+
+
+### Get Company
+Name: getCompany
+
+`Get individual company.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Company ID | STRING | `ID of the company you want to retrieve.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Company",
+  "name" : "getCompany",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "mautic/v1/getCompany"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the company. |
+| isPublished | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the company is published. |
+| dateAdded | DATE | Date/time company was created. |
+| createdBy | INTEGER | ID of the user that created the company. |
+| createdByUser | STRING | Name of the user that created the company. |
+| dateModified | DATE | Date/time company was last modified. |
+| modifiedBy | INTEGER | ID of the user that last modified the company. |
+| modifiedByUser | STRING | Name of the user that last modified the company. |
+| fields | ARRAY <details> <summary> Items </summary> [] </details> | Custom fields for the company. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "isPublished" : false,
+  "dateAdded" : "2021-01-01",
+  "createdBy" : 1,
+  "createdByUser" : "",
+  "dateModified" : "2021-01-01",
+  "modifiedBy" : 1,
+  "modifiedByUser" : "",
+  "fields" : [ ]
+}
+```
+
+
+### Get Contact
+Name: getContact
+
+`Get individual contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Contact ID | STRING | `ID of the contact you want to retrieve.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Contact",
+  "name" : "getContact",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "mautic/v1/getContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the contact. |
+| isPublished | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact is published. |
+| dateAdded | DATE | Date/time contact was created. |
+| createdBy | INTEGER | ID of the user that created the contact. |
+| createdByUser | STRING | Name of the user that created the contact. |
+| dateModified | DATE | Date/time company was last modified. |
+| modifiedBy | INTEGER | ID of the user that last modified the contact. |
+| modifiedByUser | STRING | Name of the user that last modified the contact. |
+| owner | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | User object that owns the contact. |
+| points | INTEGER | Contact's current number of points. |
+| lastActive | DATE | Date/time for when the contact was last recorded as active. |
+| dateIdentified | DATE | Date/time when the contact identified themselves. |
+| color | STRING | Hex value given to contact from Point Trigger definitions based on the number of points the contact has been awarded. |
+| ipAddresses | ARRAY <details> <summary> Items </summary> [] </details> | Array of IPs currently associated with this contact. |
+| fields | ARRAY <details> <summary> Items </summary> [] </details> | Custom fields for the contact. |
+| tags | ARRAY <details> <summary> Items </summary> [] </details> | Array of tags associated with this contact. |
+| utmtags | ARRAY <details> <summary> Items </summary> [] </details> | Array of UTM Tags associated with this contact. |
+| doNotContact | ARRAY <details> <summary> Items </summary> [] </details> | Array of Do Not Contact objects. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "isPublished" : false,
+  "dateAdded" : "2021-01-01",
+  "createdBy" : 1,
+  "createdByUser" : "",
+  "dateModified" : "2021-01-01",
+  "modifiedBy" : 1,
+  "modifiedByUser" : "",
+  "owner" : { },
+  "points" : 1,
+  "lastActive" : "2021-01-01",
+  "dateIdentified" : "2021-01-01",
+  "color" : "",
+  "ipAddresses" : [ ],
+  "fields" : [ ],
+  "tags" : [ ],
+  "utmtags" : [ ],
+  "doNotContact" : [ ]
+}
+```
+
+
+
+

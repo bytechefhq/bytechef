@@ -1,0 +1,62 @@
+---
+title: "Bash"
+description: "Allows you to run arbitrary Bash scripts."
+---
+
+Allows you to run arbitrary Bash scripts.
+
+
+
+Type: bash/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Execute
+Name: execute
+
+`Creates a temporary script that executes bash commands. The script is afterwards deleted.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| script | Script | STRING | `Script written in bash. Multiple commands are possible with the ';' separator.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Execute",
+  "name" : "execute",
+  "parameters" : {
+    "script" : ""
+  },
+  "type" : "bash/v1/execute"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```Sample result```
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+

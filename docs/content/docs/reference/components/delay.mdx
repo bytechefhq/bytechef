@@ -1,0 +1,53 @@
+---
+title: "Delay"
+description: "Sets a value which can then be referenced in other tasks."
+---
+
+Sets a value which can then be referenced in other tasks.
+
+
+Categories: Helpers
+
+
+Type: delay/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Sleep
+Name: sleep
+
+`Delay action execution.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| millis | Millis | INTEGER | `Time in milliseconds.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Sleep",
+  "name" : "sleep",
+  "parameters" : {
+    "millis" : 1
+  },
+  "type" : "delay/v1/sleep"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+

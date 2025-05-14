@@ -1,0 +1,484 @@
+---
+title: "Crypto Helper"
+description: "The Crypto Helper allows you to use cryptographic functions."
+---
+
+The Crypto Helper allows you to use cryptographic functions.
+
+
+Categories: Helpers
+
+
+Type: cryptoHelper/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Hash
+Name: hash
+
+`Computes and returns the hash of the input.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| algorithm | Cryptographic Algorithm | STRING <details> <summary> Options </summary> MD5, SHA-1, SHA-256 </details> | `The cryptographic algorithm that will be used to hash the input.` | true |
+| input | Input | STRING | `Calculates the hash of the provided input.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Hash",
+  "name" : "hash",
+  "parameters" : {
+    "algorithm" : "",
+    "input" : ""
+  },
+  "type" : "cryptoHelper/v1/hash"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Hmac
+Name: hmac
+
+`Computes and returns the HMAC of the input.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| algorithm | Cryptographic Algorithm | STRING <details> <summary> Options </summary> HmacMD5, HmacSHA1, HmacSHA256 </details> | `The cryptographic algorithm that will be used to hash the input.` | true |
+| input | Input | STRING | `Generates a cryptographic HMAC for the provided input.` | true |
+| key | Key | STRING | `Key that will be used for the encryption.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Hmac",
+  "name" : "hmac",
+  "parameters" : {
+    "algorithm" : "",
+    "input" : "",
+    "key" : ""
+  },
+  "type" : "cryptoHelper/v1/hmac"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### PGP Decrypt
+Name: pgpDecrypt
+
+`Decrypts PGP encrypted file using private key and passphrase.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| privateKey | Private PGP Key | STRING | `Private PGP key that will decrypt the file. Make sure there is a new line after the PGP header.` | true |
+| file | File | FILE_ENTRY | `File that will be decrypted.` | true |
+| passphrase | Passphrase | STRING | `Passphrase that was used for encryption.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "PGP Decrypt",
+  "name" : "pgpDecrypt",
+  "parameters" : {
+    "privateKey" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "passphrase" : ""
+  },
+  "type" : "cryptoHelper/v1/pgpDecrypt"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+### PGP Encrypt
+Name: pgpEncrypt
+
+`Encrypts the file using PGP public key.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| publicKey | Public PGP Key | STRING | `Public PGP key of the recipient of the encrypted file. Make sure there is a new line after the PGP header.` | true |
+| file | File | FILE_ENTRY | `File that will be encrypted.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "PGP Encrypt",
+  "name" : "pgpEncrypt",
+  "parameters" : {
+    "publicKey" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "cryptoHelper/v1/pgpEncrypt"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+### RSA Decrypt
+Name: rsaDecrypt
+
+`Decrypts RSA encrypted file using RSA private key.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| privateKey | Private RSA Key | STRING | `Private RSA key that will decrypt the file.` | true |
+| file | File | FILE_ENTRY | `File that will be decrypted.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "RSA Decrypt",
+  "name" : "rsaDecrypt",
+  "parameters" : {
+    "privateKey" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "cryptoHelper/v1/rsaDecrypt"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+### RSA Encrypt
+Name: rsaEncrypt
+
+`Encrypts the file using the RSA public key.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| publicKey | Public RSA Key | STRING | `Public RSA key of the recipient of the encrypted file.` | true |
+| file | File | FILE_ENTRY | `File that will be encrypted.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "RSA Encrypt",
+  "name" : "rsaEncrypt",
+  "parameters" : {
+    "publicKey" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "cryptoHelper/v1/rsaEncrypt"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+### Sign
+Name: sign
+
+`Cryptographically signs a file.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| privateKey | Private RSA Key | STRING | `Private RSA key that will be used to sign the file.` | true |
+| file | File | FILE_ENTRY | `File that will be signed` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Sign",
+  "name" : "sign",
+  "parameters" : {
+    "privateKey" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "cryptoHelper/v1/sign"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+### Verify
+Name: verify
+
+`Verify the signature using public RSA key.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| publicKey | Public RSA Key | STRING | `Public RSA key that will verify the signature.` | true |
+| file | File | FILE_ENTRY | `File whose signature will be verified.` | true |
+| signature | Signature | FILE_ENTRY | `Signature that will be verified.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Verify",
+  "name" : "verify",
+  "parameters" : {
+    "publicKey" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "signature" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "cryptoHelper/v1/verify"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
+
+
+<hr />
+
+# Additional instructions
+<hr />
+
+How to generate RSA key pair:
+
+    1. Run this command in terminal to create private_key.pem in the working directory:
+        openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+        
+    2. Run this command in terminal to extract public key form the private key:
+        openssl rsa -pubout -in private_key.pem -out public_key.pem
+    
+    3. To read the keys run this in terminal:
+        cat public_key.pem or cat private_key.pem
+
+How to generate PGP key pair:
+
+    Run these commands in terminal.
+
+    1. sudo apt install gnupg
+
+    2. gpg --full-generate-key
+
+    3. When prompted write your name, email address, comment and passphrase
+
+    4. To get public key run:
+        gpg --armor --export &lt;our_email_address&gt; &gt; public_key.asc
+
+    5. To get private key run:
+        gpg --armor --export-secret-key &lt;our_email_address&gt; &gt; private_key.asc

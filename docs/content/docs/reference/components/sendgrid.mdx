@@ -1,0 +1,122 @@
+---
+title: "Sendgrid"
+description: "Trusted for reliable email delivery at scale."
+---
+
+Trusted for reliable email delivery at scale.
+
+
+Categories: Communication, Marketing Automation
+
+
+Type: sendgrid/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Send Email
+Name: sendEmail
+
+`Sends an email.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from | From | STRING | `Email address from which you want to send.` | true |
+| to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Email addresses which you want to send to.` | true |
+| cc | CC | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Email address which receives a copy.` | false |
+| subject | Subject | STRING | `Subject of your email` | true |
+| text | Message Body | STRING | `This is the message you want to send` | true |
+| type | Message Type | STRING <details> <summary> Options </summary> text/plain, text/html </details> | `Message type for your content` | true |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments you want to include with the email.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Email",
+  "name" : "sendEmail",
+  "parameters" : {
+    "from" : "",
+    "to" : [ "" ],
+    "cc" : [ "" ],
+    "subject" : "",
+    "text" : "",
+    "type" : "",
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ]
+  },
+  "type" : "sendgrid/v1/sendEmail"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING |  |
+| from | STRING |  |
+| to | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| subject | STRING |  |
+| text | STRING |  |
+| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "type" : "",
+  "from" : "",
+  "to" : [ "" ],
+  "subject" : "",
+  "text" : "",
+  "attachments" : [ {
+    "extension" : "",
+    "mimeType" : "",
+    "name" : "",
+    "url" : ""
+  } ]
+}
+```
+
+
+
+
