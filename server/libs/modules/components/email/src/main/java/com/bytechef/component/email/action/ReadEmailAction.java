@@ -22,17 +22,16 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.email.constant.EmailConstants.CRYPTOGRAPHIC_PROTOCOL;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
 import static com.bytechef.component.email.constant.EmailConstants.PROTOCOL;
-import static com.bytechef.component.email.constant.EmailConstants.TLS;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.email.EmailProtocol;
+import com.bytechef.component.email.commons.EmailUtils;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
@@ -45,7 +44,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author Igor Beslic
@@ -101,16 +99,18 @@ public class ReadEmailAction {
 
         if (connectionParameters.containsKey(USERNAME)) {
             session =
-                Session.getInstance(getProperties(port, emailProtocol, connectionParameters), new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(
-                            connectionParameters.getRequiredString(USERNAME),
-                            connectionParameters.getRequiredString(PASSWORD));
-                    }
-                });
+                Session.getInstance(EmailUtils.getMailSessionProperties(port, emailProtocol, connectionParameters),
+                    new Authenticator() {
+                        @Override
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(
+                                connectionParameters.getRequiredString(USERNAME),
+                                connectionParameters.getRequiredString(PASSWORD));
+                        }
+                    });
         } else {
-            session = Session.getInstance(getProperties(port, emailProtocol, connectionParameters));
+            session = Session.getInstance(
+                EmailUtils.getMailSessionProperties(port, emailProtocol, connectionParameters));
         }
 
         Store protocolStore = session.getStore(emailProtocol.name());
@@ -145,31 +145,5 @@ public class ReadEmailAction {
             filtered.length, inputParameters.get("from"), inputParameters.get("to")));
 
         return filtered;
-    }
-
-    private static Properties getProperties(int port, EmailProtocol protocol, Parameters connectionParameters) {
-        Properties props = new Properties();
-
-        props.setProperty("mail.store.protocol", protocol.name());
-        props.setProperty("mail.debug", "true");
-
-        if (connectionParameters.containsKey(CRYPTOGRAPHIC_PROTOCOL)) {
-            if (TLS.contentEquals(connectionParameters.getRequiredString(CRYPTOGRAPHIC_PROTOCOL))) {
-                props.put(String.format("mail.%s.starttls.enable", protocol), "true");
-            } else {
-                props.put(String.format("mail.%s.ssl.enable", protocol), "true");
-                props.put(String.format("mail.%s.ssl.trust", protocol), connectionParameters.getRequiredString(HOST));
-            }
-        }
-
-        if (connectionParameters.containsKey(USERNAME)) {
-            props.put(String.format("mail.%s.user", protocol), connectionParameters.getRequiredString(USERNAME));
-            props.put(String.format("mail.%s.auth", protocol), true);
-        }
-
-        props.put(String.format("mail.%s.host", protocol), connectionParameters.getRequiredString(HOST));
-        props.put(String.format("mail.%s.port", protocol), port);
-
-        return props;
     }
 }
