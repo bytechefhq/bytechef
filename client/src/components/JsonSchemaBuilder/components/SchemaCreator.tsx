@@ -1,4 +1,5 @@
-import {AsteriskIcon} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {AsteriskIcon, ChevronDownIcon} from 'lucide-react';
 import {PropsWithChildren, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -19,12 +20,12 @@ import {SchemaRecordType} from '../utils/types';
 import {SchemaArrayControls, SchemaControls} from './SchemaControls';
 
 interface SchemaCreatorProps {
-    schema: SchemaRecordType;
-    schemakey?: string;
     isRequired?: boolean;
     onChangeKey?: (key: string) => void;
-    onDelete?: (key: string) => void;
     onChange?: (schema: SchemaRecordType) => void;
+    onDelete?: (key: string) => void;
+    schema: SchemaRecordType;
+    schemakey?: string;
 }
 
 const SchemaCreator = ({
@@ -34,76 +35,31 @@ const SchemaCreator = ({
     onDelete = () => {},
     schema,
     schemakey = '__root__',
-}: SchemaCreatorProps) => {
-    const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+}: SchemaCreatorProps) => (
+    <div className="size-full">
+        <div className="flex items-end">
+            {isRequired && <AsteriskIcon className="mb-3 mr-1 h-4 text-xs" />}
 
-    return (
-        <div className="h-full">
-            <div className="flex items-end">
-                {isRequired && <AsteriskIcon className="mb-3 mr-1 h-4 text-xs" />}
-
-                <SchemaControls
-                    isCollapsed={isCollapsed}
-                    onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
-                    onChange={onChange}
-                    onChangeKey={schemakey !== '__root__' ? onChangeKey : undefined}
-                    onCollapse={
-                        isSchemaObject(schema) || isSchemaArray(schema) ? () => setIsCollapsed((c) => !c) : undefined
-                    }
-                    onDelete={schemakey !== '__root__' ? () => onDelete(schemakey) : undefined}
-                    schema={schema}
-                    schemakey={schemakey}
-                />
-            </div>
-
-            <div className={twMerge(isCollapsed ? 'hidden' : 'block')}>
-                {isSchemaObject(schema) && hasSchemaProperties(schema) && (
-                    <SchemaBox>
-                        <SchemaObjectProperties
-                            onChange={(key, s) => onChange(setSchemaProperty(key, s, schema))}
-                            onChangeKey={(oldkey, newkey) => onChange(renameSchemaProperty(oldkey, newkey, schema))}
-                            onDelete={(key) => onChange(deleteSchemaProperty(key, schema))}
-                            schema={schema}
-                        />
-                    </SchemaBox>
-                )}
-
-                {isSchemaArray(schema) && (
-                    <SchemaBox>
-                        <SchemaArrayItems
-                            onChange={(s) => onChange(setSchemaItems(s, schema))}
-                            schema={getSchemaItems(schema)}
-                        />
-                    </SchemaBox>
-                )}
-            </div>
-        </div>
-    );
-};
-
-interface SchemaArrayItemsProps {
-    schema: SchemaRecordType;
-    onChange: (schema: SchemaRecordType) => void;
-}
-
-const SchemaArrayItems = ({onChange, schema}: SchemaArrayItemsProps) => {
-    return (
-        <div>
-            <SchemaArrayControls
+            <SchemaControls
                 onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
                 onChange={onChange}
+                onChangeKey={schemakey !== '__root__' ? onChangeKey : undefined}
+                onDelete={schemakey !== '__root__' ? () => onDelete(schemakey) : undefined}
                 schema={schema}
+                schemakey={schemakey}
             />
+        </div>
 
+        <div className="block">
             {isSchemaObject(schema) && hasSchemaProperties(schema) && (
-                <div className="mt-2">
+                <SchemaBox>
                     <SchemaObjectProperties
                         onChange={(key, s) => onChange(setSchemaProperty(key, s, schema))}
                         onChangeKey={(oldkey, newkey) => onChange(renameSchemaProperty(oldkey, newkey, schema))}
                         onDelete={(key) => onChange(deleteSchemaProperty(key, schema))}
                         schema={schema}
                     />
-                </div>
+                </SchemaBox>
             )}
 
             {isSchemaArray(schema) && (
@@ -115,8 +71,43 @@ const SchemaArrayItems = ({onChange, schema}: SchemaArrayItemsProps) => {
                 </SchemaBox>
             )}
         </div>
-    );
-};
+    </div>
+);
+
+interface SchemaArrayItemsProps {
+    schema: SchemaRecordType;
+    onChange: (schema: SchemaRecordType) => void;
+}
+
+const SchemaArrayItems = ({onChange, schema}: SchemaArrayItemsProps) => (
+    <div>
+        <SchemaArrayControls
+            onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
+            onChange={onChange}
+            schema={schema}
+        />
+
+        {isSchemaObject(schema) && hasSchemaProperties(schema) && (
+            <div className="mt-2">
+                <SchemaObjectProperties
+                    onChange={(key, s) => onChange(setSchemaProperty(key, s, schema))}
+                    onChangeKey={(oldkey, newkey) => onChange(renameSchemaProperty(oldkey, newkey, schema))}
+                    onDelete={(key) => onChange(deleteSchemaProperty(key, schema))}
+                    schema={schema}
+                />
+            </div>
+        )}
+
+        {isSchemaArray(schema) && (
+            <SchemaBox>
+                <SchemaArrayItems
+                    onChange={(s) => onChange(setSchemaItems(s, schema))}
+                    schema={getSchemaItems(schema)}
+                />
+            </SchemaBox>
+        )}
+    </div>
+);
 
 interface SchemaObjectPropertiesProps {
     schema: SchemaRecordType;
@@ -125,27 +116,45 @@ interface SchemaObjectPropertiesProps {
     onChange: (key: string, schema: SchemaRecordType) => void;
 }
 
-const SchemaObjectProperties = ({onChange, onChangeKey, onDelete, schema}: SchemaObjectPropertiesProps) => {
+const SchemaObjectProperties = ({onChange, onChangeKey, onDelete, schema}: SchemaObjectPropertiesProps) => (
+    <ul className="grid gap-2">
+        {Object.entries(getSchemaProperties(schema)).map(([key, s]) => (
+            <li key={key}>
+                <SchemaCreator
+                    isRequired={isFieldRequired(key, schema)}
+                    onChange={(newSchema) => onChange(key, newSchema)}
+                    onChangeKey={(newKey) => onChangeKey(key, newKey)}
+                    onDelete={onDelete}
+                    schema={s as SchemaRecordType}
+                    schemakey={key}
+                />
+            </li>
+        ))}
+    </ul>
+);
+
+const SchemaBox = ({children}: PropsWithChildren) => {
+    const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+
     return (
-        <ul className="grid gap-2">
-            {Object.entries(getSchemaProperties(schema)).map(([key, s]) => (
-                <li key={key}>
-                    <SchemaCreator
-                        isRequired={isFieldRequired(key, schema)}
-                        onChange={(newSchema) => onChange(key, newSchema)}
-                        onChangeKey={(newKey) => onChangeKey(key, newKey)}
-                        onDelete={onDelete}
-                        schema={s as SchemaRecordType}
-                        schemakey={key}
-                    />
-                </li>
-            ))}
-        </ul>
+        <div
+            className={twMerge(
+                'relative my-4 ml-4 w-full border-l-2 border-stroke-neutral-secondary pl-6',
+                isCollapsed && 'h-2'
+            )}
+        >
+            <Button
+                className="absolute -left-3 top-0 size-6"
+                onClick={() => setIsCollapsed((prev) => !prev)}
+                size="icon"
+                variant="outline"
+            >
+                <ChevronDownIcon className={twMerge(isCollapsed && 'rotate-180')} />
+            </Button>
+
+            <div className={twMerge(isCollapsed ? 'hidden' : 'block')}>{children}</div>
+        </div>
     );
 };
 
 export default SchemaCreator;
-
-const SchemaBox = ({children}: PropsWithChildren) => (
-    <div className="w-full rounded-bl border-b border-l border-blue-400 py-2 pl-2">{children}</div>
-);
