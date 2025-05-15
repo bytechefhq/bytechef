@@ -38,7 +38,7 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
 
     return (
         <div className="flex w-full flex-row">
-            <div className="grid grid-flow-col gap-2">
+            <div className="flex flex-1 gap-2">
                 <SchemaTypesSelect
                     onChange={(translation) => onChange(setSchemaTypeAndRemoveWrongFields(translation, schema))}
                     type={getSchemaType(schema)}
@@ -56,7 +56,7 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
                 )}
             </div>
 
-            <div className="ml-auto grid grid-flow-col items-center gap-1">
+            <div className="ml-auto grid flex-shrink-0 grid-flow-col items-center gap-1">
                 <Button
                     onClick={() => setIsMenuOpen((open) => !open)}
                     size="icon"
