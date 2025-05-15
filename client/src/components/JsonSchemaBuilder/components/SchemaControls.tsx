@@ -1,5 +1,5 @@
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
-import SchemaMenuDialog from '@/components/JsonSchemaBuilder/components/SchemaMenuDialog';
+import SchemaMenuPopover from '@/components/JsonSchemaBuilder/components/SchemaMenuPopover';
 import SchemaTypesSelect from '@/components/JsonSchemaBuilder/components/SchemaTypesSelect';
 import {Button} from '@/components/ui/button';
 import {CircleEllipsisIcon, PlusIcon, TrashIcon} from 'lucide-react';
@@ -13,6 +13,8 @@ import {
     setSchemaTypeAndRemoveWrongFields,
 } from '../utils/helpers';
 import {SchemaRecordType} from '../utils/types';
+import {Badge} from '@/components/ui/badge';
+import {twMerge} from 'tailwind-merge';
 
 interface SchemaControlsProps {
     schema: SchemaRecordType;
@@ -29,6 +31,8 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
     const isObjectSchema = getSchemaType(schema) === 'object';
+
+    const extraFields = Object.keys(schema).filter((key) => key !== 'type' && key !== 'items' && key !== 'properties');
 
     useEffect(() => {
         if (!schema.type || !getSchemaType(schema)) {
@@ -56,15 +60,34 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
                 )}
             </div>
 
-            <div className="ml-auto grid flex-shrink-0 grid-flow-col items-center gap-1">
-                <Button
-                    onClick={() => setIsMenuOpen((open) => !open)}
-                    size="icon"
-                    title="Extra options"
-                    variant="ghost"
+            <div className="ml-auto grid shrink-0 grid-flow-col items-center gap-1">
+                <SchemaMenuPopover
+                    onChange={onChange}
+                    onClose={() => setIsMenuOpen(false)}
+                    open={isMenuOpen}
+                    schema={schema}
                 >
-                    <CircleEllipsisIcon />
-                </Button>
+                    <Button
+                        className={twMerge('group px-2.5', isMenuOpen && 'bg-surface-brand-secondary')}
+                        onClick={() => setIsMenuOpen((open) => !open)}
+                        title="Extra options"
+                        variant="ghost"
+                    >
+                        <CircleEllipsisIcon className={twMerge(isMenuOpen && 'text-content-brand-primary')} />
+
+                        {extraFields.length > 0 && (
+                            <Badge
+                                className={twMerge(
+                                    'group-hover:bg-surface-neutral-secondary-hover',
+                                    isMenuOpen && 'bg-surface-brand-primary text-white'
+                                )}
+                                variant="secondary"
+                            >
+                                {extraFields.length}
+                            </Badge>
+                        )}
+                    </Button>
+                </SchemaMenuPopover>
 
                 {typeof onDelete === 'function' && (
                     <Button
@@ -90,15 +113,6 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
                     </Button>
                 )}
             </div>
-
-            {isMenuOpen && (
-                <SchemaMenuDialog
-                    onChange={onChange}
-                    onClose={() => setIsMenuOpen(false)}
-                    schema={schema}
-                    title="Extra fields"
-                />
-            )}
         </div>
     );
 };
@@ -112,6 +126,8 @@ interface SchemaArrayControlsProps {
 const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayControlsProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
+    const extraFields = Object.keys(schema).filter((key) => key !== 'type' && key !== 'items' && key !== 'properties');
+
     return (
         <div className="flex w-full items-center">
             <SchemaTypesSelect
@@ -120,14 +136,33 @@ const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayControlsProps
             />
 
             <div className="ml-auto flex space-x-1">
-                <Button
-                    onClick={() => setIsMenuOpen((open) => !open)}
-                    size="icon"
-                    title="Extra options"
-                    variant="ghost"
+                <SchemaMenuPopover
+                    onChange={onChange}
+                    onClose={() => setIsMenuOpen(false)}
+                    open={isMenuOpen}
+                    schema={schema}
                 >
-                    <CircleEllipsisIcon />
-                </Button>
+                    <Button
+                        className={twMerge('group px-2.5', isMenuOpen && 'bg-surface-brand-secondary')}
+                        onClick={() => setIsMenuOpen((open) => !open)}
+                        title="Extra options"
+                        variant="ghost"
+                    >
+                        <CircleEllipsisIcon className={twMerge(isMenuOpen && 'text-content-brand-primary')} />
+
+                        {extraFields.length > 0 && (
+                            <Badge
+                                className={twMerge(
+                                    'group-hover:bg-surface-neutral-secondary-hover',
+                                    isMenuOpen && 'bg-surface-brand-primary text-white'
+                                )}
+                                variant="secondary"
+                            >
+                                {extraFields.length}
+                            </Badge>
+                        )}
+                    </Button>
+                </SchemaMenuPopover>
 
                 {typeof onAdd === 'function' && (
                     <Button onClick={onAdd} size="icon" title="Add" variant="ghost">
@@ -135,15 +170,6 @@ const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayControlsProps
                     </Button>
                 )}
             </div>
-
-            {isMenuOpen && (
-                <SchemaMenuDialog
-                    onChange={onChange}
-                    onClose={() => setIsMenuOpen(false)}
-                    schema={schema}
-                    title="Extra fields"
-                />
-            )}
         </div>
     );
 };
