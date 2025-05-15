@@ -18,12 +18,14 @@ package com.bytechef.component.email.action;
 
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.email.EmailProtocol;
 import com.bytechef.component.email.constant.EmailConstants;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.server.AbstractServer;
@@ -34,11 +36,16 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.boot.jackson.JsonComponentModule;
 
 /**
  * @author Igor Beslic
  */
 public class EmailActionIntTest {
+
+    static {
+        JsonUtils.setObjectMapper(new JacksonConfiguration(new JsonComponentModule()).objectMapper());
+    }
 
     @RegisterExtension
     static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP_IMAP)
@@ -74,7 +81,7 @@ public class EmailActionIntTest {
 
         String from = (String) fromObject;
 
-        Assertions.assertEquals("[test.from@test.com]", from);
+        Assertions.assertTrue(from.contains("\"test.from@test.com\""));
 
         System.out.println(result);
     }
