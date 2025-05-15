@@ -36,7 +36,7 @@ const Item = ({children, onDelete}: ItemProps) => (
         <div className="min-w-0 flex-1">{children}</div>
 
         <Button
-            className="flex-shrink-0 text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive"
+            className="shrink-0 text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive"
             onClick={onDelete}
             size="icon"
             variant="ghost"

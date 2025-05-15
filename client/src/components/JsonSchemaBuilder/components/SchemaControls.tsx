@@ -1,9 +1,11 @@
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import SchemaMenuPopover from '@/components/JsonSchemaBuilder/components/SchemaMenuPopover';
 import SchemaTypesSelect from '@/components/JsonSchemaBuilder/components/SchemaTypesSelect';
+import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {CircleEllipsisIcon, PlusIcon, TrashIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import {
     addSchemaProperty,
@@ -13,8 +15,6 @@ import {
     setSchemaTypeAndRemoveWrongFields,
 } from '../utils/helpers';
 import {SchemaRecordType} from '../utils/types';
-import {Badge} from '@/components/ui/badge';
-import {twMerge} from 'tailwind-merge';
 
 interface SchemaControlsProps {
     schema: SchemaRecordType;
