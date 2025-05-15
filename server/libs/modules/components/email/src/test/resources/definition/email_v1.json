@@ -66,9 +66,6 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -76,8 +73,11 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : [ {
       "advancedOption" : null,
@@ -98,57 +98,6 @@
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "port",
-      "type" : "INTEGER",
-      "defaultValue" : 25,
-      "exampleValue" : null,
-      "label" : "Port",
-      "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
-    }, {
-      "advancedOption" : null,
-      "description" : "Protocol defines communication procedure. SMTP allows sending emails, IMAP allows receiving emails. POP3 is older protocol for receiving emails.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "protocol",
-      "type" : "STRING",
-      "defaultValue" : "smtp",
-      "exampleValue" : null,
-      "label" : "Protocol",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : [ {
-        "description" : "sending email",
-        "label" : "smtp",
-        "value" : "smtp"
-      }, {
-        "description" : "receive email",
-        "label" : "imap",
-        "value" : "imap"
-      }, {
-        "description" : "receive email",
-        "label" : "pop3",
-        "value" : "pop3"
-      } ],
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
@@ -174,6 +123,34 @@
         "value" : false
       } ],
       "controlType" : "SELECT"
+    }, {
+      "advancedOption" : null,
+      "description" : "Connection security activates cryptographic protocol to secure communication over a network.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "cryptoProtocol",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Connection Security",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : "Transport Layer Security is the modern, more secure replacement for SSL",
+        "label" : "tls",
+        "value" : "tls"
+      }, {
+        "description" : "Secure Sockets Layer is an older protocol that has been deprecated due to security vulnerabilities.",
+        "label" : "ssl",
+        "value" : "ssl"
+      } ],
+      "optionsDataSource" : null
     } ],
     "version" : 1,
     "authorizationRequired" : false,
@@ -189,6 +166,25 @@
     "name" : "send",
     "outputDefinition" : null,
     "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Defines the port to connect to the email server.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "port",
+      "type" : "INTEGER",
+      "defaultValue" : 25,
+      "exampleValue" : null,
+      "label" : "Port",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
       "advancedOption" : null,
       "description" : "From who to send the email.",
       "displayCondition" : null,
@@ -247,8 +243,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Who to CC on the email.",
@@ -288,8 +284,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Who to BCC on the email.",
@@ -329,8 +325,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "When someone replies to this email, where should it go to?",
@@ -370,8 +366,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Your email subject.",
@@ -527,8 +523,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Send",
     "perform" : { },
@@ -543,6 +539,53 @@
     "name" : "get",
     "outputDefinition" : null,
     "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Defines the port to connect to the email server.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "port",
+      "type" : "INTEGER",
+      "defaultValue" : 25,
+      "exampleValue" : null,
+      "label" : "Port",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Protocol defines communication procedure. IMAP allows receiving emails. POP3 is older protocol for receiving emails.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "protocol",
+      "type" : "STRING",
+      "defaultValue" : "imap",
+      "exampleValue" : null,
+      "label" : "Protocol",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : "IMAP is used to receive email",
+        "label" : "imap",
+        "value" : "imap"
+      }, {
+        "description" : "POP3 is used to receive email",
+        "label" : "pop3",
+        "value" : "pop3"
+      } ],
+      "optionsDataSource" : null
+    }, {
       "advancedOption" : null,
       "description" : "From who the email was sent.",
       "displayCondition" : null,
@@ -588,7 +631,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "clusterElements" : null
 }
