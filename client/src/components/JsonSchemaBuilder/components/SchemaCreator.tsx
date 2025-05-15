@@ -1,3 +1,4 @@
+import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {AsteriskIcon, ChevronDownIcon} from 'lucide-react';
 import {PropsWithChildren, useState} from 'react';
@@ -18,7 +19,6 @@ import {
 } from '../utils/helpers';
 import {SchemaRecordType} from '../utils/types';
 import {SchemaArrayControls, SchemaControls} from './SchemaControls';
-import {Badge} from '@/components/ui/badge';
 
 interface SchemaCreatorProps {
     isRequired?: boolean;
