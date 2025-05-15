@@ -26,6 +26,7 @@ import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
 import static com.bytechef.component.email.constant.EmailConstants.PROTOCOL;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -41,7 +42,6 @@ import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -130,10 +130,10 @@ public class ReadEmailAction {
 
             filtered[i] = new HashMap<>();
 
-            filtered[i].put(FROM, Arrays.toString(message.getFrom()));
-            filtered[i].put(TO, Arrays.toString(message.getRecipients(RecipientType.TO)));
-            filtered[i].put(CC, Arrays.toString(message.getRecipients(RecipientType.CC)));
-            filtered[i].put(BCC, Arrays.toString(message.getRecipients(RecipientType.BCC)));
+            filtered[i].put(FROM, JsonUtils.write(message.getFrom()));
+            filtered[i].put(TO, JsonUtils.write(message.getRecipients(RecipientType.TO)));
+            filtered[i].put(CC, JsonUtils.write(message.getRecipients(RecipientType.CC)));
+            filtered[i].put(BCC, JsonUtils.write(message.getRecipients(RecipientType.BCC)));
             filtered[i].put(SUBJECT, message.getSubject());
             filtered[i].put(CONTENT, message.getContent()
                 .toString());
