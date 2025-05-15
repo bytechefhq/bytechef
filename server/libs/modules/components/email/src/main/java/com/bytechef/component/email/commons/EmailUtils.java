@@ -17,8 +17,9 @@
 package com.bytechef.component.email.commons;
 
 import static com.bytechef.component.definition.Authorization.USERNAME;
-import static com.bytechef.component.email.constant.EmailConstants.*;
+import static com.bytechef.component.email.constant.EmailConstants.CRYPTOGRAPHIC_PROTOCOL;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
+import static com.bytechef.component.email.constant.EmailConstants.TLS;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.email.EmailProtocol;
