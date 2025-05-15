@@ -34,11 +34,11 @@ const SchemaInput = ({label, onChange, placeholder, type = 'text', value = 'Unti
     };
 
     return (
-        <fieldset className="space-y-1">
+        <fieldset className="space-y-1 overflow-hidden">
             <Label>{label}</Label>
 
             <Input
-                className="bg-white"
+                className="text-ellipsis"
                 onBlur={onChangeValue}
                 onChange={(e) => setLocalVal(e.target.value)}
                 onKeyPress={handleEnterPress(onChangeValue)}

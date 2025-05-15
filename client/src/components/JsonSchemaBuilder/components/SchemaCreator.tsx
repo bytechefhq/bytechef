@@ -41,7 +41,7 @@ const SchemaCreator = ({
         isSchemaObject(schema) && getSchemaProperties(schema) ? Object.keys(getSchemaProperties(schema)).length : 0;
 
     return (
-        <div className="size-full">
+        <div className="w-full min-w-0 overflow-hidden">
             <div className="flex items-end">
                 {isRequired && <AsteriskIcon className="mb-3 mr-1 h-4 text-xs" />}
 
@@ -123,7 +123,7 @@ interface SchemaObjectPropertiesProps {
 }
 
 const SchemaObjectProperties = ({onChange, onChangeKey, onDelete, schema}: SchemaObjectPropertiesProps) => (
-    <ul className="grid gap-2">
+    <ul className="grid w-full gap-2">
         {Object.entries(getSchemaProperties(schema)).map(([key, s]) => (
             <li key={key}>
                 <SchemaCreator
@@ -145,7 +145,7 @@ const SchemaBox = ({children, itemCount}: {itemCount?: number} & PropsWithChildr
     return (
         <div
             className={twMerge(
-                'relative my-4 ml-4 w-full border-l-2 border-stroke-neutral-secondary pl-6',
+                'relative my-4 ml-4 border-l-2 border-stroke-neutral-secondary pl-6',
                 isCollapsed && 'h-2'
             )}
         >
@@ -155,7 +155,7 @@ const SchemaBox = ({children, itemCount}: {itemCount?: number} & PropsWithChildr
                 size="icon"
                 variant="outline"
             >
-                <ChevronDownIcon className={twMerge(isCollapsed && 'rotate-180')} />
+                <ChevronDownIcon className={twMerge('transition-all duration-200', isCollapsed && 'rotate-180')} />
             </Button>
 
             {isCollapsed ? (
