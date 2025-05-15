@@ -19,16 +19,19 @@ package com.bytechef.component.email.action;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.email.constant.EmailConstants.CRYPTOGRAPHIC_PROTOCOL;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
 import static com.bytechef.component.email.constant.EmailConstants.PROTOCOL;
-import static com.bytechef.component.email.constant.EmailConstants.SSL;
 import static com.bytechef.component.email.constant.EmailConstants.TLS;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.email.EmailProtocol;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Folder;
@@ -42,7 +45,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -63,6 +65,21 @@ public class ReadEmailAction {
         .title("Get Mail")
         .description("Get emails from inbox.")
         .properties(
+            integer(PORT)
+                .label("Port")
+                .description("Defines the port to connect to the email server.")
+                .required(true)
+                .defaultValue(25),
+            string(PROTOCOL)
+                .controlType(Property.ControlType.SELECT)
+                .defaultValue(EmailProtocol.imap.name())
+                .label("Protocol")
+                .description(
+                    "Protocol defines communication procedure. IMAP allows receiving emails. POP3 is older protocol for receiving emails.")
+                .options(
+                    option(EmailProtocol.imap.name(), EmailProtocol.imap.name(), "IMAP is used to receive email"),
+                    option(EmailProtocol.pop3.name(), EmailProtocol.pop3.name(), "POP3 is used to receive email"))
+                .required(true),
             string(FROM)
                 .label("From Email")
                 .description("From who the email was sent.")
@@ -79,20 +96,21 @@ public class ReadEmailAction {
         throws MessagingException, IOException {
 
         Session session;
-        EmailProtocol emailProtocol = EmailProtocol.valueOf(connectionParameters.getRequiredString(PROTOCOL));
+        EmailProtocol emailProtocol = EmailProtocol.valueOf(inputParameters.getRequiredString(PROTOCOL));
+        int port = inputParameters.getRequiredInteger(PORT);
 
         if (connectionParameters.containsKey(USERNAME)) {
-            session = Session.getInstance(getProperties(emailProtocol, connectionParameters), new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(
-                        connectionParameters.getRequiredString(USERNAME),
-                        connectionParameters.getRequiredString(PASSWORD));
-                }
-            });
-
+            session =
+                Session.getInstance(getProperties(port, emailProtocol, connectionParameters), new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(
+                            connectionParameters.getRequiredString(USERNAME),
+                            connectionParameters.getRequiredString(PASSWORD));
+                    }
+                });
         } else {
-            session = Session.getInstance(getProperties(emailProtocol, connectionParameters));
+            session = Session.getInstance(getProperties(port, emailProtocol, connectionParameters));
         }
 
         Store protocolStore = session.getStore(emailProtocol.name());
@@ -129,18 +147,19 @@ public class ReadEmailAction {
         return filtered;
     }
 
-    private static Properties getProperties(EmailProtocol protocol, Parameters connectionParameters) {
+    private static Properties getProperties(int port, EmailProtocol protocol, Parameters connectionParameters) {
         Properties props = new Properties();
 
         props.setProperty("mail.store.protocol", protocol.name());
         props.setProperty("mail.debug", "true");
 
-        if (Objects.equals(connectionParameters.getBoolean(TLS), false)) {
-            props.put(String.format("mail.%s.starttls.enable", protocol), "true");
-        }
-
-        if (Objects.equals(connectionParameters.getBoolean(SSL), false)) {
-            props.put(String.format("mail.%s.ssl.enable", protocol), "true");
+        if (connectionParameters.containsKey(CRYPTOGRAPHIC_PROTOCOL)) {
+            if (TLS.contentEquals(connectionParameters.getRequiredString(CRYPTOGRAPHIC_PROTOCOL))) {
+                props.put(String.format("mail.%s.starttls.enable", protocol), "true");
+            } else {
+                props.put(String.format("mail.%s.ssl.enable", protocol), "true");
+                props.put(String.format("mail.%s.ssl.trust", protocol), connectionParameters.getRequiredString(HOST));
+            }
         }
 
         if (connectionParameters.containsKey(USERNAME)) {
@@ -149,7 +168,7 @@ public class ReadEmailAction {
         }
 
         props.put(String.format("mail.%s.host", protocol), connectionParameters.getRequiredString(HOST));
-        props.put(String.format("mail.%s.port", protocol), connectionParameters.getRequiredInteger(PORT));
+        props.put(String.format("mail.%s.port", protocol), port);
 
         return props;
     }

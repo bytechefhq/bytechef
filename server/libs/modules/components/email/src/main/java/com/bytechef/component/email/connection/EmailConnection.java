@@ -21,17 +21,14 @@ import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.connection;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.email.constant.EmailConstants.CRYPTOGRAPHIC_PROTOCOL;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
-import static com.bytechef.component.email.constant.EmailConstants.PORT;
-import static com.bytechef.component.email.constant.EmailConstants.PROTOCOL;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.email.EmailProtocol;
 import com.bytechef.component.email.constant.EmailConstants;
 
 /**
@@ -45,25 +42,20 @@ public class EmailConnection {
             string(HOST)
                 .label("Host")
                 .required(true),
-            integer(PORT)
-                .label("Port")
-                .description("")
-                .required(true)
-                .defaultValue(25),
-            string(PROTOCOL)
-                .controlType(Property.ControlType.SELECT)
-                .defaultValue(EmailProtocol.smtp.name())
-                .label("Protocol")
-                .description(
-                    "Protocol defines communication procedure. SMTP allows sending emails, IMAP allows receiving emails. POP3 is older protocol for receiving emails.")
-                .options(
-                    option(EmailProtocol.smtp.name(), EmailProtocol.smtp.name(), "sending email"),
-                    option(EmailProtocol.imap.name(), EmailProtocol.imap.name(), "receive email"),
-                    option(EmailProtocol.pop3.name(), EmailProtocol.pop3.name(), "receive email"))
-                .required(true),
             bool(EmailConstants.TLS)
                 .label("Use TLS")
-                .description("If selected the connection will use TLS when connecting to server."))
+                .description("If selected the connection will use TLS when connecting to server."),
+            string(CRYPTOGRAPHIC_PROTOCOL)
+                .controlType(Property.ControlType.SELECT)
+                .label("Connection Security")
+                .description(
+                    "Connection security activates cryptographic protocol to secure communication over a network.")
+                .options(
+                    option(EmailConstants.TLS, EmailConstants.TLS,
+                        "Transport Layer Security is the modern, more secure replacement for SSL"),
+                    option(EmailConstants.SSL, EmailConstants.SSL,
+                        "Secure Sockets Layer is an older protocol that has been deprecated due to security vulnerabilities."))
+                .required(false))
         .authorizationRequired(false)
         .authorizations(
             authorization(AuthorizationType.BASIC_AUTH)

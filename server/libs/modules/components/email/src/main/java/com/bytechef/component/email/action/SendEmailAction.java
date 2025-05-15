@@ -18,10 +18,7 @@ package com.bytechef.component.email.action;
 
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
-import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.*;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
 import static com.bytechef.component.email.constant.EmailConstants.TLS;
@@ -69,6 +66,11 @@ public class SendEmailAction {
         .title("Send")
         .description("Send an email to any address.")
         .properties(
+            integer(PORT)
+                .label("Port")
+                .description("Defines the port to connect to the email server.")
+                .required(true)
+                .defaultValue(25),
             string(FROM)
                 .label("From Email")
                 .description("From who to send the email.")
@@ -111,7 +113,7 @@ public class SendEmailAction {
         Properties properties = new Properties();
 
         properties.put("mail.smtp.host", connectionParameters.getRequiredString(HOST));
-        properties.put("mail.smtp.port", connectionParameters.getRequiredInteger(PORT));
+        properties.put("mail.smtp.port", inputParameters.getRequiredInteger(PORT));
 
         if (Objects.equals(connectionParameters.getBoolean(TLS), true)) {
             properties.put("mail.smtp.starttls.enable", "true");
