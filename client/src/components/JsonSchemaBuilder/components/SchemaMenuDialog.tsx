@@ -8,13 +8,17 @@ import {
 } from '@/components/ui/dialog';
 import React from 'react';
 
+import {SchemaRecordType} from '../utils/types';
+import SchemaMenu from './SchemaMenu';
+
 interface SchemaMenuModalProps {
+    onChange: (schema: SchemaRecordType) => void;
     onClose: () => void;
-    children?: React.ReactNode;
+    schema: SchemaRecordType;
     title?: string | React.ReactNode;
 }
 
-const SchemaMenuDialog = ({children, onClose, title}: SchemaMenuModalProps) => (
+const SchemaMenuDialog = ({onChange, onClose, schema, title}: SchemaMenuModalProps) => (
     <Dialog onOpenChange={onClose} open={true}>
         <DialogContent>
             <DialogHeader className="flex flex-row items-center justify-between space-y-0">
@@ -27,7 +31,7 @@ const SchemaMenuDialog = ({children, onClose, title}: SchemaMenuModalProps) => (
                 <DialogCloseButton />
             </DialogHeader>
 
-            {children}
+            <SchemaMenu onChange={onChange} schema={schema} />
         </DialogContent>
     </Dialog>
 );

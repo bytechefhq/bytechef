@@ -20,7 +20,7 @@ import {
 
 export const SCHEMA_TYPES: SchemaTypeOptionType[] = [
     {
-        label: 'Text',
+        label: 'String',
         value: 'string',
     },
     {

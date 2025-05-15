@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import Select from 'react-select';
 
-import * as helpers from '../utils/helpers';
+import {getAllSchemaKeys, getSchemaMenuOptions, getSchemaType, setSchemaField, translateLabels} from '../utils/helpers';
 import {SchemaMenuOptionType, SchemaRecordType} from '../utils/types';
 import SchemaMenuList from './SchemaMenuList';
 
@@ -16,13 +16,10 @@ interface SchemaMenuProps {
 const SchemaMenu = ({onChange, schema}: SchemaMenuProps) => {
     const {t: translation} = useTranslation();
 
-    const type = helpers.getSchemaType(schema);
-    const allOptions = useMemo(
-        () => helpers.translateLabels(translation, helpers.getSchemaMenuOptions(type)),
-        [type, translation]
-    );
+    const type = getSchemaType(schema);
+    const fields = getAllSchemaKeys(schema);
 
-    const fields = helpers.getAllSchemaKeys(schema);
+    const allOptions = useMemo(() => translateLabels(translation, getSchemaMenuOptions(type)), [type, translation]);
 
     const displayFields = useMemo(() => allOptions.filter((item) => fields.includes(item.value)), [allOptions, fields]);
 
@@ -32,9 +29,7 @@ const SchemaMenu = ({onChange, schema}: SchemaMenuProps) => {
 
             <Select
                 className="w-full min-w-48"
-                onChange={(option: SchemaMenuOptionType) =>
-                    onChange(helpers.setSchemaField(option.value, undefined, schema))
-                }
+                onChange={(option: SchemaMenuOptionType) => onChange(setSchemaField(option.value, undefined, schema))}
                 options={allOptions.filter((option) => !displayFields.some((field) => field.value === option.value))}
                 placeholder={translation('addFields')}
                 value={null}

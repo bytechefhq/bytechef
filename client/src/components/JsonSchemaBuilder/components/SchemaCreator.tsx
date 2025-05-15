@@ -18,6 +18,7 @@ import {
 } from '../utils/helpers';
 import {SchemaRecordType} from '../utils/types';
 import {SchemaArrayControls, SchemaControls} from './SchemaControls';
+import {Badge} from '@/components/ui/badge';
 
 interface SchemaCreatorProps {
     isRequired?: boolean;
@@ -35,44 +36,49 @@ const SchemaCreator = ({
     onDelete = () => {},
     schema,
     schemakey = '__root__',
-}: SchemaCreatorProps) => (
-    <div className="size-full">
-        <div className="flex items-end">
-            {isRequired && <AsteriskIcon className="mb-3 mr-1 h-4 text-xs" />}
+}: SchemaCreatorProps) => {
+    const objectPropertiesCount =
+        isSchemaObject(schema) && getSchemaProperties(schema) ? Object.keys(getSchemaProperties(schema)).length : 0;
 
-            <SchemaControls
-                onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
-                onChange={onChange}
-                onChangeKey={schemakey !== '__root__' ? onChangeKey : undefined}
-                onDelete={schemakey !== '__root__' ? () => onDelete(schemakey) : undefined}
-                schema={schema}
-                schemakey={schemakey}
-            />
+    return (
+        <div className="size-full">
+            <div className="flex items-end">
+                {isRequired && <AsteriskIcon className="mb-3 mr-1 h-4 text-xs" />}
+
+                <SchemaControls
+                    onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
+                    onChange={onChange}
+                    onChangeKey={schemakey !== '__root__' ? onChangeKey : undefined}
+                    onDelete={schemakey !== '__root__' ? () => onDelete(schemakey) : undefined}
+                    schema={schema}
+                    schemakey={schemakey}
+                />
+            </div>
+
+            <div className="block">
+                {isSchemaObject(schema) && hasSchemaProperties(schema) && (
+                    <SchemaBox itemCount={objectPropertiesCount}>
+                        <SchemaObjectProperties
+                            onChange={(key, s) => onChange(setSchemaProperty(key, s, schema))}
+                            onChangeKey={(oldkey, newkey) => onChange(renameSchemaProperty(oldkey, newkey, schema))}
+                            onDelete={(key) => onChange(deleteSchemaProperty(key, schema))}
+                            schema={schema}
+                        />
+                    </SchemaBox>
+                )}
+
+                {isSchemaArray(schema) && (
+                    <SchemaBox>
+                        <SchemaArrayItems
+                            onChange={(s) => onChange(setSchemaItems(s, schema))}
+                            schema={getSchemaItems(schema)}
+                        />
+                    </SchemaBox>
+                )}
+            </div>
         </div>
-
-        <div className="block">
-            {isSchemaObject(schema) && hasSchemaProperties(schema) && (
-                <SchemaBox>
-                    <SchemaObjectProperties
-                        onChange={(key, s) => onChange(setSchemaProperty(key, s, schema))}
-                        onChangeKey={(oldkey, newkey) => onChange(renameSchemaProperty(oldkey, newkey, schema))}
-                        onDelete={(key) => onChange(deleteSchemaProperty(key, schema))}
-                        schema={schema}
-                    />
-                </SchemaBox>
-            )}
-
-            {isSchemaArray(schema) && (
-                <SchemaBox>
-                    <SchemaArrayItems
-                        onChange={(s) => onChange(setSchemaItems(s, schema))}
-                        schema={getSchemaItems(schema)}
-                    />
-                </SchemaBox>
-            )}
-        </div>
-    </div>
-);
+    );
+};
 
 interface SchemaArrayItemsProps {
     schema: SchemaRecordType;
@@ -80,7 +86,7 @@ interface SchemaArrayItemsProps {
 }
 
 const SchemaArrayItems = ({onChange, schema}: SchemaArrayItemsProps) => (
-    <div>
+    <>
         <SchemaArrayControls
             onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
             onChange={onChange}
@@ -106,7 +112,7 @@ const SchemaArrayItems = ({onChange, schema}: SchemaArrayItemsProps) => (
                 />
             </SchemaBox>
         )}
-    </div>
+    </>
 );
 
 interface SchemaObjectPropertiesProps {
@@ -133,7 +139,7 @@ const SchemaObjectProperties = ({onChange, onChangeKey, onDelete, schema}: Schem
     </ul>
 );
 
-const SchemaBox = ({children}: PropsWithChildren) => {
+const SchemaBox = ({children, itemCount}: {itemCount?: number} & PropsWithChildren) => {
     const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
     return (
@@ -152,7 +158,13 @@ const SchemaBox = ({children}: PropsWithChildren) => {
                 <ChevronDownIcon className={twMerge(isCollapsed && 'rotate-180')} />
             </Button>
 
-            <div className={twMerge(isCollapsed ? 'hidden' : 'block')}>{children}</div>
+            {isCollapsed ? (
+                <Badge className="border-0 bg-surface-neutral-secondary px-2.5 py-1 font-normal leading-4 text-content-neutral-primary shadow-none hover:bg-surface-neutral-secondary">
+                    {itemCount} items nested
+                </Badge>
+            ) : (
+                <div>{children}</div>
+            )}
         </div>
     );
 };
