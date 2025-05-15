@@ -15,10 +15,11 @@ interface SchemaTypesSelectProps {
 }
 
 const SchemaTypesSelect = ({onChange, type}: SchemaTypesSelectProps) => (
-    <div>
-        <Label>Type</Label>
+    <fieldset className="space-y-1">
+        <Label>Pill Type</Label>
 
         <Select
+            defaultValue="object"
             onValueChange={(option: SchemaType) => onChange(option)}
             value={helpers.findOption(type)(SCHEMA_TYPES)?.value}
         >
@@ -38,7 +39,7 @@ const SchemaTypesSelect = ({onChange, type}: SchemaTypesSelectProps) => (
                 ))}
             </SelectContent>
         </Select>
-    </div>
+    </fieldset>
 );
 
 export default SchemaTypesSelect;

@@ -18,7 +18,7 @@ interface SchemaInputProps {
     type?: string;
 }
 
-const SchemaInput = ({label, onChange, placeholder, type = 'text', value = ''}: SchemaInputProps) => {
+const SchemaInput = ({label, onChange, placeholder, type = 'text', value = 'Untitled Pill'}: SchemaInputProps) => {
     const [localVal, setLocalVal] = useState<string>(value);
 
     useEffect(() => {
@@ -34,7 +34,7 @@ const SchemaInput = ({label, onChange, placeholder, type = 'text', value = ''}: 
     };
 
     return (
-        <div className="w-full">
+        <fieldset className="space-y-1">
             <Label>{label}</Label>
 
             <Input
@@ -46,7 +46,7 @@ const SchemaInput = ({label, onChange, placeholder, type = 'text', value = ''}: 
                 type={type}
                 value={localVal}
             />
-        </div>
+        </fieldset>
     );
 };
 

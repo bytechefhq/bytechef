@@ -1,12 +1,17 @@
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
-import SchemaMenu from '@/components/JsonSchemaBuilder/components/SchemaMenu';
 import SchemaMenuDialog from '@/components/JsonSchemaBuilder/components/SchemaMenuDialog';
 import SchemaTypesSelect from '@/components/JsonSchemaBuilder/components/SchemaTypesSelect';
 import {Button} from '@/components/ui/button';
 import {CircleEllipsisIcon, PlusIcon, TrashIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
-import * as helpers from '../utils/helpers';
+import {
+    addSchemaProperty,
+    getSchemaTitle,
+    getSchemaType,
+    setSchemaTitle,
+    setSchemaTypeAndRemoveWrongFields,
+} from '../utils/helpers';
 import {SchemaRecordType} from '../utils/types';
 
 interface SchemaControlsProps {
@@ -20,26 +25,34 @@ interface SchemaControlsProps {
     onChange: (schema: SchemaRecordType) => void;
 }
 
-export const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemakey}: SchemaControlsProps) => {
+const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemakey}: SchemaControlsProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
+    const isObjectSchema = getSchemaType(schema) === 'object';
+
+    useEffect(() => {
+        if (!schema.type || !getSchemaType(schema)) {
+            onChange(setSchemaTypeAndRemoveWrongFields('object', schema));
+        }
+    }, [schema, onChange]);
+
     return (
-        <div className="flex w-full flex-row items-end">
+        <div className="flex w-full flex-row">
             <div className="grid grid-flow-col gap-2">
-                <SchemaInput
-                    label="Title"
-                    onChange={(title) => onChange(helpers.setSchemaTitle(title, schema))}
-                    placeholder="Title"
-                    value={helpers.getSchemaTitle(schema)}
+                <SchemaTypesSelect
+                    onChange={(translation) => onChange(setSchemaTypeAndRemoveWrongFields(translation, schema))}
+                    type={getSchemaType(schema)}
                 />
 
-                <SchemaTypesSelect
-                    onChange={(translation) => onChange(helpers.setSchemaTypeAndRemoveWrongFields(translation, schema))}
-                    type={helpers.getSchemaType(schema)}
+                <SchemaInput
+                    label="Pill Title"
+                    onChange={(title) => onChange(setSchemaTitle(title, schema))}
+                    placeholder="Untitled Pill"
+                    value={getSchemaTitle(schema)}
                 />
 
                 {typeof onChangeKey === 'function' && (
-                    <SchemaInput label="Key" onChange={onChangeKey} placeholder="Key" value={schemakey} />
+                    <SchemaInput label="Pill Key" onChange={onChangeKey} placeholder="Pill Key" value={schemakey} />
                 )}
             </div>
 
@@ -65,39 +78,48 @@ export const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, 
                     </Button>
                 )}
 
-                {typeof onAdd === 'function' && (
-                    <Button onClick={onAdd} size="icon" title="Add" variant="ghost">
+                {(typeof onAdd === 'function' || isObjectSchema) && (
+                    <Button
+                        disabled={!isObjectSchema}
+                        onClick={onAdd || (() => onChange(addSchemaProperty(schema)))}
+                        size="icon"
+                        title="Add Property"
+                        variant="ghost"
+                    >
                         <PlusIcon />
                     </Button>
                 )}
             </div>
 
             {isMenuOpen && (
-                <SchemaMenuDialog onClose={() => setIsMenuOpen(false)} title="Extra fields">
-                    <SchemaMenu onChange={onChange} schema={schema} />
-                </SchemaMenuDialog>
+                <SchemaMenuDialog
+                    onChange={onChange}
+                    onClose={() => setIsMenuOpen(false)}
+                    schema={schema}
+                    title="Extra fields"
+                />
             )}
         </div>
     );
 };
 
 interface SchemaArrayControlsProps {
-    schema: SchemaRecordType;
-    onChange: (schema: SchemaRecordType) => void;
     onAdd?: () => void;
+    onChange: (schema: SchemaRecordType) => void;
+    schema: SchemaRecordType;
 }
 
-export const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayControlsProps) => {
+const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayControlsProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
     return (
-        <div className="flex items-end">
+        <div className="flex w-full items-center">
             <SchemaTypesSelect
-                onChange={(value) => onChange(helpers.setSchemaTypeAndRemoveWrongFields(value, schema))}
-                type={helpers.getSchemaType(schema)}
+                onChange={(value) => onChange(setSchemaTypeAndRemoveWrongFields(value, schema))}
+                type={getSchemaType(schema)}
             />
 
-            <div className="mb-0.5 ml-2 grid grid-flow-col gap-1">
+            <div className="ml-auto flex space-x-1">
                 <Button
                     onClick={() => setIsMenuOpen((open) => !open)}
                     size="icon"
@@ -115,10 +137,15 @@ export const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayContro
             </div>
 
             {isMenuOpen && (
-                <SchemaMenuDialog onClose={() => setIsMenuOpen(false)} title="Extra fields">
-                    <SchemaMenu onChange={onChange} schema={schema} />
-                </SchemaMenuDialog>
+                <SchemaMenuDialog
+                    onChange={onChange}
+                    onClose={() => setIsMenuOpen(false)}
+                    schema={schema}
+                    title="Extra fields"
+                />
             )}
         </div>
     );
 };
+
+export {SchemaControls, SchemaArrayControls};
