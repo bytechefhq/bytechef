@@ -19,15 +19,15 @@ package com.bytechef.component.email.action;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.*;
-import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
-import static com.bytechef.component.email.constant.EmailConstants.TLS;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.email.EmailProtocol;
+import com.bytechef.component.email.commons.EmailUtils;
 import jakarta.activation.DataHandler;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
@@ -45,11 +45,10 @@ import jakarta.mail.util.ByteArrayDataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class SendEmailAction {
 
@@ -110,31 +109,23 @@ public class SendEmailAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MessagingException, IOException {
 
-        Properties properties = new Properties();
-
-        properties.put("mail.smtp.host", connectionParameters.getRequiredString(HOST));
-        properties.put("mail.smtp.port", inputParameters.getRequiredInteger(PORT));
-
-        if (Objects.equals(connectionParameters.getBoolean(TLS), true)) {
-            properties.put("mail.smtp.starttls.enable", "true");
-//            prop.put("mail.smtp.ssl.trust", MapUtils.getRequiredString(context.getConnectionParameters(), HOST));
-        }
-
+        int port = inputParameters.getRequiredInteger(PORT);
         Session session;
 
         if (connectionParameters.containsKey(USERNAME)) {
-            properties.put("mail.smtp.auth", true);
-
-            session = Session.getInstance(properties, new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(
-                        connectionParameters.getRequiredString(USERNAME),
-                        connectionParameters.getRequiredString(PASSWORD));
-                }
-            });
+            session =
+                Session.getInstance(EmailUtils.getMailSessionProperties(port, EmailProtocol.smtp, connectionParameters),
+                    new Authenticator() {
+                        @Override
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(
+                                connectionParameters.getRequiredString(USERNAME),
+                                connectionParameters.getRequiredString(PASSWORD));
+                        }
+                    });
         } else {
-            session = Session.getInstance(properties);
+            session = Session
+                .getInstance(EmailUtils.getMailSessionProperties(port, EmailProtocol.smtp, connectionParameters));
         }
 
         Message message = new MimeMessage(session);
