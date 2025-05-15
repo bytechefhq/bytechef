@@ -24,14 +24,14 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.email.EmailProtocol;
 import com.bytechef.component.email.constant.EmailConstants;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.bytechef.component.test.definition.MockParametersImpl;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.server.AbstractServer;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -44,46 +44,66 @@ public class EmailActionIntTest {
     static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP_IMAP)
         .withConfiguration(GreenMailConfiguration
             .aConfig()
-            .withUser("bytecheftest@localhost", "bytecheftest", "bytecheftest"));
+            .withUser("bytecheftest@bytechef.io", "bytecheftest", "bytecheftest"));
 
     @Test
     public void testEmailActions() throws Exception {
         ActionContext actionContext = mock(ActionContext.class);
 
-        SendEmailAction.perform(getSendEmailActionParameters(), getConnectionParameters(EmailProtocol.smtp),
-            actionContext);
+        AbstractServer server = greenMail.getSmtp();
+
+        SendEmailAction.perform(
+            getSendEmailActionParameters(server.getPort()), getConnectionParameters(), actionContext);
 
         greenMail.waitForIncomingEmail(1);
 
-        Object result = ReadEmailAction.perform(new MockParametersImpl(Collections.emptyMap()),
-            getConnectionParameters(EmailProtocol.imap), actionContext);
+        server = greenMail.getImap();
+
+        Object result = ReadEmailAction.perform(
+            getReceieveEmailActionParameters(server.getPort()), getConnectionParameters(), actionContext);
+
+        Class<?> clazz = result.getClass();
+
+        Assertions.assertTrue(clazz.isArray());
+
+        Map<?, ?>[] resultMap = (Map<?, ?>[]) result;
+
+        Assertions.assertEquals(1, resultMap.length);
+
+        Object fromObject = resultMap[0].get("from");
+
+        String from = (String) fromObject;
+
+        Assertions.assertEquals("[test.from@test.com]", from);
 
         System.out.println(result);
     }
 
-    private Parameters getConnectionParameters(EmailProtocol protocol) {
+    private Parameters getConnectionParameters() {
         HashMap<String, Object> parameterMap = new HashMap<>();
 
-        AbstractServer server = greenMail.getSmtp();
-
-        if (protocol == EmailProtocol.imap) {
-            server = greenMail.getImap();
-        }
-
-        parameterMap.put(EmailConstants.PORT, String.valueOf(server.getPort()));
         parameterMap.put(EmailConstants.HOST, "localhost");
         parameterMap.put(Authorization.USERNAME, "bytecheftest");
         parameterMap.put(Authorization.PASSWORD, "bytecheftest");
-        parameterMap.put(EmailConstants.PROTOCOL, protocol.name());
 
         return MockParametersFactory.create(parameterMap);
     }
 
-    private Parameters getSendEmailActionParameters() {
+    private Parameters getReceieveEmailActionParameters(int port) {
         HashMap<String, Object> parameterMap = new HashMap<>();
 
+        parameterMap.put(EmailConstants.PORT, String.valueOf(port));
+        parameterMap.put(EmailConstants.PROTOCOL, EmailProtocol.imap.name());
+
+        return MockParametersFactory.create(parameterMap);
+    }
+
+    private Parameters getSendEmailActionParameters(int port) {
+        HashMap<String, Object> parameterMap = new HashMap<>();
+
+        parameterMap.put(EmailConstants.PORT, String.valueOf(port));
         parameterMap.put("from", "test.from@test.com");
-        parameterMap.put("to", Arrays.asList("test.to@test.com"));
+        parameterMap.put("to", Arrays.asList("bytecheftest@bytechef.io"));
         parameterMap.put("cc", Arrays.asList("test.cc@test.com"));
         parameterMap.put("bcc", Arrays.asList("test.bcc@test.com"));
         parameterMap.put("replyTo", Arrays.asList("test.replyto@test.com"));
@@ -92,4 +112,5 @@ public class EmailActionIntTest {
 
         return MockParametersFactory.create(parameterMap);
     }
+
 }
