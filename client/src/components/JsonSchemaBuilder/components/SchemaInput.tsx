@@ -18,20 +18,20 @@ interface SchemaInputProps {
     type?: string;
 }
 
-const SchemaInput = ({label, onChange, placeholder, type = 'text', value = 'Untitled Pill'}: SchemaInputProps) => {
-    const [localVal, setLocalVal] = useState<string>(value);
-
-    useEffect(() => {
-        setLocalVal(value);
-    }, [value]);
+const SchemaInput = ({label, onChange, placeholder, type = 'text', value = 'Untitled'}: SchemaInputProps) => {
+    const [localValue, setLocalValue] = useState<string>(value);
 
     const onChangeValue = () => {
-        if (localVal === value) {
+        if (localValue === value) {
             return;
         }
 
-        onChange(localVal);
+        onChange(localValue);
     };
+
+    useEffect(() => {
+        setLocalValue(value);
+    }, [value]);
 
     return (
         <fieldset className="space-y-1 overflow-hidden">
@@ -40,11 +40,11 @@ const SchemaInput = ({label, onChange, placeholder, type = 'text', value = 'Unti
             <Input
                 className="text-ellipsis"
                 onBlur={onChangeValue}
-                onChange={(e) => setLocalVal(e.target.value)}
+                onChange={(e) => setLocalValue(e.target.value)}
                 onKeyPress={handleEnterPress(onChangeValue)}
                 placeholder={placeholder}
                 type={type}
-                value={localVal}
+                value={localValue}
             />
         </fieldset>
     );

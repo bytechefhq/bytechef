@@ -32,12 +32,14 @@ interface ItemProps {
 }
 
 const Item = ({children, onDelete}: ItemProps) => (
-    <div className="flex items-end justify-between">
-        {children}
+    <div className="flex w-full items-end justify-between gap-2">
+        <div className="min-w-0 flex-1">{children}</div>
 
         <Button
-            className="ml-2 text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive"
+            className="flex-shrink-0 text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive"
             onClick={onDelete}
+            size="icon"
+            variant="ghost"
         >
             <TrashIcon />
         </Button>

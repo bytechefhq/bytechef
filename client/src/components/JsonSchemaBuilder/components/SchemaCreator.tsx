@@ -158,13 +158,7 @@ const SchemaBox = ({children, itemCount}: {itemCount?: number} & PropsWithChildr
                 <ChevronDownIcon className={twMerge('transition-all duration-200', isCollapsed && 'rotate-180')} />
             </Button>
 
-            {isCollapsed ? (
-                <Badge className="border-0 bg-surface-neutral-secondary px-2.5 py-1 font-normal leading-4 text-content-neutral-primary shadow-none hover:bg-surface-neutral-secondary">
-                    {itemCount} items nested
-                </Badge>
-            ) : (
-                <div>{children}</div>
-            )}
+            {isCollapsed ? <Badge variant="secondary">{itemCount} items nested</Badge> : <div>{children}</div>}
         </div>
     );
 };
