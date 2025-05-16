@@ -69,7 +69,7 @@ const PropertyDynamicProperties = ({
 
     const isPending = lookupDependsOnValuesKey !== lastProcessedKey;
 
-    if (isLoading || isPending) {
+    if ((isLoading || isPending) && queryEnabled) {
         return (
             <ul className="flex flex-col gap-4">
                 <li className="flex flex-col space-y-1">
