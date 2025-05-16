@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Text Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -120,9 +121,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Base64 Encode/Decode",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -243,9 +244,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Concatenate",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -353,9 +354,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Contains",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -487,9 +488,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Extract Content from HTML",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -611,9 +612,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Extract URLs",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1531,10 +1532,6 @@
         "value" : "XCD"
       }, {
         "description" : null,
-        "label" : "XCG",
-        "value" : "XCG"
-      }, {
-        "description" : null,
         "label" : "XDR",
         "value" : "XDR"
       }, {
@@ -1698,9 +1695,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Format Currency",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1780,9 +1777,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "HTML to Markdown",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1862,9 +1859,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Lower Case",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1944,9 +1941,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Markdown to HTML",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2090,9 +2087,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Replace",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2191,9 +2188,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Select First N Characters",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2292,9 +2289,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Select Last N Characters",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2436,9 +2433,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Split",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2518,9 +2515,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Trim Whitespace",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2600,9 +2597,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Upper Case",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2710,12 +2707,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "URL Encode/Decode",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : null,
-  "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "clusterElements" : null
 }
