@@ -5,19 +5,32 @@ import {
     PATH_HASH_REPLACEMENT,
     PATH_OPENING_PARENTHESIS_REPLACEMENT,
     PATH_SPACE_REPLACEMENT,
+    PATH_UNICODE_REPLACEMENT_PREFIX,
 } from '@/shared/constants';
 import isObject from 'isobject';
 
-function encodeParametersGeneric(
-    parameters: {[key: string]: unknown},
-    matchPattern: RegExp,
-    replacement: string
-): {[key: string]: unknown} {
+interface EncodeParametersGenericProps {
+    matchPattern: RegExp;
+    parameters: {[key: string]: unknown};
+    replacement?: string;
+    replacementFn?: (match: string) => string;
+}
+
+function encodeParametersGeneric({
+    matchPattern,
+    parameters,
+    replacement,
+    replacementFn,
+}: EncodeParametersGenericProps): {
+    [key: string]: unknown;
+} {
     const encodedParameters = {...parameters};
 
     Object.keys(encodedParameters).forEach((key) => {
         if (key.match(matchPattern)) {
-            const newKey = key.replace(matchPattern, replacement);
+            const newKey = replacementFn
+                ? key.replace(matchPattern, replacementFn(key))
+                : key.replace(matchPattern, replacement!);
 
             encodedParameters[newKey] = encodedParameters[key];
 
@@ -25,11 +38,11 @@ function encodeParametersGeneric(
         }
 
         if (isObject(encodedParameters[key]) && encodedParameters[key] !== null) {
-            encodedParameters[key] = encodeParametersGeneric(
-                encodedParameters[key] as {[key: string]: unknown},
+            encodedParameters[key] = encodeParametersGeneric({
                 matchPattern,
-                replacement
-            );
+                parameters: encodedParameters[key] as {[key: string]: unknown},
+                replacement,
+            });
         }
     });
 
@@ -47,17 +60,48 @@ function encodePathGeneric(path: string, matchPattern: RegExp, replacement: stri
 }
 
 export function encodeParameters(parameters: {[key: string]: unknown}): {[key: string]: unknown} {
-    let encodedParameters = encodeParametersGeneric(parameters, /\s/g, PATH_SPACE_REPLACEMENT);
+    let encodedParameters = encodeParametersGeneric({
+        matchPattern: /\s/g,
+        parameters,
+        replacement: PATH_SPACE_REPLACEMENT,
+    });
 
-    encodedParameters = encodeParametersGeneric(encodedParameters, /^\d/, PATH_DIGIT_PREFIX);
+    encodedParameters = encodeParametersGeneric({
+        matchPattern: /^\d/,
+        parameters: encodedParameters,
+        replacement: PATH_DIGIT_PREFIX,
+    });
 
-    encodedParameters = encodeParametersGeneric(encodedParameters, /-/g, PATH_DASH_REPLACEMENT);
+    encodedParameters = encodeParametersGeneric({
+        matchPattern: /-/g,
+        parameters: encodedParameters,
+        replacement: PATH_DASH_REPLACEMENT,
+    });
 
-    encodedParameters = encodeParametersGeneric(encodedParameters, /#/g, PATH_HASH_REPLACEMENT);
+    encodedParameters = encodeParametersGeneric({
+        matchPattern: /#/g,
+        parameters: encodedParameters,
+        replacement: PATH_HASH_REPLACEMENT,
+    });
 
-    encodedParameters = encodeParametersGeneric(encodedParameters, /\(/g, PATH_OPENING_PARENTHESIS_REPLACEMENT);
+    encodedParameters = encodeParametersGeneric({
+        matchPattern: /\(/g,
+        parameters: encodedParameters,
+        replacement: PATH_OPENING_PARENTHESIS_REPLACEMENT,
+    });
 
-    encodedParameters = encodeParametersGeneric(encodedParameters, /\)/g, PATH_CLOSING_PARENTHESIS_REPLACEMENT);
+    encodedParameters = encodeParametersGeneric({
+        matchPattern: /\)/g,
+        parameters: encodedParameters,
+        replacement: PATH_CLOSING_PARENTHESIS_REPLACEMENT,
+    });
+
+    encodedParameters = encodeParametersGeneric({
+        // eslint-disable-next-line no-control-regex
+        matchPattern: /[^\x00-\x7F]/g,
+        parameters: encodedParameters,
+        replacementFn: (match) => `${PATH_UNICODE_REPLACEMENT_PREFIX}${match.charCodeAt(0)}_`,
+    });
 
     return encodedParameters;
 }
@@ -89,6 +133,10 @@ export function decodePath(path: string): string {
         decodedPath = decodedPath.replace(new RegExp(PATH_CLOSING_PARENTHESIS_REPLACEMENT, 'g'), ')');
     }
 
+    if (decodedPath.includes(PATH_UNICODE_REPLACEMENT_PREFIX)) {
+        decodedPath = decodeNonAsciiCharacters(decodedPath);
+    }
+
     return decodedPath;
 }
 
@@ -105,7 +153,20 @@ export function encodePath(path: string): string {
 
     encodedPath = encodePathGeneric(encodedPath, /\)/g, PATH_CLOSING_PARENTHESIS_REPLACEMENT);
 
+    encodedPath = encodeNonAsciiCharacters(encodedPath);
+
     return encodedPath;
+}
+
+function encodeNonAsciiCharacters(string: string): string {
+    // eslint-disable-next-line no-control-regex
+    return string.replace(/[^\x00-\x7F]/g, (char) => `${PATH_UNICODE_REPLACEMENT_PREFIX}${char.charCodeAt(0)}_`);
+}
+
+function decodeNonAsciiCharacters(string: string): string {
+    return string.replace(new RegExp(`${PATH_UNICODE_REPLACEMENT_PREFIX}(\\d+)_`, 'g'), (_, code) =>
+        String.fromCharCode(Number(code))
+    );
 }
 
 // Transform: "user.first-name" → "user['first-name']"
