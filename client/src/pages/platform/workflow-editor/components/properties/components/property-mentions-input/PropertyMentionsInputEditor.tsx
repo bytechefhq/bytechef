@@ -2,7 +2,11 @@ import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/co
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowNodeParameterMutation} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {encodeParameters, encodePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {
+    encodeParameters,
+    encodePath,
+    transformValueForObjectAccess,
+} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {
@@ -214,6 +218,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 } else {
                     value = decode(value);
                 }
+
+                value = transformValueForObjectAccess(value);
 
                 if (isFormulaMode && !value.startsWith('=')) {
                     value = `=${value}`;
