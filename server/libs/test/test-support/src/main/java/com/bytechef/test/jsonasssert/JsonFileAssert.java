@@ -16,8 +16,10 @@
 
 package com.bytechef.test.jsonasssert;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,15 +40,18 @@ import org.skyscreamer.jsonassert.JSONAssert;
  */
 public class JsonFileAssert {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
-        {
-            disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
-        }
-    };
+    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
+        .addModule(
+            new JavaTimeModule())
+        .addModule(
+            new Jdk8Module())
+        .configure(
+            MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+        .disable(
+            SerializationFeature.FAIL_ON_EMPTY_BEANS)
+        .disable(
+            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
 
     public static void assertEquals(String filename, Object object) {
         try {
