@@ -17,17 +17,18 @@ import {
 import {SchemaRecordType} from '../utils/types';
 
 interface SchemaControlsProps {
-    schema: SchemaRecordType;
-    schemakey: string;
     isCollapsed?: boolean;
-    onDelete?: () => void;
     onAdd?: () => void;
-    onCollapse?: () => void;
     onChangeKey?: (key: string) => void;
     onChange: (schema: SchemaRecordType) => void;
+    onCollapse?: () => void;
+    onDelete?: () => void;
+    root?: boolean;
+    schema: SchemaRecordType;
+    schemakey: string;
 }
 
-const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemakey}: SchemaControlsProps) => {
+const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, schemakey}: SchemaControlsProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
     const isObjectSchema = getSchemaType(schema) === 'object';
@@ -41,8 +42,8 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
     }, [schema, onChange]);
 
     return (
-        <div className="flex w-full flex-row">
-            <div className="flex flex-1 gap-2">
+        <div className="flex w-full items-end">
+            <div className={twMerge('flex gap-2', root ? 'mr-1' : 'flex-1')}>
                 <SchemaTypesSelect
                     onChange={(translation) => onChange(setSchemaTypeAndRemoveWrongFields(translation, schema))}
                     type={getSchemaType(schema)}
@@ -60,7 +61,12 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
                 )}
             </div>
 
-            <div className="ml-auto grid shrink-0 grid-flow-col items-center gap-1">
+            <div
+                className={twMerge(
+                    'ml-auto grid shrink-0 grid-flow-col items-center gap-1',
+                    root && 'ml-0 flex-1 justify-between'
+                )}
+            >
                 <SchemaMenuPopover
                     onChange={onChange}
                     onClose={() => setIsMenuOpen(false)}
@@ -70,10 +76,12 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
                     <Button
                         className={twMerge('group px-2.5', isMenuOpen && 'bg-surface-brand-secondary')}
                         onClick={() => setIsMenuOpen((open) => !open)}
-                        title="Extra options"
+                        title="Extra fields"
                         variant="ghost"
                     >
                         <CircleEllipsisIcon className={twMerge(isMenuOpen && 'text-content-brand-primary')} />
+
+                        {root && <span>Extra fields</span>}
 
                         {extraFields.length > 0 && (
                             <Badge
@@ -103,13 +111,18 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
 
                 {(typeof onAdd === 'function' || isObjectSchema) && (
                     <Button
+                        className={twMerge(
+                            root && 'ml-auto bg-surface-brand-primary hover:bg-surface-brand-primary-hover'
+                        )}
                         disabled={!isObjectSchema}
                         onClick={onAdd || (() => onChange(addSchemaProperty(schema)))}
-                        size="icon"
+                        size={root ? 'default' : 'icon'}
                         title="Add Property"
-                        variant="ghost"
+                        variant={root ? 'default' : 'ghost'}
                     >
                         <PlusIcon />
+
+                        {root && <span>Add a pill</span>}
                     </Button>
                 )}
             </div>
@@ -120,10 +133,11 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, schema, schemak
 interface SchemaArrayControlsProps {
     onAdd?: () => void;
     onChange: (schema: SchemaRecordType) => void;
+    root?: boolean;
     schema: SchemaRecordType;
 }
 
-const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayControlsProps) => {
+const SchemaArrayControls = ({onAdd, onChange, root, schema}: SchemaArrayControlsProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
     const extraFields = Object.keys(schema).filter((key) => key !== 'type' && key !== 'items' && key !== 'properties');
@@ -145,10 +159,12 @@ const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayControlsProps
                     <Button
                         className={twMerge('group px-2.5', isMenuOpen && 'bg-surface-brand-secondary')}
                         onClick={() => setIsMenuOpen((open) => !open)}
-                        title="Extra options"
+                        title="Extra fields"
                         variant="ghost"
                     >
                         <CircleEllipsisIcon className={twMerge(isMenuOpen && 'text-content-brand-primary')} />
+
+                        {root && <span>Extra fields</span>}
 
                         {extraFields.length > 0 && (
                             <Badge
