@@ -159,10 +159,7 @@ const ProjectDeploymentDialog = ({
         setIsOpen(false);
 
         setTimeout(() => {
-            reset({
-                environment: Environment.Development,
-                projectDeploymentWorkflows: [],
-            });
+            reset();
 
             setActiveStepIndex(0);
 
