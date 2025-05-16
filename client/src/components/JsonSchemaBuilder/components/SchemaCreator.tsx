@@ -25,6 +25,7 @@ interface SchemaCreatorProps {
     onChangeKey?: (key: string) => void;
     onChange?: (schema: SchemaRecordType) => void;
     onDelete?: (key: string) => void;
+    root?: boolean;
     schema: SchemaRecordType;
     schemakey?: string;
 }
@@ -34,6 +35,7 @@ const SchemaCreator = ({
     onChange = () => {},
     onChangeKey = () => {},
     onDelete = () => {},
+    root = false,
     schema,
     schemakey = '__root__',
 }: SchemaCreatorProps) => {
@@ -50,6 +52,7 @@ const SchemaCreator = ({
                     onChange={onChange}
                     onChangeKey={schemakey !== '__root__' ? onChangeKey : undefined}
                     onDelete={schemakey !== '__root__' ? () => onDelete(schemakey) : undefined}
+                    root={root}
                     schema={schema}
                     schemakey={schemakey}
                 />
@@ -71,6 +74,7 @@ const SchemaCreator = ({
                     <SchemaBox>
                         <SchemaArrayItems
                             onChange={(s) => onChange(setSchemaItems(s, schema))}
+                            root={schemakey === '__root__'}
                             schema={getSchemaItems(schema)}
                         />
                     </SchemaBox>
@@ -82,14 +86,16 @@ const SchemaCreator = ({
 
 interface SchemaArrayItemsProps {
     schema: SchemaRecordType;
+    root?: boolean;
     onChange: (schema: SchemaRecordType) => void;
 }
 
-const SchemaArrayItems = ({onChange, schema}: SchemaArrayItemsProps) => (
+const SchemaArrayItems = ({onChange, root, schema}: SchemaArrayItemsProps) => (
     <>
         <SchemaArrayControls
             onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
             onChange={onChange}
+            root={root}
             schema={schema}
         />
 
@@ -108,6 +114,7 @@ const SchemaArrayItems = ({onChange, schema}: SchemaArrayItemsProps) => (
             <SchemaBox>
                 <SchemaArrayItems
                     onChange={(s) => onChange(setSchemaItems(s, schema))}
+                    root={root}
                     schema={getSchemaItems(schema)}
                 />
             </SchemaBox>

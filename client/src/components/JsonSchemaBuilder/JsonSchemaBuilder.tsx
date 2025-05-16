@@ -54,6 +54,7 @@ const JsonSchemaBuilder = ({locale = 'en', onChange, schema}: JsonSchemaBuilderP
                     ...schema,
                 });
             }}
+            root
             schema={curSchema}
         />
     );
