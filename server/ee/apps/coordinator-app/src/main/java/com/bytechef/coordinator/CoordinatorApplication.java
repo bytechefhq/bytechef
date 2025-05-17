@@ -8,6 +8,7 @@
 package com.bytechef.coordinator;
 
 import com.bytechef.AbstractApplication;
+import com.bytechef.config.ApplicationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -18,6 +19,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication(scanBasePackages = "com.bytechef")
 public class CoordinatorApplication extends AbstractApplication {
+
+    protected CoordinatorApplication(ApplicationProperties applicationProperties) {
+        super(applicationProperties);
+    }
 
     /**
      * Main method, used to run the application.

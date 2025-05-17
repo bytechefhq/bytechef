@@ -22,7 +22,6 @@ import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorageImpl;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -43,16 +42,6 @@ public class ApiConnectorFileStorageConfiguration {
 
         Provider provider = applicationProperties.getFileStorage()
             .getProvider();
-
-        if (provider == null) {
-            provider = Provider.FILESYSTEM;
-        }
-
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                "API connector file storage provider type enabled: %s".formatted(
-                    StringUtils.lowerCase(provider.name())));
-        }
 
         return new ApiConnectorFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }

@@ -73,7 +73,9 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
             .orElseThrow(
                 () -> new IllegalArgumentException("No method found: " + methodName + " on " + delegate.getClass()));
 
-        logger.info("Registering AWS Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Registering AWS Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        }
 
         SqsEndpoint endpoint = createListenerEndpoint(messageRoute.getName(), delegate, listenerMethod);
 

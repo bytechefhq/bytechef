@@ -20,6 +20,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -2011,5 +2012,896 @@ public class ApplicationProperties {
                 }
             }
         }
+    }
+
+    /**
+     * Formats the application properties in a human-readable format.
+     *
+     * @return a formatted string representation of the application properties
+     */
+    @SuppressWarnings("checkstyle:methodlength")
+    public String formatApplicationProperties() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("\n----------------------------------------------------------");
+        builder.append("\n\tApplication Properties:");
+
+        // AI Section
+        builder.append("\n\t\n\t[AI]");
+
+        Ai.Copilot copilot = getAi().getCopilot();
+
+        builder.append("\n\tai.copilot.enabled: ")
+            .append(copilot.isEnabled());
+        builder.append("\n\tai.copilot.provider: ")
+            .append(copilot.getProvider());
+
+        Ai.OpenAi copilotOpenAi = copilot.getOpenAi();
+
+        if (copilotOpenAi != null) {
+            String apiKey = copilotOpenAi.getApiKey();
+
+            if (StringUtils.isNotBlank(apiKey)) {
+                builder.append("\n\tai.copilot.openAi.apiKey: ")
+                    .append(maskSensitiveData(apiKey));
+            }
+
+            Ai.OpenAi.Chat chat = copilotOpenAi.getChat();
+
+            if (chat != null) {
+                Ai.OpenAi.Chat.Options options = chat.getOptions();
+
+                if (options != null) {
+                    String model = options.getModel();
+
+                    if (StringUtils.isNotBlank(model)) {
+                        builder.append("\n\tai.copilot.openAi.chat.options.model: ")
+                            .append(model);
+                    }
+
+                    Double temperature = options.getTemperature();
+
+                    if (temperature != null) {
+                        builder.append("\n\tai.copilot.openAi.chat.options.temperature: ")
+                            .append(temperature);
+                    }
+                }
+            }
+        }
+
+        Ai.Provider provider = getAi().getProvider();
+
+        if (provider != null) {
+            Ai.Provider.AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = provider.getAmazonBedrockAnthropic2();
+
+            if (amazonBedrockAnthropic2 != null) {
+                String apiKey = amazonBedrockAnthropic2.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.amazonBedrockAnthropic2.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = provider.getAmazonBedrockAnthropic3();
+
+            if (amazonBedrockAnthropic3 != null) {
+                String apiKey = amazonBedrockAnthropic3.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.amazonBedrockAnthropic3.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.AmazonBedrockCohere amazonBedrockCohere = provider.getAmazonBedrockCohere();
+
+            if (amazonBedrockCohere != null) {
+                String apiKey = amazonBedrockCohere.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.amazonBedrockCohere.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.AmazonBedrockJurassic2 amazonBedrockJurassic2 = provider.getAmazonBedrockJurassic2();
+
+            if (amazonBedrockJurassic2 != null) {
+                String apiKey = amazonBedrockJurassic2.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.amazonBedrockJurassic2.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.AmazonBedrockLlama amazonBedrockLlama = provider.getAmazonBedrockLlama();
+
+            if (amazonBedrockLlama != null) {
+                String apiKey = amazonBedrockLlama.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.amazonBedrockLlama.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.AmazonBedrockTitan amazonBedrockTitan = provider.getAmazonBedrockTitan();
+
+            if (amazonBedrockTitan != null) {
+                String apiKey = amazonBedrockTitan.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.amazonBedrockTitan.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.Anthropic anthropic = provider.getAnthropic();
+
+            if (anthropic != null) {
+                String apiKey = anthropic.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.anthropic.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.AzureOpenAi azureOpenAi = provider.getAzureOpenAi();
+
+            if (azureOpenAi != null) {
+                String apiKey = azureOpenAi.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.azureOpenAi.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.DeepSeek deepSeek = provider.getDeepSeek();
+
+            if (deepSeek != null) {
+                String apiKey = deepSeek.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.deepSeek.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.Groq groq = provider.getGroq();
+
+            if (groq != null) {
+                String apiKey = groq.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.groq.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.Nvidia nvidia = provider.getNvidia();
+
+            if (nvidia != null) {
+                String apiKey = nvidia.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.nvidia.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.HuggingFace huggingFace = provider.getHuggingFace();
+
+            if (huggingFace != null) {
+                String apiKey = huggingFace.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.huggingFace.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.Mistral mistral = provider.getMistral();
+
+            if (mistral != null) {
+                String apiKey = mistral.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.mistral.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.OpenAi openAi = provider.getOpenAi();
+
+            if (openAi != null) {
+                String apiKey = openAi.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.openAi.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.Perplexity perplexity = provider.getPerplexity();
+
+            if (perplexity != null) {
+                String apiKey = perplexity.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.perplexity.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.Stability stability = provider.getStability();
+
+            if (stability != null) {
+                String apiKey = stability.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.stability.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+
+            Ai.Provider.VertexGemini vertexGemini = provider.getVertexGemini();
+
+            if (vertexGemini != null) {
+                String apiKey = vertexGemini.getApiKey();
+
+                if (StringUtils.isNotBlank(apiKey)) {
+                    builder.append("\n\tai.provider.vertexGemini.apiKey: ")
+                        .append(maskSensitiveData(apiKey));
+                }
+            }
+        }
+
+        // Analytics Section
+        builder.append("\n\t\n\t[ANALYTICS]");
+        builder.append("\n\tanalytics.enabled: ")
+            .append(getAnalytics().isEnabled());
+
+        // Cache Section
+        builder.append("\n\t\n\t[CACHE]");
+        builder.append("\n\tcache.provider: ")
+            .append(getCache().getProvider());
+
+        // Cloud Section
+        builder.append("\n\t\n\t[CLOUD]");
+        builder.append("\n\tcloud.provider: ")
+            .append(getCloud().getProvider());
+
+        Cloud.Aws cloudAws = getCloud().getAws();
+
+        if (cloudAws != null) {
+            String accessKeyId = cloudAws.getAccessKeyId();
+
+            if (StringUtils.isNotBlank(accessKeyId)) {
+                builder.append("\n\tcloud.aws.accessKeyId: ")
+                    .append(maskSensitiveData(accessKeyId));
+            }
+
+            String secretAccessKey = cloudAws.getSecretAccessKey();
+
+            if (StringUtils.isNotBlank(secretAccessKey)) {
+                builder.append("\n\tcloud.aws.secretAccessKey: ")
+                    .append(maskSensitiveData(secretAccessKey));
+            }
+
+            String region = cloudAws.getRegion();
+
+            if (StringUtils.isNotBlank(region)) {
+                builder.append("\n\tcloud.aws.region: ")
+                    .append(region);
+            }
+
+            String accountId = cloudAws.getAccountId();
+
+            if (StringUtils.isNotBlank(accountId)) {
+                builder.append("\n\tcloud.aws.accountId: ")
+                    .append(accountId);
+            }
+        }
+
+        // Component Section
+        builder.append("\n\t\n\t[COMPONENT]");
+
+        Component.Registry registry = getComponent().getRegistry();
+
+        List<String> exclude = registry.getExclude();
+
+        if (exclude != null && !exclude.isEmpty()) {
+            builder.append("\n\tcomponent.registry.exclude: ")
+                .append(exclude);
+        }
+
+        // Coordinator Section
+        builder.append("\n\t\n\t[COORDINATOR]");
+        builder.append("\n\tcoordinator.enabled: ")
+            .append(getCoordinator().isEnabled());
+
+        // Coordinator Task Section
+        builder.append("\n\t\n\t[COORDINATOR TASK]");
+
+        Coordinator.Task coordinatorTask = getCoordinator().getTask();
+
+        if (coordinatorTask != null) {
+            Coordinator.Task.Subscriptions subscriptions = coordinatorTask.getSubscriptions();
+
+            if (subscriptions != null) {
+                Integer applicationEvents = subscriptions.getApplicationEvents();
+
+                if (applicationEvents != null) {
+                    builder.append("\n\tcoordinator.task.subscriptions.applicationEvents: ")
+                        .append(applicationEvents);
+                }
+
+                Integer resumeJobEvents = subscriptions.getResumeJobEvents();
+
+                if (resumeJobEvents != null) {
+                    builder.append("\n\tcoordinator.task.subscriptions.resumeJobEvents: ")
+                        .append(resumeJobEvents);
+                }
+
+                Integer startJobEvents = subscriptions.getStartJobEvents();
+
+                if (startJobEvents != null) {
+                    builder.append("\n\tcoordinator.task.subscriptions.startJobEvents: ")
+                        .append(startJobEvents);
+                }
+
+                Integer stopJobEvents = subscriptions.getStopJobEvents();
+
+                if (stopJobEvents != null) {
+                    builder.append("\n\tcoordinator.task.subscriptions.stopJobEvents: ")
+                        .append(stopJobEvents);
+                }
+
+                Integer taskExecutionCompleteEvents = subscriptions.getTaskExecutionCompleteEvents();
+
+                if (taskExecutionCompleteEvents != null) {
+                    builder.append("\n\tcoordinator.task.subscriptions.taskExecutionCompleteEvents: ")
+                        .append(taskExecutionCompleteEvents);
+                }
+
+                Integer taskExecutionErrorEvents = subscriptions.getTaskExecutionErrorEvents();
+
+                if (taskExecutionErrorEvents != null) {
+                    builder.append("\n\tcoordinator.task.subscriptions.taskExecutionErrorEvents: ")
+                        .append(taskExecutionErrorEvents);
+                }
+            }
+        }
+
+        // Coordinator Trigger Section
+        builder.append("\n\t\n\t[COORDINATOR TRIGGER]");
+
+        Coordinator.Trigger trigger = getCoordinator().getTrigger();
+        if (trigger != null) {
+            Coordinator.Trigger.Scheduler scheduler = trigger.getScheduler();
+
+            if (scheduler != null) {
+                builder.append("\n\tcoordinator.trigger.scheduler.provider: ")
+                    .append(scheduler.getProvider());
+            }
+
+            Coordinator.Trigger.Subscriptions triggerSubscriptions = trigger.getSubscriptions();
+
+            if (triggerSubscriptions != null) {
+                Integer applicationEvents = triggerSubscriptions.getApplicationEvents();
+
+                if (applicationEvents != null) {
+                    builder.append("\n\tcoordinator.trigger.subscriptions.applicationEvents: ")
+                        .append(applicationEvents);
+                }
+
+                Integer triggerExecutionCompleteEvents = triggerSubscriptions.getTriggerExecutionCompleteEvents();
+
+                if (triggerExecutionCompleteEvents != null) {
+                    builder.append("\n\tcoordinator.trigger.subscriptions.triggerExecutionCompleteEvents: ")
+                        .append(triggerExecutionCompleteEvents);
+                }
+
+                Integer triggerExecutionErrorEvents = triggerSubscriptions.getTriggerExecutionErrorEvents();
+
+                if (triggerExecutionErrorEvents != null) {
+                    builder.append("\n\tcoordinator.trigger.subscriptions.triggerExecutionErrorEvents: ")
+                        .append(triggerExecutionErrorEvents);
+                }
+
+                Integer triggerListenerEvents = triggerSubscriptions.getTriggerListenerEvents();
+
+                if (triggerListenerEvents != null) {
+                    builder.append("\n\tcoordinator.trigger.subscriptions.triggerListenerEvents: ")
+                        .append(triggerListenerEvents);
+                }
+
+                Integer triggerPollEvents = triggerSubscriptions.getTriggerPollEvents();
+
+                if (triggerPollEvents != null) {
+                    builder.append("\n\tcoordinator.trigger.subscriptions.triggerPollEvents: ")
+                        .append(triggerPollEvents);
+                }
+
+                Integer triggerWebhookEvents = triggerSubscriptions.getTriggerWebhookEvents();
+
+                if (triggerWebhookEvents != null) {
+                    builder.append("\n\tcoordinator.trigger.subscriptions.triggerWebhookEvents: ")
+                        .append(triggerWebhookEvents);
+                }
+            }
+        }
+
+        // Datasource Section
+        builder.append("\n\t\n\t[DATASOURCE]");
+
+        if (getDatasource() != null) {
+            String url = getDatasource().getUrl();
+
+            if (StringUtils.isNotBlank(url)) {
+                builder.append("\n\tdatasource.url: ")
+                    .append(url);
+            }
+
+            String username = getDatasource().getUsername();
+
+            if (StringUtils.isNotBlank(username)) {
+                builder.append("\n\tdatasource.username: ")
+                    .append(maskSensitiveData(username));
+            }
+
+            String password = getDatasource().getPassword();
+
+            if (StringUtils.isNotBlank(password)) {
+                builder.append("\n\tdatasource.password: ")
+                    .append(maskSensitiveData(password));
+            }
+        }
+
+        // DataStorage Section
+
+        if (getDataStorage() != null) {
+            builder.append("\n\t\n\t[DATA STORAGE]");
+            builder.append("\n\tdataStorage.provider: ")
+                .append(getDataStorage().getProvider());
+        }
+
+        // DiscoveryService Section
+        builder.append("\n\t\n\t[DISCOVERY SERVICE]");
+
+        if (getDiscoveryService() != null) {
+            builder.append("\n\tdiscoveryService.provider: ")
+                .append(getDiscoveryService().getProvider());
+        }
+
+        // Edition Section
+        builder.append("\n\t\n\t[EDITION]");
+
+        if (getEdition() != null) {
+            builder.append("\n\tedition: ")
+                .append(getEdition());
+        }
+
+        // Encryption Section
+
+        if (getEncryption() != null) {
+            builder.append("\n\t\n\t[ENCRYPTION]");
+            builder.append("\n\tencryption.provider: ")
+                .append(getEncryption().getProvider());
+
+            Encryption.Property property = getEncryption().getProperty();
+
+            if (property != null) {
+                String key = property.getKey();
+
+                if (StringUtils.isNotBlank(key)) {
+                    builder.append("\n\tencryption.property.key: ")
+                        .append(maskSensitiveData(key));
+                }
+            }
+        }
+
+        // Feature Flags Section
+        builder.append("\n\t\n\t[FEATURE FLAGS]");
+
+        if (getFeatureFlags() != null && !getFeatureFlags().isEmpty()) {
+            builder.append("\n\tfeatureFlags: ")
+                .append(getFeatureFlags());
+        }
+
+        // FileStorage Section
+        builder.append("\n\t\n\t[FILE STORAGE]");
+
+        if (getFileStorage() != null) {
+            builder.append("\n\tfileStorage.provider: ")
+                .append(getFileStorage().getProvider());
+
+            FileStorage.Filesystem filesystem = getFileStorage().getFilesystem();
+
+            if (filesystem != null) {
+                String basedir = filesystem.getBasedir();
+                if (StringUtils.isNotBlank(basedir)) {
+                    builder.append("\n\tfileStorage.filesystem.basedir: ")
+                        .append(basedir);
+                }
+            }
+
+            FileStorage.Aws aws = getFileStorage().getAws();
+
+            if (aws != null) {
+                String bucket = aws.getBucket();
+
+                if (StringUtils.isNotBlank(bucket)) {
+                    builder.append("\n\tfileStorage.aws.bucket: ")
+                        .append(bucket);
+                }
+            }
+        }
+
+        // HelpHub Section
+        builder.append("\n\t\n\t[HELP HUB]");
+
+        if (getHelpHub() != null) {
+            builder.append("\n\thelpHub.enabled: ")
+                .append(getHelpHub().isEnabled());
+        }
+
+        // Observability Section
+        builder.append("\n\t\n\t[OBSERVABILITY]");
+
+        if (getObservability() != null) {
+            Observability.Loki loki = getObservability().getLoki();
+
+            if (loki != null) {
+                Observability.Loki.Appender appender = loki.getAppender();
+
+                if (appender != null) {
+                    builder.append("\n\tobservability.loki.appender.level: ")
+                        .append(appender.getLevel());
+
+                    Observability.Loki.Appender.Http http = appender.getHttp();
+
+                    if (http != null) {
+                        String url = http.getUrl();
+
+                        if (StringUtils.isNotBlank(url)) {
+                            builder.append("\n\tobservability.loki.appender.http.url: ")
+                                .append(url);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Mail Section
+        builder.append("\n\t\n\t[MAIL]");
+
+        if (getMail() != null) {
+            String from = getMail().getFrom();
+
+            if (StringUtils.isNotBlank(from)) {
+                builder.append("\n\tmail.from: ")
+                    .append(from);
+            }
+
+            String host = getMail().getHost();
+
+            if (StringUtils.isNotBlank(host)) {
+                builder.append("\n\tmail.host: ")
+                    .append(host);
+            }
+
+            builder.append("\n\tmail.port: ")
+                .append(getMail().getPort());
+
+            String protocol = getMail().getProtocol();
+
+            if (StringUtils.isNotBlank(protocol)) {
+                builder.append("\n\tmail.protocol: ")
+                    .append(protocol);
+            }
+
+            builder.append("\n\tmail.auth: ")
+                .append(getMail().isAuth());
+
+            String username = getMail().getUsername();
+
+            if (StringUtils.isNotBlank(username)) {
+                builder.append("\n\tmail.username: ")
+                    .append(maskSensitiveData(username));
+            }
+
+            String password = getMail().getPassword();
+
+            if (StringUtils.isNotBlank(password)) {
+                builder.append("\n\tmail.password: ")
+                    .append(maskSensitiveData(password));
+            }
+
+            String baseUrl = getMail().getBaseUrl();
+
+            if (StringUtils.isNotBlank(baseUrl)) {
+                builder.append("\n\tmail.baseUrl: ")
+                    .append(baseUrl);
+            }
+
+            Mail.Ssl ssl = getMail().getSsl();
+
+            if (ssl != null) {
+                builder.append("\n\tmail.ssl.enabled: ")
+                    .append(ssl.isEnabled());
+            }
+
+            Mail.Starttls starttls = getMail().getStarttls();
+
+            if (starttls != null) {
+                builder.append("\n\tmail.starttls.enable: ")
+                    .append(starttls.isEnable());
+            }
+        }
+
+        // MessageBroker Section
+        builder.append("\n\t\n\t[MESSAGE BROKER]");
+
+        if (getMessageBroker() != null) {
+            builder.append("\n\tmessageBroker.provider: ")
+                .append(getMessageBroker().getProvider());
+        }
+
+        // OAuth2 Section
+        builder.append("\n\t\n\t[OAUTH2]");
+
+        if (getOauth2() != null) {
+            String redirectUri = getOauth2().getRedirectUri();
+
+            if (StringUtils.isNotBlank(redirectUri)) {
+                builder.append("\n\toauth2.redirectUri: ")
+                    .append(redirectUri);
+            }
+
+            Map<String, Oauth2.OAuth2App> predefinedApps = getOauth2().getPredefinedApps();
+
+            if (predefinedApps != null && !predefinedApps.isEmpty()) {
+                builder.append("\n\toauth2.predefinedApps: ");
+
+                for (Map.Entry<String, Oauth2.OAuth2App> entry : predefinedApps.entrySet()) {
+                    if (entry.getKey() != null) {
+                        builder.append("\n\t  ")
+                            .append(entry.getKey())
+                            .append(":");
+
+                        Oauth2.OAuth2App value = entry.getValue();
+
+                        if (value != null) {
+                            String clientId = value.getClientId();
+
+                            if (StringUtils.isNotBlank(clientId)) {
+                                builder.append("\n\t    clientId: ")
+                                    .append(maskSensitiveData(clientId));
+                            }
+
+                            String clientSecret = value.getClientSecret();
+
+                            if (StringUtils.isNotBlank(clientSecret)) {
+                                builder.append("\n\t    clientSecret: ")
+                                    .append(maskSensitiveData(clientSecret));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Public URL Section
+        builder.append("\n\t\n\t[PUBLIC URL]");
+
+        if (StringUtils.isNotBlank(getPublicUrl())) {
+            builder.append("\n\tpublicUrl: ")
+                .append(getPublicUrl());
+        }
+
+        // Resources Section
+        builder.append("\n\t\n\t[RESOURCES]");
+
+        if (getResources() != null) {
+            String web = getResources().getWeb();
+
+            if (StringUtils.isNotBlank(web)) {
+                builder.append("\n\tresources.web: ")
+                    .append(web);
+            }
+        }
+
+        // Security Section
+        if (getSecurity() != null) {
+            builder.append("\n\t\n\t[SECURITY]");
+
+            String contentSecurityPolicy = getSecurity().getContentSecurityPolicy();
+
+            if (StringUtils.isNotBlank(contentSecurityPolicy)) {
+                builder.append("\n\tsecurity.contentSecurityPolicy: ")
+                    .append(contentSecurityPolicy);
+            }
+
+            Security.RememberMe rememberMe = getSecurity().getRememberMe();
+
+            if (rememberMe != null) {
+                String key = rememberMe.getKey();
+
+                if (StringUtils.isNotBlank(key)) {
+                    builder.append("\n\tsecurity.rememberMe.key: ")
+                        .append(maskSensitiveData(key));
+                }
+            }
+        }
+
+        // SignUp Section
+        builder.append("\n\t\n\t[SIGN UP]");
+
+        if (getSignUp() != null) {
+            builder.append("\n\tsignUp.enabled: ")
+                .append(getSignUp().isEnabled());
+        }
+
+        // Tenant Section
+        builder.append("\n\t\n\t[TENANT]");
+
+        if (getTenant() != null) {
+            builder.append("\n\ttenant.mode: ")
+                .append(getTenant().getMode());
+        }
+
+        // Webhook URL Section
+        builder.append("\n\t\n\t[WEBHOOK URL]");
+
+        if (StringUtils.isNotBlank(getWebhookUrl())) {
+            builder.append("\n\twebhookUrl: ")
+                .append(getWebhookUrl());
+        }
+
+        // Tracing Section
+        builder.append("\n\t\n\t[TRACING]");
+
+        if (getTracing() != null) {
+            Otlp otlp = getTracing().getOtlp();
+
+            if (otlp != null) {
+                String endpoint = otlp.getEndpoint();
+
+                if (StringUtils.isNotBlank(endpoint)) {
+                    builder.append("\n\ttracing.otlp.endpoint: ")
+                        .append(endpoint);
+                }
+            }
+        }
+
+        // Worker Section
+        builder.append("\n\t\n\t[WORKER]");
+
+        if (getWorker() != null) {
+            builder.append("\n\tworker.enabled: ")
+                .append(getWorker().isEnabled());
+
+            Worker.Task workflowTask = getWorker().getTask();
+
+            if (workflowTask != null) {
+                Map<String, Integer> subscriptions = workflowTask.getSubscriptions();
+
+                if (subscriptions != null && !subscriptions.isEmpty()) {
+                    builder.append("\n\tworker.task.subscriptions: ")
+                        .append(subscriptions);
+                }
+            }
+        }
+
+        // Workflow Section
+        builder.append("\n\t\n\t[WORKFLOW]");
+
+        if (getWorkflow() != null) {
+            Workflow.OutputStorage outputStorage = getWorkflow().getOutputStorage();
+
+            if (outputStorage != null) {
+                builder.append("\n\tworkflow.outputStorage.provider: ")
+                    .append(outputStorage.getProvider());
+            }
+
+            Workflow.Repository repository = getWorkflow().getRepository();
+
+            if (repository != null) {
+                Workflow.Repository.Classpath classpath = repository.getClasspath();
+
+                if (classpath != null) {
+                    builder.append("\n\tworkflow.repository.classpath.enabled: ")
+                        .append(classpath.isEnabled());
+
+                    String locationPattern = classpath.getLocationPattern();
+
+                    if (StringUtils.isNotBlank(locationPattern)) {
+                        builder.append("\n\tworkflow.repository.classpath.locationPattern: ")
+                            .append(locationPattern);
+                    }
+                }
+
+                Workflow.Repository.Filesystem filesystem = repository.getFilesystem();
+
+                if (filesystem != null) {
+                    builder.append("\n\tworkflow.repository.filesystem.enabled: ")
+                        .append(filesystem.isEnabled());
+
+                    String locationPattern = filesystem.getLocationPattern();
+
+                    if (StringUtils.isNotBlank(locationPattern)) {
+                        builder.append("\n\tworkflow.repository.filesystem.locationPattern: ")
+                            .append(locationPattern);
+                    }
+                }
+
+                Workflow.Repository.Git git = repository.getGit();
+
+                if (git != null) {
+                    builder.append("\n\tworkflow.repository.git.enabled: ")
+                        .append(git.isEnabled());
+
+                    String url = git.getUrl();
+
+                    if (StringUtils.isNotBlank(url)) {
+                        builder.append("\n\tworkflow.repository.git.url: ")
+                            .append(url);
+                    }
+
+                    String branch = git.getBranch();
+
+                    if (StringUtils.isNotBlank(branch)) {
+                        builder.append("\n\tworkflow.repository.git.branch: ")
+                            .append(branch);
+                    }
+
+                    String username = git.getUsername();
+
+                    if (StringUtils.isNotBlank(username)) {
+                        builder.append("\n\tworkflow.repository.git.username: ")
+                            .append(maskSensitiveData(username));
+                    }
+
+                    String password = git.getPassword();
+
+                    if (StringUtils.isNotBlank(password)) {
+                        builder.append("\n\tworkflow.repository.git.password: ")
+                            .append(maskSensitiveData(password));
+                    }
+                }
+
+                Workflow.Repository.Jdbc jdbc = repository
+                    .getJdbc();
+
+                if (jdbc != null) {
+                    builder.append("\n\tworkflow.repository.jdbc.enabled: ")
+                        .append(jdbc.isEnabled());
+                }
+            }
+        }
+
+        builder.append("\n----------------------------------------------------------");
+
+        return builder.toString();
+    }
+
+    /**
+     * Masks sensitive data with "xxxxxxxxxxxxxx"
+     *
+     * @param value the value to mask if sensitive
+     * @return the original value or "xxxxxxxxxxxxxx" if sensitive
+     */
+    private static String maskSensitiveData(String value) {
+        if (StringUtils.isBlank(value)) {
+            return value;
+        }
+
+        int length = value.length();
+
+        return "xxxxxxxxxxxxxx" + (length >= 3 ? value.substring(length - 3) : value);
     }
 }

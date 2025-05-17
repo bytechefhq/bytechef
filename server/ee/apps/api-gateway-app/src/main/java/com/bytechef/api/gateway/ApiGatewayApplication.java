@@ -8,6 +8,7 @@
 package com.bytechef.api.gateway;
 
 import com.bytechef.AbstractApplication;
+import com.bytechef.config.ApplicationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -24,6 +25,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
     },
     scanBasePackages = "com.bytechef")
 public class ApiGatewayApplication extends AbstractApplication {
+
+    protected ApiGatewayApplication(ApplicationProperties applicationProperties) {
+        super(applicationProperties);
+    }
 
     /**
      * Main method, used to run the application.

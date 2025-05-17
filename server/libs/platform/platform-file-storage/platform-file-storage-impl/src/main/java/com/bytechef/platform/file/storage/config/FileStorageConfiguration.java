@@ -24,9 +24,6 @@ import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.file.storage.TriggerFileStorageImpl;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,20 +33,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FileStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileStorageConfiguration.class);
-
     @Bean
     FilesFileStorage filesFileStorage(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
         FileStorage.Provider provider = applicationProperties.getFileStorage()
             .getProvider();
-
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                "Workflow trigger output storage provider type enabled: %s".formatted(
-                    StringUtils.lowerCase(provider.name())));
-        }
 
         return new FilesFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }
@@ -61,12 +50,6 @@ public class FileStorageConfiguration {
         OutputStorage.Provider provider = applicationProperties.getWorkflow()
             .getOutputStorage()
             .getProvider();
-
-        if (logger.isInfoEnabled()) {
-            String providerName = provider.name();
-
-            logger.info("Files storage provider type enabled: %s".formatted(providerName.toLowerCase()));
-        }
 
         return new TriggerFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }

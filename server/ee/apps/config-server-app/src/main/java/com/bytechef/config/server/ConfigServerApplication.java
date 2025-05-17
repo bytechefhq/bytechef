@@ -17,6 +17,7 @@
 package com.bytechef.config.server;
 
 import com.bytechef.AbstractApplication;
+import com.bytechef.config.ApplicationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.config.server.EnableConfigServer;
@@ -24,6 +25,10 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 @SpringBootApplication(scanBasePackages = "com.bytechef")
 @EnableConfigServer
 public class ConfigServerApplication extends AbstractApplication {
+
+    protected ConfigServerApplication(ApplicationProperties applicationProperties) {
+        super(applicationProperties);
+    }
 
     /**
      * Main method, used to run the application.

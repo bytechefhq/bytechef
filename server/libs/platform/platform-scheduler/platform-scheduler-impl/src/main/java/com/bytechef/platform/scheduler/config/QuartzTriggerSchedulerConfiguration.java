@@ -21,8 +21,6 @@ import com.bytechef.platform.scheduler.TriggerScheduler;
 import org.quartz.Scheduler;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -38,14 +36,6 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 @ConditionalOnProperty(
     prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "quartz", matchIfMissing = true)
 public class QuartzTriggerSchedulerConfiguration implements SchedulerFactoryBeanCustomizer {
-
-    private static final Logger log = LoggerFactory.getLogger(QuartzTriggerSchedulerConfiguration.class);
-
-    QuartzTriggerSchedulerConfiguration() {
-        if (log.isInfoEnabled()) {
-            log.info("Trigger scheduler provider type enabled: quartz");
-        }
-    }
 
     @Override
     public void customize(SchedulerFactoryBean schedulerFactoryBean) {

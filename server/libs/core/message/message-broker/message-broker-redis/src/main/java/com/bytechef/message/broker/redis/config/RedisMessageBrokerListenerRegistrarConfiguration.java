@@ -108,7 +108,9 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
 
         Class<?> delegateClass = delegate.getClass();
 
-        logger.info("Registering Redis Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Registering Redis Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
+        }
 
         if (messageRoute.isControlExchange()) {
             redisMessageListenerContainer.addMessageListener(

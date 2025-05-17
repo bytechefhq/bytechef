@@ -80,7 +80,9 @@ public class JmsMessageBrokerListenerRegistrarConfiguration
 
         Class<?> delegateClass = delegate.getClass();
 
-        logger.info("Registering JMS Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Registering JMS Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
+        }
 
         MessageListenerAdapter messageListenerAdapter = new NoReplyMessageListenerAdapter(delegate);
 

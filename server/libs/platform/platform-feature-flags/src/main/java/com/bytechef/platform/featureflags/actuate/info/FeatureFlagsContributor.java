@@ -19,8 +19,6 @@ package com.bytechef.platform.featureflags.actuate.info;
 import com.bytechef.config.ApplicationProperties;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
@@ -33,16 +31,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class FeatureFlagsContributor implements InfoContributor {
 
-    private static final Logger log = LoggerFactory.getLogger(FeatureFlagsContributor.class);
-
     private final List<String> featureFlags;
 
     public FeatureFlagsContributor(ApplicationProperties applicationProperties) {
         this.featureFlags = applicationProperties.getFeatureFlags();
-
-        if (featureFlags != null && !featureFlags.isEmpty()) {
-            log.info("Feature flags: {}", featureFlags);
-        }
     }
 
     @Override

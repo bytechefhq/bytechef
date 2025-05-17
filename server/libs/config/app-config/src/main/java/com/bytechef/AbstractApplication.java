@@ -40,6 +40,12 @@ public abstract class AbstractApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractApplication.class);
 
+    private final ApplicationProperties applicationProperties;
+
+    protected AbstractApplication(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
+    }
+
     @EventListener
     public void onApplicationStartedEvent(ApplicationStartedEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
@@ -47,7 +53,7 @@ public abstract class AbstractApplication {
         logApplicationStartup(applicationContext.getEnvironment());
     }
 
-    private static void logApplicationStartup(Environment environment) {
+    private void logApplicationStartup(Environment environment) {
         String protocol = Optional.ofNullable(environment.getProperty("server.ssl.key-store"))
             .map(key -> "https")
             .orElse("http");
@@ -57,6 +63,12 @@ public abstract class AbstractApplication {
             .orElse("/");
 
         String[] activeProfiles = environment.getActiveProfiles();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                CRLFLogConverter.CRLF_SAFE_MARKER,
+                applicationProperties.formatApplicationProperties());
+        }
 
         logger.info(
             CRLFLogConverter.CRLF_SAFE_MARKER,
@@ -104,4 +116,5 @@ public abstract class AbstractApplication {
             ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
             : "-";
     }
+
 }

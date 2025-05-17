@@ -76,7 +76,9 @@ public class KafkaMessageBrokerListenerRegistrarConfiguration
 
         Class<?> delegateClass = delegate.getClass();
 
-        logger.info("Registering Kafka Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Registering Kafka Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        }
 
         Method listenerMethod = Stream.of(delegateClass.getMethods())
             .filter(it -> methodName.equals(it.getName()))

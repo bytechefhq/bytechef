@@ -17,8 +17,6 @@
 package com.bytechef.atlas.configuration.repository.jdbc.config;
 
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryJdbc;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -27,12 +25,4 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnWorkflowRepositoryJdbc
 public class JdbcWorkflowRepositoryConfiguration {
-
-    private static final Logger logger = LoggerFactory.getLogger(JdbcWorkflowRepositoryConfiguration.class);
-
-    public JdbcWorkflowRepositoryConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Workflow repository type enabled: jdbc");
-        }
-    }
 }

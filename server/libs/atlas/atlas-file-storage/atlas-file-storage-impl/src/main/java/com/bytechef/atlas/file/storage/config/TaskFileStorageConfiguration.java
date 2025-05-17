@@ -21,7 +21,6 @@ import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage.Provider;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -42,12 +41,6 @@ public class TaskFileStorageConfiguration {
         Provider provider = applicationProperties.getWorkflow()
             .getOutputStorage()
             .getProvider();
-
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                "Workflow task output storage provider type enabled: %s".formatted(
-                    StringUtils.lowerCase(provider.name())));
-        }
 
         return new TaskFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }

@@ -77,7 +77,9 @@ public class LocalMessageBrokerListenerRegistrarConfiguration
 
         Class<?> delegateClass = delegate.getClass();
 
-        logger.info("Registering Local Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Registering Local Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
+        }
 
         listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
     }

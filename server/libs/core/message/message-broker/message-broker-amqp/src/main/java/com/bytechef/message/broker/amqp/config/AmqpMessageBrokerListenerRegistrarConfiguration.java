@@ -94,7 +94,9 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
 
         Class<?> delegateClass = delegate.getClass();
 
-        logger.info("Registering AMQP Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Registering AMQP Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        }
 
         Exchange exchange;
         Queue queue;

@@ -13,9 +13,6 @@ import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFile
 import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFileStorageImpl;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,24 +25,12 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnEEVersion
 public class CustomComponentFileStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(CustomComponentFileStorageConfiguration.class);
-
     @Bean
     CustomComponentFileStorage customComponentFileStorage(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
         Provider provider = applicationProperties.getFileStorage()
             .getProvider();
-
-        if (provider == null) {
-            provider = Provider.FILESYSTEM;
-        }
-
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                "Custom component file storage provider type enabled: %s".formatted(
-                    StringUtils.lowerCase(provider.name())));
-        }
 
         return new CustomComponentFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }

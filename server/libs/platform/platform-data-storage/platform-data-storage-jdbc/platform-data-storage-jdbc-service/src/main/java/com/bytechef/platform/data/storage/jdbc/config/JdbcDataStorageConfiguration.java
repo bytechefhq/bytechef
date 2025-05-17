@@ -25,8 +25,6 @@ import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageServiceImpl;
 import java.util.Map;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -37,14 +35,6 @@ import org.springframework.lang.NonNull;
 @Configuration
 @ConditionalOnDataStorageProviderJdbc
 public class JdbcDataStorageConfiguration {
-
-    private static final Logger logger = LoggerFactory.getLogger(JdbcDataStorageConfiguration.class);
-
-    public JdbcDataStorageConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Data storage provider type enabled: jdbc");
-        }
-    }
 
     @Bean
     JdbcDataStorageService jdbcDataStorageService(DataStorageRepository dataStorageRepository) {

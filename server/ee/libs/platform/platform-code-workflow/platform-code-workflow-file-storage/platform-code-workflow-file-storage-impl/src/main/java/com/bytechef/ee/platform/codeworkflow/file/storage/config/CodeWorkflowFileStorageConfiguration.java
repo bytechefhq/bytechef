@@ -22,7 +22,6 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorageImpl;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -42,16 +41,6 @@ public class CodeWorkflowFileStorageConfiguration {
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
         Provider provider = applicationProperties.getFileStorage()
             .getProvider();
-
-        if (provider == null) {
-            provider = Provider.FILESYSTEM;
-        }
-
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                "Code workflow file storage provider type enabled: %s".formatted(
-                    StringUtils.lowerCase(provider.name())));
-        }
 
         return new CodeWorkflowFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }
