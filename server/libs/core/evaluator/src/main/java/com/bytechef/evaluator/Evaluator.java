@@ -18,6 +18,7 @@
 
 package com.bytechef.evaluator;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,13 +70,16 @@ public class Evaluator {
     private Evaluator(Builder builder) {
         Map<String, MethodExecutor> map = new HashMap<>();
 
+        map.put("add", new Add());
+        map.put("addAll", new AddAll());
+        map.put("atZone", new AtZone());
         map.put("boolean", new Cast<>(Boolean.class));
         map.put("byte", new Cast<>(Byte.class));
         map.put("char", new Cast<>(Character.class));
         map.put("config", new Config(builder.environment));
         map.put("concat", new Concat());
         map.put("contains", new Contains());
-        map.put("dateFormat", new DateFormat());
+        map.put("format", new Format());
         map.put("flatten", new Flatten());
         map.put("float", new Cast<>(Float.class));
         map.put("double", new Cast<>(Double.class));
@@ -85,18 +89,41 @@ public class Evaluator {
         map.put("lastIndexOf", new LastIndexOf());
         map.put("length", new Length());
         map.put("long", new Cast<>(Long.class));
-        map.put("minusDays", new MinusDays());
+        map.put("minusMicros", new Minus(ChronoUnit.MICROS));
+        map.put("minusMillis", new Minus(ChronoUnit.MILLIS));
+        map.put("minusSeconds", new Minus(ChronoUnit.SECONDS));
+        map.put("minusMinutes", new Minus(ChronoUnit.MINUTES));
+        map.put("minusHours", new Minus(ChronoUnit.HOURS));
+        map.put("minusDays", new Minus(ChronoUnit.DAYS));
+        map.put("minusMonths", new Minus(ChronoUnit.MONTHS));
+        map.put("minusWeeks", new Minus(ChronoUnit.WEEKS));
+        map.put("minusYears", new Minus(ChronoUnit.YEARS));
         map.put("now", new Now());
+        map.put("parseDate", new Parse(Parse.Type.DATE));
+        map.put("parseDateTime", new Parse(Parse.Type.DATE_TIME));
+        map.put("plusMicros", new Plus(ChronoUnit.MICROS));
+        map.put("plusMillis", new Plus(ChronoUnit.MILLIS));
+        map.put("plusSeconds", new Plus(ChronoUnit.SECONDS));
+        map.put("plusMinutes", new Plus(ChronoUnit.MINUTES));
+        map.put("plusHours", new Plus(ChronoUnit.HOURS));
+        map.put("plusDays", new Plus(ChronoUnit.DAYS));
+        map.put("plusMonths", new Plus(ChronoUnit.MONTHS));
+        map.put("plusWeeks", new Plus(ChronoUnit.WEEKS));
+        map.put("plusYears", new Plus(ChronoUnit.YEARS));
+        map.put("put", new Put());
+        map.put("putAll", new PutAll());
         map.put("range", new Range());
+        map.put("remove", new Remove());
+        map.put("set", new Set());
         map.put("size", new Size());
         map.put("short", new Cast<>(Short.class));
         map.put("sort", new Sort());
         map.put("split", new Split());
-        map.put("stringf", new StringFormat());
         map.put("substring", new Substring());
-        map.put("systemProperty", new SystemProperty());
-        map.put("tempDir", new TempDir());
+//        map.put("systemProperty", new SystemProperty());
+//        map.put("tempDir", new TempDir());
         map.put("timestamp", new Timestamp());
+        map.put("toMap", new ToMap());
         map.put("uuid", new Uuid());
         map.putAll(builder.methodExecutors);
 

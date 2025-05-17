@@ -56,9 +56,8 @@ class LastIndexOf implements MethodExecutor {
                 case Character c -> string.lastIndexOf(c);
                 default ->
                     throw new AccessException(
-                        "Invalid argument type for String.lastIndexOf(arg). Expected String, Integer, or Character. Got: "
-                            +
-                            firstArgumentClass.getName());
+                        "Invalid argument type for String.lastIndexOf(arg). Expected String, Integer, or Character. " +
+                            "Got: " + firstArgumentClass.getName());
             };
         } else {
             // arguments.length == 3
@@ -87,9 +86,8 @@ class LastIndexOf implements MethodExecutor {
                 case Integer i -> string.lastIndexOf(i, fromIndex);
                 case Character c -> string.lastIndexOf(c);
                 default -> throw new AccessException(
-                    "Invalid first argument type for String.lastIndexOf(arg, fromIndex). Expected String, Integer, or "
-                        +
-                        "Character. Got: " + firstArgumentClass.getName());
+                    "Invalid first argument type for String.lastIndexOf(arg, fromIndex). Expected String, Integer, " +
+                        "or Character. Got: " + firstArgumentClass.getName());
             };
         }
 

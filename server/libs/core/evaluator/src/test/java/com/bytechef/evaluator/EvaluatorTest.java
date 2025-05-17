@@ -20,7 +20,6 @@ package com.bytechef.evaluator;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -311,19 +310,19 @@ public class EvaluatorTest {
         Assertions.assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), MapUtils.get(map, "flattened"));
     }
 
-    @Test
-    public void test32() {
-        Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "tempDir", "=tempDir()"), Collections.emptyMap());
-
-        String tmpDir = System.getProperty("java.io.tmpdir");
-
-        if (tmpDir.endsWith(File.separator)) {
-            tmpDir = tmpDir.substring(0, tmpDir.lastIndexOf(File.separator));
-        }
-
-        Assertions.assertEquals(tmpDir, MapUtils.get(map, "tempDir"));
-    }
+//    @Test
+//    public void test32() {
+//        Map<String, Object> map = EVALUATOR.evaluate(
+//            Map.of("type", "type", "tempDir", "=tempDir()"), Collections.emptyMap());
+//
+//        String tmpDir = System.getProperty("java.io.tmpdir");
+//
+//        if (tmpDir.endsWith(File.separator)) {
+//            tmpDir = tmpDir.substring(0, tmpDir.lastIndexOf(File.separator));
+//        }
+//
+//        Assertions.assertEquals(tmpDir, MapUtils.get(map, "tempDir"));
+//    }
 
     @Test
     public void test33() {
@@ -392,7 +391,7 @@ public class EvaluatorTest {
     @Test
     public void test40() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "date", "=dateFormat(now(),'yyyyMMdd')"), Collections.emptyMap());
+            Map.of("type", "type", "date", "=format(now(),'yyyyMMdd')"), Collections.emptyMap());
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 

@@ -18,7 +18,7 @@
 
 package com.bytechef.evaluator;
 
-import java.util.Date;
+import java.time.Instant;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -32,6 +32,6 @@ class Now implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        return new TypedValue(new Date());
+        return new TypedValue(Instant.now());
     }
 }

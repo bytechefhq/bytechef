@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,29 +12,34 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2025 ByteChef
  */
 
 package com.bytechef.evaluator;
 
-import java.util.List;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.TypedValue;
 
 /**
- * @author Arik Cohen
- * @since Feb, 19 2020
+ * @author Ivica Cardic
  */
-class Contains implements MethodExecutor {
+class Minus implements MethodExecutor {
+
+    private final TemporalUnit temporalUnit;
+
+    Minus(TemporalUnit temporalUnit) {
+        this.temporalUnit = temporalUnit;
+    }
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        List<?> l1 = (List<?>) arguments[0];
-        Object value = arguments[1];
-
-        return new TypedValue(l1.contains(value));
+        if (arguments[0] instanceof Temporal temporal) {
+            return new TypedValue(temporal.minus((Integer) arguments[1], temporalUnit));
+        } else {
+            throw new IllegalArgumentException("Invalid arguments for plusDays.");
+        }
     }
 }
