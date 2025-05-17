@@ -3,8 +3,6 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ActionDefinitionApi,
     ComponentDefinitionApi,
-    ComponentDefinitionBasic,
-    TaskDispatcherDefinitionBasic,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
@@ -14,8 +12,6 @@ import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {QueryClient, useQueryClient} from '@tanstack/react-query';
 import {Edge, Node} from '@xyflow/react';
-import {PlayIcon} from 'lucide-react';
-import InlineSVG from 'react-inlinesvg';
 import {useParams} from 'react-router-dom';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -24,60 +20,92 @@ import getParametersWithDefaultValues from '../utils/getParametersWithDefaultVal
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 
-/**
- * Creates workflow node data object from the dropped node
- */
-function createWorkflowNodeData(droppedNode: ClickedDefinitionType): NodeDataType {
-    return {
+async function createWorkflowNodeData(
+    droppedNode: ClickedDefinitionType,
+    queryClient: QueryClient
+): Promise<NodeDataType> {
+    const baseNodeData: NodeDataType = {
         componentName: droppedNode.name!,
         label: droppedNode.title,
-        name: getFormattedName(droppedNode.name!),
+        name: droppedNode.trigger ? 'trigger_1' : getFormattedName(droppedNode.name!),
         taskDispatcher: droppedNode.taskDispatcher,
         title: droppedNode?.title,
+        trigger: droppedNode.trigger,
         version: droppedNode.version,
-        workflowNodeName: getFormattedName(droppedNode.name!),
+        workflowNodeName: droppedNode.trigger ? 'trigger_1' : getFormattedName(droppedNode.name!),
     };
-}
 
-/**
- * Initializes parameters for a workflow node
- */
-async function initializeNodeParameters(nodeData: NodeDataType, queryClient: QueryClient) {
-    if (nodeData.taskDispatcher) {
-        const initalParameters = TASK_DISPATCHER_CONFIG[
-            nodeData.componentName as keyof typeof TASK_DISPATCHER_CONFIG
+    if (baseNodeData.taskDispatcher) {
+        const initialParameters = TASK_DISPATCHER_CONFIG[
+            baseNodeData.componentName as keyof typeof TASK_DISPATCHER_CONFIG
         ]?.getInitialParameters([]);
 
         return {
-            ...initalParameters,
+            ...baseNodeData,
+            parameters: initialParameters,
         };
-    } else if (nodeData.version && nodeData.componentName) {
-        const draggedComponentDefinition = await queryClient.fetchQuery({
-            queryFn: () =>
-                new ComponentDefinitionApi().getComponentDefinition({
-                    componentName: nodeData.componentName,
-                    componentVersion: nodeData.version!,
-                }),
-            queryKey: ComponentDefinitionKeys.componentDefinition({
-                componentName: nodeData.componentName,
-                componentVersion: nodeData.version,
-            }),
+    }
+
+    if (!baseNodeData.version || !baseNodeData.componentName) {
+        return baseNodeData;
+    }
+
+    const getComponentDefinitionRequest = {
+        componentName: baseNodeData.componentName,
+        componentVersion: baseNodeData.version,
+    };
+
+    const componentDefinition = await queryClient.fetchQuery({
+        queryFn: () => new ComponentDefinitionApi().getComponentDefinition(getComponentDefinitionRequest),
+        queryKey: ComponentDefinitionKeys.componentDefinition(getComponentDefinitionRequest),
+    });
+
+    if (baseNodeData.trigger) {
+        const triggerName = componentDefinition.triggers?.[0].name as string;
+
+        const getTriggerDefinitionRequest = {
+            componentName: baseNodeData.componentName,
+            componentVersion: componentDefinition.version,
+            triggerName,
+        };
+
+        const triggerDefinition = await queryClient.fetchQuery({
+            queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(getTriggerDefinitionRequest),
+            queryKey: TriggerDefinitionKeys.triggerDefinition(getTriggerDefinitionRequest),
         });
 
+        return {
+            ...baseNodeData,
+            parameters: {
+                ...getParametersWithDefaultValues({
+                    properties: triggerDefinition.properties || [],
+                }),
+            },
+            type: `${baseNodeData.componentName}/v${componentDefinition.version}/${triggerName}`,
+        };
+    } else {
+        const actionName = componentDefinition.actions?.[0].name as string;
+
         const getActionDefinitionRequest = {
-            actionName: draggedComponentDefinition.actions?.[0].name as string,
-            componentName: nodeData.componentName,
-            componentVersion: draggedComponentDefinition.version,
+            actionName,
+            componentName: baseNodeData.componentName,
+            componentVersion: componentDefinition.version,
         };
 
-        const draggedComponentActionDefinition = await queryClient.fetchQuery({
+        const actionDefinition = await queryClient.fetchQuery({
             queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
             queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
         });
 
-        return getParametersWithDefaultValues({
-            properties: draggedComponentActionDefinition.properties || [],
-        });
+        return {
+            ...baseNodeData,
+            parameters: {
+                ...getParametersWithDefaultValues({
+                    properties: actionDefinition.properties || [],
+                }),
+            },
+            type: `${baseNodeData.componentName}/v${componentDefinition.version}/${actionName}`,
+        };
     }
 }
 
@@ -86,17 +114,19 @@ async function getFirstActionName(nodeData: NodeDataType, queryClient: QueryClie
         return undefined;
     }
 
+    const getComponentDefinitionRequest = {
+        componentName: nodeData.componentName,
+        componentVersion: nodeData.version,
+    };
+
     const componentDefinition = await queryClient.fetchQuery({
-        queryFn: () =>
-            new ComponentDefinitionApi().getComponentDefinition({
-                componentName: nodeData.componentName,
-                componentVersion: nodeData.version!,
-            }),
-        queryKey: ComponentDefinitionKeys.componentDefinition({
-            componentName: nodeData.componentName,
-            componentVersion: nodeData.version,
-        }),
+        queryFn: () => new ComponentDefinitionApi().getComponentDefinition(getComponentDefinitionRequest),
+        queryKey: ComponentDefinitionKeys.componentDefinition(getComponentDefinitionRequest),
     });
+
+    if (nodeData.trigger) {
+        return componentDefinition.triggers?.[0].name;
+    }
 
     return componentDefinition.actions?.[0].name;
 }
@@ -143,30 +173,15 @@ export default function useHandleDrop(): [
 
         setEdges([...edges, newPlaceholderEdge]);
 
-        console.log('droppedNode', droppedNode);
-
-        const nodeData = createWorkflowNodeData(droppedNode);
-
-        const newWorkflowNode = {
-            ...targetNode,
-            data: nodeData,
-            name: droppedNode.name,
-            type: 'workflow',
-        };
-
-        const parameters = await initializeNodeParameters(nodeData, queryClient);
+        const nodeData = await createWorkflowNodeData(droppedNode, queryClient);
 
         captureComponentUsed(
             nodeData.componentName,
-            !nodeData.taskDispatcher ? await getFirstActionName(nodeData, queryClient) : undefined,
-            undefined
+            !nodeData.taskDispatcher ? await getFirstActionName(nodeData, queryClient) : undefined
         );
 
         saveWorkflowDefinition({
-            nodeData: {
-                ...newWorkflowNode.data,
-                parameters,
-            },
+            nodeData,
             projectId: +projectId!,
             queryClient,
             updateWorkflowMutation,
@@ -185,9 +200,7 @@ export default function useHandleDrop(): [
 
         const targetEdgeIndex = edges.findIndex((edge) => edge.id === targetEdge.id);
 
-        const nodeData = createWorkflowNodeData(droppedNode);
-
-        console.log('nodeData', nodeData);
+        const nodeData = await createWorkflowNodeData(droppedNode, queryClient);
 
         const newWorkflowNode = {
             data: nodeData,
@@ -217,19 +230,13 @@ export default function useHandleDrop(): [
 
         setEdges(edges);
 
-        const parameters = await initializeNodeParameters(nodeData, queryClient);
-
         captureComponentUsed(
             nodeData.componentName,
-            !nodeData.taskDispatcher ? await getFirstActionName(nodeData, queryClient) : undefined,
-            undefined
+            !nodeData.taskDispatcher ? await getFirstActionName(nodeData, queryClient) : undefined
         );
 
         saveWorkflowDefinition({
-            nodeData: {
-                ...newWorkflowNode.data,
-                parameters,
-            },
+            nodeData,
             nodeIndex: targetEdgeIndex,
             projectId: +projectId!,
             queryClient,
@@ -237,61 +244,13 @@ export default function useHandleDrop(): [
         });
     }
 
-    async function handleDropOnTriggerNode(droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) {
-        const {icon, name, title, version} = droppedNode;
+    async function handleDropOnTriggerNode(droppedNode: ClickedDefinitionType) {
+        const nodeData = await createWorkflowNodeData(droppedNode, queryClient);
 
-        const draggedComponentDefinition = await queryClient.fetchQuery({
-            queryFn: () =>
-                new ComponentDefinitionApi().getComponentDefinition({
-                    componentName: name,
-                    componentVersion: version,
-                }),
-            queryKey: ComponentDefinitionKeys.componentDefinition({
-                componentName: name,
-                componentVersion: version,
-            }),
-        });
-
-        const {triggers} = draggedComponentDefinition;
-
-        const newTriggerNodeData = {
-            componentName: name,
-            icon: icon ? (
-                <InlineSVG className="size-9 text-gray-700" src={icon} />
-            ) : (
-                <PlayIcon className="size-9 text-gray-700" />
-            ),
-            label: title,
-            name: 'trigger_1',
-            trigger: true,
-            type: `${name}/v${version}/${triggers?.[0].name}`,
-            workflowNodeName: 'trigger_1',
-        };
-
-        const draggedComponentTriggerDefinition = await queryClient.fetchQuery({
-            queryFn: () =>
-                new TriggerDefinitionApi().getComponentTriggerDefinition({
-                    componentName: name,
-                    componentVersion: version,
-                    triggerName: triggers?.[0].name as string,
-                }),
-            queryKey: TriggerDefinitionKeys.triggerDefinition({
-                componentName: name,
-                componentVersion: version,
-                triggerName: triggers?.[0].name as string,
-            }),
-        });
-
-        captureComponentUsed(name, undefined, triggers?.[0].name);
+        captureComponentUsed(nodeData.componentName, undefined, await getFirstActionName(nodeData, queryClient));
 
         saveWorkflowDefinition({
-            nodeData: {
-                ...newTriggerNodeData,
-                operationName: draggedComponentTriggerDefinition.name,
-                parameters: getParametersWithDefaultValues({
-                    properties: draggedComponentTriggerDefinition.properties || [],
-                }),
-            },
+            nodeData,
             projectId: +projectId!,
             queryClient,
             updateWorkflowMutation,

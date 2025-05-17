@@ -1,11 +1,5 @@
-import {
-    ComponentDefinitionApi,
-    Workflow,
-    WorkflowTask,
-    WorkflowTrigger,
-} from '@/shared/middleware/platform/configuration';
+import {Workflow, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
@@ -51,10 +45,21 @@ export default async function saveWorkflowDefinition({
     const workflowTasks: Array<WorkflowTask> = workflow.tasks ?? [];
     const workflowDefinitionTasks: Array<WorkflowTask> = workflowDefinition.tasks ?? [];
 
-    const {clusterElements, componentName, description, label, metadata, name, parameters, taskDispatcher, trigger} =
-        nodeData ?? {};
+    const {
+        clusterElements,
+        componentName,
+        description,
+        label,
+        metadata,
+        name,
+        operationName,
+        parameters,
+        taskDispatcher,
+        trigger,
+        version,
+    } = nodeData ?? {};
 
-    let {operationName, type, version} = nodeData ?? {};
+    let {type} = nodeData ?? {};
 
     if (trigger) {
         if (!type) {
@@ -80,24 +85,6 @@ export default async function saveWorkflowDefinition({
         });
 
         return;
-    }
-
-    if (!operationName && !taskDispatcher && componentName) {
-        const newNodeComponentDefinition = await queryClient.fetchQuery({
-            queryFn: () =>
-                new ComponentDefinitionApi().getComponentDefinition({componentName, componentVersion: version!}),
-            queryKey: ComponentDefinitionKeys.componentDefinition({componentName, componentVersion: version!}),
-        });
-
-        if (!version) {
-            version = newNodeComponentDefinition?.version;
-        }
-
-        if (!newNodeComponentDefinition) {
-            return;
-        }
-
-        operationName = newNodeComponentDefinition.actions?.[0].name;
     }
 
     if (!type && !trigger) {

@@ -116,6 +116,11 @@ const WorkflowEditor = ({
         }
 
         if (droppedNodeType === 'trigger') {
+            droppedNode = {
+                ...droppedNode,
+                trigger: true,
+            };
+
             const targetChildNode = (event.target as HTMLElement).closest('.react-flow__node > div') as HTMLElement;
 
             const targetNodeType = targetChildNode?.dataset.nodetype;
