@@ -22,6 +22,7 @@ function createPlaceholderNode(conditionId: string, conditionCase: string, suffi
             conditionCase,
             conditionId,
             label: '+',
+            taskDispatcherId: conditionId,
         },
         id: `${conditionId}-condition-${suffix}-placeholder-0`,
         position: DEFAULT_NODE_POSITION,
