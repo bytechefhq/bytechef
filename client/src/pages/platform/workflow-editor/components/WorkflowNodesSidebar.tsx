@@ -70,7 +70,6 @@ const WorkflowNodesSidebar = ({
             <div className="flex flex-1 flex-col overflow-hidden pt-1">
                 <WorkflowNodesTabs
                     actionComponentDefinitions={filteredActionComponentDefinitions}
-                    hideTriggerComponents
                     itemsDraggable
                     taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                     triggerComponentDefinitions={filteredTriggerComponentDefinitions}

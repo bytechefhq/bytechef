@@ -1,5 +1,5 @@
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {Component1Icon} from '@radix-ui/react-icons';
+import {ComponentIcon} from 'lucide-react';
 import {HTMLAttributes, MouseEvent} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -50,12 +50,12 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
             {node.icon ? (
                 <InlineSVG
                     className="mr-2 size-7 flex-none"
-                    loader={<Component1Icon className="mr-2 size-7 flex-none" />}
+                    loader={<ComponentIcon className="mr-2 size-7 flex-none" />}
                     src={node.icon}
                     title={node.title}
                 />
             ) : (
-                <Component1Icon className="mr-2 size-7 flex-none" />
+                <ComponentIcon className="mr-2 size-7 flex-none" />
             )}
 
             <div className="flex flex-col">
