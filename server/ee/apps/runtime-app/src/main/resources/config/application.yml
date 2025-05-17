@@ -101,7 +101,7 @@ bytechef:
     host:
     port: 25
   message-broker:
-    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: jms
+    # Messaging provider between Coordinator and Workers (local) default: local
     provider: local
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"

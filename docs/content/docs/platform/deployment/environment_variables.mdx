@@ -11,7 +11,7 @@ ByteChef can be configured using environment variables. This page documents all 
 |----------------------|-------------|---------------|
 | `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
 | `BYTECHEF_AI_COPILOT_PROVIDER` | The AI provider to use for copilot (OPENAI, ANTHROPIC) | `OPENAI` |
-| `BYTECHEF_AI_COPILOT_OPENAI_APIKEY` | OpenAI API key for copilot (sensitive) | - |
+| `BYTECHEF_AI_COPILOT_OPENAI_API_KEY` | OpenAI API key for copilot (sensitive) | - |
 | `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_MODEL` | OpenAI model to use for chat | - |
 | `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_TEMPERATURE` | Temperature setting for OpenAI chat | - |
 
@@ -19,23 +19,23 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_AI_PROVIDER_ANTHROPIC_APIKEY` | Anthropic API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_AZUREOPENAI_APIKEY` | Azure OpenAI API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_DEEPSEEK_APIKEY` | DeepSeek API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_GROQ_APIKEY` | Groq API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_NVIDIA_APIKEY` | NVIDIA API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_HUGGINGFACE_APIKEY` | HuggingFace API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_MISTRAL_APIKEY` | Mistral API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_OPENAI_APIKEY` | OpenAI API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_PERPLEXITY_APIKEY` | Perplexity API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_STABILITY_APIKEY` | Stability API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_VERTEXGEMINI_APIKEY` | Vertex Gemini API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_ANTHROPIC_API_KEY` | Anthropic API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_AZURE_OPENAI_API_KEY` | Azure OpenAI API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_DEEP_SEEK_API_KEY` | DeepSeek API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_GROQ_API_KEY` | Groq API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_NVIDIA_API_KEY` | NVIDIA API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_HUGGING_FACE_API_KEY` | HuggingFace API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_MISTRAL_API_KEY` | Mistral API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_OPENAI_API_KEY` | OpenAI API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_PERPLEXITY_API_KEY` | Perplexity API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_STABILITY_API_KEY` | Stability API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_VERTEX_GEMINI_API_KEY` | Vertex Gemini API key (sensitive) | - |
 
 ## Analytics Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_ANALYTICS_ENABLED` | Enable or disable analytics | `false` |
+| `BYTECHEF_ANALYTICS_ENABLED` | Enable or disable analytics | `true` |
 
 ## Cache Configuration
 
@@ -48,10 +48,10 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
 | `BYTECHEF_CLOUD_PROVIDER` | Cloud provider (AWS, NONE) | `NONE` |
-| `BYTECHEF_CLOUD_AWS_ACCESSKEYID` | AWS access key ID (sensitive) | - |
-| `BYTECHEF_CLOUD_AWS_SECRETACCESSKEY` | AWS secret access key (sensitive) | - |
+| `BYTECHEF_CLOUD_AWS_ACCESS_KEY_ID` | AWS access key ID (sensitive) | - |
+| `BYTECHEF_CLOUD_AWS_SECRET_ACCESS_KEY` | AWS secret access key (sensitive) | - |
 | `BYTECHEF_CLOUD_AWS_REGION` | AWS region | - |
-| `BYTECHEF_CLOUD_AWS_ACCOUNTID` | AWS account ID | - |
+| `BYTECHEF_CLOUD_AWS_ACCOUNT_ID` | AWS account ID | - |
 
 ## Component Configuration
 
@@ -69,24 +69,24 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_APPLICATIONEVENTS` | Number of application event subscribers | `1` |
-| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_RESUMEJOBEVENTS` | Number of resume job event subscribers | - |
-| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_STARTJOBEVENTS` | Number of start job event subscribers | - |
-| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_STOPJOBEVENTS` | Number of stop job event subscribers | - |
-| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_TASKEXECUTIONCOMPLETEEVENTS` | Number of task execution complete event subscribers | - |
-| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_TASKEXECUTIONERROREVENTS` | Number of task execution error event subscribers | - |
+| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_APPLICATION_EVENTS` | Number of application event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_RESUME_JOB_EVENTS` | Number of resume job event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_START_JOB_EVENTS` | Number of start job event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_STOP_JOB_EVENTS` | Number of stop job event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_TASK_EXECUTION_COMPLETE_EVENTS` | Number of task execution complete event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TASK_SUBSCRIPTIONS_TASK_EXECUTION_ERROR_EVENTS` | Number of task execution error event subscribers | `1` |
 
 ### Coordinator Trigger Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
 | `BYTECHEF_COORDINATOR_TRIGGER_SCHEDULER_PROVIDER` | Scheduler provider (AWS, QUARTZ) | `QUARTZ` |
-| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_APPLICATIONEVENTS` | Number of application event subscribers | `1` |
-| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGEREXECUTIONCOMPLETEEVENTS` | Number of trigger execution complete event subscribers | `1` |
-| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGEREXECUTIONERROREVENTS` | Number of trigger execution error event subscribers | `1` |
-| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGERLISTENEREVENTS` | Number of trigger listener event subscribers | `1` |
-| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGERPOLLEVENTS` | Number of trigger poll event subscribers | `1` |
-| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGERWEBHOOKEVENTS` | Number of trigger webhook event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_APPLICATION_EVENTS` | Number of application event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_EXECUTION_COMPLETE_EVENTS` | Number of trigger execution complete event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_EXECUTION_ERROR_EVENTS` | Number of trigger execution error event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_LISTENER_EVENTS` | Number of trigger listener event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_POLL_EVENTS` | Number of trigger poll event subscribers | `1` |
+| `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_WEBHOOK_EVENTS` | Number of trigger webhook event subscribers | `1` |
 
 ## Datasource Configuration
 
@@ -100,13 +100,13 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_DATASTORAGE_PROVIDER` | Data storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
+| `BYTECHEF_DATA_STORAGE_PROVIDER` | Data storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
 
 ## Discovery Service Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_DISCOVERYSERVICE_PROVIDER` | Discovery service provider (REDIS) | `REDIS` |
+| `BYTECHEF_DISCOVERY_SERVICE_PROVIDER` | Discovery service provider (REDIS) | `REDIS` |
 
 ## Edition Configuration
 
@@ -125,21 +125,21 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_FEATUREFLAGS` | List of enabled feature flags | - |
+| `BYTECHEF_FEATURE_FLAGS` | List of enabled feature flags | - |
 
 ## File Storage Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_FILESTORAGE_PROVIDER` | File storage provider (AWS, FILESYSTEM, JDBC) | `FILESYSTEM` |
-| `BYTECHEF_FILESTORAGE_FILESYSTEM_BASEDIR` | Base directory for filesystem storage | - |
-| `BYTECHEF_FILESTORAGE_AWS_BUCKET` | AWS S3 bucket name | - |
+| `BYTECHEF_FILE_STORAGE_PROVIDER` | File storage provider (AWS, FILESYSTEM, JDBC) | `FILESYSTEM` |
+| `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` | Base directory for filesystem storage | - |
+| `BYTECHEF_FILE_STORAGE_AWS_BUCKET` | AWS S3 bucket name | - |
 
 ## Help Hub Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_HELPHUB_ENABLED` | Enable or disable the help hub | `false` |
+| `BYTECHEF_HELP_HUB_ENABLED` | Enable or disable the help hub | `true` |
 
 ## Observability Configuration
 
@@ -162,27 +162,27 @@ ByteChef can be configured using environment variables. This page documents all 
 | `BYTECHEF_MAIL_STARTTLS_ENABLE` | Enable STARTTLS | `false` |
 | `BYTECHEF_MAIL_STARTTLS_REQUIRED` | Require STARTTLS | `false` |
 | `BYTECHEF_MAIL_SSL_ENABLED` | Enable SSL for mail | `false` |
-| `BYTECHEF_MAIL_BASEURL` | Base URL for mail links | - |
+| `BYTECHEF_MAIL_BASE_URL` | Base URL for mail links | - |
 
 ## Message Broker Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_MESSAGEBROKER_PROVIDER` | Message broker provider (AMQP, AWS, JMS, KAFKA, LOCAL, REDIS) | `JMS` |
+| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | Message broker provider (AMQP, AWS, JMS, KAFKA, LOCAL, REDIS) | `JMS` |
 
 ## OAuth2 Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_OAUTH2_REDIRECTURI` | OAuth2 redirect URI | - |
-| `BYTECHEF_OAUTH2_PREDEFINEDAPPS_<APP_NAME>_CLIENTID` | Client ID for predefined OAuth2 app (sensitive) | - |
-| `BYTECHEF_OAUTH2_PREDEFINEDAPPS_<APP_NAME>_CLIENTSECRET` | Client secret for predefined OAuth2 app (sensitive) | - |
+| `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | - |
+| `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_ID` | Client ID for predefined OAuth2 app (sensitive) | - |
+| `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_SECRET` | Client secret for predefined OAuth2 app (sensitive) | - |
 
 ## Public URL Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_PUBLICURL` | Public URL of the ByteChef instance | - |
+| `BYTECHEF_PUBLIC_URL` | Public URL of the ByteChef instance | http://127.0.0.1:8080 |
 
 ## Resources Configuration
 
@@ -194,14 +194,14 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_SECURITY_CONTENTSECURITYPOLICY` | Content Security Policy | - |
-| `BYTECHEF_SECURITY_REMEMBERME_KEY` | Remember Me key (sensitive) | - |
+| `BYTECHEF_SECURITY_CONTENT_SECURITY_POLICY` | Content Security Policy | - |
+| `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | Remember Me key (sensitive) | - |
 
 ## Sign Up Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_SIGNUP_ACTIVATIONREQUIRED` | Require account activation | `false` |
+| `BYTECHEF_SIGNUP_ACTIVATION_REQUIRED` | Require account activation | `false` |
 | `BYTECHEF_SIGNUP_ENABLED` | Enable sign up | `true` |
 
 ## Tenant Configuration
@@ -214,7 +214,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_WEBHOOKURL` | Webhook URL | - |
+| `BYTECHEF_WEBHOOK_URL` | Webhook URL | - |
 
 ## Tracing Configuration
 
@@ -235,20 +235,20 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_WORKFLOW_OUTPUTSTORAGE_PROVIDER` | Output storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
+| `BYTECHEF_WORKFLOW_OUTPUT_STORAGE_PROVIDER` | Output storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
 
 ### Repository Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
 | `BYTECHEF_WORKFLOW_REPOSITORY_CLASSPATH_ENABLED` | Enable classpath repository | `false` |
-| `BYTECHEF_WORKFLOW_REPOSITORY_CLASSPATH_LOCATIONPATTERN` | Classpath location pattern | - |
+| `BYTECHEF_WORKFLOW_REPOSITORY_CLASSPATH_LOCATION_PATTERN` | Classpath location pattern | - |
 | `BYTECHEF_WORKFLOW_REPOSITORY_FILESYSTEM_ENABLED` | Enable filesystem repository | `false` |
-| `BYTECHEF_WORKFLOW_REPOSITORY_FILESYSTEM_LOCATIONPATTERN` | Filesystem location pattern | - |
+| `BYTECHEF_WORKFLOW_REPOSITORY_FILESYSTEM_LOCATION_PATTERN` | Filesystem location pattern | - |
 | `BYTECHEF_WORKFLOW_REPOSITORY_GIT_ENABLED` | Enable Git repository | `false` |
 | `BYTECHEF_WORKFLOW_REPOSITORY_GIT_URL` | Git repository URL | - |
 | `BYTECHEF_WORKFLOW_REPOSITORY_GIT_BRANCH` | Git repository branch | - |
 | `BYTECHEF_WORKFLOW_REPOSITORY_GIT_USERNAME` | Git username (sensitive) | - |
 | `BYTECHEF_WORKFLOW_REPOSITORY_GIT_PASSWORD` | Git password (sensitive) | - |
-| `BYTECHEF_WORKFLOW_REPOSITORY_GIT_SEARCHPATHS` | Git search paths | - |
+| `BYTECHEF_WORKFLOW_REPOSITORY_GIT_SEARCH_PATHS` | Git search paths | - |
 | `BYTECHEF_WORKFLOW_REPOSITORY_JDBC_ENABLED` | Enable JDBC repository | `true` |
