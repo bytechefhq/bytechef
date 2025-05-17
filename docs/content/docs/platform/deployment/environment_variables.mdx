@@ -188,7 +188,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_RESOURCES_WEB` | Web resources location | - |
+| `BYTECHEF_RESOURCES_WEB` | Web resources location | file:///opt/bytechef/client/ |
 
 ## Security Configuration
 
@@ -214,7 +214,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_WEBHOOK_URL` | Webhook URL | - |
+| `BYTECHEF_WEBHOOK_URL` | Webhook URL | \$\{bytechef.public-url\}/webhooks/\{id\} |
 
 ## Tracing Configuration
 
