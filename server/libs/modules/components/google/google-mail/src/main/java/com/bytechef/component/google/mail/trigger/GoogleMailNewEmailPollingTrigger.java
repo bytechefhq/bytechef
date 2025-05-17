@@ -69,7 +69,7 @@ public class GoogleMailNewEmailPollingTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        ZoneId zoneId = ZoneId.of("GMT");
+        ZoneId zoneId = ZoneId.systemDefault();
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 

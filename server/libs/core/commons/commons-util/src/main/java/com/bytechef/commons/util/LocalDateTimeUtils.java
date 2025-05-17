@@ -19,7 +19,6 @@ package com.bytechef.commons.util;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Date;
 
 /**
@@ -43,6 +42,6 @@ public final class LocalDateTimeUtils {
     }
 
     public static LocalDateTime toLocalDateTime(Instant instant) {
-        return LocalDateTime.ofInstant(instant, ZoneOffset.systemDefault());
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 }

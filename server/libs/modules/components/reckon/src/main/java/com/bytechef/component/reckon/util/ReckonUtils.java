@@ -101,7 +101,7 @@ public class ReckonUtils extends AbstractReckonUtils {
     public static PollOutput getPollOutput(
         Parameters inputParameters, Parameters closureParameters, TriggerContext context, String path) {
 
-        ZoneId zoneId = ZoneId.of("GMT");
+        ZoneId zoneId = ZoneId.systemDefault();
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 

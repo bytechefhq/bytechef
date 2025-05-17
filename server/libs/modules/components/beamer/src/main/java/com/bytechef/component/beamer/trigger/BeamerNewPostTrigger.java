@@ -113,7 +113,7 @@ public class BeamerNewPostTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        ZoneId zoneId = ZoneId.of("GMT");
+        ZoneId zoneId = ZoneId.systemDefault();
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 

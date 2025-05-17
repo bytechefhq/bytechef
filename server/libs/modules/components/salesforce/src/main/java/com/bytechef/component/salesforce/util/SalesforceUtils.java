@@ -193,7 +193,7 @@ public class SalesforceUtils {
     public static PollOutput getPollOutput(
         Parameters inputParameters, Parameters closureParameters, TriggerContext triggerContext, String dateFieldName) {
 
-        ZoneId zoneId = ZoneId.of("GMT");
+        ZoneId zoneId = ZoneId.systemDefault();
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 

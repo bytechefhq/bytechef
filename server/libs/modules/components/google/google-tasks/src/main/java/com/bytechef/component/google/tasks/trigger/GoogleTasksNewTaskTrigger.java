@@ -75,7 +75,7 @@ public class GoogleTasksNewTaskTrigger {
         List<String> allTasks = closureParameters.getList(ALL_TASKS, String.class, List.of());
         List<String> allTasksUpdate = new ArrayList<>();
 
-        ZoneId zoneId = ZoneId.of("GMT");
+        ZoneId zoneId = ZoneId.systemDefault();
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 

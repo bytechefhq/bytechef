@@ -83,7 +83,7 @@ class BeamerNewPostTriggerTest {
                 List.of(Map.of()), Map.of(LAST_TIME_CHECKED, endDate), false);
 
             assertEquals(expectedPollOutput, pollOutput);
-            assertEquals(ZoneId.of("GMT"), zoneIdArgumentCaptor.getValue());
+            assertEquals(ZoneId.systemDefault(), zoneIdArgumentCaptor.getValue());
             assertEquals(List.of(DATE_FROM, startDate.toString()), stringArgumentCaptor.getAllValues());
         }
     }

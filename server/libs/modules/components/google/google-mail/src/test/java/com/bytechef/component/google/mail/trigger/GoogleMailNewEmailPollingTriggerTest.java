@@ -86,7 +86,7 @@ class GoogleMailNewEmailPollingTriggerTest {
             assertEquals(messages, pollOutput.records());
             assertFalse(pollOutput.pollImmediately());
 
-            ZoneId zoneId = ZoneId.of("GMT");
+            ZoneId zoneId = ZoneId.systemDefault();
 
             ZonedDateTime zonedDateTime = startDate.atZone(zoneId);
 

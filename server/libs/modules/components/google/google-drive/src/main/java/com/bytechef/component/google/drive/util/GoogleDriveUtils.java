@@ -44,7 +44,7 @@ public class GoogleDriveUtils {
     public static PollOutput getPollOutput(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters, boolean newFile) {
 
-        ZoneId zoneId = ZoneId.of("GMT");
+        ZoneId zoneId = ZoneId.systemDefault();
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 

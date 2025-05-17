@@ -67,7 +67,7 @@ class AirtableNewRecordTriggerTest {
             localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
                 .thenReturn(endDate);
 
-            when(parameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(ZoneId.of("GMT"))))
+            when(parameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(ZoneId.systemDefault())))
                 .thenReturn(startDate);
             when(mockedTriggerContext.http(any()))
                 .thenReturn(mockedExecutor);
