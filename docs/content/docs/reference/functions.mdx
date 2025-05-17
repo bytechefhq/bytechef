@@ -1,0 +1,93 @@
+---
+title: Functions
+description: Available Formula expression functions in ByteChef.
+---
+
+This page lists all the functions available in ByteChef's formula expressions.
+
+## Type Conversion Functions
+
+| Function | Description |
+|----------|-------------|
+| `boolean(value)` | Converts a value to a boolean. |
+| `byte(value)` | Converts a value to a byte. |
+| `char(value)` | Converts a value to a character. |
+| `float(value)` | Converts a value to a float. |
+| `double(value)` | Converts a value to a double. |
+| `int(value)` | Converts a value to an integer. |
+| `long(value)` | Converts a value to a long. |
+| `short(value)` | Converts a value to a short. |
+
+## String Functions
+
+| Function | Description |
+|----------|-------------|
+| `concat(str1, str2)` | Concatenates two strings or two lists. |
+| `contains(str, substr)` | Checks if a string contains a substring. |
+| `format(formatStr, args...)` | Formats a string using a format string and arguments (similar to String.format). |
+| `indexOf(str, substr)` | Returns the index of the first occurrence of a substring in a string. |
+| `join(list, delimiter)` | Joins a list of strings with a delimiter. |
+| `lastIndexOf(str, substr)` | Returns the index of the last occurrence of a substring in a string. |
+| `length(str)` | Returns the length of a string. |
+| `split(str, delimiter)` | Splits a string by a delimiter and returns a list of strings. |
+| `stringf(format, args...)` | Formats a string using a format string and arguments (similar to String.format). |
+| `substring(str, start, end)` | Returns a substring from start index to end index. |
+
+## Date and Time Functions
+
+| Function | Description |
+|----------|-------------|
+| `atZone(instant, zoneId)` | Converts an instant to a zoned date-time with the specified time zone. |
+| `format(date, [format])` | Formats a date using the specified format. If no format is provided, uses ISO format. |
+| `minusDays(date, days)` | Subtracts the specified number of days from a date. |
+| `minusHours(date, hours)` | Subtracts the specified number of hours from a date. |
+| `minusMicros(date, micros)` | Subtracts the specified number of microseconds from a date. |
+| `minusMillis(date, millis)` | Subtracts the specified number of milliseconds from a date. |
+| `minusMinutes(date, minutes)` | Subtracts the specified number of minutes from a date. |
+| `minusMonths(date, months)` | Subtracts the specified number of months from a date. |
+| `minusSeconds(date, seconds)` | Subtracts the specified number of seconds from a date. |
+| `minusWeeks(date, weeks)` | Subtracts the specified number of weeks from a date. |
+| `minusYears(date, years)` | Subtracts the specified number of years from a date. |
+| `now()` | Returns the current date and time. |
+| `parseDate(dateStr, [format])` | Parses a string into a date. If no format is provided, uses ISO format. |
+| `parseDateTime(dateTimeStr, [format])` | Parses a string into a date-time. If no format is provided, uses ISO format. |
+| `plusDays(date, days)` | Adds the specified number of days to a date. |
+| `plusHours(date, hours)` | Adds the specified number of hours to a date. |
+| `plusMicros(date, micros)` | Adds the specified number of microseconds to a date. |
+| `plusMillis(date, millis)` | Adds the specified number of milliseconds to a date. |
+| `plusMinutes(date, minutes)` | Adds the specified number of minutes to a date. |
+| `plusMonths(date, months)` | Adds the specified number of months to a date. |
+| `plusSeconds(date, seconds)` | Adds the specified number of seconds to a date. |
+| `plusWeeks(date, weeks)` | Adds the specified number of weeks to a date. |
+| `plusYears(date, years)` | Adds the specified number of years to a date. |
+| `timestamp()` | Returns the current timestamp in milliseconds. |
+
+## List Functions
+
+| Function | Description |
+|----------|-------------|
+| `add(list, element)` | Adds an element to a list and returns a new list. |
+| `addAll(list1, list2)` | Adds all elements from list2 to list1 and returns a new list. |
+| `concat(list1, list2)` | Concatenates two lists. |
+| `flatten(list)` | Flattens a nested list into a single list. |
+| `range(start, end)` | Creates a list of integers from start to end (inclusive). |
+| `remove(list, element)` | Removes an element from a list and returns the modified list. |
+| `set(list, index, element)` | Sets an element at a specific index in a list and returns the modified list. |
+| `size(list)` | Returns the size of a list or map. |
+| `sort(list)` | Sorts a list in ascending order. |
+
+## Map Functions
+
+| Function | Description |
+|----------|-------------|
+| `put(map, key, value)` | Adds a key-value pair to a map and returns a new map. |
+| `putAll(map1, map2)` | Adds all key-value pairs from map2 to map1 and returns a new map. |
+| `remove(map, key)` | Removes a key-value pair from a map and returns the modified map. |
+| `size(map)` | Returns the size of a map. |
+| `toMap(list)` | Converts a list of maps with "key" and "value" entries to a single map. |
+
+## System Functions
+
+| Function | Description |
+|----------|-------------|
+| `uuid()` | Generates a random UUID. |

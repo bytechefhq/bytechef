@@ -10,5 +10,8 @@
     "deployment",
     "---Products---",
     "automation",
-    "embedded"]
+    "embedded",
+    "---Workflows---",
+    "workflows/expressions"
+  ]
 }
