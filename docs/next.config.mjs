@@ -21,7 +21,7 @@ const config = {
       {
         source: '/',
         destination: '/platform',
-        permanent: true,
+        permanent: false,
       },
     ];
   },
