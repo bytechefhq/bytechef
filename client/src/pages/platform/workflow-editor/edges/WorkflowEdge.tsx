@@ -2,7 +2,7 @@ import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 import {PlusIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -101,6 +101,20 @@ export default function WorkflowEdge({
         edgeCenterY,
     ]);
 
+    useEffect(() => {
+        const handleGlobalDragEnd = () => {
+            setDropzoneActive(false);
+        };
+
+        document.addEventListener('dragend', handleGlobalDragEnd);
+        document.addEventListener('drop', handleGlobalDragEnd);
+
+        return () => {
+            document.removeEventListener('dragend', handleGlobalDragEnd);
+            document.removeEventListener('drop', handleGlobalDragEnd);
+        };
+    }, []);
+
     return (
         <>
             <BaseEdge
@@ -129,20 +143,37 @@ export default function WorkflowEdge({
                     >
                         <div
                             className={twMerge(
-                                'flex size-6 cursor-pointer items-center justify-center rounded border-2 border-gray-300 bg-white transition-all hover:scale-110 hover:border-gray-400',
-                                isDropzoneActive && 'z-40 size-14 scale-150 border-blue-100 bg-blue-100'
+                                'flex cursor-pointer items-center justify-center rounded transition-all',
+                                isDropzoneActive
+                                    ? 'size-16 border-2 border-blue-100 bg-blue-100'
+                                    : 'size-6 border-2 border-gray-300 bg-white hover:scale-110 hover:border-gray-400'
                             )}
                             id={`${id}-button`}
                             onDragEnter={() => setDropzoneActive(true)}
-                            onDragLeave={() => setDropzoneActive(false)}
-                            onDragOver={() => {
-                                if (!isDropzoneActive) {
-                                    setDropzoneActive(true);
+                            onDragLeave={(event) => {
+                                const relatedTarget = event.relatedTarget as Node | null;
+
+                                if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
+                                    setDropzoneActive(false);
                                 }
                             }}
-                            onDrop={() => setDropzoneActive(false)}
+                            onDragOver={(event) => {
+                                event.preventDefault();
+
+                                setDropzoneActive(true);
+                            }}
+                            onDrop={(event) => {
+                                event.preventDefault();
+
+                                setDropzoneActive(false);
+                            }}
                         >
-                            <PlusIcon className="size-3.5 text-muted-foreground" />
+                            <PlusIcon
+                                className={twMerge(
+                                    `text-muted-foreground`,
+                                    isDropzoneActive ? 'size-14 text-muted-foreground/50' : 'size-3.5'
+                                )}
+                            />
                         </div>
                     </div>
                 </WorkflowNodesPopoverMenu>
