@@ -6,7 +6,7 @@
   "pages": [
     "build-component",
     "generate-component",
-    "testing-triggers/testing-triggers",
+    "working-with-triggers",
     "component-specification",
     "components/add-component-manually"
   ]

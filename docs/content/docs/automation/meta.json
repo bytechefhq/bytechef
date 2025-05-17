@@ -1,0 +1,18 @@
+{
+  "title": "Automation",
+  "description": "The automation guide",
+  "icon": "Workflow",
+  "root": true,
+  "pages": [
+    "getting_started",
+    "glossary",
+    "quick-start",
+    "---Build---",
+    "build/index",
+    "...build",
+    "---Deploy---",
+    "deploy/index",
+    "---Monitor---",
+    "monitor/index"
+  ]
+}

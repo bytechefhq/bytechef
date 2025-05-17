@@ -7,11 +7,7 @@
     "---Getting Started---",
     "index",
     "what-is-bytechef",
-    "deployment",
-    "---Products---",
-    "automation",
-    "embedded",
-    "---Workflows---",
-    "workflows/expressions"
+    "---Setup---",
+    "deployment"
   ]
 }
