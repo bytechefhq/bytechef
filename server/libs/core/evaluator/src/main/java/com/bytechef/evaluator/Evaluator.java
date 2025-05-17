@@ -59,9 +59,11 @@ public class Evaluator {
     private static final String ACCESSOR_PREFIX = "${";
     private static final String ACCESSOR_SUFFIX = "}";
     private static final String FORMULA_PREFIX = "=";
-    private static final Pattern TEXT_EXPRESSION_PATTERN = Pattern.compile("\\$\\{(.*?)}");
+    private static final Pattern ACCESSOR_EXPRESSION_PATTERN = Pattern.compile("\\$\\{(.*?)}");
+    private static final Pattern FORMULA_EXPRESSION_PATTERN =
+        Pattern.compile("^(?!.*T\\()(?!.*\\.\\w+\\()(?!.*new\\s+\\w+(?:<[^>]*>)?\\s*\\[).*$");
     private static final Pattern VALID_ACCESSOR_PATTERN = Pattern.compile(
-        "^[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_\\-]+')])*(\\.(([a-zA-Z_][a-zA-Z0-9_]*)|\\[(\\d+|'[a-zA-Z0-9_\\-]+')]))*(\\.[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_\\-]+')])*)*$");
+        "^(?!T\\()([a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_\\-]+')])*(\\.(([a-zA-Z_][a-zA-Z0-9_]*)|\\[(\\d+|'[a-zA-Z0-9_\\-\\p{L}]+')]))*(\\.([a-zA-Z_][a-zA-Z0-9_]*)(\\[(\\d+|'[a-zA-Z0-9_\\-\\p{L}]+')])*)*$)");
 
     private final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -185,9 +187,13 @@ public class Evaluator {
                 formulaExpression = true;
 
                 try {
-                    string = string.substring(1);
+                    string = string.replaceAll("\\$\\{([^}]*)}", "$1");
 
-                    expression = expressionParser.parseExpression(string.replaceAll("\\$\\{([^}]*)}", "$1"));
+                    if (!validateFormulaExpression(string)) {
+                        throw new UnsupportedOperationException("Invalid formula expression: " + string);
+                    }
+
+                    expression = expressionParser.parseExpression(string.substring(1));
                 } catch (ParseException e) {
                     throw new IllegalArgumentException("Invalid formula expression: " + string, e);
                 }
@@ -252,8 +258,8 @@ public class Evaluator {
         };
     }
 
-    public static boolean validateTextExpression(String expression) {
-        Matcher accessorMatcher = TEXT_EXPRESSION_PATTERN.matcher(expression);
+    private static boolean validateTextExpression(String expression) {
+        Matcher accessorMatcher = ACCESSOR_EXPRESSION_PATTERN.matcher(expression);
 
         while (accessorMatcher.find()) {
             String accessorContent = accessorMatcher.group(1);
@@ -266,6 +272,12 @@ public class Evaluator {
         }
 
         return true;
+    }
+
+    private static boolean validateFormulaExpression(String expression) {
+        Matcher formulaMatcher = FORMULA_EXPRESSION_PATTERN.matcher(expression);
+
+        return formulaMatcher.matches();
     }
 
     public static Builder builder() {
@@ -287,8 +299,8 @@ public class Evaluator {
             return this;
         }
 
-        public Builder methodExecutor(String aMethodName, MethodExecutor methodExecutor) {
-            methodExecutors.put(aMethodName, methodExecutor);
+        public Builder methodExecutor(String methodName, MethodExecutor methodExecutor) {
+            methodExecutors.put(methodName, methodExecutor);
 
             return this;
         }
