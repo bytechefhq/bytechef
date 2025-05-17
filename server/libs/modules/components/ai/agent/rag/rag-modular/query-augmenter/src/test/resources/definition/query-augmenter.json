@@ -1,36 +1,36 @@
 {
-  "componentCategories" : [ {
-    "name" : "artificial-intelligence",
-    "label" : "Artificial Intelligence"
-  } ],
-  "customAction" : null,
-  "customActionHelp" : null,
-  "description" : "Query Augmenter.",
-  "icon" : "path:assets/query-augmenter.svg",
-  "tags" : null,
-  "metadata" : null,
-  "name" : "queryAugmenter",
-  "resources" : null,
-  "version" : 1,
-  "title" : "Query Augmenter",
-  "connection" : null,
   "actions" : null,
-  "unifiedApi" : null,
-  "triggers" : null,
   "clusterElements" : [ {
     "description" : "Augments the user query with contextual data from the content of the provided\ndocuments.\n",
+    "element" : { },
     "help" : null,
     "name" : "contextualQueryAugmenter",
     "outputDefinition" : null,
     "properties" : null,
     "title" : "Contextual Query Augmenter",
     "type" : {
-      "name" : "QUERY_AUGMENTER",
       "key" : "queryAugmenter",
       "label" : "Query Augmenter",
       "multipleElements" : false,
+      "name" : "QUERY_AUGMENTER",
       "required" : false
-    },
-    "element" : { }
-  } ]
+    }
+  } ],
+  "componentCategories" : [ {
+    "label" : "Artificial Intelligence",
+    "name" : "artificial-intelligence"
+  } ],
+  "connection" : null,
+  "customAction" : null,
+  "customActionHelp" : null,
+  "description" : "Query Augmenter.",
+  "icon" : "path:assets/query-augmenter.svg",
+  "metadata" : null,
+  "name" : "queryAugmenter",
+  "resources" : null,
+  "tags" : null,
+  "title" : "Query Augmenter",
+  "triggers" : null,
+  "unifiedApi" : null,
+  "version" : 1
 }

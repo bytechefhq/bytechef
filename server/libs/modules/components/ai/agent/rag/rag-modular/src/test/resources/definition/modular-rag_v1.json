@@ -1,68 +1,68 @@
 {
+  "actionClusterElementTypes" : { },
   "actions" : [ ],
-  "componentCategories" : [ {
-    "name" : "artificial-intelligence",
-    "label" : "Artificial Intelligence"
+  "clusterElementType" : [ {
+    "key" : "documentJoiner",
+    "label" : "Document Joiner",
+    "multipleElements" : false,
+    "name" : "DOCUMENT_JOINER",
+    "required" : false
+  }, {
+    "key" : "documentRetriever",
+    "label" : "Document Retriever",
+    "multipleElements" : false,
+    "name" : "DOCUMENT_RETRIEVER",
+    "required" : true
+  }, {
+    "key" : "queryAugmenter",
+    "label" : "Query Augmenter",
+    "multipleElements" : false,
+    "name" : "QUERY_AUGMENTER",
+    "required" : false
+  }, {
+    "key" : "queryExpander",
+    "label" : "Query Expander",
+    "multipleElements" : false,
+    "name" : "QUERY_EXPANDER",
+    "required" : false
+  }, {
+    "key" : "queryTransformer",
+    "label" : "Query Transformer",
+    "multipleElements" : true,
+    "name" : "QUERY_TRANSFORMER",
+    "required" : false
   } ],
-  "connection" : null,
-  "customAction" : null,
-  "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Moduler RAG.",
+    "element" : { },
     "help" : null,
     "name" : "rag",
     "outputDefinition" : null,
     "properties" : null,
     "title" : "Moduler RAG",
     "type" : {
-      "name" : "RAG",
       "key" : "rag",
       "label" : "RAG",
       "multipleElements" : false,
+      "name" : "RAG",
       "required" : false
-    },
-    "element" : { }
+    }
   } ],
+  "componentCategories" : [ {
+    "label" : "Artificial Intelligence",
+    "name" : "artificial-intelligence"
+  } ],
+  "connection" : null,
+  "customAction" : null,
+  "customActionHelp" : null,
   "description" : "Retrieval Augmentation is a powerful tool that allows you to retrieve relevant information from a vector database, such as Pinecone, and use it to enhance your AI agent's responses.",
   "icon" : "path:assets/rag.svg",
-  "tags" : null,
   "metadata" : null,
   "name" : "modularRag",
   "resources" : null,
+  "tags" : null,
   "title" : "Modular RAG",
   "triggers" : null,
   "unifiedApi" : null,
-  "version" : 1,
-  "clusterElementType" : [ {
-    "name" : "DOCUMENT_JOINER",
-    "key" : "documentJoiner",
-    "label" : "Document Joiner",
-    "multipleElements" : false,
-    "required" : false
-  }, {
-    "name" : "DOCUMENT_RETRIEVER",
-    "key" : "documentRetriever",
-    "label" : "Document Retriever",
-    "multipleElements" : false,
-    "required" : true
-  }, {
-    "name" : "QUERY_AUGMENTER",
-    "key" : "queryAugmenter",
-    "label" : "Query Augmenter",
-    "multipleElements" : false,
-    "required" : false
-  }, {
-    "name" : "QUERY_EXPANDER",
-    "key" : "queryExpander",
-    "label" : "Query Expander",
-    "multipleElements" : false,
-    "required" : false
-  }, {
-    "name" : "QUERY_TRANSFORMER",
-    "key" : "queryTransformer",
-    "label" : "Query Transformer",
-    "multipleElements" : true,
-    "required" : false
-  } ],
-  "actionClusterElementTypes" : { }
+  "version" : 1
 }
