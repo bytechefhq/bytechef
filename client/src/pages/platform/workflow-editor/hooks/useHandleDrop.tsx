@@ -8,7 +8,7 @@ import {
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
-import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
+import {ClickedDefinitionType, NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {QueryClient, useQueryClient} from '@tanstack/react-query';
 import {Edge, Node} from '@xyflow/react';
@@ -131,6 +131,41 @@ async function getFirstActionName(nodeData: NodeDataType, queryClient: QueryClie
     return componentDefinition.actions?.[0].name;
 }
 
+interface SaveDroppedNodeProps {
+    captureComponentUsed: (name: string, actionName?: string, triggerName?: string) => void;
+    nodeData: NodeDataType;
+    options?: {
+        nodeIndex?: number;
+        placeholderId?: string;
+    };
+    queryClient: QueryClient;
+    projectId: string;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
+}
+
+async function saveDroppedNode({
+    captureComponentUsed,
+    nodeData,
+    options,
+    projectId,
+    queryClient,
+    updateWorkflowMutation,
+}: SaveDroppedNodeProps) {
+    captureComponentUsed(
+        nodeData.componentName,
+        !nodeData.taskDispatcher ? await getFirstActionName(nodeData, queryClient) : undefined
+    );
+
+    saveWorkflowDefinition({
+        nodeData,
+        nodeIndex: options?.nodeIndex,
+        placeholderId: options?.placeholderId,
+        projectId: parseInt(projectId)!,
+        queryClient,
+        updateWorkflowMutation,
+    });
+}
+
 export default function useHandleDrop(): [
     (targetNode: Node, droppedNode: ClickedDefinitionType) => void,
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
@@ -175,14 +210,17 @@ export default function useHandleDrop(): [
 
         const nodeData = await createWorkflowNodeData(droppedNode, queryClient);
 
-        captureComponentUsed(
-            nodeData.componentName,
-            !nodeData.taskDispatcher ? await getFirstActionName(nodeData, queryClient) : undefined
-        );
+        if (!projectId) {
+            return;
+        }
 
-        saveWorkflowDefinition({
+        await saveDroppedNode({
+            captureComponentUsed,
             nodeData,
-            projectId: +projectId!,
+            options: {
+                placeholderId: newNodeId,
+            },
+            projectId,
             queryClient,
             updateWorkflowMutation,
         });
@@ -230,15 +268,17 @@ export default function useHandleDrop(): [
 
         setEdges(edges);
 
-        captureComponentUsed(
-            nodeData.componentName,
-            !nodeData.taskDispatcher ? await getFirstActionName(nodeData, queryClient) : undefined
-        );
+        if (!projectId) {
+            return;
+        }
 
-        saveWorkflowDefinition({
+        await saveDroppedNode({
+            captureComponentUsed,
             nodeData,
-            nodeIndex: targetEdgeIndex,
-            projectId: +projectId!,
+            options: {
+                nodeIndex: targetEdgeIndex,
+            },
+            projectId,
             queryClient,
             updateWorkflowMutation,
         });
@@ -247,11 +287,14 @@ export default function useHandleDrop(): [
     async function handleDropOnTriggerNode(droppedNode: ClickedDefinitionType) {
         const nodeData = await createWorkflowNodeData(droppedNode, queryClient);
 
-        captureComponentUsed(nodeData.componentName, undefined, await getFirstActionName(nodeData, queryClient));
+        if (!projectId) {
+            return;
+        }
 
-        saveWorkflowDefinition({
+        saveDroppedNode({
+            captureComponentUsed,
             nodeData,
-            projectId: +projectId!,
+            projectId: projectId!,
             queryClient,
             updateWorkflowMutation,
         });
