@@ -125,7 +125,7 @@ export default function getTaskDispatcherContext({
     }
 
     if (isSourceGhost && isTargetTaskDispatcher) {
-        if (!sourceNode.data.conditionData && !sourceNode.data.loopData && !sourceNode.data.branchData) {
+        if (!targetNode.data.conditionData && !targetNode.data.loopDaXta && !targetNode.data.branchData) {
             return undefined;
         }
 
