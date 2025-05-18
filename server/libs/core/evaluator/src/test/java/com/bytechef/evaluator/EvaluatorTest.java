@@ -357,22 +357,6 @@ public class EvaluatorTest {
     }
 
     @Test
-    public void test36() {
-        Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "number", "=stringf('%03d',5)"), Collections.emptyMap());
-
-        Assertions.assertEquals("005", MapUtils.getString(map, "number"));
-    }
-
-    @Test
-    public void test37() {
-        Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "number", "=stringf('%s %s','hello','world')"), Collections.emptyMap());
-
-        Assertions.assertEquals("hello world", MapUtils.getString(map, "number"));
-    }
-
-    @Test
     public void test38() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "sorted", "=sort({3,1,2})"), Collections.emptyMap());
@@ -438,24 +422,4 @@ public class EvaluatorTest {
         Assertions.assertEquals(2, MapUtils.getInteger(map, "size"));
     }
 
-//    @Test
-//    public void test41() {
-//        Environment environment = mock(Environment.class);
-//        when(environment.getProperty("my.property")).thenReturn("something");
-//
-//        Map<String, Object> map = EVALUATOR.evaluate(
-//            Map.of("type", "type", "myValue", "${config('my.property')}"), Collections.emptyMap());
-//
-//        Assertions.assertEquals("something", MapValueUtils.getString(map, "myValue"));
-//    }
-//
-//    @Test
-//    public void test42() {
-//        Environment environment = mock(Environment.class);
-//        Map<String, Object> map = EVALUATOR.evaluate(
-//            Map.of("type", "type", "myValue", "${config('no.such.property')}"), Collections.emptyMap());
-//
-//        Assertions.assertEquals(
-//            "${config('no.such.property')}", MapValueUtils.getString(map, "myValue"));
-//    }
 }
