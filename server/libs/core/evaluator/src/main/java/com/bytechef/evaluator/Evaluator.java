@@ -122,8 +122,6 @@ public class Evaluator {
         map.put("sort", new Sort());
         map.put("split", new Split());
         map.put("substring", new Substring());
-//        map.put("systemProperty", new SystemProperty());
-//        map.put("tempDir", new TempDir());
         map.put("timestamp", new Timestamp());
         map.put("toMap", new ToMap());
         map.put("uuid", new Uuid());
