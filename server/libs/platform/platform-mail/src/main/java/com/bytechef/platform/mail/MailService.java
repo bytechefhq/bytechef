@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -48,6 +49,13 @@ public class MailService {
 
     private final Logger log = LoggerFactory.getLogger(MailService.class);
 
+    private static final String[] PROPERTY_NAMES = {
+        "spring.mail.host", "spring.mail.port", "spring.mail.protocol", "spring.mail.ssl.enabled",
+        "spring.mail.properties.mail.debug", "spring.mail.properties.mail.smtp.auth",
+        "spring.mail.properties.mail.smtp.starttls.enable", "spring.mail.properties.mail.transport.protocol",
+        "spring.mail.properties.mail.smtp.starttls.required"
+    };
+
     private static final String USER = "user";
     private static final String BASE_URL = "baseUrl";
 
@@ -59,7 +67,7 @@ public class MailService {
     @SuppressFBWarnings("EI")
     public MailService(
         JavaMailSender javaMailSender, ApplicationProperties applicationProperties, MessageSource messageSource,
-        SpringTemplateEngine templateEngine) {
+        SpringTemplateEngine templateEngine, Environment environment) {
 
         this.javaMailSender = javaMailSender;
         this.mail = applicationProperties.getMail();
@@ -68,6 +76,14 @@ public class MailService {
 
         if (StringUtils.isBlank(mail.getHost()) && log.isWarnEnabled()) {
             log.warn("Mail server is not configured, not sending mails");
+        } else {
+            if (log.isTraceEnabled()) {
+                log.trace("Listing mail server properties:");
+
+                for (String propertyName : PROPERTY_NAMES) {
+                    log.trace("{}: {}", propertyName, environment.getProperty(propertyName));
+                }
+            }
         }
     }
 
