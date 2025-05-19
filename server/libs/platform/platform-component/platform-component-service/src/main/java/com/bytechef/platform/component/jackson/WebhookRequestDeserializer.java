@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.springframework.boot.jackson.JsonComponent;
 
 /**
@@ -56,7 +58,7 @@ public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest>
 
         JsonNode bodyJsonNode = jsonNode.get(BODY);
 
-        if (bodyJsonNode != null) {
+        if (bodyJsonNode != null && bodyJsonNode.getNodeType() != JsonNodeType.NULL) {
             Object content;
             Map<String, ?> bodyMap = objectCodec.treeToValue(bodyJsonNode, Map.class);
 
