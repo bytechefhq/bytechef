@@ -27,7 +27,7 @@ const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, s
     const {t: translation} = useTranslation();
 
     const type = getSchemaType(schema);
-    const fields = getAllSchemaKeys(schema);
+    const fields = getAllSchemaKeys(schema ?? {});
 
     const allOptions = useMemo(() => translateLabels(translation, getSchemaMenuOptions(type)), [type, translation]);
     const displayFields = useMemo(() => allOptions.filter((item) => fields.includes(item.value)), [allOptions, fields]);

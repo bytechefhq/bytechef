@@ -89,7 +89,7 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, s
 
                         {root && <span>Extra fields</span>}
 
-                        {extraFields.length > 0 && (
+                        {extraFields?.length > 0 && (
                             <Badge
                                 className={twMerge(
                                     'group-hover:bg-surface-neutral-secondary-hover',
@@ -146,7 +146,13 @@ interface SchemaArrayControlsProps {
 const SchemaArrayControls = ({onAdd, onChange, root, schema}: SchemaArrayControlsProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
-    const extraFields = Object.keys(schema).filter((key) => key !== 'type' && key !== 'items' && key !== 'properties');
+    const isObjectSchema = getSchemaType(schema) === 'object';
+
+    const extraFields: string[] =
+        (schema &&
+            isObjectSchema &&
+            Object.keys(schema).filter((key) => key !== 'type' && key !== 'items' && key !== 'properties')) ||
+        [];
 
     return (
         <div className="flex w-full items-center">
@@ -172,7 +178,7 @@ const SchemaArrayControls = ({onAdd, onChange, root, schema}: SchemaArrayControl
 
                         {root && <span>Extra fields</span>}
 
-                        {extraFields.length > 0 && (
+                        {extraFields?.length > 0 && (
                             <Badge
                                 className={twMerge(
                                     'group-hover:bg-surface-neutral-secondary-hover',
