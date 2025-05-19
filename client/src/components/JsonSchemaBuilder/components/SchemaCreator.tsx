@@ -59,6 +59,12 @@ const SchemaCreator = ({
             </div>
 
             <div className="block">
+                {isSchemaObject(schema) && !hasSchemaProperties(schema) && root && (
+                    <p className="p-4 text-xs text-content-neutral-secondary">
+                        No pills added. Add some to start creating a response.
+                    </p>
+                )}
+
                 {isSchemaObject(schema) && hasSchemaProperties(schema) && (
                     <SchemaBox itemCount={objectPropertiesCount}>
                         <SchemaObjectProperties
