@@ -1432,6 +1432,7 @@ public class ApplicationProperties {
     public static class Mail {
 
         private boolean auth;
+        private boolean debug;
         private String from;
         private String host;
         private String baseUrl;
@@ -1456,6 +1457,14 @@ public class ApplicationProperties {
 
         public void setBaseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
+        }
+
+        public boolean isDebug() {
+            return debug;
+        }
+
+        public void setDebug(boolean debug) {
+            this.debug = debug;
         }
 
         public String getFrom() {
@@ -2523,6 +2532,7 @@ public class ApplicationProperties {
 
             if (filesystem != null) {
                 String basedir = filesystem.getBasedir();
+
                 if (StringUtils.isNotBlank(basedir)) {
                     builder.append("\n\tfileStorage.filesystem.basedir: ")
                         .append(basedir);
