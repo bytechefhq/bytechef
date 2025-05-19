@@ -243,7 +243,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 let value = editor.getHTML();
 
                 value = value.replace(/\r\n/g, '\n');
-                value = value.replace(/\s+/g, ' ').trim();
 
                 const paragraphMatchRegex = /<p>(.*?)<\/p>/g;
 
