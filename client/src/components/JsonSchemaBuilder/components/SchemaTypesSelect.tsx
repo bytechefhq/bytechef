@@ -15,7 +15,7 @@ interface SchemaTypesSelectProps {
 }
 
 const SchemaTypesSelect = ({onChange, type}: SchemaTypesSelectProps) => (
-    <fieldset className="space-y-1">
+    <fieldset className="space-y-1 p-0.5">
         <Label>Pill Type</Label>
 
         <Select

@@ -46,7 +46,7 @@ const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, s
 
             <PopoverContent align="end" className="w-80 p-0">
                 <div className="space-y-2 p-4">
-                    <fieldset className="space-y-1">
+                    <fieldset className="space-y-1 p-0.5">
                         <Label>Add a field</Label>
 
                         <Select
