@@ -1,11 +1,32 @@
-import LoadingIcon from '@/components/LoadingIcon';
+import PageLoader from '@/components/PageLoader';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import ReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflow';
+import WorkflowEditor from '@/pages/platform/workflow-editor/components/WorkflowEditor';
+import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
+import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
+import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
+import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
+import {ReactFlowProvider} from '@xyflow/react';
 
 import useReadOnlyWorkflow from './hooks/useReadOnlyWorkflow';
 
 const ReadOnlyWorkflowSheet = () => {
-    const {closeReadOnlyWorkflowSheet, edges, isReadOnlyWorkflowSheetOpen, nodes, workflow} = useReadOnlyWorkflow();
+    const {closeReadOnlyWorkflowSheet, isReadOnlyWorkflowSheetOpen, workflow} = useReadOnlyWorkflow();
+
+    const {
+        componentDefinitions,
+        componentsError,
+        componentsIsLoading,
+        taskDispatcherDefinitions,
+        taskDispatcherDefinitionsError,
+        taskDispatcherDefinitionsLoading,
+    } = useWorkflowLayout();
+
+    const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
+        useUpdateWorkflowMutation,
+        workflowId: workflow?.id as string,
+        workflowKeys: WorkflowKeys,
+    });
 
     return (
         <Sheet
@@ -23,13 +44,26 @@ const ReadOnlyWorkflowSheet = () => {
                     <SheetCloseButton />
                 </SheetHeader>
 
-                {workflow ? (
-                    <ReadOnlyWorkflow edges={edges} nodes={nodes} />
-                ) : (
-                    <div className="flex size-full items-center justify-center">
-                        <LoadingIcon className="size-8" />
-                    </div>
-                )}
+                <WorkflowMutationProvider
+                    value={{
+                        updateWorkflowMutation: updateWorkflowEditorMutation,
+                    }}
+                >
+                    <ReactFlowProvider>
+                        <PageLoader
+                            errors={[componentsError, taskDispatcherDefinitionsError]}
+                            loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
+                        >
+                            {componentDefinitions && taskDispatcherDefinitions && workflow && (
+                                <WorkflowEditor
+                                    componentDefinitions={componentDefinitions}
+                                    readOnlyWorkflow={workflow}
+                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                />
+                            )}
+                        </PageLoader>
+                    </ReactFlowProvider>
+                </WorkflowMutationProvider>
             </SheetContent>
         </Sheet>
     );
