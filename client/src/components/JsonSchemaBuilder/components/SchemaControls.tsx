@@ -33,7 +33,13 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, s
 
     const isObjectSchema = getSchemaType(schema) === 'object';
 
-    const extraFields = Object.keys(schema).filter((key) => key !== 'type' && key !== 'items' && key !== 'properties');
+    let extraFields = Object.keys(schema).filter(
+        (key) => key !== 'type' && key !== 'items' && key !== 'properties' && key !== '$schema'
+    );
+
+    if (root) {
+        extraFields = extraFields.filter((key) => key !== 'required');
+    }
 
     useEffect(() => {
         if (!schema.type || !getSchemaType(schema)) {
