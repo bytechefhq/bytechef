@@ -20,6 +20,8 @@ interface SchemaMenuPopoverProps {
 
 const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, schema}: SchemaMenuPopoverProps) => {
     const [internalOpen, setInternalOpen] = useState(false);
+    const [selectKey, setSelectKey] = useState(0);
+
     const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
 
     const {t: translation} = useTranslation();
@@ -28,16 +30,22 @@ const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, s
     const fields = getAllSchemaKeys(schema);
 
     const allOptions = useMemo(() => translateLabels(translation, getSchemaMenuOptions(type)), [type, translation]);
-
     const displayFields = useMemo(() => allOptions.filter((item) => fields.includes(item.value)), [allOptions, fields]);
 
     const handleOpenChange = (open: boolean) => {
         if (!open) {
             onClose();
         }
+
         if (controlledOpen === undefined) {
             setInternalOpen(open);
         }
+    };
+
+    const handleSelectChange = (option: SchemaMenuOptionType) => {
+        onChange(setSchemaField(option.value, undefined, schema));
+
+        setSelectKey((previousSelectKey) => previousSelectKey + 1);
     };
 
     return (
@@ -51,14 +59,14 @@ const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, s
 
                         <Select
                             className="w-full min-w-48 text-sm"
-                            onChange={(option: SchemaMenuOptionType) =>
-                                onChange(setSchemaField(option.value, undefined, schema))
-                            }
+                            isClearable={false}
+                            key={selectKey}
+                            onChange={handleSelectChange}
                             options={allOptions.filter(
                                 (option) => !displayFields.some((field) => field.value === option.value)
                             )}
                             placeholder="Description, Required, etc."
-                            value={undefined}
+                            value={null}
                         />
                     </fieldset>
 
