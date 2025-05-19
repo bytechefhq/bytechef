@@ -139,7 +139,7 @@ class GoogleSheetsUtilsTest {
                 object(VALUES)
                     .label("Values")
                     .properties(
-                        string("header_1")
+                        string("header 1")
                             .label("header 1")
                             .defaultValue(""),
                         string("header2")
