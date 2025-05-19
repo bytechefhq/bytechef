@@ -245,7 +245,12 @@ const WorkflowEditor = ({
         canvasWidth -= 460;
     }
 
-    useLayout({canvasWidth, componentDefinitions, readOnlyWorkflow: workflow, taskDispatcherDefinitions});
+    useLayout({
+        canvasWidth,
+        componentDefinitions,
+        readOnlyWorkflow: readOnlyWorkflow ? workflow : undefined,
+        taskDispatcherDefinitions,
+    });
 
     useEffect(() => {
         setViewport(
