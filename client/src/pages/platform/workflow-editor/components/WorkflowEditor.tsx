@@ -5,7 +5,11 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {MINIMAP_MASK_COLOR, MINIMAP_NODE_COLOR} from '@/shared/constants';
-import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinitionBasic,
+    Workflow,
+} from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType} from '@/shared/types';
 import {Background, BackgroundVariant, Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
@@ -27,15 +31,21 @@ import WorkflowNode from '../nodes/WorkflowNode';
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
     projectLeftSidebarOpen?: boolean;
+    readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 }
 
 const WorkflowEditor = ({
     componentDefinitions,
     projectLeftSidebarOpen,
+    readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: WorkflowEditorProps) => {
-    const {workflow} = useWorkflowDataStore();
+    let {workflow} = useWorkflowDataStore();
+
+    if (!workflow.tasks && readOnlyWorkflow) {
+        workflow = {...workflow, ...readOnlyWorkflow};
+    }
 
     const {edges, nodes, onEdgesChange, onNodesChange} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -231,7 +241,7 @@ const WorkflowEditor = ({
         canvasWidth -= 460;
     }
 
-    useLayout({canvasWidth, componentDefinitions, taskDispatcherDefinitions});
+    useLayout({canvasWidth, componentDefinitions, readOnlyWorkflow: workflow, taskDispatcherDefinitions});
 
     useEffect(() => {
         setViewport(

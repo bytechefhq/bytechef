@@ -1,6 +1,10 @@
 import {EDGE_STYLES, FINAL_PLACEHOLDER_NODE_ID, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import defaultNodes from '@/shared/defaultNodes';
-import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinitionBasic,
+    Workflow,
+} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
@@ -25,15 +29,21 @@ import {
 export default function useLayout({
     canvasWidth,
     componentDefinitions,
+    readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: {
     componentDefinitions: Array<ComponentDefinitionBasic>;
     canvasWidth: number;
+    readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
 }) {
-    const {
-        workflow: {tasks, triggers},
-    } = useWorkflowDataStore();
+    let {workflow} = useWorkflowDataStore();
+
+    if (!workflow.tasks && readOnlyWorkflow) {
+        workflow = {...workflow, ...readOnlyWorkflow};
+    }
+
+    const {tasks, triggers} = workflow;
 
     const {setEdges, setNodes} = useWorkflowDataStore(
         useShallow((state) => ({
