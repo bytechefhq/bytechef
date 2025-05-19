@@ -55,6 +55,7 @@ interface ItemTypeProps {
 export const TextItem = ({field, onChange, schema}: ItemTypeProps) => (
     <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
         <SchemaInput
+            autoFocus
             label={field.label}
             onChange={(text) => onChange(setSchemaField(field.value, text, schema))}
             value={getSchemaField(schema, field.value) as string}
@@ -65,6 +66,7 @@ export const TextItem = ({field, onChange, schema}: ItemTypeProps) => (
 export const NumberItem = ({field, onChange, schema}: ItemTypeProps) => (
     <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
         <SchemaInput
+            autoFocus
             label={field.label}
             onChange={(text) => onChange(setSchemaField(field.value, parseInt(text, 10), schema))}
             type={'number'}
@@ -76,6 +78,7 @@ export const NumberItem = ({field, onChange, schema}: ItemTypeProps) => (
 export const BoolItem = ({field, onChange, schema}: ItemTypeProps) => (
     <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
         <SchemaCheckbox
+            autoFocus
             label={field.label}
             onChange={(text) => onChange(setSchemaField(field.value, text, schema))}
             value={getSchemaField(schema, field.value) as boolean}
@@ -90,10 +93,11 @@ export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProp
 
     return (
         <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
-            <div className="w-full">
+            <fieldset className="w-full space-y-1">
                 <Label>{field.label}</Label>
 
                 <CreatableSelect
+                    autoFocus
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
                     isMulti
@@ -105,7 +109,7 @@ export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProp
                     placeholder="Options"
                     value={allOptions}
                 />
-            </div>
+            </fieldset>
         </Item>
     );
 };
@@ -121,22 +125,21 @@ export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
 
     return (
         <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
-            <div className="w-full">
-                <Label>{translation(field.label)}</Label>
+            <fieldset className="w-full space-y-1">
+                <Label>Options</Label>
 
                 <Select
+                    autoFocus
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
                     noOptionsMessage="No options"
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    onChange={(option: any) => {
-                        onChange(setSchemaField(field.value, option.value, schema));
-                    }}
+                    onChange={(option: any) => onChange(setSchemaField(field.value, option.value, schema))}
                     options={options}
                     placeholder="Options"
                     value={selected}
                 />
-            </div>
+            </fieldset>
         </Item>
     );
 };
@@ -155,10 +158,11 @@ export const RequiredMultiSelectItem: React.FunctionComponent<ItemTypeProps> = (
 
     return (
         <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
-            <div className="w-full">
+            <fieldset className="w-full space-y-1">
                 <Label>{field.label}</Label>
 
                 <Select
+                    autoFocus
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
                     isMulti
@@ -170,18 +174,19 @@ export const RequiredMultiSelectItem: React.FunctionComponent<ItemTypeProps> = (
                     placeholder="Options"
                     value={requiredOptions}
                 />
-            </div>
+            </fieldset>
         </Item>
     );
 };
 
 interface SchemaCheckboxProps {
+    autoFocus?: boolean;
     value: boolean;
     onChange: (value: boolean) => void;
     label?: string;
 }
 
-const SchemaCheckbox = ({label, onChange, value}: SchemaCheckboxProps) => {
+const SchemaCheckbox = ({autoFocus, label, onChange, value}: SchemaCheckboxProps) => {
     const handleChange =
         (handler: (value: boolean) => void) =>
         (event: React.FormEvent<HTMLElement>): void => {
@@ -192,7 +197,7 @@ const SchemaCheckbox = ({label, onChange, value}: SchemaCheckboxProps) => {
         <div className="flex flex-row">
             <Label>{label}</Label>
 
-            <Toggle className="ml-2" defaultChecked={value} onChange={handleChange(onChange)} />
+            <Toggle autoFocus={autoFocus} className="ml-2" defaultChecked={value} onChange={handleChange(onChange)} />
         </div>
     );
 };
