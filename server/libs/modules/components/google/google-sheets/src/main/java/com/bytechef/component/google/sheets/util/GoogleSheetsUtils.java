@@ -161,7 +161,7 @@ public class GoogleSheetsUtils {
         for (Object value : firstRow) {
             String label = value.toString();
             list.add(
-                string(label.replaceAll(" ", "_"))
+                string(label)
                     .label(label)
                     .defaultValue(""));
         }
