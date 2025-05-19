@@ -43,7 +43,7 @@ public class FileEntryController {
 
     @GetMapping("/file-entries/{id}/content")
     @ResponseBody
-    public ResponseEntity<InputStreamResource> getImageDynamicType(@PathVariable("id") String id) {
+    public ResponseEntity<InputStreamResource> getFileEntryContent(@PathVariable("id") String id) {
         FileEntry fileEntry = FileEntry.parse(id);
 
         return ResponseEntity.ok()

@@ -24,8 +24,9 @@ package com.bytechef.platform.security.constant;
 public final class AuthorityConstants {
 
     public static final String ADMIN = "ROLE_ADMIN";
-    public static final String USER = "ROLE_USER";
     public static final String ANONYMOUS = "ROLE_ANONYMOUS";
+    public static final String SYSTEM_ADMIN = "ROLE_SYSTEM_ADMIN";
+    public static final String USER = "ROLE_USER";
 
     private AuthorityConstants() {
     }

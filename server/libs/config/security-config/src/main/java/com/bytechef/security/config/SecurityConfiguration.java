@@ -18,6 +18,7 @@ package com.bytechef.security.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Security;
@@ -36,15 +37,21 @@ import java.util.function.Supplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -60,7 +67,6 @@ import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
@@ -95,48 +101,57 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    @Profile("dev")
-    public SecurityFilterChain graphqlDevFilterChain(HttpSecurity http) throws Exception {
+    @Order(3)
+    public SecurityFilterChain actuatorFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
         http
-            .securityMatcher("/graphql")
-            .authorizeHttpRequests(
-                auth -> auth
-                    .anyRequest()
-                    .authenticated())
-            .httpBasic(withDefaults())
-            .csrf(AbstractHttpConfigurer::disable);
+            .securityMatcher("/actuator/**")
+            .cors(withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers(mvc.pattern("/actuator/health"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/health/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/info"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/metrics"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/metrics/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/prometheus"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/**"))
+                .hasAuthority(AuthorityConstants.SYSTEM_ADMIN))
+            .httpBasic(withDefaults());
+
+        AuthenticationProvider authenticationProvider = getSystemAuthenticationProvider(security.getSystem());
+
+        if (authenticationProvider != null) {
+            http.authenticationProvider(authenticationProvider);
+        }
 
         return http.build();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(
+    @Order(2)
+    public SecurityFilterChain apiFilterChain(
         HttpSecurity http, MvcRequestMatcher.Builder mvc,
         List<AuthenticationProviderContributor> authenticationProviderContributors,
         List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors)
         throws Exception {
 
         http
-            .securityMatcher("/**")
+            .securityMatcher("/api/**", "/graphql", "/sse")
             .cors(withDefaults())
-            .csrf(
-                csrf -> csrf
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                    // See https://stackoverflow.com/q/74447118/65681
-                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-                    .ignoringRequestMatchers(
-                        RegexRequestMatcher.regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
-                    .ignoringRequestMatchers("/api/o/**")
-                    .ignoringRequestMatchers("/approvals/**")
-                    .ignoringRequestMatchers("/graphql")
-                    .ignoringRequestMatchers("/icons/**")
-                    .ignoringRequestMatchers("/mcp/**")
-                    .ignoringRequestMatchers("/webhooks/**"));
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                // See https://stackoverflow.com/q/74447118/65681
+                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
+                .ignoringRequestMatchers("/api/o/**")
+                .ignoringRequestMatchers("/graphql")
+                .ignoringRequestMatchers("/sse"));
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
             http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
@@ -149,92 +164,50 @@ public class SecurityConfiguration {
             http.addFilterAfter(filterAfterContributor.getFilter(), filterAfterContributor.getAfterFilter());
         }
 
-        http.headers(
-            headers -> headers
+        http
+            .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp.policyDirectives(security.getContentSecurityPolicy()))
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                .referrerPolicy(
-                    referrer -> referrer
-                        .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                .permissionsPolicyHeader(
-                    permissions -> permissions.policy(
+                .referrerPolicy(referrer -> referrer
+                    .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                .permissionsPolicyHeader(permissions -> permissions
+                    .policy(
                         "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
-            .authorizeHttpRequests(
-                authz -> authz
-                    .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/actuator/health"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/actuator/health/**"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/actuator/info"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/actuator/metrics"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/actuator/metrics/**"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/actuator/prometheus"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/actuator/**"))
-                    .hasAuthority(AuthorityConstants.ADMIN)
-                    .requestMatchers(mvc.pattern("/api/authenticate"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/api/register"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/api/activate"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/api/account/reset-password/init"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/api/account/reset-password/finish"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/api/**"))
-                    .authenticated()
-                    .requestMatchers(mvc.pattern("/approvals/**"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/assets/**"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/file-entries/**"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/graphiql"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/graphql"))
-                    .authenticated()
-                    .requestMatchers(mvc.pattern("/i18n/**"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/icons/**"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/index.html"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/sse"))
-                    .authenticated()
-                    .requestMatchers(mvc.pattern("/swagger-ui/**"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/swagger-ui.html"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/v3/api-docs/**"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/webhooks/**"))
-                    .permitAll())
-            .rememberMe(
-                rememberMe -> rememberMe
-                    .rememberMeServices(rememberMeServices)
-                    .rememberMeParameter("remember-me")
-                    .key(getRememberMeKey()))
-            .exceptionHandling(
-                exceptionHanding -> exceptionHanding.defaultAuthenticationEntryPointFor(
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers(mvc.pattern("/api/authenticate"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/api/register"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/api/activate"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/api/account/reset-password/init"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/api/account/reset-password/finish"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/api/**"))
+                .authenticated()
+                .requestMatchers(mvc.pattern("/graphql"))
+                .authenticated()
+                .requestMatchers(mvc.pattern("/sse"))
+                .authenticated())
+            .rememberMe(rememberMe -> rememberMe
+                .rememberMeServices(rememberMeServices)
+                .rememberMeParameter("remember-me")
+                .key(getRememberMeKey()))
+            .exceptionHandling(exceptionHanding -> exceptionHanding
+                .defaultAuthenticationEntryPointFor(
                     new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
                     new OrRequestMatcher(antMatcher("/api/**"), antMatcher("/graphql"))))
-            .formLogin(
-                formLogin -> formLogin
-                    .loginPage("/")
-                    .loginProcessingUrl("/api/authentication")
-                    .successHandler(authenticationSuccessHandler)
-                    .failureHandler(authenticationFailureHandler)
-                    .permitAll())
-            .logout(
-                logout -> logout.logoutUrl("/api/logout")
-                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                    .permitAll());
+            .formLogin(formLogin -> formLogin
+                .loginPage("/")
+                .loginProcessingUrl("/api/authentication")
+                .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
+                .permitAll())
+            .logout(logout -> logout
+                .logoutUrl("/api/logout")
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                .permitAll());
 
         http.with(filterBeforeContributorConfigurer(filterBeforeContributors), withDefaults());
 
@@ -242,8 +215,101 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @Order(4)
+    public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
+        http
+            .securityMatcher("/**")
+            .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
+            .cors(withDefaults())
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                // See https://stackoverflow.com/q/74447118/65681
+                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                .ignoringRequestMatchers("/approvals/**")
+                .ignoringRequestMatchers("/file-entries/**")
+                .ignoringRequestMatchers("/i18n/**")
+                .ignoringRequestMatchers("/icons/**")
+                .ignoringRequestMatchers("/mcp/**")
+                .ignoringRequestMatchers("/webhooks/**"))
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/approvals/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/assets/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/file-entries/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/i18n/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/icons/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/index.html"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/swagger-ui/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/swagger-ui.html"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/v3/api-docs/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/webhooks/**"))
+                .permitAll())
+            .httpBasic(withDefaults());
+
+        return http.build();
+    }
+
+    @Bean
+    @Profile("dev")
+    @Order(1)
+    public SecurityFilterChain graphqlDevFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc)
+        throws Exception {
+
+        http
+            .securityMatcher("/graphql", "/graphiql")
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(mvc.pattern("/graphiql"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/graphql"))
+                .authenticated())
+            .httpBasic(withDefaults());
+
+        return http.build();
+    }
+
+    @Bean
     MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
         return new MvcRequestMatcher.Builder(introspector);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    private DaoAuthenticationProvider getSystemAuthenticationProvider(Security.System system) {
+        String password = system.getPassword();
+        String username = system.getUsername();
+
+        if (password == null || password.isBlank() || username == null || username.isBlank()) {
+            return null;
+        }
+
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+
+        PasswordEncoder passwordEncoder = passwordEncoder();
+
+        UserDetails user = User.withUsername(system.getUsername())
+            .password(passwordEncoder.encode(system.getPassword()))
+            .authorities(AuthorityConstants.SYSTEM_ADMIN)
+            .build();
+
+        daoAuthenticationProvider.setUserDetailsService(new InMemoryUserDetailsManager(user));
+
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+
+        return daoAuthenticationProvider;
     }
 
     private String getRememberMeKey() {
