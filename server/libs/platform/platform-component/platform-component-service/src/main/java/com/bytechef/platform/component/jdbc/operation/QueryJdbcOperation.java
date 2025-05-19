@@ -41,6 +41,7 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
                 Map<String, Object> row = new HashMap<>();
 
                 ResultSetMetaData rsMetaData = rs.getMetaData();
+
                 int columnCount = rsMetaData.getColumnCount();
 
                 for (int i = 1; i <= columnCount; i++) {

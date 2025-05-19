@@ -387,9 +387,9 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
 
             Object lastItem = closureParameters.get(LAST_ITEM);
             String queryStatement;
+
             if (lastItem == null) {
                 queryStatement = "SELECT * FROM %s.%s ORDER BY %s %s".formatted(schema, table, orderBy, orderDirection);
-
             } else {
                 if (Objects.equals(orderDirection, "ASC")) {
                     queryStatement = "SELECT * FROM %s.%s WHERE %s < %s ORDER BY %s ASC".formatted(
@@ -403,8 +403,8 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             List<Map<String, Object>> query = JdbcExecutor.query(
                 queryStatement, Map.of(), (ResultSet rs, int rowNum) -> {
                     Map<String, Object> row = new LinkedHashMap<>();
-
                     ResultSetMetaData rsMetaData = rs.getMetaData();
+
                     int columnCount = rsMetaData.getColumnCount();
 
                     for (int i = 1; i <= columnCount; i++) {
@@ -424,10 +424,10 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                 }
             }
 
+            Map<String, Object> last = allRowsUpdate.getLast();
+
             return new PollOutput(
-                lastItem == null ? List.of() : newRows,
-                Map.of(ALL_ROWS, allRowsUpdate, LAST_ITEM, allRowsUpdate.getLast()
-                    .get(orderBy)),
+                lastItem == null ? List.of() : newRows, Map.of(ALL_ROWS, allRowsUpdate, LAST_ITEM, last.get(orderBy)),
                 false);
         }
     }
@@ -508,6 +508,6 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                         .properties(properties)));
     }
 
-    record Column(String name, String type) {
+    private record Column(String name, String type) {
     }
 }
