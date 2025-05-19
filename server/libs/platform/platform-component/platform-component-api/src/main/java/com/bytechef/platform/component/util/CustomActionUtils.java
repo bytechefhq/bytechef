@@ -71,8 +71,7 @@ public class CustomActionUtils {
             .properties(
                 string(PATH)
                     .label("Path")
-                    .description(
-                        "The relative URI that will be appended to the end of the base URI. Do not prepend '/' in your relative URL.")
+                    .description("The relative URI that will be appended to the end of the base URI.")
                     .required(true),
                 string(METHOD)
                     .label("Method")
