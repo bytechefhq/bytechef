@@ -104,6 +104,29 @@ export default function useWorkflowInputs({
         setIsDeleteDialogOpen(false);
     }
 
+    function getFormattedInputName(inputName: string, existingInputs: WorkflowInput[] = []): string {
+        const baseInputName = inputName.split('_')[0];
+
+        const existingInputsWithSameName = existingInputs.filter((input) => input.name?.startsWith(baseInputName));
+
+        if (!existingInputsWithSameName.length) {
+            return inputName;
+        }
+
+        const existingInputNumbers = existingInputsWithSameName.map((input) => {
+            const nameParts = input.name.split('_');
+            const lastPart = nameParts[nameParts.length - 1];
+
+            const numberMatch = lastPart.match(/^\d+$/);
+
+            return numberMatch ? parseInt(lastPart) : 0;
+        });
+
+        const maxExistingNumber = Math.max(...existingInputNumbers, 0);
+
+        return `${baseInputName}_${maxExistingNumber + 1}`;
+    }
+
     function saveWorkflowInput(input: WorkflowInputType) {
         const {getValues} = form;
 
@@ -114,6 +137,12 @@ export default function useWorkflowInputs({
         let inputs: WorkflowInput[] = workflowDefinition.inputs ?? [];
 
         if (currentInputIndex === -1) {
+            const duplicateInput = inputs.find((existingInput) => existingInput.name === input.name);
+
+            if (duplicateInput) {
+                input.name = getFormattedInputName(input.name, inputs);
+            }
+
             inputs = [...inputs, input];
         } else {
             inputs[currentInputIndex] = input;
@@ -220,6 +249,7 @@ export default function useWorkflowInputs({
         currentInputIndex,
         deleteWorkflowInput,
         form,
+        getFormattedInputName,
         isDeleteDialogOpen,
         isEditDialogOpen,
         openDeleteDialog,
