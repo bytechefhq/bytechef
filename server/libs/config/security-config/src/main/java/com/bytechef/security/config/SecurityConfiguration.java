@@ -221,16 +221,7 @@ public class SecurityConfiguration {
             .securityMatcher("/**")
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
             .cors(withDefaults())
-            .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                // See https://stackoverflow.com/q/74447118/65681
-                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-                .ignoringRequestMatchers("/approvals/**")
-                .ignoringRequestMatchers("/file-entries/**")
-                .ignoringRequestMatchers("/i18n/**")
-                .ignoringRequestMatchers("/icons/**")
-                .ignoringRequestMatchers("/mcp/**")
-                .ignoringRequestMatchers("/webhooks/**"))
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"))
                 .permitAll()
