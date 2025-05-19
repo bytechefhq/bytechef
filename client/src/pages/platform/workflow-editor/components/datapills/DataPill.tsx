@@ -213,6 +213,14 @@ const DataPill = ({
                                 ((sampleValue as string).length > 27 ? '...' : '');
                         }
 
+                        const showSampleValue =
+                            sampleValue !== undefined &&
+                            (sampleValue === null ||
+                                typeof sampleValue !== 'object' ||
+                                (typeof sampleValue === 'object' &&
+                                    sampleValue !== null &&
+                                    Object.keys(sampleValue).length === 0));
+
                         return (
                             <div
                                 className="flex items-center space-x-2"
@@ -227,9 +235,7 @@ const DataPill = ({
                                     workflowNodeName={workflowNodeName}
                                 />
 
-                                {sampleValue !== undefined && !Object.keys(sampleValue).length && (
-                                    <DataPillSampleValue sampleOutput={sampleValue} />
-                                )}
+                                {showSampleValue && <DataPillSampleValue sampleOutput={sampleValue} />}
                             </div>
                         );
                     })}
