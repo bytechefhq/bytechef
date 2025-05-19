@@ -32,12 +32,17 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ALL_ROWS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMNS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.CONDITION;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DATABASE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.EXECUTE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.HOST;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.LAST_ITEM;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.NAME;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ORDER_BY;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ORDER_DIRECTION;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PARAMETERS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PASSWORD;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PORT;
@@ -49,6 +54,7 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TYPE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.USERNAME;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
@@ -56,22 +62,32 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.Type;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.platform.component.definition.JdbcComponentDefinition;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
+import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.jdbc.datastream.JdbcItemWriter;
 import com.bytechef.platform.component.jdbc.operation.DeleteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.ExecuteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.InsertJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.UpdateJdbcOperation;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
@@ -240,6 +256,36 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             .output()
             .perform(this::performExecute));
 
+    private final List<ModifiableTriggerDefinition> triggerDefinitions = List.of(
+        trigger("newRow")
+            .title("New Row")
+            .description("Triggers when new row is added.")
+            .type(TriggerType.POLLING)
+            .properties(
+                string(SCHEMA)
+                    .label("Schema")
+                    .description("Name of the schema the table belongs to.")
+                    .required(true)
+                    .defaultValue("public"),
+                string(TABLE)
+                    .label("Table")
+                    .description("Name of the table in which to update data in.")
+                    .required(true),
+                string(ORDER_BY)
+                    .label("Colum To Order By")
+                    .description("Use something like a created timestamp or an auto-incrementing ID.")
+                    .required(true),
+                string(ORDER_DIRECTION)
+                    .label("Order Direction")
+                    .description("The direction to sort by such that the newest rows are fetched first.")
+                    .options(
+                        option("Ascending", "ASC"),
+                        option("Descending", "DESC"))
+                    .defaultValue("DESC")
+                    .required(true))
+            .output()
+            .poll(this::poll));
+
     private final ComponentDefinition componentDefinition;
     private final String databaseJdbcName;
     private final DeleteJdbcOperation deleteJdbcOperation;
@@ -321,7 +367,69 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             .title(title)
             .connection(CONNECTION_DEFINITION)
             .actions(actionDefinitions)
+            .triggers(triggerDefinitions)
             .clusterElements(JdbcItemWriter.clusterElementDefinition(databaseJdbcName, jdbcDriverClassName));
+    }
+
+    protected PollOutput poll(
+        Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
+        TriggerContext triggerContext) {
+
+        List<Map<String, Object>> allRows = closureParameters.getList(ALL_ROWS, new TypeReference<>() {}, List.of());
+        List<Map<String, Object>> allRowsUpdate = new ArrayList<>();
+        List<Map<String, Object>> newRows = new ArrayList<>();
+
+        try (SingleConnectionDataSource dataSource = getDataSource(connectionParameters)) {
+            String schema = MapUtils.getString(inputParameters, SCHEMA, "public");
+            String table = MapUtils.getRequiredString(inputParameters, TABLE);
+            String orderBy = MapUtils.getRequiredString(inputParameters, ORDER_BY);
+            String orderDirection = MapUtils.getRequiredString(inputParameters, ORDER_DIRECTION);
+
+            Object lastItem = closureParameters.get(LAST_ITEM);
+            String queryStatement;
+            if (lastItem == null) {
+                queryStatement = "SELECT * FROM %s.%s ORDER BY %s %s".formatted(schema, table, orderBy, orderDirection);
+
+            } else {
+                if (Objects.equals(orderDirection, "ASC")) {
+                    queryStatement = "SELECT * FROM %s.%s WHERE %s < %s ORDER BY %s ASC".formatted(
+                        schema, table, orderBy, lastItem, orderBy);
+                } else {
+                    queryStatement = "SELECT * FROM %s.%s WHERE %s > %s ORDER BY %s DESC".formatted(
+                        schema, table, orderBy, lastItem, orderBy);
+                }
+            }
+
+            List<Map<String, Object>> query = JdbcExecutor.query(
+                queryStatement, Map.of(), (ResultSet rs, int rowNum) -> {
+                    Map<String, Object> row = new LinkedHashMap<>();
+
+                    ResultSetMetaData rsMetaData = rs.getMetaData();
+                    int columnCount = rsMetaData.getColumnCount();
+
+                    for (int i = 1; i <= columnCount; i++) {
+                        String columnName = rsMetaData.getColumnName(i);
+
+                        row.put(columnName, rs.getObject(i));
+                    }
+
+                    return row;
+                }, dataSource);
+
+            for (Map<String, Object> row : query) {
+                allRowsUpdate.add(row);
+
+                if (!allRows.contains(row)) {
+                    newRows.add(row);
+                }
+            }
+
+            return new PollOutput(
+                lastItem == null ? List.of() : newRows,
+                Map.of(ALL_ROWS, allRowsUpdate, LAST_ITEM, allRowsUpdate.getLast()
+                    .get(orderBy)),
+                false);
+        }
     }
 
     private SingleConnectionDataSource getDataSource(Map<String, ?> connectionParameters) {
