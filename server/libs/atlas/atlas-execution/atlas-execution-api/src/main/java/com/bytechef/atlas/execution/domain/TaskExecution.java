@@ -91,7 +91,6 @@ public final class TaskExecution
     }
 
     private static final int DEFAULT_TASK_NUMBER = -1;
-    private static final Evaluator EVALUATOR = Evaluator.create();
 
     @CreatedBy
     @Column("created_by")
@@ -176,10 +175,10 @@ public final class TaskExecution
      * @param context The context value to evaluate the task against
      * @return the evaluated {@link TaskExecution} instance.
      */
-    public TaskExecution evaluate(Map<String, ?> context) {
+    public TaskExecution evaluate(Map<String, ?> context, Evaluator evaluator) {
         WorkflowTask workflowTask = getWorkflowTask();
 
-        Map<String, Object> map = EVALUATOR.evaluate(workflowTask.toMap(), context);
+        Map<String, Object> map = evaluator.evaluate(workflowTask.toMap(), context);
 
         setWorkflowTask(new WorkflowTask(map));
 

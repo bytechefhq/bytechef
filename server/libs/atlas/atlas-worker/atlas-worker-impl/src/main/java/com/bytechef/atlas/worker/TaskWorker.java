@@ -31,6 +31,7 @@ import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.event.MessageEvent;
 import java.time.Duration;
 import java.time.Instant;
@@ -74,6 +75,7 @@ public class TaskWorker {
 
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
+    private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
     private final AsyncTaskExecutor taskExecutor;
     private final TaskHandlerResolver taskHandlerResolver;
@@ -81,9 +83,10 @@ public class TaskWorker {
     private final TaskFileStorage taskFileStorage;
 
     public TaskWorker(
-        ApplicationEventPublisher eventPublisher, AsyncTaskExecutor taskExecutor,
+        Evaluator evaluator, ApplicationEventPublisher eventPublisher, AsyncTaskExecutor taskExecutor,
         TaskHandlerResolver taskHandlerResolver, TaskFileStorage taskFileStorage) {
 
+        this.evaluator = evaluator;
         this.eventPublisher = eventPublisher;
         this.taskExecutor = taskExecutor;
         this.taskHandlerResolver = taskHandlerResolver;
@@ -184,7 +187,7 @@ public class TaskWorker {
             // pre tasks
             executeSubTasks(Validate.notNull(taskExecution.getJobId(), "id"), taskExecution.getPre(), context);
 
-            taskExecution.evaluate(context);
+            taskExecution.evaluate(context, evaluator);
 
             TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
 
@@ -220,7 +223,7 @@ public class TaskWorker {
             // pre tasks
             executeSubTasks(Validate.notNull(taskExecution.getJobId(), "id"), taskExecution.getPre(), context);
 
-            taskExecution.evaluate(context);
+            taskExecution.evaluate(context, evaluator);
 
             TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
 
@@ -251,7 +254,7 @@ public class TaskWorker {
                 .workflowTask(subWorkflowTask)
                 .build();
 
-            subTaskExecution.evaluate(context);
+            subTaskExecution.evaluate(context, evaluator);
 
             Object output = doExecuteSubTask(subTaskExecution);
 

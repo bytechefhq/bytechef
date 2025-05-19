@@ -21,6 +21,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class ConditionTaskDispatcherConfiguration {
+
+    @Autowired
+    private Evaluator evaluator;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -49,12 +53,12 @@ public class ConditionTaskDispatcherConfiguration {
     @Bean("conditionTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory conditionTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage);
     }
 
     @Bean("conditionTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory conditionTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ConditionTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage);
     }
 }

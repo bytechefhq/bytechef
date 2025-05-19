@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))
     implementation(project(":server:libs:core:encryption:encryption-impl"))
     implementation(project(":server:libs:core:encryption:encryption-property"))
+    implementation(project(":server:libs:core:evaluator:evaluator-impl"))
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-public-rest"))

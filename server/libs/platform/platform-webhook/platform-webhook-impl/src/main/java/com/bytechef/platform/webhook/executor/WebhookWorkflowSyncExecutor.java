@@ -22,6 +22,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
@@ -49,6 +50,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WebhookWorkflowSyncExecutor {
 
+    private final Evaluator evaluator;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerExecutionService triggerExecutionService;
@@ -59,12 +61,13 @@ public class WebhookWorkflowSyncExecutor {
 
     @SuppressFBWarnings("EI")
     public WebhookWorkflowSyncExecutor(
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        Evaluator evaluator, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
         TriggerFileStorage triggerFileStorage, TriggerStateService triggerStateService,
         WorkflowService workflowService) {
 
+        this.evaluator = evaluator;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerExecutionService = triggerExecutionService;
@@ -83,7 +86,8 @@ public class WebhookWorkflowSyncExecutor {
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId, workflowId))
             .build();
 
-        triggerExecution = triggerExecutionService.create(triggerExecution.evaluate(getInputMap(workflowExecutionId)));
+        triggerExecution = triggerExecutionService.create(
+            triggerExecution.evaluate(getInputMap(workflowExecutionId), evaluator));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
 
@@ -171,7 +175,7 @@ public class WebhookWorkflowSyncExecutor {
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId, workflowId))
             .build();
 
-        triggerExecution = preProcess(triggerExecution.evaluate(getInputMap(workflowExecutionId)));
+        triggerExecution = preProcess(triggerExecution.evaluate(getInputMap(workflowExecutionId), evaluator));
 
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId, workflowId);
 

@@ -34,6 +34,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Collections;
@@ -53,20 +54,22 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
+    private final Evaluator evaluator;
+    private final ApplicationEventPublisher eventPublisher;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public LoopTaskDispatcher(
-        ApplicationEventPublisher eventPublisher, ContextService contextService,
+        ContextService contextService, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
-        this.eventPublisher = eventPublisher;
         this.contextService = contextService;
+        this.evaluator = evaluator;
+        this.eventPublisher = eventPublisher;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
@@ -110,7 +113,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             newContext.put(loopWorkflowTask.getName(), workflowTaskNameMap);
 
-            subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext));
+            subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext, evaluator));
 
             contextService.push(
                 Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,

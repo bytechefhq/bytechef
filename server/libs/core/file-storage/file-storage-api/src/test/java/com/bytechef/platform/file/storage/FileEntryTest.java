@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Collections;
@@ -35,7 +36,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(ObjectMapperSetupExtension.class)
 public class FileEntryTest {
 
-    private static final Evaluator EVALUATOR = Evaluator.create();
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     @Test
     public void testOf1() {

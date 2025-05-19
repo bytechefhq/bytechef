@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
@@ -187,9 +188,11 @@ public class LoopTaskDispatcherIntTest {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
+                contextService, SpelEvaluator.create(), taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage));
+                contextService, SpelEvaluator.create(), taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage));
     }
 
     @SuppressWarnings("PMD")
@@ -199,11 +202,11 @@ public class LoopTaskDispatcherIntTest {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
-                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
 

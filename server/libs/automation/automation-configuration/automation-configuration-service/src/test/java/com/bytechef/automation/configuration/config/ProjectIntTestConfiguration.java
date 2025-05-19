@@ -20,6 +20,8 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
@@ -58,6 +60,11 @@ public class ProjectIntTestConfiguration {
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
+
+    @Bean
+    Evaluator evaluator() {
+        return SpelEvaluator.create();
+    }
 
     @Bean
     WorkflowFacade workflowFacade(WorkflowService workflowService) {

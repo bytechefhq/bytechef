@@ -37,6 +37,8 @@ import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
@@ -60,6 +62,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(ObjectMapperSetupExtension.class)
 public class TaskWorkerTest {
 
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
     private static final ExecutorService NEW_FIXED_THREAD_POOL = Executors.newFixedThreadPool(2);
     private static final ExecutorService NEW_SINGLE_THREAD_EXECUTOR = Executors.newSingleThreadExecutor();
 
@@ -80,7 +83,7 @@ public class TaskWorkerTest {
 
         TaskWorker worker =
             new TaskWorker(
-                event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+                EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
                 NEW_SINGLE_THREAD_EXECUTOR::execute, task -> taskExecution -> "done", taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -106,7 +109,7 @@ public class TaskWorkerTest {
             t -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 throw new IllegalArgumentException("bad input");
@@ -142,7 +145,7 @@ public class TaskWorkerTest {
             t -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> {
                 String type = task.getType();
@@ -186,11 +189,10 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertFalse(new File(tempDir).exists()));
-        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
-            t -> {});
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, t -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> {
                 String type = task.getType();
@@ -251,7 +253,7 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, t -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> {
                 String type = task.getType();
@@ -306,7 +308,7 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 try {
@@ -352,7 +354,7 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 try {
@@ -408,7 +410,7 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_FIXED_THREAD_POOL::execute,
             task -> taskExecution -> {
                 try {

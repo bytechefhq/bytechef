@@ -40,6 +40,7 @@ import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.constant.ModeType;
@@ -65,6 +66,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade {
 
     private final ConnectedUserService connectedUserService;
+    private final Evaluator evaluator;
     private final PrincipalJobService principalJobService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
@@ -80,7 +82,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceFacadeImpl(
-        ConnectedUserService connectedUserService, PrincipalJobService principalJobService,
+        ConnectedUserService connectedUserService, Evaluator evaluator, PrincipalJobService principalJobService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         ApplicationProperties applicationProperties,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
@@ -91,6 +93,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         WorkflowService workflowService) {
 
         this.connectedUserService = connectedUserService;
+        this.evaluator = evaluator;
         this.principalJobService = principalJobService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
@@ -255,7 +258,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.evaluateParameters(integrationInstanceConfigurationWorkflow.getInputs()),
+                workflowTrigger.evaluateParameters(integrationInstanceConfigurationWorkflow.getInputs(), evaluator),
                 getConnectionId(
                     integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfiguration.getId(),
                     integrationInstanceWorkflow.getIntegrationInstanceId(), workflow.getId(), workflowTrigger));
@@ -285,7 +288,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.evaluateParameters(integrationInstanceConfigurationWorkflow.getInputs()),
+                workflowTrigger.evaluateParameters(integrationInstanceConfigurationWorkflow.getInputs(), evaluator),
                 getConnectionId(integrationInstanceConfiguration.getIntegrationId(),
                     integrationInstanceConfiguration.getId(), integrationInstanceWorkflow.getIntegrationInstanceId(),
                     workflow.getId(), workflowTrigger),

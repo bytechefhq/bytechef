@@ -38,8 +38,6 @@ import org.springframework.util.Assert;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTrigger implements Serializable, Trigger {
 
-    private static final Evaluator EVALUATOR = Evaluator.create();
-
     private String description;
     private final Map<String, Object> extensions = new HashMap<>();
     private Map<String, ?> metadata = new HashMap<>();
@@ -95,8 +93,8 @@ public class WorkflowTrigger implements Serializable, Trigger {
             workflowTrigger -> Objects.equals(workflowTrigger.getName(), workflowNodeName));
     }
 
-    public Map<String, ?> evaluateParameters(Map<String, ?> context) {
-        WorkflowTrigger workflowTrigger = new WorkflowTrigger(EVALUATOR.evaluate(toMap(), context));
+    public Map<String, ?> evaluateParameters(Map<String, ?> context, Evaluator evaluator) {
+        WorkflowTrigger workflowTrigger = new WorkflowTrigger(evaluator.evaluate(toMap(), context));
 
         return workflowTrigger.getParameters();
     }

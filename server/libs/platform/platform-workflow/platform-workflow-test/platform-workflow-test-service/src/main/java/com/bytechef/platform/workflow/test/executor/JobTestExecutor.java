@@ -26,6 +26,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.definition.WebhookResponse;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -48,6 +49,7 @@ public class JobTestExecutor {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
+    private final Evaluator evaluator;
     private final JobSyncExecutor jobSyncExecutor;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TaskExecutionService taskExecutionService;
@@ -55,12 +57,13 @@ public class JobTestExecutor {
 
     @SuppressFBWarnings("EI")
     public JobTestExecutor(
-        ComponentDefinitionService componentDefinitionService, ContextService contextService,
+        ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
         JobSyncExecutor jobSyncExecutor, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
+        this.evaluator = evaluator;
         this.jobSyncExecutor = jobSyncExecutor;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.taskExecutionService = taskExecutionService;
@@ -88,7 +91,7 @@ public class JobTestExecutor {
 
                     return new TaskExecutionDTO(
                         taskExecution, definitionResult.title(), definitionResult.icon(),
-                        workflowTask.evaluateParameters(context), output);
+                        workflowTask.evaluateParameters(context, evaluator), output);
                 }));
     }
 

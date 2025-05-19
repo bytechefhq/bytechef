@@ -44,6 +44,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.evaluator.Evaluator;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -60,6 +61,9 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 @ConditionalOnCoordinator
 public class TaskCoordinatorConfiguration {
+
+    @Autowired
+    private Evaluator evaluator;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -96,7 +100,7 @@ public class TaskCoordinatorConfiguration {
     @Bean
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
         return new DefaultTaskCompletionHandler(
-            contextService, eventPublisher, jobExecutor(), jobService, taskExecutionService, taskFileStorage,
+            contextService, evaluator, eventPublisher, jobExecutor(), jobService, taskExecutionService, taskFileStorage,
             workflowService);
     }
 
@@ -108,7 +112,7 @@ public class TaskCoordinatorConfiguration {
     @Bean
     JobExecutor jobExecutor() {
         return new JobExecutor(
-            contextService, taskDispatcher(), taskExecutionService, taskFileStorage, workflowService);
+            contextService, evaluator, taskDispatcher(), taskExecutionService, taskFileStorage, workflowService);
     }
 
     @Bean

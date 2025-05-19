@@ -30,6 +30,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.condition.util.ConditionTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -45,6 +46,7 @@ import java.util.Objects;
 public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
 
     private final ContextService contextService;
+    private final Evaluator evaluator;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
@@ -52,11 +54,12 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public ConditionTaskCompletionHandler(
-        ContextService contextService, TaskCompletionHandler taskCompletionHandler,
+        ContextService contextService, Evaluator evaluator, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
         this.contextService = contextService;
+        this.evaluator = evaluator;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
@@ -127,7 +130,7 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
             Map<String, ?> context = taskFileStorage.readContextValue(
                 contextService.peek(id, Context.Classname.TASK_EXECUTION));
 
-            subTaskExecution.evaluate(context);
+            subTaskExecution.evaluate(context, evaluator);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 

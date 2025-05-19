@@ -17,6 +17,7 @@ subprojects {
         testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
         testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
         testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-test-int-support"))
+        testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
         testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
         testImplementation(project(":server:libs:test:test-support"))
     }

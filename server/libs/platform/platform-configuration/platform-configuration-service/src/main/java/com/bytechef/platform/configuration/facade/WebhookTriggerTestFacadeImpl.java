@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -58,6 +59,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         WebhookTriggerTestFacade.class.getName() + ".webhookEnableOutput";
 
     private final CacheManager cacheManager;
+    private final Evaluator evaluator;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final String webhookUrl;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -67,12 +69,13 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
     @SuppressFBWarnings("EI")
     public WebhookTriggerTestFacadeImpl(
-        CacheManager cacheManager, ApplicationProperties applicationProperties,
+        CacheManager cacheManager, Evaluator evaluator, ApplicationProperties applicationProperties,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.cacheManager = cacheManager;
+        this.evaluator = evaluator;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.webhookUrl = applicationProperties.getWebhookUrl();
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -119,7 +122,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
         Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
-            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId));
+            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId), evaluator);
         Long connectionId = workflowTestConfigurationService
             .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName())
             .orElse(null);
@@ -138,7 +141,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             type, -1, workflowReferenceCode, workflowTrigger.getName());
         WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
         Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
-            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId));
+            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId), evaluator);
         Long connectionId = workflowTestConfigurationService
             .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName())
             .orElse(null);

@@ -55,10 +55,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
 
-    private static final Evaluator EVALUATOR = Evaluator.create();
-
-    private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
+    private final Evaluator evaluator;
+    private final ApplicationEventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
@@ -67,11 +66,12 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
-        ContextService contextService, ApplicationEventPublisher eventPublisher, JobExecutor jobExecutor,
-        JobService jobService, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        ContextService contextService, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
+        JobExecutor jobExecutor, JobService jobService, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
+        this.evaluator = evaluator;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
         this.jobService = jobService;
@@ -157,7 +157,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         job.setEndDate(Instant.now());
         job.setStatus(Job.Status.COMPLETED);
         job.setOutputs(
-            taskFileStorage.storeJobOutputs(Validate.notNull(job.getId(), "id"), EVALUATOR.evaluate(source, context)));
+            taskFileStorage.storeJobOutputs(Validate.notNull(job.getId(), "id"), evaluator.evaluate(source, context)));
 
         job = jobService.update(job);
 

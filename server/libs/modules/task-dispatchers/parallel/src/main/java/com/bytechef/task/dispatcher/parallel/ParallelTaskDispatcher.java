@@ -52,22 +52,22 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
     private final CounterService counterService;
+    private final ApplicationEventPublisher eventPublisher;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public ParallelTaskDispatcher(
-        ApplicationEventPublisher eventPublisher, ContextService contextService,
-        CounterService counterService, TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
+        ContextService contextService, CounterService counterService, ApplicationEventPublisher eventPublisher,
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
 
-        this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.counterService = counterService;
+        this.eventPublisher = eventPublisher;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;

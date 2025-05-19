@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.evaluator.SpelEvaluator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,17 +28,20 @@ import org.junit.jupiter.api.Test;
  */
 public class WorkflowNodeParameterFacadeTest {
 
+    private static final WorkflowNodeParameterFacadeImpl WORKFLOW_NODE_PARAMETER_FACADE =
+        new WorkflowNodeParameterFacadeImpl(null, SpelEvaluator.create(), null, null, null, null, null);
+
     @Test
     public void testEvaluate() {
         Map<String, Object> parametersMap = Map.of(
             "body", Map.of("bodyContentType", "JSON"));
 
-        boolean result = WorkflowNodeParameterFacadeImpl.evaluate(
+        boolean result = WORKFLOW_NODE_PARAMETER_FACADE.evaluate(
             "body.bodyContentType == 'JSON'", Map.of(), Map.of(), parametersMap);
 
         Assertions.assertTrue(result);
 
-        result = WorkflowNodeParameterFacadeImpl.evaluate(
+        result = WORKFLOW_NODE_PARAMETER_FACADE.evaluate(
             "body.bodyContentType == 'XML'", Map.of(), Map.of(), parametersMap);
 
         Assertions.assertFalse(result);
@@ -53,7 +57,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         Map<String, String> displayConditionMap = new HashMap<>();
 
-        WorkflowNodeParameterFacadeImpl.evaluateArray(
+        WORKFLOW_NODE_PARAMETER_FACADE.evaluateArray(
             "name", "conditions[index][index].operation != 'EMPTY'", displayConditionMap, Map.of(), Map.of(),
             parametersMap);
 
@@ -66,7 +70,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         displayConditionMap = new HashMap<>();
 
-        WorkflowNodeParameterFacadeImpl.evaluateArray(
+        WORKFLOW_NODE_PARAMETER_FACADE.evaluateArray(
             "name", "conditions[index][index].operation == 'EMPTY'", displayConditionMap, Map.of(), Map.of(),
             parametersMap);
 
@@ -81,7 +85,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         displayConditionMap = new HashMap<>();
 
-        WorkflowNodeParameterFacadeImpl.evaluateArray(
+        WORKFLOW_NODE_PARAMETER_FACADE.evaluateArray(
             "name", "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", displayConditionMap, Map.of(),
             Map.of(), parametersMap);
 

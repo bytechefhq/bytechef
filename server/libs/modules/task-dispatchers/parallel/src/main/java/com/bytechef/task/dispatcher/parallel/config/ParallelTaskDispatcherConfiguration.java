@@ -59,7 +59,7 @@ public class ParallelTaskDispatcherConfiguration {
     @Bean("parallelTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory parallelTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ParallelTaskDispatcher(
-            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
+            contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
             taskFileStorage);
     }
 }

@@ -39,6 +39,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,7 +85,8 @@ public class BranchTaskDispatcherTest {
                     .build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
+            taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
                 new WorkflowTask(
@@ -134,7 +136,8 @@ public class BranchTaskDispatcherTest {
             .thenReturn(base64FileStorageService.storeFileContent("", "", "{}"));
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
+            taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
@@ -173,7 +176,8 @@ public class BranchTaskDispatcherTest {
                     .build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
+            taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
                 new WorkflowTask(
@@ -229,7 +233,8 @@ public class BranchTaskDispatcherTest {
                     .build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
+            taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(

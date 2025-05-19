@@ -27,6 +27,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
@@ -41,6 +42,7 @@ import java.util.Map;
 public class ComponentJobTestExecutor {
 
     private final ContextService contextService;
+    private final Evaluator evaluator;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final Map<String, TaskHandler<?>> taskHandlerMap;
@@ -49,10 +51,12 @@ public class ComponentJobTestExecutor {
 
     @SuppressFBWarnings("EI")
     public ComponentJobTestExecutor(
-        ContextService contextService, JobService jobService, TaskExecutionService taskExecutionService,
-        Map<String, TaskHandler<?>> taskHandlerMap, WorkflowService workflowService) {
+        ContextService contextService, Evaluator evaluator, JobService jobService,
+        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
+        WorkflowService workflowService) {
 
         this.contextService = contextService;
+        this.evaluator = evaluator;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskHandlerMap = taskHandlerMap;
@@ -66,7 +70,7 @@ public class ComponentJobTestExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, getTaskDispatcherPreSendProcessors(),
+            contextService, evaluator, jobService, getTaskDispatcherPreSendProcessors(),
             taskExecutionService, MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get, taskFileStorage,
             workflowService);
 

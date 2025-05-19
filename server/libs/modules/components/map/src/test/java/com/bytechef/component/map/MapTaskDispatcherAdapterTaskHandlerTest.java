@@ -36,6 +36,8 @@ import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
@@ -56,6 +58,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 @ExtendWith(ObjectMapperSetupExtension.class)
 public class MapTaskDispatcherAdapterTaskHandlerTest {
 
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
@@ -65,7 +68,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
 
         MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-            new ConcurrentMapCacheManager(), resolver);
+            new ConcurrentMapCacheManager(), EVALUATOR, resolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -96,7 +99,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 throw new IllegalStateException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-                new ConcurrentMapCacheManager(), taskHandlerResolver);
+                new ConcurrentMapCacheManager(), EVALUATOR, taskHandlerResolver);
 
             TaskExecution taskExecution = TaskExecution.builder()
                 .workflowTask(
@@ -151,11 +154,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         };
 
         TaskWorker worker = new TaskWorker(
-            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             EXECUTOR_SERVICE::execute, taskHandlerResolver, taskFileStorage);
 
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(
-            new ConcurrentMapCacheManager(), taskHandlerResolver);
+            new ConcurrentMapCacheManager(), EVALUATOR, taskHandlerResolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(

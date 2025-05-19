@@ -21,6 +21,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.loop.LoopBreakTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.LoopTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
@@ -34,6 +35,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class LoopTaskDispatcherConfiguration {
+
+    @Autowired
+    private Evaluator evaluator;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -50,7 +54,7 @@ public class LoopTaskDispatcherConfiguration {
     @Bean
     TaskCompletionHandlerFactory loopTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage);
     }
 
     @Bean("loopBreakTaskDispatcherResolverFactory_v1")
@@ -61,6 +65,6 @@ public class LoopTaskDispatcherConfiguration {
     @Bean("loopTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory loopTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new LoopTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage);
     }
 }

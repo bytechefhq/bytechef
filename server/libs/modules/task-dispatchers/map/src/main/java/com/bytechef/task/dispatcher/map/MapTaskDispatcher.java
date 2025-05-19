@@ -36,6 +36,7 @@ import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
@@ -51,22 +52,24 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
+    private final ContextService contextService;
+    private final CounterService counterService;
+    private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
     private final TaskDispatcher<? super TaskExecution> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final ContextService contextService;
-    private final CounterService counterService;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public MapTaskDispatcher(
-        ApplicationEventPublisher eventPublisher, ContextService contextService,
-        CounterService counterService, TaskDispatcher<? super TaskExecution> taskDispatcher,
+        ContextService contextService, CounterService counterService, Evaluator evaluator,
+        ApplicationEventPublisher eventPublisher, TaskDispatcher<? super TaskExecution> taskDispatcher,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
-        this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.counterService = counterService;
+        this.evaluator = evaluator;
+        this.eventPublisher = eventPublisher;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
@@ -109,7 +112,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
                 newContext.put(workflowTask.getName(), Map.of(ITEM, item, INDEX, i));
 
-                iterateeTaskExecution.evaluate(newContext);
+                iterateeTaskExecution.evaluate(newContext, evaluator);
 
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
 

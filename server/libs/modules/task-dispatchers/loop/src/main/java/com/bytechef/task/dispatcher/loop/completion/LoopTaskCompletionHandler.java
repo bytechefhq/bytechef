@@ -33,6 +33,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -50,6 +51,7 @@ import org.apache.commons.lang3.Validate;
 public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
     private final ContextService contextService;
+    private final Evaluator evaluator;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
@@ -57,11 +59,12 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public LoopTaskCompletionHandler(
-        ContextService contextService, TaskCompletionHandler taskCompletionHandler,
+        ContextService contextService, Evaluator evaluator, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
         this.contextService = contextService;
+        this.evaluator = evaluator;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
@@ -161,7 +164,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         firstChildContextValue.put(parentWorkflowTask.getName(), workflowTaskNameMap);
 
-        firstChildTaskExecution = taskExecutionService.create(firstChildTaskExecution.evaluate(firstChildContextValue));
+        firstChildTaskExecution = taskExecutionService.create(
+            firstChildTaskExecution.evaluate(firstChildContextValue, evaluator));
 
         contextService.push(
             Validate.notNull(firstChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
@@ -195,7 +199,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         }
 
         nextChildTaskExecution = taskExecutionService.create(
-            nextChildTaskExecution.evaluate(nextChildContextValue));
+            nextChildTaskExecution.evaluate(nextChildContextValue, evaluator));
 
         contextService.push(
             Validate.notNull(nextChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,

@@ -36,9 +36,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @author Arik Cohen
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-public class EvaluatorTest {
+public class SpelEvaluatorTest {
 
-    private static final Evaluator EVALUATOR = Evaluator.create();
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     @Test
     public void test1() {
@@ -77,7 +77,7 @@ public class EvaluatorTest {
 
     @Test
     public void test5() {
-        Assertions.assertThrowsExactly(UnsupportedOperationException.class, () -> {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
             Map<String, Object> context = new HashMap<>();
 
             context.put("number", "5");
@@ -400,26 +400,37 @@ public class EvaluatorTest {
             Map.of("date", "=minusDays(${localDateTime}, 1)"), Map.of("localDateTime", localDateTime));
 
         Assertions.assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
+
+        map = EVALUATOR.evaluate(Map.of("hour", "=${localDateTime}.hour"), Map.of("localDateTime", localDateTime));
+
+        Assertions.assertEquals(localDateTime.getHour(), MapUtils.getInteger(map, "hour"));
     }
 
     @Test
     public void test42() {
         LocalDateTime localDateTime = LocalDateTime.now();
 
-        Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("hour", "=${localDateTime}.hour"), Map.of("localDateTime", localDateTime));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            EVALUATOR.evaluate(Map.of("hour", "=${localDateTime}.getHour()"), Map.of("localDateTime", localDateTime));
+        });
 
-        Assertions.assertEquals(localDateTime.getHour(), MapUtils.getInteger(map, "hour"));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            EVALUATOR.evaluate(Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
+        });
 
-        map = EVALUATOR.evaluate(
-            Map.of("date", "=minusDays(${localDateTime}, 1)"), Map.of("localDateTime", localDateTime));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            EVALUATOR.evaluate(Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
+        });
 
-        Assertions.assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            EVALUATOR.evaluate(Map.of("hour", "${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
+        });
+    }
 
-        map = EVALUATOR.evaluate(
-            Map.of("size", "=size(${list})"), Map.of("list", List.of(1, 2)));
+    @Test
+    public void test43() {
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("size", "=size(${list})"), Map.of("list", List.of(1, 2)));
 
         Assertions.assertEquals(2, MapUtils.getInteger(map, "size"));
     }
-
 }

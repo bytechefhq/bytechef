@@ -72,6 +72,7 @@ dependencies {
     implementation(project(":server:libs:config:tenant-single-security-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))
+    implementation(project(":server:libs:core:evaluator:evaluator-impl"))
     implementation(project(":server:libs:core:encryption:encryption-impl"))
     implementation(project(":server:libs:core:encryption:encryption-property"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))

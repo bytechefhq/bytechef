@@ -24,6 +24,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
@@ -165,7 +166,7 @@ public class ConditionTaskDispatcherIntTest {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                contextService, SpelEvaluator.create(), taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
 
@@ -176,7 +177,7 @@ public class ConditionTaskDispatcherIntTest {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
 

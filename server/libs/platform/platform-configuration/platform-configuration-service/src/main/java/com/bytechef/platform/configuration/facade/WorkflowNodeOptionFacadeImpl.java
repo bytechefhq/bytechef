@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
+    private final Evaluator evaluator;
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
@@ -46,10 +48,12 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeOptionFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        Evaluator evaluator, ActionDefinitionFacade actionDefinitionFacade,
+        TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
+        this.evaluator = evaluator;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
@@ -76,7 +80,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
                 return triggerDefinitionFacade.executeOptions(
                     workflowNodeType.name(), workflowNodeType.version(),
-                    workflowNodeType.operation(), propertyName, workflowTrigger.evaluateParameters(inputs),
+                    workflowNodeType.operation(), propertyName, workflowTrigger.evaluateParameters(inputs, evaluator),
                     lookupDependsOnPaths, searchText, connectionId);
             })
             .orElseGet(
@@ -91,7 +95,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                         workflowNodeType.name(), workflowNodeType.version(),
                         workflowNodeType.operation(), propertyName,
                         workflowTask.evaluateParameters(
-                            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
+                            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
                         lookupDependsOnPaths, searchText, connectionId);
                 });
     }

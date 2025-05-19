@@ -67,11 +67,11 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     private static final Pattern ARRAY_INDEXES_PATTERN =
         Pattern.compile("^.*(\\b\\w+\\b)((\\[index])+)(\\.\\b\\w+\\b.*)|.*((\\[index])+)(\\.\\b\\w+\\b.*)$");
     private static final String DYNAMIC_PROPERTY_TYPES = "dynamicPropertyTypes";
-    private static final Evaluator EVALUATOR = Evaluator.create();
     private static final String METADATA = "metadata";
     private static final String UI = "ui";
 
     private final ActionDefinitionService actionDefinitionService;
+    private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
@@ -80,12 +80,13 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeParameterFacadeImpl(
-        ActionDefinitionService actionDefinitionService,
+        ActionDefinitionService actionDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionService triggerDefinitionService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionService = actionDefinitionService;
+        this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
@@ -208,14 +209,14 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return displayCondition.contains(parameterPath);
     }
 
-    protected static boolean evaluate(
+    protected boolean evaluate(
         String displayCondition, Map<String, Object> inputMap, Map<String, Object> outputs,
         Map<String, ?> parameterMap) {
 
         Map<String, Object> evaluate;
 
         try {
-            evaluate = EVALUATOR.evaluate(parameterMap, outputs);
+            evaluate = evaluator.evaluate(parameterMap, outputs);
         } catch (Exception e) {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace(e.getMessage());
@@ -232,7 +233,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     evaluate, Map.Entry::getKey, entry -> entry.getValue() == null ? "" : entry.getValue())));
     }
 
-    protected static void evaluateArray(
+    protected void evaluateArray(
         String propertyName, String displayCondition, Map<String, String> displayConditionMap,
         Map<String, Object> inputMap, Map<String, Object> outputs, Map<String, ?> parameterMap) {
 
@@ -486,8 +487,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
     }
 
-    private static boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
-        Map<String, Object> result = EVALUATOR.evaluate(
+    private boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
+        Map<String, Object> result = evaluator.evaluate(
             Map.of("displayCondition", "=" + displayCondition), inputParameters);
 
         Object displayConditionResult = result.get("displayCondition");

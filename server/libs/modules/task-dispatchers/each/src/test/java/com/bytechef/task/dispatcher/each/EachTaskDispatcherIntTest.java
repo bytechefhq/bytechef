@@ -18,6 +18,7 @@ package com.bytechef.task.dispatcher.each;
 
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
@@ -61,10 +62,10 @@ public class EachTaskDispatcherIntTest {
                 (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
                     counterService, taskCompletionHandler, taskExecutionService)),
             (
-                messageBroker, contextService, counterService, taskExecutionService) -> List.of(
+                eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new EachTaskDispatcher(
-                        messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
-                        taskFileStorage)),
+                        contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+                        taskExecutionService, taskFileStorage)),
             () -> Map.of("var/v1/set", testVarTaskHandler));
 
         Assertions.assertEquals(

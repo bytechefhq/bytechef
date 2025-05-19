@@ -40,6 +40,7 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.Environment;
@@ -73,6 +74,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
+    private final Evaluator evaluator;
     private final PrincipalJobService principalJobService;
     private final IntegrationFacade integrationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -90,7 +92,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
     @SuppressFBWarnings("EI")
     public IntegrationWorkflowExecutionFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, ContextService contextService,
+        ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
         PrincipalJobService principalJobService, IntegrationFacade integrationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService,
@@ -103,6 +105,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
+        this.evaluator = evaluator;
         this.principalJobService = principalJobService;
         this.integrationFacade = integrationFacade;
         this.integrationInstanceService = integrationInstanceService;
@@ -262,8 +265,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
                 return new TaskExecutionDTO(
                     taskExecutionService.getTaskExecution(Validate.notNull(taskExecution.getId(), "id")),
-                    definitionResult.title(), definitionResult.icon(), workflowTask.evaluateParameters(context),
-                    output);
+                    definitionResult.title(), definitionResult.icon(),
+                    workflowTask.evaluateParameters(context, evaluator), output);
             });
     }
 

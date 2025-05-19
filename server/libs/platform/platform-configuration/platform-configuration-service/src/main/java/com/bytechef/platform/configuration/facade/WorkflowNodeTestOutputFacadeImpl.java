@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.NullProperty;
 import com.bytechef.platform.component.domain.Property;
@@ -58,6 +59,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final Evaluator evaluator;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -69,13 +71,15 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WebhookTriggerTestFacade webhookTriggerTestFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.evaluator = evaluator;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -165,7 +169,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
-                workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId));
+                workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId), evaluator);
 
             Long connectionId = null;
 
@@ -205,7 +209,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflow.getId(), workflowTask.getName());
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
-            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
+            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
 
         OutputResponse outputResponse = taskDispatcherDefinitionService.executeOutput(
             workflowNodeType.name(), workflowNodeType.version(), inputParameters);
@@ -231,7 +235,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflow.getId(), workflowTask.getName());
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
-            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
+            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
 
         OutputResponse outputResponse = actionDefinitionFacade.executeOutput(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
@@ -255,7 +259,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
             workflowNodeType.name(), workflowNodeType.version(),
-            workflowNodeType.operation(), null, null, null, workflowTrigger.evaluateParameters(inputs),
+            workflowNodeType.operation(), null, null, null, workflowTrigger.evaluateParameters(inputs, evaluator),
             null, null, connectionId, true);
 
         Object value = triggerOutput.value();

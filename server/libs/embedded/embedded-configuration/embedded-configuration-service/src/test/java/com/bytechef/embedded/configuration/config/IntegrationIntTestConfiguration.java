@@ -18,6 +18,8 @@ package com.bytechef.embedded.configuration.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -46,6 +48,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 })
 @Configuration
 public class IntegrationIntTestConfiguration {
+
+    @Bean
+    Evaluator evaluator() {
+        return SpelEvaluator.create();
+    }
 
     @Bean
     EncryptionKey encryptionKey() {

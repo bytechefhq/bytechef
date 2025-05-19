@@ -31,6 +31,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -53,25 +54,26 @@ import java.util.Objects;
  */
 public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
+    private final ContextService contextService;
+    private final CounterService counterService;
+    private final Evaluator evaluator;
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
-    private final CounterService counterService;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final ContextService contextService;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public ForkJoinTaskCompletionHandler(
+        ContextService contextService, CounterService counterService, Evaluator evaluator,
         TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
-        CounterService counterService, TaskDispatcher<? super Task> taskDispatcher,
-        ContextService contextService,
-        TaskFileStorage taskFileStorage) {
+        TaskDispatcher<? super Task> taskDispatcher, TaskFileStorage taskFileStorage) {
 
+        this.contextService = contextService;
+        this.counterService = counterService;
+        this.evaluator = evaluator;
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
-        this.counterService = counterService;
         this.taskDispatcher = taskDispatcher;
-        this.contextService = contextService;
         this.taskFileStorage = taskFileStorage;
     }
 
@@ -142,7 +144,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             Map<String, ?> context = taskFileStorage.readContextValue(
                 contextService.peek(taskExecutionParentId, branch, Context.Classname.TASK_EXECUTION));
 
-            branchTaskExecution.evaluate(context);
+            branchTaskExecution.evaluate(context, evaluator);
 
             branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 

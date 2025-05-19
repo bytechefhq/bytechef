@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class EachTaskDispatcherConfiguration {
+
+    @Autowired
+    private Evaluator evaluator;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -59,7 +63,7 @@ public class EachTaskDispatcherConfiguration {
     @Bean("eachTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory eachTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new EachTaskDispatcher(
-            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
+            contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
             taskFileStorage);
     }
 }

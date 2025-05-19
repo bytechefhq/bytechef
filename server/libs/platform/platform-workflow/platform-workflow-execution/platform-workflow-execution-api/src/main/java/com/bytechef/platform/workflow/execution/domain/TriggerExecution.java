@@ -75,8 +75,6 @@ public class TriggerExecution implements Cloneable, Errorable, Prioritizable, Re
         }
     }
 
-    private static final Evaluator EVALUATOR = Evaluator.create();
-
     @Transient
     private boolean batch;
 
@@ -168,10 +166,10 @@ public class TriggerExecution implements Cloneable, Errorable, Prioritizable, Re
      * @param context The context value to evaluate the task against
      * @return the evaluated {@link TriggerExecution} instance.
      */
-    public TriggerExecution evaluate(Map<String, ?> context) {
+    public TriggerExecution evaluate(Map<String, ?> context, Evaluator evaluator) {
         WorkflowTrigger workflowTrigger = getWorkflowTrigger();
 
-        Map<String, Object> map = EVALUATOR.evaluate(workflowTrigger.toMap(), context);
+        Map<String, Object> map = evaluator.evaluate(workflowTrigger.toMap(), context);
 
         setWorkflowTrigger(new WorkflowTrigger(map));
 

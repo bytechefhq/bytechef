@@ -21,6 +21,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class BranchTaskDispatcherConfiguration {
 
+    private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
     private final TaskExecutionService taskExecutionService;
@@ -41,8 +43,9 @@ public class BranchTaskDispatcherConfiguration {
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcherConfiguration(
-        ApplicationEventPublisher eventPublisher, ContextService contextService,
+        Evaluator evaluator, ApplicationEventPublisher eventPublisher, ContextService contextService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
+        this.evaluator = evaluator;
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;
@@ -53,12 +56,12 @@ public class BranchTaskDispatcherConfiguration {
     @Bean("branchTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory branchTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage);
     }
 
     @Bean("branchTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory branchTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
+            contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage);
     }
 }

@@ -30,6 +30,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class SubflowJobStatusEventListener implements ApplicationEventListener {
 
+    private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
@@ -54,8 +56,9 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
-        ApplicationEventPublisher eventPublisher, JobService jobService,
+        Evaluator evaluator, ApplicationEventPublisher eventPublisher, JobService jobService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
+        this.evaluator = evaluator;
 
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
@@ -104,7 +107,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
                                 Validate.notNull(completionTaskExecution.getId(), "id"), output));
                     } else {
                         // TODO check, it seems wrong
-                        completionTaskExecution.evaluate(Map.of("execution", Map.of("output", output)));
+                        completionTaskExecution.evaluate(Map.of("execution", Map.of("output", output)), evaluator);
                     }
 
                     eventPublisher.publishEvent(new TaskExecutionCompleteEvent(completionTaskExecution));

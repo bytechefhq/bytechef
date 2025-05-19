@@ -39,6 +39,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerProvider;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.message.broker.MessageBroker;
@@ -106,7 +107,7 @@ public class ComponentTestIntConfiguration {
         TaskHandlerProvider taskHandlerProvider, WorkflowService workflowService) {
 
         return new ComponentJobTestExecutor(
-            contextService, jobService, taskExecutionService,
+            contextService, SpelEvaluator.create(), jobService, taskExecutionService,
             MapUtils.concat(taskHandlerMap, taskHandlerProvider.getTaskHandlerMap()), workflowService);
     }
 

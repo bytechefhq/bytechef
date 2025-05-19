@@ -52,9 +52,9 @@ import org.springframework.lang.Nullable;
  * @author Ivica Cardic
  * @since Mar 31, 2017
  */
-public class Evaluator {
+public class SpelEvaluator implements Evaluator {
 
-    private static final Logger logger = LoggerFactory.getLogger(Evaluator.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpelEvaluator.class);
 
     private static final String ACCESSOR_PREFIX = "${";
     private static final String ACCESSOR_SUFFIX = "}";
@@ -69,7 +69,7 @@ public class Evaluator {
 
     private final Map<String, MethodExecutor> methodExecutorMap;
 
-    private Evaluator(Builder builder) {
+    private SpelEvaluator(Builder builder) {
         Map<String, MethodExecutor> map = new HashMap<>();
 
         map.put("add", new Add());
@@ -188,7 +188,7 @@ public class Evaluator {
                     string = string.replaceAll("\\$\\{([^}]*)}", "$1");
 
                     if (!validateFormulaExpression(string)) {
-                        throw new UnsupportedOperationException("Invalid formula expression: " + string);
+                        throw new IllegalArgumentException("Invalid formula expression: " + string);
                     }
 
                     expression = expressionParser.parseExpression(string.substring(1));
@@ -304,7 +304,7 @@ public class Evaluator {
         }
 
         public Evaluator build() {
-            return new Evaluator(this);
+            return new SpelEvaluator(this);
         }
     }
 }

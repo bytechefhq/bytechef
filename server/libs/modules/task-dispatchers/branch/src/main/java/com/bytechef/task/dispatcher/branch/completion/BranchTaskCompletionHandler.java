@@ -35,6 +35,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -53,6 +54,7 @@ import org.springframework.util.Assert;
 public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
     private final ContextService contextService;
+    private final Evaluator evaluator;
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
@@ -60,11 +62,12 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public BranchTaskCompletionHandler(
-        ContextService contextService, TaskCompletionHandler taskCompletionHandler,
+        ContextService contextService, Evaluator evaluator, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
         this.contextService = contextService;
+        this.evaluator = evaluator;
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
@@ -130,7 +133,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
             Map<String, ?> context = taskFileStorage.readContextValue(
                 contextService.peek(branchTaskExecutionId, Classname.TASK_EXECUTION));
 
-            subTaskExecution.evaluate(context);
+            subTaskExecution.evaluate(context, evaluator);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 

@@ -28,6 +28,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ public class JobExecutor {
     private static final Logger logger = LoggerFactory.getLogger(JobExecutor.class);
 
     private final ContextService contextService;
+    private final Evaluator evaluator;
     private final TaskDispatcher<? super TaskExecution> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
@@ -53,11 +55,11 @@ public class JobExecutor {
 
     @SuppressFBWarnings("EI2")
     public JobExecutor(
-        ContextService contextService, TaskDispatcher<? super TaskExecution> taskDispatcher,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        ContextService contextService, Evaluator evaluator, TaskDispatcher<? super TaskExecution> taskDispatcher,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
+        this.evaluator = evaluator;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
@@ -87,7 +89,7 @@ public class JobExecutor {
             contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB));
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
 
-        nextTaskExecution = taskExecutionService.create(nextTaskExecution.evaluate(context));
+        nextTaskExecution = taskExecutionService.create(nextTaskExecution.evaluate(context, evaluator));
 
         contextService.push(
             Validate.notNull(nextTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,

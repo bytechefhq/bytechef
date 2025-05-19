@@ -47,6 +47,8 @@ import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
@@ -89,6 +91,8 @@ public class TaskCoordinatorIntTest {
 
     private static final TaskFileStorage TASK_FILE_STORAGE = new TaskFileStorageImpl(new Base64FileStorageService());
 
+    private final Evaluator evaluator = SpelEvaluator.create();
+
     @Autowired
     @Nullable
     private ContextService contextService;
@@ -125,7 +129,7 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            Objects.requireNonNull(contextService), Objects.requireNonNull(jobService), List.of(),
+            Objects.requireNonNull(contextService), evaluator, Objects.requireNonNull(jobService), List.of(),
             Objects.requireNonNull(taskExecutionService), taskHandlerMap::get, TASK_FILE_STORAGE,
             Objects.requireNonNull(workflowService));
 

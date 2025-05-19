@@ -39,6 +39,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,8 +75,8 @@ public class EachTaskDispatcherTest {
     public void testDispatch1() {
         Assertions.assertThrows(NullPointerException.class, () -> {
             EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-                taskFileStorage);
+                contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+                taskExecutionService, taskFileStorage);
 
             dispatcher.dispatch(TaskExecution.builder()
                 .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
@@ -93,8 +94,8 @@ public class EachTaskDispatcherTest {
                 .build());
 
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-            taskFileStorage);
+            contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+            taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
                 new WorkflowTask(
@@ -122,8 +123,8 @@ public class EachTaskDispatcherTest {
     @Test
     public void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-            taskFileStorage);
+            contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+            taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(
                 1L)

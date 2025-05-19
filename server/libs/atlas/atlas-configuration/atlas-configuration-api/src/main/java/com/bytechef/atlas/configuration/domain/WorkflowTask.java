@@ -40,8 +40,6 @@ import org.springframework.util.Assert;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTask implements Task, Serializable {
 
-    private static final Evaluator EVALUATOR = Evaluator.create();
-
     private String description;
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
@@ -109,8 +107,8 @@ public class WorkflowTask implements Task, Serializable {
     private WorkflowTask() {
     }
 
-    public Map<String, ?> evaluateParameters(Map<String, ?> context) {
-        WorkflowTask workflowTask = new WorkflowTask(EVALUATOR.evaluate(toMap(), context));
+    public Map<String, ?> evaluateParameters(Map<String, ?> context, Evaluator evaluator) {
+        WorkflowTask workflowTask = new WorkflowTask(evaluator.evaluate(toMap(), context));
 
         return workflowTask.getParameters();
     }

@@ -38,6 +38,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -77,6 +78,7 @@ import org.springframework.util.Assert;
 public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     private final ConnectionService connectionService;
+    private final Evaluator evaluator;
     private final PrincipalJobFacade principalJobFacade;
     private final PrincipalJobService principalJobService;
     private final JobFacade jobFacade;
@@ -95,7 +97,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentFacadeImpl(
-        ConnectionService connectionService, PrincipalJobFacade principalJobFacade,
+        ConnectionService connectionService, Evaluator evaluator, PrincipalJobFacade principalJobFacade,
         PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
@@ -105,6 +107,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
+        this.evaluator = evaluator;
         this.principalJobFacade = principalJobFacade;
         this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
@@ -453,7 +456,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs()),
+                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
                 getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger));
         }
     }
@@ -523,7 +526,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), workflowExecutionId, workflowNodeType,
-                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs()),
+                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
                 getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger),
                 getWebhookUrl(workflowExecutionId));
         }

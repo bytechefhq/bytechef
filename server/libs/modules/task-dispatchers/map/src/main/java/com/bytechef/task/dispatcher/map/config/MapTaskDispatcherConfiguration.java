@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnBean(ContextService.class)
 public class MapTaskDispatcherConfiguration {
+
+    @Autowired
+    private Evaluator evaluator;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -61,7 +65,7 @@ public class MapTaskDispatcherConfiguration {
     @Bean("mapTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory mapTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new MapTaskDispatcher(
-            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
+            contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
             taskFileStorage);
     }
 }

@@ -20,6 +20,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
@@ -64,13 +65,13 @@ public class ForkJoinTaskDispatcherIntTest {
             (
                 counterService, taskExecutionService) -> List.of(
                     (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
-                        taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
-                        taskFileStorage)),
+                        contextService, counterService, SpelEvaluator.create(), taskExecutionService,
+                        taskCompletionHandler, taskDispatcher, taskFileStorage)),
             (
-                messageBroker, contextService, counterService, taskExecutionService) -> List.of(
+                eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new ForkJoinTaskDispatcher(
-                        messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
-                        taskFileStorage)),
+                        contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+                        taskExecutionService, taskFileStorage)),
             () -> Map.of("var/v1/set", testVarTaskHandler));
 
         Assertions.assertEquals(85, testVarTaskHandler.get("sumVar1"));

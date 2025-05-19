@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.fork.join.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.fork.join.completion.ForkJoinTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class ForkJoinTaskDispatcherConfiguration {
+
+    @Autowired
+    private Evaluator evaluator;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -53,14 +57,14 @@ public class ForkJoinTaskDispatcherConfiguration {
     @Bean("forkJoinTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory forkTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
-            taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
+            contextService, counterService, evaluator, taskExecutionService, taskCompletionHandler, taskDispatcher,
             taskFileStorage);
     }
 
     @Bean("forkJoinTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory forkTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ForkJoinTaskDispatcher(
-            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
+            contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
             taskFileStorage);
     }
 }

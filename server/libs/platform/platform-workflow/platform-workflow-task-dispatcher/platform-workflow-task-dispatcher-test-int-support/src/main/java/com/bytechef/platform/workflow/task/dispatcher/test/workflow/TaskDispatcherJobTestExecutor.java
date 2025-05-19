@@ -29,6 +29,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
@@ -80,7 +81,7 @@ public class TaskDispatcherJobTestExecutor {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, syncMessageBroker,
+            contextService, SpelEvaluator.create(), jobService, syncMessageBroker,
             taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService),
             List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(

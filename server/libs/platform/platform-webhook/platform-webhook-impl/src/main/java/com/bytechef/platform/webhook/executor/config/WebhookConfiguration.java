@@ -31,6 +31,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
@@ -69,8 +70,8 @@ public class WebhookConfiguration {
 
     @Bean
     WebhookWorkflowExecutor webhookExecutor(
-        ApplicationEventPublisher eventPublisher, CacheManager cacheManager, ContextService contextService,
-        CounterService counterService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        CacheManager cacheManager, ContextService contextService, CounterService counterService, Evaluator evaluator,
+        ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         PrincipalJobFacade principalJobFacade, JobService jobService,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
         TaskHandlerRegistry taskHandlerRegistry, WebhookWorkflowSyncExecutor triggerSyncExecutor,
@@ -82,12 +83,12 @@ public class WebhookConfiguration {
             eventPublisher, jobPrincipalAccessorRegistry,
             principalJobFacade,
             new JobSyncExecutor(
-                contextService, jobService, syncMessageBroker,
+                contextService, evaluator, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
-                    contextService, counterService, taskExecutionService, taskFileStorage),
-                getTaskDispatcherAdapterFactories(cacheManager), taskDispatcherPreSendProcessors,
+                    contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
+                getTaskDispatcherAdapterFactories(cacheManager, evaluator), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, jobService, syncMessageBroker, taskExecutionService,
+                    contextService, counterService, evaluator, jobService, syncMessageBroker, taskExecutionService,
                     taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage,
                 workflowService),
@@ -99,35 +100,39 @@ public class WebhookConfiguration {
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage) {
+        ContextService contextService, CounterService counterService, Evaluator evaluator,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
+                contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
+                contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
                 counterService, taskCompletionHandler, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
-                taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
+                contextService, counterService, evaluator, taskExecutionService, taskCompletionHandler, taskDispatcher,
                 taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
+                contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(taskExecutionService,
                 taskCompletionHandler, counterService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
                 taskCompletionHandler, taskExecutionService));
     }
 
-    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(CacheManager cacheManager) {
+    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(
+        CacheManager cacheManager, Evaluator evaluator) {
 
         return List.of(
             new TaskDispatcherAdapterFactory() {
 
                 @Override
                 public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
-                    return new MapTaskDispatcherAdapterTaskHandler(cacheManager, taskHandlerResolver);
+                    return new MapTaskDispatcherAdapterTaskHandler(cacheManager, evaluator, taskHandlerResolver);
                 }
 
                 @Override
@@ -138,7 +143,7 @@ public class WebhookConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, JobService jobService,
+        ContextService contextService, CounterService counterService, Evaluator evaluator, JobService jobService,
         SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
@@ -147,26 +152,24 @@ public class WebhookConfiguration {
         return List.of(
             (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
-                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorage),
+                contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new EachTaskDispatcher(
-                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
+                contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new ForkJoinTaskDispatcher(
-                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
+                contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
-                eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorage),
+                contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new MapTaskDispatcher(
-                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
+                contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new ParallelTaskDispatcher(
-                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
+                contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
 }

@@ -39,6 +39,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
@@ -60,11 +61,15 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
     private final CacheManager cacheManager;
     private final CurrentThreadExecutorService currentThreadExecutorService = new CurrentThreadExecutorService();
+    private final Evaluator evaluator;
     private final TaskHandlerResolver taskHandlerResolver;
 
     @SuppressFBWarnings("EI")
-    public MapTaskDispatcherAdapterTaskHandler(CacheManager cacheManager, TaskHandlerResolver taskHandlerResolver) {
+    public MapTaskDispatcherAdapterTaskHandler(
+        CacheManager cacheManager, Evaluator evaluator, TaskHandlerResolver taskHandlerResolver) {
+
         this.cacheManager = cacheManager;
+        this.evaluator = evaluator;
         this.taskHandlerResolver = taskHandlerResolver;
     }
 
@@ -107,12 +112,12 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
                 Validate.notNull(taskExecution.getId(), "id"), Collections.emptyMap()));
 
         TaskWorker taskWorker = new TaskWorker(
-            getEventPublisher(syncMessageBroker), currentThreadExecutorService::execute, taskHandlerResolver,
+            evaluator, getEventPublisher(syncMessageBroker), currentThreadExecutorService::execute, taskHandlerResolver,
             taskFileStorage);
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
+            contextService, new CounterServiceImpl(new InMemoryCounterRepository(cacheManager)), evaluator,
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            contextService, new CounterServiceImpl(new InMemoryCounterRepository(cacheManager)),
             curTaskExecution -> taskWorker.onTaskExecutionEvent(new TaskExecutionEvent(curTaskExecution)),
             taskExecutionService, taskFileStorage);
 

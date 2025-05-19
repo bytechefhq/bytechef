@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDynamicPropertiesFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final Evaluator evaluator;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
@@ -45,11 +47,13 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeDynamicPropertiesFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator,
+        TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.evaluator = evaluator;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
@@ -74,7 +78,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
                 return triggerDefinitionFacade.executeDynamicProperties(
                     workflowNodeType.name(), workflowNodeType.version(),
-                    workflowNodeType.operation(), propertyName, workflowTrigger.evaluateParameters(inputs),
+                    workflowNodeType.operation(), propertyName, workflowTrigger.evaluateParameters(inputs, evaluator),
                     lookupDependsOnPaths, connectionId);
             })
             .orElseGet(() -> {
@@ -88,7 +92,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                     workflowNodeType.name(), workflowNodeType.version(),
                     workflowNodeType.operation(), propertyName, workflowId,
                     workflowTask.evaluateParameters(
-                        MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
+                        MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
                     lookupDependsOnPaths, connectionId);
             });
     }

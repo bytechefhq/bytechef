@@ -27,6 +27,7 @@ import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerRe
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
+import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -72,9 +73,10 @@ public class TaskWorkerConfiguration {
 
     @Bean
     TaskWorker taskWorker(
-        ApplicationEventPublisher eventPublisher, Executor taskExecutor, TaskFileStorage taskFileStorage,
-        TaskHandlerResolver taskHandlerResolver) {
+        Evaluator evaluator, ApplicationEventPublisher eventPublisher, Executor taskExecutor,
+        TaskFileStorage taskFileStorage, TaskHandlerResolver taskHandlerResolver) {
 
-        return new TaskWorker(eventPublisher, (AsyncTaskExecutor) taskExecutor, taskHandlerResolver, taskFileStorage);
+        return new TaskWorker(
+            evaluator, eventPublisher, (AsyncTaskExecutor) taskExecutor, taskHandlerResolver, taskFileStorage);
     }
 }

@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
@@ -64,6 +65,7 @@ public class TriggerCoordinator {
 
     private final List<ApplicationEventListener> applicationEventListeners;
     private final List<ErrorEventListener> errorEventListeners;
+    private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerCompletionHandler triggerCompletionHandler;
@@ -76,6 +78,7 @@ public class TriggerCoordinator {
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
         List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
+        Evaluator evaluator,
         ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
@@ -83,6 +86,7 @@ public class TriggerCoordinator {
 
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;
+        this.evaluator = evaluator;
         this.eventPublisher = eventPublisher;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.triggerCompletionHandler = triggerCompletionHandler;
@@ -220,7 +224,8 @@ public class TriggerCoordinator {
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
                 jobPrincipalAccessor.getInputMap(
-                    workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode())));
+                    workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode()),
+                evaluator));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
 

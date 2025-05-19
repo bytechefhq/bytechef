@@ -38,6 +38,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.Environment;
@@ -72,6 +73,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
+    private final Evaluator evaluator;
     private final JobService jobService;
     private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
@@ -88,7 +90,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowExecutionFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, ContextService contextService,
+        ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
         JobService jobService, PrincipalJobService principalJobService, ProjectFacade projectFacade,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
@@ -100,6 +102,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
+        this.evaluator = evaluator;
         this.jobService = jobService;
         this.principalJobService = principalJobService;
         this.projectFacade = projectFacade;
@@ -252,8 +255,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
 
                 return new TaskExecutionDTO(
                     taskExecutionService.getTaskExecution(Validate.notNull(taskExecution.getId(), "id")),
-                    definitionResult.title(), definitionResult.icon(), workflowTask.evaluateParameters(context),
-                    output);
+                    definitionResult.title(), definitionResult.icon(),
+                    workflowTask.evaluateParameters(context, evaluator), output);
             });
     }
 
