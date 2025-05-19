@@ -24,6 +24,8 @@ import useLayout from '../hooks/useLayout';
 import AiAgentNode from '../nodes/AiAgentNode';
 import LoopLeftGhostNode from '../nodes/LoopLeftGhostNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
+import ReadOnlyNode from '../nodes/ReadOnlyNode';
+import ReadOnlyPlaceholderNode from '../nodes/ReadOnlyPlaceholderNode';
 import TaskDispatcherBottomGhostNode from '../nodes/TaskDispatcherBottomGhostNode';
 import TaskDispatcherTopGhostNode from '../nodes/TaskDispatcherTopGhostNode';
 import WorkflowNode from '../nodes/WorkflowNode';
@@ -70,6 +72,8 @@ const WorkflowEditor = ({
             aiAgentNode: AiAgentNode,
             loopLeftGhostNode: LoopLeftGhostNode,
             placeholder: PlaceholderNode,
+            readonly: ReadOnlyNode,
+            readonlyPlaceholder: ReadOnlyPlaceholderNode,
             taskDispatcherBottomGhostNode: TaskDispatcherBottomGhostNode,
             taskDispatcherTopGhostNode: TaskDispatcherTopGhostNode,
             workflow: WorkflowNode,

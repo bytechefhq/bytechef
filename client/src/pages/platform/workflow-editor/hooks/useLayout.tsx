@@ -312,8 +312,37 @@ export default function useLayout({
     });
 
     useEffect(() => {
-        const layoutNodes = allNodes;
-        const edges: Edge[] = taskEdges;
+        let layoutNodes = allNodes;
+        let edges: Edge[] = taskEdges;
+
+        if (readOnlyWorkflow) {
+            layoutNodes = allNodes.map((node) => {
+                if (node.type === 'workflow') {
+                    return {
+                        ...node,
+                        type: 'readonly',
+                    };
+                }
+
+                if (node.type === 'placeholder') {
+                    return {
+                        ...node,
+                        type: 'readonlyPlaceholder',
+                    };
+                }
+
+                return node;
+            });
+
+            layoutNodes.pop();
+
+            edges = taskEdges.map((edge) => ({
+                ...edge,
+                type: 'smoothstep',
+            }));
+
+            edges.pop();
+        }
 
         const elements = getLayoutedElements({canvasWidth, edges, nodes: layoutNodes});
 
