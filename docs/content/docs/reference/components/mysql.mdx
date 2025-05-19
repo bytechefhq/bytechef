@@ -220,3 +220,45 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+## Triggers
+
+
+### New Row
+Name: newRow
+
+`Triggers when new row is added.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| schema | Schema | STRING | `Name of the schema the table belongs to.` | true |
+| table | Table | STRING | `Name of the table in which to update data in.` | true |
+| orderBy | Colum To Order By | STRING | `Use something like a created timestamp or an auto-incrementing ID.` | true |
+| orderDirection | Order Direction | STRING <details> <summary> Options </summary> ASC, DESC </details> | `The direction to sort by such that the newest rows are fetched first.` | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Row",
+  "name" : "newRow",
+  "parameters" : {
+    "schema" : "",
+    "table" : "",
+    "orderBy" : "",
+    "orderDirection" : ""
+  },
+  "type" : "mysql/v1/newRow"
+}
+```
+
+
+<hr />
+
