@@ -17,17 +17,25 @@
 package com.bytechef.component.youtube.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.CATEGORY_ID;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.DESCRIPTION;
 import static com.bytechef.component.youtube.constant.YoutubeConstants.FILE;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.PRIVACY_STATUS;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.TAGS;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.TITLE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -54,8 +62,32 @@ public class YoutubeUploadVideoAction {
         .properties(
             fileEntry(FILE)
                 .label("Video File")
+                .description("Video file that will be uploaded.")
                 .required(true),
-            string("videoCategoryId")
+            string(TITLE)
+                .label("Video Title")
+                    .description("Title of the video.")
+                .required(true),
+            string(DESCRIPTION)
+                .label("Video Description")
+                    .description("Description of the video.")
+                .required(true),
+            array(TAGS)
+                .label("Video Tags")
+                    .description("Tags of the video.")
+                .items(
+                    string("tag")
+                )
+                .required(false),
+            string(PRIVACY_STATUS)
+                .label("Privacy Status")
+                    .description("Privacy status of the video.")
+                        .required(true)
+                            .options(
+                                option("Private", "private"),
+                                option("Public", "public"),
+                                option("Unlisted", "unlisted")),
+            string(CATEGORY_ID)
                     .label("Video Category ID")
                     .options((ActionOptionsFunction<String>) YoutubeUtils::getVideoCategoryIdOptions)
                     .required(true))
@@ -65,74 +97,37 @@ public class YoutubeUploadVideoAction {
     private YoutubeUploadVideoAction() {
     }
 
-    public static Map<String, Object> perform(Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
-        byte[] binaryFile =   context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE)));
-        String url = context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status"))
-    .headers(Map.of("Content-Type", List.of("application/octet-stream")
-    ))
-//    .queryParameters("part", "snippet,status", "uploadType", "resumable")
+    public static FileEntry perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
+//        String url = context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status"))
+        String url = context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos"))
+    .headers(Map.of("Content-Type", List.of("application/octet-stream")))
+            .queryParameters("uploadType", "resumable", "part", "snippet,status")
     .body(
         Body.of(
             "snippet", Map.of(
-                "categoryId", inputParameters.getRequiredString("videoCategoryId"),
-                "description", "This is the description.",
-                "title", "This is the Title",
-                "tags", List.of("youtube", "test")),
-            "status", Map.of("privacyStatus", "private")
+                "categoryId", inputParameters.getRequiredString(CATEGORY_ID),
+                "description", inputParameters.getRequiredString(DESCRIPTION),
+                "title", inputParameters.getRequiredString(TITLE),
+                "tags", inputParameters.getList(TAGS, List.of())),
+            "status", Map.of(PRIVACY_STATUS, inputParameters.getRequiredString(PRIVACY_STATUS))
         )
     ).execute()
     .getHeaders()
     .get("location")
     .getFirst();
 
-//        String jsonRequest = context.json(json -> json.write(Map.of(
-//            "snippet", Map.of(
-//                "categoryId", "22",
-//                "description", "This is the descriptdzion.",
-//                "title", "This is the TitlSCe",
-//                "tags", List.of()),
-//            "status", Map.of("privacyStatus", "private")
-//        )));
-//
-//        Response response = context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos"))
-//                .headers(Map.of(
-//                    "Content-Type", List.of("application/json; charset=UTF-8"),
-//                                "X-Upload-Content-Type", List.of("application/octet-stream")
-////                                "X-Upload-Content-Type", List.of("video/*")
-////                    , "X-Upload-Content-Length",  List.of(String.valueOf(binaryFile.length))
-//                    ))
-//            .queryParameters(
-//                "uploadType", "resumable",
-//                "part", "snippet,status")
-//                .body(
-//                        Body.of(
-////                            jsonRequest
-////                            Map.of(
-//                            "snippet", Map.of(
-//                                "categoryId", "22",
-//                                "description", "This is the descriptdzion.",
-//                                "title", "This is the TitlSCe",
-//                                "tags", List.of()),
-//                            "status", Map.of("privacyStatus", "private")
-////                            )
-//
-//                        )
-//                )
-//            .execute();
-
-//            String url = response.getHeaders()
-//            .get("location")
-//            .getFirst();
-
-        Object result = context.http(http -> http.put(url))
+        return context.http(http -> http.put(url))
     .headers(Map.of("Content-Type", List.of("application/octet-stream")))
     .body(
-        Body.of(binaryFile)
+       Body.of(
+           inputParameters.getRequiredFileEntry(FILE)
+       )
     )
     .configuration(responseType(Http.ResponseType.JSON))
     .execute()
     .getBody(new TypeReference<>() {});
 
-        return null;
     }
 }

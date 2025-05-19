@@ -17,6 +17,7 @@
 package com.bytechef.component.youtube;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -39,6 +40,7 @@ public class YoutubeComponentHandler implements ComponentHandler {
         .actions(
             YoutubeUploadVideoAction.ACTION_DEFINITION,
             YoutubeTesting.ACTION_DEFINITION)
+        .clusterElements(tool(YoutubeUploadVideoAction.ACTION_DEFINITION))
         .triggers(YoutubeNewVideoTrigger.TRIGGER_DEFINITION);
 
     @Override
