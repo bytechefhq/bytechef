@@ -63,7 +63,7 @@ public class SpelEvaluator implements Evaluator {
     private static final Pattern FORMULA_EXPRESSION_PATTERN =
         Pattern.compile("^(?!.*T\\()(?!.*\\.\\w+\\()(?!.*new\\s+\\w+(?:<[^>]*>)?\\s*\\[).*$");
     private static final Pattern VALID_ACCESSOR_PATTERN = Pattern.compile(
-        "^(?!T\\()([a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_\\-]+')])*(\\.(([a-zA-Z_][a-zA-Z0-9_]*)|\\[(\\d+|'[a-zA-Z0-9_\\-\\p{L}]+')]))*(\\.([a-zA-Z_][a-zA-Z0-9_]*)(\\[(\\d+|'[a-zA-Z0-9_\\-\\p{L}]+')])*)*$)");
+        "^(?!T\\()([a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*(\\.(([a-zA-Z_][a-zA-Z0-9_]*)|\\[(\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')]))*(\\.([a-zA-Z_][a-zA-Z0-9_]*)(\\[(\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*)*$)");
 
     private final ExpressionParser expressionParser = new SpelExpressionParser();
 
