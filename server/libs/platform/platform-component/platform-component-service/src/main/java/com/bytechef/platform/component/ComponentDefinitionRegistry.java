@@ -32,7 +32,11 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
+import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
+import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ArrayProperty;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
@@ -307,7 +311,7 @@ public class ComponentDefinitionRegistry {
 
         if (subProperties.size() == 1) {
             if (propertyName.endsWith("]")) {
-                Property.ArrayProperty arrayProperty = (Property.ArrayProperty) CollectionUtils.getFirst(
+                ArrayProperty arrayProperty = (ArrayProperty) CollectionUtils.getFirst(
                     properties,
                     curProperty -> Objects.equals(
                         curProperty.getName(), propertyName.substring(0, propertyName.length() - 3)));
@@ -316,12 +320,14 @@ public class ComponentDefinitionRegistry {
 
                 return items.getFirst();
             } else {
-                return CollectionUtils.getFirst(properties,
-                    property -> Objects.equals(propertyName, property.getName()));
+                return CollectionUtils.getFirst(
+                    properties, property -> Objects.equals(propertyName, property.getName()));
             }
         } else {
+            String firstSubPropertyName = getFirstSubPropertyName(subProperties);
+
             Property firstProperty = CollectionUtils.getFirst(
-                properties, property -> Objects.equals(property.getName(), subProperties.getFirst()));
+                properties, property -> Objects.equals(property.getName(), firstSubPropertyName));
 
             if (firstProperty instanceof Property.DynamicPropertiesProperty dynamicPropertiesProperty) {
                 PropertiesDataSource<?> dynamicPropertiesDataSource = dynamicPropertiesProperty
@@ -332,35 +338,45 @@ public class ComponentDefinitionRegistry {
 
                 List<? extends Property.ValueProperty<?>> dynamicPropertyProperties;
 
-                if (propertiesFunction instanceof PropertiesDataSource.ActionPropertiesFunction actionPropertiesFunction) {
+                if (propertiesFunction instanceof ActionPropertiesFunction actionPropertiesFunction) {
                     dynamicPropertyProperties = actionPropertiesFunction.apply(
                         inputParameters, connectionParameters, lookupDependsOnPaths, (ActionContext) context);
                 } else {
-                    dynamicPropertyProperties = ((PropertiesDataSource.TriggerPropertiesFunction) propertiesFunction)
+                    dynamicPropertyProperties = ((TriggerPropertiesFunction) propertiesFunction)
                         .apply(inputParameters, connectionParameters, lookupDependsOnPaths, (TriggerContext) context);
                 }
 
                 return getProperty(
                     String.join(".", subProperties.subList(1, subProperties.size())),
                     dynamicPropertyProperties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
+            } else if (firstProperty instanceof ArrayProperty arrayProperty) {
+                List<? extends Property.ValueProperty<?>> items = OptionalUtils.get(arrayProperty.getItems());
+
+                if (items.getFirst() instanceof ObjectProperty objectProperty) {
+                    items = OptionalUtils.get(objectProperty.getProperties());
+                }
+
+                return getProperty(
+                    String.join(".", subProperties.subList(1, subProperties.size())), items, inputParameters,
+                    connectionParameters, lookupDependsOnPaths, context);
             } else {
-                Property.ObjectProperty objectProperty = (Property.ObjectProperty) CollectionUtils.getFirst(
+                ObjectProperty objectProperty = (ObjectProperty) CollectionUtils.getFirst(
                     properties, property -> Objects.equals(property.getName(), subProperties.getFirst()));
 
                 for (int i = 1; i < subProperties.size() - 1; i++) {
                     String subProperty = subProperties.get(i);
 
                     if (subProperty.endsWith("]")) {
-                        Property.ArrayProperty arrayProperty = (Property.ArrayProperty) CollectionUtils.getFirst(
+                        ArrayProperty arrayProperty = (ArrayProperty) CollectionUtils.getFirst(
                             OptionalUtils.get(objectProperty.getProperties()),
                             curProperty -> Objects.equals(
                                 curProperty.getName(), subProperty.substring(0, subProperty.length() - 3)));
 
                         List<? extends Property> items = OptionalUtils.get(arrayProperty.getItems());
 
-                        objectProperty = (Property.ObjectProperty) items.getFirst();
+                        objectProperty = (ObjectProperty) items.getFirst();
                     } else {
-                        objectProperty = (Property.ObjectProperty) CollectionUtils.getFirst(
+                        objectProperty = (ObjectProperty) CollectionUtils.getFirst(
                             OptionalUtils.get(objectProperty.getProperties()),
                             curProperty -> Objects.equals(curProperty.getName(), subProperty));
                     }
@@ -371,6 +387,15 @@ public class ComponentDefinitionRegistry {
                     curProperty -> Objects.equals(curProperty.getName(), subProperties.getLast()));
             }
         }
+    }
+
+    private static String getFirstSubPropertyName(List<String> subProperties) {
+        String firstSubPropertyName = subProperties.getFirst();
+
+        if (firstSubPropertyName.endsWith("]")) {
+            firstSubPropertyName = firstSubPropertyName.substring(0, firstSubPropertyName.indexOf("["));
+        }
+        return firstSubPropertyName;
     }
 
     private void validate(List<ComponentDefinition> componentDefinitions) {
