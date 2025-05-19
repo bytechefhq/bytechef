@@ -64,12 +64,6 @@ public abstract class AbstractApplication {
 
         String[] activeProfiles = environment.getActiveProfiles();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
-                CRLFLogConverter.CRLF_SAFE_MARKER,
-                applicationProperties.formatApplicationProperties());
-        }
-
         logger.info(
             CRLFLogConverter.CRLF_SAFE_MARKER,
             """
