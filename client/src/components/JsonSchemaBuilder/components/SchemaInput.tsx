@@ -11,6 +11,7 @@ const handleEnterPress = (handler: () => void) => {
 };
 
 interface SchemaInputProps {
+    autoFocus?: boolean;
     onChange: (text: string) => void;
     placeholder?: string;
     value?: string;
@@ -18,7 +19,14 @@ interface SchemaInputProps {
     type?: string;
 }
 
-const SchemaInput = ({label, onChange, placeholder, type = 'text', value = 'Untitled'}: SchemaInputProps) => {
+const SchemaInput = ({
+    autoFocus,
+    label,
+    onChange,
+    placeholder,
+    type = 'text',
+    value = 'Untitled',
+}: SchemaInputProps) => {
     const [localValue, setLocalValue] = useState<string>(value);
 
     const onChangeValue = () => {
@@ -34,10 +42,11 @@ const SchemaInput = ({label, onChange, placeholder, type = 'text', value = 'Unti
     }, [value]);
 
     return (
-        <fieldset className="space-y-1 overflow-hidden">
+        <fieldset className="space-y-1 overflow-hidden p-0.5">
             <Label>{label}</Label>
 
             <Input
+                autoFocus={autoFocus}
                 className="text-ellipsis"
                 onBlur={onChangeValue}
                 onChange={(e) => setLocalValue(e.target.value)}
