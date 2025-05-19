@@ -175,13 +175,13 @@ public class SpelEvaluator implements Evaluator {
             Expression expression;
             boolean formulaExpression = false;
 
-            string = string.trim();
+            String trimmedString = string.trim();
 
-            if (string.equals(FORMULA_PREFIX)) {
+            if (trimmedString.equals(FORMULA_PREFIX)) {
                 return string;
             }
 
-            if (string.startsWith(FORMULA_PREFIX)) {
+            if (trimmedString.startsWith(FORMULA_PREFIX)) {
                 formulaExpression = true;
 
                 try {

@@ -245,8 +245,7 @@ public class TaskWorker {
     }
 
     private void executeSubTasks(
-        long jobId, List<WorkflowTask> subWorkflowTasks, Map<String, Object> context)
-        throws Exception {
+        long jobId, List<WorkflowTask> subWorkflowTasks, Map<String, Object> context) throws Exception {
 
         for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
             TaskExecution subTaskExecution = TaskExecution.builder()
