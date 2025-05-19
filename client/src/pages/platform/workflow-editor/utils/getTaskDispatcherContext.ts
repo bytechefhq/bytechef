@@ -108,6 +108,8 @@ export default function getTaskDispatcherContext({
     const isSourceGhost = source.includes('ghost');
     const isTargetGhost = target.includes('ghost');
 
+    const isSourceNestedBottomGhost = sourceNode?.data.isNestedBottomGhost;
+
     const taskDispatcherId = (sourceNode?.data?.taskDispatcherId || targetNode?.data.taskDispatcherId) as string;
 
     const context: TaskDispatcherContextType = {
@@ -125,15 +127,19 @@ export default function getTaskDispatcherContext({
     }
 
     if (isSourceGhost && isTargetTaskDispatcher) {
-        if (!targetNode.data.conditionData && !targetNode.data.loopDaXta && !targetNode.data.branchData) {
+        if (!isSourceNestedBottomGhost) {
+            if (targetNode.data.conditionData || targetNode.data.loopData || targetNode.data.branchData) {
+                return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
+            }
+
             return undefined;
         }
 
         return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
     }
 
-    if (isSourceGhost && isTargetTask) {
-        return getContextFromTaskNodeData(targetNode.data as NodeDataType);
+    if (isSourceGhost && !isSourceNestedBottomGhost && isTargetTask) {
+        return getContextFromTaskNodeData(targetNode.data as NodeDataType, 1);
     }
 
     if (isSourceTaskDispatcher && isTargetTask) {
