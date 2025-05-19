@@ -252,7 +252,7 @@ public class GoogleSheetsUtils {
                         i -> {
                             Object value = row.get(i);
 
-                            return value == null ? "" : String.valueOf(value);
+                            return value == null ? "" : value;
                         }, (a, b) -> b, LinkedHashMap::new));
         } else {
             valuesMap = IntStream.range(0, row.size())
