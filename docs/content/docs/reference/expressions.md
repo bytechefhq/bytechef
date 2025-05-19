@@ -3,11 +3,11 @@ title: Expressions
 description: Expressions in ByteChef provide a powerful way to dynamically access, transform, and manipulate data within your workflows. They allow you to reference data from previous steps, perform calculations, implement conditional logic, and create dynamic configurations for your automation processes.
 ---
 
-# SpEL Cheat Sheet
+# Expression Cheat Sheet
 
 ## Expressions and types
 
-Formula expressions used in ByteChef are primarily written using SpEL (Spring Expression language) with some constraints - simple, yet powerful expression language.
+Formula and text expressions used in ByteChef are primarily written using SpEL (Spring Expression language) with some constraints - simple, yet powerful expression language.
 
 SpEL is based on Java ([reference documentation](https://docs.spring.io/spring-framework/reference/core/expressions.html)), but no prior Java knowledge is needed to use it.
 
@@ -30,7 +30,7 @@ they are usually `java.lang` (primitives), `java.util` (List, Map) and `java.tim
 | String         | string        | UTF-8                                      |
 | Boolean        | bool          |                                            |
 | Integer        | integer       | 32bit                                      |
-| Long           | number        | 64bit                                      |
+| Long           | integer       | 64bit                                      |
 | Float          | number        | single precision                           |
 | Double         | number        | double precision                           |
 | LocalTime      | time          |                                            |
@@ -52,7 +52,7 @@ also in some context `Collection` can be met (it's Java API for handling lists, 
 See [Handling data/time](#handling-datetime) for detailed description of how to deal with date and time in ByteChef.
 
 
-## SpEL syntax
+## Expression syntax
 
 ### Formula expressions
 
@@ -60,19 +60,19 @@ In ByteChef `formula` expression starts with `=` and `${}` is used to access val
 
 For example:
 
-`= ${httpClient_1.body.amount} + 1`
+`=${httpClient_1.body.amount} + 1`
 
 will access value defined in `httpClient_1.body.amount` nested structure and increase it for `1`.
 
 ### Text expressions
 
-Also, it is allowed to write an expression like
+Also, it is allowed to write a `text` expression like
 
 `${httpClient_1.body.amount} is total amount`
 
-It is processed as a text expression where `httpClient_1.body.amount` defines access to nested structure and is first evaluated and then merged with the literal part.
+where value defined in `httpClient_1.body.amount` nested structure will be merged with `' is total amount'` literal part.
 
-The same expression can be written as a formula expression:
+The same expression can be written as a `formula` expression:
 
 `=${httpClient_1.body.amount} + ' is total amount'`
 
@@ -238,29 +238,27 @@ Explicit conversions are available as built-in [functions](#built-in-functions).
 
 #### Implicit conversion
 
-SpEL has many built-in implicit conversions that are available also in Nussknacker. Mostly conversions between various
+SpEL has many built-in implicit conversions that are available also in ByteChef. Mostly conversions between various
 numeric types and between `String` and some useful logical value types. Implicit conversion means that when finding
-the "input value" of type "input type" (see the table below) in the context where "target type" is expected, Nussknacker
+the "input value" of type "input type" (see the table below) in the context where "target type" is expected, ByteChef
 will try to convert the type of the "input value" to the "target type". This behaviour can be encountered in particular
 when passing certain values to method parameters (these values can be automatically converted to the desired type).
 
 Some conversion examples:
 
-| Input value                              | Input type | Conversion target type |
-|------------------------------------------|------------|------------------------|
-| `12.34`                                  | Double     | BigDecimal             |
-| `12.34f`                                 | Float      | Double                 |
-| `42`                                     | Integer    | Long                   |
-| `42L`                                    | Long       | BigDecimal             |
-| `'Europe/Warsaw'`                        | String     | ZoneId                 |
-| `'+01:00'`                               | String     | ZoneOffset             |
-| `'09:00'`                                | String     | LocalTime              |
-| `'2020-07-01'`                           | String     | LocalDate              |
-| `'2020-07-01T'09:00'`                    | String     | LocalDateTime          |
-| `'en_GB'`                                | String     | Locale                 |
-| `'ISO-8859-1'`                           | String     | Charset                |
-| `'USD'`                                  | String     | Currency               |
-| `'bf3bb3e0-b359-4e18-95dd-1d89c7dc5135'` | String     | UUID                   |
+| Input value                               | Input type | Conversion target type |
+|-------------------------------------------|------------|------------------------|
+| `12.34f`                                  | Float      | Double                 |
+| `42`                                      | Integer    | Long                   |
+| `'Europe/Warsaw'`                         | String     | ZoneId                 |
+| `'+01:00'`                                | String     | ZoneOffset             |
+| `'09:00'`                                 | String     | LocalTime              |
+| `'2020-07-01'`                            | String     | LocalDate              |
+| `'2020-07-01T'09:00'`                     | String     | LocalDateTime          |
+| `'en_GB'`                                 | String     | Locale                 |
+| `'ISO-8859-1'`                            | String     | Charset                |
+| `'USD'`                                   | String     | Currency               |
+| `'bf3bb3e0-b359-4e18-95dd-1d89c7dc5135'`  | String     | UUID                   |
 
 Usage example:
 

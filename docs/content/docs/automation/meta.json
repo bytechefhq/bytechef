@@ -4,7 +4,7 @@
   "icon": "Workflow",
   "root": true,
   "pages": [
-    "getting_started",
+    "getting-started",
     "glossary",
     "quick-start",
     "---Build---",

@@ -12,8 +12,8 @@ ByteChef can be configured using environment variables. This page documents all 
 | `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
 | `BYTECHEF_AI_COPILOT_PROVIDER` | The AI provider to use for copilot (OPENAI, ANTHROPIC) | `OPENAI` |
 | `BYTECHEF_AI_COPILOT_OPENAI_API_KEY` | OpenAI API key for copilot (sensitive) | - |
-| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_MODEL` | OpenAI model to use for chat | - |
-| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_TEMPERATURE` | Temperature setting for OpenAI chat | - |
+| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_MODEL` | OpenAI model to use for chat | `chatgpt-4o-latest` |
+| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_TEMPERATURE` | Temperature setting for OpenAI chat | `0.4` |
 
 ### AI Providers
 
@@ -145,24 +145,25 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_OBSERVABILITY_LOKI_APPENDER_LEVEL` | Log level for Loki appender | - |
-| `BYTECHEF_OBSERVABILITY_LOKI_APPENDER_HTTP_URL` | Loki HTTP URL | - |
+| `BYTECHEF_OBSERVABILITY_LOKI_APPENDER_LEVEL` | Log level for Loki appender | `ALL` |
+| `BYTECHEF_OBSERVABILITY_LOKI_APPENDER_HTTP_URL` | Loki HTTP URL | `http://localhost:3100/loki/api/v1/push` |
 
 ## Mail Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_MAIL_FROM` | From email address | - |
-| `BYTECHEF_MAIL_HOST` | Mail server host | - |
-| `BYTECHEF_MAIL_PORT` | Mail server port | `25` |
-| `BYTECHEF_MAIL_PROTOCOL` | Mail protocol | - |
 | `BYTECHEF_MAIL_AUTH` | Enable mail authentication | `false` |
-| `BYTECHEF_MAIL_USERNAME` | Mail username (sensitive) | - |
+| `BYTECHEF_MAIL_BASE_URL` | Base URL for mail links | `BYTECHEF_PUBLIC_URL` |
+| `BYTECHEF_MAIL_DEBUG` | Enable mail debug | `false` |
+| `BYTECHEF_MAIL_FROM` | From email address | `noreply@app.bytechef.io` |
+| `BYTECHEF_MAIL_HOST` | Mail server host | `localhost` |
 | `BYTECHEF_MAIL_PASSWORD` | Mail password (sensitive) | - |
+| `BYTECHEF_MAIL_PORT` | Mail server port | `25` |
+| `BYTECHEF_MAIL_PROTOCOL` | Mail protocol | `smtp` |
+| `BYTECHEF_MAIL_SSL_ENABLED` | Enable SSL for mail | `false` |
 | `BYTECHEF_MAIL_STARTTLS_ENABLE` | Enable STARTTLS | `false` |
 | `BYTECHEF_MAIL_STARTTLS_REQUIRED` | Require STARTTLS | `false` |
-| `BYTECHEF_MAIL_SSL_ENABLED` | Enable SSL for mail | `false` |
-| `BYTECHEF_MAIL_BASE_URL` | Base URL for mail links | - |
+| `BYTECHEF_MAIL_USERNAME` | Mail username (sensitive) | - |
 
 ## Message Broker Configuration
 
@@ -174,7 +175,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | - |
+| `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | `BYTECHEF_PUBLIC_URL`/callback |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_ID` | Client ID for predefined OAuth2 app (sensitive) | - |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_SECRET` | Client secret for predefined OAuth2 app (sensitive) | - |
 
@@ -194,7 +195,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_SECURITY_CONTENT_SECURITY_POLICY` | Content Security Policy | - |
+| `BYTECHEF_SECURITY_CONTENT_SECURITY_POLICY` | Content Security Policy | "default-src 'self'; frame-src 'self' https://*.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.command.ai https://*.commandbar.com https://*.i.posthog.com https://cdn.jsdelivr.net https://storage.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://*.commandbar.com https://cdn.jsdelivr.net https://*.command.ai https://unpkg.com; img-src 'self' https://*.command.ai data:; font-src 'self' data:; media-src 'self' https://*.command.ai; connect-src 'self' https://*.command.ai https://*.i.posthog.com https://*.commandbar.com; worker-src blob: 'self';" |
 | `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | Remember Me key (sensitive) | - |
 
 ## Sign Up Configuration
@@ -214,20 +215,21 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_WEBHOOK_URL` | Webhook URL | \$\{bytechef.public-url\}/webhooks/\{id\} |
+| `BYTECHEF_WEBHOOK_URL` | Webhook URL | `BYTECHEF_PUBLIC_URL`/webhooks/\{id\} |
 
 ## Tracing Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
-| `BYTECHEF_TRACING_OTLP_ENDPOINT` | OpenTelemetry endpoint | - |
+| `BYTECHEF_TRACING_OTLP_ENDPOINT` | OpenTelemetry endpoint | http://localhost:4318/v1/traces |
 
 ## Worker Configuration
 
 | Environment Variable | Description | Default Value |
 |----------------------|-------------|---------------|
 | `BYTECHEF_WORKER_ENABLED` | Enable or disable the worker | `true` |
-| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_<EVENT_TYPE>` | Number of subscribers for specific event type | - |
+| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` | Number of subscribers for default worker queue | `10` |
+| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_<EVENT_TYPE>` | Number of subscribers for specific worker queue | - |
 
 ## Workflow Configuration
 
