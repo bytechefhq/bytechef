@@ -8,7 +8,7 @@
     "metadata" : null,
     "name" : "chat",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
