@@ -230,7 +230,7 @@ const PropertyMultiSelect = ({
                     }
                 }}
                 options={mappedOptionsData ?? options ?? []}
-                optionsLoading={isOptionsDataPending}
+                optionsLoading={isOptionsDataPending && !!queryEnabled}
                 placeholder={memoizedPlaceholder}
                 placeholderClassName={placeholderClassName}
                 value={value}
