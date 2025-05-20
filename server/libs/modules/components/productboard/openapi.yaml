@@ -83,6 +83,7 @@ paths:
           schema:
             title: "Note ID"
             type: "string"
+            x-dynamic-options: true
       responses:
         200:
           description: "Success, the response contains valid data."
@@ -105,6 +106,7 @@ paths:
           schema:
             title: "Note ID"
             type: "string"
+            x-dynamic-options: true
       requestBody:
         description: "Note update request, fields with `null` value will remain unchanged."
         content:
@@ -160,6 +162,7 @@ paths:
           schema:
             title: "Note ID"
             type: "string"
+            x-dynamic-options: true
       responses:
         204:
           description: "Note deleted"
