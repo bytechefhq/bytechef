@@ -1,0 +1,282 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Productboard"
+  description: "Productboard is a product management platform that helps teams prioritize features, gather customer feedback, and align their product strategy to deliver better products."
+  version: "v1"
+servers:
+  - url: "https://api.productboard.com"
+paths:
+  /notes:
+    post:
+      summary: "Create Note"
+      description: "Creates a new note."
+      operationId: "createNote"
+      responses:
+        201:
+          description: "Note created"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  links:
+                    type: "object"
+                    properties:
+                      html:
+                        type: "string"
+                        description: "Note is accessible via this URL in the Productboard application."
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        format: "uuid"
+                        description: "ID of the note."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "title"
+                - "content"
+              properties:
+                title:
+                  type: "string"
+                  description: "Title of note."
+                content:
+                  type: "string"
+                  description: "HTML-encoded rich text supported by certain tags; unsupported tags will be stripped out."
+    get:
+      summary: "List All Notes"
+      description: "Returns detail of all notes order by created_at desc"
+      operationId: "listNotes"
+      responses:
+        200:
+          description: "Success, the response contains valid data."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    type: "array"
+                    items:
+                      $ref: "#/components/schemas/ExpandedNote"
+                  pageCursor:
+                    type: "string"
+                    description: "Use this pageCursor returned by search results to get next page of results. GET /notes?pageCursor={pageCursor}"
+                  totalResults:
+                    type: "integer"
+                    description: "Total number of notes that meet the specified parameters for the query"
+  "/notes/{noteId}":
+    get:
+      summary: "Get Note"
+      description: "Returns detail of a specific note."
+      operationId: "getNote"
+      parameters:
+        - name: "noteId"
+          description: "ID of the note"
+          in: "path"
+          required: true
+          schema:
+            title: "Note ID"
+            type: "string"
+      responses:
+        200:
+          description: "Success, the response contains valid data."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ExpandedNote"
+    patch:
+      summary: "Update Note"
+      description: "Updates a note."
+      operationId: "updateNote"
+      parameters:
+        - name: "noteId"
+          description: "ID of the note"
+          in: "path"
+          required: true
+          schema:
+            title: "Note ID"
+            type: "string"
+      requestBody:
+        description: "Note update request, fields with `null` value will remain unchanged."
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "data"
+              properties:
+                data:
+                  properties:
+                    title:
+                      type: "string"
+                      description: "Title of note."
+                    tags:
+                      description: "A list of tags for categorizing the note."
+                      type: "array"
+                      items:
+                        type: "string"
+                    content:
+                      type: "string"
+                      description: "The content of a note. This can only be updated on notes without existing snippets."
+      responses:
+        201:
+          description: Note Updated
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  links:
+                    type: "object"
+                    properties:
+                      html:
+                        type: "string"
+                        description: "Note is accessible via this URL in the Productboard application."
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        format: "uuid"
+                        description: "ID of the note."
+    delete:
+      summary: "Delete Note"
+      description: "Deletes a note."
+      operationId: "deleteNote"
+      parameters:
+        - name: "noteId"
+          description: "ID of the note"
+          in: "path"
+          required: true
+          schema:
+            title: "Note ID"
+            type: "string"
+      responses:
+        204:
+          description: "Note deleted"
+components:
+  schemas:
+    ExpandedNote:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          description: "ID of the note."
+        title:
+          type: "string"
+          description: "Title of note."
+        content:
+          type: "string"
+          description: "HTML-encoded rich text supported by certain tags; unsupported tags will be stripped out."
+        displayUrl:
+          type: "string"
+          description: "Note display url leading to Productboard detail page."
+        externalDisplayUrl:
+          type: "string"
+          description: "URL in an external system where the note originated."
+        company:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+              description: "ID of the company."
+        user:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+              description: "ID of the user."
+        owner:
+          type: "object"
+          properties:
+            email:
+              type: "string"
+              description: "Email of th owner."
+            name:
+              type: "string"
+              description: "Name of the owner."
+        followers:
+          type: "array"
+          description: "The followers of the note."
+          items:
+            type: "object"
+            properties:
+              memberId:
+                type: "string"
+                description: "ID of the member."
+              memberName:
+                type: "string"
+                description: "Name of the member."
+              memberEmail:
+                type: "string"
+                description: "Email of the member."
+              teamId:
+                type: "string"
+                description: "ID of the team."
+              teamName:
+                type: "string"
+                description: "Name of the team."
+        state:
+          type: "string"
+          description: "State of the note."
+        source:
+          type: "object"
+          properties:
+            origin:
+              type: "string"
+              description: "A unique string identifying the external system from which the data came."
+            record_id:
+              type: "string"
+              description: "The unique id of the record in the origin system."
+        tags:
+          type: "string"
+          description: "Comma-separated list of tags."
+        features:
+          type: "array"
+          description: "All features related to a given note."
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+                description: "ID of the feature."
+              type:
+                type: "string"
+                description: "Type of the feature."
+              importance:
+                type: "integer"
+                description: "Importance of the feature."
+        createdAt:
+          type: "string"
+          format: "date-time"
+          description: "Date and time when the note was created."
+        updatedAt:
+          type: "string"
+          format: "date-time"
+          description: "Date and time when the note was last updated."
+        createdBy:
+          type: "object"
+          properties:
+            email:
+              type: "string"
+              description: "Email of the user who created the note."
+            name:
+              type: "string"
+              description: "Name of the user who created the note."
+            uuid:
+              type: "string"
+              description: "ID of the user who created the note."
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"
