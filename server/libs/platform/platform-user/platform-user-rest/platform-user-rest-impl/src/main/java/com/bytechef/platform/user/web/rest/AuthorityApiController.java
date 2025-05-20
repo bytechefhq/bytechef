@@ -51,15 +51,15 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
-public class AuthorityController implements AuthorityApi {
+public class AuthorityApiController implements AuthorityApi {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthorityController.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthorityApiController.class);
 
     private final AuthorityService authorityService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public AuthorityController(AuthorityService authorityService, ConversionService conversionService) {
+    public AuthorityApiController(AuthorityService authorityService, ConversionService conversionService) {
         this.authorityService = authorityService;
         this.conversionService = conversionService;
     }
