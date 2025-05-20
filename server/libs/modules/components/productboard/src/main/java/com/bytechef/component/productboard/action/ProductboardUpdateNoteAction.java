@@ -26,6 +26,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.productboard.util.ProductboardUtils;
 import java.util.Map;
 
 /**
@@ -46,6 +48,7 @@ public class ProductboardUpdateNoteAction {
         .properties(string("noteId").label("Note ID")
             .description("ID of the note")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
