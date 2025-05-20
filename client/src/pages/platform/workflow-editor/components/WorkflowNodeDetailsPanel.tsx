@@ -793,7 +793,7 @@ const WorkflowNodeDetailsPanel = ({
                                 {activeTab === 'description' &&
                                     (nodeDefinition ? (
                                         <DescriptionTab
-                                            key={`${currentNode?.workflowNodeName}_description`}
+                                            key={`${currentNode?.componentName}-${currentNode?.type}_description`}
                                             nodeDefinition={nodeDefinition}
                                             updateWorkflowMutation={updateWorkflowMutation}
                                         />
@@ -819,7 +819,7 @@ const WorkflowNodeDetailsPanel = ({
                                     currentComponentDefinition && (
                                         <ConnectionTab
                                             componentConnections={currentWorkflowNodeConnections}
-                                            key={`${currentNode?.workflowNodeName}_connection`}
+                                            key={`${currentNode?.componentName}-${currentNode?.type}_connection`}
                                             workflowId={workflow.id!}
                                             workflowNodeName={currentNode?.workflowNodeName}
                                             workflowTestConfigurationConnections={workflowTestConfigurationConnections}
@@ -831,7 +831,7 @@ const WorkflowNodeDetailsPanel = ({
                                         <Properties
                                             customClassName="p-4"
                                             displayConditionsQuery={displayConditionsQuery}
-                                            key={`${currentNode?.workflowNodeName}_${currentOperationName}_properties`}
+                                            key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
                                             operationName={currentOperationName}
                                             properties={currentOperationProperties}
                                         />
@@ -848,7 +848,7 @@ const WorkflowNodeDetailsPanel = ({
                                             !workflowTestConfigurationConnections?.length
                                         }
                                         currentNode={currentNode}
-                                        key={`${currentNode?.workflowNodeName}_output`}
+                                        key={`${currentNode?.componentName}-${currentNode?.type}_output`}
                                         outputDefined={
                                             (currentActionDefinition?.outputDefined ||
                                                 currentTriggerDefinition?.outputDefined ||
