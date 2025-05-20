@@ -2,6 +2,7 @@
 
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
+import {getCookie} from "@/shared/util/cookie-utils";
 
 interface SessionI {
     ipAddress: string;
@@ -31,6 +32,9 @@ const fetchGetSessions = async (): Promise<Response> => {
 
 const fetchInvalidateSession = async (series: string): Promise<Response> => {
     return await fetch(`${apiUrl}/${series}`, {
+        headers: {
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+        },
         method: 'DELETE',
     }).then((response) => response);
 };
