@@ -37,7 +37,6 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -64,37 +63,23 @@ public class MistralChatAction {
             STOP_PROPERTY,
             SEED_PROPERTY,
             SAFE_PROMPT_PROPERTY)
-        .output(ModelUtils::output)
+        .output()
         .perform(MistralChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-//        ResponseFormat responseFormat = inputParameters.getFromPath(
-//            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
-//        Map<String, Object> jsonSchema = null;
-//
-//        String type = responseFormat == ResponseFormat.TEXT ? "text" : "json_object";
-//
-//        if (type.equals("json_object")) {
-//            jsonSchema = inputParameters.getFromPath(
-//                RESPONSE + "." + RESPONSE_SCHEMA, new TypeReference<>() {}, Map.of());
-//        }
-
-        return MistralAiChatModel.builder()
-            .mistralAiApi(
-                new MistralAiApi(connectionParameters.getString(TOKEN)))
-            .defaultOptions(
-                MistralAiChatOptions.builder()
-                    .model(inputParameters.getRequiredString(MODEL))
-                    .temperature(inputParameters.getDouble(TEMPERATURE))
-                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                    .topP(inputParameters.getDouble(TOP_P))
-                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                    .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
-                    .randomSeed(inputParameters.getInteger(SEED))
-//                    .responseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type, jsonSchema))
-                    .build())
-            .build();
-    };
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> MistralAiChatModel.builder()
+        .mistralAiApi(
+            new MistralAiApi(connectionParameters.getString(TOKEN)))
+        .defaultOptions(
+            MistralAiChatOptions.builder()
+                .model(inputParameters.getRequiredString(MODEL))
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .topP(inputParameters.getDouble(TOP_P))
+                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
+                .randomSeed(inputParameters.getInteger(SEED))
+                .build())
+        .build();
 
     private MistralChatAction() {
     }

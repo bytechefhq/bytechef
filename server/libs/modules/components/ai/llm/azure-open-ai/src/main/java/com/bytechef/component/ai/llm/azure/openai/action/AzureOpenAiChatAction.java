@@ -46,7 +46,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -75,34 +74,28 @@ public class AzureOpenAiChatAction {
             TOP_P_PROPERTY,
             STOP_PROPERTY,
             USER_PROPERTY)
-        .output(ModelUtils::output)
+        .output()
         .perform(AzureOpenAiChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-//        ResponseFormat responseFormat = inputParameters.getFromPath(
-//            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
-
-        return AzureOpenAiChatModel.builder()
-            .openAIClientBuilder(
-                new OpenAIClientBuilder()
-                    .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                    .endpoint(connectionParameters.getString(ENDPOINT)))
-            .defaultOptions(
-                AzureOpenAiChatOptions.builder()
-                    .deploymentName(inputParameters.getRequiredString(MODEL))
-                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                    .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                    .N(inputParameters.getInteger(N))
-                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                    .temperature(inputParameters.getDouble(TEMPERATURE))
-                    .topP(inputParameters.getDouble(TOP_P))
-                    .user(inputParameters.getString(USER))
-//                    .responseFormat(responseFormat == ResponseFormat.TEXT ? TEXT : JSON)
-                    .build())
-            .build();
-    };
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> AzureOpenAiChatModel.builder()
+        .openAIClientBuilder(
+            new OpenAIClientBuilder()
+                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+                .endpoint(connectionParameters.getString(ENDPOINT)))
+        .defaultOptions(
+            AzureOpenAiChatOptions.builder()
+                .deploymentName(inputParameters.getRequiredString(MODEL))
+                .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .N(inputParameters.getInteger(N))
+                .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .topP(inputParameters.getDouble(TOP_P))
+                .user(inputParameters.getString(USER))
+                .build())
+        .build();
 
     private AzureOpenAiChatAction() {
     }

@@ -74,7 +74,7 @@ public class GroqChatAction {
             LOGIT_BIAS_PROPERTY,
             STOP_PROPERTY,
             USER_PROPERTY)
-        .output(ModelUtils::output)
+        .output()
         .perform(GroqChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> OpenAiChatModel.builder()

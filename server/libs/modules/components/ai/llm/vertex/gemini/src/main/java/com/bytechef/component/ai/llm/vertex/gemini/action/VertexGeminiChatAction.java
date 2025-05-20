@@ -38,7 +38,6 @@ import static com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiC
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -65,7 +64,7 @@ public class VertexGeminiChatAction {
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
             STOP_PROPERTY)
-        .output(ModelUtils::output)
+        .output()
         .perform(VertexGeminiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> VertexAiGeminiChatModel
