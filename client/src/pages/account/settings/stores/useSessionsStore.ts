@@ -1,8 +1,9 @@
+import {getCookie} from '@/shared/util/cookie-utils';
+
 /* eslint-disable sort-keys */
 
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
-import {getCookie} from "@/shared/util/cookie-utils";
 
 interface SessionI {
     ipAddress: string;
