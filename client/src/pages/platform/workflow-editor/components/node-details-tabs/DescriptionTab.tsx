@@ -150,7 +150,7 @@ const DescriptionTab = ({
 
                 <Input
                     defaultValue={workflowTaskOrTrigger?.label}
-                    key={`${workflowTaskOrTrigger?.name}_nodeTitle`}
+                    key={`${currentNode?.componentName}-${workflowTaskOrTrigger?.type}_nodeTitle`}
                     name="nodeTitle"
                     onChange={handleLabelChange}
                 />
@@ -161,7 +161,7 @@ const DescriptionTab = ({
 
                 <Textarea
                     defaultValue={workflowTaskOrTrigger?.description}
-                    key={`${workflowTaskOrTrigger?.name}_nodeNotes`}
+                    key={`${currentNode?.componentName}-${workflowTaskOrTrigger?.type}_nodeNotes`}
                     name="nodeNotes"
                     onChange={handleNotesChange}
                     placeholder="Write some notes for yourself..."
