@@ -89,7 +89,8 @@ public class YoutubeUploadVideoAction {
 
 //        String url = context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status"))
         String url = context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos"))
-            .headers(Map.of("Content-Type", List.of("application/octet-stream")))
+//            .headers(Map.of("Content-Type", List.of("application/octet-stream")))
+            .header("Content-Type", "application/octet-stream")
             .queryParameters("uploadType", "resumable", "part", "snippet,status")
             .body(
                 Body.of(
