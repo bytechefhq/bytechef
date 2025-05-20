@@ -1,12 +1,19 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -15,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:12:20.851038+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:38:31.879229+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkflowModel {
 
   private @Nullable String workflowReferenceCode;
@@ -33,7 +40,7 @@ public class WorkflowModel {
    * The reference code of a workflow.
    * @return workflowReferenceCode
    */
-
+  
   @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowReferenceCode")
   public String getWorkflowReferenceCode() {
@@ -53,7 +60,7 @@ public class WorkflowModel {
    * The label of a workflow.
    * @return label
    */
-
+  
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The label of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
   public String getLabel() {
@@ -73,7 +80,7 @@ public class WorkflowModel {
    * The description of a workflow.
    * @return description
    */
-
+  
   @Schema(name = "description", accessMode = Schema.AccessMode.READ_ONLY, description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {

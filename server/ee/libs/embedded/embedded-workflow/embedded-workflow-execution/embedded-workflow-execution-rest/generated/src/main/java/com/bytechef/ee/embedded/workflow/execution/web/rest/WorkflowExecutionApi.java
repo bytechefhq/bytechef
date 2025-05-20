@@ -5,15 +5,18 @@
  */
 package com.bytechef.ee.embedded.workflow.execution.web.rest;
 
-import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.OffsetDateTime;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionModel;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -22,13 +25,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-
+import jakarta.validation.constraints.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:41.133232+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:43:16.528917+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "workflow-execution", description = "The Embedded Workflow Execution Internal API")
 public interface WorkflowExecutionApi {
@@ -60,7 +66,7 @@ public interface WorkflowExecutionApi {
         value = "/workflow-executions/{id}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(
         @Parameter(name = "id", description = "The id of an execution.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -108,9 +114,9 @@ public interface WorkflowExecutionApi {
         value = "/workflow-executions",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<org.springframework.data.domain.Page> getWorkflowExecutionsPage(
-        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) EnvironmentModel environment,
+        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel environment,
         @Parameter(name = "jobStatus", description = "The status of an executed job", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStatus", required = false) String jobStatus,
         @Parameter(name = "jobStartDate", description = "The start date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStartDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime jobStartDate,
         @Parameter(name = "jobEndDate", description = "The end date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobEndDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime jobEndDate,

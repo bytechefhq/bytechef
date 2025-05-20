@@ -1,18 +1,23 @@
 package com.bytechef.ee.embedded.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationStatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -21,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationBasicModel {
 
   private String componentName;
@@ -74,7 +79,7 @@ public class IntegrationBasicModel {
    * The name of the integration's component.
    * @return componentName
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "componentName", description = "The name of the integration's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
   public String getComponentName() {
@@ -94,7 +99,7 @@ public class IntegrationBasicModel {
    * The created by.
    * @return createdBy
    */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -114,7 +119,7 @@ public class IntegrationBasicModel {
    * The created date.
    * @return createdDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public OffsetDateTime getCreatedDate() {
@@ -134,7 +139,7 @@ public class IntegrationBasicModel {
    * The description of an integration.
    * @return description
    */
-
+  
   @Schema(name = "description", description = "The description of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
@@ -154,7 +159,7 @@ public class IntegrationBasicModel {
    * The icon.
    * @return icon
    */
-
+  
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
   public String getIcon() {
@@ -174,7 +179,7 @@ public class IntegrationBasicModel {
    * The id of an integration.
    * @return id
    */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -194,7 +199,7 @@ public class IntegrationBasicModel {
    * The last modified by.
    * @return lastModifiedBy
    */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -214,7 +219,7 @@ public class IntegrationBasicModel {
    * The last modified date.
    * @return lastModifiedDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {
@@ -234,7 +239,7 @@ public class IntegrationBasicModel {
    * The last published date.
    * @return lastPublishedDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastPublishedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastPublishedDate")
   public OffsetDateTime getLastPublishedDate() {
@@ -254,7 +259,7 @@ public class IntegrationBasicModel {
    * Get lastStatus
    * @return lastStatus
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastStatus")
   public IntegrationStatusModel getLastStatus() {
@@ -274,7 +279,7 @@ public class IntegrationBasicModel {
    * The last version of an integration.
    * @return lastVersion
    */
-
+  
   @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastVersion")
   public Integer getLastVersion() {
@@ -294,7 +299,7 @@ public class IntegrationBasicModel {
    * If multiple instances of an integration are allowed or not.
    * @return multipleInstances
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "multipleInstances", description = "If multiple instances of an integration are allowed or not.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("multipleInstances")
   public Boolean getMultipleInstances() {
@@ -314,7 +319,7 @@ public class IntegrationBasicModel {
    * The name of an integration.
    * @return name
    */
-
+  
   @Schema(name = "name", description = "The name of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
   public String getName() {

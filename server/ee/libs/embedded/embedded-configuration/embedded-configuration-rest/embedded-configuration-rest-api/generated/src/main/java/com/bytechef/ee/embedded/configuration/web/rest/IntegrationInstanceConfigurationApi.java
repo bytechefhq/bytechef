@@ -9,12 +9,15 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.CreateIntegrationIn
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -23,14 +26,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-
+import jakarta.validation.constraints.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "integration-instance-configuration", description = "the integration-instance-configuration API")
 public interface IntegrationInstanceConfigurationApi {
@@ -63,7 +68,7 @@ public interface IntegrationInstanceConfigurationApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Long> createIntegrationInstanceConfiguration(
         @Parameter(name = "IntegrationInstanceConfigurationModel", description = "", required = true) @Valid @RequestBody IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel
     ) {
@@ -96,7 +101,7 @@ public interface IntegrationInstanceConfigurationApi {
         value = "/integration-instance-configurations/{id}/workflows/{workflowId}/jobs",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel> createIntegrationInstanceConfigurationWorkflowJob(
         @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "workflowId", description = "The id of the workflow to execute.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
@@ -135,7 +140,7 @@ public interface IntegrationInstanceConfigurationApi {
         method = RequestMethod.DELETE,
         value = "/integration-instance-configurations/{id}"
     )
-
+    
     default ResponseEntity<Void> deleteIntegrationInstanceConfiguration(
         @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -165,7 +170,7 @@ public interface IntegrationInstanceConfigurationApi {
         method = RequestMethod.PATCH,
         value = "/integration-instance-configurations/{id}/enable/{enable}"
     )
-
+    
     default ResponseEntity<Void> enableIntegrationInstanceConfiguration(
         @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "enable", description = "Enable/disable the integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable
@@ -197,7 +202,7 @@ public interface IntegrationInstanceConfigurationApi {
         method = RequestMethod.PATCH,
         value = "/integration-instance-configurations/{id}/workflows/{workflowId}/enable/{enable}"
     )
-
+    
     default ResponseEntity<Void> enableIntegrationInstanceConfigurationWorkflow(
         @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "workflowId", description = "The id of an integration workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
@@ -231,7 +236,7 @@ public interface IntegrationInstanceConfigurationApi {
         value = "/integration-instance-configurations/{id}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<IntegrationInstanceConfigurationModel> getIntegrationInstanceConfiguration(
         @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -275,7 +280,7 @@ public interface IntegrationInstanceConfigurationApi {
         value = "/integration-instance-configurations",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<IntegrationInstanceConfigurationModel>> getIntegrationInstanceConfigurations(
         @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) EnvironmentModel environment,
         @Parameter(name = "integrationId", description = "The integration id used for filtering integration instance configurations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "integrationId", required = false) Long integrationId,
@@ -318,7 +323,7 @@ public interface IntegrationInstanceConfigurationApi {
         value = "/integration-instance-configurations/{id}",
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> updateIntegrationInstanceConfiguration(
         @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "IntegrationInstanceConfigurationModel", description = "", required = true) @Valid @RequestBody IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel
@@ -351,7 +356,7 @@ public interface IntegrationInstanceConfigurationApi {
         value = "/integration-instance-configurations/{id}/workflows/{workflowId}",
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> updateIntegrationInstanceConfigurationWorkflow(
         @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "workflowId", description = "The id of an integration instance configuration workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") Long workflowId,

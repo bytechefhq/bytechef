@@ -1,15 +1,20 @@
 package com.bytechef.ee.embedded.unified.web.rest.accounting.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 import java.util.Map;
@@ -22,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 @Schema(name = "errors_inner_meta", description = "Additional metadata about the error.")
 @JsonTypeName("errors_inner_meta")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.650583+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:44:38.533737+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ErrorsInnerMetaModel {
 
   private @Nullable Object cause;
@@ -32,7 +37,7 @@ public class ErrorsInnerMetaModel {
    */
   public enum OriginEnum {
     REMOTE_PROVIDER("remote-provider"),
-
+    
     BYTECHEF("bytechef");
 
     private String value;
@@ -86,7 +91,7 @@ public class ErrorsInnerMetaModel {
    * The cause of the error. Usually the underlying error from the remote Provider.
    * @return cause
    */
-
+  
   @Schema(name = "cause", description = "The cause of the error. Usually the underlying error from the remote Provider.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("cause")
   public Object getCause() {
@@ -106,7 +111,7 @@ public class ErrorsInnerMetaModel {
    * The origin of the error.
    * @return origin
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "origin", example = "remote-provider", description = "The origin of the error.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("origin")
   public OriginEnum getOrigin() {
@@ -126,7 +131,7 @@ public class ErrorsInnerMetaModel {
    * The name of the application that generated the error.
    * @return applicationName
    */
-
+  
   @Schema(name = "application_name", example = "MyCompany Production", description = "The name of the application that generated the error.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("application_name")
   public String getApplicationName() {
@@ -201,7 +206,7 @@ public class ErrorsInnerMetaModel {
     sb.append("    cause: ").append(toIndentedString(cause)).append("\n");
     sb.append("    origin: ").append(toIndentedString(origin)).append("\n");
     sb.append("    applicationName: ").append(toIndentedString(applicationName)).append("\n");
-
+    
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();

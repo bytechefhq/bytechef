@@ -10,12 +10,15 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationStatusMo
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationVersionModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.PublishIntegrationRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.WorkflowModel;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -24,14 +27,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-
+import jakarta.validation.constraints.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Internal API")
 public interface IntegrationApi {
@@ -64,7 +69,7 @@ public interface IntegrationApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Long> createIntegration(
         @Parameter(name = "IntegrationModel", description = "", required = true) @Valid @RequestBody IntegrationModel integrationModel
     ) {
@@ -98,7 +103,7 @@ public interface IntegrationApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Long> createIntegrationWorkflow(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "WorkflowModel", description = "", required = true) @Valid @RequestBody WorkflowModel workflowModel
@@ -128,7 +133,7 @@ public interface IntegrationApi {
         method = RequestMethod.DELETE,
         value = "/integrations/{id}"
     )
-
+    
     default ResponseEntity<Void> deleteIntegration(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -160,7 +165,7 @@ public interface IntegrationApi {
         value = "/integrations/{id}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<IntegrationModel> getIntegration(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -201,7 +206,7 @@ public interface IntegrationApi {
         value = "/integrations/{id}/versions",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<IntegrationVersionModel>> getIntegrationVersions(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -246,7 +251,7 @@ public interface IntegrationApi {
         value = "/integrations",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<IntegrationModel>> getIntegrations(
         @Parameter(name = "categoryId", description = "The category id used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
         @Parameter(name = "integrationInstanceConfigurations", description = "Use for filtering integrations for which integration instance configurations exist.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "integrationInstanceConfigurations", required = false) Boolean integrationInstanceConfigurations,
@@ -290,7 +295,7 @@ public interface IntegrationApi {
         value = "/integrations/{id}/publish",
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> publishIntegration(
         @Parameter(name = "id", description = "The id of a integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "PublishIntegrationRequestModel", description = "") @Valid @RequestBody(required = false) PublishIntegrationRequestModel publishIntegrationRequestModel
@@ -322,7 +327,7 @@ public interface IntegrationApi {
         value = "/integrations/{id}",
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> updateIntegration(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "IntegrationModel", description = "", required = true) @Valid @RequestBody IntegrationModel integrationModel

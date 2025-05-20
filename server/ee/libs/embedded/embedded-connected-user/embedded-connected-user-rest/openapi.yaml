@@ -226,8 +226,8 @@ components:
         credentialStatus:
           $ref: "#/components/schemas/CredentialStatus"
     CredentialStatus:
-      $ref: "../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
+      $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
     Environment:
-      $ref: "../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
+      $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Page:
-      $ref: "../../../platform/platform-rest/openapi/components/schemas/objects/page.yaml"
+      $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/page.yaml"

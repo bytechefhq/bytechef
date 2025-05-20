@@ -1,12 +1,19 @@
 package com.bytechef.ee.embedded.execution.public_.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -15,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Function", description = "A function property type.")
 @JsonTypeName("Function")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.508120+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:40:02.722559+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class FunctionModel {
 
   private String name;
@@ -46,7 +53,7 @@ public class FunctionModel {
    * The function name.
    * @return name
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", description = "The function name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
@@ -66,7 +73,7 @@ public class FunctionModel {
    * The function description.
    * @return description
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "description", description = "The function description.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
@@ -86,7 +93,7 @@ public class FunctionModel {
    * JSON Schema for the function parameters.
    * @return parameters
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "parameters", description = "JSON Schema for the function parameters.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("parameters")
   public String getParameters() {

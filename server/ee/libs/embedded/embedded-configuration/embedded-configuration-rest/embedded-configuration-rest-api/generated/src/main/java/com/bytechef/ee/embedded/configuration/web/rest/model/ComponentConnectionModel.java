@@ -1,12 +1,19 @@
 package com.bytechef.ee.embedded.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -14,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ComponentConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ComponentConnectionModel {
 
   private String componentName;
@@ -51,7 +58,7 @@ public class ComponentConnectionModel {
    * The name of the component
    * @return componentName
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "componentName", description = "The name of the component", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
   public String getComponentName() {
@@ -71,7 +78,7 @@ public class ComponentConnectionModel {
    * The version of the component
    * @return componentVersion
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "componentVersion", description = "The version of the component", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentVersion")
   public Integer getComponentVersion() {
@@ -91,7 +98,7 @@ public class ComponentConnectionModel {
    * The key of the connection
    * @return key
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "key", description = "The key of the connection", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("key")
   public String getKey() {
@@ -111,7 +118,7 @@ public class ComponentConnectionModel {
    * If the connection is required, or not
    * @return required
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "required", description = "If the connection is required, or not", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("required")
   public Boolean getRequired() {
@@ -131,7 +138,7 @@ public class ComponentConnectionModel {
    * Get workflowNodeName
    * @return workflowNodeName
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "workflowNodeName", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workflowNodeName")
   public String getWorkflowNodeName() {

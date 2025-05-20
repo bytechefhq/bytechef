@@ -1,12 +1,19 @@
 package com.bytechef.ee.embedded.workflow.execution.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -14,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Webhook_retry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:41.133232+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:43:16.528917+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WebhookRetryModel {
 
   private @Nullable Integer initialInterval;
@@ -34,7 +41,7 @@ public class WebhookRetryModel {
    * Get initialInterval
    * @return initialInterval
    */
-
+  
   @Schema(name = "initialInterval", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("initialInterval")
   public Integer getInitialInterval() {
@@ -54,7 +61,7 @@ public class WebhookRetryModel {
    * Get maxInterval
    * @return maxInterval
    */
-
+  
   @Schema(name = "maxInterval", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxInterval")
   public Integer getMaxInterval() {
@@ -74,7 +81,7 @@ public class WebhookRetryModel {
    * Get maxAttempts
    * @return maxAttempts
    */
-
+  
   @Schema(name = "maxAttempts", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxAttempts")
   public Integer getMaxAttempts() {
@@ -94,7 +101,7 @@ public class WebhookRetryModel {
    * Get multiplier
    * @return multiplier
    */
-
+  
   @Schema(name = "multiplier", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("multiplier")
   public Integer getMultiplier() {

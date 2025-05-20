@@ -1,22 +1,31 @@
 package com.bytechef.ee.embedded.unified.web.rest.crm.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.ee.embedded.unified.web.rest.crm.model.AddressesInnerModel;
+import com.bytechef.ee.embedded.unified.web.rest.crm.model.EmailsInnerModel;
+import com.bytechef.ee.embedded.unified.web.rest.crm.model.LifecycleStageModel;
+import com.bytechef.ee.embedded.unified.web.rest.crm.model.PhonesInnerModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -24,7 +33,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("contact")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.784253+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:44:38.667495+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ContactModel {
 
   private JsonNullable<String> accountId = JsonNullable.<String>undefined();
@@ -90,7 +99,7 @@ public class ContactModel {
    * Get accountId
    * @return accountId
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "accountId", example = "fd089246-09b1-4e3b-a60a-7a76314bbcce", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("accountId")
   public JsonNullable<String> getAccountId() {
@@ -110,7 +119,7 @@ public class ContactModel {
    * Get ownerId
    * @return ownerId
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "ownerId", example = "23e640fe-6105-4a11-a636-3aa6b6c6e762", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("ownerId")
   public JsonNullable<String> getOwnerId() {
@@ -138,7 +147,7 @@ public class ContactModel {
    * Get addresses
    * @return addresses
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "addresses", example = "[{addressType=shipping, city=San Francisco, country=US, postalCode=94107, state=CA, street1=525 Brannan, street2=null}]", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("addresses")
   public List<@Valid AddressesInnerModel> getAddresses() {
@@ -166,7 +175,7 @@ public class ContactModel {
    * Get emails
    * @return emails
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "emails", example = "[{emailAddress=hello@bytechef.io, emailAddressType=work}]", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("emails")
   public List<@Valid EmailsInnerModel> getEmails() {
@@ -186,7 +195,7 @@ public class ContactModel {
    * Get firstName
    * @return firstName
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "firstName", example = "George", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("firstName")
   public JsonNullable<String> getFirstName() {
@@ -206,7 +215,7 @@ public class ContactModel {
    * Get id
    * @return id
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "id", example = "54312", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("id")
   public String getId() {
@@ -226,7 +235,7 @@ public class ContactModel {
    * Get lastActivityDate
    * @return lastActivityDate
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "lastActivityDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastActivityDate")
   public JsonNullable<OffsetDateTime> getLastActivityDate() {
@@ -246,7 +255,7 @@ public class ContactModel {
    * Get lastName
    * @return lastName
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "lastName", example = "Xing", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastName")
   public JsonNullable<String> getLastName() {
@@ -274,7 +283,7 @@ public class ContactModel {
    * Get phones
    * @return phones
    */
-  @Valid
+  @Valid 
   @Schema(name = "phones", example = "[{phoneNumber=+14151234567, phoneNumberType=primary}]", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("phones")
   public List<@Valid PhonesInnerModel> getPhones() {
@@ -294,7 +303,7 @@ public class ContactModel {
    * Get lifecycleStage
    * @return lifecycleStage
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "lifecycleStage", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lifecycleStage")
   public JsonNullable<LifecycleStageModel> getLifecycleStage() {
@@ -314,7 +323,7 @@ public class ContactModel {
    * Get createdDate
    * @return createdDate
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "createdDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("createdDate")
   public JsonNullable<OffsetDateTime> getCreatedDate() {
@@ -334,7 +343,7 @@ public class ContactModel {
    * Get lastModifiedDate
    * @return lastModifiedDate
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "lastModifiedDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {
@@ -362,7 +371,7 @@ public class ContactModel {
    * Get rawData
    * @return rawData
    */
-
+  
   @Schema(name = "rawData", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("rawData")
   public Map<String, Object> getRawData() {

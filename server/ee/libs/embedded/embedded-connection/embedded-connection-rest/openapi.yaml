@@ -179,12 +179,12 @@ paths:
 components:
   schemas:
     Connection:
-      $ref: "../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_base.yaml"
+      $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_base.yaml"
     ConnectionEnvironment:
-      $ref: "../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_environment.yaml"
+      $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_environment.yaml"
     Tag:
-      $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/Tag"
+      $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/Tag"
     UpdateConnectionRequest:
-      $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateConnectionRequest"
+      $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateConnectionRequest"
     UpdateTagsRequest:
-      $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
+      $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"

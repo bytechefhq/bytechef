@@ -1,16 +1,21 @@
 package com.bytechef.ee.embedded.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -19,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AppEvent", description = "An app event.")
 @JsonTypeName("AppEvent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class AppEventModel {
 
   private @Nullable String createdBy;
@@ -61,7 +66,7 @@ public class AppEventModel {
    * The created by.
    * @return createdBy
    */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -81,7 +86,7 @@ public class AppEventModel {
    * The created date.
    * @return createdDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public OffsetDateTime getCreatedDate() {
@@ -101,7 +106,7 @@ public class AppEventModel {
    * The id of an app event.
    * @return id
    */
-
+  
   @Schema(name = "id", description = "The id of an app event.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -121,7 +126,7 @@ public class AppEventModel {
    * The name of an app event.
    * @return name
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", description = "The name of an app event.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
@@ -141,7 +146,7 @@ public class AppEventModel {
    * The last modified by.
    * @return lastModifiedBy
    */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -161,7 +166,7 @@ public class AppEventModel {
    * The last modified date.
    * @return lastModifiedDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {
@@ -181,7 +186,7 @@ public class AppEventModel {
    * The schema of an app event.
    * @return schema
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "schema", description = "The schema of an app event.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("schema")
   public String getSchema() {
@@ -201,7 +206,7 @@ public class AppEventModel {
    * Get version
    * @return version
    */
-
+  
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
   public Integer getVersion() {

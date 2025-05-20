@@ -1,15 +1,20 @@
 package com.bytechef.ee.embedded.unified.web.rest.crm.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -17,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("addresses_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.784253+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:44:38.667495+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class AddressesInnerModel {
 
   /**
@@ -25,13 +30,13 @@ public class AddressesInnerModel {
    */
   public enum AddressTypeEnum {
     PRIMARY("primary"),
-
+    
     MAILING("mailing"),
-
+    
     OTHER("other"),
-
+    
     BILLING("billing"),
-
+    
     SHIPPING("shipping");
 
     private String value;
@@ -101,7 +106,7 @@ public class AddressesInnerModel {
    * Get addressType
    * @return addressType
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "addressType", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("addressType")
   public AddressTypeEnum getAddressType() {
@@ -121,7 +126,7 @@ public class AddressesInnerModel {
    * Get city
    * @return city
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "city", example = "San Francisco", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("city")
   public JsonNullable<String> getCity() {
@@ -141,7 +146,7 @@ public class AddressesInnerModel {
    * Get country
    * @return country
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "country", example = "USA", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("country")
   public JsonNullable<String> getCountry() {
@@ -161,7 +166,7 @@ public class AddressesInnerModel {
    * Get postalCode
    * @return postalCode
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "postalCode", example = "94107", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("postalCode")
   public JsonNullable<String> getPostalCode() {
@@ -181,7 +186,7 @@ public class AddressesInnerModel {
    * Get state
    * @return state
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "state", example = "CA", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("state")
   public JsonNullable<String> getState() {
@@ -201,7 +206,7 @@ public class AddressesInnerModel {
    * Get street1
    * @return street1
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "street1", example = "525 Brannan", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("street1")
   public JsonNullable<String> getStreet1() {
@@ -221,7 +226,7 @@ public class AddressesInnerModel {
    * Get street2
    * @return street2
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "street2", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("street2")
   public JsonNullable<String> getStreet2() {

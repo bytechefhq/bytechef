@@ -1,21 +1,29 @@
 package com.bytechef.ee.embedded.connected.user.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.ee.embedded.connected.user.web.rest.model.ConnectedUserIntegrationInstanceModel;
+import com.bytechef.ee.embedded.connected.user.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -23,7 +31,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUser")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:12:20.957053+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:39:08.552280+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ConnectedUserModel {
 
   private @Nullable String createdBy;
@@ -76,7 +84,7 @@ public class ConnectedUserModel {
    * The created by.
    * @return createdBy
    */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -96,7 +104,7 @@ public class ConnectedUserModel {
    * The created date.
    * @return createdDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public OffsetDateTime getCreatedDate() {
@@ -116,7 +124,7 @@ public class ConnectedUserModel {
    * The email address.
    * @return email
    */
-
+  
   @Schema(name = "email", description = "The email address.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("email")
   public String getEmail() {
@@ -136,7 +144,7 @@ public class ConnectedUserModel {
    * If a connected user is enabled or not
    * @return enabled
    */
-
+  
   @Schema(name = "enabled", description = "If a connected user is enabled or not", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
@@ -156,7 +164,7 @@ public class ConnectedUserModel {
    * Get environment
    * @return environment
    */
-  @Valid
+  @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
   public EnvironmentModel getEnvironment() {
@@ -176,7 +184,7 @@ public class ConnectedUserModel {
    * The connected user external id.
    * @return externalId
    */
-
+  
   @Schema(name = "externalId", accessMode = Schema.AccessMode.READ_ONLY, description = "The connected user external id.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("externalId")
   public String getExternalId() {
@@ -196,7 +204,7 @@ public class ConnectedUserModel {
    * The id of a connected user.
    * @return id
    */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connected user.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -224,7 +232,7 @@ public class ConnectedUserModel {
    * Get integrationInstances
    * @return integrationInstances
    */
-  @Valid
+  @Valid 
   @Schema(name = "integrationInstances", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstances")
   public List<@Valid ConnectedUserIntegrationInstanceModel> getIntegrationInstances() {
@@ -252,7 +260,7 @@ public class ConnectedUserModel {
    * Get metadata
    * @return metadata
    */
-
+  
   @Schema(name = "metadata", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("metadata")
   public Map<String, Object> getMetadata() {
@@ -272,7 +280,7 @@ public class ConnectedUserModel {
    * The name of a connection.
    * @return name
    */
-
+  
   @Schema(name = "name", description = "The name of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
   public String getName() {
@@ -292,7 +300,7 @@ public class ConnectedUserModel {
    * The last modified by.
    * @return lastModifiedBy
    */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -312,7 +320,7 @@ public class ConnectedUserModel {
    * The last modified date.
    * @return lastModifiedDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {
@@ -332,7 +340,7 @@ public class ConnectedUserModel {
    * Get version
    * @return version
    */
-
+  
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
   public Integer getVersion() {

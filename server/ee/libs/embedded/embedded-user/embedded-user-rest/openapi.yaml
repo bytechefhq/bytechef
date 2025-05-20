@@ -115,6 +115,6 @@ paths:
 components:
   schemas:
     ApiKey:
-      $ref: "../../../platform/platform-user/platform-user-rest/platform-user-rest-impl/openapi.yaml#/components/schemas/ApiKey"
+      $ref: "../../../../../libs/platform/platform-user/platform-user-rest/platform-user-rest-impl/openapi.yaml#/components/schemas/ApiKey"
     SigningKey:
-      $ref: "../../../platform/platform-user/platform-user-rest/platform-user-rest-impl/openapi.yaml#/components/schemas/SigningKey"
+      $ref: "../../../../../libs/platform/platform-user/platform-user-rest/platform-user-rest-impl/openapi.yaml#/components/schemas/SigningKey"

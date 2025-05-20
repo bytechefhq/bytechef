@@ -6,12 +6,15 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.ee.embedded.configuration.web.rest.model.WorkflowModel;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -20,14 +23,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-
+import jakarta.validation.constraints.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "workflow", description = "The Embedded Workflow Internal API")
 public interface WorkflowApi {
@@ -56,7 +61,7 @@ public interface WorkflowApi {
         method = RequestMethod.DELETE,
         value = "/workflows/{id}"
     )
-
+    
     default ResponseEntity<Void> deleteWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
     ) {
@@ -90,7 +95,7 @@ public interface WorkflowApi {
         value = "/integrations/{id}/versions/{integrationVersion}/workflows",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<WorkflowModel>> getIntegrationVersionWorkflows(
         @Parameter(name = "id", description = "The id of a integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "integrationVersion", description = "The version of a integration.", required = true, in = ParameterIn.PATH) @PathVariable("integrationVersion") Integer integrationVersion,
@@ -133,7 +138,7 @@ public interface WorkflowApi {
         value = "/workflows/by-integration-workflow-id/{integrationWorkflowId}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<WorkflowModel> getIntegrationWorkflow(
         @Parameter(name = "integrationWorkflowId", description = "The id of an integration workflow.", required = true, in = ParameterIn.PATH) @PathVariable("integrationWorkflowId") Long integrationWorkflowId
     ) {
@@ -174,7 +179,7 @@ public interface WorkflowApi {
         value = "/integrations/{id}/workflows",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -215,7 +220,7 @@ public interface WorkflowApi {
         value = "/workflows/{id}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<WorkflowModel> getWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to get.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
     ) {
@@ -255,7 +260,7 @@ public interface WorkflowApi {
         value = "/workflows/{id}",
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> updateWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to update.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "WorkflowModel", description = "", required = true) @Valid @RequestBody WorkflowModel workflowModel

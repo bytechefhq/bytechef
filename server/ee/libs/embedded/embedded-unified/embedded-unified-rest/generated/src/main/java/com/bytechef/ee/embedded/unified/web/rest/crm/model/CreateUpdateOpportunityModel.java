@@ -1,7 +1,9 @@
 package com.bytechef.ee.embedded.unified.web.rest.crm.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -10,10 +12,15 @@ import java.util.Map;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
+import java.util.NoSuchElementException;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -21,7 +28,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("create_update_opportunity")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.784253+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:44:38.667495+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class CreateUpdateOpportunityModel {
 
   private JsonNullable<Integer> amount = JsonNullable.<Integer>undefined();
@@ -55,7 +62,7 @@ public class CreateUpdateOpportunityModel {
    * Get amount
    * @return amount
    */
-
+  
   @Schema(name = "amount", example = "100000", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("amount")
   public JsonNullable<Integer> getAmount() {
@@ -75,7 +82,7 @@ public class CreateUpdateOpportunityModel {
    * Get closeDate
    * @return closeDate
    */
-
+  
   @Schema(name = "closeDate", example = "2022-02-10T00:00:00Z", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("closeDate")
   public JsonNullable<String> getCloseDate() {
@@ -95,7 +102,7 @@ public class CreateUpdateOpportunityModel {
    * Get description
    * @return description
    */
-
+  
   @Schema(name = "description", example = "Wants to use open source unified API for third-party integrations", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public JsonNullable<String> getDescription() {
@@ -115,7 +122,7 @@ public class CreateUpdateOpportunityModel {
    * Get name
    * @return name
    */
-
+  
   @Schema(name = "name", example = "Needs Integrations", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
   public JsonNullable<String> getName() {
@@ -135,7 +142,7 @@ public class CreateUpdateOpportunityModel {
    * Get stage
    * @return stage
    */
-
+  
   @Schema(name = "stage", example = "Closed Won", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("stage")
   public String getStage() {
@@ -155,7 +162,7 @@ public class CreateUpdateOpportunityModel {
    * Get lastActivityDate
    * @return lastActivityDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastActivityDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastActivityDate")
   public JsonNullable<OffsetDateTime> getLastActivityDate() {
@@ -175,7 +182,7 @@ public class CreateUpdateOpportunityModel {
    * Get accountId
    * @return accountId
    */
-
+  
   @Schema(name = "accountId", example = "64571bff-48ea-4469-9fa0-ee1a0bab38bd", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("accountId")
   public JsonNullable<String> getAccountId() {
@@ -195,7 +202,7 @@ public class CreateUpdateOpportunityModel {
    * Get ownerId
    * @return ownerId
    */
-
+  
   @Schema(name = "ownerId", example = "9f3e97fd-4d5d-4efc-959d-bbebfac079f5", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("ownerId")
   public JsonNullable<String> getOwnerId() {
@@ -215,7 +222,7 @@ public class CreateUpdateOpportunityModel {
    * Get pipeline
    * @return pipeline
    */
-
+  
   @Schema(name = "pipeline", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("pipeline")
   public JsonNullable<String> getPipeline() {
@@ -243,7 +250,7 @@ public class CreateUpdateOpportunityModel {
    * Custom properties to be inserted that are not covered by the common object. Object keys must match exactly to the corresponding provider API.
    * @return customFields
    */
-
+  
   @Schema(name = "customFields", description = "Custom properties to be inserted that are not covered by the common object. Object keys must match exactly to the corresponding provider API.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("customFields")
   public Map<String, Object> getCustomFields() {

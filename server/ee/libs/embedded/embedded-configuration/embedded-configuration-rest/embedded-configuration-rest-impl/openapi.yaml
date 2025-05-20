@@ -979,9 +979,9 @@ components:
           type: "integer"
           format: "int32"
     Category:
-      $ref: "../../../../platform/platform-category/platform-category-rest/platform-category-rest-api/openapi.yaml#/components/schemas/Category"
+      $ref: "../../../../../../libs/platform/platform-category/platform-category-rest/platform-category-rest-api/openapi.yaml#/components/schemas/Category"
     Environment:
-      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
+      $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Integration:
       description: "A group of workflows that make one logical integration."
       allOf:
@@ -1366,16 +1366,16 @@ components:
           description: "The id of a workflow."
           type: "string"
     Page:
-      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/page.yaml"
+      $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/page.yaml"
     Tag:
-      $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
+      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
     UpdateTagsRequest:
-      $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
+      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
     Workflow:
       description: "The blueprint that describe the execution of a job."
       x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware']
       allOf:
-        - $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+        - $ref: "../../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
         - type: "object"
           properties:
             integrationWorkflowId:
@@ -1390,7 +1390,7 @@ components:
     WorkflowBasic:
       description: "The blueprint that describe the execution of a job."
       allOf:
-        - $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
+        - $ref: "../../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
         - type: "object"
           properties:
             integrationWorkflowId:

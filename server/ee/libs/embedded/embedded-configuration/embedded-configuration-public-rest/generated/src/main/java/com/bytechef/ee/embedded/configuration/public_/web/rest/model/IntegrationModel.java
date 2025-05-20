@@ -1,16 +1,23 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -19,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:12:20.851038+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:38:31.879229+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationModel {
 
   private @Nullable Long id;
@@ -61,7 +68,7 @@ public class IntegrationModel {
    * The id of an integration.
    * @return id
    */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -81,7 +88,7 @@ public class IntegrationModel {
    * The name of the integration's component.
    * @return componentName
    */
-
+  
   @Schema(name = "componentName", accessMode = Schema.AccessMode.READ_ONLY, description = "The name of the integration's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
   public String getComponentName() {
@@ -101,7 +108,7 @@ public class IntegrationModel {
    * The title of the integration's component.
    * @return title
    */
-
+  
   @Schema(name = "title", accessMode = Schema.AccessMode.READ_ONLY, description = "The title of the integration's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
   public String getTitle() {
@@ -121,7 +128,7 @@ public class IntegrationModel {
    * The description of a project.
    * @return description
    */
-
+  
   @Schema(name = "description", accessMode = Schema.AccessMode.READ_ONLY, description = "The description of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
@@ -141,7 +148,7 @@ public class IntegrationModel {
    * The icon.
    * @return icon
    */
-
+  
   @Schema(name = "icon", accessMode = Schema.AccessMode.READ_ONLY, description = "The icon.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("icon")
   public String getIcon() {
@@ -161,7 +168,7 @@ public class IntegrationModel {
    * The version of an integration.
    * @return integrationVersion
    */
-
+  
   @Schema(name = "integrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationVersion")
   public Integer getIntegrationVersion() {
@@ -181,7 +188,7 @@ public class IntegrationModel {
    * If multiple instances of an integration are allowed or not.
    * @return multipleInstances
    */
-
+  
   @Schema(name = "multipleInstances", accessMode = Schema.AccessMode.READ_ONLY, description = "If multiple instances of an integration are allowed or not.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("multipleInstances")
   public Boolean getMultipleInstances() {
@@ -209,7 +216,7 @@ public class IntegrationModel {
    * The list of workflows.
    * @return workflows
    */
-  @Valid
+  @Valid 
   @Schema(name = "workflows", description = "The list of workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflows")
   public List<@Valid WorkflowModel> getWorkflows() {

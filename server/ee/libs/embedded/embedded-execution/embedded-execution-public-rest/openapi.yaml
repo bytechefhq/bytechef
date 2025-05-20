@@ -825,7 +825,7 @@ components:
 #              items:
 #                $ref: "#/components/schemas/Option"
     Environment:
-      $ref: "../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
+      $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Errors:
       type: array
       items:

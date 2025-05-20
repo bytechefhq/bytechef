@@ -1,17 +1,23 @@
 package com.bytechef.ee.embedded.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationStatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -20,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationVersion", description = "The integration version.")
 @JsonTypeName("IntegrationVersion")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationVersionModel {
 
   private @Nullable String description;
@@ -41,7 +47,7 @@ public class IntegrationVersionModel {
    * The description of an integration version.
    * @return description
    */
-
+  
   @Schema(name = "description", description = "The description of an integration version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
@@ -61,7 +67,7 @@ public class IntegrationVersionModel {
    * The published date.
    * @return publishedDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("publishedDate")
   public OffsetDateTime getPublishedDate() {
@@ -81,7 +87,7 @@ public class IntegrationVersionModel {
    * The version of an integration.
    * @return version
    */
-
+  
   @Schema(name = "version", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("version")
   public Integer getVersion() {
@@ -101,7 +107,7 @@ public class IntegrationVersionModel {
    * Get status
    * @return status
    */
-  @Valid
+  @Valid 
   @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("status")
   public IntegrationStatusModel getStatus() {

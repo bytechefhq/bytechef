@@ -1,12 +1,19 @@
 package com.bytechef.ee.embedded.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -14,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createIntegrationInstanceConfigurationWorkflowJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel {
 
   private @Nullable Long jobId;
@@ -28,7 +35,7 @@ public class CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel {
    * The id of an executed job.
    * @return jobId
    */
-
+  
   @Schema(name = "jobId", description = "The id of an executed job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("jobId")
   public Long getJobId() {

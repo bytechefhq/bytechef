@@ -1,14 +1,21 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -17,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:12:20.851038+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:38:31.879229+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ConnectionModel {
 
   private @Nullable Boolean active;
@@ -37,7 +44,7 @@ public class ConnectionModel {
    * If a connection is used in any of active workflows.
    * @return active
    */
-
+  
   @Schema(name = "active", accessMode = Schema.AccessMode.READ_ONLY, description = "If a connection is used in any of active workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("active")
   public Boolean getActive() {
@@ -57,7 +64,7 @@ public class ConnectionModel {
    * The version of a component that uses this connection.
    * @return connectionVersion
    */
-
+  
   @Schema(name = "connectionVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of a component that uses this connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionVersion")
   public Integer getConnectionVersion() {
@@ -77,7 +84,7 @@ public class ConnectionModel {
    * Get credentialStatus
    * @return credentialStatus
    */
-  @Valid
+  @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")
   public CredentialStatusModel getCredentialStatus() {
@@ -97,7 +104,7 @@ public class ConnectionModel {
    * The id of a connection.
    * @return id
    */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {

@@ -1,18 +1,23 @@
 package com.bytechef.ee.embedded.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -21,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "Contains user configurations for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationInstanceWorkflowModel {
 
   private @Nullable String createdBy;
@@ -67,7 +72,7 @@ public class IntegrationInstanceWorkflowModel {
    * The created by.
    * @return createdBy
    */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -87,7 +92,7 @@ public class IntegrationInstanceWorkflowModel {
    * The created date.
    * @return createdDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public OffsetDateTime getCreatedDate() {
@@ -115,7 +120,7 @@ public class IntegrationInstanceWorkflowModel {
    * The input parameters of an integration instance used as workflow input values.
    * @return inputs
    */
-
+  
   @Schema(name = "inputs", description = "The input parameters of an integration instance used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public Map<String, Object> getInputs() {
@@ -135,7 +140,7 @@ public class IntegrationInstanceWorkflowModel {
    * If a workflow is enabled or not in the integration instance workflow.
    * @return enabled
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "enabled", description = "If a workflow is enabled or not in the integration instance workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
@@ -155,7 +160,7 @@ public class IntegrationInstanceWorkflowModel {
    * The id of a project deployment workflow.
    * @return id
    */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project deployment workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -175,7 +180,7 @@ public class IntegrationInstanceWorkflowModel {
    * The id of a integration instance configuration workflow.
    * @return integrationInstanceConfigurationWorkflowId
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "integrationInstanceConfigurationWorkflowId", description = "The id of a integration instance configuration workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("integrationInstanceConfigurationWorkflowId")
   public Long getIntegrationInstanceConfigurationWorkflowId() {
@@ -195,7 +200,7 @@ public class IntegrationInstanceWorkflowModel {
    * The last modified by.
    * @return lastModifiedBy
    */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -215,7 +220,7 @@ public class IntegrationInstanceWorkflowModel {
    * The last modified date.
    * @return lastModifiedDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {
@@ -235,7 +240,7 @@ public class IntegrationInstanceWorkflowModel {
    * The id of a workflow.
    * @return workflowId
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "workflowId", description = "The id of a workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workflowId")
   public String getWorkflowId() {

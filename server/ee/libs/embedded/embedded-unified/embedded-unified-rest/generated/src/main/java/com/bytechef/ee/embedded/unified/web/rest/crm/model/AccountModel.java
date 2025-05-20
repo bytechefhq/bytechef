@@ -1,10 +1,15 @@
 package com.bytechef.ee.embedded.unified.web.rest.crm.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.ee.embedded.unified.web.rest.crm.model.AddressesInnerModel;
+import com.bytechef.ee.embedded.unified.web.rest.crm.model.EmailsInnerModel;
+import com.bytechef.ee.embedded.unified.web.rest.crm.model.LifecycleStageModel;
+import com.bytechef.ee.embedded.unified.web.rest.crm.model.PhonesInnerModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,11 +18,16 @@ import java.util.List;
 import java.util.Map;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
+import java.util.NoSuchElementException;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -25,7 +35,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("account")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.784253+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:44:38.667495+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class AccountModel {
 
   @Valid
@@ -110,7 +120,7 @@ public class AccountModel {
    * Get addresses
    * @return addresses
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "addresses", example = "[{addressType=shipping, city=San Francisco, country=US, postalCode=94107, state=CA, street1=525 Brannan, street2=null}]", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("addresses")
   public List<@Valid AddressesInnerModel> getAddresses() {
@@ -130,7 +140,7 @@ public class AccountModel {
    * Get description
    * @return description
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "description", example = "Integration API", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("description")
   public JsonNullable<String> getDescription() {
@@ -158,7 +168,7 @@ public class AccountModel {
    * Get emails
    * @return emails
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "emails", example = "[{emailAddress=hello@bytechef.io, emailAddressType=work}]", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("emails")
   public List<@Valid EmailsInnerModel> getEmails() {
@@ -178,7 +188,7 @@ public class AccountModel {
    * Get id
    * @return id
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "id", example = "1234", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("id")
   public String getId() {
@@ -198,7 +208,7 @@ public class AccountModel {
    * Get industry
    * @return industry
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "industry", example = "API's", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("industry")
   public JsonNullable<String> getIndustry() {
@@ -218,7 +228,7 @@ public class AccountModel {
    * Get lastActivityDate
    * @return lastActivityDate
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "lastActivityDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastActivityDate")
   public JsonNullable<OffsetDateTime> getLastActivityDate() {
@@ -238,7 +248,7 @@ public class AccountModel {
    * Get lifecycleStage
    * @return lifecycleStage
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "lifecycleStage", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lifecycleStage")
   public JsonNullable<LifecycleStageModel> getLifecycleStage() {
@@ -258,7 +268,7 @@ public class AccountModel {
    * Get name
    * @return name
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", example = "Sample Customer", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public JsonNullable<String> getName() {
@@ -278,7 +288,7 @@ public class AccountModel {
    * Get numberOfEmployees
    * @return numberOfEmployees
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "numberOfEmployees", example = "276000", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("numberOfEmployees")
   public JsonNullable<Integer> getNumberOfEmployees() {
@@ -298,7 +308,7 @@ public class AccountModel {
    * Get ownerId
    * @return ownerId
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "ownerId", example = "d8ceb3ff-8b7f-4fa7-b8de-849292f6ca69", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("ownerId")
   public JsonNullable<String> getOwnerId() {
@@ -326,7 +336,7 @@ public class AccountModel {
    * Get phones
    * @return phones
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "phones", example = "[{phoneNumber=+14151234567, phoneNumberType=primary}]", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("phones")
   public List<@Valid PhonesInnerModel> getPhones() {
@@ -346,7 +356,7 @@ public class AccountModel {
    * Get website
    * @return website
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "website", example = "https://bytechef.io/", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("website")
   public JsonNullable<String> getWebsite() {
@@ -374,7 +384,7 @@ public class AccountModel {
    * Custom properties to be inserted that are not covered by the common object. Object keys must match exactly to the corresponding provider API.
    * @return customFields
    */
-
+  
   @Schema(name = "customFields", description = "Custom properties to be inserted that are not covered by the common object. Object keys must match exactly to the corresponding provider API.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("customFields")
   public Map<String, Object> getCustomFields() {
@@ -394,7 +404,7 @@ public class AccountModel {
    * The remote ID of the account in the context of the 3rd Party
    * @return remoteId
    */
-
+  
   @Schema(name = "remoteId", example = "account_1234", description = "The remote ID of the account in the context of the 3rd Party", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("remoteId")
   public JsonNullable<String> getRemoteId() {
@@ -414,7 +424,7 @@ public class AccountModel {
    * The remote data of the account in the context of the 3rd Party
    * @return remoteData
    */
-
+  
   @Schema(name = "remoteData", example = "{raw_data={additional_field=some value}}", description = "The remote data of the account in the context of the 3rd Party", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("remoteData")
   public JsonNullable<Object> getRemoteData() {
@@ -434,7 +444,7 @@ public class AccountModel {
    * Get createdDate
    * @return createdDate
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "createdDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("createdDate")
   public JsonNullable<OffsetDateTime> getCreatedDate() {
@@ -454,7 +464,7 @@ public class AccountModel {
    * Get lastModifiedDate
    * @return lastModifiedDate
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "lastModifiedDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {

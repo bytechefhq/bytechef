@@ -1,16 +1,21 @@
 package com.bytechef.ee.embedded.execution.public_.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.HashMap;
 import java.util.Map;
-
+import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -18,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeAction_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.508120+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:40:02.722559+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ExecuteActionRequestModel {
 
   @Valid
@@ -52,7 +57,7 @@ public class ExecuteActionRequestModel {
    * The input parameters for the action.
    * @return input
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "input", description = "The input parameters for the action.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("input")
   public Map<String, Object> getInput() {

@@ -109,9 +109,9 @@ paths:
 components:
   schemas:
     Environment:
-      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
+      $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Page:
-      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/page.yaml"
+      $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/page.yaml"
     WorkflowExecution:
       description: "Contains information about execution of a Integration workflow."
       type: "object"
@@ -128,9 +128,9 @@ components:
         integrationInstance:
           $ref: "../../../embedded-configuration/embedded-configuration-rest/embedded-configuration-rest-impl/openapi.yaml#/components/schemas/IntegrationInstanceBasic"
         job:
-          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/Job"
+          $ref: "../../../../../../libs/platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/Job"
         triggerExecution:
-          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
+          $ref: "../../../../../../libs/platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
         workflow:
           $ref: "../../../embedded-configuration/embedded-configuration-rest/embedded-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
     WorkflowExecutionBasic:
@@ -149,6 +149,6 @@ components:
         integrationInstance:
           $ref: "../../../embedded-configuration/embedded-configuration-rest/embedded-configuration-rest-impl/openapi.yaml#/components/schemas/IntegrationInstanceBasic"
         job:
-          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/JobBasic"
+          $ref: "../../../../../../libs/platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/JobBasic"
         workflow:
           $ref: "../../../embedded-configuration/embedded-configuration-rest/embedded-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"

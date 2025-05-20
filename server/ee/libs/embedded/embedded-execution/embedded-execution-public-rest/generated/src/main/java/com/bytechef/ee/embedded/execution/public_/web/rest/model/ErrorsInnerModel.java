@@ -1,14 +1,20 @@
 package com.bytechef.ee.embedded.execution.public_.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ErrorsInnerMetaModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -16,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Errors_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.508120+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:40:02.722559+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ErrorsInnerModel {
 
   private String id;
@@ -60,7 +66,7 @@ public class ErrorsInnerModel {
    * A unique identifier for the instance of the error. Provide this to support when contacting ByteChef.
    * @return id
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "id", example = "9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5", description = "A unique identifier for the instance of the error. Provide this to support when contacting ByteChef.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("id")
   public String getId() {
@@ -80,7 +86,7 @@ public class ErrorsInnerModel {
    * A detailed description of the error.
    * @return detail
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "detail", description = "A detailed description of the error.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("detail")
   public String getDetail() {
@@ -101,7 +107,7 @@ public class ErrorsInnerModel {
    * @return problemType
    * @deprecated
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "problem_type", example = "MISSING_REQUIRED_FIELD", description = "The ByteChef error code associated with the error.", deprecated = true, requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("problem_type")
   @Deprecated
@@ -126,7 +132,7 @@ public class ErrorsInnerModel {
    * A brief description of the error. The schema and type of message will vary by Provider.
    * @return title
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "title", example = "Property values were not valid ", description = "A brief description of the error. The schema and type of message will vary by Provider.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("title")
   public String getTitle() {
@@ -146,7 +152,7 @@ public class ErrorsInnerModel {
    * The ByteChef error code associated with the error.
    * @return code
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "code", example = "MISSING_REQUIRED_FIELD", description = "The ByteChef error code associated with the error.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("code")
   public String getCode() {
@@ -166,7 +172,7 @@ public class ErrorsInnerModel {
    * The HTTP status code associated with the error.
    * @return status
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "status", example = "400", description = "The HTTP status code associated with the error.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("status")
   public String getStatus() {
@@ -186,7 +192,7 @@ public class ErrorsInnerModel {
    * Get meta
    * @return meta
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "meta", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("meta")
   public ErrorsInnerMetaModel getMeta() {

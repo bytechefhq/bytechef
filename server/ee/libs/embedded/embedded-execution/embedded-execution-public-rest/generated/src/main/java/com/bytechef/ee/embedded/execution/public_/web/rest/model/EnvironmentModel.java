@@ -1,23 +1,32 @@
 package com.bytechef.ee.embedded.execution.public_.web.rest.model;
 
+import java.net.URI;
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The environment of a project.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.508120+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:40:02.722559+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public enum EnvironmentModel {
-
+  
   DEVELOPMENT("DEVELOPMENT"),
-
+  
   STAGING("STAGING"),
-
+  
   PRODUCTION("PRODUCTION");
 
   private String value;

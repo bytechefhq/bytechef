@@ -1,5 +1,6 @@
 package com.bytechef.ee.embedded.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowInputModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowOutputModel;
@@ -11,13 +12,18 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -26,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:40.497514+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkflowModel implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
   private @Nullable String createdBy;
@@ -64,11 +70,11 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    */
   public enum SourceTypeEnum {
     CLASSPATH("CLASSPATH"),
-
+    
     FILESYSTEM("FILESYSTEM"),
-
+    
     GIT("GIT"),
-
+    
     JDBC("JDBC");
 
     private String value;
@@ -129,7 +135,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The created by.
    * @return createdBy
    */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -149,7 +155,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The created date.
    * @return createdDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public OffsetDateTime getCreatedDate() {
@@ -169,7 +175,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The number of workflow connections
    * @return connectionsCount
    */
-
+  
   @Schema(name = "connectionsCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of workflow connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionsCount")
   public Integer getConnectionsCount() {
@@ -189,7 +195,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The definition of a workflow.
    * @return definition
    */
-
+  
   @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("definition")
   public String getDefinition() {
@@ -209,7 +215,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The description of a workflow.
    * @return description
    */
-
+  
   @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
@@ -229,7 +235,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * Get format
    * @return format
    */
-  @Valid
+  @Valid 
   @Schema(name = "format", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("format")
   public com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel getFormat() {
@@ -249,7 +255,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The id of a workflow.
    * @return id
    */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public String getId() {
@@ -277,7 +283,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The workflow's expected list of inputs.
    * @return inputs
    */
-  @Valid
+  @Valid 
   @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public List<@Valid WorkflowInputModel> getInputs() {
@@ -297,7 +303,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The number of workflow inputs
    * @return inputsCount
    */
-
+  
   @Schema(name = "inputsCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of workflow inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputsCount")
   public Integer getInputsCount() {
@@ -317,7 +323,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The descriptive name for the workflow
    * @return label
    */
-
+  
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
   public String getLabel() {
@@ -337,7 +343,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The last modified by.
    * @return lastModifiedBy
    */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -357,7 +363,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The last modified date.
    * @return lastModifiedDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {
@@ -385,7 +391,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The workflow's list of expected outputs.
    * @return outputs
    */
-  @Valid
+  @Valid 
   @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's list of expected outputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputs")
   public List<@Valid WorkflowOutputModel> getOutputs() {
@@ -405,7 +411,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The type of the source which stores the workflow definition.
    * @return sourceType
    */
-
+  
   @Schema(name = "sourceType", description = "The type of the source which stores the workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("sourceType")
   public SourceTypeEnum getSourceType() {
@@ -425,7 +431,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The maximum number of times a task may retry.
    * @return maxRetries
    */
-
+  
   @Schema(name = "maxRetries", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxRetries")
   public Integer getMaxRetries() {
@@ -453,7 +459,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * Get workflowTaskComponentNames
    * @return workflowTaskComponentNames
    */
-
+  
   @Schema(name = "workflowTaskComponentNames", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTaskComponentNames")
   public List<String> getWorkflowTaskComponentNames() {
@@ -481,7 +487,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * Get workflowTriggerComponentNames
    * @return workflowTriggerComponentNames
    */
-
+  
   @Schema(name = "workflowTriggerComponentNames", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTriggerComponentNames")
   public List<String> getWorkflowTriggerComponentNames() {
@@ -509,7 +515,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The steps that make up the workflow.
    * @return tasks
    */
-  @Valid
+  @Valid 
   @Schema(name = "tasks", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tasks")
   public List<@Valid WorkflowTaskModel> getTasks() {
@@ -537,7 +543,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The steps that make up the workflow.
    * @return triggers
    */
-  @Valid
+  @Valid 
   @Schema(name = "triggers", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggers")
   public List<@Valid WorkflowTriggerModel> getTriggers() {
@@ -557,7 +563,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * Get version
    * @return version
    */
-
+  
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
   public Integer getVersion() {
@@ -577,7 +583,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The integration workflow id
    * @return integrationWorkflowId
    */
-
+  
   @Schema(name = "integrationWorkflowId", accessMode = Schema.AccessMode.READ_ONLY, description = "The integration workflow id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationWorkflowId")
   public Long getIntegrationWorkflowId() {
@@ -597,7 +603,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The workflow reference code
    * @return workflowReferenceCode
    */
-
+  
   @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow reference code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowReferenceCode")
   public String getWorkflowReferenceCode() {

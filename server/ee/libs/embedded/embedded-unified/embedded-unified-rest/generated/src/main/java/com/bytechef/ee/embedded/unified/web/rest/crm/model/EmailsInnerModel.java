@@ -1,14 +1,20 @@
 package com.bytechef.ee.embedded.unified.web.rest.crm.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -16,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("emails_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.784253+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:44:38.667495+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class EmailsInnerModel {
 
   private String emailAddress;
@@ -26,9 +32,9 @@ public class EmailsInnerModel {
    */
   public enum EmailAddressTypeEnum {
     PRIMARY("primary"),
-
+    
     WORK("work"),
-
+    
     OTHER("other");
 
     private String value;
@@ -81,7 +87,7 @@ public class EmailsInnerModel {
    * Get emailAddress
    * @return emailAddress
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "emailAddress", example = "hello@bytechef.io", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("emailAddress")
   public String getEmailAddress() {
@@ -101,7 +107,7 @@ public class EmailsInnerModel {
    * Get emailAddressType
    * @return emailAddressType
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "emailAddressType", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("emailAddressType")
   public EmailAddressTypeEnum getEmailAddressType() {

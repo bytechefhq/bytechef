@@ -176,14 +176,14 @@ components:
           type: "integer"
           readOnly: true
         credentialStatus:
-          $ref: "../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
+          $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
         id:
           description: "The id of a connection."
           type: "integer"
           format: "int64"
           readOnly: true
     Environment:
-      $ref: "../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
+      $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Integration:
       description: "A group of workflows that make one logical integration."
       type: "object"

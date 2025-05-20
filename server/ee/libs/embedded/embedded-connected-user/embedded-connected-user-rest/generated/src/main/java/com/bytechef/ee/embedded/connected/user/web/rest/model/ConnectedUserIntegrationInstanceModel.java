@@ -1,13 +1,20 @@
 package com.bytechef.ee.embedded.connected.user.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -15,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:12:20.957053+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:39:08.552280+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ConnectedUserIntegrationInstanceModel {
 
   private @Nullable String componentName;
@@ -43,7 +50,7 @@ public class ConnectedUserIntegrationInstanceModel {
    * The name of a component.
    * @return componentName
    */
-
+  
   @Schema(name = "componentName", description = "The name of a component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentName")
   public String getComponentName() {
@@ -63,7 +70,7 @@ public class ConnectedUserIntegrationInstanceModel {
    * If an integration's instance is enable dor not.
    * @return enabled
    */
-
+  
   @Schema(name = "enabled", description = "If an integration's instance is enable dor not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
@@ -83,7 +90,7 @@ public class ConnectedUserIntegrationInstanceModel {
    * The id of an integration instance.
    * @return id
    */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -103,7 +110,7 @@ public class ConnectedUserIntegrationInstanceModel {
    * The id of an integration.
    * @return integrationId
    */
-
+  
   @Schema(name = "integrationId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationId")
   public Long getIntegrationId() {
@@ -123,7 +130,7 @@ public class ConnectedUserIntegrationInstanceModel {
    * The id of an integration instance configuration.
    * @return integrationInstanceConfigurationId
    */
-
+  
   @Schema(name = "integrationInstanceConfigurationId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstanceConfigurationId")
   public Long getIntegrationInstanceConfigurationId() {
@@ -143,7 +150,7 @@ public class ConnectedUserIntegrationInstanceModel {
    * The version of an integration.
    * @return integrationVersion
    */
-
+  
   @Schema(name = "integrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationVersion")
   public Integer getIntegrationVersion() {
@@ -163,7 +170,7 @@ public class ConnectedUserIntegrationInstanceModel {
    * The id of a connection.
    * @return connectionId
    */
-
+  
   @Schema(name = "connectionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionId")
   public Long getConnectionId() {
@@ -183,7 +190,7 @@ public class ConnectedUserIntegrationInstanceModel {
    * Get credentialStatus
    * @return credentialStatus
    */
-  @Valid
+  @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")
   public com.bytechef.platform.connection.web.rest.model.CredentialStatusModel getCredentialStatus() {

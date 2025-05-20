@@ -1,12 +1,19 @@
 package com.bytechef.ee.embedded.unified.web.rest.accounting.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -14,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("listAccounts_pageable_parameter")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.650583+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:44:38.533737+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ListAccountsPageableParameterModel {
 
   private @Nullable String direction;
@@ -34,7 +41,7 @@ public class ListAccountsPageableParameterModel {
    * The direction parameter.
    * @return direction
    */
-
+  
   @Schema(name = "direction", description = "The direction parameter.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("direction")
   public String getDirection() {
@@ -54,7 +61,7 @@ public class ListAccountsPageableParameterModel {
    * The sorting parameter.
    * @return sort
    */
-
+  
   @Schema(name = "sort", description = "The sorting parameter.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("sort")
   public String getSort() {
@@ -74,7 +81,7 @@ public class ListAccountsPageableParameterModel {
    * The number of items to be returned.
    * @return size
    */
-
+  
   @Schema(name = "size", description = "The number of items to be returned.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("size")
   public Integer getSize() {
@@ -94,7 +101,7 @@ public class ListAccountsPageableParameterModel {
    * The the continuationToken parameter.
    * @return continuationToken
    */
-
+  
   @Schema(name = "continuationToken", description = "The the continuationToken parameter.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("continuationToken")
   public String getContinuationToken() {

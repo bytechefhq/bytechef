@@ -1,17 +1,24 @@
 package com.bytechef.ee.embedded.unified.web.rest.crm.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
+import java.util.NoSuchElementException;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -19,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("opportunity")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.784253+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:44:38.667495+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class OpportunityModel {
 
   private JsonNullable<String> accountId = JsonNullable.<String>undefined();
@@ -82,7 +89,7 @@ public class OpportunityModel {
    * Get accountId
    * @return accountId
    */
-
+  
   @Schema(name = "account_id", example = "fd089246-09b1-4e3b-a60a-7a76314bbcce", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("account_id")
   public JsonNullable<String> getAccountId() {
@@ -102,7 +109,7 @@ public class OpportunityModel {
    * Get amount
    * @return amount
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "amount", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("amount")
   public JsonNullable<Integer> getAmount() {
@@ -122,7 +129,7 @@ public class OpportunityModel {
    * Get closeDate
    * @return closeDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "closeDate", example = "2023-02-27T00:00Z", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("closeDate")
   public JsonNullable<OffsetDateTime> getCloseDate() {
@@ -142,7 +149,7 @@ public class OpportunityModel {
    * Get description
    * @return description
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "description", example = "Wants to use open source unified API for third-party integrations", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("description")
   public JsonNullable<String> getDescription() {
@@ -162,7 +169,7 @@ public class OpportunityModel {
    * Get id
    * @return id
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "id", example = "54312", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("id")
   public String getId() {
@@ -182,7 +189,7 @@ public class OpportunityModel {
    * Get lastActivityDate
    * @return lastActivityDate
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "lastActivityDate", example = "2023-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastActivityDate")
   public JsonNullable<OffsetDateTime> getLastActivityDate() {
@@ -202,7 +209,7 @@ public class OpportunityModel {
    * Get name
    * @return name
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", example = "Needs third-party integrations", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public JsonNullable<String> getName() {
@@ -222,7 +229,7 @@ public class OpportunityModel {
    * Get ownerId
    * @return ownerId
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "ownerId", example = "d8ceb3ff-8b7f-4fa7-b8de-849292f6ca69", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("ownerId")
   public JsonNullable<String> getOwnerId() {
@@ -242,7 +249,7 @@ public class OpportunityModel {
    * Get pipeline
    * @return pipeline
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "pipeline", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("pipeline")
   public JsonNullable<String> getPipeline() {
@@ -262,7 +269,7 @@ public class OpportunityModel {
    * Get stage
    * @return stage
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "stage", example = "Closed Won", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("stage")
   public JsonNullable<String> getStage() {
@@ -282,7 +289,7 @@ public class OpportunityModel {
    * Get status
    * @return status
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "status", example = "OPEN", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("status")
   public JsonNullable<String> getStatus() {
@@ -302,7 +309,7 @@ public class OpportunityModel {
    * Get createdDate
    * @return createdDate
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "createdDate", example = "2023-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("createdDate")
   public JsonNullable<OffsetDateTime> getCreatedDate() {
@@ -322,7 +329,7 @@ public class OpportunityModel {
    * Get lastModifiedDate
    * @return lastModifiedDate
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @Schema(name = "lastModifiedDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {

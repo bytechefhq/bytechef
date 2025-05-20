@@ -5,14 +5,16 @@
  */
 package com.bytechef.ee.embedded.unified.web.rest.crm;
 
-import com.bytechef.ee.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.AccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.CreateUpdateAccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.CreatedModel;
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.ListAccounts400ResponseModel;
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.ListAccountsPageableParameterModel;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,13 +27,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-
+import jakarta.validation.constraints.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.784253+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:44:38.667495+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "account", description = "The `Account` Common Object represents a \"company\" in CRMs.")
 public interface AccountApi {
@@ -103,7 +108,7 @@ public interface AccountApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<CreatedModel> createAccount(
         @Parameter(name = "CreateUpdateAccountModel", description = "", required = true) @Valid @RequestBody CreateUpdateAccountModel createUpdateAccountModel,
         @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = false) Long xInstanceId,
@@ -223,7 +228,7 @@ public interface AccountApi {
         value = "/accounts/{account_id}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<AccountModel> getAccount(
         @Parameter(name = "account_id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("account_id") String accountId,
         @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = false) Long xInstanceId,
@@ -301,7 +306,7 @@ public interface AccountApi {
         tags = { "account" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Paginated Accounts", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CursorPageSlice.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.ee.embedded.unified.pagination.CursorPageSlice.class))
             }),
             @ApiResponse(responseCode = "400", description = "Bad request", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ListAccounts400ResponseModel.class))
@@ -334,8 +339,8 @@ public interface AccountApi {
         value = "/accounts",
         produces = { "application/json" }
     )
-
-    default ResponseEntity<CursorPageSlice> listAccounts(
+    
+    default ResponseEntity<com.bytechef.ee.embedded.unified.pagination.CursorPageSlice> listAccounts(
         @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = false) Long xInstanceId,
         @Parameter(name = "X-Environment", description = "The environment of an integration.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) String xEnvironment,
         @Parameter(name = "include_raw_data", description = "Whether to include raw data fetched from the 3rd party provider.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "include_raw_data", required = false) Boolean includeRawData,
@@ -452,7 +457,7 @@ public interface AccountApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> updateAccount(
         @Parameter(name = "account_id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("account_id") String accountId,
         @Parameter(name = "CreateUpdateAccountModel", description = "", required = true) @Valid @RequestBody CreateUpdateAccountModel createUpdateAccountModel,
