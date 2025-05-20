@@ -37,7 +37,7 @@ const WorkflowNodesTabs = ({
     taskDispatcherDefinitions,
     triggerComponentDefinitions,
 }: WorkflowNodesTabsProps) => {
-    const [activeTab, setActiveTab] = useState(!hideTriggerComponents ? 'triggers' : 'components');
+    const [activeTab, setActiveTab] = useState(!hideActionComponents ? 'components' : 'triggers');
     const [previousComponentListLength, setPreviousComponentListLength] = useState(actionComponentDefinitions.length);
 
     const ff_1057 = useFeatureFlagsStore()('ff-1057');
