@@ -7,10 +7,10 @@
 
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
-import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
-import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;

@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
-import com.bytechef.embedded.configuration.domain.IntegrationInstance;
-import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import java.util.Optional;

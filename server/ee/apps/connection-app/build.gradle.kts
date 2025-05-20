@@ -33,7 +33,6 @@ dependencies {
     implementation(project(":server:libs:core:encryption:encryption-impl"))
     implementation(project(":server:libs:core:encryption:encryption-property"))
     implementation(project(":server:libs:core:rest:rest-impl"))
-    implementation(project(":server:libs:embedded:embedded-swagger"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-swagger"))
@@ -44,10 +43,12 @@ dependencies {
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
-    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-rest"))
+
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
+    implementation(project(":server:ee:libs:embedded:embedded-swagger"))
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")

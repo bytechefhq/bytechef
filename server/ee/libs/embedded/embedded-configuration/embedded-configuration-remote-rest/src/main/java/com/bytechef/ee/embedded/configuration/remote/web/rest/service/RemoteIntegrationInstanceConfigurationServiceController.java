@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.remote.web.rest.service;
 
-import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
-import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;

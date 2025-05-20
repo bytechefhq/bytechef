@@ -35,8 +35,6 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
-    implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
-    implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-service"))
@@ -52,6 +50,9 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-rest"))
+
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
+    implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
 
     implementation(project(":server:libs:modules:task-dispatchers:approval"))
     implementation(project(":server:libs:modules:task-dispatchers:branch"))

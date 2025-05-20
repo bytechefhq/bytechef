@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.remote.web.rest.service;
 
-import com.bytechef.embedded.configuration.domain.Integration;
-import com.bytechef.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.List;

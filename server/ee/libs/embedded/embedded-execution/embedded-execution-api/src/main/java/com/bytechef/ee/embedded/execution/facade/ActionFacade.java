@@ -1,0 +1,24 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.execution.facade;
+
+import com.bytechef.platform.constant.Environment;
+import java.util.Map;
+import org.springframework.lang.Nullable;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+public interface ActionFacade {
+
+    Object executeAction(
+        String componentName, Integer componentVersion, String actionName, Map<String, Object> inputParameters,
+        Environment environment, @Nullable Long instanceId);
+}

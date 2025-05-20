@@ -1,0 +1,31 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.execution.facade;
+
+import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
+import com.bytechef.platform.constant.Environment;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+public interface ToolFacade {
+
+    List<ToolDTO> getTools();
+
+    Map<String, List<ToolDTO>> getTools(
+        Environment environment, List<String> categoryNames, List<String> componentNames,
+        List<String> clusterElementNames);
+
+    Object executeTool(
+        String toolName, Map<String, Object> inputParameters, Environment environment, @Nullable Long instanceId);
+}

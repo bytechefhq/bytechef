@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.embedded.connected.user.remote.client.service;
 
-import com.bytechef.embedded.connected.user.domain.ConnectedUser;
-import com.bytechef.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.constant.Environment;
 import java.time.LocalDate;
 import java.util.Optional;

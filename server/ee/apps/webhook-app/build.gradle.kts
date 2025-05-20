@@ -32,8 +32,6 @@ dependencies {
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
-    implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
-    implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-impl"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-impl"))
 
@@ -45,11 +43,14 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
+    implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-client"))
+
 
     testImplementation(project(":server:libs:test:test-int-support"))
 }

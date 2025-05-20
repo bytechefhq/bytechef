@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
+import com.bytechef.ee.embedded.configuration.domain.AppEvent;
+import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import com.bytechef.embedded.configuration.domain.AppEvent;
-import com.bytechef.embedded.configuration.service.AppEventService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Component;

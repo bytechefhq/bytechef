@@ -7,10 +7,10 @@
 
 package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
-import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
-import com.bytechef.embedded.configuration.dto.IntegrationDTO;
-import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
-import com.bytechef.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;

@@ -22,7 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.appevent.trigger.AppEventTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.embedded.configuration.service.AppEventService;
+import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AppEventComponentDefinition;
 import org.springframework.stereotype.Component;

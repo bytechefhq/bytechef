@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
-import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
-import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import org.springframework.stereotype.Component;
