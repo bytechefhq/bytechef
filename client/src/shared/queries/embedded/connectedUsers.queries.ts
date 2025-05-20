@@ -1,7 +1,7 @@
+import {GetConnectedUsersRequest, Page} from '@/ee/shared/middleware/embedded/connected-user';
+import {ConnectedUserApi} from '@/ee/shared/middleware/embedded/connected-user/apis/ConnectedUserApi';
+import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user/models/ConnectedUser';
 import {GetWorkflowExecutionsPageRequest} from '@/shared/middleware/automation/workflow/execution';
-import {GetConnectedUsersRequest, Page} from '@/shared/middleware/embedded/connected-user';
-import {ConnectedUserApi} from '@/shared/middleware/embedded/connected-user/apis/ConnectedUserApi';
-import {ConnectedUser} from '@/shared/middleware/embedded/connected-user/models/ConnectedUser';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

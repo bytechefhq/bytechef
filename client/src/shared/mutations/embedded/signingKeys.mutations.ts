@@ -1,4 +1,4 @@
-import {type CreateSigningKey200Response, SigningKey, SigningKeyApi} from '@/shared/middleware/embedded/user';
+import {type CreateSigningKey200Response, SigningKey, SigningKeyApi} from '@/ee/shared/middleware/embedded/user';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateSigningKeyMutationProps {

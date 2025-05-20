@@ -1,4 +1,4 @@
-import {EnableIntegrationInstanceRequest, IntegrationInstanceApi} from '@/shared/middleware/embedded/configuration';
+import {EnableIntegrationInstanceRequest, IntegrationInstanceApi} from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface EnableIntegrationInstanceMutationProps {

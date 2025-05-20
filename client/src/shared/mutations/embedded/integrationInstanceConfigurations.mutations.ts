@@ -7,7 +7,7 @@ import {
     IntegrationInstanceConfigurationWorkflow,
     UpdateIntegrationInstanceConfigurationTagsRequest,
     UpdateIntegrationTagsRequest,
-} from '@/shared/middleware/embedded/configuration';
+} from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateIntegrationInstanceMutationProps {

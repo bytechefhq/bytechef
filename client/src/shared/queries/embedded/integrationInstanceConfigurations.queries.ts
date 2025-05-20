@@ -2,7 +2,7 @@ import {
     GetIntegrationInstanceConfigurationsRequest,
     IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationApi,
-} from '@/shared/middleware/embedded/configuration';
+} from '@/ee/shared/middleware/embedded/configuration';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

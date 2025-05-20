@@ -1,7 +1,7 @@
 import {
     EnableIntegrationInstanceWorkflowRequest,
     IntegrationInstanceApi,
-} from '@/shared/middleware/embedded/configuration';
+} from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface EnableIntegrationInstanceWorkflowMutationProps {

@@ -1,4 +1,4 @@
-import {AppEvent, AppEventApi} from '@/shared/middleware/embedded/configuration';
+import {AppEvent, AppEventApi} from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateAppEventMutationProps {

@@ -1,4 +1,4 @@
-import {ConnectionTagApi, UpdateConnectionTagsRequest} from '@/shared/middleware/embedded/connection';
+import {ConnectionTagApi, UpdateConnectionTagsRequest} from '@/ee/shared/middleware/embedded/connection';
 import {useMutation} from '@tanstack/react-query';
 
 interface UpdateConnectionTagsMutationProps {

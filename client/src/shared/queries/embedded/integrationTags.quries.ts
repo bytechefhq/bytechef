@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {IntegrationTagApi, Tag} from '@/shared/middleware/embedded/configuration';
+import {IntegrationTagApi, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const IntegrationTagKeys = {

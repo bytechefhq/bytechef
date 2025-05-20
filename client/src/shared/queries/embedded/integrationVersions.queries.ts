@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {IntegrationApi, IntegrationVersion} from '@/shared/middleware/embedded/configuration';
+import {IntegrationApi, IntegrationVersion} from '@/ee/shared/middleware/embedded/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const IntegrationVersionKeys = {

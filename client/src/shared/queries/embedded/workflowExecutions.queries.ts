@@ -4,7 +4,7 @@ import {
     Page,
     WorkflowExecution,
     WorkflowExecutionApi,
-} from '@/shared/middleware/embedded/workflow/execution';
+} from '@/ee/shared/middleware/embedded/workflow/execution';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

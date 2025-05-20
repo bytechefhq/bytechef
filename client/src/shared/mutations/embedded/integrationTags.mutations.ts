@@ -1,4 +1,4 @@
-import {IntegrationTagApi, UpdateIntegrationTagsRequest} from '@/shared/middleware/embedded/configuration';
+import {IntegrationTagApi, UpdateIntegrationTagsRequest} from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface UpdateIntegrationTagsMutationProps {

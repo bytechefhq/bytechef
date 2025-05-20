@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {SigningKey} from '@/ee/shared/middleware/embedded/user';
 import SigningKeyDialog from '@/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
-import {SigningKey} from '@/shared/middleware/embedded/user';
 import {useDeleteSigningKeyMutation} from '@/shared/mutations/embedded/signingKeys.mutations';
 import {SigningKeyKeys} from '@/shared/queries/embedded/signingKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';

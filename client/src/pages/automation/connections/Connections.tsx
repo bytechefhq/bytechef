@@ -7,8 +7,7 @@ import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {ConnectionEnvironment} from '@/shared/middleware/automation/connection';
-import {Connection} from '@/shared/middleware/embedded/connection';
+import {Connection, ConnectionEnvironment} from '@/shared/middleware/automation/connection';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {
     ConnectionKeys,

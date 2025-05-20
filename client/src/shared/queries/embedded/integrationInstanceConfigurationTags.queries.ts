@@ -1,4 +1,4 @@
-import {IntegrationInstanceConfigurationTagApi, Tag} from '@/shared/middleware/embedded/configuration';
+import {IntegrationInstanceConfigurationTagApi, Tag} from '@/ee/shared/middleware/embedded/configuration';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

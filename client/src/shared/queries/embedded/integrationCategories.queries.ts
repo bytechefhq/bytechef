@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {Category, CategoryApi} from '@/shared/middleware/embedded/configuration';
+import {Category, CategoryApi} from '@/ee/shared/middleware/embedded/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const IntegrationCategoryKeys = {

@@ -1,4 +1,4 @@
-import {GetIntegrationsRequest, Integration, IntegrationApi} from '@/shared/middleware/embedded/configuration';
+import {GetIntegrationsRequest, Integration, IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

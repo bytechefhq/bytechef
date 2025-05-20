@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {Workflow, WorkflowApi} from '@/shared/middleware/embedded/configuration';
+import {Workflow, WorkflowApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {useQuery} from '@tanstack/react-query';
 
