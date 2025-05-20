@@ -19,13 +19,21 @@ package com.bytechef.component.productboard;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.productboard.trigger.ProductboardNewNoteTrigger;
 import com.google.auto.service.AutoService;
+import java.util.List;
 
 /**
  * @author Monika Kušter
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ProductboardComponentHandler extends AbstractProductboardComponentHandler {
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(ProductboardNewNoteTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
