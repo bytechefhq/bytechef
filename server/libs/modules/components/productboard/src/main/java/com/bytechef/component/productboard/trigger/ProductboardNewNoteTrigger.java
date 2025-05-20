@@ -113,6 +113,7 @@ public class ProductboardNewNoteTrigger {
         WebhookMethod method, TriggerContext context) {
 
         Map<String, List<String>> map = parameters.toMap();
+
         List<String> validationToken = map.get("validationToken");
 
         return new WebhookValidateResponse(validationToken.getFirst(), 200);
