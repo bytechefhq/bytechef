@@ -277,7 +277,7 @@ public class AccountController {
     }
 
     /**
-     * {@code DELETE /account/sessions?series={series}} : invalidate an existing session.
+     * {@code DELETE /account/sessions/{series}} : invalidate an existing session.
      *
      * - You can only delete your own sessions, not any other user's session - If you delete one of your existing
      * sessions, and that you are currently logged in on that session, you will still be able to use that session, until
