@@ -41,8 +41,7 @@ public class ProductboardUtils extends AbstractProductboardUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, ?> body = context
-            .http(http -> http.get("/notes"))
+        Map<String, ?> body = context.http(http -> http.get("/notes"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
