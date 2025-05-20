@@ -105,7 +105,14 @@ const WorkflowDialog = ({
                             label: formData.label,
                             description: formData.description,
                             inputs: [],
-                            triggers: [],
+                            triggers: [
+                                {
+                                    description: '',
+                                    label: 'Manual',
+                                    name: 'trigger_1',
+                                    type: 'manual/v1/manual',
+                                },
+                            ],
                             tasks: [],
                         },
                         null,
