@@ -7,7 +7,7 @@
     "metadata" : null,
     "name" : "ask",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
