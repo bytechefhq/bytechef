@@ -32,9 +32,19 @@ const DescriptionTab = ({
     );
 
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+    const {workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            workflow: state.workflow,
+        }))
+    );
+
+    const workflowTaskOrTrigger = [...(workflow.tasks ?? []), ...(workflow.triggers ?? [])]?.find(
+        (task) => task.name === currentNode?.workflowNodeName
+    );
+
+    console.log('workflowTaskOrTrigger', workflowTaskOrTrigger);
 
     const queryClient = useQueryClient();
-
     const {projectId} = useParams();
 
     const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -139,8 +149,8 @@ const DescriptionTab = ({
                 <Label>Title</Label>
 
                 <Input
-                    defaultValue={currentNode?.label}
-                    key={`${currentNode?.componentName}_nodeTitle`}
+                    defaultValue={workflowTaskOrTrigger?.label}
+                    key={`${workflowTaskOrTrigger?.name}_nodeTitle`}
                     name="nodeTitle"
                     onChange={handleLabelChange}
                 />
@@ -150,8 +160,8 @@ const DescriptionTab = ({
                 <Label>Notes</Label>
 
                 <Textarea
-                    defaultValue={currentNode?.description || ''}
-                    key={`${currentNode?.componentName}_nodeNotes`}
+                    defaultValue={workflowTaskOrTrigger?.description}
+                    key={`${workflowTaskOrTrigger?.name}_nodeNotes`}
                     name="nodeNotes"
                     onChange={handleNotesChange}
                     placeholder="Write some notes for yourself..."
