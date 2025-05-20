@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.youtube.action;
+package com.bytechef.component.youtube.util;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class YoutubeUploadVideoActionTest {
+/**
+ * @author Nikolina Spehar
+ */
+class YoutubeUtilsTest {
 
     @Test
-    void testPerform() {
-        Parameters parameters = mock(Parameters.class);
+    void getChannelId() {
+    }
 
-        Assertions.assertNull(
-            YoutubeUploadVideoAction.perform(parameters, parameters, mock(ActionContext.class)));
+    @Test
+    void getVideoCategoryIdOptions() {
     }
 }

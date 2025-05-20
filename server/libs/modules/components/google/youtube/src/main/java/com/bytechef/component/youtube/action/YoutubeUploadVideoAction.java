@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,25 +34,13 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.youtube.util.YoutubeUtils;
-
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
-
-//https://www.googleapis.com/auth/youtube.upload
-//https://www.googleapis.com/auth/youtube
 
 public class YoutubeUploadVideoAction {
 
@@ -66,31 +54,30 @@ public class YoutubeUploadVideoAction {
                 .required(true),
             string(TITLE)
                 .label("Video Title")
-                    .description("Title of the video.")
+                .description("Title of the video.")
                 .required(true),
             string(DESCRIPTION)
                 .label("Video Description")
-                    .description("Description of the video.")
+                .description("Description of the video.")
                 .required(true),
             array(TAGS)
                 .label("Video Tags")
-                    .description("Tags of the video.")
+                .description("Tags of the video.")
                 .items(
-                    string("tag")
-                )
+                    string("tag"))
                 .required(false),
             string(PRIVACY_STATUS)
                 .label("Privacy Status")
-                    .description("Privacy status of the video.")
-                        .required(true)
-                            .options(
-                                option("Private", "private"),
-                                option("Public", "public"),
-                                option("Unlisted", "unlisted")),
+                .description("Privacy status of the video.")
+                .required(true)
+                .options(
+                    option("Private", "private"),
+                    option("Public", "public"),
+                    option("Unlisted", "unlisted")),
             string(CATEGORY_ID)
-                    .label("Video Category ID")
-                    .options((ActionOptionsFunction<String>) YoutubeUtils::getVideoCategoryIdOptions)
-                    .required(true))
+                .label("Video Category ID")
+                .options((ActionOptionsFunction<String>) YoutubeUtils::getVideoCategoryIdOptions)
+                .required(true))
         .output(outputSchema(string()))
         .perform(YoutubeUploadVideoAction::perform);
 
@@ -102,32 +89,29 @@ public class YoutubeUploadVideoAction {
 
 //        String url = context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status"))
         String url = context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos"))
-    .headers(Map.of("Content-Type", List.of("application/octet-stream")))
+            .headers(Map.of("Content-Type", List.of("application/octet-stream")))
             .queryParameters("uploadType", "resumable", "part", "snippet,status")
-    .body(
-        Body.of(
-            "snippet", Map.of(
-                "categoryId", inputParameters.getRequiredString(CATEGORY_ID),
-                "description", inputParameters.getRequiredString(DESCRIPTION),
-                "title", inputParameters.getRequiredString(TITLE),
-                "tags", inputParameters.getList(TAGS, List.of())),
-            "status", Map.of(PRIVACY_STATUS, inputParameters.getRequiredString(PRIVACY_STATUS))
-        )
-    ).execute()
-    .getHeaders()
-    .get("location")
-    .getFirst();
+            .body(
+                Body.of(
+                    "snippet", Map.of(
+                        "categoryId", inputParameters.getRequiredString(CATEGORY_ID),
+                        "description", inputParameters.getRequiredString(DESCRIPTION),
+                        "title", inputParameters.getRequiredString(TITLE),
+                        "tags", inputParameters.getList(TAGS, List.of())),
+                    "status", Map.of(PRIVACY_STATUS, inputParameters.getRequiredString(PRIVACY_STATUS))))
+            .execute()
+            .getHeaders()
+            .get("location")
+            .getFirst();
 
         return context.http(http -> http.put(url))
-    .headers(Map.of("Content-Type", List.of("application/octet-stream")))
-    .body(
-       Body.of(
-           inputParameters.getRequiredFileEntry(FILE)
-       )
-    )
-    .configuration(responseType(Http.ResponseType.JSON))
-    .execute()
-    .getBody(new TypeReference<>() {});
+            .headers(Map.of("Content-Type", List.of("application/octet-stream")))
+            .body(
+                Body.of(
+                    inputParameters.getRequiredFileEntry(FILE)))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
     }
 }

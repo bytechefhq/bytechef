@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,76 +16,139 @@
 
 package com.bytechef.component.youtube.trigger;
 
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.ID;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.IDENTIFIER;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.VIDEO;
+import static com.bytechef.component.youtube.util.YoutubeUtils.getChannelId;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
-import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 public class YoutubeNewVideoTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newVideo")
         .title("New Video")
-        .description("Triggers when new video is added.")
-        .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties()
-        .output(outputSchema(string()))
-        .webhookEnable(YoutubeNewVideoTrigger::webhookEnable)
-        .webhookDisable(YoutubeNewVideoTrigger::webhookDisable)
-        .webhookRequest(YoutubeNewVideoTrigger::webhookRequest)
-        .webhookValidate(YoutubeNewVideoTrigger::webhookValidate);
+        .description("Triggers when new video is added to a specific channel.")
+        .type(TriggerType.POLLING)
+        .properties(
+            string(IDENTIFIER)
+                .label("Username/Channel Handle")
+                .description("Youtube username or a channel handle (e.g. @Youtube).")
+                .required(true))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("publishedAt")
+                            .description("The date and time when the video was published."),
+                        string("channelId")
+                            .description("ID of the channel where the video was uploaded."),
+                        string("title")
+                            .description("Title of the video."),
+                        string("description")
+                            .description("Description of the video."),
+                        object("thumbnails")
+                            .description("Video thumbnails of different quality.")
+                            .properties(
+                                object("default")
+                                    .description("Default quality thumbnail of the video.")
+                                    .properties(
+                                        string("url")
+                                            .description("URL of the thumbnail."),
+                                        integer("width")
+                                            .description("Width of the thumbnail."),
+                                        integer("height")
+                                            .description("Height of the thumbnail.")),
+                                object("medium")
+                                    .description("Medium quality thumbnail of the video.")
+                                    .properties(
+                                        string("url")
+                                            .description("URL of the thumbnail."),
+                                        integer("width")
+                                            .description("Width of the thumbnail."),
+                                        integer("height")
+                                            .description("Height of the thumbnail.")),
+                                object("high")
+                                    .description("High quality thumbnail of the video.")
+                                    .properties(
+                                        string("url")
+                                            .description("URL of the thumbnail."),
+                                        integer("width")
+                                            .description("Width of the thumbnail."),
+                                        integer("height")
+                                            .description("Height of the thumbnail."))),
+                        string("channelTitle")
+                            .description("Title of the channel."),
+                        string("liveBroadcastContent")
+                            .description("Live broadcasting content."),
+                        string("publishTime")
+                            .description("The date and time when the video was published."))))
+        .poll(YoutubeNewVideoTrigger::poll);
 
     private YoutubeNewVideoTrigger() {
     }
 
-    protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
-        // TODO
+    protected static PollOutput poll(
+        Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
+        TriggerContext triggerContext) {
 
-        return null;
-    }
+        List<Object> lastVideo = closureParameters.getList(VIDEO, Object.class, List.of());
 
-    protected static void webhookDisable(
-        Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-        String workflowExecutionId, TriggerContext context) {
+//        List<Map<String, Object>> videos = new ArrayList<>();
 
-        context
-            .http(http -> http.delete("/webhook"))
-            .body(Http.Body.of("webhookIds", List.of(outputParameters.getInteger(ID))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute();
-    }
+//        for (Object video : lastVideo) {
+//            if (video instanceof Map) {
+//                videos.add((Map<String, Object>) video);
+//            }
+//        }
 
-    protected static Object webhookRequest(
-        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
-        // TODO
+        String channelId = getChannelId(inputParameters.getRequiredString(IDENTIFIER), triggerContext);
 
-        return null;
-    }
+        Map<String, Object> response =
+            triggerContext.http(http -> http.get("https://www.googleapis.com/youtube/v3/search"))
+                .queryParameters(
+                    "part", "snippet",
+                    "channelId", channelId,
+                    "type", "video",
+                    "order", "date",
+                    "maxResults", "50")
+                .configuration(Http.responseType(ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
 
-    protected static WebhookValidateResponse webhookValidate(
-        Parameters parameters, HttpHeaders httpHeaders, HttpParameters httpParameters, WebhookBody webhookBody,
-        WebhookMethod webhookMethod, TriggerContext triggerContext) {
+        Map<String, Object> newVideo = new HashMap<>();
 
-        if (Objects.equals("uselessCode", "betterExamplesInActualComponents")) {
-            return WebhookValidateResponse.ok(); // OK
-        } else {
-            return WebhookValidateResponse.badRequest(); // Bad Request
+        List<Map<String, Object>> newVideosList = new ArrayList<>();
+
+        if (response.get("items") instanceof List<?> items) {
+            for (Object item : items) {
+                if (item instanceof Map<?, ?> itemMap &&
+                    itemMap.get("snippet") instanceof Map<?, ?> snippet) {
+
+                    if (!lastVideo.contains(newVideo)) {
+                        newVideosList.add(newVideo);
+                        lastVideo.add(newVideo);
+                    }
+                }
+            }
         }
+
+        return new PollOutput(newVideosList, Map.of(VIDEO, lastVideo), false);
+
     }
+
 }

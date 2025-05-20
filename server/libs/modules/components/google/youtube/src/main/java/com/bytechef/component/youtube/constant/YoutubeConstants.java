@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@ public class YoutubeConstants {
 
     public static final String CATEGORY_ID = "categoryId";
     public static final String DESCRIPTION = "description";
-    public static final String ID = "id";
+    public static final String VIDEO = "video";
     public static final String FILE = "file";
     public static final String TAGS = "tags";
     public static final String TITLE = "title";
     public static final String PRIVACY_STATUS = "privacyStatus";
+    public static final String IDENTIFIER = "identifier";
 
     private YoutubeConstants() {
     }
