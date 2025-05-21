@@ -87,8 +87,7 @@ public class HttpClientActionUtils {
                                 option("Form-Data", Http.BodyContentType.FORM_DATA.name()),
                                 option("Form-Urlencoded", Http.BodyContentType.FORM_URL_ENCODED.name()),
                                 option("Raw", Http.BodyContentType.RAW.name()),
-                                option("Binary", Http.BodyContentType.BINARY.name()))
-                            .defaultValue(""),
+                                option("Binary", Http.BodyContentType.BINARY.name())),
                         object(BODY_CONTENT)
                             .label("Body Content - JSON")
                             .description("Body Parameters to send.")
@@ -170,7 +169,6 @@ public class HttpClientActionUtils {
                     .label("Proxy")
                     .description("HTTP proxy to use.")
                     .placeholder("https://myproxy:3128")
-                    .defaultValue("")
                     .advancedOption(true),
                 integer(TIMEOUT)
                     .label("Timeout")
