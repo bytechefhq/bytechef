@@ -65,11 +65,12 @@ public class AttioCreateTaskAction {
             dateTime(DEADLINE_AT)
                 .label("Deadline")
                 .description("Deadline of the task.")
-                .required(false),
+                .required(true),
             bool(IS_COMPLETED)
                 .label("Is Completed")
                 .description("Weather the task completed.")
-                .required(false),
+                .defaultValue(false)
+                .required(true),
             array(LINKED_RECORDS)
                 .label("Linked Records")
                 .description("Records linked to the task.")
@@ -77,7 +78,7 @@ public class AttioCreateTaskAction {
                     object()
                         .properties(
                             string(TARGET_OBJECT)
-                                .label("Target object")
+                                .label("Target Object")
                                 .options((ActionOptionsFunction<String>) AttioUtils::getTargetObjectOptions)
                                 .required(true),
                             string(TARGET_RECORD_ID)
@@ -85,16 +86,13 @@ public class AttioCreateTaskAction {
                                 .optionsLookupDependsOn(LINKED_RECORDS + "[index]." + TARGET_OBJECT)
                                 .options(AttioUtils.getTargetRecordIdOptions(TARGET_OBJECT))
                                 .required(true)))
-                .required(false),
+                .required(true),
             array(ASSIGNEES)
                 .label("Assignees")
                 .description("Assignees of the task.")
                 .options((ActionOptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
                 .required(false)
-                .items(
-                    string("assignee")
-                        .label("Assignee")
-                        .required(true)))
+                .items(string()))
         .output(
             outputSchema(
                 object()
@@ -147,7 +145,7 @@ public class AttioCreateTaskAction {
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         List<Map<String, Object>> assignees = getAssignees(
-            inputParameters.getList(ASSIGNEES, new TypeReference<>() {}));
+            inputParameters.getList(ASSIGNEES, new TypeReference<>() {}, List.of()));
 
         return context.http(http -> http.post("/tasks"))
             .body(
@@ -155,8 +153,8 @@ public class AttioCreateTaskAction {
                     DATA, new Object[] {
                         CONTENT, inputParameters.getRequiredString(CONTENT),
                         FORMAT, "plaintext",
-                        DEADLINE_AT, inputParameters.getLocalDateTime(DEADLINE_AT),
-                        IS_COMPLETED, inputParameters.getBoolean(IS_COMPLETED),
+                        DEADLINE_AT, inputParameters.getRequiredLocalDateTime(DEADLINE_AT),
+                        IS_COMPLETED, inputParameters.getRequiredBoolean(IS_COMPLETED),
                         LINKED_RECORDS, inputParameters.getList(LINKED_RECORDS),
                         ASSIGNEES, assignees
                     }))
