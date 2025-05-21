@@ -24,7 +24,6 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record UpdateParameterResultDTO(
-    Map<String, Boolean> displayConditions, Map<String, ?> metadata, List<String> missingRequiredProperties,
-    Map<String, ?> parameters) {
+public record DisplayConditionResultDTO(
+    Map<String, Boolean> displayConditions, List<String> missingRequiredProperties) {
 }

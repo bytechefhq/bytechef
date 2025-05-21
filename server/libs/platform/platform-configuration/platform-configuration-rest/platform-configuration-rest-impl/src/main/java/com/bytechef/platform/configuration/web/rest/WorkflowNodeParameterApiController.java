@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
 import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameter200ResponseModel;
@@ -66,9 +67,13 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     public ResponseEntity<GetWorkflowNodeParameterDisplayConditions200ResponseModel>
         getWorkflowNodeParameterDisplayConditions(String id, String workflowNodeName) {
 
+        DisplayConditionResultDTO displayConditionResultDTO =
+            workflowNodeParameterFacade.getDisplayConditions(id, workflowNodeName);
+
         return ResponseEntity.ok(
             new GetWorkflowNodeParameterDisplayConditions200ResponseModel()
-                .displayConditions(workflowNodeParameterFacade.getDisplayConditions(id, workflowNodeName)));
+                .displayConditions(displayConditionResultDTO.displayConditions())
+                .missingRequiredProperties(displayConditionResultDTO.missingRequiredProperties()));
     }
 
     @Override

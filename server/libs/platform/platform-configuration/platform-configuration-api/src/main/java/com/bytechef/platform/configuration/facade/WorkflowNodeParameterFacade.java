@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
 import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public interface WorkflowNodeParameterFacade {
 
     Map<String, ?> deleteParameter(String workflowId, String workflowNodeName, String path);
 
-    Map<String, Boolean> getDisplayConditions(String workflowId, String workflowNodeName);
+    DisplayConditionResultDTO getDisplayConditions(String workflowId, String workflowNodeName);
 
     UpdateParameterResultDTO updateParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,

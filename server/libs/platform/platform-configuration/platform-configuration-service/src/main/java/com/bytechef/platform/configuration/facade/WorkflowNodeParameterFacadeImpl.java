@@ -29,12 +29,12 @@ import com.bytechef.platform.component.domain.DynamicPropertiesProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
 import com.bytechef.platform.component.domain.OptionsDataSource;
 import com.bytechef.platform.component.domain.OptionsDataSourceAware;
-import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.PropertiesDataSource;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
 import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -115,28 +115,28 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
-    public Map<String, Boolean> getDisplayConditions(String workflowId, String workflowNodeName) {
+    public DisplayConditionResultDTO getDisplayConditions(String workflowId, String workflowNodeName) {
         Map<String, Boolean> displayConditionMap = new HashMap<>();
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        WorkflowNodeStructure parameterMapProperties = getWorkflowNodeStructure(
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
             workflowNodeName, definitionMap);
 
-        Set<String> keySet = parameterMapProperties.parameterMap.keySet();
+        Set<String> keySet = workflowNodeStructure.parameterMap.keySet();
 
         Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
 
         for (String parameterName : new HashSet<>(keySet)) {
             displayConditionMap.putAll(
                 checkDisplayConditionsAndParameters(
-                    parameterName, workflowNodeName, workflow, parameterMapProperties.operationType,
-                    parameterMapProperties.parameterMap, inputMap, Map.of(), parameterMapProperties.properties, false));
+                    parameterName, workflowNodeName, workflow, workflowNodeStructure.operationType,
+                    workflowNodeStructure.parameterMap, inputMap, Map.of(), workflowNodeStructure.properties, false));
         }
 
-        return displayConditionMap;
+        return new DisplayConditionResultDTO(displayConditionMap, workflowNodeStructure.missingRequiredProperties);
     }
 
     @Override
@@ -179,7 +179,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
 
-        return new UpdateParameterResultDTO(displayConditionMap, metadataMap, workflowNodeStructure.parameterMap);
+        return new UpdateParameterResultDTO(
+            displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
+            workflowNodeStructure.parameterMap);
     }
 
     protected static boolean hasExpressionVariable(String displayCondition, String parameterPath) {
