@@ -186,7 +186,6 @@ public class SecurityConfiguration {
     @Order(3)
     public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
         http
-            .securityMatcher("/**")
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
