@@ -1,0 +1,367 @@
+---
+title: "Attio"
+description: "Attio is the AI-native CRM that builds, scales and grows your company to the next level."
+---
+
+Attio is the AI-native CRM that builds, scales and grows your company to the next level.
+
+
+Categories: CRM
+
+
+Type: attio/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Access Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Access Token | STRING | `Can be found in Workspace Settings -> Developers -> Access tokens.` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Record
+Name: createRecord
+
+`Creates a new record.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| record_type | Record Type | STRING | `Type of record that will be created.` | true |
+| people | Person | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(email_address), STRING\(description), STRING\(company), STRING\(job_title), STRING\(facebook), STRING\(instagram), STRING\(linkedin), [STRING\($deal)]\(associated_deals), [STRING\($user)]\(associated_users)&#125; </details> |  | true |
+| companies | Company | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domains), STRING\(name), STRING\(description), STRING\(facebook), STRING\(instagram), STRING\(linkedin), STRING\(estimated_arr_usd), DATE\(foundation_date), STRING\(employee_range), [STRING\($category)]\(categories), [STRING\($deal)]\(associated_deals), [STRING\($workspace)]\(associated_workspaces)&#125; </details> |  | true |
+| users | | OBJECT <details> <summary> Properties </summary> &#123;STRING\(person), STRING\(email_address), STRING\(user_id), [STRING\($workspace)]\(workspace)&#125; </details> |  | true |
+| deals | | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(stage), STRING\(owner), NUMBER\(value), [STRING\($people)]\(associated_people), STRING\(associated_company)&#125; </details> |  | true |
+| workspaces | | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace_id), STRING\(name), [STRING\($user)]\(users), STRING\(company), STRING\(avatar_url)&#125; </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Record",
+  "name" : "createRecord",
+  "parameters" : {
+    "record_type" : "",
+    "people" : {
+      "first_name" : "",
+      "last_name" : "",
+      "email_address" : "",
+      "description" : "",
+      "company" : "",
+      "job_title" : "",
+      "facebook" : "",
+      "instagram" : "",
+      "linkedin" : "",
+      "associated_deals" : [ "" ],
+      "associated_users" : [ "" ]
+    },
+    "companies" : {
+      "domains" : "",
+      "name" : "",
+      "description" : "",
+      "facebook" : "",
+      "instagram" : "",
+      "linkedin" : "",
+      "estimated_arr_usd" : "",
+      "foundation_date" : "2021-01-01",
+      "employee_range" : "",
+      "categories" : [ "" ],
+      "associated_deals" : [ "" ],
+      "associated_workspaces" : [ "" ]
+    },
+    "users" : {
+      "person" : "",
+      "email_address" : "",
+      "user_id" : "",
+      "workspace" : [ "" ]
+    },
+    "deals" : {
+      "name" : "",
+      "stage" : "",
+      "owner" : "",
+      "value" : 0.0,
+      "associated_people" : [ "" ],
+      "associated_company" : ""
+    },
+    "workspaces" : {
+      "workspace_id" : "",
+      "name" : "",
+      "users" : [ "" ],
+      "company" : "",
+      "avatar_url" : ""
+    }
+  },
+  "type" : "attio/v1/createRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Create Task
+Name: createTask
+
+`Creates a new task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| content | Content | STRING | `Content of the task.` | true |
+| deadline_at | Deadline | DATE_TIME | `Deadline of the task.` | true |
+| is_completed | Is Completed | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Weather the task completed.` | true |
+| linked_records | Linked Records | ARRAY <details> <summary> Items </summary> [&#123;STRING\(target_object), STRING\(target_record_id)&#125;] </details> | `Records linked to the task.` | true |
+| assignees | Assignees | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Assignees of the task.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "content" : "",
+    "deadline_at" : "2021-01-01T00:00:00",
+    "is_completed" : false,
+    "linked_records" : [ {
+      "target_object" : "",
+      "target_record_id" : ""
+    } ],
+    "assignees" : [ "" ]
+  },
+  "type" : "attio/v1/createTask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(workspace_id), STRING\(task_id)&#125;\(id), STRING\(content_plaintext), BOOLEAN\(is_completed), STRING\(deadline_at), [&#123;STRING\(target_object_id), STRING\(target_record_id)&#125;]\(linked_records), [&#123;STRING\(referenced_actor_type), STRING\(referenced_actor_id)&#125;]\(assignees), &#123;STRING\(type), STRING\(id)&#125;\(created_by_actor), STRING\(created_at)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : {
+      "workspace_id" : "",
+      "task_id" : ""
+    },
+    "content_plaintext" : "",
+    "is_completed" : false,
+    "deadline_at" : "",
+    "linked_records" : [ {
+      "target_object_id" : "",
+      "target_record_id" : ""
+    } ],
+    "assignees" : [ {
+      "referenced_actor_type" : "",
+      "referenced_actor_id" : ""
+    } ],
+    "created_by_actor" : {
+      "type" : "",
+      "id" : ""
+    },
+    "created_at" : ""
+  }
+}
+```
+
+
+### Update Record
+Name: updateRecord
+
+`Updates a record.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| record_type | Record Type | STRING | `Type of record that will be created.` | true |
+| record_id | Record ID | STRING <details> <summary> Depends On </summary> record_type </details> | `ID of the record that will be updated.` | true |
+| people | Person | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(email_address), STRING\(description), STRING\(company), STRING\(job_title), STRING\(facebook), STRING\(instagram), STRING\(linkedin), [STRING\($deal)]\(associated_deals), [STRING\($user)]\(associated_users)&#125; </details> |  | true |
+| companies | Company | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domains), STRING\(name), STRING\(description), STRING\(facebook), STRING\(instagram), STRING\(linkedin), STRING\(estimated_arr_usd), DATE\(foundation_date), STRING\(employee_range), [STRING\($category)]\(categories), [STRING\($deal)]\(associated_deals), [STRING\($workspace)]\(associated_workspaces)&#125; </details> |  | true |
+| users | | OBJECT <details> <summary> Properties </summary> &#123;STRING\(person), STRING\(email_address), STRING\(user_id), [STRING\($workspace)]\(workspace)&#125; </details> |  | true |
+| deals | | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(stage), STRING\(owner), NUMBER\(value), [STRING\($people)]\(associated_people), STRING\(associated_company)&#125; </details> |  | true |
+| workspaces | | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace_id), STRING\(name), [STRING\($user)]\(users), STRING\(company), STRING\(avatar_url)&#125; </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Record",
+  "name" : "updateRecord",
+  "parameters" : {
+    "record_type" : "",
+    "record_id" : "",
+    "people" : {
+      "first_name" : "",
+      "last_name" : "",
+      "email_address" : "",
+      "description" : "",
+      "company" : "",
+      "job_title" : "",
+      "facebook" : "",
+      "instagram" : "",
+      "linkedin" : "",
+      "associated_deals" : [ "" ],
+      "associated_users" : [ "" ]
+    },
+    "companies" : {
+      "domains" : "",
+      "name" : "",
+      "description" : "",
+      "facebook" : "",
+      "instagram" : "",
+      "linkedin" : "",
+      "estimated_arr_usd" : "",
+      "foundation_date" : "2021-01-01",
+      "employee_range" : "",
+      "categories" : [ "" ],
+      "associated_deals" : [ "" ],
+      "associated_workspaces" : [ "" ]
+    },
+    "users" : {
+      "person" : "",
+      "email_address" : "",
+      "user_id" : "",
+      "workspace" : [ "" ]
+    },
+    "deals" : {
+      "name" : "",
+      "stage" : "",
+      "owner" : "",
+      "value" : 0.0,
+      "associated_people" : [ "" ],
+      "associated_company" : ""
+    },
+    "workspaces" : {
+      "workspace_id" : "",
+      "name" : "",
+      "users" : [ "" ],
+      "company" : "",
+      "avatar_url" : ""
+    }
+  },
+  "type" : "attio/v1/updateRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+## Triggers
+
+
+### Record Created
+Name: recordCreated
+
+`Triggers when new record is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| event_type | STRING | Type of an event that triggers the trigger. |
+| id | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace_id), STRING\(task_id)&#125; </details> |  |
+| actor | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(id)&#125; </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Record Created",
+  "name" : "recordCreated",
+  "type" : "attio/v1/recordCreated"
+}
+```
+
+
+### Task Created
+Name: taskCreated
+
+`Triggers when new task is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| event_type | STRING | Type of an event that triggers the trigger. |
+| id | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace_id), STRING\(task_id)&#125; </details> |  |
+| actor | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(id)&#125; </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Task Created",
+  "name" : "taskCreated",
+  "type" : "attio/v1/taskCreated"
+}
+```
+
+
+<hr />
+
