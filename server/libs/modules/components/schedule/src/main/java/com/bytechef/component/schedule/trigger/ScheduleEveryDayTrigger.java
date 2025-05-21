@@ -17,6 +17,7 @@
 package com.bytechef.component.schedule.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -24,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DAY_OF_WEEK;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.FIRE_TIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.HOUR;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.MINUTE;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
@@ -79,10 +81,12 @@ public class ScheduleEveryDayTrigger {
             outputSchema(
                 object()
                     .properties(
-                        string(DATETIME)
+                        string(FIRE_TIME)
                             .description(
                                 "The exact date and time when the trigger was activated, formatted according to the " +
                                     "specified timezone."),
+                        dateTime(DATETIME)
+                            .description("The date and time when the trigger was activated."),
                         integer(HOUR)
                             .description("The hour of the day (0-23) at which the workflow was set to trigger."),
                         integer(MINUTE)

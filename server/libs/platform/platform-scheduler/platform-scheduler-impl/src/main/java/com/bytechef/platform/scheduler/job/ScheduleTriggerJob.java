@@ -20,6 +20,8 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 import org.quartz.Job;
@@ -40,13 +42,17 @@ public class ScheduleTriggerJob implements Job {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
         Date fireTime = context.getFireTime();
 
+        LocalDateTime localDateTime = fireTime.toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
+
         eventPublisher.publishEvent(
             new TriggerListenerEvent(
                 new TriggerListenerEvent.ListenerParameters(
                     WorkflowExecutionId.parse(jobDataMap.getString("workflowExecutionId")),
                     fireTime.toInstant(),
                     MapUtils.concat(
-                        Map.of("datetime", fireTime),
+                        Map.of("fireTime", fireTime, "datetime", localDateTime),
                         JsonUtils.readMap(jobDataMap.getString("output"), Object.class)))));
     }
 

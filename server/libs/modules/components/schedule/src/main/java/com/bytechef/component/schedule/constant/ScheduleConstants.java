@@ -21,10 +21,11 @@ package com.bytechef.component.schedule.constant;
  */
 public class ScheduleConstants {
 
-    public static final String EXPRESSION = "expression";
     public static final String DAY_OF_MONTH = "dayOfMonth";
     public static final String DAY_OF_WEEK = "dayOfWeek";
     public static final String DATETIME = "datetime";
+    public static final String EXPRESSION = "expression";
+    public static final String FIRE_TIME = "fireTime";
     public static final String HOUR = "hour";
     public static final String INTERVAL = "interval";
     public static final String MINUTE = "minute";
