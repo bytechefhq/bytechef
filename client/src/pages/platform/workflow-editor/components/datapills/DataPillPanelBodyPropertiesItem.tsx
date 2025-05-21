@@ -127,7 +127,7 @@ const DataPillPanelBodyPropertiesItem = ({
                         />
 
                         <ul className="flex w-full flex-col space-y-2 border-l border-l-border/50 pl-4 group-data-[state=open]:h-full">
-                            {filteredProperties?.map((property) => {
+                            {filteredProperties?.map((property, index) => {
                                 let value;
 
                                 if (typeof sampleOutput === 'object' && property.name) {
@@ -137,7 +137,10 @@ const DataPillPanelBodyPropertiesItem = ({
                                 }
 
                                 return (
-                                    <div className="flex items-center space-x-3" key={property.name}>
+                                    <div
+                                        className="flex items-center space-x-3"
+                                        key={`${property.name}-${workflowNodeName}-${index}`}
+                                    >
                                         <DataPill
                                             componentIcon={icon}
                                             property={property}
