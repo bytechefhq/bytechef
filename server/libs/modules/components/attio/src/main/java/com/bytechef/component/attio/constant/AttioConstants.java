@@ -52,6 +52,7 @@ public class AttioConstants {
     public static final String TARGET_RECORD_ID = "target_record_id";
     public static final String USERS = "users";
     public static final String VALUE = "value";
+    public static final String VALUES = "values";
     public static final String WORKSPACES = "workspaces";
     public static final String WORKSPACE_MEMBER = "workspace-member";
 
@@ -82,100 +83,18 @@ public class AttioConstants {
     private AttioConstants() {
     }
 
-    public static ModifiableValueProperty<?, ?> getDealRecord(boolean isNewRecord) {
-        return object(DEALS)
-            .properties(
-                string("name")
-                    .label("Deal Name")
-                    .description("The name of the deal.")
-                    .required(isNewRecord),
-                string("stage")
-                    .label("Deal Stage")
-                    .description("The stage of the deal.")
-                    .options((ActionOptionsFunction<String>) AttioUtils::getDealStageIdOptions)
-                    .required(isNewRecord),
-                string("owner")
-                    .label("Deal Owner")
-                    .description("The owner of the deal.")
-                    .options((ActionOptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
-                    .required(isNewRecord),
-                number("value")
-                    .label("Deal Value")
-                    .description("The value of the deal.")
-                    .required(false),
-                array("associated_people")
-                    .label("Associated People")
-                    .description("The people associated with the deal.")
-                    .options(AttioUtils.getTargetRecordIdOptions(PEOPLE))
-                    .required(false)
-                    .items(
-                        string(PEOPLE)
-                            .label("People"))
-                    .required(false),
-                string("associated_company")
-                    .label("Associated Company")
-                    .description("The company associated with the deal.")
-                    .options(AttioUtils.getTargetRecordIdOptions(COMPANIES))
-                    .required(false));
-    }
-
-    public static ModifiableValueProperty<?, ?> getUserRecord(boolean isNewRecord) {
-        return object(USERS)
-            .properties(
-                string("person")
-                    .label("Person")
-                    .description("The person who will be the user.")
-                    .options(AttioUtils.getTargetRecordIdOptions(PEOPLE))
-                    .required(false),
-                string("email_address")
-                    .label("Email Address")
-                    .description("The email address of the user.")
-                    .required(isNewRecord),
-                string("user_id")
-                    .label("User ID")
-                    .description("The ID of the user.")
-                    .required(isNewRecord),
-                array("workspace")
-                    .label("Associated Workspaces")
-                    .description("The associated workspace of the company.")
-                    .options(AttioUtils.getTargetRecordIdOptions(WORKSPACES))
-                    .required(false)
-                    .items(
-                        string("workspace")
-                            .label("Workspace")
-                            .required(false)));
-    }
-
-    public static ModifiableValueProperty<?, ?> getWorkspaceRecord(boolean isNewRecord) {
-        return object(WORKSPACES)
-            .properties(
-                string("workspace_id")
-                    .label("Workspace ID")
-                    .description("The ID of the workspace.")
-                    .required(isNewRecord),
-                string("name")
-                    .label("Name")
-                    .description("The name of the workspace.")
-                    .required(false),
-                array("users")
-                    .label("Users")
-                    .description("The users in the workspace.")
-                    .options((ActionOptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
-                    .required(false)
-                    .items(
-                        string("user")
-                            .label("Users")
-                            .required(false)),
-                string("company")
-                    .label("Company")
-                    .description("The company of the workspace.")
-                    .options(AttioUtils.getTargetRecordIdOptions(COMPANIES))
-                    .required(false),
-                string("avatar_url")
-                    .label("Avatar URL")
-                    .description("The URL of the avatar of the workspace.")
-                    .required(false));
-    }
+    public static final ModifiableObjectProperty TRIGGER_OUTPUT = object()
+        .properties(
+            string("event_type")
+                .description("Type of an event that triggers the trigger."),
+            object(ID)
+                .properties(
+                    string("workspace_id"),
+                    string("task_id")),
+            object("actor")
+                .properties(
+                    string("type"),
+                    string(ID)));
 
     public static final ModifiableObjectProperty COMPANY_OUTPUT =
         object()

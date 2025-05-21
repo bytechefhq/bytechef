@@ -67,13 +67,12 @@ class AttioUpdateRecordActionTest {
             .thenReturn(responseMap);
 
         try (MockedStatic<AttioUtils> mockedAttioUtils = Mockito.mockStatic(AttioUtils.class)) {
-
             mockedAttioUtils
                 .when(() -> AttioUtils.getRecordValues(mapArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(responseMap);
 
-            Map<String, Object> result =
-                AttioUpdateRecordAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Map<String, Object> result = AttioUpdateRecordAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(responseMap, mapArgumentCaptor.getValue());
             assertEquals("test", stringArgumentCaptor.getValue());

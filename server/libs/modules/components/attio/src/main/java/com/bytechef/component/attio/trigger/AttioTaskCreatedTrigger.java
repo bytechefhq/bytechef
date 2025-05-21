@@ -17,12 +17,11 @@
 package com.bytechef.component.attio.trigger;
 
 import static com.bytechef.component.attio.constant.AttioConstants.ID;
+import static com.bytechef.component.attio.constant.AttioConstants.TRIGGER_OUTPUT;
 import static com.bytechef.component.attio.util.AttioUtils.getContent;
 import static com.bytechef.component.attio.util.AttioUtils.subscribeWebhook;
 import static com.bytechef.component.attio.util.AttioUtils.unsubscribeWebhook;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -45,20 +44,7 @@ public class AttioTaskCreatedTrigger {
         .title("Task Created")
         .description("Triggers when new task is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("event_type")
-                            .description("Type of an event that triggers the trigger."),
-                        object(ID)
-                            .properties(
-                                string("workspace_id"),
-                                string("task_id")),
-                        object("actor")
-                            .properties(
-                                string("type"),
-                                string(ID)))))
+        .output(outputSchema(TRIGGER_OUTPUT))
         .webhookEnable(AttioTaskCreatedTrigger::webhookEnable)
         .webhookDisable(AttioTaskCreatedTrigger::webhookDisable)
         .webhookRequest(AttioTaskCreatedTrigger::webhookRequest);
@@ -67,8 +53,8 @@ public class AttioTaskCreatedTrigger {
     }
 
     protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
 
         return new WebhookEnableOutput(Map.of(ID, subscribeWebhook("task.created", context, webhookUrl)), null);
     }

@@ -24,17 +24,24 @@ import static com.bytechef.component.attio.constant.AttioConstants.DEAL_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.ID;
 import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
 import static com.bytechef.component.attio.constant.AttioConstants.PERSON_OUTPUT;
+import static com.bytechef.component.attio.constant.AttioConstants.RECORD_ID;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
 import static com.bytechef.component.attio.constant.AttioConstants.TARGET_OBJECT;
+import static com.bytechef.component.attio.constant.AttioConstants.TARGET_RECORD_ID;
 import static com.bytechef.component.attio.constant.AttioConstants.USERS;
 import static com.bytechef.component.attio.constant.AttioConstants.USER_OUTPUT;
+import static com.bytechef.component.attio.constant.AttioConstants.VALUE;
 import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
-import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_MEMBER;
 import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_OUTPUT;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
@@ -57,6 +64,11 @@ import java.util.Objects;
  * @author Nikolina Spehar
  */
 public class AttioUtils {
+
+    public static final String FIRST_NAME = "first_name";
+    public static final String FULL_NAME = "full_name";
+    public static final String LAST_NAME = "last_name";
+    public static final String COMPANY = "company";
 
     public static ActionOptionsFunction<String> getCompanyIdOptions(String attribute) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
@@ -125,7 +137,7 @@ public class AttioUtils {
                 actorValueEmailList.getFirst() instanceof Map<?, ?> actorValueEmail) {
 
                 options.add(
-                    option((String) actorValueEmail.get("email_address"), (String) actorId.get("record_id")));
+                    option((String) actorValueEmail.get("email_address"), (String) actorId.get(RECORD_ID)));
             }
         }
 
@@ -180,10 +192,10 @@ public class AttioUtils {
                         !recordValueNameList.isEmpty() &&
                         recordValueNameList.getFirst() instanceof Map<?, ?> recordValueName) {
                         if (object.equals(PEOPLE)) {
-                            recordName = ((String) recordValueName.get("full_name")).isBlank() ? "Unnamed person"
-                                : (String) recordValueName.get("full_name");
+                            recordName = ((String) recordValueName.get(FULL_NAME)).isBlank() ? "Unnamed person"
+                                : (String) recordValueName.get(FULL_NAME);
                         } else {
-                            recordName = (String) recordValueName.get("value");
+                            recordName = (String) recordValueName.get(VALUE);
                         }
                     }
 
@@ -194,7 +206,7 @@ public class AttioUtils {
                         recordName = (String) recordValueEmail.get("email_address");
                     }
 
-                    recordIdOptions.add(option(recordName, (String) recordId.get("record_id")));
+                    recordIdOptions.add(option(recordName, (String) recordId.get(RECORD_ID)));
                 }
             }
 
@@ -215,7 +227,7 @@ public class AttioUtils {
 
         for (Map<String, Object> actor : actors.get(DATA)) {
             if (actor.get(ID) instanceof Map<?, ?> actorId) {
-                String fullName = actor.get("first_name") + " " + actor.get("last_name");
+                String fullName = actor.get(FIRST_NAME) + " " + actor.get(LAST_NAME);
 
                 options.add(option(fullName, (String) actorId.get("workspace_member_id")));
             }
@@ -254,8 +266,8 @@ public class AttioUtils {
         return value == null ? "" : value.toString();
     }
 
-    public static Map<String, Object> getRecordValues(Map<String, Object> recordMap, String record) {
-        HashMap<String, Object> values = new HashMap<>();
+    public static Map<String, Object> getRecordValues(Map<String, Object> recordMap, String recordType) {
+        Map<String, Object> values = new HashMap<>();
 
         for (Entry<String, Object> property : recordMap.entrySet()) {
             String key = property.getKey();
@@ -273,7 +285,7 @@ public class AttioUtils {
                     values.put(key, recordMap.get(key));
                     break;
                 case "user_id", "stage", "owner":
-                    if (record.equals(DEALS) && key.equals("owner")) {
+                    if (recordType.equals(DEALS) && key.equals("owner")) {
                         values.put(key, List.of(Map.of("referenced_actor_id", recordMap.get(key),
                             "referenced_actor_type", "workspace-member")));
                     } else {
@@ -281,19 +293,19 @@ public class AttioUtils {
                     }
                     break;
                 case "name", "description", "instagram", "facebook", "linkedin", "job_title":
-                    if (record.equals(DEALS) || record.equals(WORKSPACES)) {
+                    if (recordType.equals(DEALS) || recordType.equals(WORKSPACES)) {
                         values.put(key, recordMap.get(key));
                     } else {
-                        values.put(key, List.of(Map.of("value", recordMap.get(key))));
+                        values.put(key, List.of(Map.of(VALUE, recordMap.get(key))));
                     }
                     break;
                 case "foundation_date":
                     LocalDate foundationDate = LocalDate.parse(recordMap.get(key)
                         .toString());
-                    values.put(key, List.of(Map.of("value", foundationDate.toString())));
+                    values.put(key, List.of(Map.of(VALUE, foundationDate.toString())));
                     break;
                 case "email_address":
-                    if (record.equals(USERS)) {
+                    if (recordType.equals(USERS)) {
                         values.put("primary_email_address", recordMap.get(key));
                     } else {
                         values.put("email_addresses", List.of(recordMap.get(key)));
@@ -309,41 +321,40 @@ public class AttioUtils {
                             .map(category -> Map.of("option", category))
                             .toList());
                     break;
-
                 case "associated_deals":
                     if (recordMap.get(key) instanceof List<?> dealsList)
                         values.put(key, dealsList.stream()
-                            .map(deal -> Map.of("target_object", DEALS, "target_record_id", deal))
+                            .map(deal -> Map.of(TARGET_OBJECT, DEALS, TARGET_RECORD_ID, deal))
                             .toList());
                     break;
                 case "associated_users", "users":
                     if (recordMap.get(key) instanceof List<?> usersList)
                         values.put(key, usersList.stream()
-                            .map(user -> Map.of("target_object", USERS, "target_record_id", user))
+                            .map(user -> Map.of(TARGET_OBJECT, USERS, TARGET_RECORD_ID, user))
                             .toList());
                     break;
                 case "workspace", "associated_workspaces":
                     if (recordMap.get(key) instanceof List<?> workspacesList)
                         values.put(key, workspacesList.stream()
-                            .map(workspace -> Map.of("target_object", WORKSPACES, "target_record_id", workspace))
+                            .map(workspace -> Map.of(TARGET_OBJECT, WORKSPACES, TARGET_RECORD_ID, workspace))
                             .toList());
                     break;
                 case "associated_people":
                     if (recordMap.get(key) instanceof List<?> peopleList)
                         values.put("associated_people", peopleList.stream()
-                            .map(person -> Map.of("target_object", PEOPLE, "target_record_id", person))
+                            .map(person -> Map.of(TARGET_OBJECT, PEOPLE, TARGET_RECORD_ID, person))
                             .toList());
                     break;
                 case "person":
-                    values.put(key, Map.of("target_object", PEOPLE, "target_record_id", recordMap.get(key)));
+                    values.put(key, Map.of(TARGET_OBJECT, PEOPLE, TARGET_RECORD_ID, recordMap.get(key)));
                     break;
-                case "company", "associated_company":
-                    if (record.equals(WORKSPACES)) {
-                        values.put("company", Map.of("target_object", COMPANIES,
-                            "target_record_id", recordMap.get("company")));
+                case COMPANY, "associated_company":
+                    if (recordType.equals(WORKSPACES)) {
+                        values.put(COMPANY, Map.of(TARGET_OBJECT, COMPANIES,
+                            TARGET_RECORD_ID, recordMap.get(COMPANY)));
                     } else {
-                        values.put(key, List.of(Map.of("target_object", COMPANIES,
-                            "target_record_id", recordMap.get(key))));
+                        values.put(key, List.of(Map.of(TARGET_OBJECT, COMPANIES,
+                            TARGET_RECORD_ID, recordMap.get(key))));
                     }
                     break;
                 default:
@@ -351,26 +362,19 @@ public class AttioUtils {
             }
         }
 
-        if (record.equals(PEOPLE)) {
+        if (recordType.equals(PEOPLE)) {
             addNameToValues(recordMap, values);
         }
 
         return values;
     }
 
-    private static void addNameToValues(Map<String, Object> recordMap, HashMap<String, Object> values) {
-        String firstName = ifStringValueNull(recordMap.get("first_name"));
-        String lastName = ifStringValueNull(recordMap.get("last_name"));
+    private static void addNameToValues(Map<String, Object> recordMap, Map<String, Object> values) {
+        String firstName = ifStringValueNull(recordMap.get(FIRST_NAME));
+        String lastName = ifStringValueNull(recordMap.get(LAST_NAME));
         String fullName = firstName + " " + lastName;
 
-        values.put("name", List.of(Map.of("first_name", firstName, "last_name", lastName, "full_name", fullName)));
-    }
-
-    public static List<Map<String, Object>> getAssigneesList(List<Object> assignees) {
-
-        return assignees.stream()
-            .map(assignee -> Map.of("referenced_actor_type", WORKSPACE_MEMBER, "referenced_actor_id", assignee))
-            .toList();
+        values.put("name", List.of(Map.of(FIRST_NAME, firstName, LAST_NAME, lastName, FULL_NAME, fullName)));
     }
 
     public static OutputResponse getOutputSchema(
@@ -379,7 +383,7 @@ public class AttioUtils {
         return OutputResponse.of(getRecordOutput(inputParameters.getRequired(RECORD_TYPE, String.class)));
     }
 
-    public static ModifiableObjectProperty getRecordOutput(String recordType) {
+    private static ModifiableObjectProperty getRecordOutput(String recordType) {
         return switch (recordType) {
             case PEOPLE -> PERSON_OUTPUT;
             case COMPANIES -> COMPANY_OUTPUT;
@@ -388,5 +392,100 @@ public class AttioUtils {
             case DEALS -> DEAL_OUTPUT;
             default -> null;
         };
+    }
+
+    public static ModifiableValueProperty<?, ?> getDealRecord(boolean isNewRecord) {
+        return object(DEALS)
+            .properties(
+                string("name")
+                    .label("Deal Name")
+                    .description("The name of the deal.")
+                    .required(isNewRecord),
+                string("stage")
+                    .label("Deal Stage")
+                    .description("The stage of the deal.")
+                    .options((ActionOptionsFunction<String>) AttioUtils::getDealStageIdOptions)
+                    .required(isNewRecord),
+                string("owner")
+                    .label("Deal Owner")
+                    .description("The owner of the deal.")
+                    .options((ActionOptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
+                    .required(isNewRecord),
+                number(VALUE)
+                    .label("Deal Value")
+                    .description("The value of the deal.")
+                    .required(false),
+                array("associated_people")
+                    .label("Associated People")
+                    .description("The people associated with the deal.")
+                    .options(getTargetRecordIdOptions(PEOPLE))
+                    .required(false)
+                    .items(
+                        string(PEOPLE)
+                            .label("People"))
+                    .required(false),
+                string("associated_company")
+                    .label("Associated Company")
+                    .description("The company associated with the deal.")
+                    .options(getTargetRecordIdOptions(COMPANIES))
+                    .required(false));
+    }
+
+    public static ModifiableValueProperty<?, ?> getUserRecord(boolean isNewRecord) {
+        return object(USERS)
+            .properties(
+                string("person")
+                    .label("Person")
+                    .description("The person who will be the user.")
+                    .options(getTargetRecordIdOptions(PEOPLE))
+                    .required(false),
+                string("email_address")
+                    .label("Email Address")
+                    .description("The email address of the user.")
+                    .required(isNewRecord),
+                string("user_id")
+                    .label("User ID")
+                    .description("The ID of the user.")
+                    .required(isNewRecord),
+                array("workspace")
+                    .label("Associated Workspaces")
+                    .description("The associated workspace of the company.")
+                    .options(getTargetRecordIdOptions(WORKSPACES))
+                    .required(false)
+                    .items(
+                        string("workspace")
+                            .label("Workspace")
+                            .required(false)));
+    }
+
+    public static ModifiableValueProperty<?, ?> getWorkspaceRecord(boolean isNewRecord) {
+        return object(WORKSPACES)
+            .properties(
+                string("workspace_id")
+                    .label("Workspace ID")
+                    .description("The ID of the workspace.")
+                    .required(isNewRecord),
+                string("name")
+                    .label("Name")
+                    .description("The name of the workspace.")
+                    .required(false),
+                array(USERS)
+                    .label("Users")
+                    .description("The users in the workspace.")
+                    .options((ActionOptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
+                    .required(false)
+                    .items(
+                        string("user")
+                            .label("Users")
+                            .required(false)),
+                string("company")
+                    .label("Company")
+                    .description("The company of the workspace.")
+                    .options(getTargetRecordIdOptions(COMPANIES))
+                    .required(false),
+                string("avatar_url")
+                    .label("Avatar URL")
+                    .description("The URL of the avatar of the workspace.")
+                    .required(false));
     }
 }

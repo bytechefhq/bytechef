@@ -25,11 +25,12 @@ import static com.bytechef.component.attio.constant.AttioConstants.PERSON_RECORD
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_ID;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
 import static com.bytechef.component.attio.constant.AttioConstants.USERS;
+import static com.bytechef.component.attio.constant.AttioConstants.VALUES;
 import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
-import static com.bytechef.component.attio.constant.AttioConstants.getDealRecord;
-import static com.bytechef.component.attio.constant.AttioConstants.getUserRecord;
-import static com.bytechef.component.attio.constant.AttioConstants.getWorkspaceRecord;
+import static com.bytechef.component.attio.util.AttioUtils.getDealRecord;
 import static com.bytechef.component.attio.util.AttioUtils.getRecordValues;
+import static com.bytechef.component.attio.util.AttioUtils.getUserRecord;
+import static com.bytechef.component.attio.util.AttioUtils.getWorkspaceRecord;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -88,17 +89,14 @@ public class AttioUpdateRecordAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        String record = inputParameters.getRequiredString(RECORD_TYPE);
-        Map<String, Object> recordMap = inputParameters.getMap(record, Object.class, Map.of());
+        String recordType = inputParameters.getRequiredString(RECORD_TYPE);
+        Map<String, Object> recordMap = inputParameters.getMap(recordType, Object.class, Map.of());
 
-        Map<String, Object> values = getRecordValues(recordMap, record);
-
-        Map<String, Object> body = Map.of("values", values);
+        Map<String, Object> values = getRecordValues(recordMap, recordType);
 
         return context.http(http -> http.patch(
-            "/objects/%s/records/%s".formatted(
-                inputParameters.getRequiredString(RECORD_TYPE), inputParameters.getRequiredString(RECORD_ID))))
-            .body(Body.of(DATA, body))
+            "/objects/%s/records/%s".formatted(recordType, inputParameters.getRequiredString(RECORD_ID))))
+            .body(Body.of(DATA, Map.of(VALUES, values)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
