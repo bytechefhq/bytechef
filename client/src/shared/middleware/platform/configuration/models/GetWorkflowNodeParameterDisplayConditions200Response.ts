@@ -25,6 +25,12 @@ export interface GetWorkflowNodeParameterDisplayConditions200Response {
      * @memberof GetWorkflowNodeParameterDisplayConditions200Response
      */
     displayConditions?: { [key: string]: boolean; };
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GetWorkflowNodeParameterDisplayConditions200Response
+     */
+    missingRequiredProperties?: Array<string>;
 }
 
 /**
@@ -45,6 +51,7 @@ export function GetWorkflowNodeParameterDisplayConditions200ResponseFromJSONType
     return {
         
         'displayConditions': json['displayConditions'] == null ? undefined : json['displayConditions'],
+        'missingRequiredProperties': json['missingRequiredProperties'] == null ? undefined : json['missingRequiredProperties'],
     };
 }
 
@@ -60,6 +67,7 @@ export function GetWorkflowNodeParameterDisplayConditions200ResponseToJSONTyped(
     return {
         
         'displayConditions': value['displayConditions'],
+        'missingRequiredProperties': value['missingRequiredProperties'],
     };
 }
 

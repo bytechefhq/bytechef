@@ -37,6 +37,12 @@ export interface UpdateWorkflowNodeParameter200Response {
      * @memberof UpdateWorkflowNodeParameter200Response
      */
     displayConditions?: { [key: string]: boolean; };
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UpdateWorkflowNodeParameter200Response
+     */
+    missingRequiredProperties?: Array<string>;
 }
 
 /**
@@ -59,6 +65,7 @@ export function UpdateWorkflowNodeParameter200ResponseFromJSONTyped(json: any, i
         'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'parameters': json['parameters'] == null ? undefined : json['parameters'],
         'displayConditions': json['displayConditions'] == null ? undefined : json['displayConditions'],
+        'missingRequiredProperties': json['missingRequiredProperties'] == null ? undefined : json['missingRequiredProperties'],
     };
 }
 
@@ -76,6 +83,7 @@ export function UpdateWorkflowNodeParameter200ResponseToJSONTyped(value?: Update
         'metadata': value['metadata'],
         'parameters': value['parameters'],
         'displayConditions': value['displayConditions'],
+        'missingRequiredProperties': value['missingRequiredProperties'],
     };
 }
 
