@@ -1,6 +1,6 @@
 dependencies {
-    api("org.springframework.ai:spring-ai-client-chat:${rootProject.libs.versions.spring.ai.get()}")
-    api("org.springframework.ai:spring-ai-rag:${rootProject.libs.versions.spring.ai.get()}")
+    api("org.springframework.ai:spring-ai-client-chat")
+    api("org.springframework.ai:spring-ai-rag")
     api(project(":server:libs:platform:platform-api"))
     api(project(":sdks:backend:java:component-api"))
     api(project(":server:libs:core:exception:exception-api"))

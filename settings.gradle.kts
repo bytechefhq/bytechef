@@ -16,10 +16,6 @@ pluginManagement {
         maven {
             url = uri("https://repo.spring.io/release")
         }
-
-        maven {
-            url = uri("https://repo.spring.io/artifactory/milestone/")
-        }
     }
 }
 
