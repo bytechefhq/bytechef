@@ -17,7 +17,7 @@
 package com.bytechef.component.infobip.util;
 
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
-import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
+import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -63,7 +63,7 @@ class InfobipUtilsTest {
         Http.Body body = bodyArgumentCaptor.getValue();
 
         Map<String, Object> expectedBody = Map.of("channel", "SMS",
-            NUMBER, "number",
+            NUMBER_KEY, "numberKey",
             "forwarding", Map.of("type", "HTTP_FORWARD", "url", "webhookUrl"));
 
         assertEquals(expectedBody, body.getContent());
