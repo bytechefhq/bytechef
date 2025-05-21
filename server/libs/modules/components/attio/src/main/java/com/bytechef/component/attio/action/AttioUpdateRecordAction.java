@@ -80,7 +80,7 @@ public class AttioUpdateRecordAction {
             getWorkspaceRecord(false)
                 .displayCondition("%s == '%s'".formatted(RECORD_TYPE, WORKSPACES))
                 .required(true))
-        .output(AttioUtils::getOutputSchema)
+        .output()
         .perform(AttioUpdateRecordAction::perform);
 
     private AttioUpdateRecordAction() {
