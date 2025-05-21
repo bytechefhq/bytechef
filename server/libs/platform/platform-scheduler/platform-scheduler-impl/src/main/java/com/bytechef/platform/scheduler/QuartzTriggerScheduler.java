@@ -23,12 +23,10 @@ import com.bytechef.platform.scheduler.job.PollingTriggerJob;
 import com.bytechef.platform.scheduler.job.ScheduleTriggerJob;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.TimeZone;
-import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -95,19 +93,12 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
             .usingJobData("workflowExecutionId", workflowExecutionId.toString())
             .build();
 
-        CronExpression cronExpression;
-
-        try {
-            cronExpression = new CronExpression(pattern);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        cronExpression.setTimeZone(TimeZone.getTimeZone(ZoneId.of(zoneId)));
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(pattern)
+            .inTimeZone(TimeZone.getTimeZone(ZoneId.of(zoneId)));
 
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), "ScheduleTrigger"))
-            .withSchedule(CronScheduleBuilder.cronSchedule(pattern))
+            .withSchedule(cronScheduleBuilder)
             .startNow()
             .build();
 
