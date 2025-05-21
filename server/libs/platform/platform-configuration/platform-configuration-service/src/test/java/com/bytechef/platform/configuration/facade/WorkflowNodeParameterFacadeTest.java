@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Igor Beslic
+ * @author Ivica Cardic
  */
 public class WorkflowNodeParameterFacadeTest {
 
@@ -104,7 +105,7 @@ public class WorkflowNodeParameterFacadeTest {
         for (String expression : expressions) {
             Assertions.assertTrue(
                 WorkflowNodeParameterFacadeImpl.hasExpressionVariable(expression, "variableName"),
-                expression + " contains variableName");
+                expression + "doesn't contain variableName");
         }
 
         String[] noVariableNameExpressions = {
