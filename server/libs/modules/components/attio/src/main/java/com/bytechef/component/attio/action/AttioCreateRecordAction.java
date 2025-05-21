@@ -24,17 +24,17 @@ import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
 import static com.bytechef.component.attio.constant.AttioConstants.PERSON_RECORD;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
 import static com.bytechef.component.attio.constant.AttioConstants.USERS;
+import static com.bytechef.component.attio.constant.AttioConstants.VALUES;
 import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
-import static com.bytechef.component.attio.constant.AttioConstants.getDealRecord;
-import static com.bytechef.component.attio.constant.AttioConstants.getUserRecord;
-import static com.bytechef.component.attio.constant.AttioConstants.getWorkspaceRecord;
+import static com.bytechef.component.attio.util.AttioUtils.getDealRecord;
 import static com.bytechef.component.attio.util.AttioUtils.getRecordValues;
+import static com.bytechef.component.attio.util.AttioUtils.getUserRecord;
+import static com.bytechef.component.attio.util.AttioUtils.getWorkspaceRecord;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.attio.util.AttioUtils;
-import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -73,7 +73,7 @@ public class AttioCreateRecordAction {
             getWorkspaceRecord(true)
                 .displayCondition("%s == '%s'".formatted(RECORD_TYPE, WORKSPACES))
                 .required(true))
-        .output((OutputFunction) AttioUtils::getOutputSchema)
+        .output(AttioUtils::getOutputSchema)
         .perform(AttioCreateRecordAction::perform);
 
     private AttioCreateRecordAction() {
@@ -82,16 +82,13 @@ public class AttioCreateRecordAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        String record = inputParameters.getRequiredString(RECORD_TYPE);
-        Map<String, Object> recordMap = inputParameters.getMap(record, Object.class, Map.of());
+        String recordType = inputParameters.getRequiredString(RECORD_TYPE);
+        Map<String, Object> recordMap = inputParameters.getMap(recordType, Object.class, Map.of());
 
-        Map<String, Object> values = getRecordValues(recordMap, record);
+        Map<String, Object> values = getRecordValues(recordMap, recordType);
 
-        Map<String, Object> body = Map.of("values", values);
-
-        return context.http(http -> http.post(
-            "/objects/%s/records".formatted(inputParameters.getRequiredString(RECORD_TYPE))))
-            .body(Body.of(DATA, body))
+        return context.http(http -> http.post("/objects/%s/records".formatted(recordType)))
+            .body(Body.of(DATA, Map.of(VALUES, values)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

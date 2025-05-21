@@ -22,7 +22,9 @@ import static com.bytechef.component.attio.constant.AttioConstants.DATA;
 import static com.bytechef.component.attio.constant.AttioConstants.DEADLINE_AT;
 import static com.bytechef.component.attio.constant.AttioConstants.FORMAT;
 import static com.bytechef.component.attio.constant.AttioConstants.IS_COMPLETED;
-import static com.bytechef.component.attio.constant.AttioConstants.LINKED_RECORDS;
+import static com.bytechef.component.attio.constant.AttioConstants.REFERENCED_ACTOR_ID;
+import static com.bytechef.component.attio.constant.AttioConstants.REFERENCED_ACTOR_TYPE;
+import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_MEMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -53,8 +55,7 @@ class AttioCreateTaskActionTest {
     private final LocalDateTime localDateTime = LocalDateTime.of(2025, 5, 5, 10, 10, 0);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            DEADLINE_AT, localDateTime, CONTENT, "content", IS_COMPLETED, true,
-            LINKED_RECORDS, List.of(), ASSIGNEES, List.of()));
+            DEADLINE_AT, localDateTime, CONTENT, "content", IS_COMPLETED, true, ASSIGNEES, List.of("testAssignee")));
 
     @Test
     void testPerform() {
@@ -79,10 +80,10 @@ class AttioCreateTaskActionTest {
             DATA, Map.of(
                 CONTENT, "content",
                 FORMAT, "plaintext",
-                DEADLINE_AT, localDateTime.toString(),
+                DEADLINE_AT, localDateTime,
                 IS_COMPLETED, true,
-                LINKED_RECORDS, List.of(),
-                ASSIGNEES, List.of()));
+                ASSIGNEES,
+                List.of(Map.of(REFERENCED_ACTOR_TYPE, WORKSPACE_MEMBER, REFERENCED_ACTOR_ID, "testAssignee"))));
 
         assertEquals(expectedBody, body.getContent());
     }

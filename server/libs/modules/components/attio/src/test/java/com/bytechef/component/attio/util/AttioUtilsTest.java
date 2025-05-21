@@ -17,18 +17,12 @@
 package com.bytechef.component.attio.util;
 
 import static com.bytechef.component.attio.constant.AttioConstants.COMPANIES;
-import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.DATA;
 import static com.bytechef.component.attio.constant.AttioConstants.DEALS;
-import static com.bytechef.component.attio.constant.AttioConstants.DEAL_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.ID;
 import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
-import static com.bytechef.component.attio.constant.AttioConstants.PERSON_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.USERS;
-import static com.bytechef.component.attio.constant.AttioConstants.USER_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
-import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_MEMBER;
-import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_OUTPUT;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +32,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
@@ -402,53 +395,4 @@ class AttioUtilsTest {
 
         assertEquals(expected, result);
     }
-
-    @Test
-    void testGetAssigneesList() {
-        List<Object> mockAssignees = List.of("testAssignee", "testAssignee2");
-
-        List<Map<String, Object>> result = AttioUtils.getAssigneesList(mockAssignees);
-
-        List<Map<String, Object>> expected = List.of(
-            Map.of("referenced_actor_type", WORKSPACE_MEMBER, "referenced_actor_id", "testAssignee"),
-            Map.of("referenced_actor_type", WORKSPACE_MEMBER, "referenced_actor_id", "testAssignee2"));
-
-        assertEquals(expected, result);
-    }
-
-    @Test
-    void testGetOutputSchemaForCompany() {
-        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(COMPANIES);
-
-        assertEquals(COMPANY_OUTPUT, outputProperty);
-    }
-
-    @Test
-    void testGetOutputSchemaForWorkspace() {
-        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(WORKSPACES);
-
-        assertEquals(WORKSPACE_OUTPUT, outputProperty);
-    }
-
-    @Test
-    void testGetOutputSchemaForUser() {
-        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(USERS);
-
-        assertEquals(USER_OUTPUT, outputProperty);
-    }
-
-    @Test
-    void testGetOutputSchemaForPerson() {
-        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(PEOPLE);
-
-        assertEquals(PERSON_OUTPUT, outputProperty);
-    }
-
-    @Test
-    void testGetOutputSchemaForDeal() {
-        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(DEALS);
-
-        assertEquals(DEAL_OUTPUT, outputProperty);
-    }
-
 }

@@ -36,6 +36,7 @@ import org.mockito.MockedStatic;
  * @author Nikolina Spehar
  */
 public class AbstractAttioTriggerTest {
+
     protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
@@ -59,5 +60,4 @@ public class AbstractAttioTriggerTest {
     void afterEach() {
         attioUtilsMockedStatic.close();
     }
-
 }

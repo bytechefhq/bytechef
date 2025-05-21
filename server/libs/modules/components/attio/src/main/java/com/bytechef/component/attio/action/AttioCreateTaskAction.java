@@ -28,7 +28,7 @@ import static com.bytechef.component.attio.constant.AttioConstants.REFERENCED_AC
 import static com.bytechef.component.attio.constant.AttioConstants.REFERENCED_ACTOR_TYPE;
 import static com.bytechef.component.attio.constant.AttioConstants.TARGET_OBJECT;
 import static com.bytechef.component.attio.constant.AttioConstants.TARGET_RECORD_ID;
-import static com.bytechef.component.attio.util.AttioUtils.getAssigneesList;
+import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_MEMBER;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -46,7 +46,6 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -100,7 +99,7 @@ public class AttioCreateTaskAction {
             outputSchema(
                 object()
                     .properties(
-                        object("data")
+                        object(DATA)
                             .properties(
                                 object(ID)
                                     .properties(
@@ -147,22 +146,28 @@ public class AttioCreateTaskAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        List<Map<String, Object>> assignees =
-            getAssigneesList(inputParameters.getList(ASSIGNEES, Object.class, List.of()));
+        List<Map<String, Object>> assignees = getAssignees(
+            inputParameters.getList(ASSIGNEES, new TypeReference<>() {}));
 
         return context.http(http -> http.post("/tasks"))
             .body(
                 Body.of(
-                    DATA, Map.of(
+                    DATA, new Object[] {
                         CONTENT, inputParameters.getRequiredString(CONTENT),
                         FORMAT, "plaintext",
-                        DEADLINE_AT, inputParameters.getLocalDateTime(DEADLINE_AT, LocalDateTime.now())
-                            .toString(),
-                        IS_COMPLETED, inputParameters.getBoolean(IS_COMPLETED, false),
-                        LINKED_RECORDS, inputParameters.getList(LINKED_RECORDS, List.of()),
-                        ASSIGNEES, assignees)))
+                        DEADLINE_AT, inputParameters.getLocalDateTime(DEADLINE_AT),
+                        IS_COMPLETED, inputParameters.getBoolean(IS_COMPLETED),
+                        LINKED_RECORDS, inputParameters.getList(LINKED_RECORDS),
+                        ASSIGNEES, assignees
+                    }))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+    }
+
+    private static List<Map<String, Object>> getAssignees(List<Object> assignees) {
+        return assignees.stream()
+            .map(assignee -> Map.of(REFERENCED_ACTOR_TYPE, WORKSPACE_MEMBER, REFERENCED_ACTOR_ID, assignee))
+            .toList();
     }
 }

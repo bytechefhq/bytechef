@@ -71,8 +71,8 @@ class AttioCreateRecordActionTest {
                 .when(() -> AttioUtils.getRecordValues(mapArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(responseMap);
 
-            Map<String, Object> result =
-                AttioCreateRecordAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Map<String, Object> result = AttioCreateRecordAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(responseMap, mapArgumentCaptor.getValue());
             assertEquals("test", stringArgumentCaptor.getValue());
