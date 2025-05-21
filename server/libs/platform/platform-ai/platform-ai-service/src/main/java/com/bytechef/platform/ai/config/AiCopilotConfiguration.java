@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.ai.config;
 
+import com.bytechef.config.ApplicationProperties;
 import java.time.Duration;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,11 +37,21 @@ import org.springframework.web.client.RestClientException;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class AiCopilotConfiguration {
 
-    @Value("${spring.ai.openai.api-key}")
-    private String openAiApiKey;
+    private final String model;
+    private final String openAiApiKey;
 
-    @Value("${spring.ai.openai.chat.options.model}")
-    private String model;
+    private AiCopilotConfiguration(ApplicationProperties applicationProperties) {
+        this.model = applicationProperties.getAi()
+            .getCopilot()
+            .getOpenAi()
+            .getChat()
+            .getOptions()
+            .getModel();
+        this.openAiApiKey = applicationProperties.getAi()
+            .getCopilot()
+            .getOpenAi()
+            .getApiKey();
+    }
 
     @Bean
     OpenAiApi openAiApi() {
