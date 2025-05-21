@@ -17,13 +17,14 @@
 package com.bytechef.component.infobip.util;
 
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
-import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER_KEY;
+import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Monika Kušter
@@ -31,14 +32,15 @@ import java.util.Map;
 public class InfobipUtils {
 
     public static WebhookEnableOutput getWebhookEnableOutput(
-        String numberKey, String channel, String webhookUrl, TriggerContext triggerContext) {
+        String number, String channel, String webhookUrl, TriggerContext triggerContext) {
 
         Map<String, Object> body =
             triggerContext.http(http -> http.post("/resource-management/1/inbound-message-configurations"))
                 .body(
                     Http.Body.of(
+                        "keyword", String.valueOf(UUID.randomUUID()),
                         "channel", channel,
-                        NUMBER_KEY, numberKey,
+                        NUMBER, number,
                         "forwarding", Map.of("type", "HTTP_FORWARD", "url", webhookUrl)))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()

@@ -38,7 +38,7 @@ public class InfobipConstants {
     public static final String MESSAGE_COUNT = "messageCount";
     public static final String MESSAGE_ID = "messageId";
     public static final String NAME = "name";
-    public static final String NUMBER_KEY = "numberKey";
+    public static final String NUMBER = "number";
     public static final String SENDER = "sender";
     public static final String STATUS = "status";
     public static final String TEXT = "text";
