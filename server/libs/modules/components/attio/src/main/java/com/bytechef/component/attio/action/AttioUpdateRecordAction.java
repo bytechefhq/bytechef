@@ -94,8 +94,9 @@ public class AttioUpdateRecordAction {
 
         Map<String, Object> values = getRecordValues(recordMap, recordType);
 
-        return context.http(http -> http.patch(
-            "/objects/%s/records/%s".formatted(recordType, inputParameters.getRequiredString(RECORD_ID))))
+        return context.http(http -> http
+            .patch(
+                "/objects/%s/records/%s".formatted(recordType, inputParameters.getRequiredString(RECORD_ID))))
             .body(Body.of(DATA, Map.of(VALUES, values)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
