@@ -46,7 +46,11 @@ export default function getDataPillsFromProperties(
 
             const subProperties = properties?.length ? properties : items;
 
-            const value = `${nodeName}.${name ?? 'item'}`;
+            let value = `${nodeName}.${name ?? '[index]'}`;
+
+            if (value.includes('.[index]')) {
+                value = value.replace('.[index]', '[index]');
+            }
 
             if (subProperties?.length) {
                 const subResults = getSubProperties(componentDefinition.icon!, nodeName, subProperties, value);
