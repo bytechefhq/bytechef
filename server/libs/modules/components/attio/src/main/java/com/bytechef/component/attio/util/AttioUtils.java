@@ -160,7 +160,7 @@ public class AttioUtils {
             if (Objects.equals(targetObject, RECORD_TYPE)) {
                 object = inputParameters.getRequiredString(RECORD_TYPE);
             } else if (Objects.equals(targetObject, TARGET_OBJECT)) {
-                object = inputParameters.getRequiredString(TARGET_OBJECT);
+                object = inputParameters.getRequiredFromPath(lookupDependsOnPaths.get(TARGET_OBJECT), String.class);
             } else {
                 object = targetObject;
             }
