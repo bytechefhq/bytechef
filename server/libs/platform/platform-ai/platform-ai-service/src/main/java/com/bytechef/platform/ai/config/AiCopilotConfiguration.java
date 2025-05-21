@@ -40,17 +40,15 @@ public class AiCopilotConfiguration {
     private final String model;
     private final String openAiApiKey;
 
-    private AiCopilotConfiguration(ApplicationProperties applicationProperties) {
-        this.model = applicationProperties.getAi()
+    public AiCopilotConfiguration(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Ai.OpenAi openAi = applicationProperties.getAi()
             .getCopilot()
-            .getOpenAi()
-            .getChat()
+            .getOpenAi();
+
+        this.model = openAi.getChat()
             .getOptions()
             .getModel();
-        this.openAiApiKey = applicationProperties.getAi()
-            .getCopilot()
-            .getOpenAi()
-            .getApiKey();
+        this.openAiApiKey = openAi.getApiKey();
     }
 
     @Bean
