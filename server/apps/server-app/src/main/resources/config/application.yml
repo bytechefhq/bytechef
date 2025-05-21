@@ -100,6 +100,7 @@ spring:
     vectorstore:
       pgvector:
         initialize-schema: true
+        dimensions: 1536
   autoconfigure:
     exclude:
       org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration,
