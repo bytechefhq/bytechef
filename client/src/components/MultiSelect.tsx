@@ -32,7 +32,7 @@ export type MultiSelectOptionType = {
  * Uses class-variance-authority (cva) to define different styles based on "variant" prop.
  */
 const multiSelectVariants = cva(
-    'mb-1 mr-1 cursor-default text-xs font-normal shadow-none transition delay-150 duration-300 ease-in-out',
+    'mr-1 cursor-default text-xs font-normal shadow-none transition delay-150 duration-300 ease-in-out',
     {
         defaultVariants: {
             variant: 'default',
