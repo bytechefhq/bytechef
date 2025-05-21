@@ -1057,6 +1057,10 @@ paths:
                     type: "object"
                     additionalProperties:
                       type: "boolean"
+                  missingRequiredProperties:
+                    type: "array"
+                    items:
+                      type: "string"
   /workflows/{id}/parameters/{workflowNodeName}/display-conditions:
     get:
       description: "Get an action or trigger property options shown in the editor."
@@ -1089,6 +1093,10 @@ paths:
                     type: "object"
                     additionalProperties:
                       type: "boolean"
+                  missingRequiredProperties:
+                    type: "array"
+                    items:
+                      type: "string"
   /workflows/{id}/properties/{workflowNodeName}/options/{propertyName}:
     get:
       description: "Get an action or trigger property options shown in the editor."
