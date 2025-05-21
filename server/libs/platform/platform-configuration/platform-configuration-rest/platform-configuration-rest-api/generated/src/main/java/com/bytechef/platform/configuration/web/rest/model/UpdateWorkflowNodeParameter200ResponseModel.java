@@ -5,7 +5,10 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -23,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateWorkflowNodeParameter_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:40:37.705528+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T10:26:07.281755+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class UpdateWorkflowNodeParameter200ResponseModel {
 
   @Valid
@@ -34,6 +37,9 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
 
   @Valid
   private Map<String, Boolean> displayConditions = new HashMap<>();
+
+  @Valid
+  private List<String> missingRequiredProperties = new ArrayList<>();
 
   public UpdateWorkflowNodeParameter200ResponseModel metadata(Map<String, Object> metadata) {
     this.metadata = metadata;
@@ -119,6 +125,34 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
     this.displayConditions = displayConditions;
   }
 
+  public UpdateWorkflowNodeParameter200ResponseModel missingRequiredProperties(List<String> missingRequiredProperties) {
+    this.missingRequiredProperties = missingRequiredProperties;
+    return this;
+  }
+
+  public UpdateWorkflowNodeParameter200ResponseModel addMissingRequiredPropertiesItem(String missingRequiredPropertiesItem) {
+    if (this.missingRequiredProperties == null) {
+      this.missingRequiredProperties = new ArrayList<>();
+    }
+    this.missingRequiredProperties.add(missingRequiredPropertiesItem);
+    return this;
+  }
+
+  /**
+   * Get missingRequiredProperties
+   * @return missingRequiredProperties
+   */
+  
+  @Schema(name = "missingRequiredProperties", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("missingRequiredProperties")
+  public List<String> getMissingRequiredProperties() {
+    return missingRequiredProperties;
+  }
+
+  public void setMissingRequiredProperties(List<String> missingRequiredProperties) {
+    this.missingRequiredProperties = missingRequiredProperties;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -130,12 +164,13 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
     UpdateWorkflowNodeParameter200ResponseModel updateWorkflowNodeParameter200Response = (UpdateWorkflowNodeParameter200ResponseModel) o;
     return Objects.equals(this.metadata, updateWorkflowNodeParameter200Response.metadata) &&
         Objects.equals(this.parameters, updateWorkflowNodeParameter200Response.parameters) &&
-        Objects.equals(this.displayConditions, updateWorkflowNodeParameter200Response.displayConditions);
+        Objects.equals(this.displayConditions, updateWorkflowNodeParameter200Response.displayConditions) &&
+        Objects.equals(this.missingRequiredProperties, updateWorkflowNodeParameter200Response.missingRequiredProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(metadata, parameters, displayConditions);
+    return Objects.hash(metadata, parameters, displayConditions, missingRequiredProperties);
   }
 
   @Override
@@ -145,6 +180,7 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
     sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    displayConditions: ").append(toIndentedString(displayConditions)).append("\n");
+    sb.append("    missingRequiredProperties: ").append(toIndentedString(missingRequiredProperties)).append("\n");
     sb.append("}");
     return sb.toString();
   }
