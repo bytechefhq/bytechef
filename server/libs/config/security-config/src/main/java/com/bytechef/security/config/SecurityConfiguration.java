@@ -174,7 +174,8 @@ public class SecurityConfiguration {
             .logout(logout -> logout
                 .logoutUrl("/api/logout")
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                .permitAll());
+                .permitAll())
+            .httpBasic(AbstractHttpConfigurer::disable);
 
         http.with(filterBeforeContributorConfigurer(filterBeforeContributors), withDefaults());
 
