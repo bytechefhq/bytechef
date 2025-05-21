@@ -17,22 +17,21 @@
 package com.bytechef.component.attio.util;
 
 import static com.bytechef.component.attio.constant.AttioConstants.COMPANIES;
-import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_OUTPUT;
+import static com.bytechef.component.attio.constant.AttioConstants.COMPANY;
 import static com.bytechef.component.attio.constant.AttioConstants.DATA;
 import static com.bytechef.component.attio.constant.AttioConstants.DEALS;
-import static com.bytechef.component.attio.constant.AttioConstants.DEAL_OUTPUT;
+import static com.bytechef.component.attio.constant.AttioConstants.FIRST_NAME;
+import static com.bytechef.component.attio.constant.AttioConstants.FULL_NAME;
 import static com.bytechef.component.attio.constant.AttioConstants.ID;
+import static com.bytechef.component.attio.constant.AttioConstants.LAST_NAME;
 import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
-import static com.bytechef.component.attio.constant.AttioConstants.PERSON_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_ID;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
 import static com.bytechef.component.attio.constant.AttioConstants.TARGET_OBJECT;
 import static com.bytechef.component.attio.constant.AttioConstants.TARGET_RECORD_ID;
 import static com.bytechef.component.attio.constant.AttioConstants.USERS;
-import static com.bytechef.component.attio.constant.AttioConstants.USER_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.VALUE;
 import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
-import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_OUTPUT;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -40,7 +39,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -51,7 +49,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,11 +61,6 @@ import java.util.Objects;
  * @author Nikolina Spehar
  */
 public class AttioUtils {
-
-    public static final String FIRST_NAME = "first_name";
-    public static final String FULL_NAME = "full_name";
-    public static final String LAST_NAME = "last_name";
-    public static final String COMPANY = "company";
 
     public static ActionOptionsFunction<String> getCompanyIdOptions(String attribute) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
@@ -192,8 +184,9 @@ public class AttioUtils {
                         !recordValueNameList.isEmpty() &&
                         recordValueNameList.getFirst() instanceof Map<?, ?> recordValueName) {
                         if (object.equals(PEOPLE)) {
-                            recordName = ((String) recordValueName.get(FULL_NAME)).isBlank() ? "Unnamed person"
-                                : (String) recordValueName.get(FULL_NAME);
+                            recordName =
+                                ((String) recordValueName.get(FULL_NAME)).isBlank() ? "Unnamed person"
+                                    : (String) recordValueName.get(FULL_NAME);
                         } else {
                             recordName = (String) recordValueName.get(VALUE);
                         }
@@ -374,24 +367,8 @@ public class AttioUtils {
         String lastName = ifStringValueNull(recordMap.get(LAST_NAME));
         String fullName = firstName + " " + lastName;
 
-        values.put("name", List.of(Map.of(FIRST_NAME, firstName, LAST_NAME, lastName, FULL_NAME, fullName)));
-    }
-
-    public static OutputResponse getOutputSchema(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        return OutputResponse.of(getRecordOutput(inputParameters.getRequired(RECORD_TYPE, String.class)));
-    }
-
-    private static ModifiableObjectProperty getRecordOutput(String recordType) {
-        return switch (recordType) {
-            case PEOPLE -> PERSON_OUTPUT;
-            case COMPANIES -> COMPANY_OUTPUT;
-            case WORKSPACES -> WORKSPACE_OUTPUT;
-            case USERS -> USER_OUTPUT;
-            case DEALS -> DEAL_OUTPUT;
-            default -> null;
-        };
+        values.put("name",
+            List.of(Map.of(FIRST_NAME, firstName, LAST_NAME, lastName, FULL_NAME, fullName)));
     }
 
     public static ModifiableValueProperty<?, ?> getDealRecord(boolean isNewRecord) {

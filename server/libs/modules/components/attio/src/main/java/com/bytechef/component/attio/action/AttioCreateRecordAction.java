@@ -73,7 +73,7 @@ public class AttioCreateRecordAction {
             getWorkspaceRecord(true)
                 .displayCondition("%s == '%s'".formatted(RECORD_TYPE, WORKSPACES))
                 .required(true))
-        .output(AttioUtils::getOutputSchema)
+        .output()
         .perform(AttioCreateRecordAction::perform);
 
     private AttioCreateRecordAction() {
