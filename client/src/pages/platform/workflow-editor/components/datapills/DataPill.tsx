@@ -82,9 +82,15 @@ const DataPill = ({
             ? `${parentPropertyName}.${propertyName}`
             : `${propertyName || workflowNodeName}`;
 
-        const value = propertyName
-            ? `${workflowNodeName}.${(path || dataPillName).replaceAll('/', '.').replaceAll('.[index]', '[0]')}`
-            : workflowNodeName;
+        let value = workflowNodeName;
+
+        if (propertyName) {
+            value = `${workflowNodeName}.${path || dataPillName}`;
+        }
+
+        if (value.includes('/')) {
+            value = value.replaceAll('/', '.').replaceAll('.[index]', '[0]');
+        }
 
         const parameters = currentComponent?.parameters || {};
 
