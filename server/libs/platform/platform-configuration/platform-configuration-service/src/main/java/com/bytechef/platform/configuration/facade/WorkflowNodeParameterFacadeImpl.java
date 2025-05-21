@@ -29,6 +29,7 @@ import com.bytechef.platform.component.domain.DynamicPropertiesProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
 import com.bytechef.platform.component.domain.OptionsDataSource;
 import com.bytechef.platform.component.domain.OptionsDataSourceAware;
+import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.PropertiesDataSource;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
@@ -159,7 +160,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         // For now only check the first, root level of properties on which other properties could depend on
 
-        checkDependOn(parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
+        checkDependOn(
+            parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
             dynamicPropertyTypesMap);
 
         Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
@@ -745,7 +747,62 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             properties = triggerDefinition.getProperties();
         }
 
-        return new WorkflowNodeStructure(operationType, parameterMap, properties);
+        List<String> missingRequiredProperties = new ArrayList<>();
+
+        if (parameterMap != null && properties != null) {
+            checkRequiredProperties(properties, parameterMap, "", missingRequiredProperties);
+        }
+
+        return new WorkflowNodeStructure(operationType, parameterMap, properties, missingRequiredProperties);
+    }
+
+    private void checkRequiredProperties(
+        List<?> properties, Map<?, ?> parameterMap, String prefix, List<String> missingRequiredProperties) {
+
+        for (Object prop : properties) {
+            if (!(prop instanceof BaseProperty property)) {
+                continue;
+            }
+
+            String propertyName = property.getName();
+
+            String propertyPath = prefix.isEmpty() ? propertyName : prefix + "." + propertyName;
+
+            if (property.getRequired() && !parameterMap.containsKey(propertyName)) {
+                missingRequiredProperties.add(propertyPath);
+            } else if (parameterMap.containsKey(propertyName)) {
+                // Check nested properties
+                if (property instanceof ObjectProperty objectProperty) {
+                    List<?> nestedProperties = objectProperty.getProperties();
+
+                    if (nestedProperties != null && !nestedProperties.isEmpty()) {
+                        Object value = parameterMap.get(propertyName);
+
+                        if (value instanceof Map) {
+                            checkRequiredProperties(
+                                nestedProperties, (Map<?, ?>) value, propertyPath, missingRequiredProperties);
+                        }
+                    }
+                } else if (property instanceof ArrayProperty arrayProperty) {
+                    List<?> items = arrayProperty.getItems();
+                    if (items != null && !items.isEmpty()) {
+                        Object value = parameterMap.get(propertyName);
+
+                        if (value instanceof List<?> list) {
+                            for (int i = 0; i < list.size(); i++) {
+                                Object item = list.get(i);
+
+                                if (item instanceof Map) {
+                                    checkRequiredProperties(
+                                        items, (Map<?, ?>) item, propertyPath + "[" + i + "]",
+                                        missingRequiredProperties);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -891,7 +948,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressFBWarnings("EI")
     private record WorkflowNodeStructure(
-        OperationType operationType, Map<String, ?> parameterMap, List<? extends BaseProperty> properties) {
+        OperationType operationType, Map<String, ?> parameterMap, List<? extends BaseProperty> properties,
+        List<String> missingRequiredProperties) {
 
         enum OperationType {
             TASK,
