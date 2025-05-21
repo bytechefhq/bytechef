@@ -7,7 +7,7 @@
     "metadata" : null,
     "name" : "createRecord",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -1981,12 +1981,12 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
-      "required" : false,
+      "required" : true,
       "type" : "DATE_TIME"
     }, {
       "advancedOption" : null,
       "controlType" : "SELECT",
-      "defaultValue" : null,
+      "defaultValue" : false,
       "description" : "Weather the task completed.",
       "displayCondition" : null,
       "exampleValue" : null,
@@ -2005,7 +2005,7 @@
         "value" : false
       } ],
       "placeholder" : null,
-      "required" : false,
+      "required" : true,
       "type" : "BOOLEAN"
     }, {
       "advancedOption" : null,
@@ -2042,7 +2042,7 @@
           "exampleValue" : null,
           "expressionEnabled" : null,
           "hidden" : null,
-          "label" : "Target object",
+          "label" : "Target Object",
           "languageId" : null,
           "maxLength" : null,
           "metadata" : { },
@@ -2092,7 +2092,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
-      "required" : false,
+      "required" : true,
       "type" : "ARRAY"
     }, {
       "advancedOption" : null,
@@ -2112,16 +2112,16 @@
         "exampleValue" : null,
         "expressionEnabled" : null,
         "hidden" : null,
-        "label" : "Assignee",
+        "label" : null,
         "languageId" : null,
         "maxLength" : null,
         "metadata" : { },
         "minLength" : null,
-        "name" : "assignee",
+        "name" : null,
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
-        "required" : true,
+        "required" : null,
         "type" : "STRING"
       } ],
       "label" : "Assignees",
@@ -2149,7 +2149,7 @@
     "metadata" : null,
     "name" : "updateRecord",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -3287,7 +3287,7 @@
     "help" : null,
     "name" : "createRecord",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -5261,12 +5261,12 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
-      "required" : false,
+      "required" : true,
       "type" : "DATE_TIME"
     }, {
       "advancedOption" : null,
       "controlType" : "SELECT",
-      "defaultValue" : null,
+      "defaultValue" : false,
       "description" : "Weather the task completed.",
       "displayCondition" : null,
       "exampleValue" : null,
@@ -5285,7 +5285,7 @@
         "value" : false
       } ],
       "placeholder" : null,
-      "required" : false,
+      "required" : true,
       "type" : "BOOLEAN"
     }, {
       "advancedOption" : null,
@@ -5322,7 +5322,7 @@
           "exampleValue" : null,
           "expressionEnabled" : null,
           "hidden" : null,
-          "label" : "Target object",
+          "label" : "Target Object",
           "languageId" : null,
           "maxLength" : null,
           "metadata" : { },
@@ -5372,7 +5372,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
-      "required" : false,
+      "required" : true,
       "type" : "ARRAY"
     }, {
       "advancedOption" : null,
@@ -5392,16 +5392,16 @@
         "exampleValue" : null,
         "expressionEnabled" : null,
         "hidden" : null,
-        "label" : "Assignee",
+        "label" : null,
         "languageId" : null,
         "maxLength" : null,
         "metadata" : { },
         "minLength" : null,
-        "name" : "assignee",
+        "name" : null,
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
-        "required" : true,
+        "required" : null,
         "type" : "STRING"
       } ],
       "label" : "Assignees",
@@ -5433,7 +5433,7 @@
     "help" : null,
     "name" : "updateRecord",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
