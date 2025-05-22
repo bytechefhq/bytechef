@@ -1,14 +1,17 @@
+import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ActionDefinition,
     ActionDefinitionApi,
+    ClusterElementDefinitionApi,
     ComponentDefinition,
     TriggerDefinition,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
+import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
-import {ClickedOperationType, NodeDataType, PropertyAllType} from '@/shared/types';
+import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
@@ -17,8 +20,11 @@ import InlineSVG from 'react-inlinesvg';
 import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
+import {convertNameToCamelCase} from '../../ai-agent-editor/utils/clusterElementsUtils';
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import calculateNodeInsertIndex from '../utils/calculateNodeInsertIndex';
 import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
@@ -28,16 +34,20 @@ import handleTaskDispatcherSubtaskOperationClick from '../utils/handleTaskDispat
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesPopoverMenuOperationListProps {
+    clusterElementType?: string;
     componentDefinition: ComponentDefinition;
     edgeId?: string;
+    rootClusterElementDefinition?: ComponentDefinition;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
     trigger?: boolean;
 }
 
 const WorkflowNodesPopoverMenuOperationList = ({
+    clusterElementType,
     componentDefinition,
     edgeId,
+    rootClusterElementDefinition,
     setPopoverOpen,
     sourceNodeId,
     trigger,
@@ -50,6 +60,11 @@ const WorkflowNodesPopoverMenuOperationList = ({
             nodes: state.nodes,
         }))
     );
+
+    const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
+        useWorkflowEditorStore();
+
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {captureComponentUsed} = useAnalytics();
 
@@ -67,13 +82,16 @@ const WorkflowNodesPopoverMenuOperationList = ({
         (operation: ClickedOperationType, definition: ActionDefinition | TriggerDefinition) => {
             const {componentLabel, componentName, icon, operationName, version} = operation;
 
+            const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(componentName);
+
             return {
-                ...(componentName === 'aiAgent'
+                ...(isRootClusterElement
                     ? {
                           clusterElements: {},
                       }
                     : {}),
                 componentName,
+                componentVersion: version,
                 icon: icon ? (
                     <InlineSVG className="size-9 text-gray-700" src={icon} />
                 ) : (
@@ -114,6 +132,77 @@ const WorkflowNodesPopoverMenuOperationList = ({
         [projectId, queryClient, updateWorkflowMutation, workflow]
     );
 
+    const saveClusterElementToWorkflow = useCallback(
+        (clusterElementData: ClusterElementItemType, objectKey: string, isMultipleElements: boolean) => {
+            if (!workflow.definition) {
+                return;
+            }
+
+            const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+
+            const currentClusterRootTask = workflowDefinitionTasks?.find(
+                (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
+            );
+            const existingClusterElements = currentClusterRootTask?.clusterElements;
+
+            const clusterElements = {...(existingClusterElements || {})};
+
+            if (isMultipleElements) {
+                clusterElements[objectKey] = [
+                    ...(Array.isArray(clusterElements[objectKey]) ? clusterElements[objectKey] : []),
+                    clusterElementData,
+                ];
+            } else {
+                clusterElements[objectKey] = clusterElementData;
+            }
+
+            const updatedNodeData = {
+                ...currentClusterRootTask,
+                clusterElements,
+            };
+
+            setRootClusterElementNodeData({
+                ...rootClusterElementNodeData,
+                clusterElements,
+            } as typeof rootClusterElementNodeData);
+
+            if (currentNode?.rootClusterElement) {
+                setCurrentNode({
+                    ...currentNode,
+                    clusterElements,
+                });
+            }
+
+            saveWorkflowDefinition({
+                nodeData: updatedNodeData,
+
+                onSuccess: () => {
+                    handleComponentAddedSuccess({
+                        nodeData: updatedNodeData,
+                        queryClient,
+                        workflow,
+                    });
+                },
+                projectId: +projectId!,
+                queryClient,
+                updateWorkflowMutation,
+            });
+
+            setPopoverOpen(false);
+        },
+        [
+            rootClusterElementNodeData,
+            setRootClusterElementNodeData,
+            currentNode,
+            projectId,
+            queryClient,
+            updateWorkflowMutation,
+            setPopoverOpen,
+            setCurrentNode,
+            workflow,
+        ]
+    );
+
     const handleOperationClick = useCallback(
         async (clickedOperation: ClickedOperationType) => {
             if (!componentDefinition) {
@@ -142,6 +231,54 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 const newTriggerNodeData = getNodeData(clickedOperation, clickedComponentTriggerDefinition);
 
                 saveNodeToWorkflow(newTriggerNodeData, 0);
+
+                setPopoverOpen(false);
+
+                return;
+            }
+
+            if (clusterElementsCanvasOpen && clusterElementType) {
+                captureComponentUsed(componentName, undefined, operationName);
+
+                const objectKey = clusterElementType;
+
+                const currentClusterElementDefinition = rootClusterElementDefinition?.clusterElementTypes?.find(
+                    (clusterElementType) => convertNameToCamelCase(clusterElementType.name as string) === objectKey
+                );
+
+                if (!currentClusterElementDefinition) {
+                    console.error(`Unknown cluster element type: ${objectKey}`);
+                    return;
+                }
+
+                const isMultipleElements = !!currentClusterElementDefinition.multipleElements;
+
+                const getClusterElementDefinitionRequest = {
+                    componentName: componentName,
+                    componentVersion: version,
+                    // eslint-disable-next-line sort-keys
+                    clusterElementName: isMultipleElements ? operationName : objectKey,
+                };
+
+                const clickedClusterElementDefinition = await queryClient.fetchQuery({
+                    queryFn: () =>
+                        new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
+                            getClusterElementDefinitionRequest
+                        ),
+                    queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(getClusterElementDefinitionRequest),
+                });
+
+                const clusterElementData = {
+                    label: clickedOperation.componentLabel,
+                    name: getFormattedName(componentName),
+                    parameters:
+                        getParametersWithDefaultValues({
+                            properties: clickedClusterElementDefinition?.properties as Array<PropertyAllType>,
+                        }) || {},
+                    type: `${componentName}/v${version}/${operationName}`,
+                };
+
+                saveClusterElementToWorkflow(clusterElementData, objectKey, isMultipleElements);
 
                 setPopoverOpen(false);
 
@@ -207,7 +344,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         updateWorkflowMutation,
                         workflow,
                     });
-                } else {
+                } else if (!clusterElementsCanvasOpen) {
                     const placeholderNode = nodes.find((node) => node.id === sourceNodeId);
 
                     if (!placeholderNode) {
@@ -240,20 +377,24 @@ const WorkflowNodesPopoverMenuOperationList = ({
         },
         [
             componentDefinition,
-            getNodeData,
-            saveNodeToWorkflow,
-            trigger,
-            edgeId,
-            sourceNodeId,
-            nodes,
-            edges,
-            workflow,
-            projectId,
-            queryClient,
-            updateWorkflowMutation,
-            captureComponentUsed,
             setLatestComponentDefinition,
+            trigger,
+            clusterElementsCanvasOpen,
+            edgeId,
+            queryClient,
+            getNodeData,
+            captureComponentUsed,
+            saveNodeToWorkflow,
             setPopoverOpen,
+            clusterElementType,
+            rootClusterElementDefinition?.clusterElementTypes,
+            saveClusterElementToWorkflow,
+            workflow,
+            edges,
+            nodes,
+            projectId,
+            updateWorkflowMutation,
+            sourceNodeId,
         ]
     );
 

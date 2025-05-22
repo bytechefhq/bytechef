@@ -1,15 +1,15 @@
-import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ScrollArea} from '@/components/ui/scroll-area';
 import {
     ClusterElementDefinitionBasic,
     ComponentDefinition,
     ComponentDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
-import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {ClickedDefinitionType, ClusterElementsType} from '@/shared/types';
+import {
+    ComponentDefinitionKeys,
+    useGetComponentDefinitionQuery,
+} from '@/shared/queries/platform/componentDefinitions.queries';
+import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {ComponentIcon} from 'lucide-react';
 import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -17,6 +17,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleClusterElementClick from '../utils/handleClusterElementClick';
 import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
@@ -24,9 +25,10 @@ import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuCom
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
 
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
-    clusterElementsData?: ClusterElementsType;
+    clusterElementType?: string;
     edgeId?: string;
     hideActionComponents?: boolean;
+    hideClusterElementComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     nodeIndex?: number;
@@ -36,9 +38,10 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
 
 const WorkflowNodesPopoverMenu = ({
     children,
-    clusterElementsData,
+    clusterElementType,
     edgeId,
     hideActionComponents = false,
+    hideClusterElementComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
     nodeIndex,
@@ -59,6 +62,8 @@ const WorkflowNodesPopoverMenu = ({
         }))
     );
 
+    const {rootClusterElementNodeData} = useWorkflowEditorStore();
+
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const queryClient = useQueryClient();
@@ -73,9 +78,23 @@ const WorkflowNodesPopoverMenu = ({
         setComponentDefinitionToBeAdded(null);
     }, []);
 
+    const rootClusterElementComponentVersion = rootClusterElementNodeData?.type
+        ? parseInt(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, ''))
+        : 1;
+
+    const rootClusterElementComponentName = rootClusterElementNodeData?.componentName || '';
+
+    const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
+        {
+            componentName: rootClusterElementComponentName || '',
+            componentVersion: rootClusterElementComponentVersion || 1,
+        },
+        !!rootClusterElementNodeData && rootClusterElementNodeData?.rootClusterElement
+    );
+
     const handleComponentClick = useCallback(
         async (clickedItem: ClickedDefinitionType) => {
-            const {componentVersion, name, taskDispatcher, trigger, version} = clickedItem;
+            const {clusterElement, componentVersion, name, taskDispatcher, trigger, version} = clickedItem;
 
             if (taskDispatcher) {
                 const edge = edges.find((edge) => edge.id === edgeId);
@@ -105,6 +124,31 @@ const WorkflowNodesPopoverMenu = ({
 
             if (trigger) {
                 setTrigger(true);
+            }
+
+            if (
+                clusterElement &&
+                (!('actionsCount' in clickedItem) || !clickedItem.actionsCount) &&
+                rootClusterElementDefinition
+            ) {
+                if (projectId && clickedItem) {
+                    const clusterData = {
+                        ...clickedItem,
+                        componentName: clickedItem.componentName,
+                    } as ClusterElementDefinitionBasic;
+
+                    handleClusterElementClick({
+                        data: clusterData,
+                        projectId,
+                        queryClient,
+                        rootClusterElementDefinition,
+                        setPopoverOpen,
+                        updateWorkflowMutation,
+                    });
+                }
+
+                setPopoverOpen(false);
+                return;
             }
 
             const clickedComponentDefinition = await queryClient.fetchQuery({
@@ -170,71 +214,25 @@ const WorkflowNodesPopoverMenu = ({
                 sideOffset={-34}
             >
                 <div className="nowheel flex w-full rounded-lg bg-surface-neutral-secondary">
-                    {sourceData && sourceData.length > 0 && (
-                        <div className="flex w-full flex-col">
-                            <header className="flex items-center gap-1 rounded-t-lg bg-white p-3 text-center">
-                                <Input disabled name="workflowNodeFilter" placeholder="Search AI models" />
-                            </header>
+                    <WorkflowNodesPopoverMenuComponentList
+                        actionPanelOpen={actionPanelOpen}
+                        edgeId={edgeId}
+                        handleComponentClick={handleComponentClick}
+                        hideActionComponents={hideActionComponents}
+                        hideClusterElementComponents={hideClusterElementComponents}
+                        hideTaskDispatchers={hideTaskDispatchers}
+                        hideTriggerComponents={hideTriggerComponents}
+                        selectedComponentName={componentDefinitionToBeAdded?.name}
+                        sourceData={sourceData}
+                        sourceNodeId={sourceNodeId}
+                    />
 
-                            <ScrollArea className="w-full overflow-y-auto">
-                                <ul className="h-96 space-y-2 rounded-br-lg bg-muted p-3">
-                                    {sourceData?.map((data, index) => (
-                                        <li
-                                            className="flex cursor-pointer items-center gap-2 space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 hover:border-blue-200"
-                                            key={index}
-                                            onClick={() => {
-                                                if (clusterElementsData && projectId && sourceNode) {
-                                                    handleClusterElementClick({
-                                                        clusterElementsData,
-                                                        data,
-                                                        projectId,
-                                                        queryClient,
-                                                        setPopoverOpen,
-                                                        sourceNode,
-                                                        updateWorkflowMutation,
-                                                    });
-                                                }
-                                            }}
-                                        >
-                                            {data.icon ? data.icon : <ComponentIcon />}
-
-                                            <div className="flex flex-col gap-2 text-start">
-                                                <div>
-                                                    <span className="text-sm font-bold">{data.componentName}</span>
-
-                                                    {data.type === 'TOOLS' && (
-                                                        <span className="text-xs"> #{data.name}</span>
-                                                    )}
-                                                </div>
-
-                                                <p className="break-words text-xs text-muted-foreground">
-                                                    {data.description ? data.description : 'Description'}
-                                                </p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </ScrollArea>
-                        </div>
-                    )}
-
-                    {!sourceData && (
-                        <WorkflowNodesPopoverMenuComponentList
-                            actionPanelOpen={actionPanelOpen}
-                            edgeId={edgeId}
-                            handleComponentClick={handleComponentClick}
-                            hideActionComponents={hideActionComponents}
-                            hideTaskDispatchers={hideTaskDispatchers}
-                            hideTriggerComponents={hideTriggerComponents}
-                            selectedComponentName={componentDefinitionToBeAdded?.name}
-                            sourceNodeId={sourceNodeId}
-                        />
-                    )}
-
-                    {!sourceData && actionPanelOpen && componentDefinitionToBeAdded && (
+                    {actionPanelOpen && componentDefinitionToBeAdded && (
                         <WorkflowNodesPopoverMenuOperationList
+                            clusterElementType={clusterElementType && clusterElementType}
                             componentDefinition={componentDefinitionToBeAdded}
                             edgeId={edgeId}
+                            rootClusterElementDefinition={rootClusterElementDefinition}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}
                             trigger={trigger}

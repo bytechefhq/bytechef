@@ -11,18 +11,17 @@ import {memo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+import {convertNameToSnakeCase} from '../../ai-agent-editor/utils/clusterElementsUtils';
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
-import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import styles from './NodeTypes.module.css';
 
 const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [isDropzoneActive, setDropzoneActive] = useState(false);
     const [clusterElementDefinition, setClusterElementDefinition] = useState<ClusterElementDefinitionBasic[]>([]);
 
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
-    const {aiAgentNodeData} = useWorkflowEditorStore.getState();
+    const {rootClusterElementNodeData} = useWorkflowEditorStore.getState();
 
     const {nodes} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -34,11 +33,15 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const nodeIndex = nodes.findIndex((node) => node.id === id);
 
+    const rootClusterElementComponentVersion = rootClusterElementNodeData?.type
+        ? parseInt(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, ''))
+        : 1;
+
     const handlePopoverMenuClusterElementClick = (type: string) => {
         const rootComponentClusterElementDefinitionRequest: GetRootComponentClusterElementDefinitionsRequest = {
             clusterElementType: type,
-            rootComponentName: currentNode?.componentName || '',
-            rootComponentVersion: data.version || 1,
+            rootComponentName: rootClusterElementNodeData?.componentName || '',
+            rootComponentVersion: rootClusterElementComponentVersion || 1,
         };
 
         const fetchRootComponentClusterElementDefinition = async () => {
@@ -58,16 +61,19 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         fetchRootComponentClusterElementDefinition();
     };
 
-    const aiAgentSourceNodeId = id.split('-')[0];
+    const rootClusterElementId = id.split('-')[0];
 
     return (
         <WorkflowNodesPopoverMenu
-            clusterElementsData={aiAgentNodeData?.clusterElements}
+            clusterElementType={data.clusterElementType}
+            hideActionComponents={!!data.clusterElementType}
+            hideClusterElementComponents={!data.clusterElementType}
+            hideTaskDispatchers={!!data.clusterElementType}
             hideTriggerComponents
             key={`${id}-${nodeIndex}`}
             nodeIndex={nodeIndex}
             sourceData={data.clusterElementType ? clusterElementDefinition : undefined}
-            sourceNodeId={data.clusterElementType ? aiAgentSourceNodeId : id}
+            sourceNodeId={data.clusterElementType ? rootClusterElementId : id}
         >
             <div
                 className={twMerge(
@@ -78,11 +84,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 )}
                 onClick={() => {
                     if (data.clusterElementType) {
-                        if (data.clusterElementType !== 'chatMemory') {
-                            handlePopoverMenuClusterElementClick(data.clusterElementType.toUpperCase());
-                        } else if (data.clusterElementType === 'chatMemory') {
-                            handlePopoverMenuClusterElementClick('CHAT_MEMORY');
-                        }
+                        handlePopoverMenuClusterElementClick(convertNameToSnakeCase(data.clusterElementType));
                     }
                 }}
                 onDragEnter={() => setDropzoneActive(true)}
