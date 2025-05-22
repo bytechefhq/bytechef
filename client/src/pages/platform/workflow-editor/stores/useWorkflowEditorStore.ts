@@ -5,11 +5,11 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface WorkflowEditorI {
-    aiAgentOpen: boolean;
-    setAiAgentOpen: (aiAgentOpen: boolean) => void;
+    clusterElementsCanvasOpen: boolean;
+    setClusterElementsCanvasOpen: (clusterElementsCanvasOpen: boolean) => void;
 
-    aiAgentNodeData: NodeDataType | undefined;
-    setAiAgentNodeData: (aiAgentNodeData: NodeDataType | undefined) => void;
+    rootClusterElementNodeData: NodeDataType | undefined;
+    setRootClusterElementNodeData: (rootClusterElementNodeData: NodeDataType | undefined) => void;
 
     showBottomPanel: boolean;
     setShowBottomPanelOpen: (showBottomPanel: boolean) => void;
@@ -39,16 +39,16 @@ interface WorkflowEditorI {
 const useWorkflowEditorStore = create<WorkflowEditorI>()(
     devtools(
         (set) => ({
-            aiAgentOpen: false,
-            setAiAgentOpen: (aiAgentOpen) =>
+            clusterElementsCanvasOpen: false,
+            setClusterElementsCanvasOpen: (clusterElementsCanvasOpen) =>
                 set(() => ({
-                    aiAgentOpen: aiAgentOpen,
+                    clusterElementsCanvasOpen: clusterElementsCanvasOpen,
                 })),
 
-            aiAgentNodeData: undefined,
-            setAiAgentNodeData: (aiAgentNodeData) =>
+            rootClusterElementNodeData: undefined,
+            setRootClusterElementNodeData: (rootClusterElementNodeData) =>
                 set(() => ({
-                    aiAgentNodeData: aiAgentNodeData,
+                    rootClusterElementNodeData: rootClusterElementNodeData,
                 })),
 
             showBottomPanel: false,
