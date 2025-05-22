@@ -57,4 +57,13 @@ public class NotificationFacadeImpl implements NotificationFacade {
             notification,
             notificationEventService.getNotificationEvents(notification.getNotificationEventIds()));
     }
+
+    @Override
+    public NotificationDTO updateNotification(Notification notification) {
+        notification = notificationService.update(notification);
+
+        return new NotificationDTO(
+            notification,
+            notificationEventService.getNotificationEvents(notification.getNotificationEventIds()));
+    }
 }

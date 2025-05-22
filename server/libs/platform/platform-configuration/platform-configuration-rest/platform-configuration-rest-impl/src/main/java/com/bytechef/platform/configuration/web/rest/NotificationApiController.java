@@ -79,7 +79,7 @@ public class NotificationApiController implements NotificationApi {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                notificationService.update(
+                notificationFacade.updateNotification(
                     conversionService.convert(notificationModel.id(notificationId), Notification.class)),
                 NotificationModel.class));
     }

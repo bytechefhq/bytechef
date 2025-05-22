@@ -28,4 +28,6 @@ public interface NotificationFacade {
     List<NotificationDTO> getNotifications();
 
     NotificationDTO createNotification(Notification notification);
+
+    NotificationDTO updateNotification(Notification notification);
 }
