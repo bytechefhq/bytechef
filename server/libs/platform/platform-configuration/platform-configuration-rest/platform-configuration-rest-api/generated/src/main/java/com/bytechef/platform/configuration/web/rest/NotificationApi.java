@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T10:26:07.281755+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-22T14:31:33.822893+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "notification", description = "The Platform Notification Internal API")
 public interface NotificationApi {
@@ -84,6 +84,35 @@ public interface NotificationApi {
 
 
     /**
+     * DELETE /notifications/{notificationId} : Delete a notification
+     * Delete a notification.
+     *
+     * @param notificationId The id of a notification. (required)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "deleteNotification",
+        summary = "Delete a notification",
+        description = "Delete a notification.",
+        tags = { "notification" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = "/notifications/{notificationId}"
+    )
+    
+    default ResponseEntity<Void> deleteNotification(
+        @Parameter(name = "notificationId", description = "The id of a notification.", required = true, in = ParameterIn.PATH) @PathVariable("notificationId") Long notificationId
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
      * GET /notifications : Get a list of notifications
      * Get a list of notifications
      *
@@ -113,6 +142,50 @@ public interface NotificationApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "[ { \"settings\" : { \"key\" : \"{}\" }, \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"notificationEventIds\" : [ 1, 1 ], \"type\" : \"EMAIL\", \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ] }, { \"settings\" : { \"key\" : \"{}\" }, \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"notificationEventIds\" : [ 1, 1 ], \"type\" : \"EMAIL\", \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ] } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /notifications/{notificationId} : Update an existing notification
+     * Update an existing notification.
+     *
+     * @param notificationId The id of a notification. (required)
+     * @param notificationModel  (required)
+     * @return The updated Notification object. (status code 200)
+     */
+    @Operation(
+        operationId = "updateNotification",
+        summary = "Update an existing notification",
+        description = "Update an existing notification.",
+        tags = { "notification" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated Notification object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = NotificationModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/notifications/{notificationId}",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<NotificationModel> updateNotification(
+        @Parameter(name = "notificationId", description = "The id of a notification.", required = true, in = ParameterIn.PATH) @PathVariable("notificationId") Long notificationId,
+        @Parameter(name = "NotificationModel", description = "", required = true) @Valid @RequestBody NotificationModel notificationModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"settings\" : { \"key\" : \"{}\" }, \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"notificationEventIds\" : [ 1, 1 ], \"type\" : \"EMAIL\", \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "PropertiesDataSource", description = "Defines function that should load properties.")
 @JsonTypeName("PropertiesDataSource")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T10:26:07.281755+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-22T14:31:33.822893+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class PropertiesDataSourceModel {
 
   @Valid

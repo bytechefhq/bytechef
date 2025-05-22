@@ -26,6 +26,15 @@ export interface CreateNotificationRequest {
     notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'>;
 }
 
+export interface DeleteNotificationRequest {
+    notificationId: number;
+}
+
+export interface UpdateNotificationRequest {
+    notificationId: number;
+    notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'>;
+}
+
 /**
  * 
  */
@@ -70,6 +79,40 @@ export class NotificationApi extends runtime.BaseAPI {
     }
 
     /**
+     * Delete a notification.
+     * Delete a notification
+     */
+    async deleteNotificationRaw(requestParameters: DeleteNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['notificationId'] == null) {
+            throw new runtime.RequiredError(
+                'notificationId',
+                'Required parameter "notificationId" was null or undefined when calling deleteNotification().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/notifications/{notificationId}`.replace(`{${"notificationId"}}`, encodeURIComponent(String(requestParameters['notificationId']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete a notification.
+     * Delete a notification
+     */
+    async deleteNotification(requestParameters: DeleteNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteNotificationRaw(requestParameters, initOverrides);
+    }
+
+    /**
      * Get a list of notifications
      * Get a list of notifications
      */
@@ -94,6 +137,51 @@ export class NotificationApi extends runtime.BaseAPI {
      */
     async getNotifications(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Notification>> {
         const response = await this.getNotificationsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Update an existing notification.
+     * Update an existing notification
+     */
+    async updateNotificationRaw(requestParameters: UpdateNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Notification>> {
+        if (requestParameters['notificationId'] == null) {
+            throw new runtime.RequiredError(
+                'notificationId',
+                'Required parameter "notificationId" was null or undefined when calling updateNotification().'
+            );
+        }
+
+        if (requestParameters['notification'] == null) {
+            throw new runtime.RequiredError(
+                'notification',
+                'Required parameter "notification" was null or undefined when calling updateNotification().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/notifications/{notificationId}`.replace(`{${"notificationId"}}`, encodeURIComponent(String(requestParameters['notificationId']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: NotificationToJSON(requestParameters['notification']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => NotificationFromJSON(jsonValue));
+    }
+
+    /**
+     * Update an existing notification.
+     * Update an existing notification
+     */
+    async updateNotification(requestParameters: UpdateNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Notification> {
+        const response = await this.updateNotificationRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
