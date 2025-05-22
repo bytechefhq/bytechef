@@ -84,23 +84,34 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
     function saveNotification() {
         const formData = getValues();
 
-        formData.settings = formData.settings
+        // Parse settings string into proper object structure
+        const settingsObject: {[key: string]: object} = formData.settings
             .split(/\r?\n/)
             .filter((setting) => setting)
-            .map((setting) => ({[setting.split('=')[0]]: setting.split('=')[1]}))
+            .map((setting) => {
+                const [key, value] = setting.split('=');
+                // Ensure the value is an object rather than a string
+                return {[key]: {value}};
+            })
             .reduce((previousValue, value) => {
                 return {...previousValue, ...value};
             }, {});
 
+        // Create modified form data with correct settings type
+        const updatedFormData = {
+            ...formData,
+            settings: settingsObject,
+        };
+
         if (notification?.id) {
             updateNotificationMutation.mutate({
                 ...notification,
-                ...formData,
+                ...updatedFormData,
             });
         } else {
             createNotificationMutation.mutate({
                 ...notification,
-                ...formData,
+                ...updatedFormData,
             });
         }
     }
@@ -196,15 +207,15 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
 
                                         <FormControl>
                                             <MultiSelect
-                                                defaultValue=""
+                                                defaultValue={[]}
                                                 onValueChange={field.onChange}
                                                 options={notificationEvents?.map((notificationEvent) => ({
-                                                    label: notificationEvent.type,
-                                                    value: notificationEvent.id,
+                                                    label: notificationEvent.type ?? notificationEvent.id.toString(),
+                                                    value: notificationEvent.id.toString(),
                                                 }))}
                                                 optionsLoading={isNotificationEventsLoading}
-                                                placeholder={'Select events'}
-                                                value={field.value}
+                                                placeholder="Select events"
+                                                value={field.value.map((id) => id.toString())}
                                             />
                                         </FormControl>
 
