@@ -107,6 +107,11 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
     }
 
     @Override
+    public List<String> getTenantIdsByUserId(long id) {
+        return tenantRepository.findTenantIdsByUserId(id);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<String> getTenantIdsByUserLogin(String login) {
         return tenantRepository.findTenantIdsByUserLogin(login);

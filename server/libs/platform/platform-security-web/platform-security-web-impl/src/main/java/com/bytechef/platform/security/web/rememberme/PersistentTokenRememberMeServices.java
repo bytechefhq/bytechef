@@ -23,12 +23,16 @@ import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantService;
+import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,15 +92,17 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     private UserService userService;
     private final PersistentTokenCache<UpgradedRememberMeToken> upgradedTokenCache;
     private final PersistentTokenService persistentTokenService;
+    private final TenantService tenantService;
 
     @SuppressFBWarnings("EI")
     public PersistentTokenRememberMeServices(
         ApplicationProperties applicationProperties, UserDetailsService userDetailsService,
-        PersistentTokenService persistentTokenService) {
+        PersistentTokenService persistentTokenService, TenantService tenantService) {
 
         super(getKey(applicationProperties.getSecurity()), userDetailsService);
 
         this.persistentTokenService = persistentTokenService;
+        this.tenantService = tenantService;
         this.upgradedTokenCache = new PersistentTokenCache<>(UPGRADED_TOKEN_VALIDITY_MILLIS);
     }
 
@@ -117,7 +123,16 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
             if (login == null) {
                 PersistentToken token = getPersistentToken(cookieTokens);
 
-                User user = getUserService().getUser(token.getUserId());
+                User user;
+
+                if (tenantService.isMultiTenantEnabled()) {
+                    List<String> tenantIds = tenantService.getTenantIdsByUserId(token.getUserId());
+
+                    user = TenantUtils.callWithTenantId(
+                        tenantIds.getFirst(), () -> getUserService().getUser(token.getUserId()));
+                } else {
+                    user = getUserService().getUser(token.getUserId());
+                }
 
                 login = user.getLogin();
 
@@ -130,14 +145,25 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                 token.setUserAgent(request.getHeader("User-Agent"));
 
                 try {
-                    persistentTokenService.save(token);
+                    if (tenantService.isMultiTenantEnabled()) {
+                        List<String> tenantIds = tenantService.getTenantIdsByUserId(token.getUserId());
+
+                        TenantUtils.runWithTenantId(tenantIds.getFirst(), () -> {
+                            persistentTokenService.save(token);
+
+                            addCookie(token, TenantContext.getCurrentTenantId(), request, response);
+                        });
+                    } else {
+                        persistentTokenService.save(token);
+
+                        addCookie(token, TenantContext.getCurrentTenantId(), request, response);
+                    }
                 } catch (DataAccessException e) {
                     logger.error("Failed to update token: ", e);
 
                     throw new RememberMeAuthenticationException("Autologin failed due to data access problem", e);
                 }
 
-                addCookie(token, request, response);
                 upgradedTokenCache.put(cookieTokens[0], new UpgradedRememberMeToken(cookieTokens, login));
             }
 
@@ -153,26 +179,46 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
         logger.debug("Creating new persistent login for user {}", login);
 
-        PersistentToken token = getUserService().fetchUserByLogin(login)
-            .map(u -> {
-                PersistentToken t = new PersistentToken();
+        Optional<User> optionalUser;
 
-                t.setNew(true);
-                t.setSeries(RandomUtils.generateRandomAlphanumericString());
-                t.setUser(u);
-                t.setTokenValue(RandomUtils.generateRandomAlphanumericString());
-                t.setTokenDate(LocalDate.now());
-                t.setIpAddress(request.getRemoteAddr());
-                t.setUserAgent(request.getHeader("User-Agent"));
+        if (tenantService.isMultiTenantEnabled()) {
+            List<String> tenantIds = tenantService.getTenantIdsByUserLogin(login);
 
-                return t;
-            })
+            optionalUser = TenantUtils.callWithTenantId(
+                tenantIds.getFirst(), () -> getUserService().fetchUserByLogin(login));
+        } else {
+            optionalUser = getUserService().fetchUserByLogin(login);
+        }
+
+        PersistentToken token = optionalUser.map(u -> {
+            PersistentToken t = new PersistentToken();
+
+            t.setNew(true);
+            t.setSeries(RandomUtils.generateRandomAlphanumericString());
+            t.setUser(u);
+            t.setTokenValue(RandomUtils.generateRandomAlphanumericString());
+            t.setTokenDate(LocalDate.now());
+            t.setIpAddress(request.getRemoteAddr());
+            t.setUserAgent(request.getHeader("User-Agent"));
+
+            return t;
+        })
             .orElseThrow(() -> new UsernameNotFoundException("User " + login + " was not found in the database"));
 
         try {
-            persistentTokenService.save(token);
+            if (tenantService.isMultiTenantEnabled()) {
+                List<String> tenantIds = tenantService.getTenantIdsByUserId(token.getUserId());
 
-            addCookie(token, request, response);
+                TenantUtils.runWithTenantId(tenantIds.getFirst(), () -> {
+                    persistentTokenService.save(token);
+
+                    addCookie(token, TenantContext.getCurrentTenantId(), request, response);
+                });
+            } else {
+                persistentTokenService.save(token);
+
+                addCookie(token, TenantContext.getCurrentTenantId(), request, response);
+            }
         } catch (DataAccessException e) {
             logger.error("Failed to save persistent token ", e);
         }
@@ -198,7 +244,14 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
                 PersistentToken token = getPersistentToken(cookieTokens);
 
-                persistentTokenService.delete(token.getSeries());
+                if (tenantService.isMultiTenantEnabled()) {
+                    List<String> tenantIds = tenantService.getTenantIdsByUserId(token.getUserId());
+
+                    TenantUtils.runWithTenantId(
+                        tenantIds.getFirst(), () -> persistentTokenService.delete(token.getSeries()));
+                } else {
+                    persistentTokenService.delete(token.getSeries());
+                }
             } catch (InvalidCookieException ice) {
                 logger.info("Invalid cookie, no persistent token could be deleted", ice);
             } catch (RememberMeAuthenticationException rmae) {
@@ -213,15 +266,23 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
      * Validate the token and return it.
      */
     private PersistentToken getPersistentToken(String[] cookieTokens) {
-        if (cookieTokens.length != 2) {
+        if (cookieTokens.length != 3) {
             throw new InvalidCookieException(
-                "Cookie token did not contain " + 2 + " tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
+                "Cookie token did not contain " + 3 + " tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
         }
 
         String presentedSeries = cookieTokens[0];
         String presentedToken = cookieTokens[1];
+        String tenantId = cookieTokens[2];
 
-        Optional<PersistentToken> optionalToken = persistentTokenService.fetchPersistentToken(presentedSeries);
+        Optional<PersistentToken> optionalToken;
+
+        if (tenantService.isMultiTenantEnabled()) {
+            optionalToken = TenantUtils.callWithTenantId(
+                tenantId, () -> persistentTokenService.fetchPersistentToken(presentedSeries));
+        } else {
+            optionalToken = persistentTokenService.fetchPersistentToken(presentedSeries);
+        }
 
         if (optionalToken.isEmpty()) {
             // No series match, so we can't authenticate using this cookie
@@ -235,7 +296,14 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
         if (!presentedToken.equals(token.getTokenValue())) {
             // Token doesn't match series value. Delete this session and throw an exception.
-            persistentTokenService.delete(token.getSeries());
+            if (tenantService.isMultiTenantEnabled()) {
+                List<String> tenantIds = tenantService.getTenantIdsByUserId(token.getUserId());
+
+                TenantUtils.runWithTenantId(
+                    tenantIds.getFirst(), () -> persistentTokenService.delete(token.getSeries()));
+            } else {
+                persistentTokenService.delete(token.getSeries());
+            }
 
             throw new CookieTheftException(
                 "Invalid remember-me token (Series/token) mismatch. Implies previous cookie theft attack.");
@@ -245,7 +313,14 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
             .plusDays(TOKEN_VALIDITY_DAYS);
 
         if (tokenDate.isBefore(LocalDate.now())) {
-            persistentTokenService.delete(token.getSeries());
+            if (tenantService.isMultiTenantEnabled()) {
+                List<String> tenantIds = tenantService.getTenantIdsByUserId(token.getUserId());
+
+                TenantUtils.runWithTenantId(
+                    tenantIds.getFirst(), () -> persistentTokenService.delete(token.getSeries()));
+            } else {
+                persistentTokenService.delete(token.getSeries());
+            }
 
             throw new RememberMeAuthenticationException("Remember-me login has expired");
         }
@@ -253,10 +328,12 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         return token;
     }
 
-    private void addCookie(PersistentToken token, HttpServletRequest request, HttpServletResponse response) {
+    private void addCookie(
+        PersistentToken token, String tenantId, HttpServletRequest request, HttpServletResponse response) {
+
         setCookie(
             new String[] {
-                token.getSeries(), token.getTokenValue()
+                token.getSeries(), token.getTokenValue(), tenantId
             },
             TOKEN_VALIDITY_SECONDS, request, response);
     }

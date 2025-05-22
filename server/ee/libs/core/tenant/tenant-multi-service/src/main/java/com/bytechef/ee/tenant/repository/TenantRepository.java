@@ -99,6 +99,17 @@ public class TenantRepository {
             .collect(Collectors.toList());
     }
 
+    public List<String> findTenantIdsByUserId(long id) {
+        List<String[]> tenantIds = findTenantIdsByColumnNames(
+            tenantId -> "SELECT '%s' FROM %s.user u WHERE u.id = %s".formatted(
+                tenantId, TenantUtils.getDatabaseSchema(tenantId), id),
+            1);
+
+        return tenantIds.stream()
+            .map(row -> row[0])
+            .collect(Collectors.toList());
+    }
+
     public List<String> findTenantIdsByUserLogin(String login) {
         List<String[]> tenantIds = findTenantIdsByColumnNames(
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.login) = UPPER('%s')".formatted(
