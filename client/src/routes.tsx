@@ -32,6 +32,7 @@ import Home from '@/pages/home/Home';
 import AiProviders from '@/pages/platform/settings/ai-providers/AiProviders';
 import ApiKeys from '@/pages/platform/settings/api-keys/ApiKeys';
 import GitConfiguration from '@/pages/platform/settings/git-configuration/GitConfiguration';
+import Notifications from '@/pages/platform/settings/notifications/Notifications';
 import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
 import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
 import {AccessControl} from '@/shared/auth/AccessControl';
@@ -161,6 +162,14 @@ const platformSettingsRoutes = {
             ),
             path: 'api-keys',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <Notifications />
+                </PrivateRoute>
+            ),
+            path: 'notifications',
+        },
     ],
     navItems: [
         {
@@ -181,6 +190,10 @@ const platformSettingsRoutes = {
         {
             href: 'api-keys',
             title: 'API Keys',
+        },
+        {
+            href: 'notifications',
+            title: 'Notifications',
         },
     ],
 };
