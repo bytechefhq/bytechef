@@ -141,17 +141,17 @@ export type ClusterElementItemType = {
     parameters?: {[key: string]: any};
 };
 
+type ClusterElementValueType = ClusterElementItemType | ClusterElementItemType[] | null;
+
 export type ClusterElementsType = {
-    chatMemory?: ClusterElementItemType | null;
-    model?: ClusterElementItemType | null;
-    rag?: ClusterElementItemType | null;
-    tools?: ClusterElementItemType[] | null;
+    [key: string]: ClusterElementValueType;
 };
 
 export type NodeDataType = {
     branchData?: BranchDataType;
     branchId?: string;
     clusterElements?: ClusterElementsType;
+    clusterElementName?: string;
     clusterElementType?: string;
     componentName: string;
     conditionCase?: 'caseTrue' | 'caseFalse';
@@ -175,10 +175,12 @@ export type NodeDataType = {
             dynamicPropertyTypes?: {[key: string]: string};
         };
     };
+    multipleClusterElementsNode?: boolean;
     name: string;
     operationName?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters?: {[key: string]: any};
+    rootClusterElement?: boolean;
     taskDispatcher?: boolean;
     taskDispatcherId?: string;
     title?: string;

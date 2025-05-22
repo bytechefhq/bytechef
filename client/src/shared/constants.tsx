@@ -96,6 +96,8 @@ export const TASK_DISPATCHER_NAMES = [
     'subflow',
 ];
 
+export const ROOT_CLUSTER_ELEMENT_NAMES = ['aiAgent'];
+
 export const SORT_OPTIONS = [
     {
         label: 'Last edited',
@@ -140,16 +142,6 @@ export const COMPONENT_CATEGORY_ICON: Record<string, JSX.Element> = {
     'productivity-and-collaboration': <GaugeIcon />,
     'project-management': <SquareKanbanIcon />,
     'surveys-and-feedback': <SmileIcon />,
-};
-
-export const SORTED_CLUSTER_ELEMENTS_KEYS = ['rag', 'chatMemory', 'model', 'tools'];
-
-export const AI_AGENT_EDGE_LABELS = {
-    rag: 'Rag',
-    // eslint-disable-next-line sort-keys
-    chatMemory: 'Chat Memory',
-    model: 'Model',
-    tools: 'Tools',
 };
 
 export const TASK_DISPATCHER_DATA_KEY_MAP = {
