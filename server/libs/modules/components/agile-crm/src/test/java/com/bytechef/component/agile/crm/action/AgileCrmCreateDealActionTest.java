@@ -46,12 +46,9 @@ class AgileCrmCreateDealActionTest {
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(NAME, "testName",
-            DESCRIPTION, "testDescription",
-            EXPECTED_VALUE, 500,
-            MILESTONE, "testMilestone",
-            PROBABILITY, 50,
-            OWNER_ID, "ownerId"));
+        Map.of(
+            NAME, "testName", DESCRIPTION, "testDescription", EXPECTED_VALUE, 500, MILESTONE, "testMilestone",
+            PROBABILITY, 50, OWNER_ID, "ownerId"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of();
 
@@ -76,12 +73,8 @@ class AgileCrmCreateDealActionTest {
         Body body = bodyArgumentCaptor.getValue();
 
         Map<String, Object> expectedBody = Map.of(
-            NAME, "testName",
-            DESCRIPTION, "testDescription",
-            EXPECTED_VALUE, 500.0,
-            MILESTONE, "testMilestone",
-            PROBABILITY, "50",
-            OWNER_ID, "ownerId");
+            NAME, "testName", DESCRIPTION, "testDescription", EXPECTED_VALUE, 500.0,
+            MILESTONE, "testMilestone", PROBABILITY, "50", OWNER_ID, "ownerId");
 
         assertEquals(expectedBody, body.getContent());
     }

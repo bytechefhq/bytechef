@@ -71,12 +71,11 @@ class AgileCrmCreateTaskActionTest {
 
         Body body = bodyArgumentCaptor.getValue();
 
+        long epochSecond = mockDate.atZone(ZoneId.systemDefault())
+            .toEpochSecond();
+
         Map<String, Object> expectedBody = Map.of(
-            SUBJECT, "test",
-            TYPE, "testing",
-            PRIORITY_TYPE, "priorityType",
-            DUE, mockDate.atZone(ZoneId.systemDefault())
-                .toEpochSecond());
+            SUBJECT, "test", TYPE, "testing", PRIORITY_TYPE, "priorityType", DUE, epochSecond);
 
         assertEquals(expectedBody, body.getContent());
     }

@@ -48,8 +48,7 @@ public class AgileCrmConnection {
                         .required(true),
                     string(PASSWORD)
                         .label("REST API Key")
-                        .description("Can be found in Admin settings -> Developers & API " +
-                            "-> REST API Key.")
+                        .description("Can be found in Admin settings -> Developers & API -> REST API Key.")
                         .required(true)));
 
     private AgileCrmConnection() {
