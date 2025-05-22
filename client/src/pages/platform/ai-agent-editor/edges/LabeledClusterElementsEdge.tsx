@@ -1,10 +1,9 @@
-import {AI_AGENT_EDGE_LABELS} from '@/shared/constants';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath} from '@xyflow/react';
 import {useShallow} from 'zustand/react/shallow';
 
-import useAiAgentDataStore from '../stores/useAiAgentDataStore';
+import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
-export default function LabeledAiAgentEdge({
+export default function LabeledClusterElementsEdge({
     id,
     sourcePosition,
     sourceX,
@@ -14,13 +13,13 @@ export default function LabeledAiAgentEdge({
     targetX,
     targetY,
 }: EdgeProps) {
-    const {nodes} = useAiAgentDataStore(
+    const {nodes} = useClusterElementsDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
         }))
     );
 
-    const [edgePath] = getBezierPath({
+    const [edgePath, labelX, labelY] = getBezierPath({
         sourcePosition,
         sourceX,
         sourceY,
@@ -42,16 +41,12 @@ export default function LabeledAiAgentEdge({
         }
     });
 
-    const nodeType = node?.data.clusterElementType;
+    const nodeLabel = node?.data.clusterElementLabel;
 
-    function getEdgeLabel(type: string) {
-        return AI_AGENT_EDGE_LABELS[type as keyof typeof AI_AGENT_EDGE_LABELS] || type;
-    }
+    function getEdgeLabelPosition() {
+        const defaultPosition = `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`;
 
-    function getEdgeLabelPosition(nodeType: string | undefined, targetX: number, targetY: number) {
-        const defaultPosition = `translate(-50%, -120%) translate(${targetX}px,${targetY}px)`;
-
-        if (nodeType === 'tools') {
+        if (node?.data.multipleClusterElementsNode) {
             return `translate(-50%, -50%) translate(${targetX}px,${targetY}px)`;
         }
 
@@ -67,10 +62,10 @@ export default function LabeledAiAgentEdge({
                     className="flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white px-2 py-1 text-xs font-medium shadow-sm"
                     style={{
                         position: 'absolute',
-                        transform: getEdgeLabelPosition(nodeType as string, targetX, targetY),
+                        transform: getEdgeLabelPosition(),
                     }}
                 >
-                    {nodeType ? <span>{getEdgeLabel(nodeType as string)}</span> : ''}
+                    {nodeLabel ? <span>{node?.data?.clusterElementLabel as string}</span> : ''}
                 </div>
             </EdgeLabelRenderer>
         </>
