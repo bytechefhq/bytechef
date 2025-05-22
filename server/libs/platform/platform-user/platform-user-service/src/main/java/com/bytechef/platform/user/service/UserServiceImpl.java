@@ -360,6 +360,7 @@ public class UserServiceImpl implements UserService {
                 }
 
                 user.setLangKey(langKey);
+                user.setLogin(user.getEmail());
                 user.setImageUrl(imageUrl);
 
                 userRepository.save(user);
