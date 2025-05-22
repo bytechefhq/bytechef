@@ -7,6 +7,7 @@ import {
     NODE_HEIGHT,
     NODE_WIDTH,
     PLACEHOLDER_NODE_HEIGHT,
+    ROOT_CLUSTER_ELEMENT_NAMES,
     TASK_DISPATCHER_NAMES,
 } from '@/shared/constants';
 import {
@@ -34,11 +35,11 @@ export const calculateNodeHeight = (node: Node) => {
     const isBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
     const isLeftGhostNode = node.type === 'loopLeftGhostNode';
     const isPlaceholderNode = node.type === 'placeholder';
-    const isAIAgentNode = node.type === 'aiAgentNode';
+    const isAiAgentNode = node.type === 'aiAgentNode';
     const isGhostNode = isTopGhostNode || isBottomGhostNode || isLeftGhostNode;
 
     let height = NODE_HEIGHT;
-    const aiAgentNodeHeight = 250;
+    const aiAgentNodeHeight = 150;
 
     if (isPlaceholderNode || isGhostNode) {
         height = PLACEHOLDER_NODE_HEIGHT;
@@ -48,21 +49,21 @@ export const calculateNodeHeight = (node: Node) => {
         }
     }
 
-    if (isAIAgentNode) {
+    if (isAiAgentNode) {
         height = aiAgentNodeHeight;
     }
 
     return height;
 };
 
-export const calculateAiAgentCanvasNodeHeight = (node: Node) => {
-    const isToolsPlaceholder = node.id.includes('tools') && node.type === 'placeholder';
-    const isToolsGhostNode = node.id.includes('tools') && node.type === 'aiAgentToolsGhostNode';
+export const calculateClusterElementsNodeHeight = (node: Node) => {
+    const isMultipleElementsGhostNode =
+        node.data.multipleClusterElementsNode && node.type === 'multipleClusterElementsGhostNode';
 
-    let height = 200;
+    let height = 150;
 
-    if (isToolsGhostNode || isToolsPlaceholder) {
-        height = 50;
+    if (isMultipleElementsGhostNode) {
+        height = 20;
     } else if (node.data.clusterElements) {
         height = 100;
     }
@@ -79,6 +80,8 @@ export const convertTaskToNode = (
 
     const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(componentName);
 
+    const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(componentName);
+
     return {
         data: {
             ...task,
@@ -91,6 +94,7 @@ export const convertTaskToNode = (
                 />
             ),
             operationName: task.type.split('/')[2],
+            rootClusterElement: isRootClusterElement,
             taskDispatcher: isTaskDispatcher,
             taskDispatcherId: isTaskDispatcher ? task.name : undefined,
             trigger: index === 0,
@@ -105,11 +109,11 @@ export const convertTaskToNode = (
 interface GetLayoutedElementsProps {
     canvasWidth: number;
     edges: Edge[];
-    isAiAgentCanvas?: boolean;
+    isClusterElementsCanvas?: boolean;
     nodes: Node[];
 }
 
-export const getLayoutedElements = ({canvasWidth, edges, isAiAgentCanvas, nodes}: GetLayoutedElementsProps) => {
+export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas, nodes}: GetLayoutedElementsProps) => {
     const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
     dagreGraph.setGraph({rankdir: DIRECTION});
@@ -117,13 +121,13 @@ export const getLayoutedElements = ({canvasWidth, edges, isAiAgentCanvas, nodes}
     nodes.forEach((node) => {
         let height;
 
-        if (isAiAgentCanvas) {
-            height = calculateAiAgentCanvasNodeHeight(node);
+        if (isClusterElementsCanvas) {
+            height = calculateClusterElementsNodeHeight(node);
         } else {
             height = calculateNodeHeight(node);
         }
 
-        dagreGraph.setNode(node.id, {height, width: node.type === 'aiAgentNode' ? 350 : NODE_WIDTH});
+        dagreGraph.setNode(node.id, {height, width: NODE_WIDTH});
     });
 
     edges.forEach((edge) => {
@@ -133,11 +137,7 @@ export const getLayoutedElements = ({canvasWidth, edges, isAiAgentCanvas, nodes}
     dagre.layout(dagreGraph);
 
     const allNodes = nodes.map((node) => {
-        let positionX = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
-
-        if (node.type === 'aiAgentNode') {
-            positionX -= 80;
-        }
+        const positionX = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
 
         return {
             ...node,
@@ -193,10 +193,10 @@ export const getLayoutedElements = ({canvasWidth, edges, isAiAgentCanvas, nodes}
                 condition: sourceNode.type === 'taskDispatcherTopGhostNode',
             },
             {
-                condition: sourceNode.data.componentName === 'aiAgent',
+                condition: sourceNode.data.rootClusterElement,
             },
             {
-                condition: sourceNode.type === 'aiAgentToolsGhostNode',
+                condition: sourceNode.type === 'multipleClusterElementsGhostNode',
             },
             {
                 condition: sourceNode.data.componentName === 'branch',
