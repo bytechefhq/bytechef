@@ -51,15 +51,27 @@ import {createBrowserRouter, redirect} from 'react-router-dom';
 const getAccountRoutes = (path: string) => ({
     children: [
         {
-            element: <AccountProfile />,
+            element: (
+                <PrivateRoute>
+                    <AccountProfile />
+                </PrivateRoute>
+            ),
             index: true,
         },
         {
-            element: <Appearance />,
+            element: (
+                <PrivateRoute>
+                    <Appearance />
+                </PrivateRoute>
+            ),
             path: 'appearance',
         },
         {
-            element: <Sessions />,
+            element: (
+                <PrivateRoute>
+                    <Sessions />
+                </PrivateRoute>
+            ),
             path: 'sessions',
         },
     ],
