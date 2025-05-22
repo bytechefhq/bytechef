@@ -40,12 +40,6 @@ public abstract class AbstractApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractApplication.class);
 
-    private final ApplicationProperties applicationProperties;
-
-    protected AbstractApplication(ApplicationProperties applicationProperties) {
-        this.applicationProperties = applicationProperties;
-    }
-
     @EventListener
     public void onApplicationStartedEvent(ApplicationStartedEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
