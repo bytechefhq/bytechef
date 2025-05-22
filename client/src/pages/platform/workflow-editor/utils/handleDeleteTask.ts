@@ -11,23 +11,27 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleDeleteTaskProps {
-    aiAgentOpen?: boolean;
+    rootClusterElementNodeData?: NodeDataType;
+    clusterElementsCanvasOpen?: boolean;
     currentNode?: NodeDataType;
     data: NodeDataType;
     projectId: number;
     queryClient: QueryClient;
+    setRootClusterElementNodeData?: (node: NodeDataType) => void;
     setCurrentNode?: (node: NodeDataType) => void;
     updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default function handleDeleteTask({
-    aiAgentOpen,
+    clusterElementsCanvasOpen,
     currentNode,
     data,
     projectId,
     queryClient,
+    rootClusterElementNodeData,
     setCurrentNode,
+    setRootClusterElementNodeData,
     updateWorkflowMutation,
     workflow,
 }: HandleDeleteTaskProps) {
@@ -126,41 +130,68 @@ export default function handleDeleteTask({
 
             return parentBranchTask;
         }) as Array<WorkflowTaskType>;
-    } else if (aiAgentOpen && currentNode?.name.includes('aiAgent')) {
+    } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
         const currentClusterElementType = data.clusterElementType;
         const clusterElementName = data.name;
-        const parentAiAgentTask = workflowTasks.find((task) => task.name === currentNode?.name);
+        const rootClusterElementTask = workflowTasks.find((task) => task.name === rootClusterElementNodeData?.name);
+        const updatedClusterElements = {...rootClusterElementNodeData.clusterElements};
 
-        if (parentAiAgentTask?.clusterElements && setCurrentNode && currentClusterElementType) {
-            const updatedClusterElements = {...currentNode.clusterElements};
+        if (rootClusterElementTask && rootClusterElementTask.clusterElements) {
+            const clusterElementValue =
+                rootClusterElementTask.clusterElements[
+                    currentClusterElementType as keyof typeof rootClusterElementTask.clusterElements
+                ];
 
-            if (currentClusterElementType === 'tools') {
-                updatedClusterElements.tools = (parentAiAgentTask.clusterElements.tools || []).filter(
-                    (tool) => tool.name !== clusterElementName
+            if (Array.isArray(clusterElementValue) && currentClusterElementType !== undefined) {
+                updatedClusterElements[currentClusterElementType] = clusterElementValue.filter(
+                    (element) => element.name !== clusterElementName
                 );
 
-                parentAiAgentTask.clusterElements.tools = [...updatedClusterElements.tools];
+                rootClusterElementTask.clusterElements[
+                    currentClusterElementType as keyof typeof rootClusterElementTask.clusterElements
+                ] = [...updatedClusterElements[currentClusterElementType]];
             } else {
-                updatedClusterElements[currentClusterElementType as keyof typeof parentAiAgentTask.clusterElements] =
-                    null;
+                updatedClusterElements[
+                    currentClusterElementType as keyof typeof rootClusterElementTask.clusterElements
+                ] = null;
 
-                parentAiAgentTask.clusterElements[
-                    currentClusterElementType as keyof typeof parentAiAgentTask.clusterElements
+                rootClusterElementTask.clusterElements[
+                    currentClusterElementType as keyof typeof rootClusterElementTask.clusterElements
                 ] = null;
             }
+        }
 
-            setCurrentNode({
-                ...currentNode,
-                clusterElements: updatedClusterElements,
-            });
+        if (setRootClusterElementNodeData && setCurrentNode) {
+            if (currentNode?.rootClusterElement) {
+                setCurrentNode({
+                    ...currentNode,
+                    clusterElements: updatedClusterElements,
+                });
+            } else {
+                setRootClusterElementNodeData({
+                    ...rootClusterElementNodeData,
+                    clusterElements: updatedClusterElements,
+                });
+            }
+
+            if (currentNode?.name === data.name) {
+                useWorkflowNodeDetailsPanelStore.getState().reset();
+
+                setCurrentNode({
+                    ...rootClusterElementNodeData,
+                    clusterElements: updatedClusterElements,
+                });
+
+                useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(true);
+            }
         }
 
         updatedTasks = workflowTasks.map((task) => {
-            if (task.name !== parentAiAgentTask?.name) {
+            if (task.name !== rootClusterElementTask?.name) {
                 return task;
             }
 
-            return parentAiAgentTask;
+            return rootClusterElementTask;
         }) as Array<WorkflowTaskType>;
     } else {
         updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
@@ -198,7 +229,7 @@ export default function handleDeleteTask({
                     queryKey: ProjectWorkflowKeys.workflows,
                 });
 
-                if (currentNode?.name === data.name) {
+                if (currentNode?.name === data.name && !currentNode?.clusterElementType) {
                     useWorkflowNodeDetailsPanelStore.getState().reset();
                     useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
                 }
