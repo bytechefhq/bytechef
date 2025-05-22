@@ -130,7 +130,12 @@ export default function WorkflowEdge({
             )}
 
             <EdgeLabelRenderer key={id}>
-                <WorkflowNodesPopoverMenu edgeId={id} hideTriggerComponents sourceNodeId={sourceNodeId}>
+                <WorkflowNodesPopoverMenu
+                    edgeId={id}
+                    hideClusterElementComponents
+                    hideTriggerComponents
+                    sourceNodeId={sourceNodeId}
+                >
                     <div
                         className="nodrag nopan"
                         id={id}
