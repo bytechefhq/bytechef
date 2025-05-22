@@ -151,6 +151,7 @@ public class AgileCrmCreateDealAction {
                         number("currency_conversion_value")
                             .description("The currency conversion value."),
                         array("tags")
+                            .items(string())
                             .description("Tags of the deal."),
                         array("tagsWithTime")
                             .description("Tags with time of the deal."),
