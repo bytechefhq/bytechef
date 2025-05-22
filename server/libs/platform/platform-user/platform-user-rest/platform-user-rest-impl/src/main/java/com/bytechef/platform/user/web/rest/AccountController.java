@@ -223,7 +223,7 @@ public class AccountController {
         if (tenantService.isMultiTenantEnabled()) {
             List<String> tenantIds = tenantService.getTenantIdsByUserEmail(userDTO.getEmail());
 
-            if (!tenantIds.contains(TenantContext.getCurrentTenantId())) {
+            if (!tenantIds.isEmpty() && !tenantIds.contains(TenantContext.getCurrentTenantId())) {
                 throw new EmailAlreadyUsedException();
             }
         }
