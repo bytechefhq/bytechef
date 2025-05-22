@@ -1,4 +1,5 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {NodeDataType} from '@/shared/types';
@@ -18,6 +19,8 @@ export default function handleComponentAddedSuccess({
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore.getState();
 
+    const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(nodeData.componentName as string);
+
     queryClient.invalidateQueries({
         queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
             id: workflow.id!,
@@ -30,7 +33,7 @@ export default function handleComponentAddedSuccess({
             setCurrentNode({...currentNode, ...nodeData});
             setCurrentComponent({...currentComponent, ...nodeData});
         }
-    } else if (nodeData.componentName === 'aiAgent') {
+    } else if (isRootClusterElement) {
         return;
     } else {
         setCurrentNode({...nodeData, description: ''});
