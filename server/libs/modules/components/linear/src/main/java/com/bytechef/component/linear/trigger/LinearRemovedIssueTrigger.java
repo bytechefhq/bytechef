@@ -18,6 +18,9 @@ package com.bytechef.component.linear.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.linear.constant.LinearConstants.ALL_PUBLIC_TEAMS_PROPERTY;
+import static com.bytechef.component.linear.constant.LinearConstants.ID;
+import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID_TRIGGER_PROPERTY;
 import static com.bytechef.component.linear.constant.LinearConstants.TRIGGER_OUTPUT_PROPERTY;
 import static com.bytechef.component.linear.util.LinearUtils.createWebhook;
 import static com.bytechef.component.linear.util.LinearUtils.deleteWebhook;
@@ -44,6 +47,9 @@ public class LinearRemovedIssueTrigger {
         .title("Removed Issue")
         .description("Triggers when an issue is removed.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
+        .properties(
+            ALL_PUBLIC_TEAMS_PROPERTY,
+            TEAM_ID_TRIGGER_PROPERTY)
         .output(outputSchema(TRIGGER_OUTPUT_PROPERTY))
         .webhookEnable(LinearRemovedIssueTrigger::webhookEnable)
         .webhookDisable(LinearRemovedIssueTrigger::webhookDisable)
@@ -56,17 +62,17 @@ public class LinearRemovedIssueTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return createWebhook("Issue", webhookUrl, context);
+        return createWebhook(webhookUrl, context, inputParameters);
     }
 
     protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        deleteWebhook(outputParameters, context);
+        deleteWebhook(outputParameters.getString(ID), context);
     }
 
-    protected static Map<String, Object> webhookRequest(
+    protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
 

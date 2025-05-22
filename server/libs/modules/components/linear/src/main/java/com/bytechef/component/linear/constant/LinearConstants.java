@@ -16,16 +16,22 @@
 
 package com.bytechef.component.linear.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
+import com.bytechef.component.linear.util.LinearUtils;
 
 /**
  * @author Marija Horvat
  */
 public class LinearConstants {
 
+    public static final String ALL_PUBLIC_TEAMS = "allPublicTeams";
     public static final String ASSIGNEE_ID = "assigneeId";
     public static final String BODY = "body";
     public static final String DESCRIPTION = "description";
@@ -40,6 +46,18 @@ public class LinearConstants {
     public static final String TEAM_ID = "teamId";
     public static final String TITLE = "title";
     public static final String VARIABLES = "variables";
+
+    public static ModifiableBooleanProperty ALL_PUBLIC_TEAMS_PROPERTY =   bool(ALL_PUBLIC_TEAMS)
+        .label("All Public Teams")
+        .description("If true, the webhook will be created for all public teams.")
+        .defaultValue(false)
+        .required(true);
+
+    public static ComponentDsl.ModifiableStringProperty TEAM_ID_TRIGGER_PROPERTY =  string(TEAM_ID)
+        .label("Team ID")
+        .displayCondition("%s == false".formatted(ALL_PUBLIC_TEAMS))
+        .options((TriggerOptionsFunction<String>) LinearUtils::getTeamOptions)
+        .required(true);
 
     public static final ModifiableObjectProperty TRIGGER_OUTPUT_PROPERTY =
         object()
