@@ -32,6 +32,7 @@ import WorkflowNode from '../nodes/WorkflowNode';
 
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
+    customCanvasWidth?: number;
     projectLeftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
@@ -39,6 +40,7 @@ export interface WorkflowEditorProps {
 
 const WorkflowEditor = ({
     componentDefinitions,
+    customCanvasWidth,
     projectLeftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
@@ -246,7 +248,7 @@ const WorkflowEditor = ({
     }
 
     useLayout({
-        canvasWidth,
+        canvasWidth: customCanvasWidth || canvasWidth,
         componentDefinitions,
         readOnlyWorkflow: readOnlyWorkflow ? workflow : undefined,
         taskDispatcherDefinitions,
