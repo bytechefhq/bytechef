@@ -128,8 +128,8 @@ public class AgileCrmCreateContactAction {
                             .description("The time the contact was last called."),
                         integer("viewed_time")
                             .description("The time the contact was last viewed."),
-                        array("viewed")
-                            .items(
+                        object("viewed")
+                            .properties(
                                 integer("viewed_time")
                                     .description("The time the contact was last viewed.")),
                         integer("star_value")
@@ -139,6 +139,7 @@ public class AgileCrmCreateContactAction {
                         string("klout_score")
                             .description("The klout score of the contact."),
                         array("tags")
+                            .items(string())
                             .description("Tags of the contact."),
                         array("tagsWithTime")
                             .items(
