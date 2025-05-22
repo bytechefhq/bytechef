@@ -25,15 +25,10 @@ const DescriptionTab = ({
     nodeDefinition: ComponentDefinition | TaskDispatcherDefinition | TriggerDefinition;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }) => {
-    const {nodes} = useWorkflowDataStore(
+    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+    const {nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
-        }))
-    );
-
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
-    const {workflow} = useWorkflowDataStore(
-        useShallow((state) => ({
             workflow: state.workflow,
         }))
     );
@@ -41,8 +36,6 @@ const DescriptionTab = ({
     const workflowTaskOrTrigger = [...(workflow.tasks ?? []), ...(workflow.triggers ?? [])]?.find(
         (task) => task.name === currentNode?.workflowNodeName
     );
-
-    console.log('workflowTaskOrTrigger', workflowTaskOrTrigger);
 
     const queryClient = useQueryClient();
     const {projectId} = useParams();
