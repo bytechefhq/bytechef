@@ -46,7 +46,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -105,8 +104,7 @@ public class AgileCrmCreateContactAction {
             array(TAGS)
                 .label("Tags")
                 .description("Tags of the contact.")
-                .items(
-                    string("tag"))
+                .items(string("tag"))
                 .required(false))
         .output(
             outputSchema(
@@ -228,12 +226,10 @@ public class AgileCrmCreateContactAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Object[] tags = inputParameters.getArray(TAGS) == null ? new Object[0] : inputParameters.getArray(TAGS);
-
         return context.http(http -> http.post("/contacts"))
             .body(
                 Body.of(
-                    TAGS, List.of(tags),
+                    TAGS, inputParameters.getList(TAGS, String.class),
                     PROPERTIES, getPropertiesList(inputParameters)))
             .configuration(responseType(ResponseType.JSON))
             .execute()

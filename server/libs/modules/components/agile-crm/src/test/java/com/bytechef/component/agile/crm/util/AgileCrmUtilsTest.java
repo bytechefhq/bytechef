@@ -56,24 +56,6 @@ class AgileCrmUtilsTest {
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
-    void ifPropertyIsNull() {
-        String mockProperty = "test";
-
-        String result = AgileCrmUtils.ifPropertyIsNull(mockProperty);
-
-        assertEquals(mockProperty, result);
-    }
-
-    @Test
-    void ifPropertyIsNullPropertyNull() {
-        String mockProperty = null;
-
-        String result = AgileCrmUtils.ifPropertyIsNull(mockProperty);
-
-        assertEquals("", result);
-    }
-
-    @Test
     void getPropertiesList() {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(ADDRESS, "testAddress", COMPANY, "testCompany"));
@@ -123,18 +105,18 @@ class AgileCrmUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(List.of(Map.of("name", "testName", "id", "123456")));
+            .thenReturn(List.of(Map.of("name", "testName", "id", 123456L)));
 
         List<Option<Long>> result = AgileCrmUtils.getPipelineIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        List<Option<Long>> expected = List.of(option("testName", 123456));
+        List<Option<Long>> expected = List.of(option("testName", 123456L));
 
         assertEquals(expected, result);
     }
 
     @Test
-    void getMilestone() {
+    void getMilestoneOptions() {
         Parameters mockedParameters = MockParametersFactory.create(Map.of("pipeline_id", 123456));
 
         when(mockedContext.http(any()))
@@ -144,30 +126,12 @@ class AgileCrmUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(List.of(Map.of("name", "testName", "id", "123456", "milestones", "lost,won")));
+            .thenReturn(List.of(Map.of("name", "testName", "id", 123456L, "milestones", "lost,won")));
 
-        List<Option<String>> result = AgileCrmUtils.getMilestone(
+        List<Option<String>> result = AgileCrmUtils.getMilestoneOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        List<Option<String>> expected = List.of(option("lost", "lost"),
-            option("won", "won"));
-
-        assertEquals(expected, result);
-    }
-
-    @Test
-    void getTaskTypeOptions() {
-        List<Option<String>> result = AgileCrmUtils.getTaskTypeOptions();
-
-        List<Option<String>> expected = List.of(
-            option("Call", "CALL"),
-            option("Email", "EMAIL"),
-            option("Follow Up", "FOLLOW_UP"),
-            option("Meeting", "MEETING"),
-            option("Milestone", "MILESTONE"),
-            option("Send", "SEND"),
-            option("Tweet", "TWEET"),
-            option("Other", "OTHER"));
+        List<Option<String>> expected = List.of(option("lost", "lost"), option("won", "won"));
 
         assertEquals(expected, result);
     }

@@ -32,7 +32,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
-import com.bytechef.component.agile.crm.util.AgileCrmUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -58,12 +57,21 @@ public class AgileCrmCreateTaskAction {
             string(TYPE)
                 .label("Task Type")
                 .description("The type of the task.")
-                .options(AgileCrmUtils.getTaskTypeOptions())
+                .options(
+                    option("Call", "CALL"),
+                    option("Email", "EMAIL"),
+                    option("Follow Up", "FOLLOW_UP"),
+                    option("Meeting", "MEETING"),
+                    option("Milestone", "MILESTONE"),
+                    option("Send", "SEND"),
+                    option("Tweet", "TWEET"),
+                    option("Other", "OTHER"))
                 .required(true),
             string(PRIORITY_TYPE)
                 .label("Priority")
                 .description("The priority of the task.")
-                .options(option("High", "HIGH"),
+                .options(
+                    option("High", "HIGH"),
                     option("Normal", "NORMAL"),
                     option("Low", "LOW"))
                 .required(true),

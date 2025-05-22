@@ -73,7 +73,7 @@ public class AgileCrmCreateDealAction {
                 .label("Milestone")
                 .description("Milestone the deal is currently at.")
                 .optionsLookupDependsOn(PIPELINE_ID)
-                .options((ActionOptionsFunction<String>) AgileCrmUtils::getMilestone)
+                .options((ActionOptionsFunction<String>) AgileCrmUtils::getMilestoneOptions)
                 .required(true),
             integer(PROBABILITY)
                 .label("Probability")

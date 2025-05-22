@@ -16,7 +16,9 @@
 
 package com.bytechef.component.agile.crm.util;
 
+import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.ID;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.NAME;
+import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.PIPELINE_ID;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.VALUE;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.WEBSITE;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -28,6 +30,7 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,29 +41,62 @@ import java.util.stream.Collectors;
  */
 public class AgileCrmUtils {
 
-    public static String ifPropertyIsNull(String property) {
-        return property == null ? "" : property;
+    public static List<Option<String>> getMilestoneOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Map<String, Object>> tracks = getTrackList(context);
+
+        String milestones = tracks.stream()
+            .filter(track -> (Long) track.get(ID) == inputParameters.getRequiredLong(PIPELINE_ID))
+            .map(trackOption -> (String) trackOption.get("milestones"))
+            .collect(Collectors.joining());
+
+        return Arrays.stream(milestones.split(","))
+            .map(milestone -> option(milestone, milestone))
+            .collect(Collectors.toList());
     }
 
-    public static List<Map<String, Object>> getPropertiesList(Parameters properties) {
+    public static List<Option<Long>> getPipelineIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        List<Map<String, Object>> propertiesList = new ArrayList<>();
+        List<Map<String, Object>> tracks = getTrackList(context);
 
-        for (PropertiesValuesEnum value : PropertiesValuesEnum.values()) {
-            Map<String, Object> propertiesMap = new HashMap<>();
+        List<Option<Long>> options = new ArrayList<>();
 
-            propertiesMap.put(NAME, value.getValue());
-            propertiesMap.put(VALUE, ifPropertyIsNull(properties.getString(value.getValue())));
-
-            if (value.getValue()
-                .equals(WEBSITE)) {
-                propertiesMap.put("subtype", "URL");
-            }
-
-            propertiesList.add(propertiesMap);
+        for (Map<String, Object> track : tracks) {
+            options.add(option((String) track.get("name"), ((Long) track.get(ID)).longValue()));
         }
 
-        return propertiesList;
+        return options;
+    }
+
+    public static List<Map<String, Object>> getPropertiesList(Parameters inputParameters) {
+        return Arrays.stream(PropertiesValuesEnum.values())
+            .map(propertiesValuesEnum -> createPropertiesMap(propertiesValuesEnum, inputParameters))
+            .collect(Collectors.toList());
+    }
+
+    private static Map<String, Object> createPropertiesMap(
+        PropertiesValuesEnum propertiesValuesEnum, Parameters inputParameters) {
+
+        String value = propertiesValuesEnum.getValue();
+
+        Map<String, Object> propertiesMap = new HashMap<>();
+
+        propertiesMap.put(NAME, value);
+        propertiesMap.put(VALUE, defaultIfNull(inputParameters.getString(value)));
+
+        if (value.equals(WEBSITE)) {
+            propertiesMap.put("subtype", "URL");
+        }
+
+        return propertiesMap;
+    }
+
+    private static String defaultIfNull(String property) {
+        return property == null ? "" : property;
     }
 
     public static List<Option<String>> getUserIdOptions(
@@ -74,7 +110,7 @@ public class AgileCrmUtils {
 
         Map<String, Object> user = userOptions.get("domainUser");
 
-        return List.of(option((String) user.get("domain"), (String) user.get("id")));
+        return List.of(option((String) user.get("domain"), (String) user.get(ID)));
     }
 
     private static List<Map<String, Object>> getTrackList(Context context) {
@@ -82,55 +118,5 @@ public class AgileCrmUtils {
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-    }
-
-    public static List<Option<Long>> getPipelineIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, Context context) {
-
-        List<Map<String, Object>> trackOptions = getTrackList(context);
-
-        List<Option<Long>> trackIdOptions = new ArrayList<>();
-
-        for (Map<String, Object> trackOption : trackOptions) {
-            trackIdOptions.add(option((String) trackOption.get("name"), Long.parseLong(trackOption.get("id")
-                .toString())));
-        }
-
-        return trackIdOptions;
-    }
-
-    public static List<Option<String>> getMilestone(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, Context context) {
-
-        List<Map<String, Object>> trackOptions = getTrackList(context);
-
-        List<Option<String>> milestoneOptions = new ArrayList<>();
-
-        String milestonesString = trackOptions.stream()
-            .filter(
-                trackOption -> Long.parseLong(trackOption.get("id")
-                    .toString()) == inputParameters.getLong("pipeline_id"))
-            .map(trackOption -> (String) trackOption.get("milestones"))
-            .collect(Collectors.joining());
-
-        for (String milestoneOption : milestonesString.split(",")) {
-            milestoneOptions.add(option(milestoneOption, milestoneOption));
-        }
-
-        return milestoneOptions;
-    }
-
-    public static List<Option<String>> getTaskTypeOptions() {
-        return List.of(
-            option("Call", "CALL"),
-            option("Email", "EMAIL"),
-            option("Follow Up", "FOLLOW_UP"),
-            option("Meeting", "MEETING"),
-            option("Milestone", "MILESTONE"),
-            option("Send", "SEND"),
-            option("Tweet", "TWEET"),
-            option("Other", "OTHER"));
     }
 }

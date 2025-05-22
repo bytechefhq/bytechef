@@ -22,6 +22,7 @@ import com.bytechef.component.agile.crm.constant.AgileCrmConstants;
  * @author Nikolina Spehar
  */
 public enum PropertiesValuesEnum {
+
     ADDRESS(AgileCrmConstants.ADDRESS),
     COMPANY(AgileCrmConstants.COMPANY),
     EMAIL(AgileCrmConstants.EMAIL),

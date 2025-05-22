@@ -48,7 +48,7 @@ class AgileCrmCreateContactActionTest {
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(FIRST_NAME, "test", EMAIL, "test_email"));
+        Map.of(FIRST_NAME, "test", EMAIL, "test_email", TAGS, List.of("tag1", "tag2")));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final Map<String, Object> responseMap = Map.of();
@@ -78,8 +78,7 @@ class AgileCrmCreateContactActionTest {
 
             Body body = bodyArgumentCaptor.getValue();
 
-            Map<String, Object> expectedBody = Map.of(
-                TAGS, List.of(new Object[0]), PROPERTIES, List.of());
+            Map<String, Object> expectedBody = Map.of(TAGS, List.of("tag1", "tag2"), PROPERTIES, List.of());
 
             assertEquals(expectedBody, body.getContent());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
