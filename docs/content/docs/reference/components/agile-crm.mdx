@@ -106,11 +106,11 @@ Type: OBJECT
 | last_campaign_emailed | INTEGER | The time the contact was last emailed about the campaign. |
 | last_called | INTEGER | The time the contact was last called. |
 | viewed_time | INTEGER | The time the contact was last viewed. |
-| viewed | ARRAY <details> <summary> Items </summary> [INTEGER\($viewed_time)] </details> |  |
+| viewed | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(viewed_time)&#125; </details> |  |
 | star_value | INTEGER | The star value of the contact. |
 | lead_score | INTEGER | The lead score of the contact. |
 | klout_score | STRING | The klout score of the contact. |
-| tags | ARRAY <details> <summary> Items </summary> [] </details> | Tags of the contact. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags of the contact. |
 | tagsWithTime | ARRAY <details> <summary> Items </summary> [&#123;STRING\(tag), NUMBER\(createdTime), INTEGER\(availableCount), STRING\(entity_type)&#125;] </details> |  |
 | properties | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(name), STRING\(value)&#125;] </details> | Properties of the contact. |
 | campaignStatus | ARRAY <details> <summary> Items </summary> [] </details> | The status of the campaign. |
@@ -148,11 +148,13 @@ Type: OBJECT
   "last_campaign_emailed" : 1,
   "last_called" : 1,
   "viewed_time" : 1,
-  "viewed" : [ 1 ],
+  "viewed" : {
+    "viewed_time" : 1
+  },
   "star_value" : 1,
   "lead_score" : 1,
   "klout_score" : "",
-  "tags" : [ ],
+  "tags" : [ "" ],
   "tagsWithTime" : [ {
     "tag" : "",
     "createdTime" : 0.0,
@@ -273,7 +275,7 @@ Type: OBJECT
 | updated_time | INTEGER | The time when the deal was updated. |
 | isCurrencyUpdateRequired | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the deal currency requires updating. |
 | currency_conversion_value | NUMBER | The currency conversion value. |
-| tags | ARRAY <details> <summary> Items </summary> [] </details> | Tags of the deal. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags of the deal. |
 | tagsWithTime | ARRAY <details> <summary> Items </summary> [] </details> | Tags with time of the deal. |
 | owner | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(domain), STRING\(email), STRING\(phone), STRING\(name), STRING\(pic), STRING\(schedule_id), STRING\(calendar_url), STRING\(calendarURL)&#125;] </details> | The owner of the deal. |
 | contacts | ARRAY <details> <summary> Items </summary> [] </details> | Contacts of the deal. |
@@ -314,7 +316,7 @@ Type: OBJECT
   "updated_time" : 1,
   "isCurrencyUpdateRequired" : false,
   "currency_conversion_value" : 0.0,
-  "tags" : [ ],
+  "tags" : [ "" ],
   "tagsWithTime" : [ ],
   "owner" : [ {
     "id" : 0.0,
