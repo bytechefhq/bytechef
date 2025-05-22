@@ -4,6 +4,7 @@ import {NodeProps} from '@xyflow/react';
 import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import useClusterElementsDataStore from '../../ai-agent-editor/stores/useClusterElementsDataStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -19,12 +20,23 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         }))
     );
 
-    const {setAiAgentOpen} = useWorkflowEditorStore();
+    const {nodes: clusterElementsCanvasNodes} = useClusterElementsDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
+
+    const {clusterElementsCanvasOpen, setClusterElementsCanvasOpen} = useWorkflowEditorStore();
 
     return useCallback(() => {
         const clickedNode = nodes.find((node) => node.id === id);
+        const clickedNodeInClusterElementCanvas = clusterElementsCanvasNodes.find((node) => node.id === id);
 
-        if (!clickedNode) {
+        if (!clusterElementsCanvasOpen && !clickedNode) {
+            return;
+        }
+
+        if (clusterElementsCanvasOpen && !clickedNodeInClusterElementCanvas) {
             return;
         }
 
@@ -32,12 +44,11 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         setActiveTab(activeTab ?? 'description');
         setCurrentNode({...data, description: ''});
 
-        if (data.componentName === 'aiAgent') {
-            setAiAgentOpen(true);
-            setWorkflowNodeDetailsPanelOpen(true);
-        } else {
-            setWorkflowNodeDetailsPanelOpen(true);
+        if (data.rootClusterElement) {
+            setClusterElementsCanvasOpen(true);
         }
+
+        setWorkflowNodeDetailsPanelOpen(true);
 
         if (data.type) {
             setCurrentComponent({
@@ -47,13 +58,15 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         }
     }, [
         nodes,
+        clusterElementsCanvasNodes,
+        clusterElementsCanvasOpen,
         setRightSidebarOpen,
         setActiveTab,
         activeTab,
         setCurrentNode,
         data,
         id,
-        setAiAgentOpen,
+        setClusterElementsCanvasOpen,
         setWorkflowNodeDetailsPanelOpen,
         setCurrentComponent,
     ]);
