@@ -5,13 +5,13 @@ import {useShallow} from 'zustand/react/shallow';
 
 import PlaceholderNode from '../../workflow-editor/nodes/PlaceholderNode';
 import WorkflowNode from '../../workflow-editor/nodes/WorkflowNode';
-import LabeledAiAgentEdge from '../edges/LabeledAiAgentEdge';
-import useAiAgentLayout from '../hooks/useAiAgentLayout';
-import AiAgentToolsGhostNode from '../nodes/AiAgentToolsGhostNode';
-import useAiAgentDataStore from '../stores/useAiAgentDataStore';
+import LabeledClusterElementsEdge from '../edges/LabeledClusterElementsEdge';
+import useClusterElementsLayout from '../hooks/useClusterElementsLayout';
+import MultipleClusterElementsGhostNode from '../nodes/MultipleClusterElementsGhostNode';
+import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
-const AiAgentWorkflowEditor = () => {
-    const {edges, nodes, onEdgesChange, onNodesChange} = useAiAgentDataStore(
+const ClusterElementsWorkflowEditor = () => {
+    const {edges, nodes, onEdgesChange, onNodesChange} = useClusterElementsDataStore(
         useShallow((state) => ({
             edges: state.edges,
             nodes: state.nodes,
@@ -20,27 +20,27 @@ const AiAgentWorkflowEditor = () => {
         }))
     );
 
-    const aiAgentEdgeTypes = {
-        labeledAiAgentEdge: LabeledAiAgentEdge,
+    const clusterElementsEdgeTypes = {
+        labeledClusterElementsEdge: LabeledClusterElementsEdge,
     };
 
-    const aiAgentNodeTypes = {
-        aiAgentToolsGhostNode: AiAgentToolsGhostNode,
+    const clusterElementsNodeTypes = {
+        multipleClusterElementsGhostNode: MultipleClusterElementsGhostNode,
         placeholder: PlaceholderNode,
         workflow: WorkflowNode,
     };
 
-    useAiAgentLayout();
+    useClusterElementsLayout();
 
     return (
         <div className="size-full rounded-lg bg-surface-popover-canvas">
             <ReactFlowProvider>
                 <ReactFlow
-                    edgeTypes={aiAgentEdgeTypes}
+                    edgeTypes={clusterElementsEdgeTypes}
                     edges={edges}
                     maxZoom={1}
                     minZoom={0.6}
-                    nodeTypes={aiAgentNodeTypes}
+                    nodeTypes={clusterElementsNodeTypes}
                     nodes={nodes}
                     nodesConnectable={false}
                     nodesDraggable
@@ -63,4 +63,4 @@ const AiAgentWorkflowEditor = () => {
     );
 };
 
-export default AiAgentWorkflowEditor;
+export default ClusterElementsWorkflowEditor;

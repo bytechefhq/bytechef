@@ -3,8 +3,8 @@ import {Handle, Position} from '@xyflow/react';
 import {memo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const AiAgentToolsGhostNode = ({id}: {id: string}) => (
-    <div className="h-0.5 w-[75px]" data-nodetype="aiAgentToolsGhostNode" key={id}>
+const MultipleClusterElementsGhostNode = ({id}: {id: string}) => (
+    <div className="h-0.5 w-[75px]" data-nodetype="multipleClusterElementsGhostNode" key={id}>
         <Handle
             className={twMerge('left-node-handle-placement', styles.handle)}
             isConnectable={false}
@@ -21,4 +21,4 @@ const AiAgentToolsGhostNode = ({id}: {id: string}) => (
     </div>
 );
 
-export default memo(AiAgentToolsGhostNode);
+export default memo(MultipleClusterElementsGhostNode);
