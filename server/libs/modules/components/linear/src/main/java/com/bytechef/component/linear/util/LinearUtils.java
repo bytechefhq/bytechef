@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.linear.constant.LinearConstants.ID;
 import static com.bytechef.component.linear.constant.LinearConstants.ISSUE_ID;
+import static com.bytechef.component.linear.constant.LinearConstants.NAME;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 
 import com.bytechef.component.definition.Context;
@@ -176,10 +177,11 @@ public class LinearUtils {
 
             for (Object node : nodes) {
                 if (node instanceof Map<?, ?> nodeMap) {
-                    options.add(option((String) nodeMap.get("name"), (String) nodeMap.get("id")));
+                    options.add(option((String) nodeMap.get(NAME), (String) nodeMap.get(ID)));
                 }
             }
         }
+
         return options;
     }
 
@@ -192,49 +194,47 @@ public class LinearUtils {
             .getBody(new TypeReference<>() {});
     }
 
-    public static Map<String, Object>
-        executeIssueTriggerQuery(String requiredAction, WebhookBody body, TriggerContext context) {
+    public static Object executeIssueTriggerQuery(
+        String requiredAction, WebhookBody body, TriggerContext context) {
 
         Map<String, Object> content = body.getContent(new TypeReference<>() {});
         String action = (String) content.get("action");
 
         if (requiredAction.equals(action)) {
-            Map<String, Object> data = (Map<String, Object>) content.get("data");
-            String issueId = (String) data.get(ISSUE_ID);
-
-            String query =
-                "{issue(id: \"%s\") {id title team {id name} state {name} priority assignee {id name} description}}"
-                    .formatted(issueId);
-
-            Map<String, Object> response = executeGraphQLQuery(query, context);
-
-            if (response.get("data") instanceof Map<?, ?> responseData &&
-                responseData.get("issue") instanceof Map<?, ?> issue) {
-
-                return (Map<String, Object>) issue;
-            }
+           return content.get("data");
         }
+
         return null;
     }
 
     public static WebhookEnableOutput createWebhook(
-        String type, String webhookUrl, TriggerContext context) {
+        String webhookUrl, TriggerContext context, Parameters inputParameters) {
 
-        String query = "mutation {webhookCreate(input: {url: \"%s\",resourceTypes: [\"%s\"]}) {webhook {id}}}"
-            .formatted(webhookUrl, type);
+        String query;
+        if (inputParameters.getRequiredBoolean("allPublicTeams")) {
+            query =
+                "mutation {webhookCreate(input: {url: \"%s\", allPublicTeams: %s, resourceTypes: [\"Issue\"]}) {webhook {id}}}"
+                    .formatted(webhookUrl, true);
+        } else {
+            query =
+                "mutation {webhookCreate(input: {url: \"%s\", teamId: \"%s\", resourceTypes: [\"Issue\"]}) {webhook {id}}}"
+                    .formatted(webhookUrl, inputParameters.getRequiredString(TEAM_ID));
+        }
 
         Map<String, Object> body = executeGraphQLQuery(query, context);
 
-        if (body.get("data") instanceof Map<?, ?> map && map.get("webhookCreate") instanceof Map<?, ?> webhookCreate
-            && webhookCreate.get("webhook") instanceof Map<?, ?> webhook) {
+        if (body.get("data") instanceof Map<?, ?> map &&
+            map.get("webhookCreate") instanceof Map<?, ?> webhookCreate &&
+            webhookCreate.get("webhook") instanceof Map<?, ?> webhook) {
+
             return new WebhookEnableOutput(Map.of(ID, webhook.get(ID)), null);
         }
 
         throw new ProviderException("Failed to start Linear webhook.");
     }
 
-    public static void deleteWebhook(Parameters outputParameters, Context context) {
-        String query = "mutation{webhookDelete(id: \"%s\")}".formatted(outputParameters.getString(ID));
+    public static void deleteWebhook(String webhookId, Context context) {
+        String query = "mutation{webhookDelete(id: \"%s\"){success}}".formatted(webhookId);
 
         executeGraphQLQuery(query, context);
     }
