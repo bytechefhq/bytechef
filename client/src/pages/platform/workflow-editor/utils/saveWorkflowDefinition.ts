@@ -1,3 +1,4 @@
+import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {Workflow, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
@@ -167,15 +168,15 @@ export default async function saveWorkflowDefinition({
                 combinedParameters = newTask.parameters ?? {};
             }
 
-            if (existingWorkflowTask.type.split('/')[0] === 'aiAgent') {
-                const aiAgentTask: WorkflowTask = {
+            if (ROOT_CLUSTER_ELEMENT_NAMES.includes(existingWorkflowTask.type.split('/')[0])) {
+                const rootClusterElementTask: WorkflowTask = {
                     ...newTask,
                     clusterElements: {
                         ...(newTask.clusterElements || {}),
                     },
                 };
 
-                updatedWorkflowDefinitionTasks[existingTaskIndex] = aiAgentTask;
+                updatedWorkflowDefinitionTasks[existingTaskIndex] = rootClusterElementTask;
             } else {
                 const combinedTask: WorkflowTask = {
                     ...newTask,
