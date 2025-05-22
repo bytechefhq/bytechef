@@ -30,12 +30,14 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record NotificationDTO(
     Long id, String name, Type type, Map<String, Object> settings, List<NotificationEvent> notificationEvents,
+    List<Long> notificationEventIds,
     String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate, int version) {
 
     public NotificationDTO(Notification notification, List<NotificationEvent> notificationEvents) {
         this(
             notification.getId(), notification.getName(), notification.getType(), notification.getSettings(),
-            notificationEvents, notification.getCreatedBy(), notification.getCreatedDate(),
+            notificationEvents, notification.getNotificationEventIds(), notification.getCreatedBy(),
+            notification.getCreatedDate(),
             notification.getLastModifiedBy(), notification.getLastModifiedDate(), notification.getVersion());
     }
 }

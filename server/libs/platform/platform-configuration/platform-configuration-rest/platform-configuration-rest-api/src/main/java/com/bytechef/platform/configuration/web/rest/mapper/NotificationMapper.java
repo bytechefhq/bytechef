@@ -34,7 +34,7 @@ public interface NotificationMapper extends Converter<NotificationDTO, Notificat
 
     @Override
     @Mapping(target = "notificationEventIds", ignore = true)
-    NotificationModel convert(NotificationDTO notification);
+    NotificationModel convert(NotificationDTO notificationDTO);
 
     @InheritInverseConfiguration
     @DelegatingConverter

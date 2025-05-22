@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.dto.NotificationDTO;
 import java.util.List;
 
@@ -25,4 +26,6 @@ import java.util.List;
 public interface NotificationFacade {
 
     List<NotificationDTO> getNotifications();
+
+    NotificationDTO createNotification(Notification notification);
 }

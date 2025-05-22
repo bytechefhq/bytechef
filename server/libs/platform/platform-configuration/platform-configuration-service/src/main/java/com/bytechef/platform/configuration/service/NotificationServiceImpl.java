@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.service;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.domain.NotificationEvent;
 import com.bytechef.platform.configuration.repository.NotificationRepository;
@@ -37,6 +38,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public void delete(long notificationId) {
+        notificationRepository.deleteById(notificationId);
+    }
+
+    @Override
     public List<Notification> getNotifications() {
         return notificationRepository.findAll();
     }
@@ -49,5 +55,18 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public Notification create(Notification notification) {
         return notificationRepository.save(notification);
+    }
+
+    @Override
+    public Notification update(Notification notification) {
+        Notification curNotification = OptionalUtils.get(notificationRepository.findById(notification.getId()));
+
+        curNotification.setName(notification.getName());
+        curNotification.setNotificationEventIds(notification.getNotificationEventIds());
+        curNotification.setSettings(notification.getSettings());
+        curNotification.setType(notification.getType());
+        curNotification.setVersion(notification.getVersion());
+
+        return notificationRepository.save(curNotification);
     }
 }

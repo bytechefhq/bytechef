@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.domain.Notification;
+import com.bytechef.platform.configuration.facade.NotificationFacade;
 import com.bytechef.platform.configuration.service.NotificationService;
 import com.bytechef.platform.configuration.web.rest.model.NotificationModel;
 import java.util.List;
@@ -35,10 +36,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class NotificationApiController implements NotificationApi {
 
     private final ConversionService conversionService;
+    private final NotificationFacade notificationFacade;
     private final NotificationService notificationService;
 
-    public NotificationApiController(ConversionService conversionService, NotificationService notificationService) {
+    public NotificationApiController(
+        ConversionService conversionService, NotificationFacade notificationFacade,
+        NotificationService notificationService) {
+
         this.conversionService = conversionService;
+        this.notificationFacade = notificationFacade;
         this.notificationService = notificationService;
     }
 
@@ -46,16 +52,35 @@ public class NotificationApiController implements NotificationApi {
     public ResponseEntity<NotificationModel> createNotification(NotificationModel notificationModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                notificationService.create(conversionService.convert(notificationModel, Notification.class)),
+                notificationFacade.createNotification(conversionService.convert(notificationModel, Notification.class)),
                 NotificationModel.class));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteNotification(Long notificationId) {
+        notificationService.delete(notificationId);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override
     public ResponseEntity<List<NotificationModel>> getNotifications() {
         return ResponseEntity.ok(
-            notificationService.getNotifications()
+            notificationFacade.getNotifications()
                 .stream()
                 .map(notification -> conversionService.convert(notification, NotificationModel.class))
                 .toList());
+    }
+
+    @Override
+    public ResponseEntity<NotificationModel> updateNotification(
+        Long notificationId, NotificationModel notificationModel) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                notificationService.update(
+                    conversionService.convert(notificationModel.id(notificationId), Notification.class)),
+                NotificationModel.class));
     }
 }

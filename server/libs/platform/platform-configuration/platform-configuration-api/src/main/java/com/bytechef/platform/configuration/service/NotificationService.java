@@ -27,7 +27,11 @@ public interface NotificationService {
 
     Notification create(Notification notification);
 
+    void delete(long notificationId);
+
     List<Notification> getNotifications();
 
     List<Notification> getNotifications(NotificationEvent.Type eventType);
+
+    Notification update(Notification notification);
 }

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.workflow.configuration.remote.client.facade;
 
+import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.dto.NotificationDTO;
 import com.bytechef.platform.configuration.facade.NotificationFacade;
 import java.util.List;
@@ -22,6 +23,11 @@ public class RemoteNotificationFacadeClient implements NotificationFacade {
 
     @Override
     public List<NotificationDTO> getNotifications() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public NotificationDTO createNotification(Notification notification) {
         throw new UnsupportedOperationException();
     }
 }

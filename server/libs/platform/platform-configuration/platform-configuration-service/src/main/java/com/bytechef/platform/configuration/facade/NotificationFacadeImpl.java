@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.dto.NotificationDTO;
 import com.bytechef.platform.configuration.service.NotificationEventService;
 import com.bytechef.platform.configuration.service.NotificationService;
@@ -45,5 +46,15 @@ public class NotificationFacadeImpl implements NotificationFacade {
             .map(notification -> new NotificationDTO(
                 notification, notificationEventService.getNotificationEvents(notification.getNotificationEventIds())))
             .toList();
+    }
+
+    @Override
+    public NotificationDTO createNotification(Notification notification) {
+
+        notification = notificationService.create(notification);
+
+        return new NotificationDTO(
+            notification,
+            notificationEventService.getNotificationEvents(notification.getNotificationEventIds()));
     }
 }
