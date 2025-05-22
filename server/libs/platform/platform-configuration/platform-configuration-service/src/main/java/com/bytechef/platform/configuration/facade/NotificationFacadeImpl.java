@@ -21,6 +21,8 @@ import com.bytechef.platform.configuration.dto.NotificationDTO;
 import com.bytechef.platform.configuration.service.NotificationEventService;
 import com.bytechef.platform.configuration.service.NotificationService;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,6 +34,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     private final NotificationEventService notificationEventService;
     private final NotificationService notificationService;
 
+    @SuppressFBWarnings("EI")
     public NotificationFacadeImpl(
         NotificationEventService notificationEventService, NotificationService notificationService) {
 

@@ -22,6 +22,8 @@ import com.bytechef.platform.configuration.facade.NotificationFacade;
 import com.bytechef.platform.configuration.service.NotificationService;
 import com.bytechef.platform.configuration.web.rest.model.NotificationModel;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +41,7 @@ public class NotificationApiController implements NotificationApi {
     private final NotificationFacade notificationFacade;
     private final NotificationService notificationService;
 
+    @SuppressFBWarnings("EI")
     public NotificationApiController(
         ConversionService conversionService, NotificationFacade notificationFacade,
         NotificationService notificationService) {
