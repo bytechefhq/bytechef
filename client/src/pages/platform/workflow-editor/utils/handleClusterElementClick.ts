@@ -1,134 +1,113 @@
-import {ClusterElementDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {ClusterElementsType, UpdateWorkflowMutationType} from '@/shared/types';
+import {ClusterElementDefinitionBasic, ComponentDefinition} from '@/shared/middleware/platform/configuration';
+import {UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
-import {Node} from '@xyflow/react';
 
+import {initializeClusterElementsObject} from '../../ai-agent-editor/utils/clusterElementsUtils';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import getFormattedClusterElementName from './getFormattedClusterElementName';
+import getFormattedName from './getFormattedName';
+import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
-type ClusterElementsDefinitionType = 'CHAT_MEMORY' | 'MODEL' | 'RAG';
-type StoredClusterElementsType = 'chatMemory' | 'model' | 'rag';
-
 interface HandleClusterElementClickProps {
-    clusterElementsData: ClusterElementsType;
     data: ClusterElementDefinitionBasic;
     projectId: string;
     queryClient: QueryClient;
+    rootClusterElementDefinition: ComponentDefinition;
     setPopoverOpen: (open: boolean) => void;
-    sourceNode: Node;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
 export default function handleClusterElementClick({
-    clusterElementsData,
     data,
     projectId,
     queryClient,
+    rootClusterElementDefinition,
     setPopoverOpen,
-    sourceNode,
     updateWorkflowMutation,
 }: HandleClusterElementClickProps) {
-    const {aiAgentNodeData, setAiAgentNodeData} = useWorkflowEditorStore.getState();
+    const {rootClusterElementNodeData, setRootClusterElementNodeData} = useWorkflowEditorStore.getState();
+    const {workflow} = useWorkflowDataStore.getState();
     const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
 
-    const updatedClusterElementsData: ClusterElementsType = {
-        rag: clusterElementsData.rag
-            ? {
-                  label: clusterElementsData.rag.label,
-                  name: clusterElementsData.rag.name,
-                  parameters: clusterElementsData.rag.parameters || {},
-                  type: clusterElementsData.rag.type,
-              }
-            : null,
-        // eslint-disable-next-line sort-keys
-        chatMemory: clusterElementsData.chatMemory
-            ? {
-                  label: clusterElementsData.chatMemory.label,
-                  name: clusterElementsData.chatMemory.name,
-                  parameters: clusterElementsData.chatMemory.parameters || {},
-                  type: clusterElementsData.chatMemory.type,
-              }
-            : null,
+    if (!workflow.definition) {
+        return;
+    }
 
-        model: clusterElementsData.model
-            ? {
-                  label: clusterElementsData.model.label,
-                  name: clusterElementsData.model.name,
-                  parameters: clusterElementsData.model.parameters || {},
-                  type: clusterElementsData.model.type,
-              }
-            : null,
+    const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-        tools: clusterElementsData.tools
-            ? clusterElementsData.tools.map((tool) => ({
-                  label: tool.label,
-                  name: tool.name,
-                  parameters: tool.parameters || {},
-                  type: tool.type,
-              }))
-            : [],
-    };
+    const currentParentTask = workflowDefinitionTasks?.find(
+        (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
+    );
+    const existingClusterElements = currentParentTask?.clusterElements;
 
-    const propertyMap: Record<ClusterElementsDefinitionType, StoredClusterElementsType> = {
-        CHAT_MEMORY: 'chatMemory',
-        MODEL: 'model',
-        RAG: 'rag',
-    };
+    const currentClusterElementDefinition = rootClusterElementDefinition.clusterElementTypes?.find(
+        (clusterElementDefinition) => clusterElementDefinition.name === data.type
+    );
+    const clusterElementContainsMultipleElements = currentClusterElementDefinition?.multipleElements;
 
-    if (data.type === 'TOOLS') {
-        updatedClusterElementsData.tools = [
-            ...(updatedClusterElementsData.tools || []),
-            {
+    const clusterElements = initializeClusterElementsObject(rootClusterElementDefinition, existingClusterElements);
+
+    const objectKey = data.name;
+
+    if (objectKey in clusterElements) {
+        if (clusterElementContainsMultipleElements) {
+            const existingElements = Array.isArray(clusterElements[objectKey]) ? clusterElements[objectKey] : [];
+
+            clusterElements[objectKey] = [
+                ...existingElements,
+                {
+                    label: data.componentName,
+                    name: getFormattedName(data.componentName),
+                    parameters: {},
+                    type: `${data.componentName}/v${data.componentVersion}/${data.name}`,
+                },
+            ];
+        } else {
+            clusterElements[objectKey] = {
+                ...(clusterElements[objectKey] && !Array.isArray(clusterElements[objectKey])
+                    ? clusterElements[objectKey]
+                    : {}),
                 label: data.title,
-                name: getFormattedClusterElementName(data.name, 'tools'),
+                name: getFormattedName(data.componentName),
                 parameters: {},
                 type: `${data.componentName}/v${data.componentVersion}/${data.name}`,
-            },
-        ];
-    } else if (data.type in propertyMap) {
-        updatedClusterElementsData[propertyMap[data.type as ClusterElementsDefinitionType]] = {
-            label: data.title,
-            name: getFormattedClusterElementName(
-                data.componentName,
-                propertyMap[data.type as ClusterElementsDefinitionType]
-            ),
-            parameters: {},
-            type: `${data.componentName}/v${data.componentVersion}/${propertyMap[data.type as ClusterElementsDefinitionType]}`,
-        };
+            };
+        }
+    }
+
+    const updatedNodeData = {
+        ...currentParentTask,
+        clusterElements,
+    };
+
+    setRootClusterElementNodeData({
+        ...rootClusterElementNodeData,
+        clusterElements,
+    } as typeof rootClusterElementNodeData);
+
+    if (currentNode?.rootClusterElement) {
+        setCurrentNode({
+            ...currentNode,
+            clusterElements,
+        });
     }
 
     saveWorkflowDefinition({
-        nodeData: {
-            ...sourceNode.data,
-            clusterElements: updatedClusterElementsData,
-            componentName: String(sourceNode.data.componentName),
-            name: String(sourceNode.data.name),
-            workflowNodeName: String(sourceNode.data.workflowNodeName),
-        },
+        nodeData: updatedNodeData,
 
         onSuccess: () => {
-            setPopoverOpen(false);
-
-            setAiAgentNodeData({
-                ...aiAgentNodeData,
-                clusterElements: updatedClusterElementsData,
-                componentName: aiAgentNodeData?.componentName as string,
-                name: aiAgentNodeData?.name as string,
-                workflowNodeName: aiAgentNodeData?.workflowNodeName as string,
-            });
-
-            setCurrentNode({
-                ...currentNode,
-                clusterElements: updatedClusterElementsData,
-                componentName: currentNode?.componentName as string,
-                name: currentNode?.name as string,
-                workflowNodeName: currentNode?.workflowNodeName as string,
+            handleComponentAddedSuccess({
+                nodeData: updatedNodeData,
+                queryClient,
+                workflow,
             });
         },
         projectId: +projectId!,
         queryClient,
         updateWorkflowMutation,
     });
+
+    setPopoverOpen(false);
 }
