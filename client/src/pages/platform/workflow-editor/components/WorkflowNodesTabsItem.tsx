@@ -1,4 +1,8 @@
-import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {
+    ClusterElementDefinitionBasic,
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinition,
+} from '@/shared/middleware/platform/configuration';
 import {ComponentIcon} from 'lucide-react';
 import {HTMLAttributes, MouseEvent} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -10,7 +14,11 @@ interface DragEventI<T = Element> extends MouseEvent<T, DragEventInit> {
 
 interface WorkflowNodesTabsItemProps extends HTMLAttributes<HTMLLIElement> {
     handleClick?: () => void;
-    node: (ComponentDefinitionBasic | TaskDispatcherDefinition) & {taskDispatcher: boolean; trigger: boolean};
+    node: (ComponentDefinitionBasic | TaskDispatcherDefinition | ClusterElementDefinitionBasic) & {
+        clusterElement?: boolean;
+        taskDispatcher: boolean;
+        trigger: boolean;
+    };
     selected?: boolean;
 }
 

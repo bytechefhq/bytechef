@@ -20,6 +20,7 @@ import {
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
+import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {
@@ -32,6 +33,7 @@ import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/querie
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
     BranchCaseType,
+    ComponentOperationType,
     ComponentPropertiesType,
     NodeDataType,
     PropertyAllType,
@@ -52,6 +54,7 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
+import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import CurrentOperationSelect from './CurrentOperationSelect';
@@ -94,6 +97,10 @@ const WorkflowNodeDetailsPanel = ({
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
     const [currentActionDefinition, setCurrentActionDefinition] = useState<ActionDefinition | undefined>();
     const [currentActionFetched, setCurrentActionFetched] = useState(false);
+    const [currentClusterElementName, setCurrentClusterElementName] = useState<string | undefined>();
+    const [clusterElementComponentActions, setClusterElementComponentActions] = useState<Array<ComponentOperationType>>(
+        []
+    );
 
     const {
         activeTab,
@@ -107,11 +114,14 @@ const WorkflowNodeDetailsPanel = ({
 
     const {componentActions, setDataPills, workflow} = useWorkflowDataStore();
 
-    const {setAiAgentOpen} = useWorkflowEditorStore();
+    const {clusterElementsCanvasOpen, rootClusterElementNodeData, setClusterElementsCanvasOpen} =
+        useWorkflowEditorStore();
 
     const queryClient = useQueryClient();
 
     const {projectId} = useParams();
+
+    const isClusterElement = !!currentNode?.clusterElementType;
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
         {
@@ -129,12 +139,24 @@ const WorkflowNodeDetailsPanel = ({
         !!workflow.id && !!currentNode
     );
 
+    const {data: currentClusterElementDefinition} = useGetClusterElementDefinitionQuery(
+        {
+            componentName: currentNode?.componentName as string,
+            componentVersion: currentNode?.version as number,
+            // eslint-disable-next-line sort-keys
+            clusterElementName: currentNode?.clusterElementName as string,
+        },
+        isClusterElement
+    );
+
     const {nodeNames} = workflow;
 
     const matchingOperation = useMemo(
         () =>
             [...(currentComponentDefinition?.actions || []), ...(currentComponentDefinition?.triggers || [])].find(
-                (action) => action.name === currentOperationName
+                (action) => {
+                    return action.name === currentOperationName;
+                }
             ),
         [currentComponentDefinition, currentOperationName]
     );
@@ -169,7 +191,7 @@ const WorkflowNodeDetailsPanel = ({
             id: workflow.id!,
             workflowNodeName: currentNodeName!,
         },
-        !!currentNodeName && currentNodeName !== 'manual'
+        !!currentNodeName && currentNodeName !== 'manual' && currentNodeName !== currentClusterElementName
     );
 
     const {data: workflowNodeParameterDisplayConditions} = displayConditionsQuery;
@@ -183,8 +205,18 @@ const WorkflowNodeDetailsPanel = ({
             return currentTaskDispatcherDefinition;
         }
 
+        if (currentNode?.clusterElementType) {
+            return currentClusterElementDefinition;
+        }
+
         return currentActionDefinition;
-    }, [currentNode, currentTriggerDefinition, currentTaskDispatcherDefinition, currentActionDefinition]);
+    }, [
+        currentNode,
+        currentTriggerDefinition,
+        currentTaskDispatcherDefinition,
+        currentActionDefinition,
+        currentClusterElementDefinition,
+    ]);
 
     const currentNodeIndex = useMemo(
         () => currentNode && nodeNames?.indexOf(currentNode?.workflowNodeName),
@@ -266,8 +298,8 @@ const WorkflowNodeDetailsPanel = ({
     ]);
 
     const currentWorkflowNode = useMemo(
-        () => currentComponentDefinition || currentTaskDispatcherDefinition,
-        [currentComponentDefinition, currentTaskDispatcherDefinition]
+        () => currentComponentDefinition || currentTaskDispatcherDefinition || currentClusterElementDefinition,
+        [currentClusterElementDefinition, currentComponentDefinition, currentTaskDispatcherDefinition]
     );
 
     const currentOperationFetched = useMemo(
@@ -292,8 +324,17 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const nodeDefinition = useMemo(
-        () => currentComponentDefinition || currentTaskDispatcherDefinition || currentTriggerDefinition,
-        [currentComponentDefinition, currentTaskDispatcherDefinition, currentTriggerDefinition]
+        () =>
+            currentComponentDefinition ||
+            currentTaskDispatcherDefinition ||
+            currentTriggerDefinition ||
+            currentClusterElementDefinition,
+        [
+            currentClusterElementDefinition,
+            currentComponentDefinition,
+            currentTaskDispatcherDefinition,
+            currentTriggerDefinition,
+        ]
     );
 
     const currentTaskDataOperations = useMemo(
@@ -366,10 +407,29 @@ const WorkflowNodeDetailsPanel = ({
                 (dataKey) => dataKey && currentNode?.[dataKey as keyof typeof currentNode]
             );
 
+            const isClusterElement = !!currentNode?.clusterElementType;
+
             if (isTaskDispatcherSubtask) {
                 saveTaskDispatcherSubtaskFieldChange({
                     currentComponentDefinition,
                     currentNodeIndex: currentNodeIndex ?? 0,
+                    currentOperationProperties,
+                    fieldUpdate: {
+                        field: 'operation',
+                        value: newOperationName,
+                    },
+                    projectId: +projectId!,
+                    queryClient,
+                    updateWorkflowMutation,
+                });
+
+                return;
+            }
+
+            if (isClusterElement) {
+                saveClusterElementFieldChange({
+                    currentClusterElementName: currentNode.name,
+                    currentComponentDefinition,
                     currentOperationProperties,
                     fieldUpdate: {
                         field: 'operation',
@@ -431,18 +491,38 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const handlePanelClose = useCallback(() => {
-        setAiAgentOpen(false);
+        setClusterElementsCanvasOpen(false);
         useWorkflowNodeDetailsPanelStore.getState().reset();
-    }, [setAiAgentOpen]);
+    }, [setClusterElementsCanvasOpen]);
+
+    // Get the node version for different definition types
+    function getNodeVersion(node: typeof currentWorkflowNode): string {
+        if (!node) return '1';
+
+        if ('version' in node) {
+            return node.version.toString();
+        }
+        if ('componentVersion' in node) {
+            return node.componentVersion.toString();
+        }
+
+        return '1';
+    }
 
     // Set current node name
     useEffect(() => {
         if (currentNode?.name) {
-            setCurrentNodeName(currentNode?.name);
+            setCurrentNodeName(currentNode.name);
+
+            if (isClusterElement) {
+                setCurrentClusterElementName(currentNode.name);
+            } else {
+                setCurrentClusterElementName(undefined);
+            }
         } else {
             setCurrentNodeName(undefined);
         }
-    }, [currentNode?.name]);
+    }, [currentNode?.name, isClusterElement]);
 
     // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(() => {
@@ -572,7 +652,7 @@ const WorkflowNodeDetailsPanel = ({
 
         let updatedNode = {...currentNode};
 
-        if (currentNode.operationName && currentOperationName) {
+        if (currentNode.operationName && currentOperationName && !isClusterElement) {
             updatedNode = {
                 ...updatedNode,
                 operationName: currentOperationName,
@@ -605,21 +685,71 @@ const WorkflowNodeDetailsPanel = ({
         currentTriggerDefinition,
     ]);
 
+    useEffect(() => {
+        let clusterElementsActionsData: ComponentOperationType[] = [];
+
+        if (clusterElementsCanvasOpen) {
+            const currentRootClusterTask = workflow?.tasks?.find(
+                (task) => task.name === rootClusterElementNodeData?.workflowNodeName
+            );
+            const currentRootClusterTaskClusterElements = currentRootClusterTask?.clusterElements;
+
+            if (currentRootClusterTaskClusterElements) {
+                Object.entries(currentRootClusterTaskClusterElements).forEach(([, value]) => {
+                    if (Array.isArray(value)) {
+                        const multipleElementsData = value.map((element) => ({
+                            componentName: element.componentName || '',
+                            operationName: element.type ? element.type.split('/')[2] : '',
+                            workflowNodeName: element.name || '',
+                        }));
+
+                        clusterElementsActionsData = [...clusterElementsActionsData, ...multipleElementsData];
+                    } else {
+                        clusterElementsActionsData.push({
+                            componentName: value.componentName || '',
+                            operationName: value.type ? value.type.split('/')[2] : '',
+                            workflowNodeName: value.name || '',
+                        });
+                    }
+                });
+
+                if (clusterElementsActionsData.length > 0) {
+                    setClusterElementComponentActions(clusterElementsActionsData);
+                }
+            }
+        }
+    }, [clusterElementsCanvasOpen, rootClusterElementNodeData, workflow]);
+
     // Set currentOperationName depending on the currentComponentAction.operationName
     useEffect(() => {
         if (!componentActions?.length) {
             return;
         }
 
-        const currentComponentAction = componentActions.find(
-            (action) => action.workflowNodeName === currentNode?.workflowNodeName
-        );
+        let currentComponentAction;
 
-        if (currentComponentAction?.operationName) {
+        if (componentActions.length && !clusterElementsCanvasOpen) {
+            currentComponentAction = componentActions.find(
+                (action) => action.workflowNodeName === currentNode?.workflowNodeName
+            );
+        } else if (clusterElementsCanvasOpen) {
+            if (currentNode?.rootClusterElement) {
+                currentComponentAction = componentActions.find(
+                    (action) => action.workflowNodeName === currentNode?.workflowNodeName
+                );
+            } else if (clusterElementComponentActions) {
+                currentComponentAction = clusterElementComponentActions.find(
+                    (action) => action.workflowNodeName === currentNode?.workflowNodeName
+                );
+            }
+        }
+
+        if (currentComponentAction?.operationName && currentComponentAction.operationName !== currentOperationName) {
             setCurrentOperationName(currentComponentAction.operationName);
         }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [componentActions, currentNode?.workflowNodeName]);
+    }, [clusterElementComponentActions, componentActions, currentNode?.workflowNodeName, currentOperationName]);
 
     // Update display conditions when currentNode changes
     useEffect(() => {
@@ -868,7 +998,7 @@ const WorkflowNodeDetailsPanel = ({
                     </main>
 
                     <footer className="z-50 mt-auto flex bg-background px-4 py-2">
-                        <Select defaultValue={currentWorkflowNode?.version.toString()}>
+                        <Select defaultValue={getNodeVersion(currentWorkflowNode)}>
                             <SelectTrigger className="w-auto border-none shadow-none">
                                 <SelectValue placeholder="Choose version..." />
                             </SelectTrigger>

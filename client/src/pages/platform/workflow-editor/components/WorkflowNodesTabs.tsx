@@ -1,6 +1,10 @@
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {
+    ClusterElementDefinitionBasic,
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinition,
+} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
 import {useEffect, useMemo, useState} from 'react';
@@ -16,7 +20,9 @@ type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
 
 interface WorkflowNodesTabsProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasic>;
+    clusterElementComponentDefinitions?: Array<ClusterElementDefinitionBasic>;
     hideActionComponents?: boolean;
+    hideClusterElementComponents?: boolean;
     hideTaskDispatchers?: boolean;
     hideTriggerComponents?: boolean;
     itemsDraggable?: boolean;
@@ -28,7 +34,9 @@ interface WorkflowNodesTabsProps {
 
 const WorkflowNodesTabs = ({
     actionComponentDefinitions,
+    clusterElementComponentDefinitions,
     hideActionComponents = false,
+    hideClusterElementComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
     itemsDraggable = false,
@@ -37,7 +45,9 @@ const WorkflowNodesTabs = ({
     taskDispatcherDefinitions,
     triggerComponentDefinitions,
 }: WorkflowNodesTabsProps) => {
-    const [activeTab, setActiveTab] = useState(!hideActionComponents ? 'components' : 'triggers');
+    const [activeTab, setActiveTab] = useState(
+        !hideActionComponents ? 'components' : !hideClusterElementComponents ? 'clusterElements' : 'triggers'
+    );
     const [previousComponentListLength, setPreviousComponentListLength] = useState(actionComponentDefinitions.length);
 
     const ff_1057 = useFeatureFlagsStore()('ff-1057');
@@ -82,6 +92,17 @@ const WorkflowNodesTabs = ({
         );
     }, [ff_1057, taskDispatcherDefinitions]);
 
+    const availableClusterElements = useMemo(
+        () =>
+            clusterElementComponentDefinitions?.map((clusterElementDefinition) => ({
+                ...clusterElementDefinition,
+                clusterElement: true,
+                taskDispatcher: false,
+                trigger: false,
+            })),
+        [clusterElementComponentDefinitions]
+    );
+
     useEffect(() => {
         if (previousComponentListLength === actionComponentDefinitions.length) {
             return;
@@ -96,6 +117,7 @@ const WorkflowNodesTabs = ({
         }
     }, [
         actionComponentDefinitions.length,
+        clusterElementComponentDefinitions,
         filterState.activeView,
         filterState.selectedCategories.length,
         previousComponentListLength,
@@ -123,6 +145,12 @@ const WorkflowNodesTabs = ({
                             Flows
                         </TabsTrigger>
                     )}
+
+                    {!hideClusterElementComponents && (
+                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="clusterElements">
+                            Cluster elements
+                        </TabsTrigger>
+                    )}
                 </TabsList>
             </div>
 
@@ -137,6 +165,31 @@ const WorkflowNodesTabs = ({
                     setSearchValue={setSearchValue}
                     toggleCategory={toggleCategory}
                 />
+            )}
+
+            {!hideClusterElementComponents && (
+                <ScrollArea className="overflow-y-auto px-3">
+                    <TabsContent className="mt-0 w-full flex-1" value="clusterElements">
+                        <ul className="space-y-2" role="list">
+                            {!clusterElementComponentDefinitions?.length && (
+                                <span className="block px-3 py-2 text-xs text-content-neutral-secondary">
+                                    No cluster element components found.
+                                </span>
+                            )}
+
+                            {availableClusterElements?.map((clusterElementDefinition, index) => (
+                                <WorkflowNodesTabsItem
+                                    draggable={itemsDraggable}
+                                    handleClick={() =>
+                                        onItemClick && onItemClick(clusterElementDefinition as ClickedDefinitionType)
+                                    }
+                                    key={index}
+                                    node={clusterElementDefinition}
+                                />
+                            ))}
+                        </ul>
+                    </TabsContent>
+                </ScrollArea>
             )}
 
             {!hideTriggerComponents && (
