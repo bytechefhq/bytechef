@@ -26,12 +26,15 @@
     <includeAll path="classpath:config/liquibase/changelog/platform/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/data_entry/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
 
-    <!-- quartz -->
-    <includeAll path="classpath:config/liquibase/changelog/quartz/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler" />
+    <!-- audit -->
+    <includeAll path="classpath:config/liquibase/changelog/audit/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
+
+    <!-- spring ai -->
+    <includeAll path="classpath:config/liquibase/changelog/ai/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or ai" />
 
     <!-- spring batch -->
     <includeAll path="classpath:config/liquibase/changelog/batch/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or batch" />
 
-    <!-- audit -->
-    <includeAll path="classpath:config/liquibase/changelog/audit/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
+    <!-- quartz -->
+    <includeAll path="classpath:config/liquibase/changelog/quartz/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler" />
 </databaseChangeLog>
