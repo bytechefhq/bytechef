@@ -620,7 +620,7 @@ const ConnectionDialog = ({
                                                                     },
                                                                 ]);
                                                             }}
-                                                            options={remainingTags!.map((tag: Tag) => ({
+                                                            options={remainingTags?.map((tag: Tag) => ({
                                                                 label: tag.name,
                                                                 value: tag.name.toLowerCase().replace(/\W/g, ''),
                                                                 ...tag,
@@ -789,7 +789,7 @@ const Scopes = ({scopes}: {scopes: string[]}) => (
         <div className="space-y-1">
             {scopes.map((scope) => (
                 <div className="flex items-center space-x-1" key={scope}>
-                    <Checkbox checked disabled id={scope} />
+                    <Checkbox checked disabled key={scope} />
 
                     <Label htmlFor={scope}>{scope}</Label>
                 </div>
