@@ -44,5 +44,4 @@ public enum PropertiesValuesEnum {
     public String getValue() {
         return value;
     }
-
 }
