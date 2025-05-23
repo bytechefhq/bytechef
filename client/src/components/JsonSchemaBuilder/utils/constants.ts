@@ -174,3 +174,5 @@ export const TYPE_TO_VALIDATE_FIELDS: Record<SchemaType, string[]> = {
     object: OBJECT_VALID_SCHEMA_PROPERTIES,
     string: STRING_VALID_SCHEMA_PROPERTIES,
 };
+
+export const WORKFLOW_DEFINITION_SPACE = 4;

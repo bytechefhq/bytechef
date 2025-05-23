@@ -8,6 +8,7 @@ import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/wo
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import Editor from '@monaco-editor/react';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
@@ -17,7 +18,9 @@ import {useParams} from 'react-router-dom';
 const workflowTestApi = new WorkflowTestApi();
 
 interface WorkflowCodeEditorSheetProps {
+    integrationId?: number;
     onSheetOpenClose: (open: boolean) => void;
+    projectId?: number;
     runDisabled: boolean;
     sheetOpen: boolean;
     testConfigurationDisabled: boolean;
@@ -26,7 +29,9 @@ interface WorkflowCodeEditorSheetProps {
 }
 
 const WorkflowCodeEditorSheet = ({
+    integrationId,
     onSheetOpenClose,
+    projectId,
     runDisabled,
     sheetOpen,
     testConfigurationDisabled,
@@ -41,7 +46,7 @@ const WorkflowCodeEditorSheet = ({
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
-    const {projectId, projectWorkflowId} = useParams();
+    const {projectWorkflowId} = useParams();
 
     const queryClient = useQueryClient();
 
@@ -84,15 +89,21 @@ const WorkflowCodeEditorSheet = ({
                         onSuccess: () => {
                             setDirty(false);
 
-                            queryClient.invalidateQueries({
-                                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
-                            });
+                            if (projectId && projectWorkflowId) {
+                                queryClient.invalidateQueries({
+                                    queryKey: ProjectWorkflowKeys.projectWorkflow(projectId, +projectWorkflowId),
+                                });
+                            } else if (integrationId && workflow.id) {
+                                queryClient.invalidateQueries({
+                                    queryKey: IntegrationWorkflowKeys.integrationWorkflow(integrationId, +workflow.id),
+                                });
+                            }
                         },
                     }
                 );
                 /* eslint-disable @typescript-eslint/no-unused-vars */
             } catch (e) {
-                //ignore
+                console.error('Invalid JSON', e);
             }
         }
     };
@@ -177,7 +188,7 @@ const WorkflowCodeEditorSheet = ({
                             {workflowIsRunning && (
                                 <Button
                                     onClick={() => {
-                                        // TODO
+                                        console.error('Implement cancel workflow execution');
                                     }}
                                     size="icon"
                                     variant="destructive"

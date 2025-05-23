@@ -2,6 +2,7 @@ import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/us
 import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {BranchCaseType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
@@ -15,7 +16,8 @@ interface HandleDeleteTaskProps {
     clusterElementsCanvasOpen?: boolean;
     currentNode?: NodeDataType;
     data: NodeDataType;
-    projectId: number;
+    integrationId?: number;
+    projectId?: number;
     queryClient: QueryClient;
     setRootClusterElementNodeData?: (node: NodeDataType) => void;
     setCurrentNode?: (node: NodeDataType) => void;
@@ -27,6 +29,7 @@ export default function handleDeleteTask({
     clusterElementsCanvasOpen,
     currentNode,
     data,
+    integrationId,
     projectId,
     queryClient,
     rootClusterElementNodeData,
@@ -221,13 +224,21 @@ export default function handleDeleteTask({
                     }),
                 });
 
-                queryClient.invalidateQueries({
-                    queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
-                });
+                if (projectId) {
+                    queryClient.invalidateQueries({
+                        queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
+                    });
 
-                queryClient.invalidateQueries({
-                    queryKey: ProjectWorkflowKeys.workflows,
-                });
+                    queryClient.invalidateQueries({
+                        queryKey: ProjectWorkflowKeys.workflows,
+                    });
+                }
+
+                if (integrationId) {
+                    queryClient.invalidateQueries({
+                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
+                    });
+                }
 
                 if (currentNode?.name === data.name && !currentNode?.clusterElementType) {
                     useWorkflowNodeDetailsPanelStore.getState().reset();

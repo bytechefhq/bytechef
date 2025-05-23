@@ -19,7 +19,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {ArrowLeftRightIcon, ComponentIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
-import {useParams} from 'react-router-dom';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 
@@ -37,7 +36,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [clusterElementDefinition, setClusterElementDefinition] = useState<ClusterElementDefinitionBasic[]>([]);
 
     const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {workflow} = useWorkflowDataStore();
+    const {integrationId, projectId, workflow} = useWorkflowDataStore();
     const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
         useWorkflowEditorStore();
 
@@ -95,8 +94,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
-    const {projectId} = useParams();
-
     const isClusterElement = 'clusterElementType' in data;
 
     const handleDeleteNodeClick = (data: NodeDataType) => {
@@ -105,7 +102,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 clusterElementsCanvasOpen,
                 currentNode,
                 data,
-                projectId: +projectId!,
+                integrationId,
+                projectId,
                 queryClient,
                 rootClusterElementNodeData,
                 setCurrentNode,

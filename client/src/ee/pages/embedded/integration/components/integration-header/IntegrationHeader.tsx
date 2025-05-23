@@ -216,7 +216,7 @@ const IntegrationHeader = ({
                     {!!integrationId && (
                         <WorkflowDialog
                             createWorkflowMutation={createIntegrationWorkflowMutation}
-                            parentId={integrationId}
+                            integrationId={integrationId}
                             triggerNode={
                                 <Button className="hover:bg-background/70 [&_svg]:size-5" size="icon" variant="ghost">
                                     <Tooltip>
@@ -276,6 +276,7 @@ const IntegrationHeader = ({
 
             {showEditWorkflowDialog && (
                 <WorkflowDialog
+                    integrationId={integrationId}
                     onClose={() => setShowEditWorkflowDialog(false)}
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}

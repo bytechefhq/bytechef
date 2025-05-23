@@ -1,3 +1,4 @@
+import {WORKFLOW_DEFINITION_SPACE} from '@/components/JsonSchemaBuilder/utils/constants';
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
@@ -15,18 +16,17 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
-import React, {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {useParams} from 'react-router-dom';
-
-const SPACE = 4;
 
 interface WorkflowDialogProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     createWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
     onClose?: () => void;
-    parentId?: number;
+    projectId?: number;
+    integrationId?: number;
     triggerNode?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
@@ -36,16 +36,15 @@ interface WorkflowDialogProps {
 
 const WorkflowDialog = ({
     createWorkflowMutation,
+    integrationId,
     onClose,
-    parentId,
+    projectId,
     triggerNode,
     updateWorkflowMutation,
     useGetWorkflowQuery,
     workflowId,
 }: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
-
-    const {projectId} = useParams();
 
     const {data: workflow} = useGetWorkflowQuery(workflowId ?? '', !!workflowId);
 
@@ -86,18 +85,26 @@ const WorkflowDialog = ({
                             label: formData.label,
                         },
                         null,
-                        SPACE
+                        WORKFLOW_DEFINITION_SPACE
                     ),
                     version: workflow.version,
                 },
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(parseInt(projectId!), parseInt(workflow.id!)),
-            });
+            if (projectId) {
+                queryClient.invalidateQueries({
+                    queryKey: ProjectWorkflowKeys.projectWorkflow(projectId!, parseInt(workflow.id!)),
+                });
+            }
+
+            if (integrationId) {
+                queryClient.invalidateQueries({
+                    queryKey: IntegrationWorkflowKeys.integrationWorkflow(integrationId!, parseInt(workflow.id!)),
+                });
+            }
         } else {
             mutate({
-                id: parentId,
+                id: projectId ?? integrationId,
                 workflow: {
                     /* eslint-disable sort-keys */
                     definition: JSON.stringify(
@@ -116,7 +123,7 @@ const WorkflowDialog = ({
                             tasks: [],
                         },
                         null,
-                        SPACE
+                        WORKFLOW_DEFINITION_SPACE
                     ),
                 },
             });
