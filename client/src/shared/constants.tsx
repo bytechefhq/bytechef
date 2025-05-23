@@ -124,6 +124,7 @@ export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
     branch: ['default', 'cases'],
     condition: ['caseTrue', 'caseFalse'],
     loop: ['iteratee'],
+    parallel: ['tasks'],
 };
 
 export const COMPONENT_CATEGORY_ICON: Record<string, JSX.Element> = {
@@ -148,4 +149,5 @@ export const TASK_DISPATCHER_DATA_KEY_MAP = {
     branch: 'branchData',
     condition: 'conditionData',
     loop: 'loopData',
+    parallel: 'parallelData',
 };

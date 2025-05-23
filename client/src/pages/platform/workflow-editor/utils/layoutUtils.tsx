@@ -21,6 +21,7 @@ import {
     ConditionChildTasksType,
     LoopChildTasksType,
     NodeDataType,
+    ParallelChildTasksType,
 } from '@/shared/types';
 import dagre from '@dagrejs/dagre';
 import {Edge, Node} from '@xyflow/react';
@@ -33,7 +34,7 @@ import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatc
 export const calculateNodeHeight = (node: Node) => {
     const isTopGhostNode = node.type === 'taskDispatcherTopGhostNode';
     const isBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
-    const isLeftGhostNode = node.type === 'loopLeftGhostNode';
+    const isLeftGhostNode = node.type === 'taskDispatcherLeftGhostNode';
     const isPlaceholderNode = node.type === 'placeholder';
     const isAiAgentNode = node.type === 'aiAgentNode';
     const isGhostNode = isTopGhostNode || isBottomGhostNode || isLeftGhostNode;
@@ -260,6 +261,10 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
 
         componentName = parentTaskDispatcher.type.split('/')[0];
 
+        if (componentName === 'parallel') {
+            return null;
+        }
+
         let parentSubtasks: WorkflowTask[] = [];
 
         if (componentName === 'condition') {
@@ -335,6 +340,8 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
             return false;
         } else if (subsequentNodeData.branchData && subsequentNodeData.branchData.branchId === taskDispatcherId) {
             return false;
+        } else if (subsequentNodeData.parallelData && subsequentNodeData.parallelData.parallelId === taskDispatcherId) {
+            return false;
         }
 
         for (const task of tasks || []) {
@@ -383,7 +390,8 @@ export function collectTaskDispatcherData(
     task: WorkflowTask,
     branchChildTasks: BranchChildTasksType,
     conditionChildTasks: ConditionChildTasksType,
-    loopChildTasks: LoopChildTasksType
+    loopChildTasks: LoopChildTasksType,
+    parallelChildTasks: ParallelChildTasksType
 ): void {
     const {name, parameters, type} = task;
     const componentName = type.split('/')[0];
@@ -414,6 +422,10 @@ export function collectTaskDispatcherData(
             }, {}),
             default: (parameters.default || []).map((defaultSubtask: WorkflowTask) => defaultSubtask.name),
         };
+    } else if (componentName === 'parallel' && parameters?.tasks) {
+        parallelChildTasks[name] = {
+            tasks: parameters.tasks.map((task: WorkflowTask) => task.name),
+        };
     }
 }
 
@@ -424,7 +436,8 @@ export function getTaskAncestry(
     taskName: string,
     conditionChildTasks: ConditionChildTasksType,
     loopChildTasks: LoopChildTasksType,
-    branchChildTasks: BranchChildTasksType
+    branchChildTasks: BranchChildTasksType,
+    parallelChildTasks: ParallelChildTasksType
 ): {nestingData: Record<string, unknown>; isNested: boolean} {
     let isNested = false;
     let nestingData = {};
@@ -502,6 +515,23 @@ export function getTaskAncestry(
             }
 
             if (isNested) {
+                break;
+            }
+        }
+    }
+
+    if (!isNested) {
+        for (const [parallelId, parallelData] of Object.entries(parallelChildTasks)) {
+            if (parallelData.tasks.includes(taskName)) {
+                nestingData = {
+                    parallelData: {
+                        index: parallelData.tasks.indexOf(taskName),
+                        parallelId,
+                    },
+                };
+
+                isNested = true;
+
                 break;
             }
         }

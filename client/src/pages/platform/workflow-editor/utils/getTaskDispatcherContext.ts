@@ -31,6 +31,10 @@ function getContextFromTaskNodeData(
         context.caseKey = nodeData.branchData.caseKey as string;
         context.index = (nodeData.branchData.index as number) + indexIncrement;
         context.taskDispatcherId = nodeData.branchData.branchId as string;
+    } else if (nodeData.parallelData) {
+        context.parallelId = nodeData.parallelData.parallelId as string;
+        context.index = (nodeData.parallelData.index as number) + indexIncrement;
+        context.taskDispatcherId = nodeData.parallelData.parallelId as string;
     }
 
     return context;
@@ -44,6 +48,7 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     const isLoopPlaceholder = placeholderNode.id.includes('loop') && isPlaceholder;
     const isConditionPlaceholder = placeholderNode.id.includes('condition') && isPlaceholder;
     const isBranchPlaceholder = placeholderNode.id.includes('branch') && isPlaceholder;
+    const isParallelPlaceholder = placeholderNode.id.includes('parallel') && isPlaceholder;
 
     const context: TaskDispatcherContextType = {
         taskDispatcherId: placeholderNode.data?.taskDispatcherId as string,
@@ -58,7 +63,7 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     context.index = placeholderIndex;
 
     if (isLoopPlaceholder) {
-        const loopId = placeholderNode.id.split('-loop-placeholder')[0];
+        const loopId = placeholderNode.data.loopId as string;
 
         context.loopId = loopId;
         context.taskDispatcherId = loopId;
@@ -74,6 +79,11 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
         context.branchId = branchId;
         context.caseKey = placeholderNode.data?.caseKey as string;
         context.taskDispatcherId = branchId;
+    } else if (isParallelPlaceholder) {
+        const parallelId = placeholderNode.data?.parallelId as string;
+
+        context.parallelId = parallelId;
+        context.taskDispatcherId = parallelId;
     }
 
     return context;

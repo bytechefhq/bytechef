@@ -133,6 +133,27 @@ export default function handleDeleteTask({
 
             return parentBranchTask;
         }) as Array<WorkflowTaskType>;
+    } else if (data.parallelData) {
+        const parentParallelTask = TASK_DISPATCHER_CONFIG.parallel.getTask({
+            taskDispatcherId: data.parallelData.parallelId,
+            tasks: workflowTasks,
+        });
+
+        if (!parentParallelTask?.parameters) {
+            return;
+        }
+
+        parentParallelTask.parameters.tasks = (parentParallelTask.parameters.tasks as Array<WorkflowTask>).filter(
+            (childTask) => childTask.name !== data.name
+        );
+
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== parentParallelTask.name) {
+                return task;
+            }
+
+            return parentParallelTask;
+        }) as Array<WorkflowTaskType>;
     } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
         const currentClusterElementType = data.clusterElementType;
         const clusterElementName = data.name;

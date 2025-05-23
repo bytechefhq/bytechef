@@ -51,9 +51,16 @@ export default function insertTaskDispatcherSubtask({
     let context: TaskDispatcherContextType = {...taskDispatcherContext};
 
     if (placeholderId && context.index === 0) {
-        const placeholderContext = extractContextFromPlaceholder(placeholderId);
+        if (componentName === 'parallel') {
+            context = {
+                ...context,
+                index: targetTaskDispatcher.parameters?.tasks?.length,
+            };
+        } else {
+            const placeholderContext = extractContextFromPlaceholder(placeholderId);
 
-        context = {...context, ...placeholderContext};
+            context = {...context, ...placeholderContext};
+        }
     }
 
     const subtasks = getSubtasks({context, task: targetTaskDispatcher});

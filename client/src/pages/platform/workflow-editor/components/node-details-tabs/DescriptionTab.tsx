@@ -27,14 +27,13 @@ interface DescriptionTabProps {
 }
 
 const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflowMutation}: DescriptionTabProps) => {
+    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
     const {nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
             workflow: state.workflow,
         }))
     );
-
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const queryClient = useQueryClient();
 
@@ -43,7 +42,7 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
             return;
         }
 
-        if (currentNode.conditionData || currentNode.loopData || currentNode.branchData) {
+        if (currentNode.conditionData || currentNode.loopData || currentNode.branchData || currentNode.parallelData) {
             saveTaskDispatcherSubtaskFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
                 currentNodeIndex: nodes.findIndex((node) => node.data.name === currentNode.workflowNodeName),
@@ -110,7 +109,7 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
             return;
         }
 
-        if (currentNode.conditionData || currentNode.loopData || currentNode.branchData) {
+        if (currentNode.conditionData || currentNode.loopData || currentNode.branchData || currentNode.parallelData) {
             saveTaskDispatcherSubtaskFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
                 currentNodeIndex: nodes.findIndex((node) => node.data.name === currentNode.workflowNodeName),

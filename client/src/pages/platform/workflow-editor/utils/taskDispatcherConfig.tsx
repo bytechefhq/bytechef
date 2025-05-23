@@ -56,6 +56,11 @@ export function buildGenericNodeData(
                     caseKey: taskDispatcherContext.caseKey ?? 'default',
                     index: taskDispatcherContext.index ?? 0,
                 };
+            } else if (type === 'parallel') {
+                newNodeData.parallelData = {
+                    index: taskDispatcherContext.index ?? 0,
+                    parallelId: taskDispatcherId,
+                };
             }
 
             newNodeData.taskDispatcherId = taskDispatcherId;
@@ -319,6 +324,42 @@ export const TASK_DISPATCHER_CONFIG = {
         getTask: getTaskDispatcherTask,
         initializeParameters: () => ({}),
         updateTaskParameters: ({task}: UpdateTaskParametersType): WorkflowTask => task,
+    },
+    parallel: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'parallel'),
+        contextIdentifier: 'parallelId',
+        dataKey: 'parallelData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+            const index = parseInt(parts[parts.length - 1] || '-1');
+
+            return {index, taskDispatcherId: parts[0]};
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.parallelId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+        }),
+        getSubtasks: ({node, task}: {node?: Node; task?: WorkflowTask}): Array<WorkflowTask> => {
+            const parameters = (node?.data as NodeDataType)?.parameters || task?.parameters;
+
+            if (!parameters) {
+                return [];
+            }
+
+            return parameters?.tasks || [];
+        },
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({
+            tasks: [],
+        }),
+        updateTaskParameters: ({task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => ({
+            ...task,
+            parameters: {
+                ...task.parameters,
+                tasks: updatedSubtasks,
+            },
+        }),
     },
 };
 
