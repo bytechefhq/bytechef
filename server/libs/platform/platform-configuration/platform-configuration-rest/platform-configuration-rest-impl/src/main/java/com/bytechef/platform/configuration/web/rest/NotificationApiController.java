@@ -21,9 +21,8 @@ import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.facade.NotificationFacade;
 import com.bytechef.platform.configuration.service.NotificationService;
 import com.bytechef.platform.configuration.web.rest.model.NotificationModel;
-import java.util.List;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -20,9 +20,8 @@ import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.dto.NotificationDTO;
 import com.bytechef.platform.configuration.service.NotificationEventService;
 import com.bytechef.platform.configuration.service.NotificationService;
-import java.util.List;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
