@@ -235,6 +235,7 @@ const ProjectWorkflowListItem = ({
             {showEditDialog && workflow && (
                 <WorkflowDialog
                     onClose={() => setShowEditDialog(false)}
+                    projectId={project.id}
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}

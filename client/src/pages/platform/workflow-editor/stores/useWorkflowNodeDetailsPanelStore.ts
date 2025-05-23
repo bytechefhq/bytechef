@@ -14,9 +14,7 @@ interface WorkflowNodeDetailsPanelStoreI {
     currentNode: NodeDataType | undefined;
     setCurrentNode: (currentNode: NodeDataType | undefined) => void;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     focusedInput: Editor | null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setFocusedInput: (focusedInput: Editor | null) => void;
 
     reset: () => void;

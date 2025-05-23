@@ -150,6 +150,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
             {showEditWorkflowDialog && (
                 <WorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
+                    projectId={project.id}
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}

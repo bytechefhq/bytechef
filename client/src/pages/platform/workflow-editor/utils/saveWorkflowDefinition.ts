@@ -1,6 +1,7 @@
 import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {Workflow, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
@@ -16,11 +17,12 @@ type UpdateWorkflowRequestType = {
 
 interface SaveWorkflowDefinitionProps {
     decorative?: boolean;
+    integrationId?: number;
     nodeData?: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
     placeholderId?: string;
-    projectId: number;
+    projectId?: number;
     queryClient: QueryClient;
     taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
@@ -29,6 +31,7 @@ interface SaveWorkflowDefinitionProps {
 
 export default async function saveWorkflowDefinition({
     decorative,
+    integrationId,
     nodeData,
     nodeIndex,
     onSuccess,
@@ -77,9 +80,20 @@ export default async function saveWorkflowDefinition({
 
         executeWorkflowMutation({
             definitionUpdate: {triggers: [newTrigger]},
-            onSuccess,
-            projectId,
-            queryClient,
+            onSuccess: () => {
+                if (onSuccess) {
+                    onSuccess();
+                }
+
+                if (projectId) {
+                    queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+                    queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
+                } else if (integrationId) {
+                    queryClient.invalidateQueries({
+                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
+                    });
+                }
+            },
             updateWorkflowMutation,
             workflow,
             workflowDefinition,
@@ -217,8 +231,6 @@ export default async function saveWorkflowDefinition({
     executeWorkflowMutation({
         definitionUpdate: {tasks: updatedWorkflowDefinitionTasks},
         onSuccess,
-        projectId,
-        queryClient,
         updateWorkflowMutation,
         workflow,
         workflowDefinition,
@@ -232,17 +244,13 @@ interface ExecuteWorkflowMutationProps {
         tasks?: Array<WorkflowTask>;
         triggers?: Array<WorkflowTrigger>;
     };
-    projectId: number;
     onSuccess?: () => void;
-    queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
 }
 
 function executeWorkflowMutation({
     definitionUpdate,
     onSuccess,
-    projectId,
-    queryClient,
     updateWorkflowMutation,
     workflow,
     workflowDefinition,
@@ -267,9 +275,6 @@ function executeWorkflowMutation({
                 if (onSuccess) {
                     onSuccess();
                 }
-
-                queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
-                queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
             },
         }
     );
