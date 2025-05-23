@@ -22,11 +22,11 @@ import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
 import AiAgentNode from '../nodes/AiAgentNode';
-import LoopLeftGhostNode from '../nodes/LoopLeftGhostNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import ReadOnlyNode from '../nodes/ReadOnlyNode';
 import ReadOnlyPlaceholderNode from '../nodes/ReadOnlyPlaceholderNode';
 import TaskDispatcherBottomGhostNode from '../nodes/TaskDispatcherBottomGhostNode';
+import TaskDispatcherLeftGhostNode from '../nodes/TaskDispatcherLeftGhostNode';
 import TaskDispatcherTopGhostNode from '../nodes/TaskDispatcherTopGhostNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 
@@ -79,11 +79,11 @@ const WorkflowEditor = ({
     const nodeTypes = useMemo(
         () => ({
             aiAgentNode: AiAgentNode,
-            loopLeftGhostNode: LoopLeftGhostNode,
             placeholder: PlaceholderNode,
             readonly: ReadOnlyNode,
             readonlyPlaceholder: ReadOnlyPlaceholderNode,
             taskDispatcherBottomGhostNode: TaskDispatcherBottomGhostNode,
+            taskDispatcherLeftGhostNode: TaskDispatcherLeftGhostNode,
             taskDispatcherTopGhostNode: TaskDispatcherTopGhostNode,
             workflow: WorkflowNode,
         }),

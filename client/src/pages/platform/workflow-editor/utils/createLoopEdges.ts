@@ -9,7 +9,7 @@ import {Edge, Node} from '@xyflow/react';
 function createBaseLoopStructureEdges(loopId: string): Edge[] {
     const topGhostId = `${loopId}-loop-top-ghost`;
     const bottomGhostId = `${loopId}-loop-bottom-ghost`;
-    const leftGhostId = `${loopId}-loop-left-ghost`;
+    const leftGhostId = `${loopId}-taskDispatcher-left-ghost`;
 
     const edgeFromLoopToTopGhost = {
         id: `${loopId}=>${topGhostId}`,
