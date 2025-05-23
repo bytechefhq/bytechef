@@ -930,8 +930,10 @@ const WorkflowNodeDetailsPanel = ({
                                 {activeTab === 'description' &&
                                     (nodeDefinition ? (
                                         <DescriptionTab
+                                            integrationId={integrationId}
                                             key={`${currentNode?.componentName}-${currentNode?.type}_description`}
                                             nodeDefinition={nodeDefinition}
+                                            projectId={projectId}
                                             updateWorkflowMutation={updateWorkflowMutation}
                                         />
                                     ) : (
