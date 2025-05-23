@@ -19,15 +19,13 @@ import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 
 const workflowTestApi = new WorkflowTestApi();
 
-export const useProjectHeader = ({
-    bottomResizablePanelRef,
-    chatTrigger,
-    projectId,
-}: {
+interface UseProjectHeaderProps {
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
     chatTrigger?: boolean;
     projectId: number;
-}) => {
+}
+
+export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectId}: UseProjectHeaderProps) => {
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {workflow} = useWorkflowDataStore();
     const {setShowBottomPanelOpen, setWorkflowIsRunning, setWorkflowTestExecution, showBottomPanel} =

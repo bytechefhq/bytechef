@@ -26,12 +26,18 @@ interface WorkflowDataStateI {
     setEdges: (edges: Edge[]) => void;
     onEdgesChange: OnEdgesChange;
 
+    integrationId: number | undefined;
+    setIntegrationId: (integrationId: number | undefined) => void;
+
     latestComponentDefinition: ComponentDefinitionBasic | null;
     setLatestComponentDefinition: (latestComponentDefinition: ComponentDefinitionBasic | null) => void;
 
     nodes: Node[];
     setNodes: (nodes: Node[]) => void;
     onNodesChange: OnNodesChange;
+
+    projectId: number | undefined;
+    setProjectId: (projectId: number | undefined) => void;
 
     reset: () => void;
 
@@ -76,6 +82,12 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                     nodes: applyNodeChanges(changes, get().nodes),
                 });
             },
+
+            projectId: undefined,
+            setProjectId: (projectId) => set((state) => ({...state, projectId})),
+
+            integrationId: undefined,
+            setIntegrationId: (integrationId) => set((state) => ({...state, integrationId})),
 
             reset: () =>
                 set(() => ({

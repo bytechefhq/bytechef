@@ -85,6 +85,15 @@ export default async function saveWorkflowDefinition({
                 if (onSuccess) {
                     onSuccess();
                 }
+
+                if (projectId) {
+                    queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+                    queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
+                } else if (integrationId) {
+                    queryClient.invalidateQueries({
+                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
+                    });
+                }
             },
             projectId,
             queryClient,
@@ -245,6 +254,7 @@ interface ExecuteWorkflowMutationProps {
     onSuccess?: () => void;
     projectId?: number;
     queryClient: QueryClient;
+    onSuccess?: () => void;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
 }
 

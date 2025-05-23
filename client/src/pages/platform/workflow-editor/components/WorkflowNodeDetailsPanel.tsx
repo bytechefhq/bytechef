@@ -46,7 +46,6 @@ import {InfoIcon, XIcon} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
-import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -81,17 +80,23 @@ const TABS: Array<{label: string; name: TabNameType}> = [
     },
 ];
 
-const WorkflowNodeDetailsPanel = ({
-    className,
-    previousComponentDefinitions,
-    updateWorkflowMutation,
-    workflowNodeOutputs,
-}: {
+interface WorkflowNodeDetailsPanelProps {
     className?: string;
+    integrationId?: number;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
+    projectId?: number;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
-}) => {
+}
+
+const WorkflowNodeDetailsPanel = ({
+    className,
+    integrationId,
+    previousComponentDefinitions,
+    projectId,
+    updateWorkflowMutation,
+    workflowNodeOutputs,
+}: WorkflowNodeDetailsPanelProps) => {
     const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
@@ -118,8 +123,6 @@ const WorkflowNodeDetailsPanel = ({
         useWorkflowEditorStore();
 
     const queryClient = useQueryClient();
-
-    const {projectId} = useParams();
 
     const isClusterElement = !!currentNode?.clusterElementType;
 
@@ -418,7 +421,8 @@ const WorkflowNodeDetailsPanel = ({
                         field: 'operation',
                         value: newOperationName,
                     },
-                    projectId: +projectId!,
+                    integrationId,
+                    projectId,
                     queryClient,
                     updateWorkflowMutation,
                 });
@@ -435,7 +439,8 @@ const WorkflowNodeDetailsPanel = ({
                         field: 'operation',
                         value: newOperationName,
                     },
-                    projectId: +projectId!,
+                    integrationId,
+                    projectId,
                     queryClient,
                     updateWorkflowMutation,
                 });
@@ -444,6 +449,7 @@ const WorkflowNodeDetailsPanel = ({
             }
 
             saveWorkflowDefinition({
+                integrationId,
                 nodeData,
                 onSuccess: () => {
                     setCurrentComponent({
@@ -471,7 +477,7 @@ const WorkflowNodeDetailsPanel = ({
                         workflowNodeName,
                     });
                 },
-                projectId: +projectId!,
+                projectId,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -481,6 +487,7 @@ const WorkflowNodeDetailsPanel = ({
             currentComponent,
             queryClient,
             currentNode,
+            integrationId,
             projectId,
             updateWorkflowMutation,
             currentNodeIndex,

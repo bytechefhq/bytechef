@@ -16,6 +16,15 @@ import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {RefObject} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 
+interface ProjectHeaderProps {
+    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
+    chatTrigger?: boolean;
+    projectId: number;
+    projectWorkflowId: number;
+    runDisabled: boolean;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
+}
+
 const ProjectHeader = ({
     bottomResizablePanelRef,
     chatTrigger,
@@ -23,14 +32,7 @@ const ProjectHeader = ({
     projectWorkflowId,
     runDisabled,
     updateWorkflowMutation,
-}: {
-    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
-    chatTrigger?: boolean;
-    projectId: number;
-    projectWorkflowId: number;
-    runDisabled: boolean;
-    updateWorkflowMutation: UpdateWorkflowMutationType;
-}) => {
+}: ProjectHeaderProps) => {
     const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {workflowIsRunning} = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
