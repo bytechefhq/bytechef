@@ -96,7 +96,7 @@ const ProjectsLeftSidebar = ({
                 {selectedProjectId === projectId && (
                     <WorkflowDialog
                         createWorkflowMutation={createProjectWorkflowMutation}
-                        parentId={projectId}
+                        projectId={projectId}
                         triggerNode={
                             <Button
                                 className="w-full bg-surface-neutral-secondary py-2 hover:bg-background [&_svg]:size-5"

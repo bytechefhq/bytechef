@@ -88,6 +88,8 @@ const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: numbe
                     {componentDefinitions && taskDispatcherDefinitions && (
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
+                            integrationId={integrationId}
+                            projectId={projectId}
                             projectLeftSidebarOpen={projectLeftSidebarOpen}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
@@ -116,7 +118,9 @@ const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: numbe
 
             {currentComponent && !isRootClusterElement && (
                 <WorkflowNodeDetailsPanel
+                    integrationId={integrationId}
                     previousComponentDefinitions={previousComponentDefinitions}
+                    projectId={projectId}
                     updateWorkflowMutation={updateWorkflowMutation}
                     workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                 />
@@ -144,7 +148,9 @@ const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: numbe
 
                     <WorkflowNodeDetailsPanel
                         className="fixed inset-y-0 right-0 rounded-l-none border-none"
+                        integrationId={integrationId}
                         previousComponentDefinitions={previousComponentDefinitions}
+                        projectId={projectId}
                         updateWorkflowMutation={updateWorkflowMutation}
                         workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                     />
@@ -183,7 +189,9 @@ const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: numbe
             />
 
             <WorkflowCodeEditorSheet
+                integrationId={integrationId}
                 onSheetOpenClose={setShowWorkflowCodeEditorSheet}
+                projectId={projectId}
                 runDisabled={runDisabled}
                 sheetOpen={showWorkflowCodeEditorSheet}
                 testConfigurationDisabled={testConfigurationDisabled}

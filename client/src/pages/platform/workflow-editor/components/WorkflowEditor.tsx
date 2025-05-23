@@ -33,6 +33,8 @@ import WorkflowNode from '../nodes/WorkflowNode';
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
+    integrationId?: number;
+    projectId?: number;
     projectLeftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
@@ -41,6 +43,8 @@ export interface WorkflowEditorProps {
 const WorkflowEditor = ({
     componentDefinitions,
     customCanvasWidth,
+    integrationId,
+    projectId,
     projectLeftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
@@ -67,7 +71,10 @@ const WorkflowEditor = ({
 
     const {setViewport} = useReactFlow();
 
-    const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop();
+    const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop({
+        integrationId,
+        projectId,
+    });
 
     const nodeTypes = useMemo(
         () => ({

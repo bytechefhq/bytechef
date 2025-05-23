@@ -5,7 +5,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {EdgeLabelRenderer} from '@xyflow/react';
 import {CheckIcon, PenIcon, PlusIcon, TrashIcon} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
@@ -27,15 +26,16 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {nodes, workflow} = useWorkflowDataStore(
+    const {integrationId, nodes, projectId, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
+            integrationId: state.integrationId,
             nodes: state.nodes,
+            projectId: state.projectId,
             workflow: state.workflow,
         }))
     );
 
     const queryClient = useQueryClient();
-    const {projectId} = useParams();
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const targetNodeId = useMemo(() => edgeId.split('=>')[1], [edgeId]);
@@ -63,16 +63,25 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
             }
 
             saveRootTaskDispatcher({
+                integrationId,
                 nodes,
                 parentNodeData: parentBranchNodeData,
-                projectId: Number(projectId),
+                projectId,
                 queryClient,
                 updateWorkflowMutation,
                 updatedParameters: branchParameters,
                 workflowDefinition: workflow.definition,
             });
         },
-        [nodes, parentBranchNodeData, projectId, queryClient, updateWorkflowMutation, workflow.definition]
+        [
+            integrationId,
+            nodes,
+            parentBranchNodeData,
+            projectId,
+            queryClient,
+            updateWorkflowMutation,
+            workflow.definition,
+        ]
     );
 
     const handleCreateCaseClick = useCallback(() => {

@@ -124,7 +124,7 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
                         button={
                             <WorkflowDialog
                                 createWorkflowMutation={createProjectWorkflowMutation}
-                                parentId={project.id}
+                                projectId={project.id}
                                 triggerNode={<Button>Create Workflow</Button>}
                                 useGetWorkflowQuery={useGetWorkflowQuery}
                             />

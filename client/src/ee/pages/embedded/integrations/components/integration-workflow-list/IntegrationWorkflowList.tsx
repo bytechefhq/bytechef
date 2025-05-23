@@ -125,7 +125,7 @@ const IntegrationWorkflowList = ({integration}: {integration: Integration}) => {
                         button={
                             <WorkflowDialog
                                 createWorkflowMutation={createIntegrationWorkflowMutation}
-                                parentId={integration.id}
+                                integrationId={integration.id}
                                 triggerNode={<Button>Create Workflow</Button>}
                                 useGetWorkflowQuery={useGetWorkflowQuery}
                             />

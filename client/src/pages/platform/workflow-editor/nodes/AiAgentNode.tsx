@@ -7,7 +7,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
-import {useParams} from 'react-router-dom';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 
@@ -23,13 +22,11 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {workflow} = useWorkflowDataStore();
+    const {integrationId, projectId, workflow} = useWorkflowDataStore();
 
     const queryClient = useQueryClient();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
-
-    const {projectId} = useParams();
 
     const isSelected = currentNode?.name === data.name;
 
@@ -48,7 +45,8 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             handleDeleteTask({
                 currentNode,
                 data,
-                projectId: +projectId!,
+                integrationId,
+                projectId,
                 queryClient,
                 updateWorkflowMutation,
                 workflow,

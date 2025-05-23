@@ -4,6 +4,7 @@ import {
 } from '@/ee/mutations/projectGit.mutations';
 import {ProjectGitConfigurationKeys, useGetProjectGitConfigurationQuery} from '@/ee/queries/projectGit.queries';
 import {useToast} from '@/hooks/use-toast';
+import {useProject} from '@/pages/automation/project/hooks/useProject';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -24,6 +25,8 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 
 export const useSettingsMenu = ({project, workflow}: {project: Project; workflow: Workflow}) => {
     const {data: projectGitConfiguration} = useGetProjectGitConfigurationQuery(project.id!);
+
+    const {projectId} = useProject();
 
     const {captureProjectWorkflowImported} = useAnalytics();
     const navigate = useNavigate();
@@ -115,7 +118,6 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
-            const projectId = project.id;
             const deletedWorkflowId = (workflow as Workflow).projectWorkflowId;
 
             const firstRemainingWorkflowId = project?.projectWorkflowIds?.find(
