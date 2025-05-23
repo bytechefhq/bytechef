@@ -64,6 +64,7 @@ export default async function handleTaskDispatcherClick({
         type: `${name}/v${version}`,
         workflowNodeName,
     };
+
     if (taskDispatcherContext) {
         if (taskDispatcherContext.conditionId) {
             newNodeData.conditionData = {
