@@ -131,7 +131,16 @@ type LoopBreakDataType = {
     loopBreakId: string;
 };
 
-export type TaskDispatcherDataType = BranchDataType & LoopDataType & LoopBreakDataType & ConditionDataType;
+type ParallelDataType = {
+    index: number;
+    parallelId: string;
+};
+
+export type TaskDispatcherDataType = BranchDataType &
+    LoopDataType &
+    LoopBreakDataType &
+    ConditionDataType &
+    ParallelDataType;
 
 export type ClusterElementItemType = {
     label?: string;
@@ -180,6 +189,10 @@ export type NodeDataType = {
     operationName?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters?: {[key: string]: any};
+    parallelData?: {
+        parallelId: string;
+        index: number;
+    };
     rootClusterElement?: boolean;
     taskDispatcher?: boolean;
     taskDispatcherId?: string;
@@ -295,6 +308,7 @@ export type TaskDispatcherContextType = {
     index?: number;
     loopBreakId?: string;
     loopId?: string;
+    parallelId?: string;
     taskDispatcherId: string;
 };
 
@@ -313,6 +327,7 @@ export type UpdateTaskParametersType = {
 export type ConditionChildTasksType = {[conditionId: string]: {caseTrue: string[]; caseFalse: string[]}};
 export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
 export type BranchChildTasksType = {[branchId: string]: {cases: {[caseKey: string]: string[]}; default: string[]}};
+export type ParallelChildTasksType = {[parallelId: string]: {tasks: string[]}};
 
 export type WorkflowInputType = WorkflowInput & {
     testValue?: string;

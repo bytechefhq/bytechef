@@ -85,6 +85,11 @@ export default async function handleTaskDispatcherClick({
                 caseKey: taskDispatcherContext.caseKey as string,
                 index: (taskDispatcherContext.index ?? 0) as number,
             };
+        } else if (taskDispatcherContext.parallelId) {
+            newNodeData.parallelData = {
+                index: (taskDispatcherContext.index ?? 0) as number,
+                parallelId: taskDispatcherContext.parallelId as string,
+            };
         }
     }
 

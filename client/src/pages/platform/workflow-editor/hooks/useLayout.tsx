@@ -18,6 +18,8 @@ import createConditionEdges, {hasTaskInConditionBranches} from '../utils/createC
 import createConditionNode from '../utils/createConditionNode';
 import createLoopEdges from '../utils/createLoopEdges';
 import createLoopNode from '../utils/createLoopNode';
+import createParallelEdges from '../utils/createParallelEdges';
+import createParallelNode from '../utils/createParallelNode';
 import {
     collectTaskDispatcherData,
     convertTaskToNode,
@@ -73,10 +75,11 @@ export default function useLayout({
         const branchChildTasks = {};
         const conditionChildTasks = {};
         const loopChildTasks = {};
+        const parallelChildTasks = {};
 
         // First pass: collect all task dispatcher data and save it in the corresponding objects
         tasks.forEach((task) => {
-            collectTaskDispatcherData(task, branchChildTasks, conditionChildTasks, loopChildTasks);
+            collectTaskDispatcherData(task, branchChildTasks, conditionChildTasks, loopChildTasks, parallelChildTasks);
         });
 
         tasks.forEach((task) => {
@@ -114,7 +117,8 @@ export default function useLayout({
                 name,
                 conditionChildTasks,
                 loopChildTasks,
-                branchChildTasks
+                branchChildTasks,
+                parallelChildTasks
             );
 
             if (isNested) {
@@ -167,6 +171,17 @@ export default function useLayout({
                         emptyCaseKeys,
                     },
                 });
+            } else if (componentName === 'parallel') {
+                const hasSubtasks = parameters?.tasks?.length > 0;
+
+                allNodes = createParallelNode({
+                    allNodes: [...allNodes, taskNode],
+                    isNested,
+                    options: {
+                        createLeftGhost: !hasSubtasks,
+                    },
+                    parallelId: taskNode.id,
+                });
             } else {
                 allNodes.push(taskNode);
             }
@@ -191,6 +206,7 @@ export default function useLayout({
         const isConditionNode = nodeData.componentName === 'condition';
         const isLoopNode = nodeData.componentName === 'loop';
         const isBranchNode = nodeData.componentName === 'branch';
+        const isParallellNode = nodeData.componentName === 'parallel';
 
         const isConditionPlaceholderNode = nodeData.conditionId && node.type === 'placeholder';
         const isBranchPlaceholderNode = nodeData.branchId && node.type === 'placeholder';
@@ -222,6 +238,14 @@ export default function useLayout({
             const branchEdges = createBranchEdges(node);
 
             taskEdges.push(...branchEdges);
+
+            return;
+        }
+
+        if (isParallellNode) {
+            const parallelEdges = createParallelEdges(node);
+
+            taskEdges.push(...parallelEdges);
 
             return;
         }

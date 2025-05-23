@@ -68,6 +68,16 @@ export default function getRecursivelyUpdatedTasks(
             return updatedTask;
         }
 
+        if (task.parameters?.tasks) {
+            return {
+                ...task,
+                parameters: {
+                    ...task.parameters,
+                    tasks: getRecursivelyUpdatedTasks(task.parameters.tasks, taskToReplace),
+                },
+            };
+        }
+
         return task;
     });
 }
