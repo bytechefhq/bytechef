@@ -19,8 +19,12 @@ package com.bytechef.component.email.action;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
@@ -34,15 +38,24 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.email.EmailProtocol;
 import com.bytechef.component.email.commons.EmailUtils;
 import jakarta.mail.Authenticator;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Flags;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.Message.RecipientType;
 import jakarta.mail.MessagingException;
+import jakarta.mail.Part;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.search.FlagTerm;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,6 +63,7 @@ import java.util.Map;
  */
 public class ReadEmailAction {
 
+    private static final String HAS_ATTACHMENTS = "hasAttachments";
     private static final String FROM = "from";
     private static final String CC = "cc";
     private static final String BCC = "bcc";
@@ -87,6 +101,15 @@ public class ReadEmailAction {
                 .description(
                     "Filters email messages where subject contains this keyword. Character matching is case insensitive.")
                 .required(true))
+        .output(
+            outputSchema(
+                array()
+                    .items(
+                        object()
+                            .properties(
+                                string(CC), string(CONTENT), string(CONTENT_TYPE), string(FROM), bool(HAS_ATTACHMENTS),
+                                string(SUBJECT)))
+                    .description("The email message.")))
         .perform(ReadEmailAction::perform);
 
     protected static Object perform(
@@ -120,30 +143,120 @@ public class ReadEmailAction {
 
         Folder folder = protocolStore.getFolder("INBOX");
 
-        folder.open(Folder.READ_ONLY);
+        folder.open(Folder.READ_WRITE);
 
-        Message[] messages = folder.getMessages();
-        Map<String, String>[] filtered = new Map[messages.length];
+        Message[] messages = folder.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
 
-        for (int i = 0; i < messages.length; i++) {
-            Message message = messages[i];
+        List<Map<String, Object>> filtered = new ArrayList<>();
 
-            filtered[i] = new HashMap<>();
+        String[] fromCriterias = asCriteriaArray(inputParameters.getString(FROM));
+        String[] subjectCriterias = asCriteriaArray(inputParameters.getString(SUBJECT));
 
-            filtered[i].put(FROM, JsonUtils.write(message.getFrom()));
-            filtered[i].put(TO, JsonUtils.write(message.getRecipients(RecipientType.TO)));
-            filtered[i].put(CC, JsonUtils.write(message.getRecipients(RecipientType.CC)));
-            filtered[i].put(BCC, JsonUtils.write(message.getRecipients(RecipientType.BCC)));
-            filtered[i].put(SUBJECT, message.getSubject());
-            filtered[i].put(CONTENT, message.getContent()
-                .toString());
-            filtered[i].put(CONTENT_TYPE, message.getContentType());
+        for (Message message : messages) {
+            if (mismatchesCriteria(message.getFrom()[0].toString(), fromCriterias)) {
+                continue;
+            }
+
+            if (mismatchesCriteria(message.getSubject(), subjectCriterias)) {
+                continue;
+            }
+
+            Map<String, Object> itemMap = new HashMap<>();
+
+            itemMap.put(FROM, JsonUtils.write(message.getFrom()));
+            itemMap.put(TO, JsonUtils.write(message.getRecipients(RecipientType.TO)));
+            itemMap.put(CC, JsonUtils.write(message.getRecipients(RecipientType.CC)));
+            itemMap.put(BCC, JsonUtils.write(message.getRecipients(RecipientType.BCC)));
+            itemMap.put(SUBJECT, message.getSubject());
+            itemMap.put(CONTENT, getContent(message));
+            itemMap.put(CONTENT_TYPE, message.getContentType());
+            itemMap.put("hasAttachments", Boolean.FALSE);
+
+            filtered.add(itemMap);
         }
 
         context.log(log -> log.debug(
             "Messages read: size:{}, from:{}, to:{}",
-            filtered.length, inputParameters.get("from"), inputParameters.get("to")));
+            filtered.size(), inputParameters.get("from"), inputParameters.get("to")));
 
-        return filtered;
+        return filtered.toArray(new Map[0]);
     }
+
+    private static String[] asCriteriaArray(String value) {
+        if (value == null || value.isEmpty()) {
+            return new String[0];
+        }
+
+        String[] criteriaTerms = value.split(",");
+
+        if (criteriaTerms.length == 0) {
+            return new String[0];
+        }
+
+        String[] sanitizedCriteriaTerms = new String[criteriaTerms.length];
+
+        for (int i = 0; i < criteriaTerms.length; i++) {
+            sanitizedCriteriaTerms[i] = criteriaTerms[i].trim();
+        }
+
+        return sanitizedCriteriaTerms;
+    }
+
+    private static boolean mismatchesCriteria(String sample, String[] criterias) {
+        if (criterias.length == 0) {
+            return false;
+        }
+
+        String sanitizedSample = sample.toLowerCase();
+
+        for (String criteria : criterias) {
+            if (sanitizedSample.contains(criteria.toLowerCase())) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static String getContent(Message message) throws IOException, MessagingException {
+        Object content = message.getContent();
+
+        if (content instanceof String) {
+            return (String) content;
+        } else if (content instanceof MimeMultipart) {
+            return getMultipartContent((MimeMultipart) content);
+        }
+
+        return "Unknown content type: " + content.getClass();
+
+    }
+
+    private static String getMultipartContent(MimeMultipart multipart) throws IOException, MessagingException {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < multipart.getCount(); i++) {
+            BodyPart bodyPart = multipart.getBodyPart(i);
+
+            if (bodyPart.isMimeType("text/plain")) {
+                stringBuilder.append(bodyPart.getContent());
+                stringBuilder.append("\n");
+            } else if (bodyPart.isMimeType("text/html")) {
+                stringBuilder.append(bodyPart.getContent());
+                stringBuilder.append("\n");
+            } else if (bodyPart.getDisposition() != null && bodyPart.getDisposition()
+                .equalsIgnoreCase(Part.ATTACHMENT)) {
+                System.out.println("Attachment: " + bodyPart.getFileName());
+                try (InputStream is = bodyPart.getInputStream()) {
+                    System.out.println(
+                        "Attachment content: " + new String(is.readAllBytes(), Charset.forName("UTF-8")));
+                }
+            } else if (bodyPart.getContent() instanceof MimeMultipart) {
+                stringBuilder.append(getMultipartContent((MimeMultipart) bodyPart.getContent()));
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
 }
