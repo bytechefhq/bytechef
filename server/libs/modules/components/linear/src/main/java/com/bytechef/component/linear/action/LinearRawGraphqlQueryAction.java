@@ -29,8 +29,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -60,20 +58,17 @@ public class LinearRawGraphqlQueryAction {
     private LinearRawGraphqlQueryAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Object jsonVariables = null;
+        String variables = inputParameters.getString(VARIABLES);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("query", inputParameters.getRequiredString(QUERY));
-
-        if (inputParameters.getString(VARIABLES) != null) {
-            Object jsonVariables = context.json(json -> json.read(inputParameters.getString(VARIABLES)));
-            body.put("variables", jsonVariables);
+        if (variables != null) {
+            jsonVariables = context.json(json -> json.read(variables));
         }
 
         return context
             .http(http -> http.post("/graphql"))
-            .body(Body.of(body))
+            .body(Body.of(QUERY, inputParameters.getRequiredString(QUERY), VARIABLES, jsonVariables))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();

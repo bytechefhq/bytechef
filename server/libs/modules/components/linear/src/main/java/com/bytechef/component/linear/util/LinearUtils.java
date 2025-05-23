@@ -18,9 +18,12 @@ package com.bytechef.component.linear.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.linear.constant.LinearConstants.ALL_PUBLIC_TEAMS;
+import static com.bytechef.component.linear.constant.LinearConstants.DATA;
 import static com.bytechef.component.linear.constant.LinearConstants.ID;
-import static com.bytechef.component.linear.constant.LinearConstants.ISSUE_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.NAME;
+import static com.bytechef.component.linear.constant.LinearConstants.NODES;
+import static com.bytechef.component.linear.constant.LinearConstants.QUERY;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 
 import com.bytechef.component.definition.Context;
@@ -45,6 +48,22 @@ public class LinearUtils {
     private LinearUtils() {
     }
 
+    public static void appendOptionalField(StringBuilder stringBuilder, String fieldName, Object value) {
+        if (value != null) {
+            if (value instanceof String) {
+                stringBuilder.append(fieldName)
+                    .append(": \"")
+                    .append(value)
+                    .append("\", ");
+            } else if (value instanceof Integer) {
+                stringBuilder.append(fieldName)
+                    .append(": ")
+                    .append(value)
+                    .append(", ");
+            }
+        }
+    }
+
     public static List<Option<String>> getAssigneeOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
@@ -55,16 +74,17 @@ public class LinearUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (result.get("data") instanceof Map<?, ?> data &&
+        if (result.get(DATA) instanceof Map<?, ?> data &&
             data.get("users") instanceof Map<?, ?> users &&
-            users.get("nodes") instanceof List<?> nodes) {
+            users.get(NODES) instanceof List<?> nodes) {
 
             for (Object node : nodes) {
                 if (node instanceof Map<?, ?> nodeMap) {
-                    options.add(option((String) nodeMap.get("displayName"), (String) nodeMap.get("id")));
+                    options.add(option((String) nodeMap.get("displayName"), (String) nodeMap.get(ID)));
                 }
             }
         }
+
         return options;
     }
 
@@ -79,16 +99,17 @@ public class LinearUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (result.get("data") instanceof Map<?, ?> data &&
+        if (result.get(DATA) instanceof Map<?, ?> data &&
             data.get("issues") instanceof Map<?, ?> issues &&
-            issues.get("nodes") instanceof List<?> nodes) {
+            issues.get(NODES) instanceof List<?> nodes) {
 
             for (Object node : nodes) {
                 if (node instanceof Map<?, ?> nodeMap) {
-                    options.add(option((String) nodeMap.get("title"), (String) nodeMap.get("id")));
+                    options.add(option((String) nodeMap.get("title"), (String) nodeMap.get(ID)));
                 }
             }
         }
+
         return options;
     }
 
@@ -102,16 +123,17 @@ public class LinearUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (result.get("data") instanceof Map<?, ?> data &&
+        if (result.get(DATA) instanceof Map<?, ?> data &&
             data.get("projects") instanceof Map<?, ?> projects &&
-            projects.get("nodes") instanceof List<?> nodes) {
+            projects.get(NODES) instanceof List<?> nodes) {
 
             for (Object node : nodes) {
                 if (node instanceof Map<?, ?> nodeMap) {
-                    options.add(option((String) nodeMap.get("name"), (String) nodeMap.get("id")));
+                    options.add(option((String) nodeMap.get(NAME), (String) nodeMap.get(ID)));
                 }
             }
         }
+
         return options;
     }
 
@@ -125,13 +147,13 @@ public class LinearUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (result.get("data") instanceof Map<?, ?> data &&
+        if (result.get(DATA) instanceof Map<?, ?> data &&
             data.get("projectStatuses") instanceof Map<?, ?> projectStatuses &&
-            projectStatuses.get("nodes") instanceof List<?> nodes) {
+            projectStatuses.get(NODES) instanceof List<?> nodes) {
 
             for (Object node : nodes) {
                 if (node instanceof Map<?, ?> nodeMap) {
-                    options.add(option((String) nodeMap.get("name"), (String) nodeMap.get("id")));
+                    options.add(option((String) nodeMap.get(NAME), (String) nodeMap.get(ID)));
                 }
             }
         }
@@ -148,13 +170,13 @@ public class LinearUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (result.get("data") instanceof Map<?, ?> data &&
+        if (result.get(DATA) instanceof Map<?, ?> data &&
             data.get("workflowStates") instanceof Map<?, ?> workflowStates &&
-            workflowStates.get("nodes") instanceof List<?> nodes) {
+            workflowStates.get(NODES) instanceof List<?> nodes) {
 
             for (Object node : nodes) {
                 if (node instanceof Map<?, ?> nodeMap) {
-                    options.add(option((String) nodeMap.get("name"), (String) nodeMap.get("id")));
+                    options.add(option((String) nodeMap.get(NAME), (String) nodeMap.get(ID)));
                 }
             }
         }
@@ -171,9 +193,9 @@ public class LinearUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (result.get("data") instanceof Map<?, ?> data &&
+        if (result.get(DATA) instanceof Map<?, ?> data &&
             data.get("teams") instanceof Map<?, ?> teams &&
-            teams.get("nodes") instanceof List<?> nodes) {
+            teams.get(NODES) instanceof List<?> nodes) {
 
             for (Object node : nodes) {
                 if (node instanceof Map<?, ?> nodeMap) {
@@ -188,7 +210,7 @@ public class LinearUtils {
     public static Map<String, Object> executeGraphQLQuery(String query, Context context) {
         return context
             .http(http -> http.post("/graphql"))
-            .body(Body.of(Map.of("query", query)))
+            .body(Body.of(Map.of(QUERY, query)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -201,7 +223,7 @@ public class LinearUtils {
         String action = (String) content.get("action");
 
         if (requiredAction.equals(action)) {
-           return content.get("data");
+            return content.get(DATA);
         }
 
         return null;
@@ -211,7 +233,7 @@ public class LinearUtils {
         String webhookUrl, TriggerContext context, Parameters inputParameters) {
 
         String query;
-        if (inputParameters.getRequiredBoolean("allPublicTeams")) {
+        if (inputParameters.getRequiredBoolean(ALL_PUBLIC_TEAMS)) {
             query =
                 "mutation {webhookCreate(input: {url: \"%s\", allPublicTeams: %s, resourceTypes: [\"Issue\"]}) {webhook {id}}}"
                     .formatted(webhookUrl, true);
@@ -223,7 +245,7 @@ public class LinearUtils {
 
         Map<String, Object> body = executeGraphQLQuery(query, context);
 
-        if (body.get("data") instanceof Map<?, ?> map &&
+        if (body.get(DATA) instanceof Map<?, ?> map &&
             map.get("webhookCreate") instanceof Map<?, ?> webhookCreate &&
             webhookCreate.get("webhook") instanceof Map<?, ?> webhook) {
 

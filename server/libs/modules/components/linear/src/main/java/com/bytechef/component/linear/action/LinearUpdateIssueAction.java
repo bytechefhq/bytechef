@@ -25,12 +25,14 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.linear.constant.LinearConstants.ASSIGNEE_ID;
+import static com.bytechef.component.linear.constant.LinearConstants.DATA;
 import static com.bytechef.component.linear.constant.LinearConstants.DESCRIPTION;
 import static com.bytechef.component.linear.constant.LinearConstants.ISSUE_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.PRIORITY;
-import static com.bytechef.component.linear.constant.LinearConstants.STATE_ID;
+import static com.bytechef.component.linear.constant.LinearConstants.STATUS_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TITLE;
+import static com.bytechef.component.linear.util.LinearUtils.appendOptionalField;
 import static com.bytechef.component.linear.util.LinearUtils.executeGraphQLQuery;
 
 import com.bytechef.component.definition.Context;
@@ -63,7 +65,7 @@ public class LinearUpdateIssueAction {
                 .label("Issue Title")
                 .description("The title of the new issue.")
                 .required(false),
-            string(STATE_ID)
+            string(STATUS_ID)
                 .label("Status")
                 .description("The status of the issue.")
                 .options((ActionOptionsFunction<String>) LinearUtils::getIssueStateOptions)
@@ -106,29 +108,35 @@ public class LinearUpdateIssueAction {
     private LinearUpdateIssueAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        String query = "mutation{issueUpdate(input: { %s%s%s%s%s } id: \"%s\"){success issue{id title}}}"
-            .formatted(
-                inputParameters.getString(TITLE) != null ? "title: \"%s\", ".formatted(inputParameters.getString(TITLE))
-                    : "",
-                inputParameters.getRequiredString(STATE_ID) != null
-                    ? "stateId: \"%s\", ".formatted(inputParameters.getString(STATE_ID)) : "",
-                inputParameters.getInteger(PRIORITY) != null
-                    ? "priority: %d, ".formatted(inputParameters.getInteger(PRIORITY)) : "",
-                inputParameters.getString(ASSIGNEE_ID) != null
-                    ? "assigneeId: \"%s\", ".formatted(inputParameters.getString(ASSIGNEE_ID)) : "",
-                inputParameters.getString(DESCRIPTION) != null
-                    ? "description: \"%s\"".formatted(inputParameters.getString(DESCRIPTION)) : "",
-                inputParameters.getRequiredString(ISSUE_ID));
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String query = buildGraphQLQuery(inputParameters);
         Map<String, Object> body = executeGraphQLQuery(query, context);
 
-        if (body.get("data") instanceof Map<?, ?> data && data.get("issueUpdate") instanceof Map<?, ?> issueUpdate) {
+        if (body.get(DATA) instanceof Map<?, ?> data && data.get("issueUpdate") instanceof Map<?, ?> issueUpdate) {
             return issueUpdate;
         }
 
         return null;
+    }
+
+    private static String buildGraphQLQuery(Parameters inputParameters) {
+        StringBuilder stringBuilder = new StringBuilder("mutation{issueUpdate(input: { ");
+
+        appendOptionalField(stringBuilder, TITLE, inputParameters.getString(TITLE));
+        appendOptionalField(stringBuilder, "stateId", inputParameters.getString(STATUS_ID));
+        appendOptionalField(stringBuilder, PRIORITY, inputParameters.getInteger(PRIORITY));
+        appendOptionalField(stringBuilder, ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID));
+        appendOptionalField(stringBuilder, DESCRIPTION, inputParameters.getString(DESCRIPTION));
+
+        if (stringBuilder.toString()
+            .endsWith(", ")) {
+            stringBuilder.setLength(stringBuilder.length() - 2);
+        }
+
+        stringBuilder.append(" } id: \"")
+            .append(inputParameters.getRequiredString(ISSUE_ID))
+            .append("\"){success issue{id title}}}");
+
+        return stringBuilder.toString();
     }
 }

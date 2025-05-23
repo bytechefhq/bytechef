@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.linear.constant.LinearConstants.BODY;
+import static com.bytechef.component.linear.constant.LinearConstants.DATA;
 import static com.bytechef.component.linear.constant.LinearConstants.ISSUE_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static com.bytechef.component.linear.util.LinearUtils.executeGraphQLQuery;
@@ -62,8 +63,7 @@ public class LinearCreateCommentAction {
                 object()
                     .properties(
                         bool("success")
-                            .description(
-                                "Whether the operation was successful."),
+                            .description("Whether the operation was successful."),
                         object("comment")
                             .description("The comment that was created.")
                             .properties(
@@ -79,19 +79,16 @@ public class LinearCreateCommentAction {
     private LinearCreateCommentAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String query =
             "mutation{commentCreate(input: {issueId: \"%s\", body: \"%s\"}){success comment{id issue{id} body}}}"
-                .formatted(
-                    inputParameters.getRequiredString(ISSUE_ID),
-                    inputParameters.getRequiredString(BODY));
+                .formatted(inputParameters.getRequiredString(ISSUE_ID), inputParameters.getRequiredString(BODY));
 
         Map<String, Object> body = executeGraphQLQuery(query, context);
 
-        if (body.get("data") instanceof Map<?, ?> data
+        if (body.get(DATA) instanceof Map<?, ?> data
             && data.get("commentCreate") instanceof Map<?, ?> commentCreate) {
+
             return commentCreate;
         }
 

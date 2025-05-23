@@ -35,7 +35,6 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import java.util.Map;
 
 /**
  * @author Marija Horvat

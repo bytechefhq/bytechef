@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class LinearConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.linear.app")
         .authorizations(
-            authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)
