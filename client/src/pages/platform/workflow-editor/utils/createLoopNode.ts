@@ -53,9 +53,9 @@ function createLeftGhostNode(loopId: string): Node {
             loopId,
             taskDispatcherId: loopId,
         },
-        id: `${loopId}-loop-left-ghost`,
+        id: `${loopId}-taskDispatcher-left-ghost`,
         position: DEFAULT_NODE_POSITION,
-        type: 'loopLeftGhostNode',
+        type: 'taskDispatcherLeftGhostNode',
     };
 }
 
