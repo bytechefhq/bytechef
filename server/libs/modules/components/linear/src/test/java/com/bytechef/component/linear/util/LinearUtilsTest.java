@@ -59,7 +59,6 @@ class LinearUtilsTest {
 
     @BeforeEach
     public void beforeEach() {
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedTriggerContext.http(any()))
@@ -208,14 +207,13 @@ class LinearUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(graphqlResponse);
 
-        Map<String, Object> result = LinearUtils.executeIssueTriggerQuery("create", mockedBody, mockedTriggerContext);
+        Object result = LinearUtils.executeIssueTriggerQuery("create", mockedBody, mockedTriggerContext);
 
         assertEquals(mockIssue, result);
     }
 
     @Test
     void testCreateWebhook() {
-        String type = "Issue";
         String url = "https://example.com/webhook";
         Map<String, Object> graphqlResponse = Map.of(
             "data", Map.of(
@@ -225,7 +223,7 @@ class LinearUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(graphqlResponse);
 
-        WebhookEnableOutput result = LinearUtils.createWebhook(type, url, mockedTriggerContext);
+        WebhookEnableOutput result = LinearUtils.createWebhook(url, mockedTriggerContext, mockedInputParameters);
 
         assertEquals(Map.of("id", "abc123"), result.parameters());
         assertNull(result.webhookExpirationDate());

@@ -29,12 +29,13 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.linear.util.LinearUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
  */
-public abstract class AbstractLinearTriggerTest {
+abstract class AbstractLinearTriggerTest {
 
     protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
@@ -44,15 +45,20 @@ public abstract class AbstractLinearTriggerTest {
     protected Parameters mockedParameters = mock(Parameters.class);
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected MockedStatic<LinearUtils> linearUtilsMockedStatic;
+    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    protected ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    protected ArgumentCaptor<WebhookBody> webhookBodyArgumentCaptor = ArgumentCaptor.forClass(WebhookBody.class);
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
+        ArgumentCaptor.forClass(TriggerContext.class);
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         linearUtilsMockedStatic = mockStatic(LinearUtils.class);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         linearUtilsMockedStatic.close();
     }
 }
