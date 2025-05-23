@@ -16,14 +16,10 @@
 
 package com.bytechef.component.linear.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.linear.constant.LinearConstants.ALL_PUBLIC_TEAMS;
 import static com.bytechef.component.linear.constant.LinearConstants.ALL_PUBLIC_TEAMS_PROPERTY;
 import static com.bytechef.component.linear.constant.LinearConstants.ID;
-import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID_TRIGGER_PROPERTY;
 import static com.bytechef.component.linear.constant.LinearConstants.TRIGGER_OUTPUT_PROPERTY;
 import static com.bytechef.component.linear.util.LinearUtils.createWebhook;
@@ -31,7 +27,6 @@ import static com.bytechef.component.linear.util.LinearUtils.deleteWebhook;
 import static com.bytechef.component.linear.util.LinearUtils.executeIssueTriggerQuery;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -40,8 +35,6 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.linear.constant.LinearConstants;
-import com.bytechef.component.linear.util.LinearUtils;
 
 /**
  * @author Marija Horvat

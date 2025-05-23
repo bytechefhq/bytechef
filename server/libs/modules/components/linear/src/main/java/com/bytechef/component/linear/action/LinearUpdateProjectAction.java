@@ -25,12 +25,14 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.linear.constant.LinearConstants.DATA;
 import static com.bytechef.component.linear.constant.LinearConstants.DESCRIPTION;
 import static com.bytechef.component.linear.constant.LinearConstants.NAME;
 import static com.bytechef.component.linear.constant.LinearConstants.PRIORITY;
 import static com.bytechef.component.linear.constant.LinearConstants.PROJECT_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.START_DATE;
-import static com.bytechef.component.linear.constant.LinearConstants.STATE_ID;
+import static com.bytechef.component.linear.constant.LinearConstants.STATUS_ID;
+import static com.bytechef.component.linear.util.LinearUtils.appendOptionalField;
 import static com.bytechef.component.linear.util.LinearUtils.executeGraphQLQuery;
 
 import com.bytechef.component.definition.Context;
@@ -57,7 +59,7 @@ public class LinearUpdateProjectAction {
                 .label("Project Name")
                 .description("The name of the project.")
                 .required(false),
-            string(STATE_ID)
+            string(STATUS_ID)
                 .label("Status")
                 .description("The status of the project.")
                 .options((ActionOptionsFunction<String>) LinearUtils::getProjectStateOptions)
@@ -100,30 +102,37 @@ public class LinearUpdateProjectAction {
     private LinearUpdateProjectAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        String query = "mutation{projectUpdate(input: { %s%s%s%s%s } id: \"%s\"){success project{id name}}}"
-            .formatted(
-                inputParameters.getString(NAME) != null ? "name: \"%s\", ".formatted(inputParameters.getString(NAME))
-                    : "",
-                inputParameters.getString(STATE_ID) != null
-                    ? "statusId: \"%s\", ".formatted(inputParameters.getString(STATE_ID)) : "",
-                inputParameters.getInteger(PRIORITY) != null
-                    ? "priority: %d, ".formatted(inputParameters.getInteger(PRIORITY)) : "",
-                inputParameters.getString(START_DATE) != null
-                    ? "startDate: \"%s\", ".formatted(inputParameters.getString(START_DATE)) : "",
-                inputParameters.getString(DESCRIPTION) != null
-                    ? "description: \"%s\"".formatted(inputParameters.getString(DESCRIPTION)) : "",
-                inputParameters.getRequiredString(PROJECT_ID));
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String query = buildGraphQLQuery(inputParameters);
         Map<String, Object> body = executeGraphQLQuery(query, context);
 
-        if (body.get("data") instanceof Map<?, ?> data
-            && data.get("projectUpdate") instanceof Map<?, ?> projectUpdate) {
+        if (body.get(DATA) instanceof Map<?, ?> data &&
+            data.get("projectUpdate") instanceof Map<?, ?> projectUpdate) {
+
             return projectUpdate;
         }
 
         return null;
+    }
+
+    private static String buildGraphQLQuery(Parameters inputParameters) {
+        StringBuilder stringBuilder = new StringBuilder("mutation{projectUpdate(input: { ");
+
+        appendOptionalField(stringBuilder, NAME, inputParameters.getString(NAME));
+        appendOptionalField(stringBuilder, STATUS_ID, inputParameters.getString(STATUS_ID));
+        appendOptionalField(stringBuilder, PRIORITY, inputParameters.getInteger(PRIORITY));
+        appendOptionalField(stringBuilder, START_DATE, inputParameters.getString(START_DATE));
+        appendOptionalField(stringBuilder, DESCRIPTION, inputParameters.getString(DESCRIPTION));
+
+        if (stringBuilder.toString()
+            .endsWith(", ")) {
+            stringBuilder.setLength(stringBuilder.length() - 2);
+        }
+
+        stringBuilder.append(" } id: \"")
+            .append(inputParameters.getRequiredString(PROJECT_ID))
+            .append("\"){success project{id name}}}");
+
+        return stringBuilder.toString();
     }
 }

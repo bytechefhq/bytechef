@@ -20,9 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.linear.util.LinearUtils;
 
@@ -34,26 +34,28 @@ public class LinearConstants {
     public static final String ALL_PUBLIC_TEAMS = "allPublicTeams";
     public static final String ASSIGNEE_ID = "assigneeId";
     public static final String BODY = "body";
+    public static final String DATA = "data";
     public static final String DESCRIPTION = "description";
     public static final String ID = "id";
     public static final String ISSUE_ID = "issueId";
     public static final String NAME = "name";
+    public static final String NODES = "nodes";
     public static final String PRIORITY = "priority";
     public static final String PROJECT_ID = "projectId";
     public static final String QUERY = "query";
     public static final String START_DATE = "startDate";
-    public static final String STATE_ID = "stateId";
+    public static final String STATUS_ID = "statusId";
     public static final String TEAM_ID = "teamId";
     public static final String TITLE = "title";
     public static final String VARIABLES = "variables";
 
-    public static ModifiableBooleanProperty ALL_PUBLIC_TEAMS_PROPERTY =   bool(ALL_PUBLIC_TEAMS)
+    public static final ModifiableBooleanProperty ALL_PUBLIC_TEAMS_PROPERTY = bool(ALL_PUBLIC_TEAMS)
         .label("All Public Teams")
         .description("If true, the webhook will be created for all public teams.")
         .defaultValue(false)
         .required(true);
 
-    public static ComponentDsl.ModifiableStringProperty TEAM_ID_TRIGGER_PROPERTY =  string(TEAM_ID)
+    public static final ModifiableStringProperty TEAM_ID_TRIGGER_PROPERTY = string(TEAM_ID)
         .label("Team ID")
         .displayCondition("%s == false".formatted(ALL_PUBLIC_TEAMS))
         .options((TriggerOptionsFunction<String>) LinearUtils::getTeamOptions)
