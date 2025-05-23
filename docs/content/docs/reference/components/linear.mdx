@@ -51,7 +51,7 @@ Name: createIssue
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | title | Issue Title | STRING | `The title of the new issue.` | true |
 | teamId | Team ID | STRING | `The ID of the team where this issue should be created.` | true |
-| stateId | Status | STRING | `The status of the issue.` | true |
+| statusId | Status | STRING | `The status of the issue.` | true |
 | priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | `The priority of the issue.` | false |
 | assigneeId | Assignee ID | STRING | `The identifier of the user to assign the issue to.` | false |
 | description | Description | STRING | `The detailed description of the issue.` | false |
@@ -64,7 +64,7 @@ Name: createIssue
   "parameters" : {
     "title" : "",
     "teamId" : "",
-    "stateId" : "",
+    "statusId" : "",
     "priority" : 1,
     "assigneeId" : "",
     "description" : ""
@@ -114,7 +114,7 @@ Name: updateIssue
 | teamId | Team ID | STRING | `The ID of the team where this issue should be created.` | true |
 | issueId | Issue ID | STRING <details> <summary> Depends On </summary> teamId </details> | `The identifier of the issue to update.` | true |
 | title | Issue Title | STRING | `The title of the new issue.` | false |
-| stateId | Status | STRING | `The status of the issue.` | false |
+| statusId | Status | STRING | `The status of the issue.` | false |
 | priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | `The priority of the issue.` | false |
 | assigneeId | Assignee ID | STRING | `The identifier of the user to assign the issue to.` | false |
 | description | Description | STRING | `The detailed description of the issue.` | false |
@@ -128,7 +128,7 @@ Name: updateIssue
     "teamId" : "",
     "issueId" : "",
     "title" : "",
-    "stateId" : "",
+    "statusId" : "",
     "priority" : 1,
     "assigneeId" : "",
     "description" : ""
@@ -177,7 +177,7 @@ Name: createProject
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Project Name | STRING | `The name of the project.` | true |
 | teamId | Team ID | STRING | `The ID of the team where this project should be created.` | true |
-| stateId | Status | STRING | `The status of the project.` | false |
+| statusId | Status | STRING | `The status of the project.` | false |
 | priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | `The priority of the project.` | false |
 | startDate | Start Date | DATE | `The planned start date of the project.` | false |
 | description | Description | STRING | `The detailed description of the project.` | false |
@@ -190,7 +190,7 @@ Name: createProject
   "parameters" : {
     "name" : "",
     "teamId" : "",
-    "stateId" : "",
+    "statusId" : "",
     "priority" : 1,
     "startDate" : "2021-01-01",
     "description" : ""
@@ -239,7 +239,7 @@ Name: updateProject
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | projectId | Project ID | STRING | `The identifier of the project to update.` | true |
 | name | Project Name | STRING | `The name of the project.` | false |
-| stateId | Status | STRING | `The status of the project.` | false |
+| statusId | Status | STRING | `The status of the project.` | false |
 | priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | `The priority of the project.` | false |
 | startDate | Start Date | DATE | `The planned start date of the project.` | false |
 | description | Description | STRING | `The detailed description of the issue.` | false |
@@ -252,7 +252,7 @@ Name: updateProject
   "parameters" : {
     "projectId" : "",
     "name" : "",
-    "stateId" : "",
+    "statusId" : "",
     "priority" : 1,
     "startDate" : "2021-01-01",
     "description" : ""
@@ -410,6 +410,13 @@ Name: newIssue
 
 Type: DYNAMIC_WEBHOOK
 
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| allPublicTeams | All Public Teams | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, the webhook will be created for all public teams.` | true |
+| teamId | Team ID | STRING |  | true |
+
 
 #### Output
 
@@ -438,6 +445,10 @@ Type: OBJECT
 {
   "label" : "New Issue",
   "name" : "newIssue",
+  "parameters" : {
+    "allPublicTeams" : false,
+    "teamId" : ""
+  },
   "type" : "linear/v1/newIssue"
 }
 ```
@@ -449,6 +460,13 @@ Name: updatedIssue
 `Triggers when an issue is updated.`
 
 Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| allPublicTeams | All Public Teams | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, the webhook will be created for all public teams.` | true |
+| teamId | Team ID | STRING |  | true |
 
 
 #### Output
@@ -478,6 +496,10 @@ Type: OBJECT
 {
   "label" : "Updated Issue",
   "name" : "updatedIssue",
+  "parameters" : {
+    "allPublicTeams" : false,
+    "teamId" : ""
+  },
   "type" : "linear/v1/updatedIssue"
 }
 ```
@@ -489,6 +511,13 @@ Name: removedIssue
 `Triggers when an issue is removed.`
 
 Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| allPublicTeams | All Public Teams | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, the webhook will be created for all public teams.` | true |
+| teamId | Team ID | STRING |  | true |
 
 
 #### Output
@@ -518,6 +547,10 @@ Type: OBJECT
 {
   "label" : "Removed Issue",
   "name" : "removedIssue",
+  "parameters" : {
+    "allPublicTeams" : false,
+    "teamId" : ""
+  },
   "type" : "linear/v1/removedIssue"
 }
 ```
