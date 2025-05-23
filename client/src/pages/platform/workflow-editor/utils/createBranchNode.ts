@@ -54,6 +54,16 @@ function createCasePlaceholderNode(branchId: string, caseKey: string): Node {
     };
 }
 
+interface CreateBranchNodeProps {
+    allNodes: Node[];
+    branchId: string;
+    isNested?: boolean;
+    options?: {
+        createDefaultPlaceholder?: boolean;
+        emptyCaseKeys?: Array<string>;
+    };
+}
+
 export default function createBranchNode({
     allNodes,
     branchId,
@@ -62,15 +72,7 @@ export default function createBranchNode({
         createDefaultPlaceholder: true,
         emptyCaseKeys: [],
     },
-}: {
-    allNodes: Node[];
-    branchId: string;
-    isNested?: boolean;
-    options?: {
-        createDefaultPlaceholder?: boolean;
-        emptyCaseKeys?: Array<string>;
-    };
-}): Node[] {
+}: CreateBranchNodeProps): Node[] {
     const nodesWithBranch = [...allNodes];
     const insertIndex = nodesWithBranch.findIndex((node) => node.id === branchId) + 1;
     const nodesToAdd = [];
