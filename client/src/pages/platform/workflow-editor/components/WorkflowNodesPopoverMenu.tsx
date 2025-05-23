@@ -11,6 +11,7 @@ import {
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
+import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -52,7 +53,7 @@ const WorkflowNodesPopoverMenu = ({
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [trigger, setTrigger] = useState(false);
 
-    const {integrationId, projectId, workflow} = useWorkflowDataStore();
+    const {workflow} = useWorkflowDataStore();
 
     const {edges, nodes} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -66,6 +67,8 @@ const WorkflowNodesPopoverMenu = ({
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const queryClient = useQueryClient();
+
+    const {projectId} = useParams();
 
     const sourceNode = useMemo(() => nodes.find((node) => node.id === sourceNodeId), [sourceNodeId, nodes]);
 
@@ -104,8 +107,7 @@ const WorkflowNodesPopoverMenu = ({
 
                 await handleTaskDispatcherClick({
                     edge: !!edge,
-                    integrationId,
-                    projectId,
+                    projectId: +projectId!,
                     queryClient,
                     sourceNodeId,
                     taskDispatcherContext,
@@ -230,8 +232,6 @@ const WorkflowNodesPopoverMenu = ({
                             clusterElementType={clusterElementType && clusterElementType}
                             componentDefinition={componentDefinitionToBeAdded}
                             edgeId={edgeId}
-                            integrationId={integrationId}
-                            projectId={projectId}
                             rootClusterElementDefinition={rootClusterElementDefinition}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}

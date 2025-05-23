@@ -16,26 +16,28 @@ const ProjectBreadcrumb = ({
     project,
     projectWorkflowId,
     projectWorkflows,
-}: ProjectBreadcrumbProps) => (
-    <Breadcrumb>
-        <BreadcrumbList>
-            <BreadcrumbItem>
-                <ProjectTitle project={project} />
-            </BreadcrumbItem>
+}: ProjectBreadcrumbProps) => {
+    return (
+        <Breadcrumb>
+            <BreadcrumbList>
+                <BreadcrumbItem>
+                    <ProjectTitle project={project} />
+                </BreadcrumbItem>
 
-            <BreadcrumbSeparator />
+                <BreadcrumbSeparator />
 
-            <BreadcrumbItem>
-                <WorkflowSelect
-                    currentWorkflowLabel={currentWorkflow.label}
-                    onValueChange={onProjectWorkflowValueChange}
-                    projectId={project.id!}
-                    projectWorkflowId={projectWorkflowId}
-                    projectWorkflows={projectWorkflows}
-                />
-            </BreadcrumbItem>
-        </BreadcrumbList>
-    </Breadcrumb>
-);
+                <BreadcrumbItem>
+                    <WorkflowSelect
+                        currentWorkflowLabel={currentWorkflow.label}
+                        onValueChange={onProjectWorkflowValueChange}
+                        projectId={project.id!}
+                        projectWorkflowId={projectWorkflowId}
+                        projectWorkflows={projectWorkflows}
+                    />
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+    );
+};
 
 export default ProjectBreadcrumb;

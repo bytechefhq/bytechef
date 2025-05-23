@@ -18,11 +18,10 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleTaskDispatcherSubtaskOperationClickProps {
-    integrationId?: number;
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;
     placeholderId?: string;
-    projectId?: number;
+    projectId: number;
     queryClient: QueryClient;
     taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -30,7 +29,6 @@ interface HandleTaskDispatcherSubtaskOperationClickProps {
 }
 
 export default function handleTaskDispatcherSubtaskOperationClick({
-    integrationId,
     operation,
     operationDefinition,
     placeholderId,
@@ -81,7 +79,6 @@ export default function handleTaskDispatcherSubtaskOperationClick({
     const taskAfterCurrentIndex = workflow.tasks?.length;
 
     saveWorkflowDefinition({
-        integrationId,
         nodeData: {
             ...newWorkflowNodeData,
             parameters: getParametersWithDefaultValues({

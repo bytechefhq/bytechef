@@ -62,8 +62,8 @@ const Integration = () => {
                     )
                 }
             >
-                <ResizablePanelGroup className="flex-1 bg-surface-main" direction="vertical">
-                    <ResizablePanel className="relative flex" defaultSize={65}>
+                <ResizablePanelGroup className="flex-1" direction="vertical">
+                    <ResizablePanel className="relative" defaultSize={65}>
                         <ConnectionReactQueryProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,

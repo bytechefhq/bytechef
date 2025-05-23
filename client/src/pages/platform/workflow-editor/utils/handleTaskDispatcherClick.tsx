@@ -20,8 +20,7 @@ const fallbackIcon = <ComponentIcon className="size-9 text-gray-700" />;
 
 interface HandleTaskDispatcherClickProps {
     edge?: boolean;
-    integrationId?: number;
-    projectId?: number;
+    projectId: number;
     queryClient: QueryClient;
     sourceNodeId?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
@@ -33,7 +32,6 @@ interface HandleTaskDispatcherClickProps {
 
 export default async function handleTaskDispatcherClick({
     edge,
-    integrationId,
     projectId,
     queryClient,
     sourceNodeId,
@@ -104,7 +102,6 @@ export default async function handleTaskDispatcherClick({
     }
 
     saveWorkflowDefinition({
-        integrationId,
         nodeData: {
             ...newNodeData,
             parameters: config.getInitialParameters(taskDispatcherDefinition?.properties as Array<PropertyAllType>),

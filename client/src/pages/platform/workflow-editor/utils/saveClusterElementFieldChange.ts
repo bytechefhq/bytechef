@@ -18,8 +18,7 @@ interface SaveClusterElementFieldChangeProps {
     currentClusterElementName: string;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
-    integrationId?: number;
-    projectId?: number;
+    projectId: string | number;
     queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, {id: string; workflow: Workflow}, unknown>;
 }
@@ -29,7 +28,6 @@ export default function saveClusterElementFieldChange({
     currentComponentDefinition,
     currentOperationProperties,
     fieldUpdate,
-    integrationId,
     projectId,
     queryClient,
     updateWorkflowMutation,
@@ -131,8 +129,8 @@ export default function saveClusterElementFieldChange({
     }
 
     saveWorkflowDefinition({
-        integrationId,
         nodeData: updatedNodeData,
+
         onSuccess: () => {
             if (fieldUpdate.field === 'operation') {
                 setCurrentNode({
@@ -150,7 +148,7 @@ export default function saveClusterElementFieldChange({
                 });
             }
         },
-        projectId,
+        projectId: +projectId!,
         queryClient,
         updateWorkflowMutation,
     });

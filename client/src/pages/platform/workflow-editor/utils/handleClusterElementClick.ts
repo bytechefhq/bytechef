@@ -12,8 +12,7 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleClusterElementClickProps {
     data: ClusterElementDefinitionBasic;
-    integrationId?: number;
-    projectId?: number;
+    projectId: string;
     queryClient: QueryClient;
     rootClusterElementDefinition: ComponentDefinition;
     setPopoverOpen: (open: boolean) => void;
@@ -22,7 +21,6 @@ interface HandleClusterElementClickProps {
 
 export default function handleClusterElementClick({
     data,
-    integrationId,
     projectId,
     queryClient,
     rootClusterElementDefinition,
@@ -97,8 +95,8 @@ export default function handleClusterElementClick({
     }
 
     saveWorkflowDefinition({
-        integrationId,
         nodeData: updatedNodeData,
+
         onSuccess: () => {
             handleComponentAddedSuccess({
                 nodeData: updatedNodeData,
@@ -106,7 +104,7 @@ export default function handleClusterElementClick({
                 workflow,
             });
         },
-        projectId,
+        projectId: +projectId!,
         queryClient,
         updateWorkflowMutation,
     });

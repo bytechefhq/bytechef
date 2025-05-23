@@ -330,8 +330,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
             {showWorkflowDialog && !!integration.id && (
                 <WorkflowDialog
                     createWorkflowMutation={createIntegrationWorkflowMutation}
-                    integrationId={integration.id}
                     onClose={() => setShowWorkflowDialog(false)}
+                    parentId={integration.id}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                 />
             )}

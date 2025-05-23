@@ -12,6 +12,7 @@ import {
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
+import {useParams} from 'react-router-dom';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -19,14 +20,14 @@ import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldCh
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 
-interface DescriptionTabProps {
-    integrationId?: number;
+const DescriptionTab = ({
+    nodeDefinition,
+    updateWorkflowMutation,
+}: {
     nodeDefinition: ComponentDefinition | ClusterElementDefinition | TaskDispatcherDefinition | TriggerDefinition;
-    projectId?: number;
     updateWorkflowMutation: UpdateWorkflowMutationType;
-}
-
-const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflowMutation}: DescriptionTabProps) => {
+}) => {
+    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
     const {nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
@@ -34,9 +35,12 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
         }))
     );
 
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+    const workflowTaskOrTrigger = [...(workflow.tasks ?? []), ...(workflow.triggers ?? [])]?.find(
+        (task) => task.name === currentNode?.workflowNodeName
+    );
 
     const queryClient = useQueryClient();
+    const {projectId} = useParams();
 
     const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (!currentNode) {
@@ -51,8 +55,7 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
                     field: 'label',
                     value: event.target.value,
                 },
-                integrationId,
-                projectId,
+                projectId: +projectId!,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -68,8 +71,7 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
                     field: 'label',
                     value: event.target.value,
                 },
-                integrationId,
-                projectId,
+                projectId: +projectId!,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -79,7 +81,6 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
 
         saveWorkflowDefinition({
             decorative: true,
-            integrationId,
             nodeData: {
                 ...currentNode,
                 label: event.target.value,
@@ -99,7 +100,7 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
                     label: event.target.value,
                 });
             },
-            projectId,
+            projectId: +projectId!,
             queryClient,
             updateWorkflowMutation,
         });
@@ -118,8 +119,7 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
                     field: 'description',
                     value: event.target.value,
                 },
-                integrationId,
-                projectId,
+                projectId: +projectId!,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -135,8 +135,7 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
                     field: 'description',
                     value: event.target.value,
                 },
-                integrationId,
-                projectId,
+                projectId: +projectId!,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -146,7 +145,6 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
 
         saveWorkflowDefinition({
             decorative: true,
-            integrationId,
             nodeData: {
                 ...currentNode,
                 description: event.target.value,
@@ -166,20 +164,11 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
                     description: event.target.value,
                 });
             },
-            projectId,
+            projectId: +projectId!,
             queryClient,
             updateWorkflowMutation,
         });
     }, 300);
-
-    let workflowTaskOrTrigger = [...(workflow.tasks ?? []), ...(workflow.triggers ?? [])]?.find(
-        (task) => task.name === currentNode?.workflowNodeName
-    );
-
-    if (!workflowTaskOrTrigger && currentNode?.clusterElementType) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        workflowTaskOrTrigger = currentNode as any;
-    }
 
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
