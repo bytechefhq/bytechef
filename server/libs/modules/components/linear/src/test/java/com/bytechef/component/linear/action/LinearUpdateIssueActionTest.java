@@ -20,10 +20,12 @@ import static com.bytechef.component.linear.constant.LinearConstants.ASSIGNEE_ID
 import static com.bytechef.component.linear.constant.LinearConstants.DESCRIPTION;
 import static com.bytechef.component.linear.constant.LinearConstants.ISSUE_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.PRIORITY;
-import static com.bytechef.component.linear.constant.LinearConstants.STATE_ID;
+import static com.bytechef.component.linear.constant.LinearConstants.STATUS_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -49,10 +51,13 @@ class LinearUpdateIssueActionTest {
     @Test
     void testPerform() {
         Parameters parameters = MockParametersFactory.create(
-            Map.of(TEAM_ID, "1", ISSUE_ID, "2", TITLE, "Title", STATE_ID, "Done", PRIORITY, 0, ASSIGNEE_ID, "abc",
+            Map.of(TEAM_ID, "1", ISSUE_ID, "2", TITLE, "Title", STATUS_ID, "Done", PRIORITY, 0, ASSIGNEE_ID, "abc",
                 DESCRIPTION, "This is a description."));
 
         try (MockedStatic<LinearUtils> linearUtilsMockedStatic = mockStatic(LinearUtils.class)) {
+            linearUtilsMockedStatic
+                .when(() -> LinearUtils.appendOptionalField(any(StringBuilder.class), anyString(), any(Object.class)))
+                .thenCallRealMethod();
             linearUtilsMockedStatic
                 .when(() -> LinearUtils.executeGraphQLQuery(
                     stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))

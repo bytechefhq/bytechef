@@ -16,12 +16,15 @@
 
 package com.bytechef.component.linear.trigger;
 
+import static com.bytechef.component.linear.constant.LinearConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.linear.util.LinearUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
 
 /**
  * @author Marija Horvat
@@ -31,29 +34,54 @@ class LinearUpdatedIssueTriggerTest extends AbstractLinearTriggerTest {
     @Test
     void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
-        WebhookEnableOutput expectedOutput = new WebhookEnableOutput(Map.of("id", "123"), null);
+        WebhookEnableOutput expectedOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
         linearUtilsMockedStatic.when(
-            () -> LinearUtils.createWebhook("Issue", webhookUrl, mockedTriggerContext))
+            () -> LinearUtils.createWebhook(
+                stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture(),
+                parametersArgumentCaptor.capture()))
             .thenReturn(expectedOutput);
 
         WebhookEnableOutput actualOutput = LinearUpdatedIssueTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        assertEquals(expectedOutput.parameters(), actualOutput.parameters());
-        assertEquals(expectedOutput.webhookExpirationDate(), actualOutput.webhookExpirationDate());
+        assertEquals(expectedOutput, actualOutput);
+        assertEquals(webhookUrl, stringArgumentCaptor.getValue());
+        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
+        assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testWebhookDisable() {
+        mockedParameters = MockParametersFactory.create(Map.of(ID, "123"));
+
+        linearUtilsMockedStatic.when(
+            () -> LinearUtils.deleteWebhook(
+                stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()))
+            .thenAnswer((Answer<Void>) invocation -> null);
+
+        LinearUpdatedIssueTrigger.webhookDisable(
+            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+
+        assertEquals("123", stringArgumentCaptor.getValue());
+        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 
     @Test
     void testWebhookRequest() {
         linearUtilsMockedStatic.when(
-            () -> LinearUtils.executeIssueTriggerQuery("update", mockedWebhookBody, mockedTriggerContext))
-            .thenReturn(Map.of("id", "123"));
+            () -> LinearUtils.executeIssueTriggerQuery(
+                stringArgumentCaptor.capture(), webhookBodyArgumentCaptor.capture(),
+                triggerContextArgumentCaptor.capture()))
+            .thenReturn(Map.of(ID, "123"));
 
         Object result = LinearUpdatedIssueTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
             mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
-        assertEquals(Map.of("id", "123"), result);
+        assertEquals(Map.of(ID, "123"), result);
+        assertEquals("update", stringArgumentCaptor.getValue());
+        assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
+        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 }

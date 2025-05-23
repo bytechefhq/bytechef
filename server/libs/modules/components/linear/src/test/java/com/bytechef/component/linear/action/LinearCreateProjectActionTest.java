@@ -20,9 +20,11 @@ import static com.bytechef.component.linear.constant.LinearConstants.DESCRIPTION
 import static com.bytechef.component.linear.constant.LinearConstants.NAME;
 import static com.bytechef.component.linear.constant.LinearConstants.PRIORITY;
 import static com.bytechef.component.linear.constant.LinearConstants.START_DATE;
-import static com.bytechef.component.linear.constant.LinearConstants.STATE_ID;
+import static com.bytechef.component.linear.constant.LinearConstants.STATUS_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -48,10 +50,13 @@ class LinearCreateProjectActionTest {
     @Test
     void testPerform() {
         Parameters parameters = MockParametersFactory.create(
-            Map.of(NAME, "Name", TEAM_ID, "1", STATE_ID, "Done", PRIORITY, 0, START_DATE, "2025-05-15", DESCRIPTION,
+            Map.of(NAME, "Name", TEAM_ID, "1", STATUS_ID, "Done", PRIORITY, 0, START_DATE, "2025-05-15", DESCRIPTION,
                 "This is a description."));
 
         try (MockedStatic<LinearUtils> linearUtilsMockedStatic = mockStatic(LinearUtils.class)) {
+            linearUtilsMockedStatic
+                .when(() -> LinearUtils.appendOptionalField(any(StringBuilder.class), anyString(), any(Object.class)))
+                .thenCallRealMethod();
             linearUtilsMockedStatic
                 .when(() -> LinearUtils.executeGraphQLQuery(
                     stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
