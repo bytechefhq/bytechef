@@ -2,5 +2,9 @@
   "title": "Embedded",
   "description": "The embedded guide",
   "icon": "LayoutTemplate",
-  "root": true
+  "root": true,
+  "pages": [
+    "---Getting Started---",
+    "index"
+  ]
 }
