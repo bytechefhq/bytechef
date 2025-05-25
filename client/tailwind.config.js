@@ -4,15 +4,7 @@ module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx}', './*.html'],
     darkMode: 'class',
     important: true,
-    plugins: [
-        require('@tailwindcss/forms'),
-        require('tailwindcss-animate'),
-        require('@tailwindcss/typography'),
-        require('@assistant-ui/react-ui/tailwindcss')({
-            components: ['thread'],
-            shadcn: true,
-        }),
-    ],
+    plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate'), require('@tailwindcss/typography')],
     theme: {
         container: {
             center: 'true',

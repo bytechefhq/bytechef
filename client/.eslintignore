@@ -1,5 +1,6 @@
 node_modules
 dist
+src/components/assistant-ui
 src/components/ui
 src/hooks/use-toast.ts
 src/**/graphql.ts
