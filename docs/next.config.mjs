@@ -15,16 +15,6 @@ const config = {
       },
     ],
   },
-
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/platform',
-        permanent: false,
-      },
-    ];
-  },
 };
 
 export default withMDX(config);
