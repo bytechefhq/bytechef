@@ -453,7 +453,7 @@ export const WorkflowExecutions = () => {
                     </div>
                 </div>
             }
-            leftSidebarHeader={<Header position="sidebar" title="Execution History" />}
+            leftSidebarHeader={<Header position="sidebar" title="Workflow Executions" />}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
