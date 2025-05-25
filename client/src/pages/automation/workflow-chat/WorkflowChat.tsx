@@ -1,9 +1,8 @@
+import {Thread} from '@/components/assistant-ui/thread';
 import {WorkflowTestChatRuntimeProvider} from '@/pages/automation/workflow-chat/runtime-providers/WorkflowChatRuntimeProvider';
 import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
-import {Thread} from '@assistant-ui/react-ui';
 import {useEffect} from 'react';
 import {useParams} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 
 const WorkflowChat = () => {
     const {environment, workflowExecutionId} = useParams();
@@ -16,7 +15,7 @@ const WorkflowChat = () => {
     }, []);
 
     return (
-        <div className="size-full">
+        <div className="size-full bg-surface-main">
             <WorkflowTestChatRuntimeProvider
                 environment={environment ?? 'production'}
                 workflowExecutionId={workflowExecutionId ?? ''}
@@ -30,9 +29,7 @@ const WorkflowChat = () => {
                         </div>
                     )}
 
-                    <div className={twMerge('absolute inset-x-0 bottom-0', environment === 'test' && 'top-16')}>
-                        <Thread />
-                    </div>
+                    <Thread />
                 </div>
             </WorkflowTestChatRuntimeProvider>
         </div>

@@ -214,7 +214,7 @@ function App() {
                     <Outlet />
 
                     {ai.copilot.enabled && copilotPanelOpen && (
-                        <aside className="border-l border-l-border/70">
+                        <aside>
                             <CopilotPanel />
                         </aside>
                     )}

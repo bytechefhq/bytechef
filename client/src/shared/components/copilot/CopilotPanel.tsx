@@ -1,8 +1,8 @@
+import {Thread} from '@/components/assistant-ui/thread';
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {Thread} from '@assistant-ui/react-ui';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {BotMessageSquareIcon, MessageSquareOffIcon} from 'lucide-react';
 import {useEffect} from 'react';
@@ -35,7 +35,7 @@ const CopilotPanel = () => {
     }, [context?.source]);
 
     return (
-        <div className="relative h-full min-h-[50vh] w-[450px]">
+        <div className="relative h-full min-h-[50vh] w-[450px] bg-surface-main">
             <div className="flex items-center justify-between p-3">
                 <div className="flex items-center space-x-1">
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>

@@ -1,6 +1,6 @@
+import {Thread} from '@/components/assistant-ui/thread';
 import {WorkflowTestChatRuntimeProvider} from '@/pages/platform/workflow-editor/components/workflow-test-chat/runtime-providers/WorkflowTestChatRuntimeProvider';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {Thread} from '@assistant-ui/react-ui';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useEffect} from 'react';
 
@@ -22,7 +22,7 @@ const WorkflowTestChatPanel = () => {
 
     return (
         <div className="absolute inset-y-4 bottom-6 right-[69px] top-2 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-l border border-stroke-neutral-secondary bg-background">
-            <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
+            <div className="flex h-full flex-col divide-y divide-gray-100 bg-surface-main">
                 <header className="flex items-center p-4 text-lg font-medium">
                     <span>Playground</span>
 
