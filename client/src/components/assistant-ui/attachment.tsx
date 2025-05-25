@@ -84,7 +84,7 @@ const AttachmentPreview: FC<AttachmentPreviewProps> = ({ src }) => {
   );
 };
 
-const AttachmentPreviewDialog: FC<PropsWithChildren> = ({ children }) => {
+const AttachmentPreviewDialog = ({ children }: { children: JSX.Element }) => {
   const src = useAttachmentSrc();
 
   if (!src) return children;
