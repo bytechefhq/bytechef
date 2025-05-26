@@ -6,7 +6,7 @@ import {OptionsDataSource} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {ReactNode, useEffect, useMemo, useState} from 'react';
+import {ReactNode, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
@@ -43,11 +43,9 @@ const PropertyMultiSelect = ({
     path,
     property,
     showInputTypeSwitchButton,
-    value: initialValue,
+    value,
     workflowId,
 }: PropertyMultiSelectProps) => {
-    const [value, setValue] = useState<string[]>(initialValue ?? defaultValue ?? []);
-
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
     const {description, label, name, placeholder, required} = property;
 
@@ -178,12 +176,6 @@ const PropertyMultiSelect = ({
         dependencyMissing && 'text-destructive'
     );
 
-    useEffect(() => {
-        if (defaultValue) {
-            setValue(defaultValue);
-        }
-    }, [defaultValue]);
-
     return (
         <fieldset className="w-full space-y-1">
             {label && (
@@ -220,11 +212,9 @@ const PropertyMultiSelect = ({
             )}
 
             <MultiSelect
-                defaultValue={value}
+                defaultValue={value ?? defaultValue}
                 leadingIcon={leadingIcon as ReactNode}
                 onValueChange={(value) => {
-                    setValue(value);
-
                     if (onChange) {
                         onChange(value);
                     }

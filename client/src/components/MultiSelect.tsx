@@ -15,7 +15,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Separator} from '@/components/ui/separator';
 import {type VariantProps, cva} from 'class-variance-authority';
 import {CheckIcon, ChevronDown, CircleXIcon, XIcon} from 'lucide-react';
-import {ButtonHTMLAttributes, ComponentType, KeyboardEvent, ReactNode, forwardRef, useEffect, useState} from 'react';
+import {ButtonHTMLAttributes, ComponentType, KeyboardEvent, ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {ScrollArea} from './ui/scroll-area';
@@ -143,26 +143,39 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
             placeholderClassName,
             searchable = false,
             showFooter = false,
-            value = [],
+            value,
             variant,
             ...props
         },
         ref
     ) => {
-        const [selectedValues, setSelectedValues] = useState<string[]>(value ?? defaultValue);
+        // Check if we're in controlled mode
+        const isControlled = value !== undefined;
+
+        // Initialize uncontrolled state with defaultValue
+        const [uncontrolledValues, setUncontrolledValues] = useState(defaultValue);
+
+        // Use the appropriate value source based on mode
+        const selectedValues = isControlled ? value : uncontrolledValues;
+
         const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+        // Update the values internally and notify parent
+        const updateValues = (newValues: string[]) => {
+            if (!isControlled) {
+                setUncontrolledValues(newValues);
+            }
+
+            onValueChange(newValues);
+        };
 
         const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
             if (event.key === 'Enter') {
                 setIsPopoverOpen(true);
             } else if (event.key === 'Backspace' && !event.currentTarget.value) {
                 const newSelectedValues = [...selectedValues];
-
                 newSelectedValues.pop();
-
-                setSelectedValues(newSelectedValues);
-
-                onValueChange(newSelectedValues);
+                updateValues(newSelectedValues);
             }
         };
 
@@ -171,25 +184,18 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                 ? selectedValues.filter((value) => value !== option)
                 : [...selectedValues, option];
 
-            setSelectedValues(newSelectedValues);
-
-            onValueChange(newSelectedValues);
+            updateValues(newSelectedValues);
         };
 
         const handleClear = () => {
-            setSelectedValues([]);
-
-            onValueChange([]);
+            updateValues([]);
         };
 
         const handleTogglePopover = () => setIsPopoverOpen((prev) => !prev);
 
         const clearExtraOptions = () => {
             const newSelectedValues = selectedValues.slice(0, maxCount);
-
-            setSelectedValues(newSelectedValues);
-
-            onValueChange(newSelectedValues);
+            updateValues(newSelectedValues);
         };
 
         const toggleAll = () => {
@@ -197,18 +203,9 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                 handleClear();
             } else {
                 const allValues = options.map((option) => option.value);
-
-                setSelectedValues(allValues);
-
-                onValueChange(allValues);
+                updateValues(allValues);
             }
         };
-
-        useEffect(() => {
-            if (defaultValue) {
-                setSelectedValues(defaultValue);
-            }
-        }, [defaultValue]);
 
         return (
             <Popover modal={modalPopover} onOpenChange={setIsPopoverOpen} open={isPopoverOpen}>
@@ -219,6 +216,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                         className={twMerge(
                             'flex h-auto w-full items-center justify-between rounded-md border border-input bg-inherit px-4 py-2 text-sm font-normal text-primary shadow-sm hover:bg-inherit [&_svg]:pointer-events-auto',
                             leadingIcon && 'relative',
+                            optionsLoading && 'min-h-10 cursor-not-allowed',
                             className
                         )}
                         disabled={!options.length || optionsLoading}
@@ -230,7 +228,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                             </div>
                         )}
 
-                        {selectedValues.length > 0 && (
+                        {selectedValues?.length > 0 && !optionsLoading && (
                             <div className="flex w-full items-center justify-between">
                                 <div className={twMerge('flex flex-wrap items-center', leadingIcon && 'pl-9')}>
                                     {selectedValues.slice(0, maxCount).map((value) => {
@@ -241,13 +239,15 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                             <Badge className={twMerge(multiSelectVariants({variant}))} key={value}>
                                                 {IconComponent && <IconComponent className="mr-2 size-4" />}
 
-                                                {option?.label ?? option?.value}
+                                                <span aria-label={`${option?.label ?? option?.value}-selected`}>
+                                                    {option?.label ?? option?.value}
+                                                </span>
 
                                                 <XIcon
+                                                    aria-label="remove-option"
                                                     className="ml-2 size-4 cursor-pointer text-content-neutral-secondary hover:text-destructive"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
-
                                                         toggleOption(value);
                                                     }}
                                                 />
@@ -257,6 +257,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 
                                     {selectedValues.length > maxCount && (
                                         <Badge
+                                            aria-label="more-count"
                                             className={twMerge(
                                                 multiSelectVariants({variant}),
                                                 'border-stroke-neutral-secondary bg-white hover:bg-white'
@@ -265,10 +266,10 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                             {`+ ${selectedValues.length - maxCount} more`}
 
                                             <XIcon
+                                                aria-label="clear-extra-options"
                                                 className="ml-2 size-4 cursor-pointer text-content-neutral-secondary hover:text-destructive"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
-
                                                     clearExtraOptions();
                                                 }}
                                             />
@@ -278,10 +279,10 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 
                                 <div className="flex items-center justify-between">
                                     <CircleXIcon
+                                        aria-label="clear-all"
                                         className="mr-1 cursor-pointer fill-content-neutral-secondary text-white hover:fill-destructive"
                                         onClick={(event) => {
                                             event.stopPropagation();
-
                                             handleClear();
                                         }}
                                     />
@@ -296,9 +297,10 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                             </div>
                         )}
 
-                        {!selectedValues.length && (
+                        {(!selectedValues || selectedValues.length === 0) && (
                             <div className="mx-auto flex w-full items-center justify-between">
                                 <span
+                                    aria-label={placeholder}
                                     className={twMerge(
                                         'flex items-center text-sm text-primary',
                                         leadingIcon && 'ml-9',
@@ -325,7 +327,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                     onEscapeKeyDown={() => setIsPopoverOpen(false)}
                 >
                     <Command>
-                        {searchable && !!handleInputKeyDown && (
+                        {searchable && (
                             <CommandInput
                                 className="my-1 h-8 border-0"
                                 onKeyDown={handleInputKeyDown}
@@ -341,7 +343,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                     <div
                                         className={twMerge(
                                             'flex size-4 items-center justify-center rounded-xs border border-stroke-neutral-tertiary',
-                                            selectedValues.length === options.length
+                                            selectedValues?.length === options.length
                                                 ? 'border-content-brand-primary bg-content-brand-primary text-primary-foreground'
                                                 : '[&_svg]:invisible'
                                         )}
@@ -349,14 +351,14 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                         <CheckIcon className="size-4" />
                                     </div>
 
-                                    <span>Select All</span>
+                                    <span aria-label="Select All">Select All</span>
                                 </CommandItem>
 
                                 <CommandSeparator className="my-1.5" />
 
                                 <ScrollArea className="h-48 pr-3">
                                     {options.map((option) => {
-                                        const isSelected = selectedValues.includes(option.value);
+                                        const isSelected = selectedValues?.includes(option.value);
 
                                         return (
                                             <CommandItem
@@ -379,7 +381,9 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                                     <option.icon className="mr-2 size-4 text-muted-foreground" />
                                                 )}
 
-                                                <span>{option.label ?? option.value}</span>
+                                                <span aria-label={option.label ?? option.value}>
+                                                    {option.label ?? option.value}
+                                                </span>
                                             </CommandItem>
                                         );
                                     })}
@@ -392,9 +396,10 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 
                                     <CommandGroup>
                                         <div className="flex items-center justify-between">
-                                            {selectedValues.length > 0 && (
+                                            {selectedValues?.length > 0 && (
                                                 <>
                                                     <CommandItem
+                                                        aria-label="clear-all"
                                                         className="flex-1 cursor-pointer justify-center"
                                                         onSelect={handleClear}
                                                     >
