@@ -1,3 +1,4 @@
+import {DEFAULT_NODE_POSITION} from '@/shared/constants';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {Edge, Node} from '@xyflow/react';
 import {useEffect, useMemo} from 'react';
@@ -26,14 +27,15 @@ const useClusterElementsLayout = () => {
     const {rootClusterElementNodeData} = useWorkflowEditorStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const componentVersion = rootClusterElementNodeData?.type
-        ? parseInt(rootClusterElementNodeData.type.split('/')[1].replace(/^v/, ''))
-        : 1;
+    const rootClusterElementComponentVersion =
+        Number(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, '')) || 1;
+
+    const rootClusterElementComponentName = rootClusterElementNodeData?.componentName || '';
 
     const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
         {
-            componentName: rootClusterElementNodeData?.componentName || '',
-            componentVersion: componentVersion || 1,
+            componentName: rootClusterElementComponentName,
+            componentVersion: rootClusterElementComponentVersion,
         },
         !!rootClusterElementNodeData && currentNode?.rootClusterElement
     );
@@ -51,7 +53,7 @@ const useClusterElementsLayout = () => {
         const nodes: Array<Node> = [];
         const edges: Array<Edge> = [];
 
-        if (!rootClusterElementNodeData) {
+        if (!rootClusterElementNodeData || !rootClusterElementDefinition) {
             return {allNodes: nodes, taskEdges: edges};
         }
 
@@ -59,7 +61,7 @@ const useClusterElementsLayout = () => {
             const rootClusterElementNode = {
                 data: rootClusterElementNodeData,
                 id: rootClusterElementNodeData.workflowNodeName,
-                position: {x: 0, y: 0},
+                position: DEFAULT_NODE_POSITION,
                 type: 'workflow',
             };
 
@@ -68,11 +70,11 @@ const useClusterElementsLayout = () => {
 
         const clusterElements = rootClusterElementNodeData.clusterElements || {};
 
-        //Create nodes
-        if (rootClusterElementDefinition?.clusterElementTypes && clusterElements) {
+        // Create nodes
+        if (rootClusterElementDefinition.clusterElementTypes && clusterElements) {
             rootClusterElementDefinition.clusterElementTypes.forEach((clusterElementType) => {
-                const elementType = convertNameToCamelCase(clusterElementType.name as string);
-                const elementLabel = clusterElementType?.label;
+                const elementType = convertNameToCamelCase(clusterElementType.name || '');
+                const elementLabel = clusterElementType.label || '';
                 const isMultipleElementsNode = clusterElementType.multipleElements;
                 const currentRootClusterElementNodeName = rootClusterElementNodeData.workflowNodeName;
                 const clusterElementData = clusterElements[elementType as keyof typeof clusterElements];
@@ -108,14 +110,15 @@ const useClusterElementsLayout = () => {
             (node) => node.data.multipleClusterElementsNode && node.type === 'workflow'
         );
 
-        //Create edges
+        // Create edges
         nodes.forEach((node) => {
             const currentNodeId = node.id;
             const isRootClusterElementNode = node.data.clusterElements;
-            //Create edges from root node to cluster elements
+
+            // Create edges from root node to cluster elements
             if (isRootClusterElementNode && rootClusterElementDefinition?.clusterElementTypes && clusterElements) {
                 rootClusterElementDefinition.clusterElementTypes.forEach((clusterElementType) => {
-                    const elementType = convertNameToCamelCase(clusterElementType.name as string);
+                    const elementType = convertNameToCamelCase(clusterElementType.name || '');
                     const isMultipleElementsNode = clusterElementType.multipleElements;
                     const clusterElementData = clusterElements[elementType as keyof typeof clusterElements];
 
@@ -148,12 +151,12 @@ const useClusterElementsLayout = () => {
                 });
             }
 
-            //Create edges from multiple elements ghost node to its nodes
+            // Create edges from multiple elements ghost node to its nodes
             if (node.type === 'multipleClusterElementsGhostNode') {
                 const rootNodeId = node.data.rootNodeId as string;
                 const elementType = node.data.clusterElementType as string;
 
-                //Create edges from ghost node to its nodes
+                // Create edges from ghost node to its nodes
                 if (multipleElementNodes.length) {
                     multipleElementNodes.forEach((node) => {
                         const multipleElementNodesId = node.id;
@@ -168,7 +171,7 @@ const useClusterElementsLayout = () => {
                     });
                 }
 
-                //Create edges from ghost node to multiple elements placeholder node
+                // Create edges from ghost node to multiple elements placeholder node
                 const edgeFromGhostNodeToPlaceholderNode = createEdgeForMultipleElementsPlaceholderNode(
                     currentNodeId,
                     elementType,

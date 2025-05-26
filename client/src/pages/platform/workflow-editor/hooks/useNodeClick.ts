@@ -4,7 +4,7 @@ import {NodeProps} from '@xyflow/react';
 import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
-import useClusterElementsDataStore from '../../ai-agent-editor/stores/useClusterElementsDataStore';
+import useClusterElementsDataStore from '../../cluster-element-editor/stores/useClusterElementsDataStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -30,13 +30,13 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
 
     return useCallback(() => {
         const clickedNode = nodes.find((node) => node.id === id);
-        const clickedNodeInClusterElementCanvas = clusterElementsCanvasNodes.find((node) => node.id === id);
+        const clickedClusterNode = clusterElementsCanvasNodes.find((node) => node.id === id);
 
         if (!clusterElementsCanvasOpen && !clickedNode) {
             return;
         }
 
-        if (clusterElementsCanvasOpen && !clickedNodeInClusterElementCanvas) {
+        if (clusterElementsCanvasOpen && !clickedClusterNode) {
             return;
         }
 

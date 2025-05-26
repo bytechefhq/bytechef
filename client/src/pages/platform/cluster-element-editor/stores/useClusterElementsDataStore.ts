@@ -40,7 +40,7 @@ const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
                 });
             },
         }),
-        {name: 'aiAgent-data'}
+        {name: 'cluster-elements-data'}
     )
 );
 

@@ -24,7 +24,7 @@ import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import ClusterElementsWorkflowEditor from '../ai-agent-editor/components/ClusterElementsWorkflowEditor';
+import ClusterElementsWorkflowEditor from '../cluster-element-editor/components/ClusterElementsWorkflowEditor';
 import WorkflowEditor from './components/WorkflowEditor';
 import DataPillPanel from './components/datapills/DataPillPanel';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';

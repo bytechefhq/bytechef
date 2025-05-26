@@ -11,7 +11,7 @@ import {memo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import {convertNameToSnakeCase} from '../../ai-agent-editor/utils/clusterElementsUtils';
+import {convertNameToSnakeCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';

@@ -21,6 +21,10 @@ export default function handleComponentAddedSuccess({
 
     const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(nodeData.componentName as string);
 
+    if (isRootClusterElement) {
+        return;
+    }
+
     queryClient.invalidateQueries({
         queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
             id: workflow.id!,
@@ -33,8 +37,6 @@ export default function handleComponentAddedSuccess({
             setCurrentNode({...currentNode, ...nodeData});
             setCurrentComponent({...currentComponent, ...nodeData});
         }
-    } else if (isRootClusterElement) {
-        return;
     } else {
         setCurrentNode({...nodeData, description: ''});
         setCurrentComponent({...nodeData, description: ''});

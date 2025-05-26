@@ -144,10 +144,9 @@ const WorkflowNodeDetailsPanel = ({
 
     const {data: currentClusterElementDefinition} = useGetClusterElementDefinitionQuery(
         {
+            clusterElementName: currentNode?.clusterElementName as string,
             componentName: currentNode?.componentName as string,
             componentVersion: currentNode?.version as number,
-            // eslint-disable-next-line sort-keys
-            clusterElementName: currentNode?.clusterElementName as string,
         },
         isClusterElement
     );
@@ -157,9 +156,7 @@ const WorkflowNodeDetailsPanel = ({
     const matchingOperation = useMemo(
         () =>
             [...(currentComponentDefinition?.actions || []), ...(currentComponentDefinition?.triggers || [])].find(
-                (action) => {
-                    return action.name === currentOperationName;
-                }
+                (action) => action.name === currentOperationName
             ),
         [currentComponentDefinition, currentOperationName]
     );
@@ -504,7 +501,9 @@ const WorkflowNodeDetailsPanel = ({
 
     // Get the node version for different definition types
     function getNodeVersion(node: typeof currentWorkflowNode): string {
-        if (!node) return '1';
+        if (!node) {
+            return '1';
+        }
 
         if ('version' in node) {
             return node.version.toString();
@@ -693,36 +692,39 @@ const WorkflowNodeDetailsPanel = ({
     ]);
 
     useEffect(() => {
-        let clusterElementsActionsData: ComponentOperationType[] = [];
+        if (!clusterElementsCanvasOpen) {
+            return;
+        }
 
-        if (clusterElementsCanvasOpen) {
-            const currentRootClusterTask = workflow?.tasks?.find(
-                (task) => task.name === rootClusterElementNodeData?.workflowNodeName
-            );
-            const currentRootClusterTaskClusterElements = currentRootClusterTask?.clusterElements;
+        const currentRootClusterTask = workflow?.tasks?.find(
+            (task) => task.name === rootClusterElementNodeData?.workflowNodeName
+        );
 
-            if (currentRootClusterTaskClusterElements) {
-                Object.entries(currentRootClusterTaskClusterElements).forEach(([, value]) => {
-                    if (Array.isArray(value)) {
-                        const multipleElementsData = value.map((element) => ({
-                            componentName: element.componentName || '',
-                            operationName: element.type ? element.type.split('/')[2] : '',
-                            workflowNodeName: element.name || '',
-                        }));
+        const currentRootClusterTaskClusterElements = currentRootClusterTask?.clusterElements;
 
-                        clusterElementsActionsData = [...clusterElementsActionsData, ...multipleElementsData];
-                    } else {
-                        clusterElementsActionsData.push({
-                            componentName: value.componentName || '',
-                            operationName: value.type ? value.type.split('/')[2] : '',
-                            workflowNodeName: value.name || '',
-                        });
-                    }
-                });
+        if (currentRootClusterTaskClusterElements) {
+            let clusterElementsActionsData: ComponentOperationType[] = [];
 
-                if (clusterElementsActionsData.length > 0) {
-                    setClusterElementComponentActions(clusterElementsActionsData);
+            Object.entries(currentRootClusterTaskClusterElements).forEach(([, value]) => {
+                if (Array.isArray(value)) {
+                    const multipleElementsData = value.map((element) => ({
+                        componentName: element.componentName || '',
+                        operationName: element.type ? element.type.split('/')[2] : '',
+                        workflowNodeName: element.name || '',
+                    }));
+
+                    clusterElementsActionsData = [...clusterElementsActionsData, ...multipleElementsData];
+                } else {
+                    clusterElementsActionsData.push({
+                        componentName: value.componentName || '',
+                        operationName: value.type ? value.type.split('/')[2] : '',
+                        workflowNodeName: value.name || '',
+                    });
                 }
+            });
+
+            if (clusterElementsActionsData.length > 0) {
+                setClusterElementComponentActions(clusterElementsActionsData);
             }
         }
     }, [clusterElementsCanvasOpen, rootClusterElementNodeData, workflow]);
