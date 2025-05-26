@@ -42,13 +42,13 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             clusterElementsCanvasOpen: false,
             setClusterElementsCanvasOpen: (clusterElementsCanvasOpen) =>
                 set(() => ({
-                    clusterElementsCanvasOpen: clusterElementsCanvasOpen,
+                    clusterElementsCanvasOpen,
                 })),
 
             rootClusterElementNodeData: undefined,
             setRootClusterElementNodeData: (rootClusterElementNodeData) =>
                 set(() => ({
-                    rootClusterElementNodeData: rootClusterElementNodeData,
+                    rootClusterElementNodeData,
                 })),
 
             showBottomPanel: false,

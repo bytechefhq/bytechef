@@ -61,15 +61,15 @@ export const calculateClusterElementsNodeHeight = (node: Node) => {
     const isMultipleElementsGhostNode =
         node.data.multipleClusterElementsNode && node.type === 'multipleClusterElementsGhostNode';
 
-    let height = 150;
+    let clusterElementNodeHeight = 150;
 
     if (isMultipleElementsGhostNode) {
-        height = 20;
+        clusterElementNodeHeight = 20;
     } else if (node.data.clusterElements) {
-        height = 100;
+        clusterElementNodeHeight = 100;
     }
 
-    return height;
+    return clusterElementNodeHeight;
 };
 
 export const convertTaskToNode = (

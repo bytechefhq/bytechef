@@ -78,9 +78,8 @@ const WorkflowNodesPopoverMenu = ({
         setComponentDefinitionToBeAdded(null);
     }, []);
 
-    const rootClusterElementComponentVersion = rootClusterElementNodeData?.type
-        ? parseInt(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, ''))
-        : 1;
+    const rootClusterElementComponentVersion =
+        Number(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, '')) || 1;
 
     const rootClusterElementComponentName = rootClusterElementNodeData?.componentName || '';
 
@@ -89,7 +88,7 @@ const WorkflowNodesPopoverMenu = ({
             componentName: rootClusterElementComponentName,
             componentVersion: rootClusterElementComponentVersion,
         },
-        !!rootClusterElementNodeData && rootClusterElementNodeData?.rootClusterElement
+        !!rootClusterElementNodeData
     );
 
     const handleComponentClick = useCallback(

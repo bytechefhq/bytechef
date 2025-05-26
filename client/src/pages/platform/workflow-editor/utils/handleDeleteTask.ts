@@ -155,33 +155,29 @@ export default function handleDeleteTask({
             return parentParallelTask;
         }) as Array<WorkflowTaskType>;
     } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
-        const currentClusterElementType = data.clusterElementType;
-        const clusterElementName = data.name;
         const rootClusterElementTask = workflowTasks.find((task) => task.name === rootClusterElementNodeData?.name);
         const updatedClusterElements = {...rootClusterElementNodeData.clusterElements};
 
         if (rootClusterElementTask && rootClusterElementTask.clusterElements) {
-            const clusterElementValue =
-                rootClusterElementTask.clusterElements[
-                    currentClusterElementType as keyof typeof rootClusterElementTask.clusterElements
-                ];
+            const currentClusterElementType =
+                data.clusterElementType as keyof typeof rootClusterElementTask.clusterElements;
+
+            const clusterElementValue = rootClusterElementTask.clusterElements[currentClusterElementType];
 
             if (Array.isArray(clusterElementValue) && currentClusterElementType !== undefined) {
+                const clusterElementName = data.name;
+
                 updatedClusterElements[currentClusterElementType] = clusterElementValue.filter(
                     (element) => element.name !== clusterElementName
                 );
 
-                rootClusterElementTask.clusterElements[
-                    currentClusterElementType as keyof typeof rootClusterElementTask.clusterElements
-                ] = [...updatedClusterElements[currentClusterElementType]];
+                rootClusterElementTask.clusterElements[currentClusterElementType] = [
+                    ...updatedClusterElements[currentClusterElementType],
+                ];
             } else {
-                updatedClusterElements[
-                    currentClusterElementType as keyof typeof rootClusterElementTask.clusterElements
-                ] = null;
+                updatedClusterElements[currentClusterElementType] = null;
 
-                rootClusterElementTask.clusterElements[
-                    currentClusterElementType as keyof typeof rootClusterElementTask.clusterElements
-                ] = null;
+                rootClusterElementTask.clusterElements[currentClusterElementType] = null;
             }
         }
 
