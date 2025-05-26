@@ -1,4 +1,4 @@
-import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 
@@ -7,9 +7,6 @@ import Login from '../Login';
 import PasswordResetEmailSent from '../PasswordResetEmailSent';
 import PasswordResetInit from '../PasswordResetInit';
 import {mockPasswordResetStore} from '../tests/mocks/mockPasswordResetStore';
-import {resetAll, windowResizeObserver} from './utils/testUtils';
-
-screen.debug();
 
 const renderPasswordResetInitPage = () => {
     render(

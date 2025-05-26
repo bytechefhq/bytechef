@@ -1,6 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {resetAll, windowResizeObserver} from '@/pages/account/public/tests/utils/testUtils';
-import {fireEvent, render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
+import {fireEvent, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 
 import ActionComponentsFilter from '../components/ActionComponentsFilter';
