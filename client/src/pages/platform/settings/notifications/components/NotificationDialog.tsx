@@ -18,6 +18,7 @@ import {useCreateNotificationMutation, useUpdateNotificationMutation} from '@/ee
 import {useGetNotificationEventsQuery} from '@/ee/queries/notificationEvents.queries';
 import {NotificationKeys} from '@/ee/queries/notifications.queries';
 import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/configuration';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import React, {ReactNode, useState} from 'react';
@@ -43,6 +44,8 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const [notificationType, setNotificationType] = useState(NotificationTypeEnum.Email);
+
+    const ff_1132 = useFeatureFlagsStore()('ff-1132');
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -168,12 +171,14 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                                                     {NotificationTypeEnum.Email.toString()}
                                                 </SelectItem>
 
-                                                <SelectItem
-                                                    key={NotificationTypeEnum.Webhook.toString()}
-                                                    value={NotificationTypeEnum.Webhook.toString()}
-                                                >
-                                                    {NotificationTypeEnum.Webhook.toString()}
-                                                </SelectItem>
+                                                {ff_1132 && (
+                                                    <SelectItem
+                                                        key={NotificationTypeEnum.Webhook.toString()}
+                                                        value={NotificationTypeEnum.Webhook.toString()}
+                                                    >
+                                                        {NotificationTypeEnum.Webhook.toString()}
+                                                    </SelectItem>
+                                                )}
                                             </SelectContent>
                                         </Select>
                                     </FormControl>
