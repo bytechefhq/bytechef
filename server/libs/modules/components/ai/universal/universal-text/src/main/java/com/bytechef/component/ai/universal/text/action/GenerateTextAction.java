@@ -16,13 +16,13 @@
 
 package com.bytechef.component.ai.universal.text.action;
 
+import static com.bytechef.component.ai.llm.ChatModel.Role.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CONTENT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ROLE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MODEL_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MODEL_URL_PROPERTY;
@@ -76,7 +76,7 @@ public class GenerateTextAction implements AiTextAction {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
         modelInputParametersMap.put(
-            MESSAGES, List.of(Map.of(CONTENT, inputParameters.getString(PROMPT), ROLE, USER)));
+            MESSAGES, List.of(Map.of(CONTENT, inputParameters.getString(PROMPT), ROLE, USER.name())));
         modelInputParametersMap.put(MODEL, inputParameters.getString(MODEL));
 
         return ParametersFactory.createParameters(modelInputParametersMap);
