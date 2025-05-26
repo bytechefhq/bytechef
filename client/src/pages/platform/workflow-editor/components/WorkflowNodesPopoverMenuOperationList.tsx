@@ -11,7 +11,13 @@ import {
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
-import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
+import {
+    ClickedOperationType,
+    ClusterElementItemType,
+    NodeDataType,
+    PropertyAllType,
+    StructureParentType,
+} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
@@ -40,8 +46,8 @@ interface WorkflowNodesPopoverMenuOperationListProps {
     componentDefinition: ComponentDefinition;
     edgeId?: string;
     rootClusterElementDefinition?: ComponentDefinition;
-    integrationId?: number;
-    projectId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
     trigger?: boolean;
@@ -51,8 +57,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
     clusterElementType,
     componentDefinition,
     edgeId,
-    integrationId,
-    projectId,
+    parentId,
+    parentType,
     rootClusterElementDefinition,
     setPopoverOpen,
     sourceNodeId,
@@ -120,7 +126,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
     const saveNodeToWorkflow = useCallback(
         (nodeData: NodeDataType, nodeIndex?: number) => {
             saveWorkflowDefinition({
-                integrationId,
                 nodeData,
                 nodeIndex,
                 onSuccess: () =>
@@ -129,12 +134,13 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         queryClient,
                         workflow,
                     }),
-                projectId,
+                parentId,
+                parentType,
                 queryClient,
                 updateWorkflowMutation,
             });
         },
-        [integrationId, projectId, queryClient, updateWorkflowMutation, workflow]
+        [parentId, parentType, queryClient, updateWorkflowMutation, workflow]
     );
 
     const saveClusterElementToWorkflow = useCallback(
@@ -181,7 +187,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
             }
 
             saveWorkflowDefinition({
-                integrationId,
                 nodeData: updatedNodeData,
                 onSuccess: () => {
                     handleComponentAddedSuccess({
@@ -190,7 +195,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         workflow,
                     });
                 },
-                projectId,
+                parentId,
+                parentType,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -203,8 +209,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
             setRootClusterElementNodeData,
             rootClusterElementNodeData,
             currentNode,
-            integrationId,
-            projectId,
+            parentId,
+            parentType,
             queryClient,
             updateWorkflowMutation,
             setPopoverOpen,
@@ -317,10 +323,10 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 if (taskDispatcherContext?.taskDispatcherId) {
                     handleTaskDispatcherSubtaskOperationClick({
-                        integrationId,
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
-                        projectId,
+                        parentId,
+                        parentType,
                         queryClient,
                         taskDispatcherContext,
                         updateWorkflowMutation,
@@ -344,11 +350,11 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 if (taskDispatcherContext?.taskDispatcherId) {
                     handleTaskDispatcherSubtaskOperationClick({
-                        integrationId,
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
+                        parentId,
+                        parentType,
                         placeholderId: sourceNodeId,
-                        projectId,
                         queryClient,
                         taskDispatcherContext,
                         updateWorkflowMutation,
@@ -390,21 +396,21 @@ const WorkflowNodesPopoverMenuOperationList = ({
             setLatestComponentDefinition,
             trigger,
             clusterElementsCanvasOpen,
-            edgeId,
+            clusterElementType,
             queryClient,
             getNodeData,
+            edgeId,
             captureComponentUsed,
             saveNodeToWorkflow,
             setPopoverOpen,
-            clusterElementType,
             rootClusterElementDefinition?.clusterElementTypes,
             saveClusterElementToWorkflow,
-            workflow,
             edges,
             nodes,
-            integrationId,
-            projectId,
+            parentId,
+            parentType,
             updateWorkflowMutation,
+            workflow,
             sourceNodeId,
         ]
     );

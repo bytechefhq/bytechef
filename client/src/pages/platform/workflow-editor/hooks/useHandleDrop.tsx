@@ -11,6 +11,7 @@ import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinition
 import {
     ClickedDefinitionType,
     NodeDataType,
+    StructureParentType,
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
@@ -128,7 +129,6 @@ async function createWorkflowNodeData(
 
 interface SaveDroppedNodeProps {
     captureComponentUsed: (name: string, actionName?: string, triggerName?: string) => void;
-    integrationId?: number;
     nodeData: NodeDataType;
     operationName?: string;
     options?: {
@@ -137,17 +137,18 @@ interface SaveDroppedNodeProps {
         taskDispatcherContext?: TaskDispatcherContextType;
     };
     queryClient: QueryClient;
-    projectId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
 async function saveDroppedNode({
     captureComponentUsed,
-    integrationId,
     nodeData,
     operationName,
     options,
-    projectId,
+    parentId,
+    parentType,
     queryClient,
     updateWorkflowMutation,
 }: SaveDroppedNodeProps) {
@@ -161,20 +162,20 @@ async function saveDroppedNode({
 
     saveWorkflowDefinition({
         ...options,
-        integrationId,
         nodeData,
-        projectId,
+        parentId,
+        parentType,
         queryClient,
         updateWorkflowMutation,
     });
 }
 
 export default function useHandleDrop({
-    integrationId,
-    projectId,
+    parentId,
+    parentType,
 }: {
-    integrationId?: number;
-    projectId?: number;
+    parentId?: number;
+    parentType?: StructureParentType;
 }): [
     (targetNode: Node, droppedNode: ClickedDefinitionType) => void,
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
@@ -185,24 +186,36 @@ export default function useHandleDrop({
     const queryClient = useQueryClient();
 
     async function handleDropOnPlaceholderNode(targetNode: Node, droppedNode: ClickedDefinitionType) {
+        if (!parentId || !parentType) {
+            console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
+
+            return;
+        }
+
         const {nodeData, operationName} = await createWorkflowNodeData(droppedNode, queryClient);
 
         await saveDroppedNode({
             captureComponentUsed,
-            integrationId,
             nodeData,
             operationName,
             options: {
                 placeholderId: targetNode.id,
                 taskDispatcherContext: getTaskDispatcherContext({node: targetNode}),
             },
-            projectId,
+            parentId,
+            parentType,
             queryClient,
             updateWorkflowMutation,
         });
     }
 
     async function handleDropOnWorkflowEdge(targetEdge: Edge, droppedNode: ClickedDefinitionType) {
+        if (!parentId || !parentType) {
+            console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
+
+            return;
+        }
+
         const {nodes} = useWorkflowDataStore.getState();
         const {nodeData, operationName} = await createWorkflowNodeData(droppedNode, queryClient);
 
@@ -210,28 +223,34 @@ export default function useHandleDrop({
 
         await saveDroppedNode({
             captureComponentUsed,
-            integrationId,
             nodeData,
             operationName,
             options: {
                 nodeIndex: insertIndex,
                 taskDispatcherContext: getTaskDispatcherContext({edge: targetEdge, nodes}),
             },
-            projectId,
+            parentId,
+            parentType,
             queryClient,
             updateWorkflowMutation,
         });
     }
 
     async function handleDropOnTriggerNode(droppedNode: ClickedDefinitionType) {
+        if (!parentId || !parentType) {
+            console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
+
+            return;
+        }
+
         const {nodeData, operationName} = await createWorkflowNodeData(droppedNode, queryClient);
 
         await saveDroppedNode({
             captureComponentUsed,
-            integrationId,
             nodeData,
             operationName,
-            projectId,
+            parentId,
+            parentType,
             queryClient,
             updateWorkflowMutation,
         });

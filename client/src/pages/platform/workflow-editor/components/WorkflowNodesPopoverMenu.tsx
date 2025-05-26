@@ -55,7 +55,7 @@ const WorkflowNodesPopoverMenu = ({
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [trigger, setTrigger] = useState(false);
 
-    const {integrationId, projectId, workflow} = useWorkflowDataStore();
+    const {parentId, parentType, workflow} = useWorkflowDataStore();
 
     const {edges, nodes} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -93,6 +93,12 @@ const WorkflowNodesPopoverMenu = ({
 
     const handleComponentClick = useCallback(
         async (clickedItem: ClickedDefinitionType) => {
+            if (!parentId || !parentType) {
+                console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
+
+                return <></>;
+            }
+
             const {clusterElement, componentVersion, name, taskDispatcher, trigger, version} = clickedItem;
 
             if (taskDispatcher) {
@@ -106,8 +112,8 @@ const WorkflowNodesPopoverMenu = ({
 
                 await handleTaskDispatcherClick({
                     edge: !!edge,
-                    integrationId,
-                    projectId,
+                    parentId,
+                    parentType,
                     queryClient,
                     sourceNodeId,
                     taskDispatcherContext,
@@ -131,7 +137,7 @@ const WorkflowNodesPopoverMenu = ({
                 (!('actionsCount' in clickedItem) || !clickedItem.actionsCount) &&
                 rootClusterElementDefinition
             ) {
-                if (projectId && clickedItem) {
+                if (parentId && clickedItem) {
                     const getClusterElementDefinitionRequest = {
                         clusterElementName: convertNameToCamelCase(clickedItem.type),
                         componentName: clickedItem.componentName || '',
@@ -147,7 +153,6 @@ const WorkflowNodesPopoverMenu = ({
                             getClusterElementDefinitionRequest
                         ),
                     });
-
                     const clusterData = {
                         ...clickedItem,
                         componentName: clickedItem.componentName,
@@ -156,7 +161,8 @@ const WorkflowNodesPopoverMenu = ({
                     handleClusterElementClick({
                         clickedClusterElementDefinition,
                         data: clusterData,
-                        projectId,
+                        parentId,
+                        parentType,
                         queryClient,
                         rootClusterElementDefinition,
                         setPopoverOpen,
@@ -204,6 +210,12 @@ const WorkflowNodesPopoverMenu = ({
         };
     }, []);
 
+    if (!parentId || !parentType) {
+        console.log(`Parent "${parentId}" of type "${parentType}" not found.`);
+
+        return <></>;
+    }
+
     return (
         <Popover
             key={`${sourceNodeId}-popoverMenu-${nodeIndex}`}
@@ -250,8 +262,8 @@ const WorkflowNodesPopoverMenu = ({
                             clusterElementType={clusterElementType}
                             componentDefinition={componentDefinitionToBeAdded}
                             edgeId={edgeId}
-                            integrationId={integrationId}
-                            projectId={projectId}
+                            parentId={parentId}
+                            parentType={parentType}
                             rootClusterElementDefinition={rootClusterElementDefinition}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}

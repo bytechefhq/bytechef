@@ -2,7 +2,13 @@ import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {Workflow, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
-import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
+import {
+    BranchCaseType,
+    NodeDataType,
+    StructureParentType,
+    TaskDispatcherContextType,
+    WorkflowDefinitionType,
+} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -17,12 +23,12 @@ type UpdateWorkflowRequestType = {
 
 interface SaveWorkflowDefinitionProps {
     decorative?: boolean;
-    integrationId?: number;
     nodeData?: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
     placeholderId?: string;
-    projectId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     queryClient: QueryClient;
     taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
@@ -31,12 +37,12 @@ interface SaveWorkflowDefinitionProps {
 
 export default async function saveWorkflowDefinition({
     decorative,
-    integrationId,
     nodeData,
     nodeIndex,
     onSuccess,
+    parentId,
+    parentType,
     placeholderId,
-    projectId,
     queryClient,
     taskDispatcherContext,
     updateWorkflowMutation,
@@ -80,13 +86,13 @@ export default async function saveWorkflowDefinition({
 
         executeWorkflowMutation({
             definitionUpdate: {triggers: [newTrigger]},
-            integrationId,
             onSuccess: () => {
                 if (onSuccess) {
                     onSuccess();
                 }
             },
-            projectId,
+            parentId,
+            parentType,
             queryClient,
             updateWorkflowMutation,
             workflow,
@@ -224,9 +230,9 @@ export default async function saveWorkflowDefinition({
 
     executeWorkflowMutation({
         definitionUpdate: {tasks: updatedWorkflowDefinitionTasks},
-        integrationId,
         onSuccess,
-        projectId,
+        parentId,
+        parentType,
         queryClient,
         updateWorkflowMutation,
         workflow,
@@ -241,18 +247,18 @@ interface ExecuteWorkflowMutationProps {
         tasks?: Array<WorkflowTask>;
         triggers?: Array<WorkflowTrigger>;
     };
-    integrationId?: number;
     onSuccess?: () => void;
-    projectId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
 }
 
 function executeWorkflowMutation({
     definitionUpdate,
-    integrationId,
     onSuccess,
-    projectId,
+    parentId,
+    parentType,
     queryClient,
     updateWorkflowMutation,
     workflow,
@@ -279,12 +285,12 @@ function executeWorkflowMutation({
                     onSuccess();
                 }
 
-                if (projectId) {
-                    queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+                if (parentType === 'PROJECT') {
+                    queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(parentId)});
                     queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
-                } else if (integrationId) {
+                } else if (parentType === 'INTEGRATION') {
                     queryClient.invalidateQueries({
-                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
+                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(parentId),
                     });
                 }
             },

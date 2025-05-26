@@ -37,6 +37,7 @@ import {
     ComponentPropertiesType,
     NodeDataType,
     PropertyAllType,
+    StructureParentType,
     TabNameType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
@@ -82,18 +83,18 @@ const TABS: Array<{label: string; name: TabNameType}> = [
 
 interface WorkflowNodeDetailsPanelProps {
     className?: string;
-    integrationId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
-    projectId?: number;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
 }
 
 const WorkflowNodeDetailsPanel = ({
     className,
-    integrationId,
+    parentId,
+    parentType,
     previousComponentDefinitions,
-    projectId,
     updateWorkflowMutation,
     workflowNodeOutputs,
 }: WorkflowNodeDetailsPanelProps) => {
@@ -418,8 +419,8 @@ const WorkflowNodeDetailsPanel = ({
                         field: 'operation',
                         value: newOperationName,
                     },
-                    integrationId,
-                    projectId,
+                    parentId,
+                    parentType,
                     queryClient,
                     updateWorkflowMutation,
                 });
@@ -436,8 +437,8 @@ const WorkflowNodeDetailsPanel = ({
                         field: 'operation',
                         value: newOperationName,
                     },
-                    integrationId,
-                    projectId,
+                    parentId,
+                    parentType,
                     queryClient,
                     updateWorkflowMutation,
                 });
@@ -446,7 +447,6 @@ const WorkflowNodeDetailsPanel = ({
             }
 
             saveWorkflowDefinition({
-                integrationId,
                 nodeData,
                 onSuccess: () => {
                     setCurrentComponent({
@@ -474,7 +474,8 @@ const WorkflowNodeDetailsPanel = ({
                         workflowNodeName,
                     });
                 },
-                projectId,
+                parentId,
+                parentType,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -484,8 +485,8 @@ const WorkflowNodeDetailsPanel = ({
             currentComponent,
             queryClient,
             currentNode,
-            integrationId,
-            projectId,
+            parentId,
+            parentType,
             updateWorkflowMutation,
             currentNodeIndex,
             currentOperationProperties,
@@ -932,10 +933,10 @@ const WorkflowNodeDetailsPanel = ({
                                 {activeTab === 'description' &&
                                     (nodeDefinition ? (
                                         <DescriptionTab
-                                            integrationId={integrationId}
                                             key={`${currentNode?.componentName}-${currentNode?.type}_description`}
                                             nodeDefinition={nodeDefinition}
-                                            projectId={projectId}
+                                            parentId={parentId}
+                                            parentType={parentType}
                                             updateWorkflowMutation={updateWorkflowMutation}
                                         />
                                     ) : (

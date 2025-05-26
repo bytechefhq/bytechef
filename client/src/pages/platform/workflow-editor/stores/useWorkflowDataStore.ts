@@ -3,7 +3,7 @@ import defaultNodes from '@/shared/defaultNodes';
 
 /* eslint-disable sort-keys */
 import {ComponentDefinitionBasic, TaskDispatcherDefinition, Workflow} from '@/shared/middleware/platform/configuration';
-import {ComponentOperationType, DataPillType} from '@/shared/types';
+import {ComponentOperationType, DataPillType, StructureParentType} from '@/shared/types';
 import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeChanges} from '@xyflow/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
@@ -26,8 +26,8 @@ interface WorkflowDataStateI {
     setEdges: (edges: Edge[]) => void;
     onEdgesChange: OnEdgesChange;
 
-    integrationId: number | undefined;
-    setIntegrationId: (integrationId: number | undefined) => void;
+    parentType: StructureParentType | undefined;
+    setParentType: (parentType: StructureParentType | undefined) => void;
 
     latestComponentDefinition: ComponentDefinitionBasic | null;
     setLatestComponentDefinition: (latestComponentDefinition: ComponentDefinitionBasic | null) => void;
@@ -36,8 +36,8 @@ interface WorkflowDataStateI {
     setNodes: (nodes: Node[]) => void;
     onNodesChange: OnNodesChange;
 
-    projectId: number | undefined;
-    setProjectId: (projectId: number | undefined) => void;
+    parentId: number | undefined;
+    setParentId: (parentId: number | undefined) => void;
 
     reset: () => void;
 
@@ -83,11 +83,11 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                 });
             },
 
-            projectId: undefined,
-            setProjectId: (projectId) => set((state) => ({...state, projectId})),
+            parentId: undefined,
+            setParentId: (parentId) => set((state) => ({...state, parentId})),
 
-            integrationId: undefined,
-            setIntegrationId: (integrationId) => set((state) => ({...state, integrationId})),
+            parentType: undefined,
+            setParentType: (parentType) => set((state) => ({...state, parentType})),
 
             reset: () =>
                 set(() => ({

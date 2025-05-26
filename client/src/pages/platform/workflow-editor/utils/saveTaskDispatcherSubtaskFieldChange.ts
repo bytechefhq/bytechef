@@ -1,6 +1,6 @@
 import {TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
 import {ComponentDefinition, Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {NodeDataType, PropertyAllType, TaskDispatcherContextType} from '@/shared/types';
+import {NodeDataType, PropertyAllType, StructureParentType, TaskDispatcherContextType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -20,8 +20,8 @@ interface SaveTaskDispatcherSubtaskFieldChangeProps {
     currentNodeIndex: number;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
-    integrationId?: number;
-    projectId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, {id: string; workflow: Workflow}, unknown>;
 }
@@ -31,8 +31,8 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     currentNodeIndex,
     currentOperationProperties,
     fieldUpdate,
-    integrationId,
-    projectId,
+    parentId,
+    parentType,
     queryClient,
     updateWorkflowMutation,
 }: SaveTaskDispatcherSubtaskFieldChangeProps): void {
@@ -191,7 +191,6 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     const recursivelyUpdatedTasks = getRecursivelyUpdatedTasks(workflowDefinitionTasks, updatedTaskDispatcherTask);
 
     saveWorkflowDefinition({
-        integrationId,
         onSuccess: () => {
             let commonUpdates: NodeDataType = {
                 componentName,
@@ -225,7 +224,8 @@ export default function saveTaskDispatcherSubtaskFieldChange({
                 name: workflowNodeName || '',
             });
         },
-        projectId,
+        parentId,
+        parentType,
         queryClient,
         taskDispatcherContext,
         updateWorkflowMutation,

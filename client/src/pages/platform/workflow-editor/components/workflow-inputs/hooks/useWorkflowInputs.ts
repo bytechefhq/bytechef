@@ -5,7 +5,7 @@ import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {WorkflowDefinitionType, WorkflowInputType} from '@/shared/types';
+import {StructureParentType, WorkflowDefinitionType, WorkflowInputType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -13,16 +13,12 @@ import {useForm} from 'react-hook-form';
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
 
 interface UseWorkflowInputsProps {
-    integrationId?: number;
-    projectId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
-export default function useWorkflowInputs({
-    integrationId,
-    projectId,
-    workflowTestConfiguration,
-}: UseWorkflowInputsProps) {
+export default function useWorkflowInputs({parentId, parentType, workflowTestConfiguration}: UseWorkflowInputsProps) {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -184,13 +180,13 @@ export default function useWorkflowInputs({
                         inputs,
                     });
 
-                    if (projectId) {
+                    if (parentType === 'PROJECT') {
                         queryClient.invalidateQueries({
-                            queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
+                            queryKey: ProjectWorkflowKeys.projectWorkflows(parentId),
                         });
-                    } else if (integrationId) {
+                    } else if (parentType === 'INTEGRATION') {
                         queryClient.invalidateQueries({
-                            queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
+                            queryKey: IntegrationWorkflowKeys.integrationWorkflows(parentId),
                         });
                     }
                 },
@@ -224,11 +220,11 @@ export default function useWorkflowInputs({
             },
             {
                 onSuccess: () => {
-                    if (projectId) {
-                        queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
-                    } else if (integrationId) {
+                    if (parentType === 'PROJECT') {
+                        queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(parentId)});
+                    } else if (parentType === 'INTEGRATION') {
                         queryClient.invalidateQueries({
-                            queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
+                            queryKey: IntegrationWorkflowKeys.integrationWorkflows(parentId),
                         });
                     }
 

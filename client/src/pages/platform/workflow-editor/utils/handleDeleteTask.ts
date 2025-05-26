@@ -4,7 +4,13 @@ import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {BranchCaseType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
+import {
+    BranchCaseType,
+    NodeDataType,
+    StructureParentType,
+    WorkflowDefinitionType,
+    WorkflowTaskType,
+} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
@@ -16,8 +22,8 @@ interface HandleDeleteTaskProps {
     clusterElementsCanvasOpen?: boolean;
     currentNode?: NodeDataType;
     data: NodeDataType;
-    integrationId?: number;
-    projectId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     queryClient: QueryClient;
     setRootClusterElementNodeData?: (node: NodeDataType) => void;
     setCurrentNode?: (node: NodeDataType) => void;
@@ -29,8 +35,8 @@ export default function handleDeleteTask({
     clusterElementsCanvasOpen,
     currentNode,
     data,
-    integrationId,
-    projectId,
+    parentId,
+    parentType,
     queryClient,
     rootClusterElementNodeData,
     setCurrentNode,
@@ -260,9 +266,9 @@ export default function handleDeleteTask({
                     }),
                 });
 
-                if (projectId) {
+                if (parentType === 'PROJECT') {
                     queryClient.invalidateQueries({
-                        queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
+                        queryKey: ProjectWorkflowKeys.projectWorkflows(parentId),
                     });
 
                     queryClient.invalidateQueries({
@@ -270,9 +276,9 @@ export default function handleDeleteTask({
                     });
                 }
 
-                if (integrationId) {
+                if (parentType === 'INTEGRATION') {
                     queryClient.invalidateQueries({
-                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
+                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(parentId),
                     });
                 }
 

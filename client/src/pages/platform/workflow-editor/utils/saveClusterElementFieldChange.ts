@@ -1,5 +1,5 @@
 import {ComponentDefinition, Workflow} from '@/shared/middleware/platform/configuration';
-import {PropertyAllType} from '@/shared/types';
+import {PropertyAllType, StructureParentType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -18,8 +18,8 @@ interface SaveClusterElementFieldChangeProps {
     currentClusterElementName: string;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
-    integrationId?: number;
-    projectId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, {id: string; workflow: Workflow}, unknown>;
 }
@@ -29,8 +29,8 @@ export default function saveClusterElementFieldChange({
     currentComponentDefinition,
     currentOperationProperties,
     fieldUpdate,
-    integrationId,
-    projectId,
+    parentId,
+    parentType,
     queryClient,
     updateWorkflowMutation,
 }: SaveClusterElementFieldChangeProps): void {
@@ -131,7 +131,6 @@ export default function saveClusterElementFieldChange({
     }
 
     saveWorkflowDefinition({
-        integrationId,
         nodeData: updatedNodeData,
         onSuccess: () => {
             if (fieldUpdate.field === 'operation') {
@@ -150,7 +149,8 @@ export default function saveClusterElementFieldChange({
                 });
             }
         },
-        projectId,
+        parentId,
+        parentType,
         queryClient,
         updateWorkflowMutation,
     });

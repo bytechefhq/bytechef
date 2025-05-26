@@ -10,7 +10,7 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
-import {ClickedDefinitionType} from '@/shared/types';
+import {ClickedDefinitionType, StructureParentType} from '@/shared/types';
 import {Background, BackgroundVariant, Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -30,25 +30,34 @@ import TaskDispatcherLeftGhostNode from '../nodes/TaskDispatcherLeftGhostNode';
 import TaskDispatcherTopGhostNode from '../nodes/TaskDispatcherTopGhostNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 
-export interface WorkflowEditorProps {
+type ConditionalWorkflowEditorPropsType =
+    | {
+          readOnlyWorkflow?: Workflow;
+          parentId?: never;
+          parentType?: never;
+      }
+    | {
+          readOnlyWorkflow?: never;
+          parentId: number;
+          parentType: StructureParentType;
+      };
+
+type WorkflowEditorPropsType = {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
-    integrationId?: number;
-    projectId?: number;
     projectLeftSidebarOpen?: boolean;
-    readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
-}
+};
 
 const WorkflowEditor = ({
     componentDefinitions,
     customCanvasWidth,
-    integrationId,
-    projectId,
+    parentId,
+    parentType,
     projectLeftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
-}: WorkflowEditorProps) => {
+}: WorkflowEditorPropsType & ConditionalWorkflowEditorPropsType) => {
     let {workflow} = useWorkflowDataStore();
 
     if (!workflow.tasks && readOnlyWorkflow) {
@@ -72,8 +81,8 @@ const WorkflowEditor = ({
     const {setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop({
-        integrationId,
-        projectId,
+        parentId,
+        parentType,
     });
 
     const nodeTypes = useMemo(
