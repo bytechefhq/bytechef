@@ -14,7 +14,6 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Textarea} from '@/components/ui/textarea';
 import {useCreateNotificationMutation, useUpdateNotificationMutation} from '@/ee/mutations/notifications.mutations';
 import {useGetNotificationEventsQuery} from '@/ee/queries/notificationEvents.queries';
 import {NotificationKeys} from '@/ee/queries/notifications.queries';
@@ -28,7 +27,7 @@ import {z} from 'zod';
 const formSchema = z.object({
     name: z.string().min(1, 'Name is required').max(256, 'Name cannot be longer than 256 characters'),
     notificationEventIds: z.array(z.number()),
-    settings: z.string(),
+    settings: z.union([z.object({email: z.string()}), z.object({webhook: z.string()})]),
     type: z.enum(['EMAIL', 'WEBHOOK'], {
         required_error: 'Please select a notification type.',
     }),
@@ -43,12 +42,14 @@ interface NotificationDialogProps {
 const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
+    const [notificationType, setNotificationType] = useState(NotificationTypeEnum.Email);
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             name: notification?.name || '',
             notificationEventIds: notification?.notificationEvents?.map((event) => event.id) || [],
-            settings: JSON.stringify(notification?.settings) || '',
-            type: notification?.type || NotificationTypeEnum.Email,
+            settings: notification?.settings || {},
+            type: notification?.type || notificationType,
         },
         resolver: zodResolver(formSchema),
     });
@@ -82,36 +83,15 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
     }
 
     function saveNotification() {
-        const formData = getValues();
-
-        // Parse settings string into proper object structure
-        const settingsObject: {[key: string]: object} = formData.settings
-            .split(/\r?\n/)
-            .filter((setting) => setting)
-            .map((setting) => {
-                const [key, value] = setting.split('=');
-                // Ensure the value is an object rather than a string
-                return {[key]: {value}};
-            })
-            .reduce((previousValue, value) => {
-                return {...previousValue, ...value};
-            }, {});
-
-        // Create modified form data with correct settings type
-        const updatedFormData = {
-            ...formData,
-            settings: settingsObject,
-        };
-
         if (notification?.id) {
             updateNotificationMutation.mutate({
                 ...notification,
-                ...updatedFormData,
+                ...getValues(),
             });
         } else {
             createNotificationMutation.mutate({
                 ...notification,
-                ...updatedFormData,
+                ...getValues(),
             });
         }
     }
@@ -169,7 +149,13 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                                     <FormLabel>Type</FormLabel>
 
                                     <FormControl>
-                                        <Select onValueChange={field.onChange} value={field.value}>
+                                        <Select
+                                            onValueChange={(value) => {
+                                                field.onChange(value);
+                                                setNotificationType(value);
+                                            }}
+                                            value={field.value}
+                                        >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue />
                                             </SelectTrigger>
@@ -211,11 +197,11 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                                                 onValueChange={field.onChange}
                                                 options={notificationEvents?.map((notificationEvent) => ({
                                                     label: notificationEvent.type ?? notificationEvent.id.toString(),
-                                                    value: notificationEvent.id.toString(),
+                                                    value: notificationEvent.id,
                                                 }))}
                                                 optionsLoading={isNotificationEventsLoading}
                                                 placeholder="Select events"
-                                                value={field.value.map((id) => id.toString())}
+                                                value={field.value}
                                             />
                                         </FormControl>
 
@@ -225,21 +211,45 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                             />
                         )}
 
-                        <FormField
-                            control={control}
-                            name="settings"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Settings</FormLabel>
+                        <div className="pb-12">
+                            <h2 className="text-base font-semibold leading-7 text-gray-900">Settings</h2>
 
-                                    <FormControl>
-                                        <Textarea rows={6} {...field} />
-                                    </FormControl>
+                            {notificationType === NotificationTypeEnum.Email && (
+                                <FormField
+                                    control={control}
+                                    name="settings.email"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
 
-                                    <FormMessage />
-                                </FormItem>
+                                            <FormControl>
+                                                <Input autoComplete="email" type="email" {...field} />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             )}
-                        />
+
+                            {notificationType === NotificationTypeEnum.Webhook && (
+                                <FormField
+                                    control={control}
+                                    name="settings.webhook"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Webhook URL</FormLabel>
+
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+                        </div>
 
                         <DialogFooter>
                             <DialogClose asChild>
