@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:38:31.879229+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-26T08:51:43.780222+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Public API")
 public interface IntegrationApi {
@@ -43,8 +43,102 @@ public interface IntegrationApi {
     }
 
     /**
-     * GET /{externalUserId}/integrations : Get active integrations
-     * Get active integrations.
+     * GET /integrations/{id} : Get an integration by id for particular external user
+     * Get an integration by id for particular external user.
+     *
+     * @param id The id of an integration. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The integration object. (status code 200)
+     *         or Access token is missing or invalid (status code 401)
+     */
+    @Operation(
+        operationId = "getFrontendIntegration",
+        summary = "Get an integration by id for particular external user",
+        description = "Get an integration by id for particular external user.",
+        tags = { "integration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The integration object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
+        },
+        security = {
+            @SecurityRequirement(name = "frontendBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/integrations/{id}",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<IntegrationModel> getFrontendIntegration(
+        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"id\" : 0, \"componentName\" : \"componentName\", \"workflows\" : [ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /integrations : Get active integrations for particular external user
+     * Get active integrations for particular external user.
+     *
+     * @param xEnvironment The environment. (optional)
+     * @return The list of active integrations. (status code 200)
+     *         or Access token is missing or invalid (status code 401)
+     */
+    @Operation(
+        operationId = "getFrontendIntegrations",
+        summary = "Get active integrations for particular external user",
+        description = "Get active integrations for particular external user.",
+        tags = { "integration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IntegrationModel.class)))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
+        },
+        security = {
+            @SecurityRequirement(name = "frontendBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/integrations",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<List<IntegrationModel>> getFrontendIntegrations(
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"id\" : 0, \"componentName\" : \"componentName\", \"workflows\" : [ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\" }, { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"id\" : 0, \"componentName\" : \"componentName\", \"workflows\" : [ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /{externalUserId}/integrations : Get active integrations for particular external user
+     * Get active integrations for particular external user.
      *
      * @param externalUserId The external user id. (required)
      * @param xEnvironment The environment. (optional)
@@ -53,8 +147,8 @@ public interface IntegrationApi {
      */
     @Operation(
         operationId = "getIntegrations",
-        summary = "Get active integrations",
-        description = "Get active integrations.",
+        summary = "Get active integrations for particular external user",
+        description = "Get active integrations for particular external user.",
         tags = { "integration" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
