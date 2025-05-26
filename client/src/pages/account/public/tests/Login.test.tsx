@@ -1,6 +1,6 @@
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
 
@@ -9,7 +9,6 @@ import PasswordResetInit from '../PasswordResetInit';
 import Register from '../Register';
 import {mockApplicationInfoStore} from '../tests/mocks/mockApplicationInfoStore';
 import {mockAuthenticationStore} from '../tests/mocks/mockAuthenticationStore';
-import {resetAll, windowResizeObserver} from './utils/testUtils';
 
 screen.debug();
 

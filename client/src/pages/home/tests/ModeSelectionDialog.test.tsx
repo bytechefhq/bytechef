@@ -1,9 +1,8 @@
-import {resetAll} from '@/pages/account/public/tests/utils/testUtils';
 import ModeSelectionDialog from '@/pages/home/components/ModeSelectionDialog';
 import {ModeType} from '@/pages/home/stores/useModeTypeStore';
 import {mockModeTypeStore} from '@/pages/home/tests/mocks/mockModeTypeStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {render, screen, userEvent} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
 
