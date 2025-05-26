@@ -9,6 +9,7 @@ import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/
 import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
+import {StructureParentType} from '@/shared/types';
 import Editor from '@monaco-editor/react';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
@@ -18,9 +19,9 @@ import {useParams} from 'react-router-dom';
 const workflowTestApi = new WorkflowTestApi();
 
 interface WorkflowCodeEditorSheetProps {
-    integrationId?: number;
     onSheetOpenClose: (open: boolean) => void;
-    projectId?: number;
+    parentId: number;
+    parentType: StructureParentType;
     runDisabled: boolean;
     sheetOpen: boolean;
     testConfigurationDisabled: boolean;
@@ -29,9 +30,9 @@ interface WorkflowCodeEditorSheetProps {
 }
 
 const WorkflowCodeEditorSheet = ({
-    integrationId,
     onSheetOpenClose,
-    projectId,
+    parentId,
+    parentType,
     runDisabled,
     sheetOpen,
     testConfigurationDisabled,
@@ -73,7 +74,6 @@ const WorkflowCodeEditorSheet = ({
     const handleWorkflowCodeEditorSheetSave = (workflow: Workflow, definition: string) => {
         if (workflow && workflow.id) {
             try {
-                // validate
                 JSON.parse(definition);
 
                 updateWorkflowMutation.mutate(
@@ -89,13 +89,13 @@ const WorkflowCodeEditorSheet = ({
                         onSuccess: () => {
                             setDirty(false);
 
-                            if (projectId && projectWorkflowId) {
+                            if (parentType === 'PROJECT' && projectWorkflowId) {
                                 queryClient.invalidateQueries({
-                                    queryKey: ProjectWorkflowKeys.projectWorkflow(projectId, +projectWorkflowId),
+                                    queryKey: ProjectWorkflowKeys.projectWorkflow(parentId, +projectWorkflowId),
                                 });
-                            } else if (integrationId && workflow.id) {
+                            } else if (parentType === 'INTEGRATION' && workflow.id) {
                                 queryClient.invalidateQueries({
-                                    queryKey: IntegrationWorkflowKeys.integrationWorkflow(integrationId, +workflow.id),
+                                    queryKey: IntegrationWorkflowKeys.integrationWorkflow(parentId, +workflow.id),
                                 });
                             }
                         },

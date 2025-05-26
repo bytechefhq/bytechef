@@ -83,7 +83,12 @@ const Integration = () => {
                                         updateWorkflowNodeParameterMutation,
                                     }}
                                 >
-                                    {integrationId && <WorkflowEditorLayout integrationId={parseInt(integrationId)} />}
+                                    {integrationId && (
+                                        <WorkflowEditorLayout
+                                            parentId={parseInt(integrationId)}
+                                            parentType="INTEGRATION"
+                                        />
+                                    )}
                                 </WorkflowNodeParameterMutationProvider>
                             </WorkflowMutationProvider>
                         </ConnectionReactQueryProvider>

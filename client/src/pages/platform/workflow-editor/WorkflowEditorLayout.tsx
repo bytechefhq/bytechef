@@ -21,6 +21,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
+import {StructureParentType} from '@/shared/types';
 import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -30,7 +31,7 @@ import DataPillPanel from './components/datapills/DataPillPanel';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
 
-const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: number; projectId?: number}) => {
+const WorkflowEditorLayout = ({parentId, parentType}: {parentId: number; parentType: StructureParentType}) => {
     const {copilotPanelOpen} = useCopilotStore();
     const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {rightSidebarOpen} = useRightSidebarStore();
@@ -85,11 +86,11 @@ const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: numbe
                 loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
             >
                 <div className={twMerge('relative mx-3 mb-3 flex w-full', projectLeftSidebarOpen && 'ml-0')}>
-                    {componentDefinitions && taskDispatcherDefinitions && (
+                    {componentDefinitions && taskDispatcherDefinitions && parentId && (
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
-                            integrationId={integrationId}
-                            projectId={projectId}
+                            parentId={parentId}
+                            parentType={parentType}
                             projectLeftSidebarOpen={projectLeftSidebarOpen}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
@@ -118,9 +119,9 @@ const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: numbe
 
             {currentComponent && !isRootClusterElement && (
                 <WorkflowNodeDetailsPanel
-                    integrationId={integrationId}
+                    parentId={parentId}
+                    parentType={parentType}
                     previousComponentDefinitions={previousComponentDefinitions}
-                    projectId={projectId}
                     updateWorkflowMutation={updateWorkflowMutation}
                     workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                 />
@@ -148,9 +149,9 @@ const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: numbe
 
                     <WorkflowNodeDetailsPanel
                         className="fixed inset-y-0 right-0 rounded-l-none border-none"
-                        integrationId={integrationId}
+                        parentId={parentId}
+                        parentType={parentType}
                         previousComponentDefinitions={previousComponentDefinitions}
-                        projectId={projectId}
                         updateWorkflowMutation={updateWorkflowMutation}
                         workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                     />
@@ -175,9 +176,9 @@ const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: numbe
             )}
 
             <WorkflowInputsSheet
-                integrationId={integrationId}
                 onSheetOpenChange={setShowWorkflowInputsSheet}
-                projectId={projectId}
+                parentId={parentId}
+                parentType={parentType}
                 sheetOpen={showWorkflowInputsSheet}
                 workflowTestConfiguration={workflowTestConfiguration}
             />
@@ -189,9 +190,9 @@ const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: numbe
             />
 
             <WorkflowCodeEditorSheet
-                integrationId={integrationId}
                 onSheetOpenClose={setShowWorkflowCodeEditorSheet}
-                projectId={projectId}
+                parentId={parentId}
+                parentType={parentType}
                 runDisabled={runDisabled}
                 sheetOpen={showWorkflowCodeEditorSheet}
                 testConfigurationDisabled={testConfigurationDisabled}

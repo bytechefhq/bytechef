@@ -2,6 +2,7 @@ import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
     NodeDataType,
+    StructureParentType,
     TaskDispatcherContextType,
     TaskDispatcherDataType,
     UpdateWorkflowMutationType,
@@ -13,10 +14,10 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface SaveRootTaskDispatcherProps {
-    integrationId?: number;
     nodes: Node[];
+    parentId: number;
     parentNodeData: NodeDataType;
-    projectId?: number;
+    parentType: StructureParentType;
     queryClient: QueryClient;
     updatedParameters: object;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -28,10 +29,10 @@ interface SaveRootTaskDispatcherProps {
  * regardless of the task dispatcher types in the parent chain.
  */
 export default function saveRootTaskDispatcher({
-    integrationId,
     nodes,
+    parentId,
     parentNodeData,
-    projectId,
+    parentType,
     queryClient,
     updateWorkflowMutation,
     updatedParameters,
@@ -84,9 +85,9 @@ export default function saveRootTaskDispatcher({
     );
 
     saveWorkflowDefinition({
-        integrationId,
         nodeData: rootNodeData,
-        projectId,
+        parentId,
+        parentType,
         queryClient,
         updateWorkflowMutation,
     });

@@ -26,11 +26,11 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {integrationId, nodes, projectId, workflow} = useWorkflowDataStore(
+    const {nodes, parentId, parentType, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
-            integrationId: state.integrationId,
             nodes: state.nodes,
-            projectId: state.projectId,
+            parentId: state.parentId,
+            parentType: state.parentType,
             workflow: state.workflow,
         }))
     );
@@ -58,30 +58,28 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
     const saveBranchChange = useCallback(
         (branchParameters: object) => {
+            if (!parentId || !parentType) {
+                console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
+
+                return;
+            }
+
             if (!workflow.definition || !parentBranchNodeData) {
                 return;
             }
 
             saveRootTaskDispatcher({
-                integrationId,
                 nodes,
+                parentId,
                 parentNodeData: parentBranchNodeData,
-                projectId,
+                parentType,
                 queryClient,
                 updateWorkflowMutation,
                 updatedParameters: branchParameters,
                 workflowDefinition: workflow.definition,
             });
         },
-        [
-            integrationId,
-            nodes,
-            parentBranchNodeData,
-            projectId,
-            queryClient,
-            updateWorkflowMutation,
-            workflow.definition,
-        ]
+        [nodes, parentBranchNodeData, parentId, parentType, queryClient, updateWorkflowMutation, workflow.definition]
     );
 
     const handleCreateCaseClick = useCallback(() => {

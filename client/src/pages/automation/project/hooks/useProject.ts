@@ -25,7 +25,7 @@ import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 
 export const useProject = () => {
-    const {setProjectId, setWorkflow, workflow} = useWorkflowDataStore();
+    const {setParentId, setParentType, setWorkflow, workflow} = useWorkflowDataStore();
     const {setCopilotPanelOpen} = useCopilotStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
@@ -166,9 +166,11 @@ export const useProject = () => {
 
     useEffect(() => {
         if (projectId) {
-            setProjectId(parseInt(projectId!));
+            setParentId(parseInt(projectId!));
+
+            setParentType('PROJECT');
         }
-    }, [projectId, setProjectId]);
+    }, [projectId, setParentId, setParentType]);
 
     return {
         bottomResizablePanelRef,

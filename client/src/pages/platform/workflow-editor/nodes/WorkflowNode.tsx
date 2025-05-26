@@ -36,7 +36,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [clusterElementDefinition, setClusterElementDefinition] = useState<ClusterElementDefinitionBasic[]>([]);
 
     const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {integrationId, projectId, workflow} = useWorkflowDataStore();
+    const {parentId, parentType, workflow} = useWorkflowDataStore();
     const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
         useWorkflowEditorStore();
 
@@ -95,13 +95,13 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const isClusterElement = 'clusterElementType' in data;
 
     const handleDeleteNodeClick = (data: NodeDataType) => {
-        if (data) {
+        if (data && parentId && parentType) {
             handleDeleteTask({
                 clusterElementsCanvasOpen,
                 currentNode,
                 data,
-                integrationId,
-                projectId,
+                parentId,
+                parentType,
                 queryClient,
                 rootClusterElementNodeData,
                 setCurrentNode,

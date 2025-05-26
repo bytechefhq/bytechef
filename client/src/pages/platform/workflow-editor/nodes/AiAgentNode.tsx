@@ -22,7 +22,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {integrationId, projectId, workflow} = useWorkflowDataStore();
+    const {parentId, parentType, workflow} = useWorkflowDataStore();
 
     const queryClient = useQueryClient();
 
@@ -41,12 +41,12 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const handleNodeClick = useNodeClickHandler(data, id);
 
     const handleDeleteNodeClick = (data: NodeDataType) => {
-        if (data) {
+        if (data && parentId && parentType) {
             handleDeleteTask({
                 currentNode,
                 data,
-                integrationId,
-                projectId,
+                parentId,
+                parentType,
                 queryClient,
                 updateWorkflowMutation,
                 workflow,
