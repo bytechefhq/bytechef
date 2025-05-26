@@ -1,16 +1,22 @@
-import {ClusterElementDefinitionBasic, ComponentDefinition} from '@/shared/middleware/platform/configuration';
-import {UpdateWorkflowMutationType} from '@/shared/types';
+import {
+    ClusterElementDefinition,
+    ClusterElementDefinitionBasic,
+    ComponentDefinition,
+} from '@/shared/middleware/platform/configuration';
+import {PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 
-import {initializeClusterElementsObject} from '../../ai-agent-editor/utils/clusterElementsUtils';
+import {initializeClusterElementsObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedName from './getFormattedName';
+import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleClusterElementClickProps {
+    clickedClusterElementDefinition: ClusterElementDefinition;
     data: ClusterElementDefinitionBasic;
     integrationId?: number;
     projectId?: number;
@@ -21,6 +27,7 @@ interface HandleClusterElementClickProps {
 }
 
 export default function handleClusterElementClick({
+    clickedClusterElementDefinition,
     data,
     integrationId,
     projectId,
@@ -39,44 +46,52 @@ export default function handleClusterElementClick({
 
     const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-    const currentParentTask = workflowDefinitionTasks?.find(
+    const currentParentTask = workflowDefinitionTasks.find(
         (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
     );
-    const existingClusterElements = currentParentTask?.clusterElements;
 
-    const currentClusterElementDefinition = rootClusterElementDefinition.clusterElementTypes?.find(
+    if (!currentParentTask) {
+        console.error('Parent task not found:', rootClusterElementNodeData?.workflowNodeName);
+
+        return;
+    }
+
+    const clusterElementType = data.name;
+
+    const clusterElementTypeDefinition = rootClusterElementDefinition.clusterElementTypes?.find(
         (clusterElementDefinition) => clusterElementDefinition.name === data.type
     );
-    const clusterElementContainsMultipleElements = currentClusterElementDefinition?.multipleElements;
 
-    const clusterElements = initializeClusterElementsObject(rootClusterElementDefinition, existingClusterElements);
+    const isMultipleElements = !!clusterElementTypeDefinition?.multipleElements;
 
-    const objectKey = data.name;
+    const clusterElements = initializeClusterElementsObject(
+        rootClusterElementDefinition,
+        currentParentTask.clusterElements
+    );
 
-    if (objectKey in clusterElements) {
-        if (clusterElementContainsMultipleElements) {
-            const existingElements = Array.isArray(clusterElements[objectKey]) ? clusterElements[objectKey] : [];
-
-            clusterElements[objectKey] = [
-                ...existingElements,
-                {
-                    label: data.componentName,
-                    name: getFormattedName(data.componentName),
-                    parameters: {},
-                    type: `${data.componentName}/v${data.componentVersion}/${data.name}`,
-                },
-            ];
-        } else {
-            clusterElements[objectKey] = {
-                ...(clusterElements[objectKey] && !Array.isArray(clusterElements[objectKey])
-                    ? clusterElements[objectKey]
-                    : {}),
-                label: data.title,
+    if (isMultipleElements) {
+        clusterElements[clusterElementType] = [
+            ...(Array.isArray(clusterElements[clusterElementType]) ? clusterElements[clusterElementType] : []),
+            {
+                label: data.componentName,
                 name: getFormattedName(data.componentName),
-                parameters: {},
+                parameters:
+                    getParametersWithDefaultValues({
+                        properties: clickedClusterElementDefinition?.properties as Array<PropertyAllType>,
+                    }) || {},
                 type: `${data.componentName}/v${data.componentVersion}/${data.name}`,
-            };
-        }
+            },
+        ];
+    } else {
+        clusterElements[clusterElementType] = {
+            label: data.title,
+            name: getFormattedName(data.componentName),
+            parameters:
+                getParametersWithDefaultValues({
+                    properties: clickedClusterElementDefinition?.properties as Array<PropertyAllType>,
+                }) || {},
+            type: `${data.componentName}/v${data.componentVersion}/${data.name}`,
+        };
     }
 
     const updatedNodeData = {

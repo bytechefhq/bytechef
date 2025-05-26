@@ -1,9 +1,11 @@
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {
+    ClusterElementDefinitionApi,
     ClusterElementDefinitionBasic,
     ComponentDefinition,
     ComponentDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
+import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionQuery,
@@ -14,6 +16,7 @@ import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'reac
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+import {convertNameToCamelCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -83,8 +86,8 @@ const WorkflowNodesPopoverMenu = ({
 
     const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
         {
-            componentName: rootClusterElementComponentName || '',
-            componentVersion: rootClusterElementComponentVersion || 1,
+            componentName: rootClusterElementComponentName,
+            componentVersion: rootClusterElementComponentVersion,
         },
         !!rootClusterElementNodeData && rootClusterElementNodeData?.rootClusterElement
     );
@@ -130,12 +133,29 @@ const WorkflowNodesPopoverMenu = ({
                 rootClusterElementDefinition
             ) {
                 if (projectId && clickedItem) {
+                    const getClusterElementDefinitionRequest = {
+                        clusterElementName: convertNameToCamelCase(clickedItem.type),
+                        componentName: clickedItem.componentName || '',
+                        componentVersion: clickedItem.componentVersion || 1,
+                    };
+
+                    const clickedClusterElementDefinition = await queryClient.fetchQuery({
+                        queryFn: () =>
+                            new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
+                                getClusterElementDefinitionRequest
+                            ),
+                        queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(
+                            getClusterElementDefinitionRequest
+                        ),
+                    });
+
                     const clusterData = {
                         ...clickedItem,
                         componentName: clickedItem.componentName,
                     } as ClusterElementDefinitionBasic;
 
                     handleClusterElementClick({
+                        clickedClusterElementDefinition,
                         data: clusterData,
                         projectId,
                         queryClient,
@@ -146,6 +166,7 @@ const WorkflowNodesPopoverMenu = ({
                 }
 
                 setPopoverOpen(false);
+
                 return;
             }
 
@@ -227,7 +248,7 @@ const WorkflowNodesPopoverMenu = ({
 
                     {actionPanelOpen && componentDefinitionToBeAdded && (
                         <WorkflowNodesPopoverMenuOperationList
-                            clusterElementType={clusterElementType && clusterElementType}
+                            clusterElementType={clusterElementType}
                             componentDefinition={componentDefinitionToBeAdded}
                             edgeId={edgeId}
                             integrationId={integrationId}
