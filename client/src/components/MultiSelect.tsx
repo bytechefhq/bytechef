@@ -15,7 +15,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Separator} from '@/components/ui/separator';
 import {type VariantProps, cva} from 'class-variance-authority';
 import {CheckIcon, ChevronDown, CircleXIcon, XIcon} from 'lucide-react';
-import {ButtonHTMLAttributes, ComponentType, KeyboardEvent, ReactNode, forwardRef, useState} from 'react';
+import {ButtonHTMLAttributes, ComponentType, ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {ScrollArea} from './ui/scroll-area';
@@ -149,34 +149,20 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
         },
         ref
     ) => {
-        // Check if we're in controlled mode
         const isControlled = value !== undefined;
 
-        // Initialize uncontrolled state with defaultValue
         const [uncontrolledValues, setUncontrolledValues] = useState(defaultValue);
 
-        // Use the appropriate value source based on mode
         const selectedValues = isControlled ? value : uncontrolledValues;
 
         const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-        // Update the values internally and notify parent
         const updateValues = (newValues: string[]) => {
             if (!isControlled) {
                 setUncontrolledValues(newValues);
             }
 
             onValueChange(newValues);
-        };
-
-        const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-            if (event.key === 'Enter') {
-                setIsPopoverOpen(true);
-            } else if (event.key === 'Backspace' && !event.currentTarget.value) {
-                const newSelectedValues = [...selectedValues];
-                newSelectedValues.pop();
-                updateValues(newSelectedValues);
-            }
         };
 
         const toggleOption = (option: string) => {
@@ -203,6 +189,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                 handleClear();
             } else {
                 const allValues = options.map((option) => option.value);
+
                 updateValues(allValues);
             }
         };
@@ -327,13 +314,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                     onEscapeKeyDown={() => setIsPopoverOpen(false)}
                 >
                     <Command>
-                        {searchable && (
-                            <CommandInput
-                                className="my-1 h-8 border-0"
-                                onKeyDown={handleInputKeyDown}
-                                placeholder="Search..."
-                            />
-                        )}
+                        {searchable && <CommandInput className="my-1 h-8 border-0" placeholder="Search..." />}
 
                         <CommandList className="overflow-hidden">
                             <CommandEmpty>No results found.</CommandEmpty>
