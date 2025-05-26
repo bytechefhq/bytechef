@@ -28,7 +28,7 @@ import {z} from 'zod';
 const formSchema = z.object({
     name: z.string().min(1, 'Name is required').max(256, 'Name cannot be longer than 256 characters'),
     notificationEventIds: z.array(z.number()),
-    settings: z.union([z.object({email: z.string()}), z.object({webhook: z.string()})]),
+    settings: z.record(z.string(), z.any()),
     type: z.enum(['EMAIL', 'WEBHOOK'], {
         required_error: 'Please select a notification type.',
     }),
@@ -43,7 +43,7 @@ interface NotificationDialogProps {
 const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
-    const [notificationType, setNotificationType] = useState(NotificationTypeEnum.Email);
+    const [notificationType, setNotificationType] = useState(notification?.type || NotificationTypeEnum.Email);
 
     const ff_1132 = useFeatureFlagsStore()('ff-1132');
 
@@ -86,15 +86,22 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
     }
 
     function saveNotification() {
+        const formValues = getValues();
+
+        // Ensure settings is properly structured
+        const settings = {...formValues.settings};
+
         if (notification?.id) {
             updateNotificationMutation.mutate({
                 ...notification,
-                ...getValues(),
+                ...formValues,
+                settings,
             });
         } else {
             createNotificationMutation.mutate({
                 ...notification,
-                ...getValues(),
+                ...formValues,
+                settings,
             });
         }
     }
@@ -155,7 +162,7 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                                         <Select
                                             onValueChange={(value) => {
                                                 field.onChange(value);
-                                                setNotificationType(value);
+                                                setNotificationType(value as NotificationTypeEnum);
                                             }}
                                             value={field.value}
                                         >
@@ -202,11 +209,11 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                                                 onValueChange={field.onChange}
                                                 options={notificationEvents?.map((notificationEvent) => ({
                                                     label: notificationEvent.type ?? notificationEvent.id.toString(),
-                                                    value: notificationEvent.id,
+                                                    value: notificationEvent.id.toString(),
                                                 }))}
                                                 optionsLoading={isNotificationEventsLoading}
                                                 placeholder="Select events"
-                                                value={field.value}
+                                                value={field.value.map((id: number) => id.toString())}
                                             />
                                         </FormControl>
 
@@ -228,7 +235,12 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                                             <FormLabel>Email</FormLabel>
 
                                             <FormControl>
-                                                <Input autoComplete="email" type="email" {...field} />
+                                                <Input
+                                                    autoComplete="email"
+                                                    onChange={(e) => field.onChange(e.target.value)}
+                                                    type="email"
+                                                    value={field.value || ''}
+                                                />
                                             </FormControl>
 
                                             <FormMessage />
@@ -246,7 +258,10 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                                             <FormLabel>Webhook URL</FormLabel>
 
                                             <FormControl>
-                                                <Input {...field} />
+                                                <Input
+                                                    onChange={(e) => field.onChange(e.target.value)}
+                                                    value={field.value || ''}
+                                                />
                                             </FormControl>
 
                                             <FormMessage />
