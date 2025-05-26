@@ -48,15 +48,15 @@ public class LinearUtils {
     private LinearUtils() {
     }
 
-    public static void appendOptionalField(StringBuilder stringBuilder, String fieldName, Object value) {
+    public static void appendOptionalField(StringBuilder sb, String fieldName, Object value) {
         if (value != null) {
             if (value instanceof String) {
-                stringBuilder.append(fieldName)
+                sb.append(fieldName)
                     .append(": \"")
                     .append(value)
                     .append("\", ");
             } else if (value instanceof Integer) {
-                stringBuilder.append(fieldName)
+                sb.append(fieldName)
                     .append(": ")
                     .append(value)
                     .append(", ");

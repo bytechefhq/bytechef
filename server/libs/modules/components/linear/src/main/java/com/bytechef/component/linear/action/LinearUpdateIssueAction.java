@@ -120,23 +120,24 @@ public class LinearUpdateIssueAction {
     }
 
     private static String buildGraphQLQuery(Parameters inputParameters) {
-        StringBuilder stringBuilder = new StringBuilder("mutation{issueUpdate(input: { ");
+        StringBuilder sb = new StringBuilder("mutation{issueUpdate(input: { ");
 
-        appendOptionalField(stringBuilder, TITLE, inputParameters.getString(TITLE));
-        appendOptionalField(stringBuilder, "stateId", inputParameters.getString(STATUS_ID));
-        appendOptionalField(stringBuilder, PRIORITY, inputParameters.getInteger(PRIORITY));
-        appendOptionalField(stringBuilder, ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID));
-        appendOptionalField(stringBuilder, DESCRIPTION, inputParameters.getString(DESCRIPTION));
+        appendOptionalField(sb, TITLE, inputParameters.getString(TITLE));
+        appendOptionalField(sb, "stateId", inputParameters.getString(STATUS_ID));
+        appendOptionalField(sb, PRIORITY, inputParameters.getInteger(PRIORITY));
+        appendOptionalField(sb, ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID));
+        appendOptionalField(sb, DESCRIPTION, inputParameters.getString(DESCRIPTION));
 
-        if (stringBuilder.toString()
-            .endsWith(", ")) {
-            stringBuilder.setLength(stringBuilder.length() - 2);
+        String query = sb.toString();
+
+        if (query.endsWith(", ")) {
+            sb.setLength(sb.length() - 2);
         }
 
-        stringBuilder.append(" } id: \"")
+        sb.append(" } id: \"")
             .append(inputParameters.getRequiredString(ISSUE_ID))
             .append("\"){success issue{id title}}}");
 
-        return stringBuilder.toString();
+        return query;
     }
 }

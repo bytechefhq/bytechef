@@ -86,9 +86,7 @@ public class LinearCreateCommentAction {
 
         Map<String, Object> body = executeGraphQLQuery(query, context);
 
-        if (body.get(DATA) instanceof Map<?, ?> data
-            && data.get("commentCreate") instanceof Map<?, ?> commentCreate) {
-
+        if (body.get(DATA) instanceof Map<?, ?> data && data.get("commentCreate") instanceof Map<?, ?> commentCreate) {
             return commentCreate;
         }
 
