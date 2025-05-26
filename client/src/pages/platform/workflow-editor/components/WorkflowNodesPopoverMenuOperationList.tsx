@@ -19,7 +19,10 @@ import {useCallback, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useShallow} from 'zustand/react/shallow';
 
-import {convertNameToCamelCase} from '../../ai-agent-editor/utils/clusterElementsUtils';
+import {
+    convertNameToCamelCase,
+    initializeClusterElementsObject,
+} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -135,8 +138,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
     );
 
     const saveClusterElementToWorkflow = useCallback(
-        (clusterElementData: ClusterElementItemType, objectKey: string, isMultipleElements: boolean) => {
-            if (!workflow.definition) {
+        (clusterElementData: ClusterElementItemType, clusterElementType: string, isMultipleElements: boolean) => {
+            if (!workflow.definition || !rootClusterElementDefinition) {
                 return;
             }
 
@@ -145,17 +148,19 @@ const WorkflowNodesPopoverMenuOperationList = ({
             const currentClusterRootTask = workflowDefinitionTasks?.find(
                 (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
             );
-            const existingClusterElements = currentClusterRootTask?.clusterElements;
 
-            const clusterElements = {...(existingClusterElements || {})};
+            const clusterElements = initializeClusterElementsObject(
+                rootClusterElementDefinition,
+                currentClusterRootTask?.clusterElements || {}
+            );
 
             if (isMultipleElements) {
-                clusterElements[objectKey] = [
-                    ...(Array.isArray(clusterElements[objectKey]) ? clusterElements[objectKey] : []),
+                clusterElements[clusterElementType] = [
+                    ...(Array.isArray(clusterElements[clusterElementType]) ? clusterElements[clusterElementType] : []),
                     clusterElementData,
                 ];
             } else {
-                clusterElements[objectKey] = clusterElementData;
+                clusterElements[clusterElementType] = clusterElementData;
             }
 
             const updatedNodeData = {
@@ -194,6 +199,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
         },
         [
             workflow,
+            rootClusterElementDefinition,
             setRootClusterElementNodeData,
             rootClusterElementNodeData,
             currentNode,
@@ -243,24 +249,23 @@ const WorkflowNodesPopoverMenuOperationList = ({
             if (clusterElementsCanvasOpen && clusterElementType) {
                 captureComponentUsed(componentName, undefined, operationName);
 
-                const objectKey = clusterElementType;
-
                 const currentClusterElementDefinition = rootClusterElementDefinition?.clusterElementTypes?.find(
-                    (clusterElementType) => convertNameToCamelCase(clusterElementType.name as string) === objectKey
+                    (currentClusterElementType) =>
+                        convertNameToCamelCase(currentClusterElementType.name as string) === clusterElementType
                 );
 
                 if (!currentClusterElementDefinition) {
-                    console.error(`Unknown cluster element type: ${objectKey}`);
+                    console.error(`Unknown cluster element type: ${clusterElementType}`);
+
                     return;
                 }
 
                 const isMultipleElements = !!currentClusterElementDefinition.multipleElements;
 
                 const getClusterElementDefinitionRequest = {
+                    clusterElementName: isMultipleElements ? operationName : clusterElementType,
                     componentName: componentName,
                     componentVersion: version,
-                    // eslint-disable-next-line sort-keys
-                    clusterElementName: isMultipleElements ? operationName : objectKey,
                 };
 
                 const clickedClusterElementDefinition = await queryClient.fetchQuery({
@@ -281,7 +286,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     type: `${componentName}/v${version}/${operationName}`,
                 };
 
-                saveClusterElementToWorkflow(clusterElementData, objectKey, isMultipleElements);
+                saveClusterElementToWorkflow(clusterElementData, clusterElementType, isMultipleElements);
 
                 setPopoverOpen(false);
 
