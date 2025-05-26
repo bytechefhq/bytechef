@@ -116,26 +116,27 @@ public class LinearCreateProjectAction {
     }
 
     private static String buildGraphQLQuery(Parameters inputParameters) {
-        StringBuilder stringBuilder = new StringBuilder("mutation{projectCreate(input: {");
+        StringBuilder sb = new StringBuilder("mutation{projectCreate(input: {");
 
-        stringBuilder.append("name: \"")
+        sb.append("name: \"")
             .append(inputParameters.getRequiredString(NAME))
             .append("\", teamIds: [\"")
             .append(inputParameters.getRequiredString(TEAM_ID))
             .append("\"], ");
 
-        appendOptionalField(stringBuilder, STATUS_ID, inputParameters.getString(STATUS_ID));
-        appendOptionalField(stringBuilder, PRIORITY, inputParameters.getInteger(PRIORITY));
-        appendOptionalField(stringBuilder, START_DATE, inputParameters.getString(START_DATE));
-        appendOptionalField(stringBuilder, DESCRIPTION, inputParameters.getString(DESCRIPTION));
+        appendOptionalField(sb, STATUS_ID, inputParameters.getString(STATUS_ID));
+        appendOptionalField(sb, PRIORITY, inputParameters.getInteger(PRIORITY));
+        appendOptionalField(sb, START_DATE, inputParameters.getString(START_DATE));
+        appendOptionalField(sb, DESCRIPTION, inputParameters.getString(DESCRIPTION));
 
-        if (stringBuilder.toString()
-            .endsWith(", ")) {
-            stringBuilder.setLength(stringBuilder.length() - 2);
+        String query = sb.toString();
+
+        if (query.endsWith(", ")) {
+            sb.setLength(sb.length() - 2);
         }
 
-        stringBuilder.append("}){success project{id name}}}");
+        sb.append("}){success project{id name}}}");
 
-        return stringBuilder.toString();
+        return query;
     }
 }
