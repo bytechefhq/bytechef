@@ -66,9 +66,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public Workflow create(
-        String definition, Format format, SourceType sourceType) {
-
+    public Workflow create(String definition, Format format, SourceType sourceType) {
         Assert.notNull(definition, "'definition' must not be null");
         Assert.notNull(format, "'format' must not be null");
         Assert.notNull(sourceType, "'sourceType' must not be null");

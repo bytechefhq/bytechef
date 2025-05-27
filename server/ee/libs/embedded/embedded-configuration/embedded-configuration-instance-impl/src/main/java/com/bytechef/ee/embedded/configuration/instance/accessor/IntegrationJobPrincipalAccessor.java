@@ -76,8 +76,7 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
 
     @Override
     public String getWorkflowId(long jobPrincipalId, String workflowReferenceCode) {
-        return integrationWorkflowService.getWorkflowId(
-            jobPrincipalId, workflowReferenceCode);
+        return integrationWorkflowService.getWorkflowId(jobPrincipalId, workflowReferenceCode);
     }
 
     @Override
