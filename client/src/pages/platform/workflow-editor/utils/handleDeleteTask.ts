@@ -154,6 +154,25 @@ export default function handleDeleteTask({
 
             return parentParallelTask;
         }) as Array<WorkflowTaskType>;
+    } else if (data.eachData) {
+        const parentEachTask = TASK_DISPATCHER_CONFIG.loop.getTask({
+            taskDispatcherId: data.eachData.eachId,
+            tasks: workflowTasks,
+        });
+
+        if (!parentEachTask?.parameters) {
+            return;
+        }
+
+        parentEachTask.parameters.iteratee = {};
+
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== parentEachTask.name) {
+                return task;
+            }
+
+            return parentEachTask;
+        }) as Array<WorkflowTaskType>;
     } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
         const rootClusterElementTask = workflowTasks.find((task) => task.name === rootClusterElementNodeData?.name);
         const updatedClusterElements = {...rootClusterElementNodeData.clusterElements};

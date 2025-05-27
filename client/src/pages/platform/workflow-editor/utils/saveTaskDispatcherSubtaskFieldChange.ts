@@ -52,7 +52,7 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     );
 
     let taskDispatcherContext: TaskDispatcherContextType | undefined = undefined;
-    let taskDispatcherComponentName: 'branch' | 'condition' | 'loop' | 'parallel' | undefined = undefined;
+    let taskDispatcherComponentName: 'branch' | 'condition' | 'each' | 'loop' | 'parallel' | undefined = undefined;
 
     switch (taskDispatcherDataKey) {
         case 'branchData': {
@@ -82,6 +82,20 @@ export default function saveTaskDispatcherSubtaskFieldChange({
             };
 
             taskDispatcherComponentName = 'condition';
+
+            break;
+        }
+        case 'eachData': {
+            if (!currentNode.eachData) {
+                break;
+            }
+
+            taskDispatcherContext = {
+                index: currentNodeIndex,
+                taskDispatcherId: currentNode.eachData.eachId,
+            };
+
+            taskDispatcherComponentName = 'each';
 
             break;
         }

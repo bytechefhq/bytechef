@@ -123,6 +123,7 @@ export const MINIMAP_NODE_COLOR = '#e2e8f0';
 export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
     branch: ['default', 'cases'],
     condition: ['caseTrue', 'caseFalse'],
+    each: ['iteratee'],
     loop: ['iteratee'],
     parallel: ['tasks'],
 };
@@ -148,6 +149,7 @@ export const COMPONENT_CATEGORY_ICON: Record<string, JSX.Element> = {
 export const TASK_DISPATCHER_DATA_KEY_MAP = {
     branch: 'branchData',
     condition: 'conditionData',
+    each: 'eachData',
     loop: 'loopData',
     parallel: 'parallelData',
 };

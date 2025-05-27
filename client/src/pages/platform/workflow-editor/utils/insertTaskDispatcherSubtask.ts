@@ -56,11 +56,28 @@ export default function insertTaskDispatcherSubtask({
                 ...context,
                 index: targetTaskDispatcher.parameters?.tasks?.length,
             };
+        } else if (componentName === 'each') {
+            context = {
+                ...context,
+                index: 0,
+            };
         } else {
             const placeholderContext = extractContextFromPlaceholder(placeholderId);
 
             context = {...context, ...placeholderContext};
         }
+    }
+
+    if (componentName === 'each') {
+        const updatedTaskDispatcherTask = {
+            ...targetTaskDispatcher,
+            parameters: {
+                ...targetTaskDispatcher.parameters,
+                iteratee: newTask,
+            },
+        };
+
+        return getRecursivelyUpdatedTasks(tasks, updatedTaskDispatcherTask);
     }
 
     const subtasks = getSubtasks({context, task: targetTaskDispatcher});
