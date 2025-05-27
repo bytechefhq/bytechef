@@ -24,7 +24,7 @@ import java.util.Map;
 public class WorkflowNodeDescriptionUtils {
 
     public static String renderComponentProperties(
-        Map<String, ?> inputParameters, String componentTile, String operationTitle) {
+        Map<String, ?> inputParameters, String componentTile, String operationTitle, String operationDescription) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -41,10 +41,11 @@ public class WorkflowNodeDescriptionUtils {
                 <div class="flex flex-col space-y-0.5">%n\
                     <div class="font-semibold">%s</div>%n\
                     <div class="text-sm">%s</div>%n\
+                    <div class="text-sm">%s</div>%n\
                 </div>%n\
                 %s%n\
             </div>%n\
-            """.formatted(componentTile, operationTitle, sb);
+            """.formatted(componentTile, operationTitle, operationDescription, sb);
     }
 
     public static String renderTaskDispatcherProperties(Map<String, ?> inputParameters, String taskDispatcherTitle) {

@@ -372,7 +372,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return actionDefinition.getWorkflowNodeDescription()
             .orElse((inputParameters, context) -> WorkflowNodeDescriptionUtils.renderComponentProperties(
                 inputParameters, OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName()),
-                OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName())));
+                OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()),
+                OptionalUtils.orElse(actionDefinition.getDescription(), null)));
     }
 
     private static Map<String, String> getLookupDependsOnPathsMap(List<String> lookupDependsOnPaths) {

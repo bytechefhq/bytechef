@@ -581,7 +581,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return triggerDefinition.getWorkflowNodeDescription()
             .orElse((inputParameters, context) -> WorkflowNodeDescriptionUtils.renderComponentProperties(
                 inputParameters, OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName()),
-                OptionalUtils.orElse(triggerDefinition.getTitle(), triggerDefinition.getName())));
+                OptionalUtils.orElse(triggerDefinition.getTitle(), triggerDefinition.getName()),
+                OptionalUtils.orElse(triggerDefinition.getDescription(), null)));
     }
 
     private ListenerDisableConsumer getListenerDisableConsumer(
