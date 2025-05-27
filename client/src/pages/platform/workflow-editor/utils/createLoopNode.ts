@@ -13,9 +13,6 @@ type CreateLoopNodePropsType = {
     options?: LoopNodeOptionsType;
 };
 
-/**
- * Creates a placeholder node for a loop
- */
 function createPlaceholderNode(loopId: string): Node {
     return {
         data: {
@@ -29,9 +26,6 @@ function createPlaceholderNode(loopId: string): Node {
     };
 }
 
-/**
- * Creates a top ghost node for a loop
- */
 function createTopGhostNode(loopId: string): Node {
     return {
         data: {
@@ -44,9 +38,6 @@ function createTopGhostNode(loopId: string): Node {
     };
 }
 
-/**
- * Creates a left ghost node for a loop
- */
 function createLeftGhostNode(loopId: string): Node {
     return {
         data: {
@@ -59,9 +50,6 @@ function createLeftGhostNode(loopId: string): Node {
     };
 }
 
-/**
- * Creates a bottom ghost node for a loop
- */
 function createBottomGhostNode(loopId: string, isNested: boolean = false): Node {
     return {
         data: {
@@ -75,7 +63,7 @@ function createBottomGhostNode(loopId: string, isNested: boolean = false): Node 
 }
 
 /**
- * Creates all necessary auxiliary nodes for a loop task node
+ * Creates all necessary auxiliary nodes for the Loop task dispatcher
  */
 export default function createLoopNode({
     allNodes,
