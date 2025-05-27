@@ -47,7 +47,7 @@ export const calculateNodeHeight = (node: Node) => {
         height = PLACEHOLDER_NODE_HEIGHT;
 
         if (isBottomGhostNode) {
-            height = NODE_HEIGHT;
+            height = 0;
         }
     }
 
@@ -133,7 +133,11 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
     });
 
     edges.forEach((edge) => {
-        dagreGraph.setEdge(edge.source, edge.target);
+        if (edge.target.includes('bottom-ghost')) {
+            dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
+        } else {
+            dagreGraph.setEdge(edge.source, edge.target);
+        }
     });
 
     dagre.layout(dagreGraph);
