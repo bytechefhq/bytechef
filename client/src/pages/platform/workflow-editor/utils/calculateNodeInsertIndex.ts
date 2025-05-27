@@ -1,3 +1,5 @@
+import {BranchCaseType} from '@/shared/types';
+
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 
 export default function calculateNodeInsertIndex(targetId: string): number {
@@ -34,12 +36,16 @@ export default function calculateNodeInsertIndex(targetId: string): number {
 
     if (branchTasks.length) {
         tasksInBranches = branchTasks.reduce((count, branchTask) => {
-            const caseKeys = ['default', Object.keys(branchTask.parameters?.cases || {})];
+            const defaultTasks = branchTask.parameters?.default?.length || 0;
 
-            return count + caseKeys.length;
+            const caseTasks = (branchTask.parameters?.cases || []).reduce(
+                (caseCount: number, caseItem: BranchCaseType) => caseCount + (caseItem.tasks?.length || 0),
+                0
+            );
+
+            return count + defaultTasks + caseTasks;
         }, 0);
     }
-
     if (eachTasks.length) {
         tasksInEach = eachTasks.reduce((count, eachTask) => {
             if (eachTask.parameters?.iteratee) {

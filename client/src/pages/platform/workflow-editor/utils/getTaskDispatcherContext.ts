@@ -150,7 +150,13 @@ export default function getTaskDispatcherContext({
 
     if (isSourceGhost && isTargetTaskDispatcher) {
         if (!isSourceNestedBottomGhost) {
-            if (targetNode.data.conditionData || targetNode.data.loopData || targetNode.data.branchData) {
+            if (
+                targetNode.data.conditionData ||
+                targetNode.data.loopData ||
+                targetNode.data.branchData ||
+                targetNode.data.parallelData ||
+                targetNode.data.eachData
+            ) {
                 return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
             }
 
