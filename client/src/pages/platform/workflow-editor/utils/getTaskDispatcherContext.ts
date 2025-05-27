@@ -128,6 +128,8 @@ export default function getTaskDispatcherContext({
     const isSourceGhost = source.includes('ghost');
     const isTargetGhost = target.includes('ghost');
 
+    const isSourceTopGhost = sourceNode?.type === 'taskDispatcherTopGhostNode';
+
     const isSourceNestedBottomGhost = sourceNode?.data.isNestedBottomGhost;
 
     const taskDispatcherId = (sourceNode?.data?.taskDispatcherId || targetNode?.data.taskDispatcherId) as string;
@@ -155,6 +157,10 @@ export default function getTaskDispatcherContext({
             return undefined;
         }
 
+        return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
+    }
+
+    if (isSourceTopGhost && isTargetTask) {
         return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
     }
 
