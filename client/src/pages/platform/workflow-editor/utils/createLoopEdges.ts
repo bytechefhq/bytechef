@@ -130,7 +130,7 @@ function createLoopSubtaskEdges(loopId: string, loopChildTasks: Array<WorkflowTa
 }
 
 /**
- * Creates all edges for a loop node and its iteratees
+ * Creates all edges for the Loop task dispatcher
  */
 export default function createLoopEdges(loopNode: Node): Edge[] {
     const edges: Edge[] = [];
