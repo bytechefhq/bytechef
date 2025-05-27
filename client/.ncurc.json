@@ -1,0 +1,3 @@
+{
+  "reject": ["eslint", "react-i18next", "tailwindcss"]
+}
