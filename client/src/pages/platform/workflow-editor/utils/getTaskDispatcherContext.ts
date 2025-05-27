@@ -35,6 +35,10 @@ function getContextFromTaskNodeData(
         context.parallelId = nodeData.parallelData.parallelId as string;
         context.index = (nodeData.parallelData.index as number) + indexIncrement;
         context.taskDispatcherId = nodeData.parallelData.parallelId as string;
+    } else if (nodeData.eachData) {
+        context.eachId = nodeData.eachData.eachId as string;
+        context.index = (nodeData.eachData.index as number) + indexIncrement;
+        context.taskDispatcherId = nodeData.eachData.eachId as string;
     }
 
     return context;
@@ -49,6 +53,7 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     const isConditionPlaceholder = placeholderNode.id.includes('condition') && isPlaceholder;
     const isBranchPlaceholder = placeholderNode.id.includes('branch') && isPlaceholder;
     const isParallelPlaceholder = placeholderNode.id.includes('parallel') && isPlaceholder;
+    const isEachPlaceholder = placeholderNode.id.includes('each') && isPlaceholder;
 
     const context: TaskDispatcherContextType = {
         taskDispatcherId: placeholderNode.data?.taskDispatcherId as string,
@@ -84,6 +89,11 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
 
         context.parallelId = parallelId;
         context.taskDispatcherId = parallelId;
+    } else if (isEachPlaceholder) {
+        const eachId = placeholderNode.data?.eachId as string;
+
+        context.eachId = eachId;
+        context.taskDispatcherId = eachId;
     }
 
     return context;

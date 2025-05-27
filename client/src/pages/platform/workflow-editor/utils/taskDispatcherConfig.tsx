@@ -32,7 +32,7 @@ export function buildGenericNodeData(
 
     for (const [type, config] of Object.entries(TASK_DISPATCHER_CONFIG)) {
         const taskDispatcherId =
-            taskDispatcherContext[config.contextIdentifier as 'branchId' | 'conditionId' | 'loopId'];
+            taskDispatcherContext[config.contextIdentifier as 'branchId' | 'conditionId' | 'eachId' | 'loopId'];
 
         if (taskDispatcherId) {
             if (type === 'condition') {
@@ -60,6 +60,11 @@ export function buildGenericNodeData(
                 newNodeData.parallelData = {
                     index: taskDispatcherContext.index ?? 0,
                     parallelId: taskDispatcherId,
+                };
+            } else if (type === 'each') {
+                newNodeData.eachData = {
+                    eachId: taskDispatcherId,
+                    index: 0,
                 };
             }
 
@@ -267,6 +272,42 @@ export const TASK_DISPATCHER_CONFIG = {
                 },
             };
         },
+    },
+    each: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'each'),
+        contextIdentifier: 'eachId',
+        dataKey: 'eachData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+            const index = parseInt(parts[parts.length - 1] || '-1');
+
+            return {index, taskDispatcherId: parts[0]};
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.eachId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+        }),
+        getSubtasks: ({node, task}: {node?: Node; task?: WorkflowTask}): Array<WorkflowTask> => {
+            const parameters = (node?.data as NodeDataType)?.parameters || task?.parameters;
+
+            if (!parameters || !parameters.iteratee) {
+                return [];
+            }
+
+            return parameters.iteratee;
+        },
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({
+            iteratee: null,
+        }),
+        updateTaskParameters: ({task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => ({
+            ...task,
+            parameters: {
+                ...task.parameters,
+                iteratee: updatedSubtasks,
+            },
+        }),
     },
     loop: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>

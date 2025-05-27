@@ -19,6 +19,7 @@ import {
     BranchCaseType,
     BranchChildTasksType,
     ConditionChildTasksType,
+    EachChildTasksType,
     LoopChildTasksType,
     NodeDataType,
     ParallelChildTasksType,
@@ -228,17 +229,19 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
     return {edges, nodes: allNodes};
 };
 
+interface CreateEdgeFromTaskDispatcherBottomGhostNodeProps {
+    allNodes?: Node[];
+    index?: number;
+    node: Node;
+    tasks?: WorkflowTask[];
+}
+
 export const createEdgeFromTaskDispatcherBottomGhostNode = ({
     allNodes = [],
     index = 0,
     node,
     tasks = [],
-}: {
-    allNodes?: Node[];
-    node: Node;
-    index?: number;
-    tasks?: WorkflowTask[];
-}): Edge | null => {
+}: CreateEdgeFromTaskDispatcherBottomGhostNodeProps): Edge | null => {
     const nodeData = node.data as NodeDataType;
 
     const {taskDispatcherId} = nodeData;
@@ -342,6 +345,8 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
             return false;
         } else if (subsequentNodeData.parallelData && subsequentNodeData.parallelData.parallelId === taskDispatcherId) {
             return false;
+        } else if (subsequentNodeData.eachData && subsequentNodeData.eachData.eachId === taskDispatcherId) {
+            return false;
         }
 
         for (const task of tasks || []) {
@@ -390,6 +395,7 @@ export function collectTaskDispatcherData(
     task: WorkflowTask,
     branchChildTasks: BranchChildTasksType,
     conditionChildTasks: ConditionChildTasksType,
+    eachChildTasks: EachChildTasksType,
     loopChildTasks: LoopChildTasksType,
     parallelChildTasks: ParallelChildTasksType
 ): void {
@@ -426,19 +432,33 @@ export function collectTaskDispatcherData(
         parallelChildTasks[name] = {
             tasks: parameters.tasks.map((task: WorkflowTask) => task.name),
         };
+    } else if (componentName === 'each' && parameters?.iteratee) {
+        eachChildTasks[name] = {
+            iteratee: parameters.iteratee.name,
+        };
     }
 }
 
 /**
  * Detects if a task is nested inside a task dispatcher and returns relevant nesting data
  */
-export function getTaskAncestry(
-    taskName: string,
-    conditionChildTasks: ConditionChildTasksType,
-    loopChildTasks: LoopChildTasksType,
-    branchChildTasks: BranchChildTasksType,
-    parallelChildTasks: ParallelChildTasksType
-): {nestingData: Record<string, unknown>; isNested: boolean} {
+interface GetTaskAncestryProps {
+    branchChildTasks: BranchChildTasksType;
+    conditionChildTasks: ConditionChildTasksType;
+    eachChildTasks: EachChildTasksType;
+    loopChildTasks: LoopChildTasksType;
+    parallelChildTasks: ParallelChildTasksType;
+    taskName: string;
+}
+
+export function getTaskAncestry({
+    branchChildTasks,
+    conditionChildTasks,
+    eachChildTasks,
+    loopChildTasks,
+    parallelChildTasks,
+    taskName,
+}: GetTaskAncestryProps): {nestingData: Record<string, unknown>; isNested: boolean} {
     let isNested = false;
     let nestingData = {};
 
@@ -527,6 +547,23 @@ export function getTaskAncestry(
                     parallelData: {
                         index: parallelData.tasks.indexOf(taskName),
                         parallelId,
+                    },
+                };
+
+                isNested = true;
+
+                break;
+            }
+        }
+    }
+
+    if (!isNested) {
+        for (const [eachId, eachData] of Object.entries(eachChildTasks)) {
+            if (eachData.iteratee === taskName) {
+                nestingData = {
+                    eachData: {
+                        eachId,
+                        index: 0,
                     },
                 };
 

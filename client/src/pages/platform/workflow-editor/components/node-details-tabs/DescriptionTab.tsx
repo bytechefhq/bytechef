@@ -42,7 +42,13 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
             return;
         }
 
-        if (currentNode.conditionData || currentNode.loopData || currentNode.branchData || currentNode.parallelData) {
+        if (
+            currentNode.conditionData ||
+            currentNode.loopData ||
+            currentNode.branchData ||
+            currentNode.parallelData ||
+            currentNode.eachData
+        ) {
             saveTaskDispatcherSubtaskFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
                 currentNodeIndex: nodes.findIndex((node) => node.data.name === currentNode.workflowNodeName),
@@ -109,7 +115,13 @@ const DescriptionTab = ({integrationId, nodeDefinition, projectId, updateWorkflo
             return;
         }
 
-        if (currentNode.conditionData || currentNode.loopData || currentNode.branchData || currentNode.parallelData) {
+        if (
+            currentNode.conditionData ||
+            currentNode.loopData ||
+            currentNode.branchData ||
+            currentNode.parallelData ||
+            currentNode.eachData
+        ) {
             saveTaskDispatcherSubtaskFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
                 currentNodeIndex: nodes.findIndex((node) => node.data.name === currentNode.workflowNodeName),

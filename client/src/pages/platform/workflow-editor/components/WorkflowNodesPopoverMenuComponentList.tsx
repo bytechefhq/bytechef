@@ -162,7 +162,11 @@ export default WorkflowNodesPopoverMenuComponentList;
 const isLoopSubtask = (node?: Node) => !!node?.data?.loopData || !!node?.data.loopId;
 
 const isTaskDispatcherSubtask = (node?: Node) =>
-    !!node?.data?.loopData || !!node?.data?.conditionData || !!node?.data?.branchData || !!node?.data?.parallelData;
+    !!node?.data?.loopData ||
+    !!node?.data?.conditionData ||
+    !!node?.data?.branchData ||
+    !!node?.data?.parallelData ||
+    !!node?.data?.eachData;
 
 const filterTaskDispatcherDefinitions = (
     taskDispatcherDefinitions: Array<TaskDispatcherDefinition> | null,

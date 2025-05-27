@@ -5,6 +5,10 @@ export default function getRecursivelyUpdatedTasks(
     tasks: Array<WorkflowTask>,
     taskToReplace: WorkflowTask
 ): Array<WorkflowTask> {
+    if (!Array.isArray(tasks)) {
+        return [tasks];
+    }
+
     return tasks.map((task) => {
         if (task.name === taskToReplace.name) {
             return taskToReplace;

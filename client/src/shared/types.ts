@@ -136,7 +136,13 @@ type ParallelDataType = {
     parallelId: string;
 };
 
+type EachDataType = {
+    eachId: string;
+    index: number;
+};
+
 export type TaskDispatcherDataType = BranchDataType &
+    EachDataType &
     LoopDataType &
     LoopBreakDataType &
     ConditionDataType &
@@ -174,6 +180,8 @@ export type NodeDataType = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
     };
+    eachId?: string;
+    eachData?: EachDataType;
     icon?: JSX.Element | ReactNode | string;
     label?: string;
     loopBreakData?: LoopBreakDataType;
@@ -305,6 +313,7 @@ export type TaskDispatcherContextType = {
     caseKey?: string;
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionId?: string;
+    eachId?: string;
     index?: number;
     loopBreakId?: string;
     loopId?: string;
@@ -324,9 +333,10 @@ export type UpdateTaskParametersType = {
     updatedSubtasks: Array<WorkflowTask>;
 };
 
-export type ConditionChildTasksType = {[conditionId: string]: {caseTrue: string[]; caseFalse: string[]}};
-export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
 export type BranchChildTasksType = {[branchId: string]: {cases: {[caseKey: string]: string[]}; default: string[]}};
+export type ConditionChildTasksType = {[conditionId: string]: {caseTrue: string[]; caseFalse: string[]}};
+export type EachChildTasksType = {[eachId: string]: {iteratee: string}};
+export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
 export type ParallelChildTasksType = {[parallelId: string]: {tasks: string[]}};
 
 export type WorkflowInputType = WorkflowInput & {

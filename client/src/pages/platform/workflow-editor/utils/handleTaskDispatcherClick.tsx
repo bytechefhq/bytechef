@@ -90,6 +90,11 @@ export default async function handleTaskDispatcherClick({
                 index: (taskDispatcherContext.index ?? 0) as number,
                 parallelId: taskDispatcherContext.parallelId as string,
             };
+        } else if (taskDispatcherContext.eachId) {
+            newNodeData.eachData = {
+                eachId: taskDispatcherContext.eachId as string,
+                index: (taskDispatcherContext.index ?? 0) as number,
+            };
         }
     }
 
