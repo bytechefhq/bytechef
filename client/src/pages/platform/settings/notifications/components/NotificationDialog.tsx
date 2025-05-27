@@ -27,7 +27,7 @@ import {z} from 'zod';
 
 const formSchema = z.object({
     name: z.string().min(1, 'Name is required').max(256, 'Name cannot be longer than 256 characters'),
-    notificationEventIds: z.array(z.number()),
+    notificationEventIds: z.array(z.string()),
     settings: z.record(z.string(), z.any()),
     type: z.enum(['EMAIL', 'WEBHOOK'], {
         required_error: 'Please select a notification type.',
@@ -50,7 +50,7 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             name: notification?.name || '',
-            notificationEventIds: notification?.notificationEvents?.map((event) => event.id) || [],
+            notificationEventIds: notification?.notificationEvents?.map((event) => String(event.id)) || [],
             settings: notification?.settings || {},
             type: notification?.type || notificationType,
         },
@@ -88,21 +88,16 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
     function saveNotification() {
         const formValues = getValues();
 
-        // Ensure settings is properly structured
-        const settings = {...formValues.settings};
+        const updatedFormData = {
+            ...notification,
+            ...formValues,
+            ...{notificationEventIds: formValues.notificationEventIds.map((id: string) => Number(id))},
+        };
 
         if (notification?.id) {
-            updateNotificationMutation.mutate({
-                ...notification,
-                ...formValues,
-                settings,
-            });
+            updateNotificationMutation.mutate(updatedFormData);
         } else {
-            createNotificationMutation.mutate({
-                ...notification,
-                ...formValues,
-                settings,
-            });
+            createNotificationMutation.mutate(updatedFormData);
         }
     }
 
@@ -213,7 +208,7 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                                                 }))}
                                                 optionsLoading={isNotificationEventsLoading}
                                                 placeholder="Select events"
-                                                value={field.value.map((id: number) => id.toString())}
+                                                value={field.value}
                                             />
                                         </FormControl>
 
