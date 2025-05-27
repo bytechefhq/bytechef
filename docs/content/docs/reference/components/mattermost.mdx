@@ -1,0 +1,133 @@
+---
+title: "Mattermost"
+description: "Mattermost is an open-source, self-hosted messaging platform designed for secure team collaboration and communication."
+---
+
+Mattermost is an open-source, self-hosted messaging platform designed for secure team collaboration and communication.
+
+
+Categories: Communication
+
+
+Type: mattermost/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| domain | Domain | STRING |  | true |
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Send message
+Name: sendMessage
+
+`Send message to a channel.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| channel_id | Channel Id | STRING | `The channel ID to send message to.` | true |
+| message | Message | STRING | `The message contents.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send message",
+  "name" : "sendMessage",
+  "parameters" : {
+    "channel_id" : "",
+    "message" : ""
+  },
+  "type" : "mattermost/v1/sendMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| create_at | INTEGER |  |
+| update_at | INTEGER |  |
+| edit_at | INTEGER |  |
+| delete_at | INTEGER |  |
+| is_pinned | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| user_id | STRING |  |
+| channel_id | STRING |  |
+| root_id | STRING |  |
+| parent_id | STRING |  |
+| original_id | STRING |  |
+| message | STRING |  |
+| type | STRING |  |
+| props | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
+| hashtags | STRING |  |
+| pending_post_id | STRING |  |
+| reply_count | INTEGER |  |
+| last_reply_at | INTEGER |  |
+| participants | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
+| is_following | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "create_at" : 1,
+  "update_at" : 1,
+  "edit_at" : 1,
+  "delete_at" : 1,
+  "is_pinned" : false,
+  "user_id" : "",
+  "channel_id" : "",
+  "root_id" : "",
+  "parent_id" : "",
+  "original_id" : "",
+  "message" : "",
+  "type" : "",
+  "props" : { },
+  "hashtags" : "",
+  "pending_post_id" : "",
+  "reply_count" : 1,
+  "last_reply_at" : 1,
+  "participants" : { },
+  "is_following" : false,
+  "metadata" : { }
+}
+```
+
+
+
+
