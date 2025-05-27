@@ -123,7 +123,7 @@ const NotificationDialog = ({notification, onClose, triggerNode}: NotificationDi
                 <Form {...form}>
                     <form
                         className="flex flex-col gap-4"
-                        onSubmit={handleSubmit(saveNotification, (error) => console.log(error))}
+                        onSubmit={handleSubmit(saveNotification, (error) => console.error(error))}
                     >
                         <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                             <div className="flex flex-col space-y-1">
