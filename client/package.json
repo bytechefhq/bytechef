@@ -98,7 +98,7 @@
     "monaco-yaml": "^5.4.0",
     "posthog-js": "^1.246.0",
     "react": "^19.1.0",
-    "react-day-picker": "^8.10.1",
+    "react-day-picker": "^9.7.0",
     "react-dom": "^19.1.0",
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.56.4",
