@@ -63,7 +63,7 @@ const WorkflowNodesSidebar = ({
                     className="bg-white shadow-none"
                     name="workflowNodeFilter"
                     onChange={(event) => setFilter(event.target.value)}
-                    placeholder="Filter actions and flows"
+                    placeholder="Filter components"
                     value={filter}
                 />
             </div>
