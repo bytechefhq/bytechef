@@ -331,7 +331,7 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
     const subsequentNodes = allNodes.slice(index + 1);
 
     const nextTaskNodeOutsideTaskDispatcher = subsequentNodes.find((subsequentNode) => {
-        if (subsequentNode.type !== 'workflow') {
+        if (subsequentNode.type !== 'workflow' && subsequentNode.type !== 'aiAgentNode') {
             return false;
         }
 
