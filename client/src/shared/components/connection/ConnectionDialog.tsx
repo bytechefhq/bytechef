@@ -401,7 +401,7 @@ const ConnectionDialog = ({
             {!componentDefinitionsLoading && (
                 <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
                     <Form {...form}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 py-3">
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 pb-4 pt-6">
                             <div className="flex flex-col space-y-1">
                                 <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
 
@@ -659,7 +659,7 @@ const ConnectionDialog = ({
                         </div>
 
                         {connection?.id && connectionDefinition && (
-                            <div className="px-6 pt-6">
+                            <div className="px-6 pt-4">
                                 <ConnectionParameters
                                     authorizationParameters={connection.authorizationParameters}
                                     connectionDefinition={connectionDefinition}
@@ -668,7 +668,7 @@ const ConnectionDialog = ({
                             </div>
                         )}
 
-                        <DialogFooter className="px-6 py-3">
+                        <DialogFooter className="px-6 pb-6 pt-4">
                             {wizardStep === 'oauth_step' && (
                                 <Button
                                     onClick={() => {

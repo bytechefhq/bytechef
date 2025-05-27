@@ -130,13 +130,13 @@ const ProjectDeploymentEditWorkflowDialog = ({
         >
             <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 py-3">
+                    <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 pb-4 pt-6">
                         <DialogTitle>{`Edit ${workflow?.label} Workflow`}</DialogTitle>
 
                         <DialogCloseButton />
                     </DialogHeader>
 
-                    <div className="max-h-dialog-height overflow-y-auto">
+                    <div className="max-h-dialog-height overflow-y-auto px-6">
                         <ProjectDeploymentDialogWorkflowsStepItem
                             control={control}
                             formState={formState}
@@ -148,7 +148,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
                         />
                     </div>
 
-                    <DialogFooter className="px-6 py-3">
+                    <DialogFooter className="px-6 pb-6 pt-4">
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
