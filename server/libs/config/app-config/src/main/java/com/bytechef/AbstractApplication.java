@@ -23,9 +23,11 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -36,9 +38,14 @@ import org.springframework.core.env.Environment;
  * @author Ivica Cardic
  */
 @EnableConfigurationProperties(ApplicationProperties.class)
-public abstract class AbstractApplication {
+public abstract class AbstractApplication implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractApplication.class);
+
+    @Override
+    public void afterPropertiesSet() {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+    }
 
     @EventListener
     public void onApplicationStartedEvent(ApplicationStartedEvent event) {
@@ -104,5 +111,4 @@ public abstract class AbstractApplication {
             ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
             : "-";
     }
-
 }
