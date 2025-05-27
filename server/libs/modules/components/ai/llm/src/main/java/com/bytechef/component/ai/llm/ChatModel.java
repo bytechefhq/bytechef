@@ -23,6 +23,7 @@ import com.bytechef.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.lang.Nullable;
 
 /**
@@ -48,12 +49,15 @@ public interface ChatModel {
 
         org.springframework.ai.chat.model.ChatModel chatModel = createChatModel(inputParameters, connectionParameters);
 
-        List<org.springframework.ai.chat.messages.Message> messages =
-            ModelUtils.getMessages(inputParameters, actionContext);
+        List<org.springframework.ai.chat.messages.Message> messages = ModelUtils.getMessages(
+            inputParameters, actionContext);
 
         ChatClient.CallResponseSpec callResponseSpec = ChatClient.create(chatModel)
             .prompt()
             .messages(messages)
+            .advisors(
+                SimpleLoggerAdvisor.builder()
+                    .build())
             .call();
 
         return ModelUtils.getChatResponse(callResponseSpec, inputParameters, actionContext);

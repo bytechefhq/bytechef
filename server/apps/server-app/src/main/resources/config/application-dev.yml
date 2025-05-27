@@ -2,6 +2,7 @@ logging:
   level:
     ROOT: INFO
     com.bytechef: DEBUG
+    org.springframework.ai.chat.client.advisor': DEBUG
 
 server:
   port: 9555
