@@ -211,7 +211,7 @@ const WorkflowNodesPopoverMenu = ({
     }, []);
 
     if (!parentId || !parentType) {
-        console.log(`Parent "${parentId}" of type "${parentType}" not found.`);
+        console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
 
         return <></>;
     }
