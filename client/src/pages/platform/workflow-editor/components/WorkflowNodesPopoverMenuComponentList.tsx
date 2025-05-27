@@ -125,8 +125,9 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
-                <header className="flex items-center gap-1 rounded-t-lg bg-background p-3 text-center">
+                <header className="flex items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
                     <Input
+                        className="bg-white shadow-none"
                         name="workflowNodeFilter"
                         onChange={(event) => setFilter(event.target.value)}
                         placeholder="Filter actions, triggers and flows"
