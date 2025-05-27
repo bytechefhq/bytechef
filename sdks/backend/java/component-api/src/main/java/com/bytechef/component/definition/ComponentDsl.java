@@ -1147,10 +1147,8 @@ public final class ComponentDsl {
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
         private List<? extends ActionDefinition> actionDefinitions;
-        private Boolean additionalConnections;
         private List<ComponentCategory> componentCategories;
         private ConnectionDefinition connectionDefinition;
-        private Boolean connectionRequired;
         private Boolean customAction;
         private Help customActionHelp;
         private List<? extends ClusterElementDefinition<?>> clusterElementDefinitions;
@@ -1189,12 +1187,6 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableComponentDefinition additionalConnections(boolean additionalConnections) {
-            this.additionalConnections = additionalConnections;
-
-            return this;
-        }
-
         public ModifiableComponentDefinition categories(List<ComponentCategory> categories) {
             this.componentCategories = new ArrayList<>(categories);
 
@@ -1221,12 +1213,6 @@ public final class ComponentDsl {
 
         public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
             this.connectionDefinition = connectionDefinition;
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition connectionRequired(boolean connectionRequired) {
-            this.connectionRequired = connectionRequired;
 
             return this;
         }
@@ -1421,10 +1407,8 @@ public final class ComponentDsl {
             }
 
             return Objects.equals(actionDefinitions, that.actionDefinitions) &&
-                Objects.equals(additionalConnections, that.additionalConnections) &&
                 Objects.equals(componentCategories, that.componentCategories) &&
                 Objects.equals(connectionDefinition, that.connectionDefinition) &&
-                Objects.equals(connectionRequired, that.connectionRequired) &&
                 Objects.equals(customAction, that.customAction) &&
                 Objects.equals(customActionHelp, that.customActionHelp) &&
                 Objects.equals(clusterElementDefinitions, that.clusterElementDefinitions) &&
@@ -1449,9 +1433,7 @@ public final class ComponentDsl {
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", connectionDefinition=" + connectionDefinition +
-                ", additionalConnections=" + additionalConnections +
                 ", categories='" + componentCategories + '\'' +
-                ", connectionRequired=" + connectionRequired +
                 ", customAction=" + customAction +
                 ", customActionHelp=" + customActionHelp +
                 ", clusterElementDefinitions=" + clusterElementDefinitions +
