@@ -12,9 +12,12 @@ export default function calculateNodeInsertIndex(targetId: string): number {
 
     const branchTasks = workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('branch/')) || [];
 
+    const eachTasks = workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('each/')) || [];
+
     let tasksInConditions = 0;
     let tasksInLoops = 0;
     let tasksInBranches = 0;
+    let tasksInEach = 0;
 
     if (conditionTasks.length) {
         tasksInConditions = conditionTasks.reduce((count, conditionTask) => {
@@ -37,5 +40,15 @@ export default function calculateNodeInsertIndex(targetId: string): number {
         }, 0);
     }
 
-    return nextTaskIndex - tasksInConditions - tasksInLoops - tasksInBranches;
+    if (eachTasks.length) {
+        tasksInEach = eachTasks.reduce((count, eachTask) => {
+            if (eachTask.parameters?.iteratee) {
+                count += 1;
+            }
+
+            return count;
+        }, 0);
+    }
+
+    return nextTaskIndex - tasksInConditions - tasksInLoops - tasksInBranches - tasksInEach;
 }
