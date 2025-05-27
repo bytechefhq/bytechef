@@ -113,18 +113,10 @@ public class ModelUtils {
     public static List<Message> getMessages(Parameters inputParameters, ActionContext actionContext) {
         List<ChatModel.Message> chatModelMessages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
 
-        List<Message> messages = new ArrayList<>(
+        return new ArrayList<>(
             chatModelMessages.stream()
                 .map(chatModelMessage -> createMessage(chatModelMessage, actionContext))
                 .toList());
-
-        String responseSchema = inputParameters.getString(RESPONSE_SCHEMA);
-
-        if (responseSchema != null && !responseSchema.isEmpty()) {
-            messages.add(new SystemMessage(responseSchema));
-        }
-
-        return messages;
     }
 
     public static RestClient.Builder getRestClientBuilder() {
