@@ -138,6 +138,6 @@ public class LinearUpdateIssueAction {
             .append(inputParameters.getRequiredString(ISSUE_ID))
             .append("\"){success issue{id title}}}");
 
-        return query;
+        return sb.toString();
     }
 }

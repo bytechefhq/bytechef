@@ -137,6 +137,6 @@ public class LinearCreateProjectAction {
 
         sb.append("}){success project{id name}}}");
 
-        return query;
+        return sb.toString();
     }
 }
