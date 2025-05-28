@@ -102,6 +102,39 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(2)
+    public SecurityFilterChain actuatorFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
+        http
+            .securityMatcher("/actuator/**")
+            .cors(withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers(mvc.pattern("/actuator/health"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/health/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/info"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/metrics"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/metrics/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/prometheus"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/**"))
+                .hasAuthority(AuthorityConstants.SYSTEM_ADMIN))
+            .httpBasic(withDefaults());
+
+        AuthenticationProvider authenticationProvider = getSystemAuthenticationProvider(security.getSystem());
+
+        if (authenticationProvider != null) {
+            http.authenticationProvider(authenticationProvider);
+        }
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(3)
     public SecurityFilterChain apiFilterChain(
         HttpSecurity http, MvcRequestMatcher.Builder mvc,
         List<AuthenticationProviderContributor> authenticationProviderContributors,
@@ -183,7 +216,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    @Order(3)
+    @Order(4)
     public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
         http
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
@@ -192,20 +225,6 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/health"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/health/**"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/info"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/metrics"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/metrics/**"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/prometheus"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/**"))
-                .hasAuthority(AuthorityConstants.SYSTEM_ADMIN)
                 .requestMatchers(mvc.pattern("/approvals/**"))
                 .permitAll()
                 .requestMatchers(mvc.pattern("/assets/**"))
@@ -227,12 +246,6 @@ public class SecurityConfiguration {
                 .requestMatchers(mvc.pattern("/webhooks/**"))
                 .permitAll())
             .httpBasic(withDefaults());
-
-        AuthenticationProvider authenticationProvider = getSystemAuthenticationProvider(security.getSystem());
-
-        if (authenticationProvider != null) {
-            http.authenticationProvider(authenticationProvider);
-        }
 
         return http.build();
     }
