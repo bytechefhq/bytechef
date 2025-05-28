@@ -1,0 +1,16 @@
+extend type Query {
+    mcpProject(id: ID): McpProject
+    mcpProjects: [McpProject]
+    mcpProjectsByServerId(mcpServerId: ID): [McpProject]
+}
+
+type McpProject {
+    id: ID!
+    projectDeploymentId: ID!
+    mcpServerId: ID!
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}

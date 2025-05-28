@@ -1,0 +1,19 @@
+extend type Query {
+    mcpComponent(id: ID): McpComponent
+    mcpComponents: [McpComponent]
+    mcpComponentsByServerId(mcpServerId: ID): [McpComponent]
+}
+
+type McpComponent {
+    id: ID!
+    componentName: String!
+    componentVersion: Int!
+    mcpServerId: ID!
+    connectionId: ID
+    mcpActions: [McpAction]
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}

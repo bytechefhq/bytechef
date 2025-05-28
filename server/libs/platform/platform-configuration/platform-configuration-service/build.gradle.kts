@@ -1,6 +1,4 @@
 dependencies {
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
-
     implementation("org.apache.commons:commons-lang3")
     implementation("org.aspectj:aspectjweaver")
     implementation("org.springframework:spring-context")
@@ -10,6 +8,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:modules:components:ai:llm"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-mail"))
 

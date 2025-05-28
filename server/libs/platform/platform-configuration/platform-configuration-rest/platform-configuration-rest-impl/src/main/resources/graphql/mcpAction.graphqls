@@ -1,0 +1,19 @@
+extend type Query {
+    mcpAction(id: ID): McpAction
+    mcpActions: [McpAction]
+    mcpActionsByComponentId(mcpComponentId: ID): [McpAction]
+}
+
+type McpAction {
+    id: ID!
+    name: String!
+    parameters: Map
+    mcpComponentId: ID!
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+scalar Map
