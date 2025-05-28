@@ -1,0 +1,51 @@
+extend type Query {
+    mcpServer(id: ID): McpServer
+    mcpServers: [McpServer]
+}
+
+extend type Mutation {
+    createMcpServer(input: McpServerInput!): McpServer
+    updateMcpServer(id: ID!, input: McpServerUpdateInput!): McpServer
+}
+
+scalar Long
+
+enum ModeType {
+    AUTOMATION
+    EMBEDDED
+}
+
+enum Environment {
+    DEVELOPMENT
+    STAGING
+    PRODUCTION
+}
+
+type McpServer {
+    id: ID!
+    name: String!
+    type: ModeType!
+    environment: Environment!
+    enabled: Boolean!
+    mcpComponents: [McpComponent]
+    mcpProjects: [McpProject]
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+input McpServerInput {
+    name: String!
+    type: ModeType!
+    environment: Environment!
+    enabled: Boolean
+}
+
+input McpServerUpdateInput {
+    name: String
+    type: ModeType
+    environment: Environment
+    enabled: Boolean
+}

@@ -1,0 +1,243 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.platform.configuration.domain;
+
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.tag.domain.Tag;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
+import org.springframework.data.relational.core.mapping.Table;
+
+/**
+ * Domain class representing an MCP server.
+ *
+ * @author Ivica Cardic
+ */
+@Table
+public final class McpServer {
+
+    @Id
+    private Long id;
+
+    @Column
+    private String name;
+
+    @Column
+    private int type;
+
+    @Column
+    private int environment;
+
+    @Column
+    private boolean enabled;
+
+    @MappedCollection(idColumn = "mcp_server_id")
+    private Set<McpServerTag> mcpServerTags = new HashSet<>();
+
+    @CreatedBy
+    @Column("created_by")
+    private String createdBy;
+
+    @Column("created_date")
+    @CreatedDate
+    private Instant createdDate;
+
+    @Column("last_modified_by")
+    @LastModifiedBy
+    private String lastModifiedBy;
+
+    @Column("last_modified_date")
+    @LastModifiedDate
+    private Instant lastModifiedDate;
+
+    @Version
+    private int version;
+
+    public McpServer() {
+    }
+
+    public McpServer(Long id) {
+        this.id = id;
+    }
+
+    public McpServer(String name, ModeType type, Environment environment) {
+        this.name = name;
+        this.type = type.ordinal();
+        this.environment = environment.ordinal();
+        this.enabled = true;
+    }
+
+    public McpServer(String name, ModeType type, Environment environment, boolean enabled) {
+        this.name = name;
+        this.type = type.ordinal();
+        this.environment = environment.ordinal();
+        this.enabled = enabled;
+    }
+
+    public McpServer(Long id, String name, ModeType type, Environment environment) {
+        this.id = id;
+        this.name = name;
+        this.type = type.ordinal();
+        this.environment = environment.ordinal();
+        this.enabled = true;
+    }
+
+    public McpServer(Long id, String name, ModeType type, Environment environment, boolean enabled) {
+        this.id = id;
+        this.name = name;
+        this.type = type.ordinal();
+        this.environment = environment.ordinal();
+        this.enabled = enabled;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ModeType getType() {
+        return ModeType.values()[type];
+    }
+
+    public Environment getEnvironment() {
+        return Environment.values()[environment];
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public List<Long> getTagIds() {
+        return mcpServerTags
+            .stream()
+            .map(McpServerTag::getTagId)
+            .toList();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        McpServer mcpServer = (McpServer) o;
+
+        return Objects.equals(id, mcpServer.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(ModeType type) {
+        this.type = type.ordinal();
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment.ordinal();
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public void setTagIds(List<Long> tagIds) {
+        this.mcpServerTags = new HashSet<>();
+
+        if (!CollectionUtils.isEmpty(tagIds)) {
+            for (Long tagId : tagIds) {
+                mcpServerTags.add(new McpServerTag(tagId));
+            }
+        }
+    }
+
+    public void setTags(List<Tag> tags) {
+        if (!CollectionUtils.isEmpty(tags)) {
+            setTagIds(CollectionUtils.map(tags, Tag::getId));
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "McpServer{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", type='" + type + '\'' +
+            ", environment='" + environment + '\'' +
+            ", enabled=" + enabled +
+            ", mcpServerTags=" + mcpServerTags +
+            ", version=" + version +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            '}';
+    }
+}

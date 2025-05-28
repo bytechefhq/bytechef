@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20250313170120" author="Ivica Cardic">
+        <createTable tableName="mcp_server">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_mcp_server_name" tableName="mcp_server" columnNames="name" />
+
+        <createTable tableName="mcp_component">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_server_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_component_mcp_server_id" references="mcp_server(id)"/>
+            </column>
+            <column name="connection_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="component_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_mcp_component_name_version_server" tableName="mcp_component" columnNames="component_name,component_version,mcp_server_id" />
+
+        <createTable tableName="mcp_action">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_component_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_action_mcp_component_id" references="mcp_component(id)"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parameters" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_mcp_action_name_component" tableName="mcp_action" columnNames="name,mcp_component_id" />
+
+        <createTable tableName="mcp_project">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_server_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_project_mcp_server_id" references="mcp_server(id)"/>
+            </column>
+            <column name="project_deployment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_mcp_project_project_deployment_server" tableName="mcp_project" columnNames="project_deployment_id,mcp_server_id" />
+
+        <createTable tableName="mcp_server_tag">
+            <column name="mcp_server_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="mcp_server_tag" columnNames="mcp_server_id,tag_id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_server_tag"
+            baseColumnNames="mcp_server_id"
+            constraintName="fk_mcp_server_tag_mcp_server"
+            referencedTableName="mcp_server"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_server_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_mcp_server_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20250313170120-1" author="Ivica Cardic" contextFilter="mono">
+        <addForeignKeyConstraint
+            baseTableName="mcp_component"
+            baseColumnNames="connection_id"
+            constraintName="fk_mcp_component_connection"
+            referencedTableName="connection"
+            referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
