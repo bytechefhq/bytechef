@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-22T14:31:33.822893+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-28T22:49:14.820205+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private @Nullable String header;

@@ -22,6 +22,16 @@ import {
     OptionToJSON,
 } from '../models/index';
 
+export interface GetClusterElementNodeOptionsRequest {
+    id: string;
+    workflowNodeName: string;
+    clusterElementType: string;
+    clusterElement: string;
+    propertyName: string;
+    lookupDependsOnPaths?: Array<string>;
+    searchText?: string;
+}
+
 export interface GetWorkflowNodeOptionsRequest {
     id: string;
     workflowNodeName: string;
@@ -34,6 +44,77 @@ export interface GetWorkflowNodeOptionsRequest {
  * 
  */
 export class WorkflowNodeOptionApi extends runtime.BaseAPI {
+
+    /**
+     * Get an action or trigger property options shown in the editor.
+     * Get an action or trigger property options shown in the editor
+     */
+    async getClusterElementNodeOptionsRaw(requestParameters: GetClusterElementNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Option>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getClusterElementNodeOptions().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling getClusterElementNodeOptions().'
+            );
+        }
+
+        if (requestParameters['clusterElementType'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElementType',
+                'Required parameter "clusterElementType" was null or undefined when calling getClusterElementNodeOptions().'
+            );
+        }
+
+        if (requestParameters['clusterElement'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElement',
+                'Required parameter "clusterElement" was null or undefined when calling getClusterElementNodeOptions().'
+            );
+        }
+
+        if (requestParameters['propertyName'] == null) {
+            throw new runtime.RequiredError(
+                'propertyName',
+                'Required parameter "propertyName" was null or undefined when calling getClusterElementNodeOptions().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['lookupDependsOnPaths'] != null) {
+            queryParameters['lookupDependsOnPaths'] = requestParameters['lookupDependsOnPaths'];
+        }
+
+        if (requestParameters['searchText'] != null) {
+            queryParameters['searchText'] = requestParameters['searchText'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/{id}/cluster-element-types/{clusterElementType}/cluster-elements/{clusterElement}/properties/{workflowNodeName}/options/{propertyName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElement"}}`, encodeURIComponent(String(requestParameters['clusterElement']))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OptionFromJSON));
+    }
+
+    /**
+     * Get an action or trigger property options shown in the editor.
+     * Get an action or trigger property options shown in the editor
+     */
+    async getClusterElementNodeOptions(requestParameters: GetClusterElementNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Option>> {
+        const response = await this.getClusterElementNodeOptionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get an action or trigger property options shown in the editor.
