@@ -92,8 +92,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
                     return actionDefinitionFacade.executeOptions(
-                        workflowNodeType.name(), workflowNodeType.version(),
-                        workflowNodeType.operation(), propertyName,
+                        workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
                         workflowTask.evaluateParameters(
                             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
                         lookupDependsOnPaths, searchText, connectionId);
