@@ -903,6 +903,68 @@ paths:
                 properties:
                   description:
                     type: string
+
+  /workflows/{id}/cluster-element-types/{clusterElementType}/cluster-elements/{clusterElement}/properties/{workflowNodeName}/options/{propertyName}:
+    get:
+      description: "Get an action or trigger property options shown in the editor."
+      summary: "Get an action or trigger property options shown in the editor"
+      tags:
+        - "workflow-node-option"
+      operationId: "getClusterElementNodeOptions"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "clusterElementType"
+          description: "The name of a cluster element type."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "clusterElement"
+          description: "The name of a cluster element."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "propertyName"
+          description: "The name of a property."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "lookupDependsOnPaths"
+          description: "The list of dependency paths."
+          required: false
+          in: "query"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+        - name: "searchText"
+          description: "Optional search text used to filter option items"
+          in: "query"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Option"
+
   /workflows/{id}/dynamic-properties/{workflowNodeName}/properties/{propertyName}:
     get:
       description: "Get dynamic properties for an action or trigger property shown in the editor."
