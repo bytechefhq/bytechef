@@ -20,32 +20,52 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURA
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
+import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
-@Disabled
 class InfobipUtilsTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Map<String, Object> responseMap = Map.of(CONFIGURATION_KEY, "abc");
+    private final Context mockedContext = mock(Context.class);
+
+    @Test
+    void testGetTemplates() {
+        List<Map<String, String>> templates = List.of(Map.of("name", "template", "language", "en"));
+
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("templates", templates));
+
+        assertEquals(templates, InfobipUtils.getTemplates(anyString(), mockedContext));
+    }
 
     @Test
     void testGetWebhookEnableOutput() {
+        Map<String, Object> responseMap = Map.of(CONFIGURATION_KEY, "abc");
+
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -67,8 +87,7 @@ class InfobipUtilsTest {
         Map<String, Object> expectedBody = Map.of(
             "channel", "SMS",
             NUMBER, "number",
-            "forwarding", Map.of("type", "HTTP_FORWARD", "url", "webhookUrl"),
-            "keyword", "");
+            "forwarding", Map.of("type", "HTTP_FORWARD", "url", "webhookUrl"));
 
         assertEquals(expectedBody, body.getContent());
     }

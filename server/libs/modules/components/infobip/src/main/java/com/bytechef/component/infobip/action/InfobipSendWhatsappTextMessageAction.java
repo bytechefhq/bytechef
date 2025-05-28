@@ -17,22 +17,13 @@
 package com.bytechef.component.infobip.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
-import static com.bytechef.component.infobip.constant.InfobipConstants.DESCRIPTION;
 import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
-import static com.bytechef.component.infobip.constant.InfobipConstants.GROUP_ID;
-import static com.bytechef.component.infobip.constant.InfobipConstants.GROUP_NAME;
-import static com.bytechef.component.infobip.constant.InfobipConstants.ID;
-import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGE_COUNT;
-import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGE_ID;
-import static com.bytechef.component.infobip.constant.InfobipConstants.NAME;
-import static com.bytechef.component.infobip.constant.InfobipConstants.STATUS;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
+import static com.bytechef.component.infobip.constant.InfobipConstants.WHATSAPP_MESSAGE_OUTPUT_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -47,8 +38,8 @@ import java.util.Map;
 public class InfobipSendWhatsappTextMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendWhatsappTextMessage")
-        .title("Send Whatsapp Text Message")
-        .description("Send a new SMS message")
+        .title("Send WhatsApp Text Message")
+        .description("Send a  WhatsApp text message to a single recipient.")
         .properties(
             string(FROM)
                 .label("From")
@@ -67,31 +58,7 @@ public class InfobipSendWhatsappTextMessageAction {
                 .description("Content of the message being sent.")
                 .maxLength(4096)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(TO)
-                            .description("The destination address of the message."),
-                        integer(MESSAGE_COUNT)
-                            .description("Number of messages required to deliver."),
-                        string(MESSAGE_ID)
-                            .description("ID of the message sent."),
-                        object(STATUS)
-                            .description("Status of the message.")
-                            .properties(
-                                integer(GROUP_ID)
-                                    .description("Status group ID."),
-                                string(GROUP_NAME)
-                                    .description("Status group name."),
-                                integer(ID)
-                                    .description("Status ID."),
-                                string(NAME)
-                                    .description("Status name."),
-                                string(DESCRIPTION)
-                                    .description("Human-readable description of the status."),
-                                string("action")
-                                    .description("Action that should be taken to eliminate error.")))))
+        .output(outputSchema(WHATSAPP_MESSAGE_OUTPUT_PROPERTY))
         .perform(InfobipSendWhatsappTextMessageAction::perform);
 
     private InfobipSendWhatsappTextMessageAction() {
