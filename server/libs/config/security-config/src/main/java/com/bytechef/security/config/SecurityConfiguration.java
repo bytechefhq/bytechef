@@ -32,7 +32,6 @@ import com.bytechef.security.web.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import org.springframework.context.annotation.Bean;
@@ -78,22 +77,6 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
-    private static final String[] PERMIT_ALL_PATTERNS = new String[] {
-        "/approvals/**",
-        "/assets/**",
-        "/file-entries/**",
-        "/i18n/**",
-        "/icons/**",
-        "/index.html",
-        "/swagger-ui/**",
-        "/swagger-ui.html",
-        "/v3/api-docs/**",
-        "/webhooks/**",
-        "/*.ico",
-        "/*.png",
-        "/*.svg"
-    };
-
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final RememberMeServices rememberMeServices;
@@ -115,38 +98,6 @@ public class SecurityConfiguration {
         List<FilterBeforeContributor> filterBeforeContributors) {
 
         return new FilterBeforeContributorConfigurer<>(filterBeforeContributors);
-    }
-
-    @Bean
-    @Order(3)
-    public SecurityFilterChain actuatorFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
-        http
-            .securityMatcher("/actuator/**")
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(mvc.pattern("/actuator/health"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/health/**"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/info"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/metrics"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/metrics/**"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/prometheus"))
-                .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/**"))
-                .hasAuthority(AuthorityConstants.SYSTEM_ADMIN))
-            .httpBasic(withDefaults());
-
-        AuthenticationProvider authenticationProvider = getSystemAuthenticationProvider(security.getSystem());
-
-        if (authenticationProvider != null) {
-            http.authenticationProvider(authenticationProvider);
-        }
-
-        return http.build();
     }
 
     @Bean
@@ -232,19 +183,56 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    @Order(4)
+    @Order(3)
     public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
         http
-            .securityMatcher(PERMIT_ALL_PATTERNS)
+            .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(authz -> {
-                Arrays.stream(PERMIT_ALL_PATTERNS)
-                    .forEach(pattern -> authz.requestMatchers(mvc.pattern(pattern))
-                        .permitAll());
-                authz.anyRequest()
-                    .authenticated();
-            });
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/health"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/health/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/info"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/metrics"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/metrics/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/prometheus"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/actuator/**"))
+                .hasAuthority(AuthorityConstants.SYSTEM_ADMIN)
+                .requestMatchers(mvc.pattern("/approvals/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/assets/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/file-entries/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/i18n/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/icons/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/index.html"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/swagger-ui/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/swagger-ui.html"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/v3/api-docs/**"))
+                .permitAll()
+                .requestMatchers(mvc.pattern("/webhooks/**"))
+                .permitAll())
+            .httpBasic(withDefaults());
+
+        AuthenticationProvider authenticationProvider = getSystemAuthenticationProvider(security.getSystem());
+
+        if (authenticationProvider != null) {
+            http.authenticationProvider(authenticationProvider);
+        }
 
         return http.build();
     }
