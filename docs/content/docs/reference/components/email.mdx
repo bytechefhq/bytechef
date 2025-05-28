@@ -49,6 +49,7 @@ Name: send
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| port | Port | INTEGER | `Defines the port to connect to the email server.` | true |
 | from | From Email | STRING | `From who to send the email.` | true |
 | to | To Email | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Who to send the email to.` | true |
 | cc | CC Email | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Who to CC on the email.` | null |
@@ -64,6 +65,7 @@ Name: send
   "label" : "Send",
   "name" : "send",
   "parameters" : {
+    "port" : 1,
     "from" : "",
     "to" : [ "" ],
     "cc" : [ "" ],
@@ -98,6 +100,8 @@ Name: get
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| port | Port | INTEGER | `Defines the port to connect to the email server.` | true |
+| protocol | Protocol | STRING <details> <summary> Options </summary> imap, pop3 </details> | `Protocol defines communication procedure. IMAP allows receiving emails. POP3 is older protocol for receiving emails.` | true |
 | from | From Email | STRING | `From who the email was sent.` | true |
 | subject | Subject contains | STRING | `Filters email messages where subject contains this keyword. Character matching is case insensitive.` | true |
 
@@ -107,6 +111,8 @@ Name: get
   "label" : "Get Mail",
   "name" : "get",
   "parameters" : {
+    "port" : 1,
+    "protocol" : "",
     "from" : "",
     "subject" : ""
   },
@@ -116,9 +122,39 @@ Name: get
 
 #### Output
 
-This action does not produce any output.
 
 
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| cc | STRING |  |
+| content | STRING |  |
+| contentType | STRING |  |
+| from | STRING |  |
+| hasAttachments | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| subject | STRING |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "cc" : "",
+  "content" : "",
+  "contentType" : "",
+  "from" : "",
+  "hasAttachments" : false,
+  "subject" : ""
+} ]
+```
 
 
 
