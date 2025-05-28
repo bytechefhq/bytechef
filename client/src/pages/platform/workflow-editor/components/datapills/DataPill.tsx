@@ -8,7 +8,7 @@ import resolvePath from 'object-resolve-path';
 import {MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {encodePath, transformPathForObjectAccess, transformValueForObjectAccess} from '../../utils/encodingUtils';
+import {encodePath, transformPathForObjectAccess} from '../../utils/encodingUtils';
 
 interface HandleDataPillClickProps {
     workflowNodeName: string;
@@ -114,7 +114,7 @@ const DataPill = ({
             .focus()
             .insertContent({
                 attrs: {
-                    id: transformValueForObjectAccess(value),
+                    id: transformPathForObjectAccess(value),
                 },
                 type: 'mention',
             })
