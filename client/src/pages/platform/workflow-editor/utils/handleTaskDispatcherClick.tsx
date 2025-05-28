@@ -8,10 +8,12 @@ import {
     UpdateWorkflowMutationType,
 } from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
+import {Edge} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
+import calculateNodeInsertIndex from './calculateNodeInsertIndex';
 import getFormattedName from './getFormattedName';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
@@ -20,7 +22,7 @@ import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 const fallbackIcon = <ComponentIcon className="size-9 text-gray-700" />;
 
 interface HandleTaskDispatcherClickProps {
-    edge?: boolean;
+    edge?: Edge;
     parentId: number;
     parentType: StructureParentType;
     queryClient: QueryClient;
@@ -110,9 +112,7 @@ export default async function handleTaskDispatcherClick({
     }
 
     if (edge) {
-        const taskNodeName = sourceNodeId?.includes('-') ? sourceNodeId?.split('-')[0] : sourceNodeId;
-
-        nodeIndex = (workflow.tasks?.findIndex((task) => task.name === taskNodeName) ?? 0) + 1;
+        nodeIndex = calculateNodeInsertIndex(edge.target);
     }
 
     saveWorkflowDefinition({

@@ -31,7 +31,7 @@ export default function calculateNodeInsertIndex(targetId: string): number {
     }
 
     if (loopTasks.length) {
-        tasksInLoops = loopTasks.reduce((count, loopTask) => count + loopTask.parameters?.iteratee?.length || 0, 0);
+        tasksInLoops = loopTasks.reduce((count, loopTask) => count + (loopTask.parameters?.iteratee?.length || 0), 0);
     }
 
     if (branchTasks.length) {
@@ -46,6 +46,7 @@ export default function calculateNodeInsertIndex(targetId: string): number {
             return count + defaultTasks + caseTasks;
         }, 0);
     }
+
     if (eachTasks.length) {
         tasksInEach = eachTasks.reduce((count, eachTask) => {
             if (eachTask.parameters?.iteratee) {
