@@ -34,6 +34,7 @@ public class InfobipConstants {
     public static final String GROUP_ID = "groupId";
     public static final String GROUP_NAME = "groupName";
     public static final String ID = "id";
+    public static final String KEYWORD = "keyword";
     public static final String MESSAGES = "messages";
     public static final String MESSAGE_COUNT = "messageCount";
     public static final String MESSAGE_ID = "messageId";

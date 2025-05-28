@@ -58,7 +58,7 @@ class InfobipUtilsTest {
             .thenReturn(responseMap);
 
         WebhookEnableOutput webhookEnableOutput =
-            InfobipUtils.getWebhookEnableOutput("number", "SMS", "webhookUrl", mockedTriggerContext);
+            InfobipUtils.getWebhookEnableOutput("number", "SMS", null, "webhookUrl", mockedTriggerContext);
 
         assertEquals(new WebhookEnableOutput(Map.of(CONFIGURATION_KEY, "abc"), null), webhookEnableOutput);
 

@@ -17,14 +17,15 @@
 package com.bytechef.component.infobip.util;
 
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
+import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author Monika Kušter
@@ -32,16 +33,24 @@ import java.util.UUID;
 public class InfobipUtils {
 
     public static WebhookEnableOutput getWebhookEnableOutput(
-        String number, String channel, String webhookUrl, TriggerContext triggerContext) {
+        String number, String channel, String keyword, String webhookUrl, TriggerContext triggerContext) {
 
         Map<String, Object> body =
             triggerContext.http(http -> http.post("/resource-management/1/inbound-message-configurations"))
                 .body(
                     Http.Body.of(
-                        "keyword", String.valueOf(UUID.randomUUID()),
-                        "channel", channel,
-                        NUMBER, number,
-                        "forwarding", Map.of("type", "HTTP_FORWARD", "url", webhookUrl)))
+                        new HashMap<>() {
+                            {
+                                put("channel", channel);
+                                put("forwarding", Map.of("type", "HTTP_FORWARD", "url", webhookUrl));
+
+                                if (keyword != null) {
+                                    put(KEYWORD, keyword);
+                                }
+
+                                put(NUMBER, number);
+                            }
+                        }))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
