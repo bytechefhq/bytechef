@@ -184,6 +184,20 @@ export function transformPathForObjectAccess(path: string): string {
     const firstSegment = segments[0];
 
     const formattedSegments = segments.slice(1).map((segment) => {
+        const hasArrayNotation = /\[\d+\]$/.test(segment);
+
+        if (hasArrayNotation) {
+            const propertyMatch = segment.match(/^([^\[]+)(\[\d+\])$/);
+
+            if (propertyMatch) {
+                const [, propertyName, arrayAccess] = propertyMatch;
+
+                const propertyNeedsBrackets = /[^a-zA-Z0-9_$]/.test(propertyName);
+
+                return propertyNeedsBrackets ? `['${propertyName}']${arrayAccess}` : `.${propertyName}${arrayAccess}`;
+            }
+        }
+
         const hasSpecialChars = /[^a-zA-Z0-9_$]/.test(segment);
         const startsWithDigit = /^\d/.test(segment);
 
