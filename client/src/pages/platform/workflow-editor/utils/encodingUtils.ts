@@ -187,7 +187,7 @@ export function transformPathForObjectAccess(path: string): string {
         const hasArrayNotation = /\[\d+\]$/.test(segment);
 
         if (hasArrayNotation) {
-            const propertyMatch = segment.match(/^([^\[]+)(\[\d+\])$/);
+            const propertyMatch = segment.match(/^([^[]+)(\[\d+\])$/);
 
             if (propertyMatch) {
                 const [, propertyName, arrayAccess] = propertyMatch;
