@@ -54,5 +54,4 @@ abstract class AbstractInfobipActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
     }
-
 }

@@ -16,21 +16,52 @@
 
 package com.bytechef.component.infobip.util;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
+import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
 import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD;
+import static com.bytechef.component.infobip.constant.InfobipConstants.NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Monika Kušter
  */
 public class InfobipUtils {
+
+    public static List<Map<String, Object>> getTemplates(String sender, Context context) {
+        Map<String, List<Map<String, Object>>> body = context
+            .http(http -> http.get("/whatsapp/2/senders/%s/templates".formatted(sender)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return body.get("templates");
+    }
+
+    public static List<Option<String>> getTemplateOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Map<String, Object> map : getTemplates(inputParameters.getRequiredString(FROM), context)) {
+            options.add(option((String) map.get(NAME), (String) map.get(NAME)));
+        }
+
+        return options;
+    }
 
     public static WebhookEnableOutput getWebhookEnableOutput(
         String number, String channel, String keyword, String webhookUrl, TriggerContext triggerContext) {
@@ -64,5 +95,4 @@ public class InfobipUtils {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
-
 }

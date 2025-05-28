@@ -22,6 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.infobip.action.InfobipSendSMSAction;
+import com.bytechef.component.infobip.action.InfobipSendWhatsAppTemplateMessageAction;
 import com.bytechef.component.infobip.action.InfobipSendWhatsappTextMessageAction;
 import com.bytechef.component.infobip.connection.InfobipConnection;
 import com.bytechef.component.infobip.trigger.InfobipNewSMSTrigger;
@@ -45,6 +46,7 @@ public class InfobipComponentHandler implements ComponentHandler {
         .connection(InfobipConnection.CONNECTION_DEFINITION)
         .actions(
             InfobipSendSMSAction.ACTION_DEFINITION,
+            InfobipSendWhatsAppTemplateMessageAction.ACTION_DEFINITION,
             InfobipSendWhatsappTextMessageAction.ACTION_DEFINITION)
         .triggers(
             InfobipNewSMSTrigger.TRIGGER_DEFINITION,
