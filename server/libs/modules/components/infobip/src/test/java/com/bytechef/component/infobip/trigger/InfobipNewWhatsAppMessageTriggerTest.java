@@ -17,6 +17,7 @@
 package com.bytechef.component.infobip.trigger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.infobip.util.InfobipUtils;
@@ -33,8 +34,8 @@ class InfobipNewWhatsAppMessageTriggerTest extends AbstractInfobipTriggerTest {
     void testWebhookEnable() {
         infobipUtilsMockedStatic
             .when(() -> InfobipUtils.getWebhookEnableOutput(
-                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                triggerContextArgumentCaptor.capture()))
+                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), any(),
+                stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()))
             .thenReturn(mockedWebhookEnableOutput);
 
         WebhookEnableOutput webhookEnableOutput = InfobipNewWhatsAppMessageTrigger.webhookEnable(

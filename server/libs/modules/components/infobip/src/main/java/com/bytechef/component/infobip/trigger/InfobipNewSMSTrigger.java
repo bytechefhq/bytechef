@@ -19,6 +19,7 @@ package com.bytechef.component.infobip.trigger;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
+import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 import static com.bytechef.component.infobip.util.InfobipUtils.getWebhookEnableOutput;
 import static com.bytechef.component.infobip.util.InfobipUtils.unsubscribeWebhook;
@@ -58,7 +59,9 @@ public class InfobipNewSMSTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
         TriggerContext triggerContext) {
 
-        return getWebhookEnableOutput(inputParameters.getRequiredString(NUMBER), "SMS", webhookUrl, triggerContext);
+        return getWebhookEnableOutput(
+            inputParameters.getRequiredString(NUMBER), "SMS", inputParameters.getString(KEYWORD), webhookUrl,
+            triggerContext);
     }
 
     protected static void webhookDisable(

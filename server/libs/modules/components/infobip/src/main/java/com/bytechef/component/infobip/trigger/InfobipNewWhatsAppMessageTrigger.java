@@ -19,6 +19,7 @@ package com.bytechef.component.infobip.trigger;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
+import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 import static com.bytechef.component.infobip.util.InfobipUtils.getWebhookEnableOutput;
 import static com.bytechef.component.infobip.util.InfobipUtils.unsubscribeWebhook;
@@ -45,7 +46,9 @@ public class InfobipNewWhatsAppMessageTrigger {
         .properties(
             string(NUMBER)
                 .label("Number")
-                .required(true))
+                .required(true),
+            string(KEYWORD)
+                .label("Keyword"))
         .output()
         .webhookEnable(InfobipNewWhatsAppMessageTrigger::webhookEnable)
         .webhookDisable(InfobipNewWhatsAppMessageTrigger::webhookDisable)
@@ -59,7 +62,8 @@ public class InfobipNewWhatsAppMessageTrigger {
         String workflowExecutionId, TriggerContext triggerContext) {
 
         return getWebhookEnableOutput(
-            inputParameters.getRequiredString(NUMBER), "WHATSAPP", webhookUrl, triggerContext);
+            inputParameters.getRequiredString(NUMBER), "WHATSAPP", inputParameters.getString(KEYWORD), webhookUrl,
+            triggerContext);
     }
 
     protected static void webhookDisable(
