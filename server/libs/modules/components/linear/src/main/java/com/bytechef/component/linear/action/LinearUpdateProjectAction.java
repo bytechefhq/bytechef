@@ -134,6 +134,6 @@ public class LinearUpdateProjectAction {
             .append(inputParameters.getRequiredString(PROJECT_ID))
             .append("\"){success project{id name}}}");
 
-        return query;
+        return sb.toString();
     }
 }

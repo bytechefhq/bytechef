@@ -136,6 +136,6 @@ public class LinearCreateIssueAction {
 
         sb.append("}){success issue{id title}}}");
 
-        return query;
+        return sb.toString();
     }
 }
