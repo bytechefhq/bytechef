@@ -107,10 +107,75 @@ Type: OBJECT
 ```
 
 
-### Send Whatsapp Text Message
+### Send Whatsapp Template Message
+Name: sendWhatsappTemplateMessage
+
+`Send a template message.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from | From | STRING | `Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.` | true |
+| to | To | STRING | `Message recipient number. Must be in international format.` | true |
+| templateName | Template Name | STRING <details> <summary> Depends On </summary> from </details> | `Name of the WhatsApp template to use.` | true |
+| placeholders | Placeholders | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of placeholders to use in the template.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Whatsapp Template Message",
+  "name" : "sendWhatsappTemplateMessage",
+  "parameters" : {
+    "from" : "",
+    "to" : "",
+    "templateName" : "",
+    "placeholders" : [ "" ]
+  },
+  "type" : "infobip/v1/sendWhatsappTemplateMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(to), INTEGER\(messageCount), STRING\(messageId), &#123;INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)&#125;\(status)&#125;] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "messages" : [ {
+    "to" : "",
+    "messageCount" : 1,
+    "messageId" : "",
+    "status" : {
+      "groupId" : 1,
+      "groupName" : "",
+      "id" : 1,
+      "name" : "",
+      "description" : "",
+      "action" : ""
+    }
+  } ]
+}
+```
+
+
+### Send WhatsApp Text Message
 Name: sendWhatsappTextMessage
 
-`Send a new SMS message`
+`Send a  WhatsApp text message to a single recipient.`
 
 #### Properties
 
@@ -123,7 +188,7 @@ Name: sendWhatsappTextMessage
 #### Example JSON Structure
 ```json
 {
-  "label" : "Send Whatsapp Text Message",
+  "label" : "Send WhatsApp Text Message",
   "name" : "sendWhatsappTextMessage",
   "parameters" : {
     "from" : "",
@@ -187,7 +252,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| numberKey | Number | STRING |  | true |
+| number | Number | STRING |  | true |
 
 
 #### Output
@@ -200,7 +265,7 @@ The output for this action is dynamic and may vary depending on the input parame
   "label" : "New SMS Message",
   "name" : "newSMS",
   "parameters" : {
-    "numberKey" : ""
+    "number" : ""
   },
   "type" : "infobip/v1/newSMS"
 }
@@ -218,7 +283,8 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| numberKey | Number | STRING |  | true |
+| number | Number | STRING |  | true |
+| keyword | Keyword | STRING |  | null |
 
 
 #### Output
@@ -231,7 +297,8 @@ The output for this action is dynamic and may vary depending on the input parame
   "label" : "New WhatsApp Message",
   "name" : "newWhatsappMessage",
   "parameters" : {
-    "numberKey" : ""
+    "number" : "",
+    "keyword" : ""
   },
   "type" : "infobip/v1/newWhatsappMessage"
 }

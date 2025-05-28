@@ -65,7 +65,7 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(title), STRING\(content), STRING\(displayUrl), STRING\(externalDisplayUrl), &#123;STRING\(id)&#125;\(company), &#123;STRING\(id)&#125;\(user), &#123;STRING\(email), STRING\(name)&#125;\(owner), [&#123;STRING\(memberId), STRING\(memberName), STRING\(memberEmail), STRING\(teamId), STRING\(teamName)&#125;]\(followers), STRING\(state), &#123;STRING\(origin), STRING\(record_id)&#125;\(source), STRING\(tags), [&#123;STRING\(id), STRING\(type), INTEGER\(importance)&#125;]\(features), DATE_TIME\(createdAt), DATE_TIME\(updatedAt), &#123;STRING\(email), STRING\(name), STRING\(uuid)&#125;\(createdBy)&#125;] </details> |  |
-| pageCursor | STRING | Use this pageCursor returned by search results to get next page of results. GET /notes?pageCursor=\{pageCursor\} |
+| pageCursor | STRING | Use this pageCursor returned by search results to get next page of results. GET /notes?pageCursor={pageCursor} |
 | totalResults | INTEGER | Total number of notes that meet the specified parameters for the query |
 
 
