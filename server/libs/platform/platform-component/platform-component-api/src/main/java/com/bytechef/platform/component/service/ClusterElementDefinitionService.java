@@ -45,6 +45,9 @@ public interface ClusterElementDefinitionService {
     List<ClusterElementDefinition> getClusterElementDefinitions(
         String componentName, int componentVersion, ClusterElementType clusterElementType);
 
+    ClusterElementType getClusterElementType(
+        String rootComponentName, int rootComponentVersion, String clusterElementTypeName);
+
     List<ClusterElementDefinition> getRootClusterElementDefinitions(
         String rootComponentName, int rootComponentVersion, String clusterElementTypeName);
 }

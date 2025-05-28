@@ -20,16 +20,21 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.domain.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +46,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
     private final Evaluator evaluator;
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
@@ -49,16 +55,60 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     @SuppressFBWarnings("EI")
     public WorkflowNodeOptionFacadeImpl(
         Evaluator evaluator, ActionDefinitionFacade actionDefinitionFacade,
+        ClusterElementDefinitionService clusterElementDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.evaluator = evaluator;
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Option> getClusterElementNodeOptions(
+        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        String propertyName, List<String> lookupDependsOnPaths, @Nullable String searchText) {
+
+        Long connectionId = workflowTestConfigurationService
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, clusterElementName)
+            .orElse(null);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+            workflowId, workflowTask.getName());
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+
+        ClusterElementType clusterElementType = clusterElementDefinitionService.getClusterElementType(
+            workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName);
+
+        ClusterElement clusterElement = clusterElementMap.getClusterElements(clusterElementType)
+            .stream()
+            .filter(curClusterElement -> Objects.equals(curClusterElement.getName(), clusterElementName))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Cluster element %s not found".formatted(clusterElementName)));
+
+        WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
+
+        return actionDefinitionFacade.executeOptions(
+            clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
+            clusterElementWorkflowNodeType.operation(), propertyName,
+            evaluator.evaluate(
+                clusterElement.getParameters(),
+                MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
+            lookupDependsOnPaths, searchText, connectionId);
     }
 
     @Override

@@ -138,16 +138,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     @Override
-    public List<ClusterElementDefinition> getRootClusterElementDefinitions(
-        String rootComponentName, int rootComponentVersion, String clusterElementTypeName) {
-
-        ClusterElementType clusterElementType = getClusterElementType(
-            rootComponentName, rootComponentVersion, clusterElementTypeName);
-
-        return getClusterElementDefinitions(clusterElementType);
-    }
-
-    private ClusterElementType getClusterElementType(
+    public ClusterElementType getClusterElementType(
         String rootComponentName, int rootComponentVersion, String clusterElementTypeName) {
 
         ClusterRootComponentDefinition rootComponentDefinition =
@@ -161,6 +152,16 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             .orElseThrow(() -> new IllegalArgumentException(
                 "Cluster element type %s not found in root component %s".formatted(
                     clusterElementTypeName, rootComponentName)));
+    }
+
+    @Override
+    public List<ClusterElementDefinition> getRootClusterElementDefinitions(
+        String rootComponentName, int rootComponentVersion, String clusterElementTypeName) {
+
+        ClusterElementType clusterElementType = getClusterElementType(
+            rootComponentName, rootComponentVersion, clusterElementTypeName);
+
+        return getClusterElementDefinitions(clusterElementType);
     }
 
     private ComponentClusterElementDefinitionResult getComponentClusterElementDefinition(

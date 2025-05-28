@@ -45,6 +45,19 @@ public class WorkflowNodeOptionApiController implements WorkflowNodeOptionApi {
     }
 
     @Override
+    public ResponseEntity<List<OptionModel>> getClusterElementNodeOptions(
+        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        String propertyName, List<String> lookupDependsOnPaths, String searchText) {
+
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                workflowNodeOptionFacade.getClusterElementNodeOptions(
+                    workflowId, workflowNodeName, clusterElementTypeName, clusterElementName, propertyName,
+                    lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, searchText),
+                option -> conversionService.convert(option, OptionModel.class)));
+    }
+
+    @Override
     public ResponseEntity<List<OptionModel>> getWorkflowNodeOptions(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         String searchText) {
@@ -56,5 +69,4 @@ public class WorkflowNodeOptionApiController implements WorkflowNodeOptionApi {
                     lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, searchText),
                 option -> conversionService.convert(option, OptionModel.class)));
     }
-
 }
