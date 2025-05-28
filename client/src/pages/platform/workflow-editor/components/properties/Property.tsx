@@ -123,6 +123,7 @@ const Property = ({
     const editorRef = useRef<Editor>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
+    const isSavingRef = useRef(false);
 
     const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
@@ -238,9 +239,12 @@ const Property = ({
 
         const valueToSave = latestValueRef.current;
 
+        isSavingRef.current = true;
+
         saveProperty({
             includeInMetadata: custom,
             path,
+            successCallback: () => (isSavingRef.current = false),
             type,
             updateWorkflowNodeParameterMutation,
             value: isNumericalInput ? parseFloat(valueToSave as string) : valueToSave,
@@ -595,6 +599,11 @@ const Property = ({
 
     // set value to propertyParameterValue
     useEffect(() => {
+        // Skip updating if a save operation is in progress
+        if (isSavingRef.current) {
+            return;
+        }
+
         if (propertyParameterValue === '' || propertyParameterValue === undefined) {
             if (mentionInput) {
                 setMentionInputValue('');
@@ -664,7 +673,7 @@ const Property = ({
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [propertyParameterValue, mentionInput]);
+    }, [propertyParameterValue, mentionInput, controlType, inputValue]);
 
     // set lookup dependencies
     useEffect(() => {
