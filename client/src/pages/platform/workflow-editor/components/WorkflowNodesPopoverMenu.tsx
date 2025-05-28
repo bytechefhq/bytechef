@@ -111,7 +111,7 @@ const WorkflowNodesPopoverMenu = ({
                 });
 
                 await handleTaskDispatcherClick({
-                    edge: !!edge,
+                    edge,
                     parentId,
                     parentType,
                     queryClient,
