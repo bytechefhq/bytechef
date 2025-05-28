@@ -1,12 +1,12 @@
 #!/bin/sh
 
 if [ -z "$1" ]; then
-    echo "Required argument misses. Please provide docker image tag or AWS login flag."
+    echo "Required argument misses. Please provide docker image tag or registry url flag."
     echo ""
     echo "USAGE"
-    echo "    docker-build.sh [--aws url] tag1 [tag2 tag3 ...]"
+    echo "    docker-build.sh [--registry-url url] tag1 [tag2 tag3 ...]"
     echo "DESCRIPTION"
-    echo "    --aws url\t- optional flag to login to AWS ECR with the provided URL."
+    echo "    --registry-url url\t- optional flag to push image to registry other than dockerhub.io If AWS ECR URL script would attemt AWS login."
     echo "    tag\t\t- arbitrary docker image tag(s). In bytechef we use yyyyMMdd to reflect date of image build."
 
     exit 1
@@ -17,7 +17,7 @@ dckr_img_registry_bytechef="bytechef/bytechef"
 
 if [ "$1" = "--registry-url" ]; then
     if [ -z "$2" ]; then
-        echo "AWS URL is required when using the --registry-url flag."
+        echo "Registry URL is required when using the --registry-url flag."
 
         exit 1
     fi
@@ -54,6 +54,15 @@ done
 echo "Push images to the remote docker registry \`$dckr_img_registry_bytechef\`"
 
 for tag in "$@"; do
-    docker push $dckr_img_registry_bytechef_server:$tag .
-    docker push $dckr_img_registry_bytechef:$tag .
+    dckr_push_argument="$dckr_img_registry_bytechef_server:$tag"
+
+    echo "Pushing image \`$dckr_push_argument\`"
+
+    docker push $dckr_push_argument
+
+    dckr_push_argument="$dckr_img_registry_bytechef:$tag"
+
+    echo "Pushing image \`$dckr_push_argument\`"
+
+    docker push $dckr_push_argument
 done
