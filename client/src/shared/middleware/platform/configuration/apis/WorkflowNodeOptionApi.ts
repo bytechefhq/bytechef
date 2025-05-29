@@ -98,7 +98,7 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}/cluster-element-types/{clusterElementType}/cluster-elements/{clusterElement}/properties/{workflowNodeName}/options/{propertyName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElement"}}`, encodeURIComponent(String(requestParameters['clusterElement']))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName']))),
+            path: `/workflows/{id}/cluster-roots/{workflowNodeName}/cluster-element-types/{clusterElementType}/properties/{clusterElement}/options/{propertyName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElement"}}`, encodeURIComponent(String(requestParameters['clusterElement']))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
