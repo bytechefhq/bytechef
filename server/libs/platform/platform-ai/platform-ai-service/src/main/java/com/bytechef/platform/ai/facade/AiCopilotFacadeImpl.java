@@ -46,6 +46,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
     private final ChatClient chatClientComponent;
     private final ChatClient chatClientScript;
     private final WorkflowService workflowService;
+    private final RoutingWorkflow routingWorkflow;
     private final OrchestratorWorkers orchestratorWorkers;
 
     @SuppressFBWarnings("EI")
@@ -58,6 +59,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             .builder(
                 MessageWindowChatMemory.builder()
                     .chatMemoryRepository(new InMemoryChatMemoryRepository())
+                    .maxMessages(50)
                     .build())
             .build();
 
@@ -87,14 +89,16 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
 //                messageChatMemoryAdvisor,
-                questionAnswerAdvisorComponents, qaRetrievedDocuments)
+                questionAnswerAdvisorComponents,
+                qaRetrievedDocuments)
             .build();
 
         this.chatClientWorkflow = chatClientBuilder.clone()
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
                 messageChatMemoryAdvisor,
-                questionAnswerAdvisorWorkflow
+                questionAnswerAdvisorWorkflow,
+                qaRetrievedDocuments
 //                , questionAnswerAdvisorComponents
             )
             .build();
@@ -108,6 +112,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             )
             .build();
 
+        this.routingWorkflow = new RoutingWorkflow(this.chatClientWorkflow);
         this.orchestratorWorkers = new OrchestratorWorkers(this.chatClientComponent);
     }
 
@@ -126,29 +131,45 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
         return switch (contextDTO.source()) {
             case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
-                OrchestratorWorkers.FinalResponse process = orchestratorWorkers.process(message);
+                String route = routingWorkflow.route(message, Map.of("workflow", "The prompt contains some kind of workflow or the user asks you to create something.", "other", "The user wants something else."));
+                yield switch (route){
+                    case "workflow" -> {
+                        OrchestratorWorkers.FinalResponse process = orchestratorWorkers.process(message);
 
-                yield chatClientWorkflow.prompt()
-                    .system(
-                        "Return your response in a JSON format in a similar structure to the Workflows in the context.")
-                    .user(user -> user
-                        .text(
-                            """
-                                Merge all the task.structure according to instructions. Only use tasks that are provided in this prompt. If the task.type is 'trigger' and task.structure.type is 'missing/v1/missing', don't put any trigger. If the task.type is 'action' and task.structure.type is 'missing/v1/missing', pass the 'missing' Component.
+                        yield chatClientWorkflow.prompt()
+                            .system(
+                                "Return your response in a JSON format in a similar structure to the Workflows in the context.")
+                            .user(user -> user
+                                .text(
+                                    """
+                                        Merge all the task.structure according to instructions. Only use tasks that are provided in this prompt. If the task.type is 'trigger' and task.structure.type is 'missing/v1/missing', don't put any trigger. If the task.type is 'action' and task.structure.type is 'missing/v1/missing', pass the 'missing' Component.
 
-                                instructions:
-                                {task_analysis}
+                                        instructions:
+                                        {task_analysis}
 
-                                subtasks:
-                                {task_list}
-                                """)
-                        .param("task_analysis", process.analysis())
-                        .param("task_list", process.workerResponses()))
-                    .advisors(advisor -> advisor.param(
-                        ChatMemory.CONVERSATION_ID, conversationId))
-                    .stream()
-                    .content()
-                    .map(content -> Map.of("text", content));
+                                        subtasks:
+                                        {task_list}
+                                        """)
+                                .param("task_analysis", process.analysis())
+                                .param("task_list", process.workerResponses()))
+                            .advisors(advisor -> advisor.param(
+                                ChatMemory.CONVERSATION_ID, conversationId))
+                            .stream()
+                            .content()
+                            .map(content -> Map.of("text", content));
+                    }
+                    default ->
+                        chatClientWorkflow.prompt()
+                            .system(
+                                "You are a Bytechef workflow building assistant. Respond in a helpful manner, but professional tone. Offer helpful suggestions on what the user could ask you next.")
+                            .user(user -> user
+                                .text(message))
+                            .advisors(advisor -> advisor.param(
+                                ChatMemory.CONVERSATION_ID, conversationId))
+                            .stream()
+                            .content()
+                            .map(content -> Map.of("text", content));
+                };
             }
             case CODE_EDITOR -> {
                 Map<String, ?> parameters = contextDTO.parameters();
