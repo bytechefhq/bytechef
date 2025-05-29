@@ -219,6 +219,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
             {showApiEndpointDialog && !!apiCollection.id && (
                 <ApiCollectionEndpointDialog
                     apiCollectionId={apiCollection.id!}
+                    collectionVersion={apiCollection.collectionVersion!}
                     contextPath={apiCollection.contextPath!}
                     onClose={() => setShowApiEndpointDialog(false)}
                     projectId={apiCollection.projectId}
