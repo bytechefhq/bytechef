@@ -106,6 +106,12 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         projectDeployment.setProjectId(apiCollectionDTO.projectId());
         projectDeployment.setProjectVersion(apiCollectionDTO.projectVersion());
 
+        List<Tag> tags = checkTags(apiCollectionDTO.tags());
+
+        if (!tags.isEmpty()) {
+            apiCollection.setTags(tags);
+        }
+
         projectDeployment = projectDeploymentService.create(projectDeployment);
 
         apiCollection.setProjectDeploymentId(projectDeployment.getId());
