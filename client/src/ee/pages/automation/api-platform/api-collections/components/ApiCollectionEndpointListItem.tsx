@@ -159,6 +159,7 @@ const ApiCollectionEndpointListItem = ({
                 <ApiCollectionEndpointDialog
                     apiCollectionId={apiCollectionEndpoint.apiCollectionId!}
                     apiEndpoint={apiCollectionEndpoint}
+                    collectionVersion={collectionVersion}
                     contextPath={contextPath}
                     onClose={() => setShowEditApiCollectionEndpointDialog(false)}
                     projectId={projectId}

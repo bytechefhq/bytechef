@@ -76,6 +76,7 @@ const ApiCollectionEndpointList = ({
                         button={
                             <ApiCollectionEndpointDialog
                                 apiCollectionId={apiCollectionId}
+                                collectionVersion={collectionVersion}
                                 contextPath={contextPath}
                                 projectId={projectId}
                                 projectVersion={projectVersion}

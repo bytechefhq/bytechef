@@ -39,6 +39,7 @@ const formSchema = z.object({
 interface ApiEndpointDialogProps {
     apiCollectionId: number;
     apiEndpoint?: ApiCollectionEndpoint;
+    collectionVersion: number;
     contextPath: string;
     onClose?: () => void;
     projectId: number;
@@ -49,6 +50,7 @@ interface ApiEndpointDialogProps {
 const ApiCollectionEndpointDialog = ({
     apiCollectionId,
     apiEndpoint,
+    collectionVersion,
     contextPath,
     onClose,
     projectId,
@@ -269,7 +271,7 @@ const ApiCollectionEndpointDialog = ({
                                     <FormControl>
                                         <div className="flex">
                                             <div className="flex h-9 items-center rounded-md rounded-r-none border border-r-0 border-input bg-muted px-3 py-1 text-sm shadow-sm transition-colors">
-                                                {`/v${projectVersion}/${contextPath}/`}
+                                                {`/v${collectionVersion}/${contextPath}/`}
                                             </div>
 
                                             <Input {...field} className="rounded-l-none border-l-0" />
