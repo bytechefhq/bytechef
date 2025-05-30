@@ -23,6 +23,7 @@ import AccountProfile from '@/pages/account/settings/AccountProfile';
 import Appearance from '@/pages/account/settings/Appearance';
 import Sessions from '@/pages/account/settings/Sessions';
 import {Connections as AutomationConnections} from '@/pages/automation/connections/Connections';
+import McpServers from '@/pages/automation/mcp-servers/McpServers';
 import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
 import Project from '@/pages/automation/project/Project';
 import Projects from '@/pages/automation/projects/Projects';
@@ -344,6 +345,14 @@ export const getRouter = (queryClient: QueryClient) =>
                                         },
                                     ],
                                     path: 'api-platform',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <McpServers />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'mcp-servers',
                                 },
                                 {
                                     element: (
