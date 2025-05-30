@@ -29,57 +29,54 @@ export default function Dialog({closeDialog, handleConnect, isOpen}: DialogProps
                     </button>
                 </header>
 
-                <div className="flex flex-col space-y-1.5 text-center sm:text-left">
-                    <div className="space-y-4">
-                        <fieldset className="space-y-2">
-                            <label htmlFor="connection-name" className="text-sm font-medium">
-                                Connection Name
-                            </label>
+                <main className="flex flex-col space-y-2 text-center sm:text-left">
+                    <fieldset className="space-y-2">
+                        <label htmlFor="connection-name" className="text-sm font-medium">
+                            Connection Name
+                        </label>
 
-                            <input
-                                id="connection-name"
-                                type="text"
-                                value={connectionName}
-                                onChange={(event) => setConnectionName(event.target.value)}
-                                className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                placeholder="My Connection"
-                            />
-                        </fieldset>
+                        <input
+                            id="connection-name"
+                            value={connectionName}
+                            onChange={(event) => setConnectionName(event.target.value)}
+                            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            placeholder="My Connection"
+                        />
+                    </fieldset>
 
-                        <fieldset className="space-y-2">
-                            <label htmlFor="connection-type" className="text-sm font-medium">
-                                Connection Type
-                            </label>
+                    <fieldset className="space-y-2">
+                        <label htmlFor="connection-type" className="text-sm font-medium">
+                            Connection Type
+                        </label>
 
-                            <select
-                                id="connection-type"
-                                value={connectionType}
-                                onChange={(event) => setConnectionType(event.target.value)}
-                                className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                <option value="api">API Connection</option>
-                                <option value="database">Database</option>
-                                <option value="oauth">OAuth</option>
-                            </select>
-                        </fieldset>
+                        <select
+                            id="connection-type"
+                            value={connectionType}
+                            onChange={(event) => setConnectionType(event.target.value)}
+                            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <option value="api">API Connection</option>
+                            <option value="database">Database</option>
+                            <option value="oauth">OAuth</option>
+                        </select>
+                    </fieldset>
 
-                        <div className="flex items-center justify-end gap-2">
-                            <button
-                                className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-                                onClick={closeDialog}
-                            >
-                                Cancel
-                            </button>
+                    <div className="flex items-center justify-end gap-2">
+                        <button
+                            className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                            onClick={closeDialog}
+                        >
+                            Cancel
+                        </button>
 
-                            <button
-                                onClick={handleConnect}
-                                className="inline-flex h-10 items-center justify-center rounded-md bg-[#0951c4] px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-[#0951c4]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-                            >
-                                Connect
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleConnect}
+                            className="inline-flex h-10 items-center justify-center rounded-md bg-[#0951c4] px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-[#0951c4]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                        >
+                            Connect
+                        </button>
                     </div>
-                </div>
+                </main>
 
                 <footer className="flex items-center justify-center">
                     <img src={Logo} alt="ByteChef Logo" className="mr-2 size-6" />
