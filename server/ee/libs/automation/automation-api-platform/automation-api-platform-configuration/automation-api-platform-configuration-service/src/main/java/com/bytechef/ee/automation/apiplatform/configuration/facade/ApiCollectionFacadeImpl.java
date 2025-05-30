@@ -132,14 +132,14 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
             .fetchProjectDeploymentWorkflow(
                 apiCollection.getProjectDeploymentId(),
                 projectWorkflowService.getWorkflowId(
-                    apiCollection.getProjectDeploymentId(), apiCollectionEndpoint.getWorkflowReferenceCode()))
+                    apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowReferenceCode()))
             .orElseGet(() -> {
                 ProjectDeploymentWorkflow newProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
                 newProjectDeploymentWorkflow.setProjectDeploymentId(apiCollection.getProjectDeploymentId());
                 newProjectDeploymentWorkflow.setWorkflowId(
                     projectWorkflowService.getWorkflowId(
-                        apiCollection.getProjectDeploymentId(), apiCollectionEndpoint.getWorkflowReferenceCode()));
+                        apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowReferenceCode()));
 
                 return projectDeploymentWorkflowService.create(newProjectDeploymentWorkflow);
             });
@@ -147,7 +147,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflow.getId());
 
         return new ApiCollectionEndpointDTO(
-            apiCollectionEndpointService.create(apiCollectionEndpoint), projectDeploymentWorkflow);
+            apiCollectionEndpointService.create(apiCollectionEndpoint), projectDeploymentWorkflow.isEnabled(),
+            apiCollectionEndpointDTO.workflowReferenceCode());
     }
 
     @Override
@@ -448,8 +449,13 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     private ApiCollectionEndpointDTO toApiCollectionEndpointDTO(ApiCollectionEndpoint apiCollectionEndpoint) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflow(apiCollectionEndpoint.getProjectDeploymentWorkflowId());
+
+        String workflowReferenceCode = projectWorkflowService.getWorkflowReferenceCode(
+            projectDeploymentWorkflow.getProjectDeploymentId(), projectDeploymentWorkflow.getWorkflowId());
+
         return new ApiCollectionEndpointDTO(
-            apiCollectionEndpoint, projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
-                apiCollectionEndpoint.getProjectDeploymentWorkflowId()));
+            apiCollectionEndpoint, projectDeploymentWorkflow.isEnabled(), workflowReferenceCode);
     }
 }
