@@ -1,0 +1,55 @@
+{
+  "name": "@bytechef/use-embedded-connection-dialog",
+  "version": "0.1.0",
+  "description": "A React hook for managing embedded ByteChef connection dialogs.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "style": "dist/styles.css",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npx tailwindcss -i src/styles.css -o dist/styles.css && tsc && mkdir -p dist/assets && cp -r src/assets/* dist/assets/",
+    "test": "vitest",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "lint:fix": "eslint 'src/**/*.{ts,tsx}' --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,css}'",
+    "prepare": "npm run build",
+    "watch": "concurrently \"npx tailwindcss -i src/styles.css -o dist/styles.css --watch\" \"tsc --watch\""
+  },
+  "keywords": [
+    "react",
+    "hook",
+    "bytechef",
+    "connection-dialog"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/react": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.33.0",
+    "@typescript-eslint/parser": "^8.33.0",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^7.0.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-react": "^7.37.5",
+    "postcss": "^8.5.4",
+    "postcss-cli": "^11.0.1",
+    "prettier": "^3.5.3",
+    "react": "^19.1.0",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "dependencies": {
+    "react-hook-form": "^7.56.4"
+  }
+}
