@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import {describe, it, expect} from 'vitest';
 import useEmbeddedByteChefConnectionDialog from './index';
 
 describe('useEmbeddedByteChefConnectionDialog', () => {
-  it('should be defined', () => {
-    expect(useEmbeddedByteChefConnectionDialog).toBeDefined();
-  });
+    it('should be defined', () => {
+        expect(useEmbeddedByteChefConnectionDialog).toBeDefined();
+    });
 });
