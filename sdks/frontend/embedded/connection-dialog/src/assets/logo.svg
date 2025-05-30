@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Group">
+        <g id="g1">
+            <linearGradient id="linearGradient1" x1="32" y1="0" x2="0" y2="32" gradientUnits="userSpaceOnUse">
+                <stop offset="1e-05" stop-color="#2cf586" stop-opacity="1"/>
+                <stop offset="0.47211" stop-color="#53a2f5" stop-opacity="1"/>
+                <stop offset="1" stop-color="#8eddf5" stop-opacity="1"/>
+            </linearGradient>
+            <path id="Path" fill="url(#linearGradient1)" fill-rule="evenodd" stroke="none" d="M 32 16 L 16 16 L 16 32 L 2 32 C 0.895431 32 0 31.10457 0 30 L 0 2 C 0 0.89543 0.895431 0 2 0 L 30 0 C 31.10457 0 32 0.89543 32 2 L 32 16 Z"/>
+        </g>
+        <linearGradient id="linearGradient2" x1="-8.6192" y1="-7.85728" x2="16" y2="16" gradientUnits="userSpaceOnUse">
+            <stop offset="1e-05" stop-color="#1274ed" stop-opacity="0"/>
+            <stop offset="1" stop-color="#1274ed" stop-opacity="1"/>
+        </linearGradient>
+        <path id="path1" fill="url(#linearGradient2)" fill-rule="evenodd" stroke="none" d="M -16 -16 L 16 -16 L 16 16 L -16 16 Z"/>
+    </g>
+</svg>
