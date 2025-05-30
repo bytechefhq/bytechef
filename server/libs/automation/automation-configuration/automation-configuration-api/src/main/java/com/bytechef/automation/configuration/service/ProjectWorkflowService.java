@@ -46,6 +46,8 @@ public interface ProjectWorkflowService {
 
     String getWorkflowId(long projectDeploymentId, String workflowReferenceCode);
 
+    String getWorkflowReferenceCode(long projectDeploymentId, String workflowId);
+
     List<String> getWorkflowIds(long projectId);
 
     List<String> getWorkflowIds(long projectId, int projectVersion);

@@ -13,6 +13,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
@@ -70,6 +71,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     private final ApiCollectionEndpointService apiCollectionEndpointService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
     public ApiPlatformHandlerController(
@@ -78,7 +80,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
-        WebhookWorkflowExecutor webhookWorkflowExecutor) {
+        WebhookWorkflowExecutor webhookWorkflowExecutor, ProjectWorkflowService projectWorkflowService) {
 
         super(
             filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
@@ -88,6 +90,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         this.apiCollectionEndpointService = apiCollectionEndpointService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     @DeleteMapping(produces = "application/json")
@@ -177,9 +180,12 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 webhookRequest.headers(), MapUtils.concat(webhookRequest.parameters(), variables),
                 webhookRequest.body(), webhookRequest.method());
 
+            String workflowReferenceCode = projectWorkflowService.getWorkflowReferenceCode(
+                projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId());
+
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 ModeType.AUTOMATION, apiCollection.getProjectDeploymentId(),
-                apiCollectionEndpoint.getWorkflowReferenceCode(), "trigger_1");
+                workflowReferenceCode, "trigger_1");
 
             return doProcessTrigger(workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);
         });

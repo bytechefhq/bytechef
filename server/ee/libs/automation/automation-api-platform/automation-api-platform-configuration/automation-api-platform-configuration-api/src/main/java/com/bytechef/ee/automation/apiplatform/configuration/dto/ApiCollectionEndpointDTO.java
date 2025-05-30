@@ -16,7 +16,6 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.dto;
 
-import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint.HttpMethod;
 import java.time.Instant;
@@ -28,16 +27,16 @@ public record ApiCollectionEndpointDTO(
     String workflowReferenceCode) {
 
     public ApiCollectionEndpointDTO(
-        ApiCollectionEndpoint apiCollectionEndpoint, ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+        ApiCollectionEndpoint apiCollectionEndpoint, boolean enabled, String workflowReferenceCode) {
 
         this(
             apiCollectionEndpoint.getApiCollectionId(), apiCollectionEndpoint.getCreatedBy(),
-            apiCollectionEndpoint.getCreatedDate(), projectDeploymentWorkflow.isEnabled(),
+            apiCollectionEndpoint.getCreatedDate(), enabled,
             apiCollectionEndpoint.getHttpMethod(), apiCollectionEndpoint.getId(),
             apiCollectionEndpoint.getLastModifiedBy(), apiCollectionEndpoint.getLastModifiedDate(),
             apiCollectionEndpoint.getName(), apiCollectionEndpoint.getPath(),
             apiCollectionEndpoint.getProjectDeploymentWorkflowId(), apiCollectionEndpoint.getVersion(),
-            apiCollectionEndpoint.getWorkflowReferenceCode());
+            workflowReferenceCode);
     }
 
     public ApiCollectionEndpoint toApiCollectionEndpoint() {
