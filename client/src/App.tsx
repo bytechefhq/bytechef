@@ -18,6 +18,7 @@ import {
     LayoutTemplateIcon,
     Link2Icon,
     LucideIcon,
+    ServerIcon,
     Settings2Icon,
     SquareIcon,
     UnplugIcon,
@@ -55,6 +56,11 @@ const automationNavigation: NavigationType[] = [
         href: '/automation/api-platform',
         icon: LayoutTemplateIcon,
         name: 'API Collections',
+    },
+    {
+        href: '/automation/mcp-servers',
+        icon: ServerIcon,
+        name: 'MCP Servers',
     },
     {
         href: '/automation/executions',
@@ -120,10 +126,15 @@ function App() {
     const queryClient = useQueryClient();
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
+    const ff_2445 = useFeatureFlagsStore()('ff-2445');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (navItem.href === '/automation/api-platform/api-collections') {
             return ff_1023;
+        }
+
+        if (navItem.href === '/automation/mcp-servers') {
+            return ff_2445;
         }
 
         return true;

@@ -50,6 +50,12 @@ export default ({mode}) => {
                     target: 'http://localhost:9555',
                     // rewrite: (path) => path.replace(/^\/api/, ""),
                 },
+                '/graphql': {
+                    changeOrigin: true,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                    // rewrite: (path) => path.replace(/^\/api/, ""),
+                },
                 '/webhooks': {
                     changeOrigin: true,
                     secure: false,
