@@ -38,6 +38,7 @@ import org.springframework.web.client.RestClientException;
 public class AiCopilotConfiguration {
 
     private final String model;
+    private final Double temperature;
     private final String openAiApiKey;
 
     public AiCopilotConfiguration(ApplicationProperties applicationProperties) {
@@ -48,6 +49,9 @@ public class AiCopilotConfiguration {
         this.model = openAi.getChat()
             .getOptions()
             .getModel();
+        this.temperature = openAi.getChat()
+            .getOptions()
+            .getTemperature();
         this.openAiApiKey = openAi.getApiKey();
     }
 
@@ -81,7 +85,7 @@ public class AiCopilotConfiguration {
             .defaultOptions(
                 OpenAiChatOptions.builder()
                     .model(model)
-                    .temperature(0.7)
+                    .temperature(temperature)
                     .build())
             .build();
 
