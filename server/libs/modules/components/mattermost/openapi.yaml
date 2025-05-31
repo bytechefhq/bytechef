@@ -1,0 +1,88 @@
+---
+openapi: 3.0.4
+info:
+  title: "Mattermost"
+  description: "Mattermost is an open-source, self-hosted messaging platform designed for secure team collaboration and communication."
+  version: "v1"
+servers:
+  - url: "http://{domain}/api/v4"
+paths:
+  /posts:
+    post:
+      summary: "Send message"
+      description: "Send message to a channel."
+      operationId: "sendMessage"
+      x-ai-agent-tool: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Message"
+              type: "object"
+              required:
+                - "channel_id"
+                - "message"
+              properties:
+                channel_id:
+                  type: "string"
+                  description: "The channel ID to send message to."
+                  x-dynamic-options: true
+                message:
+                  type: "string"
+                  description: "The message contents."
+
+      responses:
+        201:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                  create_at:
+                    type: "integer"
+                  update_at:
+                    type: "integer"
+                  edit_at:
+                    type: "integer"
+                  delete_at:
+                    type: "integer"
+                  is_pinned:
+                    type: "boolean"
+                  user_id:
+                    type: "string"
+                  channel_id:
+                    type: "string"
+                  root_id:
+                    type: "string"
+                  parent_id:
+                    type: "string"
+                  original_id:
+                    type: "string"
+                  message:
+                    type: "string"
+                  type:
+                    type: "string"
+                  props:
+                    type: "object"
+                  hashtags:
+                    type: "string"
+                  pending_post_id:
+                    type: "string"
+                  reply_count:
+                    type: "integer"
+                  last_reply_at:
+                    type: "integer"
+                  participants:
+                    type: "object"
+                  is_following:
+                    type: "boolean"
+                  metadata:
+                    type: "object"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"
