@@ -37,6 +37,8 @@ bytechef:
   mail:
     host: localhost
     port: 1025
+  oauth2:
+    redirect-uri: http://127.0.0.1:9555/callback
   public-url: http://127.0.0.1:5173
   security:
     remember-me:
