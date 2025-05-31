@@ -8,8 +8,6 @@ servers:
 tags:
   - name: "connection"
     description: "The Embedded Connection Public API"
-  - name: "frontend-integration"
-    description: "The Embedded Frontend Integration Public API"
   - name: "integration"
     description: "The Embedded Integration Public API"
   - name: "integration-instance"
@@ -40,12 +38,12 @@ paths:
 #                  type: "array"
 #                  items:
 #                    $ref: "#/components/schemas/Connection"
-  /frontend/integrations:
+  /integrations:
     get:
-      description: "Get active integrations."
-      summary: "Get active integrations"
+      description: "Get active integrations for particular external user."
+      summary: "Get active integrations for particular external user"
       tags:
-        - "frontend-integration"
+        - "integration"
       operationId: "getFrontendIntegrations"
       parameters:
         - name: "X-Environment"
@@ -67,12 +65,12 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - frontendBearerAuth: [ ]
-  /frontend/integrations/{id}:
+  /integrations/{id}:
     get:
-      description: "Get an integration by id."
-      summary: "Get an integration by id"
+      description: "Get an integration by id for particular external user."
+      summary: "Get an integration by id for particular external user"
       tags:
-        - "frontend-integration"
+        - "integration"
       operationId: "getFrontendIntegration"
       parameters:
         - name: "X-Environment"
@@ -99,10 +97,156 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - frontendBearerAuth: [ ]
+  /projects/{externalUserId}/workflows:
+    get:
+      description: "Get automation workflows for particular external user."
+      summary: "Get automation workflows for particular external user"
+      tags:
+        - "workflow"
+      operationId: "getProjectWorkflows"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The updated integration object."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Workflow"
+    post:
+      description: "Create new workflow and adds it to an existing integration."
+      summary: "Create new workflow and adds it to an existing integration"
+      tags:
+        - "workflow"
+      operationId: "createProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                definition:
+                  description: The workflow definition
+                  type: "string"
+        required: true
+      responses:
+        "200":
+          description: "The project workflow reference code."
+          content:
+            application/json:
+              schema:
+                type: "string"
+  /projects/{externalUserId}/workflows/{workflowReferenceCode}:
+    delete:
+      description: "Delete a workflow."
+      summary: "Delete a workflow"
+      tags:
+        - "workflow"
+      operationId: "deleteProjectWorkflow"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+    get:
+      description: "Get a workflow by workflow reference code."
+      summary: "Get a workflow by workflow reference code"
+      tags:
+        - "workflow"
+      operationId: "getProjectWorkflow"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+    put:
+      description: "Update an existing workflow."
+      summary: "Update an existing workflow"
+      tags:
+        - "workflow"
+      operationId: "updateProjectWorkflow"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                definition:
+                  description: The workflow definition
+                  type: "string"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /{externalUserId}/integrations:
     get:
-      description: "Get active integrations."
-      summary: "Get active integrations"
+      description: "Get active integrations for particular external user."
+      summary: "Get active integrations for particular external user"
       tags:
         - "integration"
       operationId: "getIntegrations"
