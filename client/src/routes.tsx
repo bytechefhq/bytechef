@@ -202,7 +202,7 @@ export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
         {
             element: <OAuthPopup />,
-            path: '/callback',
+            path: '/oauth',
         },
         {
             element: <WorkflowChat />,
