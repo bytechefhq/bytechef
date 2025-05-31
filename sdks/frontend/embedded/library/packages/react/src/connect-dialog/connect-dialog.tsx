@@ -22,26 +22,26 @@ function ConnectDialog(props: ConnectDialogProps) {
 
   useEffect(() => {
     fetchIntegration().then((response) => {
-      console.log(response);
       setIntegration(response);
     });
   }, []);
 
   return (
     <>
-      <div className="div-bd60b4a4">
-        <div className="div-bd60b4a4-2">
+      <div className="div-80506ce8">
+        <div className="div-80506ce8-2">
           <CloseButton onClose={(event) => props.onClose && props.onClose()} />
-          <div className="div-bd60b4a4-3">
-            <div className="div-bd60b4a4-4">
-              <img
-                src={integration?.icon}
-                alt={integration?.title}
-              />
-            </div>
-            <div className="div-bd60b4a4-5">{integration?.title}</div>
+          <div className="div-80506ce8-3">
+            <img
+              width="48px"
+              src={`data:image/svg+xml,${encodeURIComponent(
+                integration?.icon!
+              )}`}
+              alt={integration?.title}
+            />
+            <div className="div-80506ce8-4">{integration?.title}</div>
           </div>
-          <div className="div-bd60b4a4-6">
+          <div className="div-80506ce8-5">
             {integration ? (
               <>
                 {integration?.workflows.length ? (
@@ -59,7 +59,7 @@ function ConnectDialog(props: ConnectDialogProps) {
                     ]}
                   >
                     <TabsItem id="tab1">
-                      <div className="div-bd60b4a4-10">
+                      <div className="div-80506ce8-9">
                         {integration?.description}
                       </div>
                     </TabsItem>
@@ -69,9 +69,9 @@ function ConnectDialog(props: ConnectDialogProps) {
                   </TabsList>
                 ) : (
                   <>
-                    <div className="div-bd60b4a4-7">
-                      <div className="div-bd60b4a4-8">Overview</div>
-                      <div className="div-bd60b4a4-9">
+                    <div className="div-80506ce8-6">
+                      <div className="div-80506ce8-7">Overview</div>
+                      <div className="div-80506ce8-8">
                         {integration?.description}
                       </div>
                     </div>
@@ -87,14 +87,14 @@ function ConnectDialog(props: ConnectDialogProps) {
         </div>
       </div>
 
-      <style>{`.div-bd60b4a4 {
+      <style>{`.div-80506ce8 {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.8);
-}.div-bd60b4a4-2 {
+}.div-80506ce8-2 {
   max-width: 480px;
   min-height: 300px;
   margin: 150px auto;
@@ -105,29 +105,27 @@ function ConnectDialog(props: ConnectDialogProps) {
   display: flex;
   flex-direction: column;
   font-family: Arial, sans-serif;
-}.div-bd60b4a4-3 {
+}.div-80506ce8-3 {
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
-}.div-bd60b4a4-4 {
-  width: 24px;
-}.div-bd60b4a4-5 {
+}.div-80506ce8-4 {
   font-size: 1.3rem;
   margin-left: 0.5rem;
-}.div-bd60b4a4-6 {
+}.div-80506ce8-5 {
   display: flex;
   flex-grow: 1;
-}.div-bd60b4a4-7 {
+}.div-80506ce8-6 {
   display: flex;
   flex-direction: column;
-}.div-bd60b4a4-8 {
+}.div-80506ce8-7 {
   font-size: 1rem;
   margin-bottom: 0.5rem;
-}.div-bd60b4a4-9 {
+}.div-80506ce8-8 {
   color: #737C86;
   font-size: 0.9rem;
   line-height: 1.3;
-}.div-bd60b4a4-10 {
+}.div-80506ce8-9 {
   color: #737C86;
   font-size: 0.9rem;
   line-height: 1.3;

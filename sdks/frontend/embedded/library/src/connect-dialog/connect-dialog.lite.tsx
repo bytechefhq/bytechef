@@ -49,11 +49,7 @@ export default function ConnectDialog(props: ConnectDialogProps) {
                 alignItems: 'center',
                 marginBottom: '1rem'
             }}>
-                <div css={{
-                    width: '24px',
-                }}>
-                    <img src={integration?.icon} alt={integration?.title}/>
-                </div>
+                <img width="48px" src={`data:image/svg+xml,${encodeURIComponent(integration?.icon!)}`} alt={integration?.title}/>
 
                 <div css={{
                     fontSize: '1.3rem',

@@ -3,15 +3,14 @@
     <div class="div-2">
       <CloseButton :onClose="(event) => onClose && onClose()"></CloseButton>
       <div class="div-3">
-        <div class="div-4">
-          <img
-            :src="`data:image/svg+xml;utf8,${integration?.icon}`"
-            :alt="integration?.title"
-          />
-        </div>
-        <div class="div-5">{{ integration?.title }}</div>
+        <img
+          width="48px"
+          :src="`data:image/svg+xml,${encodeURIComponent(integration?.icon)}`"
+          :alt="integration?.title"
+        />
+        <div class="div-4">{{ integration?.title }}</div>
       </div>
-      <div class="div-6">
+      <div class="div-5">
         <template v-if="integration">
           <template v-if="integration?.workflows.length">
             <TabsList
@@ -27,7 +26,7 @@
                 },
               ]"
               ><TabsItem id="tab1"
-                ><div class="div-10">
+                ><div class="div-9">
                   {{ integration?.description }}
                 </div></TabsItem
               ><TabsItem id="tab2"
@@ -38,9 +37,9 @@
           </template>
 
           <template v-else>
-            <div class="div-7">
-              <div class="div-8">Overview</div>
-              <div class="div-9">{{ integration?.description }}</div>
+            <div class="div-6">
+              <div class="div-7">Overview</div>
+              <div class="div-8">{{ integration?.description }}</div>
             </div>
           </template>
         </template>
@@ -120,30 +119,27 @@ export default defineComponent({
   margin-bottom: 1rem;
 }
 .div-4 {
-  width: 24px;
-}
-.div-5 {
   font-size: 1.3rem;
   margin-left: 0.5rem;
 }
-.div-6 {
+.div-5 {
   display: flex;
   flex-grow: 1;
 }
-.div-7 {
+.div-6 {
   display: flex;
   flex-direction: column;
 }
-.div-8 {
+.div-7 {
   font-size: 1rem;
   margin-bottom: 0.5rem;
 }
-.div-9 {
+.div-8 {
   color: #737c86;
   font-size: 0.9rem;
   line-height: 1.3;
 }
-.div-10 {
+.div-9 {
   color: #737c86;
   font-size: 0.9rem;
   line-height: 1.3;

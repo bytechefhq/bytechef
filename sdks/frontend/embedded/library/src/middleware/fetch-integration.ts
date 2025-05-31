@@ -1,10 +1,10 @@
 import {Integration} from "./model/Integration";
 
 const fetchIntegration = async (): Promise<Integration> => {
-    return await fetch('http://localhost:9555/api/embedded/v1/frontend/integrations/1053', {
+    return await fetch('http://localhost:9555/api/embedded/v1/integrations/1050', {
         headers: {
-            'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNIVmliR2xqT2s4M1pVWmtXRlZCWmpCSVJGRXpOMlE1Y0dOQmVGVnlNVEpOU1dzdlNIUjAifQ.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.cBek7AcrbY_OiZPSzbswHHhriBYnV2h30E-n7uRqYcT8pD_LNOo-0fdhLkHalg9oyQrxmWDODFVE1b29Olo5nf3-xtb3Y3PFIIkyVMAKFT-XgH02_yb6oLcVhOceJe01rQ_MUX7-WjvPtvZZ2nvaVlrouq6ow1I-ToJXMinLkquzf6WYONUj-vjqRAGJH243jjFK0mOO_c_jlOSQxJicKAYiQ6R_ltNvZidcKjR3gjDrei04w_hLpiEwHE6rMKot6H2b4FaIILEEePCLG70BrO9CF-7xrnp4-2fkn3RSiMV_4zIFCUbX-0ITOepy8X2WER7cbzWNlMSTtM6hkFqA4A',
-            'x-environment': 'test'
+            'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNIVmliR2xqT25GWmExWkROWEJKWkRGRFJVcDNWVFpCVlhoek1ucE5WVUl2T0VvMVVtZE4ifQ.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.S2jxvT57Cs3XqfqUq56W3UGjQ6VxjGkV7Z0Lh-Z6Cq1oknW0V5f2hND9-NR-sWepnCIno7hdQ5EvZRpNEe-65YjuqlyPWH_li0s3isnPfSLkJH8mmEOySLjKTWV_RgWUDkG3OOrnSNauFucTmMvywByLHBmy_wLJf9pxCDQBY_10fVIOIWykW9hKhjtW0T-DbUDYngfBlOybfmTS8ZU-8PnEEPto4Dl-rt4TifrKQYpKcpjKekrgu4vsEsCGIkG9_bSBtw46LPLiYlnILWVILiOwcZijbrtG5IUf2KmtdaJv2FD_LQILPrQVX23-IDpA76f4ldSzuVe9wMM8JjYAtg',
+            'x-environment': 'development'
         },
         method: 'GET',
     }).then((response) => response.json());
