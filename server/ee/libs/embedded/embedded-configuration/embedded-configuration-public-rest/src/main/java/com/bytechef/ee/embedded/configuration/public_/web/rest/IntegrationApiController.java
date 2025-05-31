@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +44,33 @@ public class IntegrationApiController implements IntegrationApi {
 
         this.conversionService = conversionService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
+    }
+
+    @CrossOrigin
+    @Override
+    public ResponseEntity<IntegrationModel> getFrontendIntegration(Long id, EnvironmentModel xEnvironment) {
+        Environment environment = xEnvironment == null
+            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationIntegration(
+                    id, environment, true),
+                IntegrationModel.class));
+    }
+
+    @CrossOrigin
+    @Override
+    public ResponseEntity<List<IntegrationModel>> getFrontendIntegrations(EnvironmentModel xEnvironment) {
+        Environment environment = xEnvironment == null
+            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
+
+        return ResponseEntity.ok(
+            integrationInstanceConfigurationFacade
+                .getIntegrationInstanceConfigurationIntegrations(environment, true)
+                .stream()
+                .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
+                .toList());
     }
 
     @Override

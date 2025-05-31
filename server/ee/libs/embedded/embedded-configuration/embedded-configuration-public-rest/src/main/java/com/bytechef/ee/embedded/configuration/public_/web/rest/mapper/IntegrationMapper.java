@@ -23,7 +23,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 @Mapper(
     config = EmbeddedConfigurationPublicMapperSpringConfig.class, implementationName = "EmbeddedPublic<CLASS_NAME>Impl")
-public interface FrontendIntegrationMapper extends Converter<IntegrationInstanceConfigurationDTO, IntegrationModel> {
+public interface IntegrationMapper extends Converter<IntegrationInstanceConfigurationDTO, IntegrationModel> {
 
     @Override
     @Mapping(target = "multipleInstances", source = "integration.multipleInstances")
