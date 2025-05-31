@@ -118,7 +118,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
     @Override
     public Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId) {
-        Workflow workflow = workflowService.getWorkflow(contextDTO.workflowId());
+        String currentWorkflow = workflowService.getWorkflow(contextDTO.workflowId()).getDefinition();
 
         final String userPrompt = """
             Current workflow:
@@ -129,12 +129,13 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         final String workflowString = "workflow";
         final String messageString = "message";
 
-        return switch (contextDTO.source()) {
-            case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
-                String route = routingWorkflow.route(message, Map.of("workflow", "The prompt contains some kind of workflow or the user asks you to create something.", "other", "The user wants something else."));
-                yield switch (route){
-                    case "workflow" -> {
-                        OrchestratorWorkers.FinalResponse process = orchestratorWorkers.process(message);
+        String route = routingWorkflow.route(message, Map.of("workflow", "The prompt contains some kind of workflow or the user asks you to create, add or modify something.", "other", "The user wants something else."));
+
+        return switch (route){
+            case workflowString -> {
+                yield switch (contextDTO.source()) {
+                    case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
+                        OrchestratorWorkers.FinalResponse process = orchestratorWorkers.process(message, currentWorkflow);
 
                         yield chatClientWorkflow.prompt()
                             .system(
@@ -158,54 +159,53 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                             .content()
                             .map(content -> Map.of("text", content));
                     }
-                    default ->
-                        chatClientWorkflow.prompt()
-                            .system(
-                                "You are a Bytechef workflow building assistant. Respond in a helpful manner, but professional tone. Offer helpful suggestions on what the user could ask you next.")
-                            .user(user -> user
-                                .text(message))
-                            .advisors(advisor -> advisor.param(
-                                ChatMemory.CONVERSATION_ID, conversationId))
-                            .stream()
-                            .content()
-                            .map(content -> Map.of("text", content));
-                };
-            }
-            case CODE_EDITOR -> {
-                Map<String, ?> parameters = contextDTO.parameters();
+                    case CODE_EDITOR -> {
+                        Map<String, ?> parameters = contextDTO.parameters();
 
-                yield switch ((String) parameters.get("language")) {
-                    case "javascript" -> chatClientScript.prompt()
-                        .system("You are a javascript code generator, answer only with code.")
-                        .user(user -> user.text(userPrompt)
-                            .param(workflowString, workflow.getDefinition())
-                            .param(messageString, message))
-                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
-                    case "python" -> chatClientScript.prompt()
-                        .system("You are a python code generator, answer only with code.")
-                        .user(user -> user.text(userPrompt)
-                            .param(workflowString, workflow.getDefinition())
-                            .param(messageString, message))
-                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
-                    case "ruby" -> chatClientScript.prompt()
-                        .system("You are a ruby code generator, answer only with code.")
-                        .user(user -> user.text(userPrompt)
-                            .param(workflowString, workflow.getDefinition())
-                            .param(messageString, message))
-                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
-                    default -> throw new IllegalStateException("Unexpected value: " + parameters.get("language"));
+                        yield switch ((String) parameters.get("language")) {
+                            case "javascript" -> chatClientScript.prompt()
+                                .system("You are a javascript code generator, answer only with code.")
+                                .user(user -> user.text(userPrompt)
+                                    .param(workflowString, currentWorkflow)
+                                    .param(messageString, message))
+                                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                                .stream()
+                                .content()
+                                .map(content -> Map.of("text", content));
+                            case "python" -> chatClientScript.prompt()
+                                .system("You are a python code generator, answer only with code.")
+                                .user(user -> user.text(userPrompt)
+                                    .param(workflowString, currentWorkflow)
+                                    .param(messageString, message))
+                                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                                .stream()
+                                .content()
+                                .map(content -> Map.of("text", content));
+                            case "ruby" -> chatClientScript.prompt()
+                                .system("You are a ruby code generator, answer only with code.")
+                                .user(user -> user.text(userPrompt)
+                                    .param(workflowString, currentWorkflow)
+                                    .param(messageString, message))
+                                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                                .stream()
+                                .content()
+                                .map(content -> Map.of("text", content));
+                            default -> throw new IllegalStateException("Unexpected value: " + parameters.get("language"));
+                        };
+                    }
                 };
             }
-            case null, default -> throw new IllegalStateException("Unexpected value: " + contextDTO.source());
+            default ->
+                chatClientWorkflow.prompt()
+                    .system(
+                        "You are a Bytechef workflow building assistant. Respond in a helpful manner, but professional tone. Offer helpful suggestions on what the user could ask you next.")
+                    .user(user -> user
+                        .text(message))
+                    .advisors(advisor -> advisor.param(
+                        ChatMemory.CONVERSATION_ID, conversationId))
+                    .stream()
+                    .content()
+                    .map(content -> Map.of("text", content));
         };
     }
 }
