@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.ai.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.ai.facade.dto.ContextDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,6 +45,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
     private final ChatClient chatClientComponent;
     private final ChatClient chatClientScript;
     private final WorkflowService workflowService;
+    private final RoutingWorkflow routingWorkflow;
     private final OrchestratorWorkers orchestratorWorkers;
 
     @SuppressFBWarnings("EI")
@@ -58,6 +58,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             .builder(
                 MessageWindowChatMemory.builder()
                     .chatMemoryRepository(new InMemoryChatMemoryRepository())
+                    .maxMessages(50)
                     .build())
             .build();
 
@@ -87,14 +88,16 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
 //                messageChatMemoryAdvisor,
-                questionAnswerAdvisorComponents, qaRetrievedDocuments)
+                questionAnswerAdvisorComponents,
+                qaRetrievedDocuments)
             .build();
 
         this.chatClientWorkflow = chatClientBuilder.clone()
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
                 messageChatMemoryAdvisor,
-                questionAnswerAdvisorWorkflow
+                questionAnswerAdvisorWorkflow,
+                qaRetrievedDocuments
 //                , questionAnswerAdvisorComponents
             )
             .build();
@@ -108,12 +111,14 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             )
             .build();
 
+        this.routingWorkflow = new RoutingWorkflow(this.chatClientWorkflow);
         this.orchestratorWorkers = new OrchestratorWorkers(this.chatClientComponent);
     }
 
     @Override
     public Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId) {
-        Workflow workflow = workflowService.getWorkflow(contextDTO.workflowId());
+        String currentWorkflow = workflowService.getWorkflow(contextDTO.workflowId())
+            .getDefinition();
 
         final String userPrompt = """
             Current workflow:
@@ -124,67 +129,88 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         final String workflowString = "workflow";
         final String messageString = "message";
 
-        return switch (contextDTO.source()) {
-            case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
-                OrchestratorWorkers.FinalResponse process = orchestratorWorkers.process(message);
+        String route = routingWorkflow.route(message,
+            Map.of("workflow",
+                "The prompt contains some kind of workflow or the user asks you to create, add or modify something.",
+                "other", "The user wants something else."));
 
-                yield chatClientWorkflow.prompt()
+        return switch (route) {
+            case workflowString -> {
+                yield switch (contextDTO.source()) {
+                    case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
+                        OrchestratorWorkers.FinalResponse process =
+                            orchestratorWorkers.process(message, currentWorkflow);
+
+                        yield chatClientWorkflow.prompt()
+                            .system(
+                                "Return your response in a JSON format in a similar structure to the Workflows in the context.")
+                            .user(user -> user
+                                .text(
+                                    """
+                                        Merge all the task.structure according to instructions. Only use tasks that are provided in this prompt. If the task.type is 'trigger' and task.structure.type is 'missing/v1/missing', don't put any trigger. If the task.type is 'action' and task.structure.type is 'missing/v1/missing', pass the 'missing' Component.
+
+                                        instructions:
+                                        {task_analysis}
+
+                                        subtasks:
+                                        {task_list}
+                                        """)
+                                .param("task_analysis", process.analysis())
+                                .param("task_list", process.workerResponses()))
+                            .advisors(advisor -> advisor.param(
+                                ChatMemory.CONVERSATION_ID, conversationId))
+                            .stream()
+                            .content()
+                            .map(content -> Map.of("text", content));
+                    }
+                    case CODE_EDITOR -> {
+                        Map<String, ?> parameters = contextDTO.parameters();
+
+                        yield switch ((String) parameters.get("language")) {
+                            case "javascript" -> chatClientScript.prompt()
+                                .system("You are a javascript code generator, answer only with code.")
+                                .user(user -> user.text(userPrompt)
+                                    .param(workflowString, currentWorkflow)
+                                    .param(messageString, message))
+                                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                                .stream()
+                                .content()
+                                .map(content -> Map.of("text", content));
+                            case "python" -> chatClientScript.prompt()
+                                .system("You are a python code generator, answer only with code.")
+                                .user(user -> user.text(userPrompt)
+                                    .param(workflowString, currentWorkflow)
+                                    .param(messageString, message))
+                                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                                .stream()
+                                .content()
+                                .map(content -> Map.of("text", content));
+                            case "ruby" -> chatClientScript.prompt()
+                                .system("You are a ruby code generator, answer only with code.")
+                                .user(user -> user.text(userPrompt)
+                                    .param(workflowString, currentWorkflow)
+                                    .param(messageString, message))
+                                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                                .stream()
+                                .content()
+                                .map(content -> Map.of("text", content));
+                            default ->
+                                throw new IllegalStateException("Unexpected value: " + parameters.get("language"));
+                        };
+                    }
+                };
+            }
+            default ->
+                chatClientWorkflow.prompt()
                     .system(
-                        "Return your response in a JSON format in a similar structure to the Workflows in the context.")
+                        "You are a Bytechef workflow building assistant. Respond in a helpful manner, but professional tone. Offer helpful suggestions on what the user could ask you next.")
                     .user(user -> user
-                        .text(
-                            """
-                                Merge all the task.structure according to instructions. Only use tasks that are provided in this prompt. If the task.type is 'trigger' and task.structure.type is 'missing/v1/missing', don't put any trigger. If the task.type is 'action' and task.structure.type is 'missing/v1/missing', pass the 'missing' Component.
-
-                                instructions:
-                                {task_analysis}
-
-                                subtasks:
-                                {task_list}
-                                """)
-                        .param("task_analysis", process.analysis())
-                        .param("task_list", process.workerResponses()))
+                        .text(message))
                     .advisors(advisor -> advisor.param(
                         ChatMemory.CONVERSATION_ID, conversationId))
                     .stream()
                     .content()
                     .map(content -> Map.of("text", content));
-            }
-            case CODE_EDITOR -> {
-                Map<String, ?> parameters = contextDTO.parameters();
-
-                yield switch ((String) parameters.get("language")) {
-                    case "javascript" -> chatClientScript.prompt()
-                        .system("You are a javascript code generator, answer only with code.")
-                        .user(user -> user.text(userPrompt)
-                            .param(workflowString, workflow.getDefinition())
-                            .param(messageString, message))
-                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
-                    case "python" -> chatClientScript.prompt()
-                        .system("You are a python code generator, answer only with code.")
-                        .user(user -> user.text(userPrompt)
-                            .param(workflowString, workflow.getDefinition())
-                            .param(messageString, message))
-                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
-                    case "ruby" -> chatClientScript.prompt()
-                        .system("You are a ruby code generator, answer only with code.")
-                        .user(user -> user.text(userPrompt)
-                            .param(workflowString, workflow.getDefinition())
-                            .param(messageString, message))
-                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
-                    default -> throw new IllegalStateException("Unexpected value: " + parameters.get("language"));
-                };
-            }
-            case null, default -> throw new IllegalStateException("Unexpected value: " + contextDTO.source());
         };
     }
 }
