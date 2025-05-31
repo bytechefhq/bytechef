@@ -12,9 +12,9 @@ springdoc:
 info:
   ai:
     copilot:
-      enabled: ${bytechef.ai.copilot.enabled:false}
+      enabled: ${bytechef.ai.copilot.enabled}
   analytics:
-    enabled: ${bytechef.analytics.enabled:false}
+    enabled: ${bytechef.analytics.enabled}
     postHog:
       apiKey: ${post-hog.api-key:}
       host: ${post-hog.host:}
@@ -22,11 +22,11 @@ info:
     edition: ${bytechef.edition:}
   featureFlags: ${bytechef.feature-flags}
   helpHub:
-    enabled: ${bytechef.help-hub.enabled:false}
+    enabled: ${bytechef.help-hub.enabled}
     commandBar:
       orgId: ${command-bar.org-id:}
   signUp:
-    activationRequired: ${bytechef.sign-up.activation-required:false}
+    activationRequired: ${bytechef.sign-up.activation-required}
     enabled: ${bytechef.sign-up.enabled}
 
 management:
@@ -138,23 +138,23 @@ spring:
   jmx:
     enabled: false
   mail:
-    host: ${bytechef.mail.host:localhost}
-    port: ${bytechef.mail.port:25}
+    host: ${bytechef.mail.host}
+    port: ${bytechef.mail.port}
     username: ${bytechef.mail.username}
     password: ${bytechef.mail.password}
     properties:
       mail:
-        debug: ${bytechef.mail.debug:false}
+        debug: ${bytechef.mail.debug}
         smtp:
-          auth: ${bytechef.mail.auth:false}
+          auth: ${bytechef.mail.auth}
           starttls:
-            enable: ${bytechef.mail.starttls.enable:false}
-            required: ${bytechef.mail.starttls.required:false}
+            enable: ${bytechef.mail.starttls.enable}
+            required: ${bytechef.mail.starttls.required}
         transport:
-          protocol: ${bytechef.mail.protocol:smtp}
-    protocol: ${bytechef.mail.protocol:smtp}
+          protocol: ${bytechef.mail.protocol}
+    protocol: ${bytechef.mail.protocol}
     ssl:
-      enabled: ${bytechef.mail.ssl.enabled:false}
+      enabled: ${bytechef.mail.ssl.enabled}
   liquibase:
     contexts: mono, #spring.profiles.active#
   output:
@@ -217,6 +217,9 @@ bytechef:
           options:
             model: gpt-4.1
             temperature: 0.5
+      enabled: false
+  analytics:
+    enabled: false
   cache:
     # Cache provider (redis | caffeine) default: caffeine
     provider: caffeine
@@ -238,9 +241,21 @@ bytechef:
     provider: filesystem
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
+  help-hub:
+    enabled: false
   mail:
+    auth: false
     base-url: ${bytechef.public-url}
+    debug: false
     from: noreply@app.bytechef.io
+    host: localhost
+    port: 25
+    protocol: smtp
+    ssl:
+      enabled: false
+    starttls:
+      enable: false
+      required: false
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: jms
     provider: jms
@@ -265,6 +280,8 @@ bytechef:
     system:
       username: system_admin
       password:
+  sign-up:
+    activation-required: false
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single
