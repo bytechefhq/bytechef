@@ -49,7 +49,7 @@ export default function useFetchInterceptor() {
                 clonedResponse
                     .json()
                     .then((data) => {
-                        if (data.entityClass === 'User' && data.errorKey === 100) {
+                        if (data.entityClass === 'AdminUserDTO' && data.errorKey === 100) {
                             return;
                         }
 
