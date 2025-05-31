@@ -31,7 +31,11 @@ public class OrchestratorWorkers {
         """
             Analyze this task and break it down into subtasks so that the first subtask is always a single Trigger, and each subsequent subtask is either an Action or a Flow. Use the 'condition' flow for the 'if' function and 'loop' flow for the 'for each' function.
 
-            Task: {task}
+            Current workflow:
+            {workflow}
+
+            Task:
+            {task}
 
             Return your response in this JSON format:
             \\{
@@ -148,12 +152,13 @@ public class OrchestratorWorkers {
      * @throws IllegalArgumentException if taskDescription is null or empty
      */
     @SuppressWarnings("null")
-    public FinalResponse process(String taskDescription) {
+    public FinalResponse process(String taskDescription, String currentWorkflow) {
         Assert.hasText(taskDescription, "Task description must not be empty");
 
         OrchestratorResponse orchestratorResponse = this.chatClient.prompt()
             .user(u -> u.text(this.orchestratorPrompt)
-                .param("task", taskDescription))
+                .param("task", taskDescription)
+                .param("workflow", currentWorkflow))
             .call()
             .entity(OrchestratorResponse.class);
 
