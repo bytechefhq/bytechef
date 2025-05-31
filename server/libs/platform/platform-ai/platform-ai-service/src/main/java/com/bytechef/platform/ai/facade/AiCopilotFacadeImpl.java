@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.ai.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.ai.facade.dto.ContextDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -118,7 +117,8 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
     @Override
     public Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId) {
-        String currentWorkflow = workflowService.getWorkflow(contextDTO.workflowId()).getDefinition();
+        String currentWorkflow = workflowService.getWorkflow(contextDTO.workflowId())
+            .getDefinition();
 
         final String userPrompt = """
             Current workflow:
@@ -129,13 +129,17 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         final String workflowString = "workflow";
         final String messageString = "message";
 
-        String route = routingWorkflow.route(message, Map.of("workflow", "The prompt contains some kind of workflow or the user asks you to create, add or modify something.", "other", "The user wants something else."));
+        String route = routingWorkflow.route(message,
+            Map.of("workflow",
+                "The prompt contains some kind of workflow or the user asks you to create, add or modify something.",
+                "other", "The user wants something else."));
 
-        return switch (route){
+        return switch (route) {
             case workflowString -> {
                 yield switch (contextDTO.source()) {
                     case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
-                        OrchestratorWorkers.FinalResponse process = orchestratorWorkers.process(message, currentWorkflow);
+                        OrchestratorWorkers.FinalResponse process =
+                            orchestratorWorkers.process(message, currentWorkflow);
 
                         yield chatClientWorkflow.prompt()
                             .system(
@@ -190,7 +194,8 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                                 .stream()
                                 .content()
                                 .map(content -> Map.of("text", content));
-                            default -> throw new IllegalStateException("Unexpected value: " + parameters.get("language"));
+                            default ->
+                                throw new IllegalStateException("Unexpected value: " + parameters.get("language"));
                         };
                     }
                 };
