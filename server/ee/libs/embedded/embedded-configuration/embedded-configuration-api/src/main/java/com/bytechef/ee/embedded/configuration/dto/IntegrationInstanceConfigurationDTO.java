@@ -37,8 +37,8 @@ public record IntegrationInstanceConfigurationDTO(
             integrationInstanceConfiguration.getDescription(), integrationInstanceConfiguration.isEnabled(),
             integrationInstanceConfiguration.getEnvironment(), integrationInstanceConfiguration.getId(),
             integrationInstanceConfiguration.getLastModifiedBy(),
-            integrationInstanceConfiguration.getLastModifiedDate(),
-            null, integrationInstanceConfiguration.getIntegrationId(),
+            integrationInstanceConfiguration.getLastModifiedDate(), null,
+            integrationInstanceConfiguration.getIntegrationId(),
             integrationInstanceConfiguration.getIntegrationVersion(), integrationInstanceConfiguration.getName(),
             List.of(), List.of(), integrationInstanceConfiguration.getVersion());
     }
