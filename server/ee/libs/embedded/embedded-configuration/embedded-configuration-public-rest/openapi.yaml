@@ -15,29 +15,144 @@ tags:
   - name: "workflow"
     description: "The Embedded Workflow Public API"
 paths:
-#  /connections:
-#    get:
-#      description: "Get connections."
-#      summary: "Get connections"
-#      tags:
-#        - "connection"
-#      operationId: "getConnections"
-#      parameters:
-#        - name: "X-Environment"
-#          description: "The environment."
-#          in: "header"
-#          required: false
-#          schema:
-#              $ref: '#/components/schemas/Environment'
-#      responses:
-#        "200":
-#          description: "The list of connections."
-#          content:
-#              application/json:
-#                schema:
-#                  type: "array"
-#                  items:
-#                    $ref: "#/components/schemas/Connection"
+  /automation/workflows:
+    get:
+      description: "Get automation workflows for particular external user."
+      summary: "Get automation workflows for particular external user"
+      tags:
+        - "workflow"
+      operationId: "getFrontendProjectWorkflows"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Workflow"
+    post:
+      description: "Create new workflow and adds it to an existing integration."
+      summary: "Create new workflow and adds it to an existing integration"
+      tags:
+        - "workflow"
+      operationId: "createFrontendProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                definition:
+                  description: The workflow definition
+                  type: "string"
+        required: true
+      responses:
+        "200":
+          description: "The workflow reference code."
+          content:
+            application/json:
+              schema:
+                type: "string"
+      security:
+        - frontendBearerAuth: [ ]
+  /automation/workflows/{workflowReferenceCode}:
+    delete:
+      description: "Delete a workflow."
+      summary: "Delete a workflow"
+      tags:
+        - "workflow"
+      operationId: "deleteFrontendProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+    get:
+      description: "Get a workflow by workflow reference code."
+      summary: "Get a workflow by workflow reference code"
+      tags:
+        - "workflow"
+      operationId: "getFrontendProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+    put:
+      description: "Update an existing workflow."
+      summary: "Update an existing workflow"
+      tags:
+        - "workflow"
+      operationId: "updateFrontendProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                definition:
+                  description: The workflow definition
+                  type: "string"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+      security:
+        - frontendBearerAuth: [ ]
   /integrations:
     get:
       description: "Get active integrations for particular external user."
@@ -97,6 +212,174 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - frontendBearerAuth: [ ]
+  /{externalUserId}/automation/workflows:
+    get:
+      description: "Get automation workflows for particular external user."
+      summary: "Get automation workflows for particular external user"
+      tags:
+        - "workflow"
+      operationId: "getProjectWorkflows"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Workflow"
+    post:
+      description: "Create new workflow and adds it to an existing integration."
+      summary: "Create new workflow and adds it to an existing integration"
+      tags:
+        - "workflow"
+      operationId: "createProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                definition:
+                  description: The workflow definition
+                  type: "string"
+        required: true
+      responses:
+        "200":
+          description: "The workflow reference code."
+          content:
+            application/json:
+              schema:
+                type: "string"
+      security:
+        - bearerAuth: [ ]
+  /{externalUserId}/automation/workflows/{workflowReferenceCode}:
+    delete:
+      description: "Delete a workflow."
+      summary: "Delete a workflow"
+      tags:
+        - "workflow"
+      operationId: "deleteProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+    get:
+      description: "Get a workflow by workflow reference code."
+      summary: "Get a workflow by workflow reference code"
+      tags:
+        - "workflow"
+      operationId: "getProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+    put:
+      description: "Update an existing workflow."
+      summary: "Update an existing workflow"
+      tags:
+        - "workflow"
+      operationId: "updateProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                definition:
+                  description: The workflow definition
+                  type: "string"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+      security:
+        - bearerAuth: [ ]
   /{externalUserId}/integrations:
     get:
       description: "Get active integrations for particular external user."
@@ -125,7 +408,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/Integration"
+                  $ref: "#/components/schemas/IntegrationBasic"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
@@ -168,102 +451,121 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
-#  /integrations-instances:
-#    get:
-#      description: "Get integration instances."
-#      summary: "Get integration instances"
-#      tags:
-#        - "integration-instance"
-#      operationId: "getIntegrationInstances"
-#      parameters:
-#        - name: "X-Environment"
-#          description: "The environment."
-#          in: "header"
-#          required: false
-#          schema:
-#            $ref: '#/components/schemas/Environment'
-#      responses:
-#        "200":
-#          description: "The list of integration instances."
-#          content:
-#            application/json:
-#              schema:
-#                type: "array"
-#                items:
-#                  $ref: "#/components/schemas/IntegrationInstance"
 components:
   schemas:
-    Connection:
-      description: "Contains all required information to open a connection to a service\
-              \ defined by componentName parameter."
+    ConnectionConfig:
+      description: "Contains all required information to open a connection to a service defined by componentName parameter."
       type: "object"
-      required:
-        - "name"
-        - "componentName"
-        - "componentVersion"
-        - "parameters"
       properties:
-        active:
-          description: "If a connection is used in any of active workflows."
-          type: "boolean"
-          readOnly: true
-        connectionVersion:
-          description: "The version of a component that uses this connection."
-          type: "integer"
-          readOnly: true
-        credentialStatus:
-          $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
-        id:
-          description: "The id of a connection."
-          type: "integer"
-          format: "int64"
-          readOnly: true
+        authorizationType:
+          $ref: "../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/AuthorizationType"
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Input"
+        oauth2:
+          $ref: "#/components/schemas/OAuth2"
     Environment:
       $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
-    Integration:
+    IntegrationBasic:
       description: "A group of workflows that make one logical integration."
       type: "object"
       required:
+        - "credentialStatus"
         - "icon"
         - "componentName"
         - "multipleInstances"
+        - "enabled"
       properties:
+        componentName:
+          description: "The name of the integration's component."
+          type: "string"
+        credentialStatus:
+          $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
+        description:
+          description: "The description of a project."
+          type: "string"
+        enabled:
+          description: "If an integration is enabled or not"
+          type: "boolean"
+        icon:
+          description: "The icon."
+          type: "string"
         id:
           description: "The id of an integration."
           type: "integer"
           format: "int64"
-          readOnly: true
-        componentName:
-          description: "The name of the integration's component."
-          type: "string"
-          readOnly: true
-        title:
-          description: "The title of the integration's component."
-          type: "string"
-          readOnly: true
-        description:
-          description: "The description of a project."
-          type: "string"
-          readOnly: true
-        icon:
-          description: "The icon."
-          type: "string"
-          readOnly: true
         integrationVersion:
           description: "The version of an integration."
           type: "integer"
-          readOnly: true
         multipleInstances:
           description: "If multiple instances of an integration are allowed or not."
           type: "boolean"
           default: false
-          readOnly: true
-        workflows:
-          description: "The list of workflows."
+        title:
+          description: "The title of the integration's component."
+          type: "string"
+    Integration:
+      allOf:
+        - $ref: "#/components/schemas/IntegrationBasic"
+        - type: object
+          properties:
+            connectionConfig:
+              $ref: "#/components/schemas/ConnectionConfig"
+            workflows:
+              description: "The list of workflows."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Workflow"
+    Input:
+      type: "object"
+      required:
+        - "name"
+        - "value"
+        - "type"
+      properties:
+        label:
+          description: "The descriptive name of an input"
+          type: "string"
+        name:
+          description: "The name of an input"
+          type: "string"
+        required:
+          description: "If an input is required, or not"
+          type: "boolean"
+          default: false
+        type:
+          $ref: "#/components/schemas/InputType"
+    InputType:
+      description: "The type of an input, for example \\\"STRING\\\""
+      type: "string"
+      default: "STRING"
+      enum:
+        - "BOOLEAN"
+        - "DATE"
+        - "DATE_TIME"
+        - "INTEGER"
+        - "NUMBER"
+        - "STRING"
+        - "TIME"
+    OAuth2:
+      type: "object"
+      properties:
+        authorizationUrl:
+          type: "string"
+        extraQueryParameters:
+          type: "object"
+          additionalProperties:
+            type: "string"
+        clientId:
+          type: "string"
+        redirectUri:
+          description: "The redirect URI used for OAuth2 callback URL."
+          type: "string"
+        scopes:
           type: "array"
           items:
-            $ref: "#/components/schemas/Workflow"
-#    IntegrationInstance:
+            type: "string"
     Workflow:
       description: "A group of tasks that make one logical workflow."
       type: "object"
@@ -271,18 +573,25 @@ components:
         - "name"
         - "tasks"
       properties:
-        workflowReferenceCode:
-          description: "The reference code of a workflow."
-          type: "string"
-          readOnly: true
-        label:
-          description: "The label of a workflow."
-          type: "string"
-          readOnly: true
         description:
           description: "The description of a workflow."
           type: "string"
           readOnly: true
+        definition:
+          description: "The definition of a workflow."
+          type: "string"
+        label:
+          description: "The label of a workflow."
+          type: "string"
+          readOnly: true
+        workflowReferenceCode:
+          description: "The reference code of a workflow."
+          type: "string"
+          readOnly: true
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Input"
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid

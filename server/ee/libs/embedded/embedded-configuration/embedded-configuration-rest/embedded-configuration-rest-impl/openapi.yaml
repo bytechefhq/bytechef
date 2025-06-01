@@ -10,8 +10,8 @@ tags:
     description: "The Embedded App Event Internal API"
   - name: "category"
     description: "The Embedded Category Internal API"
-  - name: "connected-user"
-    description: "The Embedded Connected User Internal API"
+  - name: "connected-user-project-workflow"
+    description: "The Embedded Connected User Project Workflow Internal API"
   - name: "integration-tag"
     description: "The Embedded Tag Internal API"
   - name: "integration"
@@ -119,6 +119,33 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /connected-user-project-workflows/{workflowReferenceCode}:
+    get:
+      description: "Get connected user project workflow."
+      summary: "Get connected user project workflow."
+      tags:
+        - "connected-user-project-workflow"
+      operationId: "getConnectedUserProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowReferenceCode"
+          description: "The workflow reference code."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The connected user project workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
   /integration-instance-configurations/tags:
     get:
       description: "Get integration instance configuration tags."
@@ -980,6 +1007,27 @@ components:
           format: "int32"
     Category:
       $ref: "../../../../../../libs/platform/platform-category/platform-category-rest/platform-category-rest-api/openapi.yaml#/components/schemas/Category"
+    ConnectedUserProjectWorkflow:
+      type: "object"
+      properties:
+        connectedUserId:
+          description: "The connected user id"
+          type: "integer"
+          format: "int64"
+        projectId:
+          description: "The project id"
+          type: "integer"
+          format: "int64"
+        vendorComponentName:
+          description: The vendor component name
+          type: "string"
+        include:
+          description: List of items to include
+          type: "array"
+          items:
+            type: "string"
+        workflow:
+          $ref: "../../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
     Environment:
       $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Integration:
