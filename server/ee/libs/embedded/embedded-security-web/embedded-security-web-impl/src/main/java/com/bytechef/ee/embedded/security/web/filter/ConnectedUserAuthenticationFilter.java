@@ -68,11 +68,9 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
             return new ConnectedUserAuthenticationToken(
                 externalUserId, getEnvironment(request), tenantKey.getTenantId());
         } else {
-            TenantKey tenantKey = TenantKey.parse(token);
-
-            Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
-
             String externalUserId;
+            Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
+            TenantKey tenantKey = TenantKey.parse(token);
 
             if (matcher.matches()) {
                 externalUserId = matcher.group(1);
