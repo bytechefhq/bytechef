@@ -154,7 +154,6 @@ public class SecurityConfiguration {
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
                 .ignoringRequestMatchers("/api/o/**")
-                .ignoringRequestMatchers("/graphql")
                 .ignoringRequestMatchers("/sse"));
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
