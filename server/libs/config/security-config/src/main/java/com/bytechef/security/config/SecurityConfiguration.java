@@ -47,6 +47,7 @@ import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -58,6 +59,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -122,7 +124,9 @@ public class SecurityConfiguration {
                 .permitAll()
                 .requestMatchers(mvc.pattern("/actuator/**"))
                 .hasAuthority(AuthorityConstants.SYSTEM_ADMIN))
-            .httpBasic(withDefaults());
+            .httpBasic(withDefaults())
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(new UnauthorizedBasicAuthenticationEntryPoint()));
 
         AuthenticationProvider authenticationProvider = getSystemAuthenticationProvider(security.getSystem());
 
@@ -207,8 +211,7 @@ public class SecurityConfiguration {
             .logout(logout -> logout
                 .logoutUrl("/api/logout")
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                .permitAll())
-            .httpBasic(AbstractHttpConfigurer::disable);
+                .permitAll());
 
         http.with(filterBeforeContributorConfigurer(filterBeforeContributors), withDefaults());
 
@@ -244,8 +247,9 @@ public class SecurityConfiguration {
                 .requestMatchers(mvc.pattern("/v3/api-docs/**"))
                 .permitAll()
                 .requestMatchers(mvc.pattern("/webhooks/**"))
-                .permitAll())
-            .httpBasic(withDefaults());
+                .permitAll()
+                .anyRequest()
+                .denyAll());
 
         return http.build();
     }
@@ -264,7 +268,9 @@ public class SecurityConfiguration {
                 .permitAll()
                 .requestMatchers(mvc.pattern("/graphql"))
                 .authenticated())
-            .httpBasic(withDefaults());
+            .httpBasic(withDefaults())
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(new UnauthorizedBasicAuthenticationEntryPoint()));
 
         return http.build();
     }
@@ -369,6 +375,18 @@ public class SecurityConfiguration {
                     filterBeforeContributor.getFilter(authenticationManager),
                     filterBeforeContributor.getBeforeFilter());
             }
+        }
+    }
+
+    private static class UnauthorizedBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
+
+        @Override
+        public void commence(
+            HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException authException) {
+
+            response.setHeader("WWW-Authenticate", "Basic realm=\"Protected Endpoints\"");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 }
