@@ -3,6 +3,7 @@
 export * from './AppEvent';
 export * from './Category';
 export * from './ComponentConnection';
+export * from './ConnectedUserProjectWorkflow';
 export * from './CreateIntegrationInstanceConfigurationWorkflowJob200Response';
 export * from './Environment';
 export * from './Integration';
