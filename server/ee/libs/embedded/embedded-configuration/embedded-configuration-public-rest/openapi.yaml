@@ -8,8 +8,6 @@ servers:
 tags:
   - name: "connection"
     description: "The Embedded Connection Public API"
-  - name: "frontend-integration"
-    description: "The Embedded Frontend Integration Public API"
   - name: "integration"
     description: "The Embedded Integration Public API"
   - name: "integration-instance"
@@ -40,12 +38,12 @@ paths:
 #                  type: "array"
 #                  items:
 #                    $ref: "#/components/schemas/Connection"
-  /frontend/integrations:
+  /integrations:
     get:
-      description: "Get active integrations."
-      summary: "Get active integrations"
+      description: "Get active integrations for particular external user."
+      summary: "Get active integrations for particular external user"
       tags:
-        - "frontend-integration"
+        - "integration"
       operationId: "getFrontendIntegrations"
       parameters:
         - name: "X-Environment"
@@ -67,12 +65,12 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - frontendBearerAuth: [ ]
-  /frontend/integrations/{id}:
+  /integrations/{id}:
     get:
-      description: "Get an integration by id."
-      summary: "Get an integration by id"
+      description: "Get an integration by id for particular external user."
+      summary: "Get an integration by id for particular external user"
       tags:
-        - "frontend-integration"
+        - "integration"
       operationId: "getFrontendIntegration"
       parameters:
         - name: "X-Environment"
@@ -101,8 +99,8 @@ paths:
         - frontendBearerAuth: [ ]
   /{externalUserId}/integrations:
     get:
-      description: "Get active integrations."
-      summary: "Get active integrations"
+      description: "Get active integrations for particular external user."
+      summary: "Get active integrations for particular external user"
       tags:
         - "integration"
       operationId: "getIntegrations"
@@ -131,7 +129,45 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
-        - frontendBearerAuth: [ ]
+        - bearerAuth: [ ]
+  /{externalUserId}/integrations/{id}:
+    get:
+      description: "Get active integrations for particular external user."
+      summary: "Get active integrations for particular external user"
+      tags:
+        - "integration"
+      operationId: "getIntegration"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          description: "The id of an integration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of active integrations."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: [ ]
 #  /integrations-instances:
 #    get:
 #      description: "Get integration instances."
