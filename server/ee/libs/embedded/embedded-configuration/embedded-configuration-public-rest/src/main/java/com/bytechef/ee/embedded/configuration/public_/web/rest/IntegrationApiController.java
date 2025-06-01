@@ -49,47 +49,55 @@ public class IntegrationApiController implements IntegrationApi {
     @CrossOrigin
     @Override
     public ResponseEntity<IntegrationModel> getFrontendIntegration(Long id, EnvironmentModel xEnvironment) {
-        Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
-
         return ResponseEntity.ok(
             conversionService.convert(
                 integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationIntegration(
-                    id, environment, true),
+                    id, getEnvironment(xEnvironment), true),
                 IntegrationModel.class));
     }
 
     @CrossOrigin
     @Override
     public ResponseEntity<List<IntegrationModel>> getFrontendIntegrations(EnvironmentModel xEnvironment) {
-        Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
-
         return ResponseEntity.ok(
             integrationInstanceConfigurationFacade
-                .getIntegrationInstanceConfigurationIntegrations(environment, true)
+                .getIntegrationInstanceConfigurationIntegrations(getEnvironment(xEnvironment), true)
                 .stream()
                 .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
                 .toList());
     }
 
     @Override
+    public ResponseEntity<IntegrationModel> getIntegration(
+        String externalUserId, Long id, EnvironmentModel xEnvironment) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationIntegration(
+                    id, getEnvironment(xEnvironment), true),
+                IntegrationModel.class));
+    }
+
+    @Override
     public ResponseEntity<List<IntegrationModel>> getIntegrations(
         String externalUserId, EnvironmentModel xEnvironment) {
 
-        Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
-
         return ResponseEntity.ok(
             integrationInstanceConfigurationFacade
-                .getIntegrationInstanceConfigurationIntegrations(environment, true)
+                .getIntegrationInstanceConfigurationIntegrations(getEnvironment(xEnvironment), true)
                 .stream()
-                .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
+                .map(integrationInstanceConfigurationDTO -> conversionService.convert(
+                    integrationInstanceConfigurationDTO, IntegrationModel.class))
                 .toList());
     }
 
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
+    }
+
+    private static Environment getEnvironment(EnvironmentModel xEnvironment) {
+        return xEnvironment == null
+            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
     }
 }
