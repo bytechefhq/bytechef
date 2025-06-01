@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.connection.exception;
+package com.bytechef.atlas.configuration.exception;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.exception.AbstractErrorType;
-import com.bytechef.platform.connection.domain.Connection;
 
 /**
  * @author Ivica Cardic
  */
-public class ConnectionErrorType extends AbstractErrorType {
+public class WorkflowErrorType extends AbstractErrorType {
 
-    public static final ConnectionErrorType CONNECTION_IS_USED = new ConnectionErrorType(100);
+    public static final WorkflowErrorType WORKFLOW_NOT_FOUND = new WorkflowErrorType(100);
+    public static final WorkflowErrorType WORKFLOW_NODE_NOT_FOUND = new WorkflowErrorType(101);
 
-    private ConnectionErrorType(int errorKey) {
-        super(Connection.class, errorKey);
+    public WorkflowErrorType(int errorKey) {
+        super(Workflow.class, errorKey);
     }
 }

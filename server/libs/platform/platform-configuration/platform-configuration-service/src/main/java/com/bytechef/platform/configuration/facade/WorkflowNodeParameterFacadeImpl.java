@@ -19,10 +19,12 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.exception.WorkflowErrorType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.DynamicPropertiesProperty;
@@ -583,7 +585,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
 
             if (taskMap == null) {
-                throw new IllegalArgumentException("Workflow node %s does not exist".formatted(workflowNodeName));
+                throw new ConfigurationException(
+                    "Workflow node with name: %s does not exist".formatted(workflowNodeName),
+                    WorkflowErrorType.WORKFLOW_NODE_NOT_FOUND);
             }
 
             metadataMap = (Map<String, Object>) taskMap.get(METADATA);
@@ -712,7 +716,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
 
             if (taskMap == null) {
-                throw new IllegalArgumentException("Workflow node %s does not exist".formatted(workflowNodeName));
+                throw new ConfigurationException(
+                    "Workflow node with name: %s does not exist".formatted(workflowNodeName),
+                    WorkflowErrorType.WORKFLOW_NODE_NOT_FOUND);
             }
 
             parameterMap = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);

@@ -39,17 +39,18 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.exception.ConfigurationException;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -702,8 +703,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectDeploymentWorkflowConnection.getWorkflowConnectionKey());
 
             if (!Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
-                throw new IllegalArgumentException(
-                    "Connection component name does not match workflow connection component name");
+                throw new ConfigurationException(
+                    "Connection component name does not match workflow connection component name",
+                    ConnectionErrorType.INVALID_CONNECTION_COMPONENT_NAME);
             }
         }
     }

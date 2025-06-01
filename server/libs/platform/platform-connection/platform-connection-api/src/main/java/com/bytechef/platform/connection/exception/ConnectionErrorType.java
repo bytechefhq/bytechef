@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.web.rest.exception;
+package com.bytechef.platform.connection.exception;
 
-import com.bytechef.exception.AbstractException;
-import org.springframework.http.HttpStatus;
+import com.bytechef.exception.AbstractErrorType;
+import com.bytechef.platform.connection.domain.Connection;
 
 /**
  * @author Ivica Cardic
  */
-public class AccountResourceException extends AbstractException {
+public class ConnectionErrorType extends AbstractErrorType {
 
-    private final AccountErrorType errorType;
+    public static final ConnectionErrorType CONNECTION_IS_USED = new ConnectionErrorType(100);
+    public static final ConnectionErrorType INVALID_CONNECTION = new ConnectionErrorType(101);
+    public static final ConnectionErrorType INVALID_CONNECTION_COMPONENT_NAME = new ConnectionErrorType(102);
 
-    public AccountResourceException(String message, AccountErrorType errorType) {
-        super(message, errorType);
-
-        this.errorType = errorType;
-    }
-
-    public HttpStatus getStatus() {
-        return errorType.getStatus();
+    private ConnectionErrorType(int errorKey) {
+        super(Connection.class, errorKey);
     }
 }

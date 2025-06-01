@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.exception;
+package com.bytechef.exception;
 
-import com.bytechef.exception.AbstractException;
-import com.bytechef.exception.ErrorType;
 import java.util.Map;
 
 /**

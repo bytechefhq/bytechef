@@ -24,8 +24,10 @@ import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
+import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -218,7 +220,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (!Objects.equals(workflowNodeType.operation(), "newApiRequest")) {
-                throw new IllegalArgumentException("Invalid workflow trigger type");
+                throw new ConfigurationException(
+                    "Invalid workflow trigger type", ApiCollectionErrorType.INVALID_WORKFLOW_TRIGGER_TYPE);
             }
 
             String path = createPath(apiCollectionEndpoint, apiCollection);

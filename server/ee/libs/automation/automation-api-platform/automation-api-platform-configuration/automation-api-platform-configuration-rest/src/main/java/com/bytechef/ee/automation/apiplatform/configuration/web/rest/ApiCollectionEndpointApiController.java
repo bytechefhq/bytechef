@@ -9,9 +9,11 @@ package com.bytechef.ee.automation.apiplatform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
+import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionEndpointModel;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -85,7 +87,8 @@ public class ApiCollectionEndpointApiController implements ApiCollectionEndpoint
         String path = apiCollectionEndpointModel.getPath();
 
         if (StringUtils.isNotEmpty(path) && path.startsWith("/")) {
-            throw new IllegalArgumentException("Context path must not start with a slash.");
+            throw new ConfigurationException(
+                "Context path must not start with a slash.", ApiCollectionErrorType.INVALID_CONTEXT_PATH);
         }
     }
 }

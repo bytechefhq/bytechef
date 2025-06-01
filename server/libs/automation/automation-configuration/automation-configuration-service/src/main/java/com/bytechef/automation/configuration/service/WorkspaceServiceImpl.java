@@ -20,7 +20,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.exception.WorkspaceErrorType;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.exception.ConfigurationException;
+import com.bytechef.exception.ConfigurationException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

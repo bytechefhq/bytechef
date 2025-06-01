@@ -23,13 +23,13 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ai.agent.SingleConnectionToolFunction;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
-import com.bytechef.platform.exception.ExecutionException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

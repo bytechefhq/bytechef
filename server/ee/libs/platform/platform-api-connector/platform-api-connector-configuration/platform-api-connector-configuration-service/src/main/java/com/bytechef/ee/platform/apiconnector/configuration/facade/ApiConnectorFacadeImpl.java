@@ -12,8 +12,10 @@ import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEndpoint;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEndpoint.HttpMethod;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
+import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
 import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiGenerator;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -23,6 +25,7 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -58,41 +61,59 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
     public ApiConnector importOpenApiSpecification(String name, String specification) {
         name = convertComponentName(name);
 
+        Path openApiSpecificationPath;
+
         try {
-            Path openApiSpecificationPath = Files.createTempFile("open_api_specification", ".yaml");
+            openApiSpecificationPath = Files.createTempFile("open_api_specification", ".yaml");
+        } catch (IOException e) {
+            throw new ConfigurationException(e.getMessage(), ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
 
+        try {
             Files.writeString(openApiSpecificationPath, specification);
+        } catch (IOException e) {
+            throw new ConfigurationException(e.getMessage(), ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
 
-            OpenAPI openAPI = parseOpenAPIFile(openApiSpecificationPath.toString());
+        OpenAPI openAPI = parseOpenAPIFile(openApiSpecificationPath.toString());
 
-            Path definitionFilePath = OpenApiGenerator.generate(name, openApiSpecificationPath);
+        Path definitionFilePath;
 
-            boolean isNew = false;
-            ApiConnector apiConnector = apiConnectorService.fetchApiConnector(name, 1)
-                .orElse(null);
+        try {
+            definitionFilePath = OpenApiGenerator.generate(name, openApiSpecificationPath);
+        } catch (Exception e) {
+            throw new ConfigurationException(e.getMessage(), ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
 
-            if (apiConnector == null) {
-                apiConnector = new ApiConnector();
-                isNew = true;
-            }
+        ApiConnector apiConnector = apiConnectorService.fetchApiConnector(name, 1)
+            .orElse(null);
+        boolean isNew = false;
 
-            apiConnector.setName(name);
-            apiConnector.setConnectorVersion(1);
+        if (apiConnector == null) {
+            apiConnector = new ApiConnector();
+            isNew = true;
+        }
+
+        apiConnector.setName(name);
+        apiConnector.setConnectorVersion(1);
+
+        try {
             apiConnector.setDefinition(
                 apiConnectorFileStorage.storeApiConnectorDefinition(
                     "definition.json", Files.readString(definitionFilePath)));
-            apiConnector.setDescription(getDescription(openAPI.getInfo()));
-            apiConnector.setSpecification(
-                apiConnectorFileStorage.storeApiConnectorSpecification("specification.yaml", specification));
-            apiConnector.setTitle(getTitle(name, openAPI.getInfo()));
+        } catch (IOException e) {
+            throw new ConfigurationException(e.getMessage(), ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
 
-            if (isNew) {
-                return apiConnectorService.create(apiConnector);
-            } else {
-                return apiConnectorService.update(apiConnector);
-            }
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+        apiConnector.setDescription(getDescription(openAPI.getInfo()));
+        apiConnector.setSpecification(
+            apiConnectorFileStorage.storeApiConnectorSpecification("specification.yaml", specification));
+        apiConnector.setTitle(getTitle(name, openAPI.getInfo()));
+
+        if (isNew) {
+            return apiConnectorService.create(apiConnector);
+        } else {
+            return apiConnectorService.update(apiConnector);
         }
     }
 
@@ -205,7 +226,8 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         List<String> messages = result.getMessages();
 
         if (messages != null && !messages.isEmpty()) {
-            throw new IllegalArgumentException(String.join("\n", messages));
+            throw new ConfigurationException(
+                String.join("\n", messages), ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
         }
 
         return openAPI;

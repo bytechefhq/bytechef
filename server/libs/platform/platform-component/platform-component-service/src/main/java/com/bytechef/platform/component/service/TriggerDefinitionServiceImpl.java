@@ -42,6 +42,8 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunctio
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
@@ -58,8 +60,6 @@ import com.bytechef.platform.component.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.domain.OutputResponse;
-import com.bytechef.platform.exception.ConfigurationException;
-import com.bytechef.platform.exception.ExecutionException;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;

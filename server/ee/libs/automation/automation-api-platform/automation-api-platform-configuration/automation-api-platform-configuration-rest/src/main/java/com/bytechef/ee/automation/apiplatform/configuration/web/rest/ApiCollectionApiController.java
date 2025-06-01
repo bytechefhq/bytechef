@@ -12,9 +12,11 @@ import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
+import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionModel;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
@@ -134,7 +136,8 @@ public class ApiCollectionApiController implements ApiCollectionApi {
         String contextPath = apiCollectionModel.getContextPath();
 
         if (contextPath.startsWith("/")) {
-            throw new IllegalArgumentException("Context path must not start with a slash.");
+            throw new ConfigurationException(
+                "Context path must not start with a slash.", ApiCollectionErrorType.INVALID_CONTEXT_PATH);
         }
     }
 }
