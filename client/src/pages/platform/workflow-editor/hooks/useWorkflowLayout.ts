@@ -11,7 +11,7 @@ import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEffect, useMemo} from 'react';
 
-export const useWorkflowLayout = () => {
+export const useWorkflowLayout = (include?: string[]) => {
     const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {componentActions, setComponentDefinitions, setTaskDispatcherDefinitions, workflow} = useWorkflowDataStore();
@@ -21,46 +21,6 @@ export const useWorkflowLayout = () => {
     const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
 
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow.id!});
-
-    const workflowTestConfigurationConnections = useMemo(
-        () =>
-            (workflowTestConfiguration?.connections ?? []).reduce(
-                (map: {[key: string]: number}, workflowTestConfigurationConnection) => {
-                    const {connectionId, workflowConnectionKey, workflowNodeName} = workflowTestConfigurationConnection;
-
-                    map[`${workflowNodeName}_${workflowConnectionKey}`] = connectionId;
-
-                    return map;
-                },
-                {}
-            ),
-        [workflowTestConfiguration]
-    );
-
-    const workflowTestConfigurationInputs = useMemo(
-        () => workflowTestConfiguration?.inputs ?? {},
-        [workflowTestConfiguration]
-    );
-
-    const runDisabled = useMemo(() => {
-        const requiredInputsMissing = (workflow?.inputs ?? []).some(
-            (input) => input.required && !workflowTestConfigurationInputs[input.name]
-        );
-
-        const noTasks = (workflow?.tasks ?? []).length === 0;
-
-        const requiredConnectionsMissing = (workflow?.tasks ?? [])
-            .flatMap((task) => task.connections ?? [])
-            .some(
-                (workflowConnection) =>
-                    workflowConnection.required &&
-                    !workflowTestConfigurationConnections[
-                        `${workflowConnection.workflowNodeName}_${workflowConnection.key}`
-                    ]
-            );
-
-        return requiredInputsMissing || noTasks || requiredConnectionsMissing;
-    }, [workflow, workflowTestConfigurationInputs, workflowTestConfigurationConnections]);
 
     const testConfigurationDisabled = useMemo(() => {
         const noInputs = (workflow?.inputs ?? []).length === 0;
@@ -79,6 +39,7 @@ export const useWorkflowLayout = () => {
         isLoading: componentsIsLoading,
     } = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
+        include,
         triggerDefinitions: true,
     });
 
@@ -186,7 +147,6 @@ export const useWorkflowLayout = () => {
         handleWorkflowOutputsClick,
         isWorkflowNodeOutputsPending,
         previousComponentDefinitions,
-        runDisabled,
         taskDispatcherDefinitions,
         taskDispatcherDefinitionsError,
         taskDispatcherDefinitionsLoading,

@@ -12,6 +12,7 @@ export interface WorkflowRightSidebarProps {
     onWorkflowInputsClick: () => void;
     onWorkflowOutputsClick: () => void;
     rightSidebarOpen: boolean;
+    showWorkflowInputs?: boolean;
 }
 const WorkflowRightSidebar = ({
     copilotPanelOpen,
@@ -21,6 +22,7 @@ const WorkflowRightSidebar = ({
     onWorkflowInputsClick,
     onWorkflowOutputsClick,
     rightSidebarOpen,
+    showWorkflowInputs = true,
 }: WorkflowRightSidebarProps) => {
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
     const ff_1840 = useFeatureFlagsStore()('ff-1840');
@@ -28,31 +30,39 @@ const WorkflowRightSidebar = ({
     const rightSidebarNavigation = useMemo(
         () =>
             [
-                {
-                    icon: BlocksIcon,
-                    name: 'Components & Flow Controls',
-                    onClick: onComponentsAndFlowControlsClick,
-                },
-                {
-                    icon: SlidersIcon,
-                    name: 'Workflow Inputs',
-                    onClick: onWorkflowInputsClick,
-                },
-                {
-                    icon: CableIcon,
-                    name: 'Workflow Outputs',
-                    onClick: onWorkflowOutputsClick,
-                },
-                {
-                    icon: Code2Icon,
-                    name: 'Workflow Code Editor',
-                    onClick: onWorkflowCodeEditorClick,
-                },
-                {
-                    icon: SparklesIcon,
-                    name: 'Copilot',
-                    onClick: onCopilotClick,
-                },
+                ...[
+                    {
+                        icon: BlocksIcon,
+                        name: 'Components & Flow Controls',
+                        onClick: onComponentsAndFlowControlsClick,
+                    },
+                ],
+                ...(showWorkflowInputs
+                    ? [
+                          {
+                              icon: SlidersIcon,
+                              name: 'Workflow Inputs',
+                              onClick: onWorkflowInputsClick,
+                          },
+                      ]
+                    : []),
+                ...[
+                    {
+                        icon: CableIcon,
+                        name: 'Workflow Outputs',
+                        onClick: onWorkflowOutputsClick,
+                    },
+                    {
+                        icon: Code2Icon,
+                        name: 'Workflow Code Editor',
+                        onClick: onWorkflowCodeEditorClick,
+                    },
+                    {
+                        icon: SparklesIcon,
+                        name: 'Copilot',
+                        onClick: onCopilotClick,
+                    },
+                ],
             ].filter((item) => {
                 if (item.name === 'Copilot') {
                     return ff_1570;

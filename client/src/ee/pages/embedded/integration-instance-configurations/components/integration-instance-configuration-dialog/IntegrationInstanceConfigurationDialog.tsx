@@ -405,11 +405,12 @@ const IntegrationInstanceConfigurationDialog = ({
                                     <Button variant="outline">Cancel</Button>
                                 </DialogClose>
 
-                                {(!integrationInstanceConfiguration?.id ||
+                                {(((!integrationInstanceConfiguration?.id ||
                                     (workflows && workflows.length > 0 && updateIntegrationVersion)) &&
-                                    oAuth2Authorization && (
-                                        <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
-                                    )}
+                                    oAuth2Authorization) ||
+                                    (workflows && workflows.length > 0 && !oAuth2Authorization)) && (
+                                    <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
+                                )}
 
                                 {(((!workflows || workflows?.length == 0) && !oAuth2Authorization) ||
                                     (integrationInstanceConfiguration?.id && !updateIntegrationVersion) ||

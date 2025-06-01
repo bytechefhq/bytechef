@@ -1,67 +1,53 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import IntegrationHeader from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeader';
-import IntegrationsSidebar from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebar';
-import IntegrationsSidebarHeader from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebarHeader';
-import {useIntegration} from '@/ee/pages/embedded/integration/hooks/useIntegration';
-import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
+import WorkflowBuilderHeader from '@/ee/pages/embedded/automations/components/workflow-builder-header/WorkflowBuilderHeader';
+import {useWorkflowBuilder} from '@/ee/pages/embedded/automations/hooks/useWorkflowBuilder';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {WorkflowNodeParameterMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {ConnectionReactQueryProvider} from '@/shared/components/connection/providers/connectionReactQueryProvider';
-import Header from '@/shared/layout/Header';
-import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/shared/queries/embedded/connections.queries';
-import {useParams} from 'react-router-dom';
 
-const Integration = () => {
-    const {leftSidebarOpen} = useIntegrationsLeftSidebarStore();
+const WorkflowBuilder = () => {
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
-
-    const {integrationId, integrationWorkflowId} = useParams();
+    const {workflow} = useWorkflowDataStore();
 
     const {
         bottomResizablePanelRef,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
+        include,
+        projectId,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
-    } = useIntegration({
-        integrationId: parseInt(integrationId!),
-        integrationWorkflowId: parseInt(integrationWorkflowId!),
-    });
-
+    } = useWorkflowBuilder();
     const {runDisabled} = useRun();
 
     return (
-        <>
-            <LayoutContainer
-                className="bg-muted/50"
-                leftSidebarBody={<IntegrationsSidebar integrationId={+integrationId!} />}
-                leftSidebarClass="bg-background"
-                leftSidebarHeader={<Header right={<IntegrationsSidebarHeader />} title="Integrations" />}
-                leftSidebarOpen={leftSidebarOpen}
-                leftSidebarWidth="96"
-                topHeader={
-                    integrationId && (
-                        <IntegrationHeader
-                            bottomResizablePanelRef={bottomResizablePanelRef}
-                            integrationId={parseInt(integrationId)}
-                            integrationWorkflowId={parseInt(integrationWorkflowId!)}
-                            runDisabled={runDisabled}
-                            updateWorkflowMutation={updateWorkflowMutation}
-                        />
-                    )
-                }
-            >
+        <div className="flex size-full flex-col">
+            {projectId && (
+                <WorkflowBuilderHeader
+                    bottomResizablePanelRef={bottomResizablePanelRef}
+                    chatTrigger={
+                        workflow.triggers &&
+                        workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
+                    }
+                    projectId={projectId}
+                    runDisabled={runDisabled}
+                    updateWorkflowMutation={updateWorkflowMutation}
+                />
+            )}
+
+            <div className="flex flex-1">
                 <ResizablePanelGroup className="flex-1 bg-surface-main" direction="vertical">
                     <ResizablePanel className="relative flex" defaultSize={65}>
                         <ConnectionReactQueryProvider
@@ -69,7 +55,7 @@ const Integration = () => {
                                 ConnectionKeys: ConnectionKeys,
                                 useCreateConnectionMutation: useCreateConnectionMutation,
                                 useGetConnectionTagsQuery: useGetConnectionTagsQuery,
-                                useGetConnectionsQuery: useGetConnectionsQuery,
+                                useGetConnectionsQuery,
                             }}
                         >
                             <WorkflowMutationProvider
@@ -83,12 +69,13 @@ const Integration = () => {
                                         updateWorkflowNodeParameterMutation,
                                     }}
                                 >
-                                    {integrationId && (
+                                    {projectId && (
                                         <WorkflowEditorLayout
-                                            parentId={parseInt(integrationId)}
-                                            parentType="INTEGRATION"
+                                            inputs={include}
+                                            parentId={projectId}
+                                            parentType="PROJECT"
                                             runDisabled={runDisabled}
-                                            showWorkflowInputs={true}
+                                            showWorkflowInputs={false}
                                         />
                                     )}
                                 </WorkflowNodeParameterMutationProvider>
@@ -106,9 +93,9 @@ const Integration = () => {
                         />
                     </ResizablePanel>
                 </ResizablePanelGroup>
-            </LayoutContainer>
-        </>
+            </div>
+        </div>
     );
 };
 
-export default Integration;
+export default WorkflowBuilder;

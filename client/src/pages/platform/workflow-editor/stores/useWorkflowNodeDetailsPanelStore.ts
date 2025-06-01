@@ -8,6 +8,9 @@ interface WorkflowNodeDetailsPanelStoreI {
     activeTab: string;
     setActiveTab: (activeTab: string) => void;
 
+    connectionDialogAllowed: boolean;
+    setConnectionDialogAllowed: (connectionDialogAllowed: boolean) => void;
+
     currentComponent: ComponentType | undefined;
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
 
@@ -28,6 +31,10 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
         (set) => ({
             activeTab: 'description',
             setActiveTab: (activeTab) => set((state) => ({...state, activeTab})),
+
+            connectionDialogAllowed: true,
+            setConnectionDialogAllowed: (connectionDialogAllowed) =>
+                set((state) => ({...state, connectionDialogAllowed})),
 
             currentComponent: undefined,
             setCurrentComponent: (currentComponent) => set((state) => ({...state, currentComponent})),
