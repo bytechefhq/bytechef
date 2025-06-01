@@ -17,16 +17,16 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateProjectWorkflowRequestModel
+ * CreateFrontendProjectWorkflowRequestModel
  */
 
-@JsonTypeName("createProjectWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-26T08:51:43.780222+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class CreateProjectWorkflowRequestModel {
+@JsonTypeName("createFrontendProjectWorkflow_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-03T07:53:09.868099+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+public class CreateFrontendProjectWorkflowRequestModel {
 
   private @Nullable String definition;
 
-  public CreateProjectWorkflowRequestModel definition(String definition) {
+  public CreateFrontendProjectWorkflowRequestModel definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -54,8 +54,8 @@ public class CreateProjectWorkflowRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateProjectWorkflowRequestModel createProjectWorkflowRequest = (CreateProjectWorkflowRequestModel) o;
-    return Objects.equals(this.definition, createProjectWorkflowRequest.definition);
+    CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequest = (CreateFrontendProjectWorkflowRequestModel) o;
+    return Objects.equals(this.definition, createFrontendProjectWorkflowRequest.definition);
   }
 
   @Override
@@ -66,7 +66,7 @@ public class CreateProjectWorkflowRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateProjectWorkflowRequestModel {\n");
+    sb.append("class CreateFrontendProjectWorkflowRequestModel {\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("}");
     return sb.toString();

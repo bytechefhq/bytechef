@@ -6,6 +6,7 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationBasicModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-26T08:51:43.780222+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-03T07:53:09.868099+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Public API")
 public interface IntegrationApi {
@@ -79,7 +80,7 @@ public interface IntegrationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"id\" : 0, \"componentName\" : \"componentName\", \"workflows\" : [ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\" }";
+                    String exampleString = "{ \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"connectionConfig\" : { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"authorizationType\" : \"API_KEY\", \"oauth2\" : { \"redirectUri\" : \"redirectUri\", \"clientId\" : \"clientId\", \"authorizationUrl\" : \"authorizationUrl\", \"extraQueryParameters\" : { \"key\" : \"extraQueryParameters\" }, \"scopes\" : [ \"scopes\", \"scopes\" ] } }, \"componentName\" : \"componentName\", \"id\" : 0, \"workflows\" : [ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\", \"enabled\" : true, \"credentialStatus\" : \"VALID\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -125,7 +126,57 @@ public interface IntegrationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"id\" : 0, \"componentName\" : \"componentName\", \"workflows\" : [ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\" }, { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"id\" : 0, \"componentName\" : \"componentName\", \"workflows\" : [ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\" } ]";
+                    String exampleString = "[ { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"connectionConfig\" : { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"authorizationType\" : \"API_KEY\", \"oauth2\" : { \"redirectUri\" : \"redirectUri\", \"clientId\" : \"clientId\", \"authorizationUrl\" : \"authorizationUrl\", \"extraQueryParameters\" : { \"key\" : \"extraQueryParameters\" }, \"scopes\" : [ \"scopes\", \"scopes\" ] } }, \"componentName\" : \"componentName\", \"id\" : 0, \"workflows\" : [ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\", \"enabled\" : true, \"credentialStatus\" : \"VALID\" }, { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"connectionConfig\" : { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"authorizationType\" : \"API_KEY\", \"oauth2\" : { \"redirectUri\" : \"redirectUri\", \"clientId\" : \"clientId\", \"authorizationUrl\" : \"authorizationUrl\", \"extraQueryParameters\" : { \"key\" : \"extraQueryParameters\" }, \"scopes\" : [ \"scopes\", \"scopes\" ] } }, \"componentName\" : \"componentName\", \"id\" : 0, \"workflows\" : [ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\", \"enabled\" : true, \"credentialStatus\" : \"VALID\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /{externalUserId}/integrations/{id} : Get active integrations for particular external user
+     * Get active integrations for particular external user.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param id The id of an integration. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The list of active integrations. (status code 200)
+     *         or Access token is missing or invalid (status code 401)
+     */
+    @Operation(
+        operationId = "getIntegration",
+        summary = "Get active integrations for particular external user",
+        description = "Get active integrations for particular external user.",
+        tags = { "integration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/{externalUserId}/integrations/{id}",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<IntegrationModel> getIntegration(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"connectionConfig\" : { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"authorizationType\" : \"API_KEY\", \"oauth2\" : { \"redirectUri\" : \"redirectUri\", \"clientId\" : \"clientId\", \"authorizationUrl\" : \"authorizationUrl\", \"extraQueryParameters\" : { \"key\" : \"extraQueryParameters\" }, \"scopes\" : [ \"scopes\", \"scopes\" ] } }, \"componentName\" : \"componentName\", \"id\" : 0, \"workflows\" : [ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\", \"enabled\" : true, \"credentialStatus\" : \"VALID\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -152,12 +203,12 @@ public interface IntegrationApi {
         tags = { "integration" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IntegrationModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IntegrationBasicModel.class)))
             }),
             @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
         },
         security = {
-            @SecurityRequirement(name = "frontendBearerAuth")
+            @SecurityRequirement(name = "bearerAuth")
         }
     )
     @RequestMapping(
@@ -166,14 +217,14 @@ public interface IntegrationApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<IntegrationModel>> getIntegrations(
+    default ResponseEntity<List<IntegrationBasicModel>> getIntegrations(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"id\" : 0, \"componentName\" : \"componentName\", \"workflows\" : [ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\" }, { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"id\" : 0, \"componentName\" : \"componentName\", \"workflows\" : [ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\" } ]";
+                    String exampleString = "[ { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"componentName\" : \"componentName\", \"id\" : 0, \"title\" : \"title\", \"enabled\" : true, \"credentialStatus\" : \"VALID\" }, { \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"multipleInstances\" : false, \"componentName\" : \"componentName\", \"id\" : 0, \"title\" : \"title\", \"enabled\" : true, \"credentialStatus\" : \"VALID\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

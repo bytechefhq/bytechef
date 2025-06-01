@@ -5,7 +5,7 @@
  */
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateProjectWorkflowRequestModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-26T08:51:43.780222+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-03T07:53:09.868099+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "workflow", description = "The Embedded Workflow Public API")
 public interface WorkflowApi {
@@ -44,35 +44,36 @@ public interface WorkflowApi {
     }
 
     /**
-     * POST /projects/{externalUserId}/workflows : Create new workflow and adds it to an existing integration
+     * POST /automation/workflows : Create new workflow and adds it to an existing integration
      * Create new workflow and adds it to an existing integration.
      *
-     * @param externalUserId The external user id. (required)
-     * @param createProjectWorkflowRequestModel  (required)
+     * @param createFrontendProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
-     * @return The project workflow reference code. (status code 200)
+     * @return The workflow reference code. (status code 200)
      */
     @Operation(
-        operationId = "createProjectWorkflow",
+        operationId = "createFrontendProjectWorkflow",
         summary = "Create new workflow and adds it to an existing integration",
         description = "Create new workflow and adds it to an existing integration.",
         tags = { "workflow" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The project workflow reference code.", content = {
+            @ApiResponse(responseCode = "200", description = "The workflow reference code.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "frontendBearerAuth")
         }
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/projects/{externalUserId}/workflows",
+        value = "/automation/workflows",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<String> createProjectWorkflow(
-        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "CreateProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel,
+    default ResponseEntity<String> createFrontendProjectWorkflow(
+        @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -81,11 +82,83 @@ public interface WorkflowApi {
 
 
     /**
-     * DELETE /projects/{externalUserId}/workflows/{workflowReferenceCode} : Delete a workflow
+     * POST /{externalUserId}/automation/workflows : Create new workflow and adds it to an existing integration
+     * Create new workflow and adds it to an existing integration.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param createFrontendProjectWorkflowRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The workflow reference code. (status code 200)
+     */
+    @Operation(
+        operationId = "createProjectWorkflow",
+        summary = "Create new workflow and adds it to an existing integration",
+        description = "Create new workflow and adds it to an existing integration.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The workflow reference code.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/{externalUserId}/automation/workflows",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<String> createProjectWorkflow(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * DELETE /automation/workflows/{workflowReferenceCode} : Delete a workflow
+     * Delete a workflow.
+     *
+     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "deleteFrontendProjectWorkflow",
+        summary = "Delete a workflow",
+        description = "Delete a workflow.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = "/automation/workflows/{workflowReferenceCode}"
+    )
+    
+    default ResponseEntity<Void> deleteFrontendProjectWorkflow(
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * DELETE /{externalUserId}/automation/workflows/{workflowReferenceCode} : Delete a workflow
      * Delete a workflow.
      *
      * @param externalUserId The external user id. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
     @Operation(
@@ -99,12 +172,13 @@ public interface WorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/projects/{externalUserId}/workflows/{workflowReferenceCode}"
+        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}"
     )
     
     default ResponseEntity<Void> deleteProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -112,11 +186,96 @@ public interface WorkflowApi {
 
 
     /**
-     * GET /projects/{externalUserId}/workflows/{workflowReferenceCode} : Get a workflow by workflow reference code
+     * GET /automation/workflows/{workflowReferenceCode} : Get a workflow by workflow reference code
+     * Get a workflow by workflow reference code.
+     *
+     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The workflow object. (status code 200)
+     */
+    @Operation(
+        operationId = "getFrontendProjectWorkflow",
+        summary = "Get a workflow by workflow reference code",
+        description = "Get a workflow by workflow reference code.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/automation/workflows/{workflowReferenceCode}",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<WorkflowModel> getFrontendProjectWorkflow(
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /automation/workflows : Get automation workflows for particular external user
+     * Get automation workflows for particular external user.
+     *
+     * @param xEnvironment The environment. (optional)
+     * @return The workflow object. (status code 200)
+     */
+    @Operation(
+        operationId = "getFrontendProjectWorkflows",
+        summary = "Get automation workflows for particular external user",
+        description = "Get automation workflows for particular external user.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/automation/workflows",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<List<WorkflowModel>> getFrontendProjectWorkflows(
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /{externalUserId}/automation/workflows/{workflowReferenceCode} : Get a workflow by workflow reference code
      * Get a workflow by workflow reference code.
      *
      * @param externalUserId The external user id. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param xEnvironment The environment. (optional)
      * @return The workflow object. (status code 200)
      */
     @Operation(
@@ -132,18 +291,19 @@ public interface WorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/projects/{externalUserId}/workflows/{workflowReferenceCode}",
+        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}",
         produces = { "application/json" }
     )
     
     default ResponseEntity<WorkflowModel> getProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
+                    String exampleString = "{ \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -155,12 +315,12 @@ public interface WorkflowApi {
 
 
     /**
-     * GET /projects/{externalUserId}/workflows : Get automation workflows for particular external user
+     * GET /{externalUserId}/automation/workflows : Get automation workflows for particular external user
      * Get automation workflows for particular external user.
      *
      * @param externalUserId The external user id. (required)
      * @param xEnvironment The environment. (optional)
-     * @return The updated integration object. (status code 200)
+     * @return The workflow object. (status code 200)
      */
     @Operation(
         operationId = "getProjectWorkflows",
@@ -168,14 +328,14 @@ public interface WorkflowApi {
         description = "Get automation workflows for particular external user.",
         tags = { "workflow" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
+            @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/projects/{externalUserId}/workflows",
+        value = "/{externalUserId}/automation/workflows",
         produces = { "application/json" }
     )
     
@@ -186,7 +346,7 @@ public interface WorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
+                    String exampleString = "[ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -198,12 +358,50 @@ public interface WorkflowApi {
 
 
     /**
-     * PUT /projects/{externalUserId}/workflows/{workflowReferenceCode} : Update an existing workflow
+     * PUT /automation/workflows/{workflowReferenceCode} : Update an existing workflow
+     * Update an existing workflow.
+     *
+     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param createFrontendProjectWorkflowRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "updateFrontendProjectWorkflow",
+        summary = "Update an existing workflow",
+        description = "Update an existing workflow.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        },
+        security = {
+            @SecurityRequirement(name = "frontendBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/automation/workflows/{workflowReferenceCode}",
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<Void> updateFrontendProjectWorkflow(
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /{externalUserId}/automation/workflows/{workflowReferenceCode} : Update an existing workflow
      * Update an existing workflow.
      *
      * @param externalUserId The external user id. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
-     * @param createProjectWorkflowRequestModel  (required)
+     * @param createFrontendProjectWorkflowRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
     @Operation(
@@ -213,18 +411,22 @@ public interface WorkflowApi {
         tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/projects/{externalUserId}/workflows/{workflowReferenceCode}",
+        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "CreateProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel
+        @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

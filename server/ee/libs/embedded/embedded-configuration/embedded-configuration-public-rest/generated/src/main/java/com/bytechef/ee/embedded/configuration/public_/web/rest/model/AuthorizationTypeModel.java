@@ -17,19 +17,35 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Gets or Sets credential_status
+ * Authorization type.
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-03T07:53:09.868099+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public enum CredentialStatusModel {
+public enum AuthorizationTypeModel {
   
-  VALID("VALID"),
+  API_KEY("API_KEY"),
   
-  INVALID("INVALID");
+  BASIC_AUTH("BASIC_AUTH"),
+  
+  BEARER_TOKEN("BEARER_TOKEN"),
+  
+  CUSTOM("CUSTOM"),
+  
+  DIGEST_AUTH("DIGEST_AUTH"),
+  
+  OAUTH2_AUTHORIZATION_CODE("OAUTH2_AUTHORIZATION_CODE"),
+  
+  OAUTH2_AUTHORIZATION_CODE_PKCE("OAUTH2_AUTHORIZATION_CODE_PKCE"),
+  
+  OAUTH2_CLIENT_CREDENTIALS("OAUTH2_CLIENT_CREDENTIALS"),
+  
+  OAUTH2_IMPLICIT_CODE("OAUTH2_IMPLICIT_CODE"),
+  
+  OAUTH2_RESOURCE_OWNER_PASSWORD("OAUTH2_RESOURCE_OWNER_PASSWORD");
 
   private String value;
 
-  CredentialStatusModel(String value) {
+  AuthorizationTypeModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +60,8 @@ public enum CredentialStatusModel {
   }
 
   @JsonCreator
-  public static CredentialStatusModel fromValue(String value) {
-    for (CredentialStatusModel b : CredentialStatusModel.values()) {
+  public static AuthorizationTypeModel fromValue(String value) {
+    for (AuthorizationTypeModel b : AuthorizationTypeModel.values()) {
       if (b.value.equalsIgnoreCase(value)) {
         return b;
       }
