@@ -2,9 +2,13 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -22,33 +26,58 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-26T08:51:43.780222+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-03T07:53:09.868099+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkflowModel {
-
-  private @Nullable String workflowReferenceCode;
-
-  private @Nullable String label;
 
   private @Nullable String description;
 
-  public WorkflowModel workflowReferenceCode(String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  private @Nullable String definition;
+
+  private @Nullable String label;
+
+  private @Nullable String workflowReferenceCode;
+
+  @Valid
+  private List<@Valid InputModel> inputs = new ArrayList<>();
+
+  public WorkflowModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * The reference code of a workflow.
-   * @return workflowReferenceCode
+   * The description of a workflow.
+   * @return description
    */
   
-  @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowReferenceCode")
-  public String getWorkflowReferenceCode() {
-    return workflowReferenceCode;
+  @Schema(name = "description", accessMode = Schema.AccessMode.READ_ONLY, description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
   }
 
-  public void setWorkflowReferenceCode(String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public WorkflowModel definition(String definition) {
+    this.definition = definition;
+    return this;
+  }
+
+  /**
+   * The definition of a workflow.
+   * @return definition
+   */
+  
+  @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("definition")
+  public String getDefinition() {
+    return definition;
+  }
+
+  public void setDefinition(String definition) {
+    this.definition = definition;
   }
 
   public WorkflowModel label(String label) {
@@ -71,24 +100,52 @@ public class WorkflowModel {
     this.label = label;
   }
 
-  public WorkflowModel description(String description) {
-    this.description = description;
+  public WorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+    this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
 
   /**
-   * The description of a workflow.
-   * @return description
+   * The reference code of a workflow.
+   * @return workflowReferenceCode
    */
   
-  @Schema(name = "description", accessMode = Schema.AccessMode.READ_ONLY, description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
+  @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowReferenceCode")
+  public String getWorkflowReferenceCode() {
+    return workflowReferenceCode;
   }
 
-  public void setDescription(String description) {
-    this.description = description;
+  public void setWorkflowReferenceCode(String workflowReferenceCode) {
+    this.workflowReferenceCode = workflowReferenceCode;
+  }
+
+  public WorkflowModel inputs(List<@Valid InputModel> inputs) {
+    this.inputs = inputs;
+    return this;
+  }
+
+  public WorkflowModel addInputsItem(InputModel inputsItem) {
+    if (this.inputs == null) {
+      this.inputs = new ArrayList<>();
+    }
+    this.inputs.add(inputsItem);
+    return this;
+  }
+
+  /**
+   * Get inputs
+   * @return inputs
+   */
+  @Valid 
+  @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
+  public List<@Valid InputModel> getInputs() {
+    return inputs;
+  }
+
+  public void setInputs(List<@Valid InputModel> inputs) {
+    this.inputs = inputs;
   }
 
   @Override
@@ -100,23 +157,27 @@ public class WorkflowModel {
       return false;
     }
     WorkflowModel workflow = (WorkflowModel) o;
-    return Objects.equals(this.workflowReferenceCode, workflow.workflowReferenceCode) &&
+    return Objects.equals(this.description, workflow.description) &&
+        Objects.equals(this.definition, workflow.definition) &&
         Objects.equals(this.label, workflow.label) &&
-        Objects.equals(this.description, workflow.description);
+        Objects.equals(this.workflowReferenceCode, workflow.workflowReferenceCode) &&
+        Objects.equals(this.inputs, workflow.inputs);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(workflowReferenceCode, label, description);
+    return Objects.hash(description, definition, label, workflowReferenceCode, inputs);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowModel {\n");
-    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
+    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("}");
     return sb.toString();
   }

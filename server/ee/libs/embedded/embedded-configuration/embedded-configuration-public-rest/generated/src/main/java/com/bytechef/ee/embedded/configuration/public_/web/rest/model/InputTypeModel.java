@@ -1,4 +1,4 @@
-package com.bytechef.ee.embedded.configuration.web.rest.model;
+package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -17,21 +17,29 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The environment of a project.
+ * The type of an input, for example \\\"STRING\\\"
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-04T12:03:33.327119+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public enum EnvironmentModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-03T07:53:09.868099+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+public enum InputTypeModel {
   
-  DEVELOPMENT("DEVELOPMENT"),
+  BOOLEAN("BOOLEAN"),
   
-  STAGING("STAGING"),
+  DATE("DATE"),
   
-  PRODUCTION("PRODUCTION");
+  DATE_TIME("DATE_TIME"),
+  
+  INTEGER("INTEGER"),
+  
+  NUMBER("NUMBER"),
+  
+  STRING("STRING"),
+  
+  TIME("TIME");
 
   private String value;
 
-  EnvironmentModel(String value) {
+  InputTypeModel(String value) {
     this.value = value;
   }
 
@@ -46,9 +54,9 @@ public enum EnvironmentModel {
   }
 
   @JsonCreator
-  public static EnvironmentModel fromValue(String value) {
-    for (EnvironmentModel b : EnvironmentModel.values()) {
-      if (b.value.equals(value)) {
+  public static InputTypeModel fromValue(String value) {
+    for (InputTypeModel b : InputTypeModel.values()) {
+      if (b.value.equalsIgnoreCase(value)) {
         return b;
       }
     }

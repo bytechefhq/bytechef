@@ -2,16 +2,11 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectionConfigModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -24,12 +19,13 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * IntegrationModel
+ * A group of workflows that make one logical integration.
  */
 
-@JsonTypeName("Integration")
+@Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
+@JsonTypeName("IntegrationBasic")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-03T07:53:09.868099+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class IntegrationModel {
+public class IntegrationBasicModel {
 
   private String componentName;
 
@@ -49,19 +45,14 @@ public class IntegrationModel {
 
   private @Nullable String title;
 
-  private @Nullable ConnectionConfigModel connectionConfig;
-
-  @Valid
-  private List<@Valid WorkflowModel> workflows = new ArrayList<>();
-
-  public IntegrationModel() {
+  public IntegrationBasicModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public IntegrationModel(String componentName, CredentialStatusModel credentialStatus, Boolean enabled, String icon, Boolean multipleInstances) {
+  public IntegrationBasicModel(String componentName, CredentialStatusModel credentialStatus, Boolean enabled, String icon, Boolean multipleInstances) {
     this.componentName = componentName;
     this.credentialStatus = credentialStatus;
     this.enabled = enabled;
@@ -69,7 +60,7 @@ public class IntegrationModel {
     this.multipleInstances = multipleInstances;
   }
 
-  public IntegrationModel componentName(String componentName) {
+  public IntegrationBasicModel componentName(String componentName) {
     this.componentName = componentName;
     return this;
   }
@@ -89,7 +80,7 @@ public class IntegrationModel {
     this.componentName = componentName;
   }
 
-  public IntegrationModel credentialStatus(CredentialStatusModel credentialStatus) {
+  public IntegrationBasicModel credentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
     return this;
   }
@@ -109,7 +100,7 @@ public class IntegrationModel {
     this.credentialStatus = credentialStatus;
   }
 
-  public IntegrationModel description(String description) {
+  public IntegrationBasicModel description(String description) {
     this.description = description;
     return this;
   }
@@ -129,7 +120,7 @@ public class IntegrationModel {
     this.description = description;
   }
 
-  public IntegrationModel enabled(Boolean enabled) {
+  public IntegrationBasicModel enabled(Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -149,7 +140,7 @@ public class IntegrationModel {
     this.enabled = enabled;
   }
 
-  public IntegrationModel icon(String icon) {
+  public IntegrationBasicModel icon(String icon) {
     this.icon = icon;
     return this;
   }
@@ -169,7 +160,7 @@ public class IntegrationModel {
     this.icon = icon;
   }
 
-  public IntegrationModel id(Long id) {
+  public IntegrationBasicModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -189,7 +180,7 @@ public class IntegrationModel {
     this.id = id;
   }
 
-  public IntegrationModel integrationVersion(Integer integrationVersion) {
+  public IntegrationBasicModel integrationVersion(Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
     return this;
   }
@@ -209,7 +200,7 @@ public class IntegrationModel {
     this.integrationVersion = integrationVersion;
   }
 
-  public IntegrationModel multipleInstances(Boolean multipleInstances) {
+  public IntegrationBasicModel multipleInstances(Boolean multipleInstances) {
     this.multipleInstances = multipleInstances;
     return this;
   }
@@ -229,7 +220,7 @@ public class IntegrationModel {
     this.multipleInstances = multipleInstances;
   }
 
-  public IntegrationModel title(String title) {
+  public IntegrationBasicModel title(String title) {
     this.title = title;
     return this;
   }
@@ -249,54 +240,6 @@ public class IntegrationModel {
     this.title = title;
   }
 
-  public IntegrationModel connectionConfig(ConnectionConfigModel connectionConfig) {
-    this.connectionConfig = connectionConfig;
-    return this;
-  }
-
-  /**
-   * Get connectionConfig
-   * @return connectionConfig
-   */
-  @Valid 
-  @Schema(name = "connectionConfig", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connectionConfig")
-  public ConnectionConfigModel getConnectionConfig() {
-    return connectionConfig;
-  }
-
-  public void setConnectionConfig(ConnectionConfigModel connectionConfig) {
-    this.connectionConfig = connectionConfig;
-  }
-
-  public IntegrationModel workflows(List<@Valid WorkflowModel> workflows) {
-    this.workflows = workflows;
-    return this;
-  }
-
-  public IntegrationModel addWorkflowsItem(WorkflowModel workflowsItem) {
-    if (this.workflows == null) {
-      this.workflows = new ArrayList<>();
-    }
-    this.workflows.add(workflowsItem);
-    return this;
-  }
-
-  /**
-   * The list of workflows.
-   * @return workflows
-   */
-  @Valid 
-  @Schema(name = "workflows", description = "The list of workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflows")
-  public List<@Valid WorkflowModel> getWorkflows() {
-    return workflows;
-  }
-
-  public void setWorkflows(List<@Valid WorkflowModel> workflows) {
-    this.workflows = workflows;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -305,29 +248,27 @@ public class IntegrationModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    IntegrationModel integration = (IntegrationModel) o;
-    return Objects.equals(this.componentName, integration.componentName) &&
-        Objects.equals(this.credentialStatus, integration.credentialStatus) &&
-        Objects.equals(this.description, integration.description) &&
-        Objects.equals(this.enabled, integration.enabled) &&
-        Objects.equals(this.icon, integration.icon) &&
-        Objects.equals(this.id, integration.id) &&
-        Objects.equals(this.integrationVersion, integration.integrationVersion) &&
-        Objects.equals(this.multipleInstances, integration.multipleInstances) &&
-        Objects.equals(this.title, integration.title) &&
-        Objects.equals(this.connectionConfig, integration.connectionConfig) &&
-        Objects.equals(this.workflows, integration.workflows);
+    IntegrationBasicModel integrationBasic = (IntegrationBasicModel) o;
+    return Objects.equals(this.componentName, integrationBasic.componentName) &&
+        Objects.equals(this.credentialStatus, integrationBasic.credentialStatus) &&
+        Objects.equals(this.description, integrationBasic.description) &&
+        Objects.equals(this.enabled, integrationBasic.enabled) &&
+        Objects.equals(this.icon, integrationBasic.icon) &&
+        Objects.equals(this.id, integrationBasic.id) &&
+        Objects.equals(this.integrationVersion, integrationBasic.integrationVersion) &&
+        Objects.equals(this.multipleInstances, integrationBasic.multipleInstances) &&
+        Objects.equals(this.title, integrationBasic.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, credentialStatus, description, enabled, icon, id, integrationVersion, multipleInstances, title, connectionConfig, workflows);
+    return Objects.hash(componentName, credentialStatus, description, enabled, icon, id, integrationVersion, multipleInstances, title);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IntegrationModel {\n");
+    sb.append("class IntegrationBasicModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
@@ -337,8 +278,6 @@ public class IntegrationModel {
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    multipleInstances: ").append(toIndentedString(multipleInstances)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
-    sb.append("    connectionConfig: ").append(toIndentedString(connectionConfig)).append("\n");
-    sb.append("    workflows: ").append(toIndentedString(workflows)).append("\n");
     sb.append("}");
     return sb.toString();
   }

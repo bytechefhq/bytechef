@@ -17,26 +17,26 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * PublishIntegrationRequestModel
+ * PublishConnectedUserProjectWorkflowRequestModel
  */
 
-@JsonTypeName("publishIntegration_request")
+@JsonTypeName("publishConnectedUserProjectWorkflow_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-04T12:03:33.327119+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class PublishIntegrationRequestModel {
+public class PublishConnectedUserProjectWorkflowRequestModel {
 
   private @Nullable String description;
 
-  public PublishIntegrationRequestModel description(String description) {
+  public PublishConnectedUserProjectWorkflowRequestModel description(String description) {
     this.description = description;
     return this;
   }
 
   /**
-   * The description of a integration version.
+   * The description of a connected user project workflow version.
    * @return description
    */
   
-  @Schema(name = "description", description = "The description of a integration version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "description", description = "The description of a connected user project workflow version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
     return description;
@@ -54,8 +54,8 @@ public class PublishIntegrationRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PublishIntegrationRequestModel publishIntegrationRequest = (PublishIntegrationRequestModel) o;
-    return Objects.equals(this.description, publishIntegrationRequest.description);
+    PublishConnectedUserProjectWorkflowRequestModel publishConnectedUserProjectWorkflowRequest = (PublishConnectedUserProjectWorkflowRequestModel) o;
+    return Objects.equals(this.description, publishConnectedUserProjectWorkflowRequest.description);
   }
 
   @Override
@@ -66,7 +66,7 @@ public class PublishIntegrationRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PublishIntegrationRequestModel {\n");
+    sb.append("class PublishConnectedUserProjectWorkflowRequestModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("}");
     return sb.toString();

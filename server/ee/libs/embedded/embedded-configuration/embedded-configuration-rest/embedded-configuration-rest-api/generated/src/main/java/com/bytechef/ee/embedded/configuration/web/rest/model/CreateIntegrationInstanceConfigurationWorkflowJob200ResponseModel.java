@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createIntegrationInstanceConfigurationWorkflowJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:42:41.760697+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-04T12:03:33.327119+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel {
 
   private @Nullable Long jobId;
