@@ -48,24 +48,23 @@ export const useIntegration = ({
         },
     });
 
+    const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
+        useUpdateWorkflowMutation: useUpdateWorkflowMutation,
+        workflowId: workflow.id!,
+        workflowKeys: WorkflowKeys,
+    });
+
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
             });
 
-            setShowEditWorkflowDialog(false);
-        },
-        useUpdateWorkflowMutation: useUpdateWorkflowMutation,
-        workflowId: workflow.id!,
-        workflowKeys: WorkflowKeys,
-    });
-
-    const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
-        onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: IntegrationWorkflowKeys.integrationWorkflow(integrationId, integrationWorkflowId),
+                queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
             });
+
+            setShowEditWorkflowDialog(false);
         },
         useUpdateWorkflowMutation: useUpdateWorkflowMutation,
         workflowId: workflow.id!,
