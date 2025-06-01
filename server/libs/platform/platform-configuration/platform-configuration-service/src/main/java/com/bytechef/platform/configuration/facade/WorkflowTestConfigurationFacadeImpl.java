@@ -19,12 +19,14 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -169,8 +171,9 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
             workflow.getId(), workflowNodeName, workflowConnectionKey);
 
         if (!Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
-            throw new IllegalArgumentException(
-                "Connection component name does not match workflow test configuration connection component name");
+            throw new ConfigurationException(
+                "Connection component name does not match workflow test configuration connection component name",
+                ConnectionErrorType.INVALID_CONNECTION_COMPONENT_NAME);
         }
     }
 

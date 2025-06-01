@@ -24,7 +24,7 @@ import com.bytechef.exception.AbstractErrorType;
  */
 public class ProjectErrorType extends AbstractErrorType {
 
-    public static final ProjectErrorType REMOVE_LAST_WORKFLOW = new ProjectErrorType(100);
+    public static final ProjectErrorType DELETE_LAST_WORKFLOW = new ProjectErrorType(100);
 
     private ProjectErrorType(int errorKey) {
         super(Project.class, errorKey);

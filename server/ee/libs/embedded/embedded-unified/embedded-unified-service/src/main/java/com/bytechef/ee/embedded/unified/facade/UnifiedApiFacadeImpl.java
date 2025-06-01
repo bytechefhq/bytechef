@@ -34,6 +34,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.unified.exception.CursorPaginationException;
 import com.bytechef.ee.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.ee.embedded.unified.pagination.CursorPageable;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -41,6 +42,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.UnifiedApiDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -183,12 +185,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
             String prevHash = params[0];
 
             if (!hashed.equals(prevHash)) {
-                throw new IllegalArgumentException("Can't modify search filter when using a continuationToken");
+                throw new CursorPaginationException("Can't modify search filter when using a continuationToken");
             }
 
             if (params.length != 2 && params.length != 4) {
-                log.error("Unexpected continuationToken length: {}", params.length);
-
                 throw new CursorPaginationException(
                     "ContinuationToken was expected to have 2 or 4 parts, but got " + params.length);
             }
@@ -283,14 +283,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
                 .map(ComponentDefinition::getName)
                 .toList();
 
-            if (componentNames.isEmpty()) {
-                throw new IllegalArgumentException("No component definitions found for category: " + category);
-            }
-
-            String externalId = SecurityUtils.getCurrentUserLogin()
+            String externalUserId = SecurityUtils.getCurrentUserLogin()
                 .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
-            ConnectedUser connectedUser = connectedUserService.getConnectedUser(environment, externalId);
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(environment, externalUserId);
 
             IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
                 connectedUser.getId(), componentNames, environment);
@@ -298,8 +294,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
             integrationInstanceId = integrationInstance.getId();
         }
 
-        IntegrationInstance integrationInstance =
-            integrationInstanceService.getIntegrationInstance(integrationInstanceId);
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstanceId);
 
         long connectionId = integrationInstance.getConnectionId();
 
@@ -308,7 +304,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         ConnectionEnvironment connectionEnvironment = connection.getEnvironment();
 
         if (!Objects.equals(connectionEnvironment.name(), environment.name())) {
-            throw new IllegalArgumentException("Connection is not valid for the current environment");
+            throw new ConfigurationException(
+                "Connection is not valid for the current environment", ConnectionErrorType.INVALID_CONNECTION);
         }
 
         return new ComponentConnection(

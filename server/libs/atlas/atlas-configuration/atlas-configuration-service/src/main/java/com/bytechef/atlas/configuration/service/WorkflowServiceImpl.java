@@ -19,10 +19,12 @@ package com.bytechef.atlas.configuration.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
+import com.bytechef.atlas.configuration.exception.WorkflowErrorType;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -157,7 +159,9 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
         }
 
-        throw new IllegalArgumentException("Workflow with id: %s does not exist".formatted(id));
+        throw new ConfigurationException(
+            "Workflow with id: %s does not exist".formatted(id),
+            WorkflowErrorType.WORKFLOW_NOT_FOUND);
     }
 
     @Override
@@ -314,8 +318,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 
                     return curWorkflow;
                 })
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "Workflow with id: %s does not exist".formatted(workflow.getId()))));
+                .orElseThrow(() -> new ConfigurationException(
+                    "Workflow with id: %s does not exist".formatted(workflow.getId()),
+                    WorkflowErrorType.WORKFLOW_NOT_FOUND)));
     }
 
     private Workflow updateCache(Workflow workflow) {

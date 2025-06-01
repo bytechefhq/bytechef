@@ -35,6 +35,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
@@ -44,11 +45,11 @@ import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.BaseProperty;
-import com.bytechef.platform.exception.ConfigurationException;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -844,8 +845,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationWorkflowConnection.getWorkflowConnectionKey());
 
             if (!Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
-                throw new IllegalArgumentException(
-                    "Connection component name does not match workflow connection component name");
+                throw new ConfigurationException(
+                    "Connection component name does not match workflow connection component name",
+                    ConnectionErrorType.INVALID_CONNECTION_COMPONENT_NAME);
             }
         }
     }

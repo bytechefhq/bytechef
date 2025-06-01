@@ -34,7 +34,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.exception.AbstractErrorType;
-import com.bytechef.platform.exception.ExecutionException;
+import com.bytechef.exception.ExecutionException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
