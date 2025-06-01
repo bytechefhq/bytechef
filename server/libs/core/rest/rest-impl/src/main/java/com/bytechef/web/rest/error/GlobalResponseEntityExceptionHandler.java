@@ -19,6 +19,7 @@ package com.bytechef.web.rest.error;
 import com.bytechef.exception.AbstractException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -54,6 +55,16 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
                 createProblemDetail(
                     exception, HttpStatus.BAD_REQUEST, Map.of("inputParameters", exception.getInputParameters()),
                     request))
+            .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ProblemDetail> handleNoSuchElementException(
+        final NoSuchElementException exception, final WebRequest request) {
+
+        return ResponseEntity
+            .of(createProblemDetail(exception, HttpStatus.NOT_FOUND, exception.getMessage(), null, null, request))
             .build();
     }
 
