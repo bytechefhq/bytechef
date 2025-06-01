@@ -33,7 +33,19 @@ import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
 import saveClusterElementNodesPosition from './utils/saveClusterElementNodesPosition';
 
-const WorkflowEditorLayout = ({parentId, parentType}: {parentId: number; parentType: StructureParentType}) => {
+const WorkflowEditorLayout = ({
+    inputs,
+    parentId,
+    parentType,
+    runDisabled,
+    showWorkflowInputs,
+}: {
+    inputs?: string[];
+    parentId: number;
+    parentType: StructureParentType;
+    runDisabled: boolean;
+    showWorkflowInputs: boolean;
+}) => {
     const {copilotPanelOpen} = useCopilotStore();
     const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {rightSidebarOpen} = useRightSidebarStore();
@@ -63,13 +75,12 @@ const WorkflowEditorLayout = ({parentId, parentType}: {parentId: number; parentT
         handleWorkflowOutputsClick,
         isWorkflowNodeOutputsPending,
         previousComponentDefinitions,
-        runDisabled,
         taskDispatcherDefinitions,
         taskDispatcherDefinitionsError,
         taskDispatcherDefinitionsLoading,
         testConfigurationDisabled,
         workflowTestConfiguration,
-    } = useWorkflowLayout();
+    } = useWorkflowLayout(inputs);
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
@@ -117,6 +128,7 @@ const WorkflowEditorLayout = ({parentId, parentType}: {parentId: number; parentT
                         onWorkflowInputsClick={handleWorkflowInputsClick}
                         onWorkflowOutputsClick={handleWorkflowOutputsClick}
                         rightSidebarOpen={rightSidebarOpen}
+                        showWorkflowInputs={showWorkflowInputs}
                     />
                 </div>
             </PageLoader>

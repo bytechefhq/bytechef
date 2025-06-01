@@ -1,0 +1,99 @@
+import {Button} from '@/components/ui/button';
+import LoaderNotification from '@/ee/pages/embedded/automations/components/workflow-builder-header/components/LoaderNotification';
+import OutputPanelButton from '@/ee/pages/embedded/automations/components/workflow-builder-header/components/OutputButton';
+import PublishPopover from '@/ee/pages/embedded/automations/components/workflow-builder-header/components/PublishPopover';
+import WorkflowActionsButton from '@/ee/pages/embedded/automations/components/workflow-builder-header/components/WorkflowActionsButton';
+import {useWorkflowBuilderHeader} from '@/ee/pages/embedded/automations/components/workflow-builder-header/hooks/useWorkflowBuilderHeader';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
+import {UpdateWorkflowMutationType} from '@/shared/types';
+import {onlineManager, useIsFetching} from '@tanstack/react-query';
+import {EditIcon} from 'lucide-react';
+import {RefObject} from 'react';
+import {ImperativePanelHandle} from 'react-resizable-panels';
+
+interface ProjectHeaderProps {
+    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
+    chatTrigger?: boolean;
+    projectId: number;
+    runDisabled: boolean;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
+}
+
+const WorkflowBuilderHeader = ({
+    bottomResizablePanelRef,
+    chatTrigger,
+    projectId,
+    runDisabled,
+    updateWorkflowMutation,
+}: ProjectHeaderProps) => {
+    const {setShowEditWorkflowDialog, showEditWorkflowDialog, workflowIsRunning} = useWorkflowEditorStore();
+    const {workflow} = useWorkflowDataStore();
+
+    const isFetching = useIsFetching();
+    const {
+        handlePublishProjectSubmit,
+        handleRunClick,
+        handleShowOutputClick,
+        handleStopClick,
+        publishProjectMutationIsPending,
+    } = useWorkflowBuilderHeader({
+        bottomResizablePanelRef,
+        chatTrigger,
+        projectId,
+    });
+
+    const isOnline = onlineManager.isOnline();
+
+    // if (!project) {
+    //     return <WorkflowBuilderSkeleton />;
+    // }
+
+    return (
+        <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
+            <div className="flex items-center">{workflow.label}</div>
+
+            <div className="flex items-center space-x-2">
+                <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
+
+                <Button
+                    className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
+                    onClick={() => setShowEditWorkflowDialog(true)}
+                    size="icon"
+                    variant="ghost"
+                >
+                    <EditIcon />
+                </Button>
+
+                <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
+
+                <PublishPopover
+                    isPending={publishProjectMutationIsPending}
+                    onPublishProjectSubmit={handlePublishProjectSubmit}
+                />
+
+                <WorkflowActionsButton
+                    chatTrigger={chatTrigger ?? false}
+                    onRunClick={handleRunClick}
+                    onStopClick={handleStopClick}
+                    runDisabled={runDisabled}
+                    workflowIsRunning={workflowIsRunning}
+                />
+            </div>
+
+            {showEditWorkflowDialog && (
+                <WorkflowDialog
+                    onClose={() => setShowEditWorkflowDialog(false)}
+                    projectId={projectId}
+                    updateWorkflowMutation={updateWorkflowMutation}
+                    useGetWorkflowQuery={useGetWorkflowQuery}
+                    workflowId={workflow.id!}
+                />
+            )}
+        </header>
+    );
+};
+
+export default WorkflowBuilderHeader;

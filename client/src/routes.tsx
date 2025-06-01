@@ -2,6 +2,8 @@ import App from '@/App';
 import ApiClients from '@/ee/pages/automation/api-platform/api-clients/ApiClients';
 import ApiCollections from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import AppEvents from '@/ee/pages/embedded/app-events/AppEvents';
+import WorkflowBuilder from '@/ee/pages/embedded/automations/WorkflowBuilder';
+import Workflows from '@/ee/pages/embedded/automations/Workflows';
 import ConnectedUsers from '@/ee/pages/embedded/connected-users/ConnectedUsers';
 import {Connections as EmbeddedConnections} from '@/ee/pages/embedded/connections/Connections';
 import IntegrationInstanceConfigurations from '@/ee/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations';
@@ -214,6 +216,10 @@ export const getRouter = (queryClient: QueryClient) =>
             path: 'chat/:environment/:workflowExecutionId',
         },
         {
+            element: <WorkflowBuilder />,
+            path: '/workflow-builder/:workflowReferenceCode',
+        },
+        {
             children: [
                 {
                     element: <Login />,
@@ -419,7 +425,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 getAccountRoutes('/embedded'),
                                 {
-                                    element: <Integrations />,
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <Integrations />
+                                        </PrivateRoute>
+                                    ),
                                     path: 'integrations',
                                 },
                                 {
@@ -445,6 +455,14 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'configurations',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <Workflows />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'workflows',
                                 },
                                 {
                                     element: (

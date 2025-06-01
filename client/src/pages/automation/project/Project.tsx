@@ -5,7 +5,7 @@ import {useProject} from '@/pages/automation/project/hooks/useProject';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
-import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
+import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {WorkflowNodeParameterMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
@@ -36,7 +36,7 @@ const Project = () => {
         useGetConnectionsQuery,
     } = useProject();
 
-    const {runDisabled} = useWorkflowLayout();
+    const {runDisabled} = useRun();
 
     useEffect(() => {
         return () => {
@@ -94,7 +94,14 @@ const Project = () => {
                                         updateWorkflowNodeParameterMutation,
                                     }}
                                 >
-                                    {projectId && <WorkflowEditorLayout parentId={projectId} parentType="PROJECT" />}
+                                    {projectId && (
+                                        <WorkflowEditorLayout
+                                            parentId={projectId}
+                                            parentType="PROJECT"
+                                            runDisabled={runDisabled}
+                                            showWorkflowInputs={true}
+                                        />
+                                    )}
                                 </WorkflowNodeParameterMutationProvider>
                             </WorkflowMutationProvider>
                         </ConnectionReactQueryProvider>

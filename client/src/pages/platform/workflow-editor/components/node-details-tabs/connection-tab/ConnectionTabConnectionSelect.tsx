@@ -43,7 +43,8 @@ const ConnectionTabConnectionSelect = ({
     const [currentConnection, setCurrentConnection] = useState<ConnectionI>();
     const [showConnectionDialog, setShowConnectionDialog] = useState<boolean>(false);
 
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+    const {connectionDialogAllowed, currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
+        useWorkflowNodeDetailsPanelStore();
 
     const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery, useGetConnectionsQuery} =
         useConnectionQuery();
@@ -163,7 +164,7 @@ const ConnectionTabConnectionSelect = ({
                             </SelectTrigger>
                         )}
 
-                        {componentDefinition && (
+                        {componentDefinition && connectionDialogAllowed && (
                             <Button
                                 className={twMerge('mt-auto p-2', !componentConnections?.length && 'w-full')}
                                 onClick={() => setShowConnectionDialog(true)}
@@ -175,6 +176,8 @@ const ConnectionTabConnectionSelect = ({
                                 {!componentConnections?.length && 'Create Connection'}
                             </Button>
                         )}
+
+                        {!connectionDialogAllowed && !componentConnections?.length && <p>No connections available.</p>}
                     </div>
 
                     <SelectContent>

@@ -14,6 +14,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ConnectionI, useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {
@@ -42,16 +43,18 @@ interface WorkflowTestConfigurationDialogProps {
 
 const WorkflowTestConfigurationFormField = ({
     componentConnection,
+    connectionDialogAllowed,
     connections,
     form,
     index,
     setComponentConnection,
     setShowNewConnectionDialog,
 }: {
+    componentConnection: ComponentConnection;
+    connectionDialogAllowed: boolean;
     connections: ConnectionI[];
     form: UseFormReturn<WorkflowTestConfiguration>;
     index: number;
-    componentConnection: ComponentConnection;
     setShowNewConnectionDialog: Dispatch<SetStateAction<boolean>>;
     setComponentConnection: Dispatch<SetStateAction<ComponentConnection | undefined>>;
 }) => {
@@ -90,18 +93,20 @@ const WorkflowTestConfigurationFormField = ({
                                             <SelectValue placeholder="Choose Connection..." />
                                         </SelectTrigger>
 
-                                        <Button
-                                            className="mt-auto p-2"
-                                            onClick={() => {
-                                                setComponentConnection(componentConnection);
-                                                setShowNewConnectionDialog(true);
-                                            }}
-                                            title="Create a new connection"
-                                            type="button"
-                                            variant="outline"
-                                        >
-                                            <PlusIcon className="size-5" />
-                                        </Button>
+                                        {connectionDialogAllowed && (
+                                            <Button
+                                                className="mt-auto p-2"
+                                                onClick={() => {
+                                                    setComponentConnection(componentConnection);
+                                                    setShowNewConnectionDialog(true);
+                                                }}
+                                                title="Create a new connection"
+                                                type="button"
+                                                variant="outline"
+                                            >
+                                                <PlusIcon className="size-5" />
+                                            </Button>
+                                        )}
                                     </div>
                                 </FormControl>
 
@@ -147,6 +152,8 @@ const WorkflowTestConfigurationDialog = ({
 }: WorkflowTestConfigurationDialogProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
     const [componentConnection, setComponentConnection] = useState<ComponentConnection | undefined>();
+
+    const {connectionDialogAllowed} = useWorkflowNodeDetailsPanelStore();
 
     const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery, useGetConnectionsQuery} =
         useConnectionQuery();
@@ -280,6 +287,7 @@ const WorkflowTestConfigurationDialog = ({
                                                     connections && (
                                                         <WorkflowTestConfigurationFormField
                                                             componentConnection={workflowConnection}
+                                                            connectionDialogAllowed={connectionDialogAllowed}
                                                             connections={connections}
                                                             form={form}
                                                             index={index}

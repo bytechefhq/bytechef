@@ -23,6 +23,7 @@ import {
     SquareIcon,
     UnplugIcon,
     UsersIcon,
+    Workflow,
     ZapIcon,
 } from 'lucide-react';
 import {useEffect, useState} from 'react';
@@ -65,7 +66,7 @@ const automationNavigation: NavigationType[] = [
     {
         href: '/automation/executions',
         icon: ActivityIcon,
-        name: 'Workflow Execution History',
+        name: 'Workflow Executions',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
 ];
@@ -81,16 +82,21 @@ const embeddedNavigation: NavigationType[] = [
         icon: Settings2Icon,
         name: 'Integration Configurations',
     },
+    {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
+    {
+        href: '/embedded/workflows',
+        icon: Workflow,
+        name: 'Automations',
+    },
     {
         href: '/embedded/connected-users',
         icon: UsersIcon,
         name: 'Connected Users',
     },
-    {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
     {
         href: '/embedded/executions',
         icon: ActivityIcon,
-        name: 'Workflow Execution History',
+        name: 'Workflow Executions',
     },
     {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
 ];
@@ -126,6 +132,7 @@ function App() {
     const queryClient = useQueryClient();
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
+    const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
@@ -145,7 +152,11 @@ function App() {
     if (location.pathname.includes('automation')) {
         navigation = filteredAutomationNavigation;
     } else if (location.pathname.includes('embedded')) {
-        navigation = embeddedNavigation;
+        navigation = embeddedNavigation.filter((navItem) => {
+            if ((ff_1779 && navItem.href === '/embedded/workflows') || navItem.href !== '/embedded/workflows') {
+                return true;
+            }
+        });
     }
 
     useFetchInterceptor();

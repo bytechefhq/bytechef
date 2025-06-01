@@ -11,10 +11,7 @@ const IntegrationList = ({integrations, tags}: {integrations: Integration[]; tag
                 const integrationTagIds = integration.tags?.map((tag) => tag.id);
 
                 return (
-                    <Collapsible
-                        className="group"
-                        key={integration.id}
-                    >
+                    <Collapsible className="group" key={integration.id}>
                         <IntegrationListItem
                             integration={integration}
                             key={integration.id}
