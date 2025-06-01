@@ -3,6 +3,7 @@
 export * from './AppEvent';
 export * from './Category';
 export * from './ComponentConnection';
+export * from './ConnectedUserProjectWorkflow';
 export * from './CreateIntegrationInstanceConfigurationWorkflowJob200Response';
 export * from './Environment';
 export * from './Integration';
@@ -17,6 +18,7 @@ export * from './IntegrationInstanceWorkflow';
 export * from './IntegrationStatus';
 export * from './IntegrationVersion';
 export * from './Page';
+export * from './PublishConnectedUserProjectWorkflowRequest';
 export * from './PublishIntegrationRequest';
 export * from './Tag';
 export * from './UpdateTagsRequest';

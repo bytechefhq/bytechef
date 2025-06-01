@@ -1,5 +1,6 @@
 apis/AppEventApi.ts
 apis/CategoryApi.ts
+apis/ConnectedUserProjectWorkflowApi.ts
 apis/IntegrationApi.ts
 apis/IntegrationInstanceApi.ts
 apis/IntegrationInstanceConfigurationApi.ts
@@ -11,6 +12,7 @@ index.ts
 models/AppEvent.ts
 models/Category.ts
 models/ComponentConnection.ts
+models/ConnectedUserProjectWorkflow.ts
 models/CreateIntegrationInstanceConfigurationWorkflowJob200Response.ts
 models/Environment.ts
 models/Integration.ts
@@ -25,6 +27,7 @@ models/IntegrationInstanceWorkflow.ts
 models/IntegrationStatus.ts
 models/IntegrationVersion.ts
 models/Page.ts
+models/PublishConnectedUserProjectWorkflowRequest.ts
 models/PublishIntegrationRequest.ts
 models/Tag.ts
 models/UpdateTagsRequest.ts
