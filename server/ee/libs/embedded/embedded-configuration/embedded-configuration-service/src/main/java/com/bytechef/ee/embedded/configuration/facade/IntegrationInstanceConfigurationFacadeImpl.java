@@ -715,8 +715,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     private List<Long> getIntegrationWorkflowIds(Integration integration) {
-        return integrationWorkflowService.getIntegrationWorkflowIds(
-            integration.getId(), integration.getLastVersion());
+        return integrationWorkflowService.getIntegrationWorkflowIds(integration.getId(), integration.getLastVersion());
     }
 
     private List<Tag> getTags(List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
@@ -739,10 +738,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     private Instant getWorkflowLastExecutionDate(String workflowId) {
-        return OptionalUtils.mapOrElse(
-            jobService.fetchLastWorkflowJob(workflowId),
-            Job::getEndDate,
-            null);
+        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowId), Job::getEndDate, null);
     }
 
     private String getWorkflowReferenceCode(
