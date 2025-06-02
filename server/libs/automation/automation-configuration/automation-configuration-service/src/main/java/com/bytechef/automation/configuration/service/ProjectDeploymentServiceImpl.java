@@ -64,6 +64,12 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     }
 
     @Override
+    public long getProjectDeploymentId(long projectId, Environment environment) {
+        return projectDeploymentRepository.findByProjectIdAndEnvironment(projectId, environment.ordinal())
+            .getProjectId();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<Long> getProjectDeploymentProjectIds() {
         return projectDeploymentRepository.findAllProjectDeploymentProjectIds();

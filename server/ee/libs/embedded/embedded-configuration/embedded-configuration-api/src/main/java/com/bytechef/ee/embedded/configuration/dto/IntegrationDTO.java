@@ -38,8 +38,8 @@ public record IntegrationDTO(
             integration.getComponentName(), integration.getCreatedBy(), integration.getCreatedDate(),
             integration.getDescription(), null, integration.getId(), integration.getIntegrationVersions(), null,
             integration.getLastModifiedBy(), integration.getLastModifiedDate(), integration.getLastPublishedDate(),
-            integration.getLastStatus(), integration.getLastVersion(), integration.getName(), List.of(),
-            null, integration.getVersion());
+            integration.getLastStatus(), integration.getLastVersion(), integration.getName(), List.of(), null,
+            integration.getVersion());
     }
 
     public IntegrationDTO(

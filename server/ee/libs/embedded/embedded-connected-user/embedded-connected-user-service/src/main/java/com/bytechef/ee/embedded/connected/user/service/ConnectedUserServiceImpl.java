@@ -35,7 +35,7 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
     }
 
     @Override
-    public ConnectedUser createConnectedUser(Environment environment, String externalId) {
+    public ConnectedUser createConnectedUser(String externalId, Environment environment) {
         ConnectedUser connectedUser = new ConnectedUser();
 
         connectedUser.setEnabled(true);
@@ -61,13 +61,13 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ConnectedUser> fetchConnectedUser(Environment environment, String externalId) {
+    public Optional<ConnectedUser> fetchConnectedUser(String externalId, Environment environment) {
         return connectedUserRepository.findByExternalIdAndEnvironment(externalId, environment.ordinal());
     }
 
     @Override
-    public ConnectedUser getConnectedUser(Environment environment, String externalId) {
-        return fetchConnectedUser(environment, externalId)
+    public ConnectedUser getConnectedUser(String externalId, Environment environment) {
+        return fetchConnectedUser(externalId, environment)
             .orElseThrow(() -> new IllegalArgumentException("Connected user not found"));
     }
 

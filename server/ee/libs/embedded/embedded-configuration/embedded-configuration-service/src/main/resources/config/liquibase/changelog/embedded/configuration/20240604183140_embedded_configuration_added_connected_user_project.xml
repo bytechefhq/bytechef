@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20240604183140" author="Ivica Cardic">
+        <createTable tableName="connected_user_project">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connected_user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="version" type="integer" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseColumnNames="project_id"
+            baseTableName="connected_user_project"
+            constraintName="fk_connected_user_project_project"
+            referencedColumnNames="id"
+            referencedTableName="project"/>
+
+        <createIndex indexName="idx_connected_user_project_unique" tableName="connected_user_project" unique="true">
+            <column name="connected_user_id"/>
+            <column name="project_id"/>
+        </createIndex>
+
+        <createTable tableName="connected_user_project_workflow">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connected_user_project_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_workflow_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vendor_component_name" type="varchar(255)"/>
+            <column name="include" type="text[]"/>
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="version" type="integer" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseColumnNames="connected_user_project_id"
+            baseTableName="connected_user_project_workflow"
+            constraintName="fk_connected_user_project_workflow_connected_user_project"
+            referencedColumnNames="id"
+            referencedTableName="connected_user_project"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="project_workflow_id"
+            baseTableName="connected_user_project_workflow"
+            constraintName="fk_connected_user_project_workflow_project_workflow"
+            referencedColumnNames="id"
+            referencedTableName="project_workflow"/>
+
+        <createIndex indexName="idx_connected_user_project_workflow_unique" tableName="connected_user_project_workflow" unique="true">
+            <column name="connected_user_project_id"/>
+            <column name="id"/>
+        </createIndex>
+
+        <createTable tableName="connected_user_project_workflow_connection">
+            <column name="connected_user_project_workflow_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="connection_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseColumnNames="connected_user_project_workflow_id"
+            baseTableName="connected_user_project_workflow_connection"
+            constraintName="fk_connected_user_project_workflow_connection_workflow"
+            referencedColumnNames="id"
+            referencedTableName="connected_user_project_workflow"/>
+
+        <createIndex indexName="idx_connected_user_project_workflow_connection_unique" tableName="connected_user_project_workflow_connection" unique="true">
+            <column name="connected_user_project_workflow_id"/>
+            <column name="connection_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20240604183140-1" author="Ivica Cardic" contextFilter="mono">
+        <addForeignKeyConstraint
+            baseColumnNames="connected_user_id"
+            baseTableName="connected_user_project"
+            constraintName="fk_connected_user_project_connected_user"
+            referencedColumnNames="id"
+            referencedTableName="connected_user"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="connection_id"
+            baseTableName="connected_user_project_workflow_connection"
+            constraintName="fk_connected_user_project_workflow_connection_connection"
+            referencedColumnNames="id"
+            referencedTableName="connection"/>
+    </changeSet>
+</databaseChangeLog>

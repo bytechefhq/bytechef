@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.exception.ConfigurationException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,15 +71,43 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public ProjectWorkflow getProjectDeploymentProjectWorkflow(long id) {
+    public Optional<String> fetchProjectWorkflowId(Long projectId, String workflowReferenceCode) {
+        return projectWorkflowRepository.findByProjectIdAndWorkflowReferenceCode(projectId, workflowReferenceCode)
+            .map(ProjectWorkflow::getWorkflowId);
+    }
+
+    @Override
+    public List<Long> getProjectProjectWorkflowIds(long projectId, int projectVersion) {
+        return projectWorkflowRepository.findAllByProjectIdAndProjectVersion(projectId, projectVersion)
+            .stream()
+            .map(ProjectWorkflow::getId)
+            .toList();
+    }
+
+    @Override
+    public ProjectWorkflow getProjectWorkflow(long id) {
         return OptionalUtils.get(projectWorkflowRepository.findById(id));
     }
 
     @Override
-    public List<Long> getProjectWorkflowIds(long projectId, int projectVersion) {
+    public ProjectWorkflow getProjectWorkflow(Long projectId, String workflowReferenceCode) {
+        return OptionalUtils.get(
+            projectWorkflowRepository.findByProjectIdAndWorkflowReferenceCode(projectId, workflowReferenceCode));
+    }
+
+    @Override
+    public List<String> getProjectWorkflowIds(long projectId) {
+        return projectWorkflowRepository.findAllByProjectId(projectId)
+            .stream()
+            .map(ProjectWorkflow::getWorkflowId)
+            .toList();
+    }
+
+    @Override
+    public List<String> getProjectWorkflowIds(long projectId, int projectVersion) {
         return projectWorkflowRepository.findAllByProjectIdAndProjectVersion(projectId, projectVersion)
             .stream()
-            .map(ProjectWorkflow::getId)
+            .map(ProjectWorkflow::getWorkflowId)
             .toList();
     }
 
@@ -98,7 +127,13 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public String getWorkflowId(long projectDeploymentId, String workflowReferenceCode) {
+    public List<ProjectWorkflow> getProjectWorkflows(Long projectId, String workflowReferenceCode) {
+        return projectWorkflowRepository.findAllByProjectIdAndWorkflowReferenceCode(
+            projectId, workflowReferenceCode);
+    }
+
+    @Override
+    public String getProjectDeploymentWorkflowId(long projectDeploymentId, String workflowReferenceCode) {
         return OptionalUtils.get(
             projectWorkflowRepository
                 .findByProjectDeploymentIdAndWorkflowReferenceCode(projectDeploymentId, workflowReferenceCode)
@@ -106,27 +141,11 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public String getWorkflowReferenceCode(long projectDeploymentId, String workflowId) {
+    public String getProjectDeploymentWorkflowReferenceCode(long projectDeploymentId, String workflowId) {
         return OptionalUtils.get(
             projectWorkflowRepository
                 .findByProjectDeploymentIdAndWorkflowId(projectDeploymentId, workflowId)
                 .map(ProjectWorkflow::getWorkflowReferenceCode));
-    }
-
-    @Override
-    public List<String> getWorkflowIds(long projectId) {
-        return projectWorkflowRepository.findAllByProjectId(projectId)
-            .stream()
-            .map(ProjectWorkflow::getWorkflowId)
-            .toList();
-    }
-
-    @Override
-    public List<String> getWorkflowIds(long projectId, int projectVersion) {
-        return projectWorkflowRepository.findAllByProjectIdAndProjectVersion(projectId, projectVersion)
-            .stream()
-            .map(ProjectWorkflow::getWorkflowId)
-            .toList();
     }
 
     @Override

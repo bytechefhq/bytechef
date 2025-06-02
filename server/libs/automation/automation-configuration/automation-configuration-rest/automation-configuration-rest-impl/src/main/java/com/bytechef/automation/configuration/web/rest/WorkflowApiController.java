@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.commons.util.CollectionUtils;
@@ -56,7 +57,9 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
 
     @Override
     public ResponseEntity<Long> createProjectWorkflow(Long id, WorkflowModel workflowModel) {
-        return ResponseEntity.ok(projectFacade.addWorkflow(id, workflowModel.getDefinition()));
+        ProjectWorkflow projectWorkflow = projectFacade.addWorkflow(id, workflowModel.getDefinition());
+
+        return ResponseEntity.ok(projectWorkflow.getId());
     }
 
     @Override

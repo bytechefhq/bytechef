@@ -25,5 +25,5 @@ public interface ConnectedUserRepository
 
     int DEFAULT_PAGE_SIZE = 20;
 
-    Optional<ConnectedUser> findByExternalIdAndEnvironment(String externalId, int ordinal);
+    Optional<ConnectedUser> findByExternalIdAndEnvironment(String externalId, int environment);
 }

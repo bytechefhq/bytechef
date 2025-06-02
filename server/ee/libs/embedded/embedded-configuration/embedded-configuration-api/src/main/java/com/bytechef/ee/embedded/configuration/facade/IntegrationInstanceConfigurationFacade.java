@@ -33,10 +33,10 @@ public interface IntegrationInstanceConfigurationFacade {
         long integrationInstanceConfigurationId, String workflowId, boolean enable);
 
     IntegrationInstanceConfigurationDTO getIntegrationInstanceConfigurationIntegration(
-        long integrationId, Environment environment, boolean enabled);
+        long integrationId, boolean enabled, Environment environment);
 
     List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurationIntegrations(
-        Environment environment, boolean enabled);
+        boolean enabled, Environment environment);
 
     IntegrationInstanceConfigurationDTO getIntegrationInstanceConfiguration(long id);
 

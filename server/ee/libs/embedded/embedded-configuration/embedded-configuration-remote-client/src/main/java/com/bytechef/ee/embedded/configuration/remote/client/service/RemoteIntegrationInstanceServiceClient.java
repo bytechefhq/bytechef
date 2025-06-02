@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class RemoteIntegrationInstanceServiceClient implements IntegrationInstanceService {
 
     @Override
-    public Optional<IntegrationInstance> fetchFirstIntegrationInstance(
+    public Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment) {
 
         throw new UnsupportedOperationException();

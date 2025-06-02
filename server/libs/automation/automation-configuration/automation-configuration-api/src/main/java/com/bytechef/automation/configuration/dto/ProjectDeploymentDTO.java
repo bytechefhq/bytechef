@@ -91,8 +91,8 @@ public record ProjectDeploymentDTO(
         private Project project;
         private long projectId;
         private Integer projectVersion;
-        private List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows;
-        private List<Tag> tags;
+        private List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows = List.of();
+        private List<Tag> tags = List.of();
         private int version;
 
         private Builder() {

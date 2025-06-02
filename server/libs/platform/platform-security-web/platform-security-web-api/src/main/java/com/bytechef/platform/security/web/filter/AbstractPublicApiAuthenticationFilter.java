@@ -23,9 +23,12 @@ import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -54,24 +57,30 @@ public abstract class AbstractPublicApiAuthenticationFilter extends OncePerReque
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) {
+        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain)
+        throws ServletException, IOException {
 
         AbstractPublicApiAuthenticationToken authentication =
             (AbstractPublicApiAuthenticationToken) getAuthentication(httpServletRequest);
 
-        TenantUtils.runWithTenantId(
-            authentication.getTenantId(),
-            () -> {
-                Authentication authenticatedAuthentication = authenticationManager.authenticate(authentication);
+        if (authentication == null) {
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+        } else {
+            TenantUtils.runWithTenantId(
+                authentication.getTenantId(),
+                () -> {
+                    Authentication authenticatedAuthentication = authenticationManager.authenticate(authentication);
 
-                SecurityContext context = SecurityContextHolder.getContext();
+                    SecurityContext context = SecurityContextHolder.getContext();
 
-                context.setAuthentication(authenticatedAuthentication);
+                    context.setAuthentication(authenticatedAuthentication);
 
-                filterChain.doFilter(httpServletRequest, httpServletResponse);
-            });
+                    filterChain.doFilter(httpServletRequest, httpServletResponse);
+                });
+        }
     }
 
+    @Nullable
     protected Authentication getAuthentication(HttpServletRequest request) {
         String token = getAuthToken(request);
 
@@ -91,7 +100,7 @@ public abstract class AbstractPublicApiAuthenticationFilter extends OncePerReque
     }
 
     protected Environment getEnvironment(HttpServletRequest request) {
-        String environment = request.getHeader("x-environment");
+        String environment = request.getHeader("X-ENVIRONMENT");
 
         if (StringUtils.isNotBlank(environment)) {
             return Environment.valueOf(environment.toUpperCase());

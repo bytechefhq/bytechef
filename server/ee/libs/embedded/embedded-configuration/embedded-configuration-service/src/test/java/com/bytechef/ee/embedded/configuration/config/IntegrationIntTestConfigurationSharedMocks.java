@@ -18,6 +18,11 @@ package com.bytechef.ee.embedded.configuration.config;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -25,6 +30,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
+import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -49,7 +55,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectedUserService.class, PrincipalJobFacade.class, PrincipalJobService.class, JobFacade.class,
     JobService.class, OAuth2Service.class, TriggerDefinitionService.class, TriggerExecutionService.class,
     TriggerLifecycleFacade.class, ComponentConnectionFacade.class, WorkflowFacade.class,
-    WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class
+    WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class,
+    ProjectDeploymentFacade.class, ProjectDeploymentService.class, ProjectFacade.class, ProjectService.class,
+    ProjectWorkflowService.class, WorkflowTestConfigurationFacade.class
 })
 public @interface IntegrationIntTestConfigurationSharedMocks {
 }

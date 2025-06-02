@@ -286,7 +286,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
             String externalUserId = SecurityUtils.getCurrentUserLogin()
                 .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
-            ConnectedUser connectedUser = connectedUserService.getConnectedUser(environment, externalUserId);
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
             IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
                 connectedUser.getId(), componentNames, environment);

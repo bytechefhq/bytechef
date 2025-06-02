@@ -87,7 +87,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
             ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(
-            environment, OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"));
+            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
 
         String workflowId = integrationWorkflowService.getLatestWorkflowId(workflowReferenceCode, environment);
 

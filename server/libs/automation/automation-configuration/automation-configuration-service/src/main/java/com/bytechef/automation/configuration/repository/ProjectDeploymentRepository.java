@@ -32,7 +32,10 @@ public interface ProjectDeploymentRepository
     CustomProjectDeploymentRepository {
 
     @Query("""
-        SELECT project_deployment.project_id FROM project_deployment WHERE project_deployment.id NOT IN
-        (SELECT api_collection.project_deployment_id FROM api_collection)""")
+        SELECT project_deployment.project_id FROM project_deployment
+        WHERE project_deployment.id NOT IN (SELECT api_collection.project_deployment_id FROM api_collection)
+        AND project_deployment.project_id NOT IN (SELECT project.id FROM project JOIN connected_user_project ON connected_user_project.project_id = project.id)""")
     List<Long> findAllProjectDeploymentProjectIds();
+
+    ProjectDeployment findByProjectIdAndEnvironment(long projectId, int environment);
 }

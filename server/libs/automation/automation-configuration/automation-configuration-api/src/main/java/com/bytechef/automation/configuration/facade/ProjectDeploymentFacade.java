@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.platform.constant.Environment;
@@ -28,6 +29,10 @@ import java.util.List;
 public interface ProjectDeploymentFacade {
 
     long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO);
+
+    long createProjectDeployment(
+        ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
+        List<Tag> tags);
 
     long createProjectDeploymentWorkflowJob(Long id, String workflowId);
 
@@ -45,6 +50,13 @@ public interface ProjectDeploymentFacade {
         long id, Environment environment, Long projectId, Long tagId, boolean includeAllFields);
 
     void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO);
+
+    void updateProjectDeployment(
+        long projectDeploymentId, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows);
+
+    void updateProjectDeployment(
+        ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
+        List<Tag> tags);
 
     void updateProjectDeploymentTags(long id, List<Tag> tags);
 

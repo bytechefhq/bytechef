@@ -24,8 +24,8 @@ public record IntegrationInstanceDTO(
     long connectedUserId, long connectionId, String createdBy, Instant createdDate, boolean enabled,
     Environment environment, Long id, long integrationInstanceConfigurationId,
     IntegrationInstanceConfiguration integrationInstanceConfiguration,
-    Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, Instant lastExecutionDate,
-    String lastModifiedBy, Instant lastModifiedDate, int version) {
+    Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, Instant lastExecutionDate, String lastModifiedBy,
+    Instant lastModifiedDate, int version) {
 
     public IntegrationInstanceDTO(
         IntegrationInstance integrationInstance, IntegrationInstanceConfiguration integrationInstanceConfiguration,

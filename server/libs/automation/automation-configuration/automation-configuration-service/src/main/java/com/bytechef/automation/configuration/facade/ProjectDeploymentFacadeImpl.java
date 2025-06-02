@@ -128,7 +128,17 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
-        ProjectDeployment projectDeployment = projectDeploymentDTO.toProjectDeployment();
+        return createProjectDeployment(
+            projectDeploymentDTO.toProjectDeployment(), CollectionUtils.map(
+                projectDeploymentDTO.projectDeploymentWorkflows(),
+                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
+            projectDeploymentDTO.tags());
+    }
+
+    @Override
+    public long createProjectDeployment(
+        ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
+        List<Tag> tags) {
 
         long projectId = Validate.notNull(projectDeployment.getProjectId(), "projectId");
 
@@ -146,20 +156,13 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 ProjectDeploymentErrorType.CREATE_PROJECT_DEPLOYMENT);
         }
 
-        List<Tag> tags = checkTags(projectDeploymentDTO.tags());
-
         if (!tags.isEmpty()) {
             projectDeployment.setTags(tags);
         }
 
         projectDeployment = projectDeploymentService.create(projectDeployment);
 
-        checkProjectDeploymentWorkflows(
-            projectDeployment, -1,
-            CollectionUtils.map(
-                projectDeploymentDTO.projectDeploymentWorkflows(),
-                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
-            List.of());
+        checkProjectDeploymentWorkflows(projectDeployment, -1, projectDeploymentWorkflows, List.of());
 
         return projectDeployment.getId();
     }
@@ -242,7 +245,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             projectDeployment.getProjectId(), projectDeployment.getProjectVersion());
-        List<String> workflowIds = projectWorkflowService.getWorkflowIds(
+        List<String> workflowIds = projectWorkflowService.getProjectWorkflowIds(
             projectDeployment.getProjectId(), projectDeployment.getProjectVersion());
 
         return new ProjectDeploymentDTO(
@@ -285,25 +288,40 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     public void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
-        ProjectDeployment projectDeployment = projectDeploymentDTO.toProjectDeployment();
+        updateProjectDeployment(
+            projectDeploymentDTO.toProjectDeployment(),
+            CollectionUtils.map(
+                projectDeploymentDTO.projectDeploymentWorkflows(),
+                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
+            projectDeploymentDTO.tags());
+    }
 
-        List<Tag> tags = checkTags(projectDeploymentDTO.tags());
+    @Override
+    public void updateProjectDeployment(
+        long projectDeploymentId, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows) {
+
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
+
+        updateProjectDeployment(projectDeployment, projectDeploymentWorkflows, List.of());
+    }
+
+    @Override
+    public void updateProjectDeployment(
+        ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
+        List<Tag> tags) {
 
         if (!tags.isEmpty()) {
             projectDeployment.setTags(tags);
         }
 
-        ProjectDeployment oldProjectDeployment =
-            projectDeploymentService.getProjectDeployment(projectDeployment.getId());
+        ProjectDeployment oldProjectDeployment = projectDeploymentService.getProjectDeployment(
+            projectDeployment.getId());
 
         projectDeploymentService.update(projectDeployment);
 
         checkProjectDeploymentWorkflows(
             projectDeployment, oldProjectDeployment.getProjectVersion(),
-            CollectionUtils.map(
-                projectDeploymentDTO.projectDeploymentWorkflows(),
-                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
-            projectWorkflowService.getProjectWorkflows(projectDeployment.getProjectId()));
+            projectDeploymentWorkflows, projectWorkflowService.getProjectWorkflows(projectDeployment.getProjectId()));
     }
 
     @Override
@@ -372,8 +390,6 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                         projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
                 }
             } else {
-                boolean oldProjectDeploymentWorkflowEnabled = oldProjectDeploymentWorkflow.isEnabled();
-
                 validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
                 String oldWorkflowId = oldProjectDeploymentWorkflow.getWorkflowId();
@@ -386,14 +402,14 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 if (projectDeploymentWorkflow.isEnabled()) {
                     projectDeploymentWorkflowService.update(oldProjectDeploymentWorkflow);
 
-                    if (projectDeployment.isEnabled() && !oldProjectDeploymentWorkflowEnabled) {
+                    if (projectDeployment.isEnabled() && !oldProjectDeploymentWorkflow.isEnabled()) {
                         validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
                         doEnableProjectDeploymentWorkflow(
                             projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
                     }
                 } else {
-                    if (oldProjectDeploymentWorkflowEnabled) {
+                    if (oldProjectDeploymentWorkflow.isEnabled()) {
                         doEnableProjectDeploymentWorkflow(projectDeployment.getId(), oldWorkflowId, false);
                     }
 
@@ -585,7 +601,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                     Project project = CollectionUtils.getFirst(
                         projects, curProject -> Objects.equals(curProject.getId(), projectDeployment.getProjectId()));
 
-                    List<String> workflowIds = projectWorkflowService.getWorkflowIds(
+                    List<String> workflowIds = projectWorkflowService.getProjectWorkflowIds(
                         projectDeployment.getProjectId(), projectDeployment.getProjectVersion());
 
                     List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(

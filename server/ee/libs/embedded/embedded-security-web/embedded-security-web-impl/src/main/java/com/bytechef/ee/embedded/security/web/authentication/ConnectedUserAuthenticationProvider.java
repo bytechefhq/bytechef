@@ -39,8 +39,8 @@ public class ConnectedUserAuthenticationProvider implements AuthenticationProvid
         Environment environment = connectedUserAuthenticationToken.getEnvironment();
         String externalUserId = connectedUserAuthenticationToken.getExternalUserId();
 
-        ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(environment, externalUserId)
-            .orElseGet(() -> connectedUserService.createConnectedUser(environment, externalUserId));
+        ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(externalUserId, environment)
+            .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environment));
 
         return new ConnectedUserAuthenticationToken(createSpringSecurityUser(externalUserId, connectedUser));
     }

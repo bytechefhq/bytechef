@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,19 +39,37 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public ProjectWorkflow getProjectDeploymentProjectWorkflow(long id) {
+    public ProjectWorkflow getProjectWorkflow(long id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getWorkflowId(
-        long projectDeploymentId, String workflowReferenceCode) {
-
+    public ProjectWorkflow getProjectWorkflow(Long projectId, String workflowReferenceCode) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Long> getProjectWorkflowIds(long projectId, int projectVersion) {
+    public String getProjectDeploymentWorkflowId(long projectDeploymentId, String workflowReferenceCode) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Long> getProjectProjectWorkflowIds(long projectId, int projectVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getProjectDeploymentWorkflowReferenceCode(long projectDeploymentId, String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<String> getProjectWorkflowIds(long projectId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<String> getProjectWorkflowIds(long projectId, int projectVersion) {
         throw new UnsupportedOperationException();
     }
 
@@ -70,12 +89,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public List<String> getWorkflowIds(long projectId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<String> getWorkflowIds(long projectId, int projectVersion) {
+    public List<ProjectWorkflow> getProjectWorkflows(Long projectId, String workflowReferenceCode) {
         throw new UnsupportedOperationException();
     }
 
@@ -86,6 +100,11 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public void delete(long projectId, int projectVersion, String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<String> fetchProjectWorkflowId(Long projectId, String workflowReferenceCode) {
         throw new UnsupportedOperationException();
     }
 

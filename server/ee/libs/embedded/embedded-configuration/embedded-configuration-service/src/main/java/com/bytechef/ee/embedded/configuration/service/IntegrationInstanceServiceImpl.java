@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.service;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceRepository;
 import com.bytechef.platform.constant.Environment;
@@ -59,7 +60,7 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
-    public Optional<IntegrationInstance> fetchFirstIntegrationInstance(
+    public Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment) {
 
         return integrationInstanceRepository.findFirstByConnectedUserIdIdAndComponentNameAndEnvironment(
@@ -70,8 +71,9 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     public IntegrationInstance getIntegrationInstance(
         long connectedUserId, List<String> componentNames, Environment environment) {
 
-        return integrationInstanceRepository.findFirstByConnectedUserIdIdAndComponentNamesAndEnvironment(
-            connectedUserId, componentNames, environment.ordinal());
+        return OptionalUtils.get(
+            integrationInstanceRepository.findFirstByConnectedUserIdIdAndComponentNamesAndEnvironment(
+                connectedUserId, componentNames, environment.ordinal()));
     }
 
     @Override

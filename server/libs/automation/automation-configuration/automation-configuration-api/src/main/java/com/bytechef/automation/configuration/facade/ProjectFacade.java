@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.platform.category.domain.Category;
@@ -29,7 +30,7 @@ import org.springframework.lang.Nullable;
  */
 public interface ProjectFacade {
 
-    long addWorkflow(long id, String definition);
+    ProjectWorkflow addWorkflow(long id, String definition);
 
     long createProject(ProjectDTO projectDTO);
 
@@ -64,7 +65,7 @@ public interface ProjectFacade {
         long workspaceId, boolean projectDeployments, @Nullable Long categoryId, @Nullable Long tagId,
         @Nullable Status status, List<Long> projectIds, boolean includeAllFields);
 
-    void publishProject(long id, @Nullable String description, boolean syncWithGit);
+    int publishProject(long id, @Nullable String description, boolean syncWithGit);
 
     void updateProject(ProjectDTO projectDTO);
 

@@ -30,7 +30,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
 @MapperConfig(componentModel = "spring", uses = {
     DateTimeMapper.class, EmbeddedConfigurationConversionServiceAdapter.class,
     PlatformCategoryConversionServiceAdapter.class, PlatformConfigurationConversionServiceAdapter.class,
-    PlatformTagConversionServiceAdapter.class
+    PlatformTagConversionServiceAdapter.class,
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.ee.embedded.configuration.web.rest.adapter",

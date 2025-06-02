@@ -1,0 +1,21 @@
+extend type Query {
+    connectedUserProjectWorkflow(id: ID): ConnectedUserProjectWorkflow
+    connectedUserProjectWorkflowsByConnectedUserProjectId(connectedUserProjectId: ID): [ConnectedUserProjectWorkflow]
+    isConnectionUsed(connectionId: ID): Boolean
+}
+
+type ConnectedUserProjectWorkflow {
+    id: ID!
+    connectedUserProjectId: ID!
+    projectWorkflowId: ID!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int
+    connections: [ConnectedUserProjectWorkflowConnection]
+}
+
+type ConnectedUserProjectWorkflowConnection {
+    connectionId: ID!
+}
