@@ -40,7 +40,7 @@ import org.mockito.stubbing.Answer;
 /**
  * @author Monika Kušter
  */
-class ProductboardNewNoteTriggerTest {
+class ProductboardUpdatedFeatureTriggerTest {
 
     private final ArgumentCaptor<TriggerContext> contextArgumentCaptor = ArgumentCaptor.forClass(TriggerContext.class);
     private final Object mockedObject = mock(Object.class);
@@ -63,11 +63,12 @@ class ProductboardNewNoteTriggerTest {
                     stringArgumentCaptor.capture()))
                 .thenReturn(mockedWebhookEnableOutput);
 
-            WebhookEnableOutput result = ProductboardNewNoteTrigger.webhookEnable(
+            WebhookEnableOutput result = ProductboardUpdatedFeatureTrigger.webhookEnable(
                 mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
             assertEquals(mockedWebhookEnableOutput, result);
-            assertEquals(List.of(webhookUrl, workflowExecutionId, "note.created"), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(webhookUrl, workflowExecutionId, "feature.updated"),
+                stringArgumentCaptor.getAllValues());
             assertEquals(mockedTriggerContext, contextArgumentCaptor.getValue());
         }
     }
@@ -82,7 +83,7 @@ class ProductboardNewNoteTriggerTest {
                     contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenAnswer((Answer<Void>) invocation -> null);
 
-            ProductboardNewNoteTrigger.webhookDisable(
+            ProductboardUpdatedFeatureTrigger.webhookDisable(
                 mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
 
             assertEquals("123", stringArgumentCaptor.getValue());
@@ -97,7 +98,7 @@ class ProductboardNewNoteTriggerTest {
                 .when(() -> ProductboardUtils.getContent(webhookBodyArgumentCaptor.capture()))
                 .thenReturn(mockedObject);
 
-            Object result = ProductboardNewNoteTrigger.webhookRequest(
+            Object result = ProductboardUpdatedFeatureTrigger.webhookRequest(
                 mockedParameters, mockedParameters, mock(HttpHeaders.class), mock(HttpParameters.class),
                 mockedWebhookBody, mock(WebhookMethod.class), mockedWebhookEnableOutput, mockedTriggerContext);
 

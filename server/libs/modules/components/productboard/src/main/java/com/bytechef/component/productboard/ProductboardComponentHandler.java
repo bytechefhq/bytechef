@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.productboard.trigger.ProductboardNewNoteTrigger;
+import com.bytechef.component.productboard.trigger.ProductboardUpdatedFeatureTrigger;
 import com.google.auto.service.AutoService;
 import java.util.List;
 
@@ -32,7 +33,9 @@ public class ProductboardComponentHandler extends AbstractProductboardComponentH
 
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
-        return List.of(ProductboardNewNoteTrigger.TRIGGER_DEFINITION);
+        return List.of(
+            ProductboardNewNoteTrigger.TRIGGER_DEFINITION,
+            ProductboardUpdatedFeatureTrigger.TRIGGER_DEFINITION);
     }
 
     @Override
