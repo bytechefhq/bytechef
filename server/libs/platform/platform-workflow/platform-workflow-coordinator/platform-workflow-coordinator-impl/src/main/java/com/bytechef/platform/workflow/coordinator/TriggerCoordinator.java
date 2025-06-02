@@ -43,6 +43,7 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -172,19 +173,21 @@ public class TriggerCoordinator {
 
         WorkflowExecutionId workflowExecutionId = triggerPollEvent.getWorkflowExecutionId();
 
-        TriggerExecution triggerExecution = TriggerExecution.builder()
-            .workflowExecutionId(workflowExecutionId)
-            .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
-            .build();
+        TenantUtils.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+            TriggerExecution triggerExecution = TriggerExecution.builder()
+                .workflowExecutionId(workflowExecutionId)
+                .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
+                .build();
 
-        dispatch(triggerExecution);
+            dispatch(triggerExecution);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
-                "Poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
-                triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
-                triggerExecution.getWorkflowExecutionId());
-        }
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "Poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
+                    triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
+                    triggerExecution.getWorkflowExecutionId());
+            }
+        });
     }
 
     /**
