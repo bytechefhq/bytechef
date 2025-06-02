@@ -154,7 +154,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
         if (workflowId != null) {
             workflowIds.add(workflowId);
         } else if (projectId != null) {
-            workflowIds.addAll(projectWorkflowService.getWorkflowIds(projectId));
+            workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
         } else {
             workflowIds.addAll(
                 CollectionUtils.map(projectFacade.getProjectWorkflows(), ProjectWorkflowDTO::getId));
@@ -202,7 +202,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                     CollectionUtils.getFirst(
                         projects,
                         project -> CollectionUtils.contains(
-                            projectWorkflowService.getWorkflowIds(project.getId()), job.getWorkflowId())),
+                            projectWorkflowService.getProjectWorkflowIds(project.getId()), job.getWorkflowId())),
                     OptionalUtils.map(
                         principalJobService.fetchJobPrincipalId(job.getId(), ModeType.AUTOMATION),
                         projectDeploymentService::getProjectDeployment),

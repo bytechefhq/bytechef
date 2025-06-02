@@ -42,10 +42,10 @@ public class ConnectionIdHelper {
             String externalId = SecurityUtils.getCurrentUserLogin()
                 .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
-            ConnectedUser connectedUser = connectedUserService.getConnectedUser(environment, externalId);
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalId, environment);
 
             connectionId = integrationInstanceService
-                .fetchFirstIntegrationInstance(connectedUser.getId(), componentName, environment)
+                .fetchIntegrationInstance(connectedUser.getId(), componentName, environment)
                 .map(IntegrationInstance::getConnectionId)
                 .orElse(null);
         } else {

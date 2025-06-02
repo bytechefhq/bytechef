@@ -20,15 +20,15 @@ import org.springframework.data.domain.Page;
  */
 public interface ConnectedUserService {
 
-    ConnectedUser createConnectedUser(Environment environment, String externalId);
+    ConnectedUser createConnectedUser(String externalId, Environment environment);
 
     void deleteConnectedUser(long id);
 
     void enableConnectedUser(long id, boolean enable);
 
-    Optional<ConnectedUser> fetchConnectedUser(Environment environment, String externalId);
+    Optional<ConnectedUser> fetchConnectedUser(String externalId, Environment environment);
 
-    ConnectedUser getConnectedUser(Environment environment, String externalId);
+    ConnectedUser getConnectedUser(String externalId, Environment environment);
 
     ConnectedUser getConnectedUser(long id);
 

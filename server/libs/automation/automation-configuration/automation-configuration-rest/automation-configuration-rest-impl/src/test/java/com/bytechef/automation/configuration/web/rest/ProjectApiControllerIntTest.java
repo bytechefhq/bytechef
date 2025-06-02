@@ -296,12 +296,14 @@ public class ProjectApiControllerIntTest {
     public void testPostIntegrationWorkflows() {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow();
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
+
         ProjectWorkflowDTO projectWorkflowDTO =
-            new ProjectWorkflowDTO(new Workflow("id", definition, Format.JSON), new ProjectWorkflow());
+            new ProjectWorkflowDTO(new Workflow("id", definition, Format.JSON), projectWorkflow);
 
         when(projectFacade.addWorkflow(anyLong(), any()))
-            .thenReturn(projectWorkflowDTO.getProjectWorkflowId());
+            .thenReturn(projectWorkflow);
 
         try {
             this.webTestClient
@@ -328,7 +330,7 @@ public class ProjectApiControllerIntTest {
         ArgumentCaptor<String> descriptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
         verify(projectFacade).addWorkflow(
-            anyLong(), isNull());
+            any(), isNull());
 
         Assertions.assertEquals("workflowLabel", nameArgumentCaptor.getValue());
         Assertions.assertEquals("workflowDescription", descriptionArgumentCaptor.getValue());

@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -32,11 +33,19 @@ public interface ProjectWorkflowService {
 
     void delete(long projectId, int projectVersion, String workflowId);
 
+    Optional<String> fetchProjectWorkflowId(Long projectId, String workflowReferenceCode);
+
     String getLatestWorkflowId(String workflowReferenceCode);
 
-    ProjectWorkflow getProjectDeploymentProjectWorkflow(long id);
+    List<Long> getProjectProjectWorkflowIds(long projectId, int projectVersion);
 
-    List<Long> getProjectWorkflowIds(long projectId, int projectVersion);
+    ProjectWorkflow getProjectWorkflow(long id);
+
+    ProjectWorkflow getProjectWorkflow(Long projectId, String workflowReferenceCode);
+
+    List<String> getProjectWorkflowIds(long projectId);
+
+    List<String> getProjectWorkflowIds(long projectId, int projectVersion);
 
     List<ProjectWorkflow> getProjectWorkflows();
 
@@ -44,13 +53,11 @@ public interface ProjectWorkflowService {
 
     List<ProjectWorkflow> getProjectWorkflows(long projectId, int projectVersion);
 
-    String getWorkflowId(long projectDeploymentId, String workflowReferenceCode);
+    List<ProjectWorkflow> getProjectWorkflows(Long projectId, String workflowReferenceCode);
 
-    String getWorkflowReferenceCode(long projectDeploymentId, String workflowId);
+    String getProjectDeploymentWorkflowId(long projectDeploymentId, String workflowReferenceCode);
 
-    List<String> getWorkflowIds(long projectId);
-
-    List<String> getWorkflowIds(long projectId, int projectVersion);
+    String getProjectDeploymentWorkflowReferenceCode(long projectDeploymentId, String workflowId);
 
     ProjectWorkflow getWorkflowProjectWorkflow(String workflowId);
 

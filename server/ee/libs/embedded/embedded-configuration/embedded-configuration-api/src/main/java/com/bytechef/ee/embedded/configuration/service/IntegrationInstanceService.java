@@ -19,7 +19,7 @@ import java.util.Optional;
  */
 public interface IntegrationInstanceService {
 
-    Optional<IntegrationInstance> fetchFirstIntegrationInstance(
+    Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment);
 
     IntegrationInstance getIntegrationInstance(

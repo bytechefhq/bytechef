@@ -1079,14 +1079,6 @@ components:
           description: "The project id"
           type: "integer"
           format: "int64"
-        vendorComponentName:
-          description: The vendor component name
-          type: "string"
-        include:
-          description: List of items to include
-          type: "array"
-          items:
-            type: "string"
         workflow:
           $ref: "../../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
     Environment:

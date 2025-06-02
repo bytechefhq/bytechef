@@ -126,10 +126,11 @@ public class ProjectDeploymentFacadeHelper {
     public ProjectWorkflowDTO addTestWorkflow(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
 
-        return projectFacade.getProjectWorkflow(
-            projectFacade.addWorkflow(
-                Validate.notNull(project.getId(), "id"),
-                "{\"label\": \"Test Workflow\", \"description\": \"Test Description\", \"tasks\": []}"));
+        ProjectWorkflow projectWorkflow = projectFacade.addWorkflow(
+            Validate.notNull(project.getId(), "id"),
+            "{\"label\": \"Test Workflow\", \"description\": \"Test Description\", \"tasks\": []}");
+
+        return projectFacade.getProjectWorkflow(projectWorkflow.getId());
     }
 
     private List<Tag> randomTags() {

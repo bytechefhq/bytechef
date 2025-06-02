@@ -17,4 +17,6 @@ dependencies {
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
 }

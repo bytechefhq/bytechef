@@ -21,6 +21,7 @@ import java.util.Map;
 public record IntegrationInstanceWorkflowDTO(
     String createdBy, Instant createdDate, Long id, long integrationInstanceConfigurationWorkflowId,
     Map<String, ?> inputs, String lastModifiedBy, Instant lastModifiedDate, boolean enabled, String workflowId) {
+
     public IntegrationInstanceWorkflowDTO(IntegrationInstanceWorkflow integrationInstanceWorkflow, String workflowId) {
         this(
             integrationInstanceWorkflow.getCreatedBy(), integrationInstanceWorkflow.getCreatedDate(),

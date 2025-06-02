@@ -45,7 +45,7 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
         Assert.notNull(projectDeployment, "'projectDeployment' must not be null");
         Assert.isTrue(projectDeployment.getId() == null, "'id' must be null");
         Assert.notNull(projectDeployment.getProjectId(), "'projectId' must not be null");
-        Assert.notNull(projectDeployment.getName(), "'projectId' must not be null");
+        Assert.notNull(projectDeployment.getName(), "'name' must not be null");
 
         projectDeployment.setEnabled(false);
 
@@ -61,6 +61,12 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     @Transactional(readOnly = true)
     public ProjectDeployment getProjectDeployment(long id) {
         return OptionalUtils.get(projectDeploymentRepository.findById(id));
+    }
+
+    @Override
+    public long getProjectDeploymentId(long projectId, Environment environment) {
+        return projectDeploymentRepository.findByProjectIdAndEnvironment(projectId, environment.ordinal())
+            .getId();
     }
 
     @Override

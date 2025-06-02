@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Component;
 public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
-    public long addWorkflow(long id, String definition) {
+    public ProjectWorkflow addWorkflow(long id, String definition) {
         throw new UnsupportedOperationException();
     }
 
@@ -108,7 +109,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public void publishProject(long id, String description, boolean syncWithGit) {
+    public int publishProject(long id, String description, boolean syncWithGit) {
         throw new UnsupportedOperationException();
     }
 

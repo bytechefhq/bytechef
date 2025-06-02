@@ -83,7 +83,7 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
 
     @Override
     public String getWorkflowId(long jobPrincipalId, String workflowReferenceCode) {
-        return projectWorkflowService.getWorkflowId(jobPrincipalId, workflowReferenceCode);
+        return projectWorkflowService.getProjectDeploymentWorkflowId(jobPrincipalId, workflowReferenceCode);
     }
 
     @Override

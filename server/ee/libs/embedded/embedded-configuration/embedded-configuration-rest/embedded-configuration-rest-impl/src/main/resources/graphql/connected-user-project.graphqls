@@ -1,0 +1,14 @@
+extend type Query {
+    connectedUserProject(id: ID): ConnectedUserProject
+}
+
+type ConnectedUserProject {
+    id: ID!
+    connectedUserId: ID!
+    projectId: ID!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int
+}

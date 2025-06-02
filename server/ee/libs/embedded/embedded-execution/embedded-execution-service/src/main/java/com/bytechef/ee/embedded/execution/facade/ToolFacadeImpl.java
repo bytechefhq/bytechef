@@ -91,7 +91,7 @@ public class ToolFacadeImpl implements ToolFacade {
         String externalId = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(environment, externalId);
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalId, environment);
 
         List<Long> integrationInstanceConfigurationIds = integrationInstanceService
             .getConnectedUserIntegrationInstances(connectedUser.getId(), environment)

@@ -1,0 +1,29 @@
+extend type Query {
+    connectedUser(id: ID): ConnectedUser
+    connectedUsers(
+        environment: Int,name: String,
+        createDateFrom: String,
+        createDateTo: String,
+        integrationId: ID,
+        pageNumber: Int
+    ): ConnectedUserPage
+}
+
+type ConnectedUser {
+    id: ID!
+    externalId: String!
+    environment: Int!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int
+}
+
+type ConnectedUserPage {
+    content: [ConnectedUser]!
+    totalElements: Int!
+    totalPages: Int!
+    number: Int!
+    size: Int!
+}

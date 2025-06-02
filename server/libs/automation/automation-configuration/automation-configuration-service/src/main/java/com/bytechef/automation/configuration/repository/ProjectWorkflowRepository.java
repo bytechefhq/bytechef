@@ -36,8 +36,20 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
 
     List<ProjectWorkflow> findAllByProjectIdAndProjectVersion(Long projectId, int projectVersion);
 
+    List<ProjectWorkflow> findAllByProjectIdAndWorkflowReferenceCode(Long projectId, String workflowReferenceCode);
+
     Optional<ProjectWorkflow> findByProjectIdAndProjectVersionAndWorkflowId(
         long projectId, int projectVersion, String workflowId);
+
+    @Query("""
+        SELECT project_workflow.* FROM project_workflow
+        WHERE project_workflow.project_id = :projectId
+        AND project_workflow.workflow_reference_code = :workflowReferenceCode
+        ORDER BY project_workflow.project_version DESC
+        LIMIT 1
+        """)
+    Optional<ProjectWorkflow> findByProjectIdAndWorkflowReferenceCode(
+        @Param("projectId") long projectId, @Param("workflowReferenceCode") String workflowReferenceCode);
 
     Optional<ProjectWorkflow> findByWorkflowId(String workflowId);
 

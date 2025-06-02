@@ -78,7 +78,7 @@ public interface IntegrationInstanceRepository
         ORDER BY integration_instance.created_date DESC
         LIMIT 1
         """)
-    IntegrationInstance findFirstByConnectedUserIdIdAndComponentNamesAndEnvironment(
+    Optional<IntegrationInstance> findFirstByConnectedUserIdIdAndComponentNamesAndEnvironment(
         @Param("connectedUserId") long connectedUserId, @Param("componentNames") List<String> componentNames,
         @Param("environment") int environment);
 }

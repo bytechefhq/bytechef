@@ -282,10 +282,11 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Transactional(readOnly = true)
     public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfigurationIntegration(
-        long integrationId, Environment environment, boolean enabled) {
+        long integrationId, boolean enabled, Environment environment) {
 
-        return getIntegrationInstanceConfigurationIntegrations(environment, true)
+        return getIntegrationInstanceConfigurationIntegrations(true, environment)
             .stream()
             .filter(integrationDTO -> Objects.equals(integrationDTO.id(), integrationId))
             .findFirst()
@@ -293,8 +294,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurationIntegrations(
-        Environment environment, boolean enabled) {
+        boolean enabled, Environment environment) {
 
         List<IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationDTOs = List.of();
 
@@ -630,8 +632,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     .toList());
 
             requiredComponentConnections = requiredComponentConnections.stream()
-                .filter(workflowConnection -> !Objects.equals(workflowConnection.componentName(),
-                    integration.getComponentName()))
+                .filter(workflowConnection -> !Objects.equals(
+                    workflowConnection.componentName(), integration.getComponentName()))
                 .toList();
 
             int connectionsCount = integrationInstanceConfigurationWorkflow.getConnectionsCount();

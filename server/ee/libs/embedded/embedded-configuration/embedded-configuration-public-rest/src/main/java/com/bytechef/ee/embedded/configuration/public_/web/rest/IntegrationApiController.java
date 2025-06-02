@@ -8,9 +8,10 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationBasicModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,15 +36,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;
-    private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
+    private final ConnectedUserIntegrationFacade connectedUserIntegrationFacade;
 
     @SuppressFBWarnings("EI")
     public IntegrationApiController(
-        ConversionService conversionService,
-        IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade) {
+        ConversionService conversionService, ConnectedUserIntegrationFacade connectedUserIntegrationFacade) {
 
         this.conversionService = conversionService;
-        this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
+        this.connectedUserIntegrationFacade = connectedUserIntegrationFacade;
     }
 
     @CrossOrigin
@@ -51,8 +51,7 @@ public class IntegrationApiController implements IntegrationApi {
     public ResponseEntity<IntegrationModel> getFrontendIntegration(Long id, EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(
             conversionService.convert(
-                integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationIntegration(
-                    id, getEnvironment(xEnvironment), true),
+                connectedUserIntegrationFacade.getConnectedUserIntegration(id, true, getEnvironment(xEnvironment)),
                 IntegrationModel.class));
     }
 
@@ -60,8 +59,8 @@ public class IntegrationApiController implements IntegrationApi {
     @Override
     public ResponseEntity<List<IntegrationModel>> getFrontendIntegrations(EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(
-            integrationInstanceConfigurationFacade
-                .getIntegrationInstanceConfigurationIntegrations(getEnvironment(xEnvironment), true)
+            connectedUserIntegrationFacade
+                .getConnectedUserIntegrations(true, getEnvironment(xEnvironment))
                 .stream()
                 .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
                 .toList());
@@ -73,21 +72,20 @@ public class IntegrationApiController implements IntegrationApi {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationIntegration(
-                    id, getEnvironment(xEnvironment), true),
+                connectedUserIntegrationFacade.getConnectedUserIntegration(id, true, getEnvironment(xEnvironment)),
                 IntegrationModel.class));
     }
 
     @Override
-    public ResponseEntity<List<IntegrationModel>> getIntegrations(
+    public ResponseEntity<List<IntegrationBasicModel>> getIntegrations(
         String externalUserId, EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
-            integrationInstanceConfigurationFacade
-                .getIntegrationInstanceConfigurationIntegrations(getEnvironment(xEnvironment), true)
+            connectedUserIntegrationFacade
+                .getConnectedUserIntegrations(true, getEnvironment(xEnvironment))
                 .stream()
                 .map(integrationInstanceConfigurationDTO -> conversionService.convert(
-                    integrationInstanceConfigurationDTO, IntegrationModel.class))
+                    integrationInstanceConfigurationDTO, IntegrationBasicModel.class))
                 .toList());
     }
 

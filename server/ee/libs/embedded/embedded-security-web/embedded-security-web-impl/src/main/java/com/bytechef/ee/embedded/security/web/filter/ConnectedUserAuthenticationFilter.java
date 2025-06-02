@@ -78,8 +78,8 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
                 throw new IllegalArgumentException("externalUserId parameter is required");
             }
 
-            return new ConnectedUserAuthenticationToken(externalUserId, getEnvironment(request),
-                tenantKey.getTenantId());
+            return new ConnectedUserAuthenticationToken(
+                externalUserId, getEnvironment(request), tenantKey.getTenantId());
         }
     }
 
