@@ -12,6 +12,8 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
@@ -26,6 +28,11 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
 public class RuntimeConfiguration {
+
+    @Bean
+    Evaluator evaluator() {
+        return SpelEvaluator.create();
+    }
 
     @Bean
     InMemoryContextRepository contextRepository(CacheManager cacheManager) {
