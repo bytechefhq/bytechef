@@ -138,6 +138,10 @@ public class JsonSchemaUtils {
     }
 
     private static void walkThroughProperty(JsonNode jsonNode, ModifiableObjectProperty property) {
+        if (jsonNode == null) {
+            return;
+        }
+
         Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
 
         while (fields.hasNext()) {

@@ -110,7 +110,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         return OptionalUtils.get(
             projectWorkflowRepository
                 .findByProjectDeploymentIdAndWorkflowId(projectDeploymentId, workflowId)
-                .map(ProjectWorkflow::getWorkflowId));
+                .map(ProjectWorkflow::getWorkflowReferenceCode));
     }
 
     @Override
