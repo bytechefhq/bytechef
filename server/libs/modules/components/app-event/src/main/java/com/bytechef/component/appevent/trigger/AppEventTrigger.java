@@ -56,7 +56,7 @@ public class AppEventTrigger {
                 .label("App Event Id")
                 .description("The Id of an app event.")
                 .options((OptionsDataSource.TriggerOptionsFunction<Long>) this::getOptions))
-        .output(this::getOutput)
+        .output(this::output)
         .webhookRequest(this::webhookRequest);
 
     @SuppressFBWarnings("EI")
@@ -78,7 +78,7 @@ public class AppEventTrigger {
             .toList();
     }
 
-    protected OutputResponse getOutput(
+    protected OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, TriggerContext context) {
 
         if (!inputParameters.containsKey(APP_EVENT_ID)) {
