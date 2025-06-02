@@ -46,15 +46,17 @@ class InfobipSendWhatsAppTemplateMessageActionTest extends AbstractInfobipAction
 
     @Test
     void testPerform() {
-        mockedParameters = MockParametersFactory.create(Map.of(FROM, "123", TO, "456", TEMPLATE_NAME, "template"));
+        mockedParameters = MockParametersFactory.create(
+            Map.of(FROM, "123", TO, "456", TEMPLATE_NAME, "template", PLACEHOLDERS,
+                Map.of("_1", "value1", "_2", "value2", "_3", "value3")));
 
         try (MockedStatic<InfobipUtils> infobipUtilsMockedStatic = mockStatic(InfobipUtils.class)) {
             infobipUtilsMockedStatic
                 .when(() -> InfobipUtils.getTemplates(stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(List.of(Map.of(NAME, "template", LANGUAGE, "en")));
 
-            Map<String, Object> result =
-                InfobipSendWhatsAppTemplateMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Map<String, Object> result = InfobipSendWhatsAppTemplateMessageAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(responseMap, result);
 
@@ -67,7 +69,7 @@ class InfobipSendWhatsAppTemplateMessageActionTest extends AbstractInfobipAction
                         TO, "456",
                         CONTENT, Map.of(
                             TEMPLATE_NAME, "template",
-                            "templateData", Map.of("body", Map.of(PLACEHOLDERS, List.of())),
+                            "templateData", Map.of("body", Map.of(PLACEHOLDERS, List.of("value1", "value2", "value3"))),
                             LANGUAGE, "en"))));
 
             assertEquals(expectedBody, body.getContent());

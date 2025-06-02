@@ -17,16 +17,21 @@
 package com.bytechef.component.infobip.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
 import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
 import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
+import static com.bytechef.component.infobip.constant.InfobipConstants.TEMPLATE_NAME;
+import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
@@ -34,11 +39,43 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Monika Kušter
  */
 public class InfobipUtils {
+
+    public static List<? extends ValueProperty<?>> createPlaceholderProperties(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        ActionContext actionContext) {
+
+        List<ValueProperty<?>> properties = new ArrayList<>();
+
+        for (Map<String, Object> map : getTemplates(inputParameters.getRequiredString(FROM), actionContext)) {
+            Object name = map.get(NAME);
+
+            if (name.equals(inputParameters.getRequiredString(TEMPLATE_NAME)) &&
+                map.get("structure") instanceof Map<?, ?> structure &&
+                structure.get("body") instanceof Map<?, ?> body) {
+
+                String text = (String) body.get(TEXT);
+
+                Pattern pattern = Pattern.compile("\\{\\{(.*?)}}");
+                Matcher matcher = pattern.matcher(text);
+
+                while (matcher.find()) {
+                    properties.add(
+                        string("_" + matcher.group(1))
+                            .label(matcher.group(1))
+                            .required(true));
+                }
+            }
+        }
+
+        return properties;
+    }
 
     public static List<Map<String, Object>> getTemplates(String sender, Context context) {
         Map<String, List<Map<String, Object>>> body = context

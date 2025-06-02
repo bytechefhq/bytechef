@@ -119,7 +119,7 @@ Name: sendWhatsappTemplateMessage
 | from | From | STRING | `Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.` | true |
 | to | To | STRING | `Message recipient number. Must be in international format.` | true |
 | templateName | Template Name | STRING <details> <summary> Depends On </summary> from </details> | `Name of the WhatsApp template to use.` | true |
-| placeholders | Placeholders | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of placeholders to use in the template.` | false |
+| placeholders | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> templateName </details> |  | null |
 
 #### Example JSON Structure
 ```json
@@ -130,7 +130,7 @@ Name: sendWhatsappTemplateMessage
     "from" : "",
     "to" : "",
     "templateName" : "",
-    "placeholders" : [ "" ]
+    "placeholders" : { }
   },
   "type" : "infobip/v1/sendWhatsappTemplateMessage"
 }
