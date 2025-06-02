@@ -18,6 +18,7 @@ package com.bytechef.component.infobip.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -38,6 +39,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.infobip.util.InfobipUtils;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,11 +70,9 @@ public class InfobipSendWhatsAppTemplateMessageAction {
                 .optionsLookupDependsOn(FROM)
                 .options((ActionOptionsFunction<String>) InfobipUtils::getTemplateOptions)
                 .required(true),
-            array(PLACEHOLDERS)
-                .label("Placeholders")
-                .description("List of placeholders to use in the template.")
-                .items(string())
-                .required(false))
+            dynamicProperties(PLACEHOLDERS)
+                .properties(InfobipUtils::createPlaceholderProperties)
+                .propertiesLookupDependsOn(TEMPLATE_NAME))
         .output(
             outputSchema(
                 object()
@@ -89,16 +89,9 @@ public class InfobipSendWhatsAppTemplateMessageAction {
 
         String from = inputParameters.getRequiredString(FROM);
         String templateName = inputParameters.getRequiredString(TEMPLATE_NAME);
+        String language = findTemplateLanguage(from, templateName, context);
 
-        String language = "";
-
-        for (Map<String, Object> map : getTemplates(from, context)) {
-            Object name = map.get(NAME);
-
-            if (name.equals(templateName)) {
-                language = (String) map.get(LANGUAGE);
-            }
-        }
+        List<String> placeholders = extractPlaceholders(inputParameters);
 
         return context
             .http(http -> http.post("/whatsapp/1/message/template"))
@@ -112,10 +105,30 @@ public class InfobipSendWhatsAppTemplateMessageAction {
                                 TEMPLATE_NAME, templateName,
                                 "templateData", Map.of(
                                     "body", Map.of(
-                                        PLACEHOLDERS, inputParameters.getList(PLACEHOLDERS, String.class, List.of()))),
+                                        PLACEHOLDERS, placeholders)),
                                 LANGUAGE, language)))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+    }
+
+    private static String findTemplateLanguage(String from, String templateName, Context context) {
+        for (Map<String, Object> map : getTemplates(from, context)) {
+            if (map.get(NAME)
+                .equals(templateName)) {
+                return (String) map.get(LANGUAGE);
+            }
+        }
+
+        return "";
+    }
+
+    private static List<String> extractPlaceholders(Parameters inputParameters) {
+        List<String> placeholders = new ArrayList<>();
+
+        inputParameters.getMap(PLACEHOLDERS, String.class, Map.of())
+            .forEach((key, value) -> placeholders.add(value));
+
+        return placeholders;
     }
 }

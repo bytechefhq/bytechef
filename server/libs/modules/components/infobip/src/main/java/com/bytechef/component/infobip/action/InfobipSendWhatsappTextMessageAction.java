@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ public class InfobipSendWhatsappTextMessageAction {
                 .label("Text")
                 .description("Content of the message being sent.")
                 .maxLength(4096)
+                .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .output(outputSchema(WHATSAPP_MESSAGE_OUTPUT_PROPERTY))
         .perform(InfobipSendWhatsappTextMessageAction::perform);

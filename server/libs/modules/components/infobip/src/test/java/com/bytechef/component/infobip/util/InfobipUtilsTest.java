@@ -16,19 +16,26 @@
 
 package com.bytechef.component.infobip.util;
 
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
+import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
+import static com.bytechef.component.infobip.constant.InfobipConstants.TEMPLATE_NAME;
+import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -43,23 +50,54 @@ class InfobipUtilsTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Context mockedContext = mock(Context.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Parameters mockedParameters =
+        MockParametersFactory.create(Map.of(FROM, "1234567890", TEMPLATE_NAME, "template"));
 
     @Test
-    void testGetTemplates() {
-        List<Map<String, String>> templates = List.of(Map.of("name", "template", "language", "en"));
+    void testCreatePlaceholderProperties() {
+        List<Map<String, Object>> templates = List.of(
+            Map.of(
+                "name", "template",
+                "structure", Map.of("body", Map.of(TEXT, "Hello {{1}}! You have {{2}} new messages."))));
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("templates", templates));
 
-        assertEquals(templates, InfobipUtils.getTemplates(anyString(), mockedContext));
+        List<? extends ValueProperty<?>> properties = InfobipUtils.createPlaceholderProperties(
+            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
+
+        List<ValueProperty<?>> expectedProperties = List.of(
+            string("_1")
+                .label("1")
+                .required(true),
+            string("_2")
+                .label("2")
+                .required(true));
+
+        assertEquals(expectedProperties, properties);
+    }
+
+    @Test
+    void testGetTemplates() {
+        List<Map<String, String>> templates = List.of(Map.of("name", "template", "language", "en"));
+
+        when(mockedActionContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("templates", templates));
+
+        assertEquals(templates, InfobipUtils.getTemplates(anyString(), mockedActionContext));
     }
 
     @Test

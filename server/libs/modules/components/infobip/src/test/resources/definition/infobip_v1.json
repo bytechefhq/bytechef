@@ -1298,45 +1298,19 @@
       "type" : "STRING"
     }, {
       "advancedOption" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "defaultValue" : null,
-      "description" : "List of placeholders to use in the template.",
+      "description" : null,
       "displayCondition" : null,
-      "exampleValue" : null,
+      "dynamicPropertiesDataSource" : {
+        "properties" : { },
+        "propertiesLookupDependsOn" : [ "templateName" ]
+      },
       "expressionEnabled" : null,
+      "header" : null,
       "hidden" : null,
-      "items" : [ {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : null,
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : null,
-        "options" : null,
-        "optionsDataSource" : null,
-        "placeholder" : null,
-        "required" : null,
-        "type" : "STRING"
-      } ],
-      "label" : "Placeholders",
-      "maxItems" : null,
       "metadata" : { },
-      "minItems" : null,
-      "multipleValues" : null,
       "name" : "placeholders",
-      "options" : null,
-      "optionsDataSource" : null,
-      "placeholder" : null,
-      "required" : false,
-      "type" : "ARRAY"
+      "required" : null,
+      "type" : "DYNAMIC_PROPERTIES"
     } ],
     "title" : "Send Whatsapp Template Message",
     "workflowNodeDescription" : null
@@ -1835,7 +1809,7 @@
       "type" : "STRING"
     }, {
       "advancedOption" : null,
-      "controlType" : "TEXT",
+      "controlType" : "TEXT_AREA",
       "defaultValue" : null,
       "description" : "Content of the message being sent.",
       "displayCondition" : null,
