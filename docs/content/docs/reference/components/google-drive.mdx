@@ -127,7 +127,7 @@ Name: createNewFolder
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
+```{mimeType=plain/text, name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
 
 
 
@@ -191,7 +191,7 @@ Name: createNewTextFile
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
+```{mimeType=plain/text, name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
 
 
 
@@ -357,6 +357,118 @@ Type: OBJECT
 ```
 
 
+### List Files
+Name: listFiles
+
+`List files in a Google Drive folder.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| folderId | Parent Folder ID | STRING | `ID of the folder from which you want to list files. If no folder is specified, the root folder will be used.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Files",
+  "name" : "listFiles",
+  "parameters" : {
+    "folderId" : ""
+  },
+  "type" : "googleDrive/v1/listFiles"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the file. |
+| kind | STRING | Identifies what kind of resource this is. |
+| mimeType | STRING | The MIME type of the file. |
+| name | STRING | The name of the file. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "kind" : "",
+  "mimeType" : "",
+  "name" : ""
+} ]
+```
+
+
+### List Folders
+Name: listFolders
+
+`List folders in a Google Drive folder.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| folderId | Parent Folder ID | STRING | `ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Folders",
+  "name" : "listFolders",
+  "parameters" : {
+    "folderId" : ""
+  },
+  "type" : "googleDrive/v1/listFolders"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the file. |
+| kind | STRING | Identifies what kind of resource this is. |
+| mimeType | STRING | The MIME type of the file. |
+| name | STRING | The name of the file. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "kind" : "",
+  "mimeType" : "",
+  "name" : ""
+} ]
+```
+
+
 ### Upload File
 Name: uploadFile
 
@@ -392,7 +504,7 @@ Name: uploadFile
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
+```{mimeType=plain/text, name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
 
 
 

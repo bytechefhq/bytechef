@@ -23,11 +23,13 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,5 +73,21 @@ public class GoogleDriveUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<File> listFiles(String folderId, boolean isEqualMimetype, Parameters connectionParameters)
+        throws IOException {
+
+        String operator = isEqualMimetype ? "=" : "!=";
+        String query = "mimeType %s '%s' and trashed = false and parents in '%s'".formatted(
+            operator, APPLICATION_VND_GOOGLE_APPS_FOLDER, folderId);
+
+        Drive drive = GoogleServices.getDrive(connectionParameters);
+
+        return drive.files()
+            .list()
+            .setQ(query)
+            .execute()
+            .getFiles();
     }
 }
