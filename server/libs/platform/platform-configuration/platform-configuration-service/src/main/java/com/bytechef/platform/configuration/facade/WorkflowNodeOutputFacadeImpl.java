@@ -21,15 +21,18 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
@@ -56,23 +59,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     private final ActionDefinitionService actionDefinitionService;
+    private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+    private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowService workflowService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
+    private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeOutputFacadeImpl(
-        ActionDefinitionService actionDefinitionService,
+        ActionDefinitionService actionDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        TriggerDefinitionFacade triggerDefinitionFacade,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
+        WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionService = actionDefinitionService;
+        this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
+        this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
+        this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
@@ -159,7 +170,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .collect(Collectors.toMap(WorkflowNodeOutputDTO::workflowNodeName, WorkflowNodeOutputDTO::sampleOutput));
     }
 
-    private OutputResponse checkOutput(OutputResponse outputResponse) {
+    private OutputResponse
+        checkOutput(String workflowId, OutputResponse outputResponse, WorkflowTrigger workflowTrigger) {
         if (outputResponse != null) {
             // Force UI to test component to get the real fileEntry instance
 
@@ -168,6 +180,22 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             }
 
             return outputResponse;
+        }
+
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+
+        if (workflowTrigger != null) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+            Map<String, ?> inputParameters = workflowTrigger.evaluateParameters(inputs, evaluator);
+
+            Long connectionId = workflowTestConfigurationService
+                .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName())
+                .orElse(null);
+
+            outputResponse = triggerDefinitionFacade.executeOutput(
+                workflowNodeType.name(), workflowNodeType.version(),
+                workflowNodeType.operation(), inputParameters, connectionId);
         }
 
         return outputResponse;
@@ -224,7 +252,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         outputResponse = workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
-            .orElseGet(() -> checkOutput(finalOutputResponse));
+            .orElseGet(() -> checkOutput(workflowId, finalOutputResponse, null));
 
         if (Objects.equals(workflowNodeType.name(), "loop") && outputResponse != null) {
             ObjectProperty objectProperty = (ObjectProperty) outputResponse.outputSchema();
@@ -252,7 +280,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
-            .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
+            .orElseGet(() -> checkOutput(workflowId, triggerDefinition.getOutputResponse(), workflowTrigger));
 
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
 
