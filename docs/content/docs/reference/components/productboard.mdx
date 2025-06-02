@@ -395,5 +395,42 @@ Type: OBJECT
 ```
 
 
+### Updated Feature
+Name: updatedFeature
+
+`Triggers when a feature is updated.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the updated feature. |
+| eventType | STRING | Type of the event that triggered the webhook. |
+| links | OBJECT <details> <summary> Properties </summary> &#123;STRING\(target)&#125; </details> | Links to the updated entity. |
+| updatedAttributes | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of updated attributes. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Updated Feature",
+  "name" : "updatedFeature",
+  "type" : "productboard/v1/updatedFeature"
+}
+```
+
+
 <hr />
 

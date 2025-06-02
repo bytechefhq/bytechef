@@ -16,6 +16,7 @@
 
 package com.bytechef.component.productboard.trigger;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -39,18 +40,18 @@ import com.bytechef.component.productboard.util.ProductboardUtils;
 /**
  * @author Monika Kušter
  */
-public class ProductboardNewNoteTrigger {
+public class ProductboardUpdatedFeatureTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newNote")
-        .title("New Note")
-        .description("Triggers when a note is created.")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("updatedFeature")
+        .title("Updated Feature")
+        .description("Triggers when a feature is updated.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(
             outputSchema(
                 object()
                     .properties(
                         string(ID)
-                            .description("ID of the note."),
+                            .description("ID of the updated feature."),
                         string("eventType")
                             .description("Type of the event that triggered the webhook."),
                         object("links")
@@ -58,20 +59,23 @@ public class ProductboardNewNoteTrigger {
                             .properties(
                                 string("target")
                                     .description(
-                                        "Link to the entity whose change triggered this webhook notification.")))))
-        .webhookEnable(ProductboardNewNoteTrigger::webhookEnable)
-        .webhookDisable(ProductboardNewNoteTrigger::webhookDisable)
-        .webhookRequest(ProductboardNewNoteTrigger::webhookRequest)
+                                        "Link to the entity whose change triggered this webhook notification.")),
+                        array("updatedAttributes")
+                            .description("List of updated attributes.")
+                            .items(string()))))
+        .webhookEnable(ProductboardUpdatedFeatureTrigger::webhookEnable)
+        .webhookDisable(ProductboardUpdatedFeatureTrigger::webhookDisable)
+        .webhookRequest(ProductboardUpdatedFeatureTrigger::webhookRequest)
         .webhookValidateOnEnable(ProductboardUtils::webhookValidateOnEnable);
 
-    private ProductboardNewNoteTrigger() {
+    private ProductboardUpdatedFeatureTrigger() {
     }
 
     protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return createSubscription(webhookUrl, workflowExecutionId, context, "note.created");
+        return createSubscription(webhookUrl, workflowExecutionId, context, "feature.updated");
     }
 
     protected static void webhookDisable(
