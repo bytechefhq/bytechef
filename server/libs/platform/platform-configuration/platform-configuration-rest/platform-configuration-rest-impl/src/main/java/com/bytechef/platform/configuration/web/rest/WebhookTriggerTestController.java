@@ -31,6 +31,8 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.tenant.util.TenantUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMapAdapter;
@@ -45,6 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ConditionalOnCoordinator
 public class WebhookTriggerTestController extends AbstractWebhookTriggerController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebhookTriggerTestController.class);
 
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
@@ -72,10 +76,16 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
             ResponseEntity<?> responseEntity;
             WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
 
+            WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
+                    "executeWorkflow: id={}, webhookRequest={}, webhookTriggerFlags={}", workflowExecutionId,
+                    webhookRequest, webhookTriggerFlags);
+            }
+
             if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) ||
                 isWorkflowDisabled(workflowExecutionId)) {
-
-                WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
                 if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
                     responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest);
@@ -84,8 +94,6 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
                         .build();
                 }
             } else {
-                WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
-
                 workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(workflowExecutionId, webhookRequest);
 
                 responseEntity = ResponseEntity.ok()
