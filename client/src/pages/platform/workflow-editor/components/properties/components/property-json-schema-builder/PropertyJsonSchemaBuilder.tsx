@@ -21,6 +21,7 @@ interface PropertyJsonSchemaBuilderProps {
     onChange?: (newSchema: SchemaRecordType) => void;
     required?: boolean;
     schema?: SchemaRecordType;
+    title?: string;
 }
 
 const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSchemaBuilderProps>(
@@ -37,6 +38,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
             onChange,
             required,
             schema,
+            title,
         },
         ref
     ) => {
@@ -112,6 +114,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
                         onChange={onChange}
                         onClose={() => setShowPropertyJsonSchemaBuilder(false)}
                         schema={schema}
+                        title={title}
                     />
                 )}
             </>
