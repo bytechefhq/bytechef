@@ -114,8 +114,9 @@ public class InfobipSendWhatsAppTemplateMessageAction {
 
     private static String findTemplateLanguage(String from, String templateName, Context context) {
         for (Map<String, Object> map : getTemplates(from, context)) {
-            if (map.get(NAME)
-                .equals(templateName)) {
+            Object name = map.get(NAME);
+
+            if (name.equals(templateName)) {
                 return (String) map.get(LANGUAGE);
             }
         }
