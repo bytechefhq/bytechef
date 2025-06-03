@@ -20,6 +20,11 @@ module.exports = {
                 sm: 'calc(var(--radius) - 4px)',
             },
             colors: {
+                bytechef: {
+                    DEFAULT: 'hsl(var(--bytechef-brand))',
+                    light: 'hsl(var(--bytechef-brand-light))',
+                    dark: 'hsl(var(--bytechef-brand-dark))',
+                },
                 accent: {
                     DEFAULT: 'hsl(var(--accent))',
                     foreground: 'hsl(var(--accent-foreground))',
