@@ -18,12 +18,10 @@ package com.bytechef.component.microsoft.one.drive.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
@@ -58,11 +56,7 @@ public class MicrosoftOneDriveListFilesAction {
         .output(
             outputSchema(
                 array()
-                    .items(
-                        object()
-                            .properties(
-                                string(ID),
-                                string(NAME)))))
+                    .items(FILE_OUTPUT_PROPERTY)))
         .perform(MicrosoftOneDriveListFilesAction::perform);
 
     private MicrosoftOneDriveListFilesAction() {

@@ -17,9 +17,9 @@
 package com.bytechef.component.microsoft.one.drive.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
@@ -42,11 +42,9 @@ public class MicrosoftOneDriveUtils {
 
     public static List<Option<String>> getFileIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, ActionContext actionContext) {
 
-        Map<String, Object> body = context
-            .http(
-                http -> http.get("/me/drive/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + "/children"))
+        Map<String, Object> body = actionContext.http(http -> http.get("/me/drive/root/search"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -55,7 +53,7 @@ public class MicrosoftOneDriveUtils {
 
         if (body.get(VALUE) instanceof List<?> list) {
             for (Object item : list) {
-                if (item instanceof Map<?, ?> map && map.containsKey("file")) {
+                if (item instanceof Map<?, ?> map && map.containsKey(FILE)) {
                     options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
@@ -72,8 +70,7 @@ public class MicrosoftOneDriveUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get("/me/drive/items/root/children"))
-            .queryParameters("$filter", "folder ne null")
+        Map<String, Object> body = context.http(http -> http.get("/me/drive/root/search"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -82,7 +79,7 @@ public class MicrosoftOneDriveUtils {
 
         if (body.get(VALUE) instanceof List<?> list) {
             for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
+                if (item instanceof Map<?, ?> map && map.containsKey("folder")) {
                     options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }

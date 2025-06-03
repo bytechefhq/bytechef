@@ -17,9 +17,9 @@
 package com.bytechef.component.microsoft.one.drive.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -30,36 +30,30 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public class MicrosoftOneDriveDownloadFileAction {
+public class MicrosoftOneDriveGetFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
-        .title("Download File")
-        .description("Download a file from your Microsoft OneDrive.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFile")
+        .title("Get File")
+        .description("Retrieve a specified file from your Microsoft OneDrive.")
         .properties(
             string(ID)
                 .label("File ID")
-                .description("ID of the file to download.")
+                .description("ID of the file to retrieve.")
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
                 .required(true))
-        .output(outputSchema(fileEntry()))
-        .perform(MicrosoftOneDriveDownloadFileAction::perform);
+        .output(outputSchema(FILE_OUTPUT_PROPERTY))
+        .perform(MicrosoftOneDriveGetFileAction::perform);
 
-    private MicrosoftOneDriveDownloadFileAction() {
+    private MicrosoftOneDriveGetFileAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Http.Response response = context
-            .http(http -> http.get("/me/drive/items/%s/content".formatted(inputParameters.getRequiredString(ID))))
+        return context
+            .http(http -> http.get("/me/drive/items/%s".formatted(inputParameters.getString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute();
-
-        Http.Response fileResponse = context
-            .http(http -> http.get(response.getFirstHeader("location")))
-            .configuration(Http.responseType(Http.ResponseType.BINARY))
-            .execute();
-
-        return fileResponse.getBody();
+            .execute()
+            .getBody();
     }
 }

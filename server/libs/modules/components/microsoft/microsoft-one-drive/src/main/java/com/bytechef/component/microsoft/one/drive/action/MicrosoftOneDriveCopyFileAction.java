@@ -17,12 +17,10 @@
 package com.bytechef.component.microsoft.one.drive.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FOLDER_OUTPUT_PROPERTY;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -30,44 +28,50 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public class MicrosoftOneDriveListFoldersAction {
+public class MicrosoftOneDriveCopyFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFolders")
-        .title("List Folders")
-        .description("List folders in a OneDrive folder.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("copyFile")
+        .title("Copy File")
+        .description("Copy a selected file to a different location within Microsoft OneDrive.")
         .properties(
-            string(PARENT_ID)
-                .label("Parent Folder ID")
+            string(ID)
+                .label("File ID")
+                .description("ID of the file to copy.")
+                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
+                .required(true),
+            string(NAME)
+                .label("New File Name")
                 .description(
-                    "ID of the Folder from which you want to list folders. If no folder is specified, the root " +
-                        "folder will be used.")
+                    "The new name for the copy. If this isn't provided, the same name will be used as the original.")
+                .required(false),
+            string(PARENT_ID)
+                .label("Destination Folder ID")
+                .description(
+                    "The ID of the folder where the copied file will be stored. If not specified, the root folder " +
+                        "will be used.")
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
-        .output(
-            outputSchema(
-                array()
-                    .items(FOLDER_OUTPUT_PROPERTY)))
-        .perform(MicrosoftOneDriveListFoldersAction::perform);
+        .perform(MicrosoftOneDriveCopyFileAction::perform);
 
-    private MicrosoftOneDriveListFoldersAction() {
+    private MicrosoftOneDriveCopyFileAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, ?> body = context
-            .http(http -> http.get(
-                "/me/drive/items/%s/children".formatted(getFolderId(inputParameters.getString(PARENT_ID)))))
-            .queryParameters("$filter", "folder ne null")
+        context
+            .http(http -> http.post(
+                "/me/drive/items/%s/copy".formatted(inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+            .body(Http.Body.of(
+                NAME, inputParameters.getString(NAME),
+                "parentReference", Map.of(ID, getFolderId(inputParameters.getString(PARENT_ID)))))
+            .execute();
 
-        return body.get(VALUE);
+        return null;
     }
 }
