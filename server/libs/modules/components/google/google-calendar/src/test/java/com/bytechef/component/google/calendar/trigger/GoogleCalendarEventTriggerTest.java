@@ -21,6 +21,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
 import static com.bytechef.component.google.calendar.trigger.GoogleCalendarEventTrigger.webhookRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -36,6 +37,7 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.Calendar.Channels;
 import com.google.api.services.calendar.Calendar.Channels.Stop;
@@ -45,7 +47,10 @@ import com.google.api.services.calendar.Calendar.Events.Watch;
 import com.google.api.services.calendar.model.Channel;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -56,8 +61,12 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarEventTriggerTest {
 
+    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
     private final ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
+    private final ArgumentCaptor<DateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(DateTime.class);
     private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
+    private final ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor =
+        ArgumentCaptor.forClass(LocalDateTime.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Channels mockedChannels = mock(Channels.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
@@ -149,24 +158,40 @@ class GoogleCalendarEventTriggerTest {
 
     @Test
     void testWebhookRequest() throws IOException {
+        LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
+        LocalDateTime minusedHours = localDateTime.minusHours(3);
+
         Event event = new Event();
         java.util.List<Event> events = java.util.List.of(event);
 
         mockedParameters = MockParametersFactory.create(Map.of(CALENDAR_ID, "calendar_id"));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
-            MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class)) {
+            MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class);
+            MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(LocalDateTime.class)) {
             googleCalendarUtilsMockedStatic
                 .when(() -> GoogleCalendarUtils.createCustomEvent(eventArgumentCaptor.capture()))
                 .thenReturn(mockedCustomEvent);
             googleServicesMockedStatic
+                .when(() -> GoogleCalendarUtils.convertToDateViaSqlTimestamp(localDateTimeArgumentCaptor.capture()))
+                .thenReturn(java.sql.Timestamp.valueOf(minusedHours));
+            googleServicesMockedStatic
                 .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedCalendar);
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
+                .thenReturn(localDateTime);
+
+            when(mockedTriggerContext.data(any()))
+                .thenReturn(Optional.empty());
             when(mockedCalendar.events())
                 .thenReturn(mockedCalendarEvents);
             when(mockedCalendarEvents.list(stringArgumentCaptor.capture()))
                 .thenReturn(mockedList);
             when(mockedList.setOrderBy(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setShowDeleted(booleanArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setUpdatedMin(dateTimeArgumentCaptor.capture()))
                 .thenReturn(mockedList);
             when(mockedList.execute())
                 .thenReturn(new com.google.api.services.calendar.model.Events().setItems(events));
@@ -180,6 +205,9 @@ class GoogleCalendarEventTriggerTest {
             assertEquals(event, eventArgumentCaptor.getValue());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(java.util.List.of("calendar_id", "updated"), stringArgumentCaptor.getAllValues());
+            assertEquals(true, booleanArgumentCaptor.getValue());
+            assertEquals(new DateTime(java.sql.Timestamp.valueOf(minusedHours)), dateTimeArgumentCaptor.getValue());
+            assertEquals(minusedHours, localDateTimeArgumentCaptor.getValue());
         }
     }
 }
