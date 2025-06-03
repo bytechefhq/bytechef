@@ -41,20 +41,20 @@ public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacad
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> authorizationParams,
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
         String redirectUri) {
 
         return connectionDefinitionService.executeAuthorizationCallback(
-            componentName, connectionVersion, authorizationName, authorizationParams,
+            componentName, connectionVersion, authorizationName, connectionParameters,
             contextFactory.createContext(componentName, null), redirectUri);
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> authorizationParams) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters) {
 
         return connectionDefinitionService.getOAuth2AuthorizationParameters(
-            componentName, connectionVersion, authorizationName, authorizationParams,
+            componentName, connectionVersion, authorizationName, connectionParameters,
             contextFactory.createContext(componentName, null));
     }
 }

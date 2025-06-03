@@ -300,35 +300,35 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, String authorizationName,
-        Map<String, ?> authorizationParams, Context context) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
 
         AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
             authorization.getAuthorizationUrl(),
-            (connectionParameters, context1) -> getDefaultAuthorizationUrl(
-                connectionParameters));
+            (curConnectionParameters, context1) -> getDefaultAuthorizationUrl(
+                curConnectionParameters));
         ClientIdFunction clientIdFunction = OptionalUtils.orElse(
             authorization.getClientId(),
-            (connectionParameters, context1) -> getDefaultClientId(connectionParameters));
+            (curConnectionParameters, context1) -> getDefaultClientId(curConnectionParameters));
         ScopesFunction scopesFunction = OptionalUtils.orElse(
             authorization.getScopes(),
-            (connectionParameters, context1) -> getDefaultScopes(connectionParameters));
+            (curConnectionParameters, context1) -> getDefaultScopes(curConnectionParameters));
         OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction =
             OptionalUtils.orElse(
                 authorization.getOAuth2AuthorizationExtraQueryParameters(),
-                (connectionParameters, context1) -> Map.of());
+                (curConnectionParameters, context1) -> Map.of());
 
-        Parameters connectionParameters = ParametersFactory.createParameters(authorizationParams);
+        Parameters parameters = ParametersFactory.createParameters(connectionParameters);
 
         try {
             return new OAuth2AuthorizationParameters(
-                authorizationUrlFunction.apply(connectionParameters, context),
-                clientIdFunction.apply(connectionParameters, context),
-                oAuth2AuthorizationExtraQueryParametersFunction.apply(connectionParameters, context),
-                scopesFunction.apply(connectionParameters, context));
+                authorizationUrlFunction.apply(parameters, context),
+                clientIdFunction.apply(parameters, context),
+                oAuth2AuthorizationExtraQueryParametersFunction.apply(parameters, context),
+                scopesFunction.apply(parameters, context));
         } catch (Exception e) {
             throw new ConfigurationException(
                 e, ConnectionDefinitionErrorType.GET_OAUTH2_AUTHORIZATION_PARAMETERS);
