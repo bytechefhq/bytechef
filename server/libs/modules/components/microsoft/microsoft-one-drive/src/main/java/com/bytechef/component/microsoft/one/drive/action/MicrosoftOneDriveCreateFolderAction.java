@@ -17,12 +17,11 @@
 package com.bytechef.component.microsoft.one.drive.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FOLDER_OUTPUT_PROPERTY;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -30,44 +29,42 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public class MicrosoftOneDriveListFoldersAction {
+public class MicrosoftOneDriveCreateFolderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFolders")
-        .title("List Folders")
-        .description("List folders in a OneDrive folder.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createNewFolder")
+        .title("Create New Folder")
+        .description("Creates a new empty folder in Microsoft OneDrive.")
         .properties(
+            string(NAME)
+                .label("Folder Name")
+                .description("The name of the new folder.")
+                .required(true),
             string(PARENT_ID)
                 .label("Parent Folder ID")
                 .description(
-                    "ID of the Folder from which you want to list folders. If no folder is specified, the root " +
-                        "folder will be used.")
+                    "ID of the folder where the new folder will be created; if no folder is selected, the folder " +
+                        "will be created in the root folder.")
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
-        .output(
-            outputSchema(
-                array()
-                    .items(FOLDER_OUTPUT_PROPERTY)))
-        .perform(MicrosoftOneDriveListFoldersAction::perform);
+        .output(outputSchema(FOLDER_OUTPUT_PROPERTY))
+        .perform(MicrosoftOneDriveCreateFolderAction::perform);
 
-    private MicrosoftOneDriveListFoldersAction() {
+    private MicrosoftOneDriveCreateFolderAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, ?> body = context
-            .http(http -> http.get(
+        return context
+            .http(http -> http.post(
                 "/me/drive/items/%s/children".formatted(getFolderId(inputParameters.getString(PARENT_ID)))))
-            .queryParameters("$filter", "folder ne null")
             .configuration(Http.responseType(Http.ResponseType.JSON))
+            .body(Http.Body.of(Map.of(NAME, inputParameters.getRequiredString(NAME), "folder", Map.of())))
             .execute()
-            .getBody(new TypeReference<>() {});
-
-        return body.get(VALUE);
+            .getBody();
     }
 }

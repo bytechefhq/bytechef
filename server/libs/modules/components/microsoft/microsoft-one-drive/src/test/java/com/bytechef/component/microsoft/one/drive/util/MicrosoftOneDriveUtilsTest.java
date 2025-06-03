@@ -32,11 +32,9 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
@@ -49,7 +47,6 @@ class MicrosoftOneDriveUtilsTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Parameters parameters = MockParametersFactory.create(Map.of());
-    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
     void testGetFileIdOptions() {
@@ -78,21 +75,15 @@ class MicrosoftOneDriveUtilsTest {
     void testGetFolderIdOptions() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(VALUE, List.of(Map.of(NAME, "some name", ID, "abc"))));
+            .thenReturn(Map.of(VALUE, List.of(Map.of(NAME, "some name", ID, "abc", "folder", "folder"))));
 
         assertEquals(
             expectedOptions,
             MicrosoftOneDriveUtils.getFolderIdOptions(parameters, parameters, Map.of(), "", mockedContext));
-
-        Object[] query = queryArgumentCaptor.getValue();
-
-        assertEquals(List.of("$filter", "folder ne null"), Arrays.asList(query));
     }
 }

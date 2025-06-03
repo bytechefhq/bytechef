@@ -22,7 +22,12 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveCopyFileAction;
+import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveCreateFolderAction;
+import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveCreateNewTextFileAction;
+import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveDeleteFileAction;
 import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveDownloadFileAction;
+import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveGetFileAction;
 import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveListFilesAction;
 import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveListFoldersAction;
 import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveUploadFileAction;
@@ -46,12 +51,22 @@ public class MicrosoftOneDriveComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(MicrosoftOneDriveConnection.CONNECTION_DEFINITION)
         .actions(
+            MicrosoftOneDriveCopyFileAction.ACTION_DEFINITION,
+            MicrosoftOneDriveCreateFolderAction.ACTION_DEFINITION,
+            MicrosoftOneDriveCreateNewTextFileAction.ACTION_DEFINITION,
+            MicrosoftOneDriveDeleteFileAction.ACTION_DEFINITION,
             MicrosoftOneDriveDownloadFileAction.ACTION_DEFINITION,
+            MicrosoftOneDriveGetFileAction.ACTION_DEFINITION,
             MicrosoftOneDriveListFilesAction.ACTION_DEFINITION,
             MicrosoftOneDriveListFoldersAction.ACTION_DEFINITION,
             MicrosoftOneDriveUploadFileAction.ACTION_DEFINITION)
         .clusterElements(
+            tool(MicrosoftOneDriveCopyFileAction.ACTION_DEFINITION),
+            tool(MicrosoftOneDriveCreateFolderAction.ACTION_DEFINITION),
+            tool(MicrosoftOneDriveCreateNewTextFileAction.ACTION_DEFINITION),
+            tool(MicrosoftOneDriveDeleteFileAction.ACTION_DEFINITION),
             tool(MicrosoftOneDriveDownloadFileAction.ACTION_DEFINITION),
+            tool(MicrosoftOneDriveGetFileAction.ACTION_DEFINITION),
             tool(MicrosoftOneDriveListFilesAction.ACTION_DEFINITION),
             tool(MicrosoftOneDriveListFoldersAction.ACTION_DEFINITION),
             tool(MicrosoftOneDriveUploadFileAction.ACTION_DEFINITION))

@@ -17,49 +17,38 @@
 package com.bytechef.component.microsoft.one.drive.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public class MicrosoftOneDriveDownloadFileAction {
+public class MicrosoftOneDriveDeleteFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
-        .title("Download File")
-        .description("Download a file from your Microsoft OneDrive.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteFile")
+        .title("Delete File")
+        .description("Delete a selected file from Microsoft One Drive.")
         .properties(
             string(ID)
                 .label("File ID")
-                .description("ID of the file to download.")
+                .description("The id of a file to delete.")
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
                 .required(true))
-        .output(outputSchema(fileEntry()))
-        .perform(MicrosoftOneDriveDownloadFileAction::perform);
+        .perform(MicrosoftOneDriveDeleteFileAction::perform);
 
-    private MicrosoftOneDriveDownloadFileAction() {
+    private MicrosoftOneDriveDeleteFileAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Http.Response response = context
-            .http(http -> http.get("/me/drive/items/%s/content".formatted(inputParameters.getRequiredString(ID))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
+        context.http(http -> http.delete("/me/drive/items/%s".formatted(inputParameters.getRequiredString(ID))))
             .execute();
 
-        Http.Response fileResponse = context
-            .http(http -> http.get(response.getFirstHeader("location")))
-            .configuration(Http.responseType(Http.ResponseType.BINARY))
-            .execute();
-
-        return fileResponse.getBody();
+        return null;
     }
 }

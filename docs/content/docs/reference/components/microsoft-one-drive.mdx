@@ -41,6 +41,235 @@ Version: 1
 ## Actions
 
 
+### Copy File
+Name: copyFile
+
+`Copy a selected file to a different location within Microsoft OneDrive.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | File ID | STRING | `ID of the file to copy.` | true |
+| name | New File Name | STRING | `The new name for the copy. If this isn't provided, the same name will be used as the original.` | false |
+| parentId | Destination Folder ID | STRING | `The ID of the folder where the copied file will be stored. If not specified, the root folder will be used.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Copy File",
+  "name" : "copyFile",
+  "parameters" : {
+    "id" : "",
+    "name" : "",
+    "parentId" : ""
+  },
+  "type" : "microsoftOneDrive/v1/copyFile"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Create New Folder
+Name: createNewFolder
+
+`Creates a new empty folder in Microsoft OneDrive.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Folder Name | STRING | `The name of the new folder.` | true |
+| parentId | Parent Folder ID | STRING | `ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create New Folder",
+  "name" : "createNewFolder",
+  "parameters" : {
+    "name" : "",
+    "parentId" : ""
+  },
+  "type" : "microsoftOneDrive/v1/createNewFolder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| createdDateTime | DATE_TIME | The date and time when the folder was created. |
+| eTag | STRING |  |
+| id | STRING | ID of the folder. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the folder was last modified. |
+| name | STRING | Name of the folder. |
+| size | INTEGER | Size of the folder in bytes. |
+| webUrl | STRING | URL to access the folder in a web browser. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| folder | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(childCount)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
+  "id" : "",
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "createdBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "folder" : {
+    "childCount" : 1
+  }
+}
+```
+
+
+### Create New Text File
+Name: createNewTextFile
+
+`Creates a new text file in Microsoft OneDrive.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | File Name | STRING | `The name of the new text file.` | true |
+| text | Text | STRING | `The text content to add to file.` | true |
+| mimeType | File Type | STRING <details> <summary> Options </summary> plain/text, text/csv, text/xml </details> | `Select file type.` | true |
+| parentId | Parent Folder ID | STRING | `ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create New Text File",
+  "name" : "createNewTextFile",
+  "parameters" : {
+    "name" : "",
+    "text" : "",
+    "mimeType" : "",
+    "parentId" : ""
+  },
+  "type" : "microsoftOneDrive/v1/createNewTextFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| createdDateTime | DATE_TIME | The date and time when the file was created. |
+| eTag | STRING |  |
+| id | STRING | ID of the file. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the file was last modified. |
+| name | STRING | Name of the created file. |
+| size | INTEGER | Size of the file in bytes. |
+| webUrl | STRING | URL to access the file in a web browser. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| file | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(quickXorHash)&#125;\(hashes), STRING\(mimeType)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
+  "id" : "",
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "createdBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "file" : {
+    "hashes" : {
+      "quickXorHash" : ""
+    },
+    "mimeType" : ""
+  }
+}
+```
+
+
+### Delete File
+Name: deleteFile
+
+`Delete a selected file from Microsoft One Drive.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | File ID | STRING | `The id of a file to delete.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete File",
+  "name" : "deleteFile",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "microsoftOneDrive/v1/deleteFile"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
 ### Download File
 Name: downloadFile
 
@@ -50,8 +279,7 @@ Name: downloadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parentId | Parent Folder ID | STRING | `ID of the folder from which you want to download the file.` | false |
-| id | File ID | STRING <details> <summary> Depends On </summary> parentId </details> | `ID of the file to download.` | true |
+| id | File ID | STRING | `ID of the file to download.` | true |
 
 #### Example JSON Structure
 ```json
@@ -59,7 +287,6 @@ Name: downloadFile
   "label" : "Download File",
   "name" : "downloadFile",
   "parameters" : {
-    "parentId" : "",
     "id" : ""
   },
   "type" : "microsoftOneDrive/v1/downloadFile"
@@ -92,6 +319,86 @@ Type: FILE_ENTRY
   "mimeType" : "",
   "name" : "",
   "url" : ""
+}
+```
+
+
+### Get File
+Name: getFile
+
+`Retrieve a specified file from your Microsoft OneDrive.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | File ID | STRING | `ID of the file to retrieve.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get File",
+  "name" : "getFile",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "microsoftOneDrive/v1/getFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| createdDateTime | DATE_TIME | The date and time when the file was created. |
+| eTag | STRING |  |
+| id | STRING | ID of the file. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the file was last modified. |
+| name | STRING | Name of the created file. |
+| size | INTEGER | Size of the file in bytes. |
+| webUrl | STRING | URL to access the file in a web browser. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| file | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(quickXorHash)&#125;\(hashes), STRING\(mimeType)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
+  "id" : "",
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "createdBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "file" : {
+    "hashes" : {
+      "quickXorHash" : ""
+    },
+    "mimeType" : ""
+  }
 }
 ```
 
@@ -132,8 +439,16 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
+| createdDateTime | DATE_TIME | The date and time when the file was created. |
+| eTag | STRING |  |
+| id | STRING | ID of the file. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the file was last modified. |
+| name | STRING | Name of the created file. |
+| size | INTEGER | Size of the file in bytes. |
+| webUrl | STRING | URL to access the file in a web browser. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| file | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(quickXorHash)&#125;\(hashes), STRING\(mimeType)&#125; </details> |  |
 
 
 
@@ -142,8 +457,31 @@ Items Type: OBJECT
 #### Output Example
 ```json
 [ {
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
   "id" : "",
-  "name" : ""
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "createdBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "file" : {
+    "hashes" : {
+      "quickXorHash" : ""
+    },
+    "mimeType" : ""
+  }
 } ]
 ```
 
@@ -184,8 +522,16 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
+| createdDateTime | DATE_TIME | The date and time when the folder was created. |
+| eTag | STRING |  |
+| id | STRING | ID of the folder. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the folder was last modified. |
+| name | STRING | Name of the folder. |
+| size | INTEGER | Size of the folder in bytes. |
+| webUrl | STRING | URL to access the folder in a web browser. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| folder | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(childCount)&#125; </details> |  |
 
 
 
@@ -194,8 +540,28 @@ Items Type: OBJECT
 #### Output Example
 ```json
 [ {
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
   "id" : "",
-  "name" : ""
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "createdBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "folder" : {
+    "childCount" : 1
+  }
 } ]
 ```
 
@@ -241,8 +607,16 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
+| createdDateTime | DATE_TIME | The date and time when the file was created. |
+| eTag | STRING |  |
+| id | STRING | ID of the file. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the file was last modified. |
+| name | STRING | Name of the created file. |
+| size | INTEGER | Size of the file in bytes. |
+| webUrl | STRING | URL to access the file in a web browser. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| file | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(quickXorHash)&#125;\(hashes), STRING\(mimeType)&#125; </details> |  |
 
 
 
@@ -250,8 +624,31 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
   "id" : "",
-  "name" : ""
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "createdBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "file" : {
+    "hashes" : {
+      "quickXorHash" : ""
+    },
+    "mimeType" : ""
+  }
 }
 ```
 
