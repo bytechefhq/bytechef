@@ -20,10 +20,12 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDe
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.convertToDateViaSqlTimestamp;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
@@ -39,12 +41,16 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Channel;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -121,14 +127,30 @@ public class GoogleCalendarEventTrigger {
         WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context)
         throws IOException {
 
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        Optional<Object> lastTimeCheckedOptional = context.data(data -> data.fetch(WORKFLOW, "lastTimeChecked"));
+
+        LocalDateTime currentRowNum = lastTimeCheckedOptional.map(o -> LocalDateTime.parse(o.toString()))
+            .orElse(now.minusHours(3));
+
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         List<Event> events = calendar.events()
             .list(inputParameters.getRequiredString(CALENDAR_ID))
             .setOrderBy("updated")
+            .setShowDeleted(true)
+            .setUpdatedMin(new DateTime(convertToDateViaSqlTimestamp(currentRowNum)))
             .execute()
             .getItems();
 
-        return createCustomEvent(events.getLast());
+        context.data(data -> data.put(WORKFLOW, "lastTimeChecked", now));
+
+        if (events != null && !events.isEmpty()) {
+            return createCustomEvent(events.getLast());
+        }
+
+        return null;
     }
 }
