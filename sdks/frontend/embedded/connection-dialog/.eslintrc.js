@@ -6,7 +6,7 @@ module.exports = {
         'plugin:react/recommended',
         'plugin:prettier/recommended',
     ],
-    plugins: ['@typescript-eslint', 'bytechef', 'react', 'sort-destructure-keys', 'prettier'],
+    plugins: ['@typescript-eslint', 'react', 'sort-destructure-keys', 'prettier'],
     env: {
         browser: true,
         es6: true,
