@@ -160,8 +160,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
 
         throw new ConfigurationException(
-            "Workflow with id: %s does not exist".formatted(id),
-            WorkflowErrorType.WORKFLOW_NOT_FOUND);
+            "Workflow with id: %s does not exist".formatted(id), WorkflowErrorType.WORKFLOW_NOT_FOUND);
     }
 
     @Override

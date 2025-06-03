@@ -51,7 +51,7 @@ public class RuntimeApplication implements ApplicationRunner {
 
         List<String> parameters = args.getOptionValues("parameters");
 
-        log.info("Running workflow: {} with parameters: {}", workflow, parameters);
+        log.info("Running workflow: {} with parameters: {}", workflow, parameters == null ? "{}" : parameters);
 
         Map<String, ?> jobParameters = parameters == null ? Map.of() : JsonUtils.readMap(parameters.getFirst());
 

@@ -28,8 +28,6 @@ import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageSe
 import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageServiceImpl;
 import java.util.Map;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -40,15 +38,9 @@ import org.springframework.lang.NonNull;
 @Configuration
 public class FileDataStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileDataStorageConfiguration.class);
-
     @Bean
     @ConditionalOnDataStorageProviderAws
     DataStorage awsFileStorageDataStorageService(FileStorageServiceRegistry fileStorageServiceRegistry) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Data storage provider type enabled: aws");
-        }
-
         return new DataStorageImpl(
             new FileDataStorageServiceImpl(fileStorageServiceRegistry.getFileStorageService(Provider.AWS.name())));
     }
@@ -56,10 +48,6 @@ public class FileDataStorageConfiguration {
     @Bean
     @ConditionalOnDataStorageProviderFilesystem
     DataStorage filesystemFileStorageDataStorageService(FileStorageServiceRegistry fileStorageServiceRegistry) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Data storage provider type enabled: filesystem");
-        }
-
         return new DataStorageImpl(
             new FileDataStorageServiceImpl(
                 fileStorageServiceRegistry.getFileStorageService(Provider.FILESYSTEM.name())));
