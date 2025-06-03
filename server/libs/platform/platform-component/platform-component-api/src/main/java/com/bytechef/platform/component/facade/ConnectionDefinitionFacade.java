@@ -26,9 +26,9 @@ import java.util.Map;
 public interface ConnectionDefinitionFacade {
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> authorizationParams,
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
         String redirectUri);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> authorizationParams);
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters);
 }

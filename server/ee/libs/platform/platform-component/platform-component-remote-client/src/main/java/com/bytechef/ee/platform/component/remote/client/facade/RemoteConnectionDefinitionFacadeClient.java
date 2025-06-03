@@ -37,34 +37,34 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
         String componentName, int connectionVersion, String authorizationName,
-        Map<String, ?> authorizationParams, String redirectUri) {
+        Map<String, ?> connectionParameters, String redirectUri) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-authorization-callback"),
             new AuthorizationCallbackRequest(
-                componentName, connectionVersion, authorizationName, authorizationParams, redirectUri),
+                componentName, connectionVersion, authorizationName, connectionParameters, redirectUri),
             Authorization.AuthorizationCallbackResponse.class);
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, String authorizationName,
-        Map<String, ?> authorizationParams) {
+        Map<String, ?> connectionParameters) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/get-oauth2-authorization-parameters"),
-            new ConnectionRequest(componentName, connectionVersion, authorizationName, authorizationParams),
+            new ConnectionRequest(componentName, connectionVersion, authorizationName, connectionParameters),
             OAuth2AuthorizationParameters.class);
     }
 
     private record AuthorizationCallbackRequest(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> authorizationParams,
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
         String redirectUri) {
     }
 
     private record ConnectionRequest(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> authorizationParams) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters) {
     }
 }
