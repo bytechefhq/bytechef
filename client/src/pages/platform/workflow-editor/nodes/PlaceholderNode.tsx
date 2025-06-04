@@ -61,6 +61,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         fetchRootComponentClusterElementDefinition();
     };
 
+    const isClusterElement = data.clusterElementType;
     const rootClusterElementId = id.split('-')[0];
 
     return (
@@ -80,7 +81,8 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     'mx-placeholder-node-position flex cursor-pointer items-center justify-center rounded-md text-lg text-gray-500 shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
                     isDropzoneActive
                         ? 'absolute ml-2 size-16 scale-150 cursor-pointer bg-blue-100'
-                        : 'size-7 bg-gray-300'
+                        : 'size-7 bg-gray-300',
+                    !!isClusterElement && 'translate-x-40'
                 )}
                 onClick={() => {
                     if (data.clusterElementType) {
