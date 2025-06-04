@@ -22,6 +22,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {StructureParentType} from '@/shared/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -30,6 +31,7 @@ import WorkflowEditor from './components/WorkflowEditor';
 import DataPillPanel from './components/datapills/DataPillPanel';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
+import saveClusterElementNodesPosition from './utils/saveClusterElementNodesPosition';
 
 const WorkflowEditorLayout = ({parentId, parentType}: {parentId: number; parentType: StructureParentType}) => {
     const {copilotPanelOpen} = useCopilotStore();
@@ -72,6 +74,8 @@ const WorkflowEditorLayout = ({parentId, parentType}: {parentId: number; parentT
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(currentComponent?.componentName as string);
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (currentNode?.rootClusterElement) {
@@ -132,6 +136,14 @@ const WorkflowEditorLayout = ({parentId, parentType}: {parentId: number; parentT
                     setClusterElementsCanvasOpen(open);
 
                     if (!open) {
+                        saveClusterElementNodesPosition({
+                            parentId,
+                            parentType,
+                            queryClient,
+                            updateWorkflowMutation,
+                            workflow,
+                        });
+
                         setRootClusterElementNodeData(undefined);
                         useWorkflowNodeDetailsPanelStore.getState().reset();
                     }

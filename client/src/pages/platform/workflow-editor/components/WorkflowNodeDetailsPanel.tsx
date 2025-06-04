@@ -55,6 +55,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChange';
+import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import CurrentOperationSelect from './CurrentOperationSelect';
@@ -496,9 +497,28 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const handlePanelClose = useCallback(() => {
+        if (clusterElementsCanvasOpen) {
+            saveClusterElementNodesPosition({
+                parentId,
+                parentType,
+                queryClient,
+                updateWorkflowMutation,
+                workflow,
+            });
+        }
+
         setClusterElementsCanvasOpen(false);
+
         useWorkflowNodeDetailsPanelStore.getState().reset();
-    }, [setClusterElementsCanvasOpen]);
+    }, [
+        clusterElementsCanvasOpen,
+        setClusterElementsCanvasOpen,
+        parentId,
+        parentType,
+        queryClient,
+        updateWorkflowMutation,
+        workflow,
+    ]);
 
     // Get the node version for different definition types
     function getNodeVersion(node: typeof currentWorkflowNode): string {
@@ -509,6 +529,7 @@ const WorkflowNodeDetailsPanel = ({
         if ('version' in node) {
             return node.version.toString();
         }
+
         if ('componentVersion' in node) {
             return node.componentVersion.toString();
         }
