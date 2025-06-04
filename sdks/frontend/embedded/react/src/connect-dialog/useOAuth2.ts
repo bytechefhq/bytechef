@@ -164,11 +164,30 @@ const useOAuth2 = ({
         async function handleMessageListener(message: MessageEvent<any>) {
             const type = message?.data?.type;
 
-            if (type !== OAUTH_RESPONSE || currentStateRef.current === message?.data?.payload.state) {
+            if (type !== OAUTH_RESPONSE || currentStateRef.current === message?.data?.payload?.state) {
                 return;
             }
 
-            currentStateRef.current = message?.data?.payload.state;
+            // Validate state to prevent CSRF attacks
+            const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+            const receivedState = message?.data?.payload?.state;
+
+            if (!receivedState || savedState !== receivedState) {
+                setUI({
+                    error: 'OAuth error: State mismatch.',
+                    loading: false,
+                });
+
+                if (onError) {
+                    onError('OAuth error: State mismatch.');
+                }
+
+                cleanup(intervalRef, popupRef, handleMessageListener);
+
+                return;
+            }
+
+            currentStateRef.current = receivedState;
 
             try {
                 const error = message?.data?.error;

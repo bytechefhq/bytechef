@@ -51,9 +51,9 @@ export default function useConnectDialog({
 
     const {getAuth} = useOAuth2({
         ...integration?.connectionConfig?.oauth2,
-        onCodeSuccess: () => console.log('onCodeSuccess called'),
+        onCodeSuccess: (payload) => console.log('onCodeSuccess called: ', payload),
         onError: (error: string) => console.error(error),
-        onTokenSuccess: () => console.log('onTokenSuccess called'),
+        onTokenSuccess: (payload) => console.log('onTokenSuccess called: ', payload),
         responseType: isOAuth2AuthorizationType ? 'code' : 'token',
         scope: integration?.connectionConfig?.oauth2?.scopes?.join(' '),
     });

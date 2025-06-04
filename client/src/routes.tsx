@@ -40,7 +40,6 @@ import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
 import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
-import OAuthPopup from '@/shared/components/connection/oauth2/OAuthPopup';
 import {AUTHORITIES} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
 import ErrorPage from '@/shared/error/ErrorPage';
@@ -203,10 +202,10 @@ const platformSettingsRoutes = {
 
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
-        {
-            element: <OAuthPopup />,
-            path: '/oauth',
-        },
+        // {
+        //     element: <OAuthPopup />,
+        //     path: '/oauth',
+        // },
         {
             element: <WorkflowChat />,
             path: 'chat/:workflowExecutionId',
