@@ -73,17 +73,23 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             componentName: rootClusterElementComponentName,
             componentVersion: rootClusterElementComponentVersion,
         },
-        !!isRootClusterElement && clusterElementsCanvasOpen
+        clusterElementsCanvasOpen && !!isRootClusterElement && !!rootClusterElementNodeData
     );
 
     const getHandlePosition = (index: number, totalHandles: number = 1): string => {
-        const handleCountRange = Math.max(1, totalHandles);
+        const nodeWidth = 384;
 
-        const sectionCount = handleCountRange + 1;
+        const nodeEdgeBuffer = nodeWidth * 0.1;
 
-        const sectionWidth = 120 / sectionCount;
+        const usableNodeWidth = nodeWidth - nodeEdgeBuffer * 2;
 
-        const handlePosition = Math.round(sectionWidth * (index + 1));
+        if (totalHandles === 1) {
+            return `${nodeWidth / 2}px`;
+        }
+
+        const stepWidth = totalHandles > 1 ? usableNodeWidth / (totalHandles - 1) : 0;
+
+        const handlePosition = nodeEdgeBuffer + stepWidth * index;
 
         return `${handlePosition}px`;
     };
@@ -146,7 +152,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             className={twMerge(
                 'relative flex min-w-60 cursor-pointer justify-center',
                 !data.taskDispatcher && 'items-center',
-                !isClusterElement && 'nodrag'
+                !isClusterElement && !isRootClusterElement && 'nodrag'
             )}
             data-nodetype={data.trigger ? 'trigger' : 'task'}
             key={id}
@@ -241,7 +247,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 workflowNodeDetailsPanelOpen &&
                                 !isRootClusterElement &&
                                 'border-blue-300 bg-blue-100 shadow-none',
-                            isRootClusterElement && 'px-10'
+                            isRootClusterElement && 'min-w-96'
                         )}
                         onClick={handleNodeClick}
                     >
@@ -249,25 +255,27 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     </Button>
                 </HoverCardTrigger>
 
-                <HoverCardPortal>
-                    <HoverCardContent className="w-fit min-w-72 max-w-xl text-sm" side="right">
-                        {nodeDescription && (
-                            <div
-                                className="flex"
-                                dangerouslySetInnerHTML={{
-                                    __html: sanitize(nodeDescription, {
-                                        allowedAttributes: {
-                                            div: ['class'],
-                                            table: ['class'],
-                                            td: ['class'],
-                                            tr: ['class'],
-                                        },
-                                    }),
-                                }}
-                            />
-                        )}
-                    </HoverCardContent>
-                </HoverCardPortal>
+                {!isRootClusterElement && (
+                    <HoverCardPortal>
+                        <HoverCardContent className="w-fit min-w-72 max-w-xl text-sm" side="right">
+                            {nodeDescription && (
+                                <div
+                                    className="flex"
+                                    dangerouslySetInnerHTML={{
+                                        __html: sanitize(nodeDescription, {
+                                            allowedAttributes: {
+                                                div: ['class'],
+                                                table: ['class'],
+                                                td: ['class'],
+                                                tr: ['class'],
+                                            },
+                                        }),
+                                    }}
+                                />
+                            )}
+                        </HoverCardContent>
+                    </HoverCardPortal>
+                )}
             </HoverCard>
 
             <div className="ml-2 flex w-full min-w-max flex-col items-start">
