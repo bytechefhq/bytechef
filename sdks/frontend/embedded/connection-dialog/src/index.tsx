@@ -3,6 +3,8 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import './styles.css';
 import useOAuth2 from './useOAuth2';
 import * as z from 'zod';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
 
 const JWT =
     'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNIVmliR2xqT2pWU2FsbFVObEkwVW5nNFFuZFNRMlJUYlVGbE1VUnBhRms0ZVdwRlVHSnUifQ.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.VniRtmGbk9VabhEXBvQxwhSwgBawNjzM5o4nqA-BsAaJuLnRqOeetYtVGDpEnYKpBAYSXh0chYX-2tjaRhiAG6IEoUo7eYKngGgm3rTtKYdJJUd0mbQTsQDZ_J9D5b48qBNOqlCAHp7H8KLyUNvorSs3VVaeBo4A4PUFkOlSU565XJjGLnvYFfX-wbZWbDtp9qa0cKjd2FKgqLj3PcssiYOyXXlIf3hVYFThBBVxOVlrSr15tmW1F76WkHOeb5UsuXzC_odTnIg1aVPdJsxku6dG0Q9EuhRzFSnXjTDeVgLRHGQwX9eaAZAMIzi2vnOtXdYJMKVuk6y71aY9qS1kUg';
@@ -20,7 +22,7 @@ interface ConnectionDialogHookReturnType {
 
 export default function useEmbeddedByteChefConnectionDialog({
     baseUrl = 'http://localhost:9555',
-    integrationId = '1050',
+    integrationId = '1051',
 }: {
     baseUrl?: string;
     integrationId?: string;
@@ -36,9 +38,9 @@ export default function useEmbeddedByteChefConnectionDialog({
         formSubmitRef.current = submitFn;
     }, []);
 
-    const triggerFormSubmit = useCallback(() => {
+    const handleSubmit = useCallback(() => {
         if (formSubmitRef.current) {
-            formSubmitRef.current(handleSubmit);
+            formSubmitRef.current(saveConnection);
         }
     }, []);
 
@@ -56,7 +58,16 @@ export default function useEmbeddedByteChefConnectionDialog({
         scope: integration?.connectionConfig?.oauth2?.scopes?.join(' '),
     });
 
-    // Dynamically generate the form schema from integration properties
+    const formSchema = useMemo(
+        () => createFormSchema(integration?.connectionConfig?.inputs || []),
+        [integration?.connectionConfig?.inputs]
+    );
+
+    const form = useForm({
+        resolver: zodResolver(formSchema),
+        mode: 'onSubmit',
+    });
+
     function createFormSchema(properties: any[]) {
         if (!properties || properties.length === 0) {
             return z.object({});
@@ -100,6 +111,8 @@ export default function useEmbeddedByteChefConnectionDialog({
 
     async function saveConnection() {
         console.log('saveConnection called');
+
+        closeDialog();
     }
 
     const openDialog = async () => {
@@ -114,12 +127,6 @@ export default function useEmbeddedByteChefConnectionDialog({
         setIsOpen(false);
     };
 
-    const handleSubmit = () => {
-        saveConnection();
-
-        closeDialog();
-    };
-
     const handleContinue = () => {
         if (isOAuth2) {
             getAuth();
@@ -132,14 +139,13 @@ export default function useEmbeddedByteChefConnectionDialog({
         <Dialog
             closeDialog={closeDialog}
             dialogStep={dialogStep}
-            formSchema={createFormSchema(integration?.connectionConfig?.inputs)}
+            form={form}
             handleContinue={handleContinue}
             handleSubmit={handleSubmit}
             integration={integration}
-            isOAuth2={false}
+            isOAuth2={isOAuth2}
             isOpen={isOpen}
             properties={integration?.connectionConfig?.inputs}
-            triggerFormSubmit={triggerFormSubmit}
             registerFormSubmit={registerFormSubmit}
         />
     );
