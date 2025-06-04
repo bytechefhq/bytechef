@@ -7,32 +7,16 @@ import InlineSVG from 'react-inlinesvg';
 export function createPlaceholderNode(
     currentRootClusterElementNodeName: string,
     elementLabel: string,
-    elementType: string
+    elementType: string,
+    placeholderPositions: Record<string, {x: number; y: number}> = {}
 ): Node {
     return {
         data: {clusterElementLabel: elementLabel, clusterElementType: elementType, label: '+'},
         id: `${currentRootClusterElementNodeName}-${elementType}-placeholder-0`,
-        position: DEFAULT_NODE_POSITION,
+        position:
+            placeholderPositions[`${currentRootClusterElementNodeName}-${elementType}-placeholder-0`] ||
+            DEFAULT_NODE_POSITION,
         type: 'placeholder',
-    };
-}
-
-export function createMultipleElementsGhostNode(
-    currentRootClusterElementNodeName: string,
-    elementLabel: string,
-    elementType: string,
-    isMultipleElementsNode: boolean
-): Node {
-    return {
-        data: {
-            clusterElementLabel: elementLabel,
-            clusterElementType: elementType,
-            multipleClusterElementsNode: isMultipleElementsNode,
-            rootNodeId: currentRootClusterElementNodeName,
-        },
-        id: `${currentRootClusterElementNodeName}-${elementType}-ghost`,
-        position: DEFAULT_NODE_POSITION,
-        type: 'multipleClusterElementsGhostNode',
     };
 }
 
@@ -41,7 +25,7 @@ export function createSingleElementsNode(
     elementLabel: string,
     elementType: string
 ): Node {
-    const {label, name, parameters, type} = clusterElementData;
+    const {label, metadata, name, parameters, type} = clusterElementData;
     const typeSegments = type.split('/');
 
     const iconUrl = `/icons/${typeSegments[0]}.svg`;
@@ -61,6 +45,7 @@ export function createSingleElementsNode(
                 />
             ),
             label,
+            metadata: metadata || {},
             name,
             operationName: typeSegments[2],
             parameters,
@@ -69,7 +54,7 @@ export function createSingleElementsNode(
             workflowNodeName: name,
         },
         id: name,
-        position: DEFAULT_NODE_POSITION,
+        position: clusterElementData.metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION,
         type: 'workflow',
     };
 }
@@ -79,7 +64,7 @@ export function createMultipleElementsNode(
     elementType: string,
     isMultipleElementsNode: boolean
 ) {
-    const {label, name, parameters, type} = element;
+    const {label, metadata, name, parameters, type} = element;
     const typeSegments = type.split('/');
 
     const iconUrl = `/icons/${typeSegments[0]}.svg`;
@@ -98,6 +83,7 @@ export function createMultipleElementsNode(
                 />
             ),
             label,
+            metadata: metadata || {},
             multipleClusterElementsNode: isMultipleElementsNode,
             name,
             operationName: typeSegments[2],
@@ -107,7 +93,7 @@ export function createMultipleElementsNode(
             workflowNodeName: name,
         },
         id: name,
-        position: DEFAULT_NODE_POSITION,
+        position: element.metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION,
         type: 'workflow',
     };
 }

@@ -46,11 +46,11 @@ export default function handleClusterElementClick({
 
     const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-    const currentParentTask = workflowDefinitionTasks.find(
+    const currentClusterRootTask = workflowDefinitionTasks.find(
         (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
     );
 
-    if (!currentParentTask) {
+    if (!currentClusterRootTask) {
         console.error('Parent task not found:', rootClusterElementNodeData?.workflowNodeName);
 
         return;
@@ -66,7 +66,7 @@ export default function handleClusterElementClick({
 
     const clusterElements = initializeClusterElementsObject(
         rootClusterElementDefinition,
-        currentParentTask.clusterElements
+        currentClusterRootTask.clusterElements
     );
 
     if (isMultipleElements) {
@@ -95,7 +95,7 @@ export default function handleClusterElementClick({
     }
 
     const updatedNodeData = {
-        ...currentParentTask,
+        ...currentClusterRootTask,
         clusterElements,
     };
 
