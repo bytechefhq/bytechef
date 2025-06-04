@@ -420,7 +420,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
             className="flex w-workflow-nodes-popover-actions-menu-width flex-col rounded-r-lg border-l border-l-border/50"
             key={`${sourceNodeId}-operationList`}
         >
-            <header className="flex items-center space-x-2 rounded-tr-lg bg-white px-3 py-1.5">
+            <header className="flex items-center space-x-2 rounded-tr-lg px-3 py-1.5">
                 {icon ? (
                     <InlineSVG className="size-8" loader={<ComponentIcon className="size-8" />} src={icon} />
                 ) : (
@@ -434,7 +434,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 </div>
             </header>
 
-            <ul className="h-96 space-y-2 overflow-auto rounded-br-lg bg-muted p-3">
+            <ul className="h-96 space-y-2 overflow-auto rounded-br-lg p-3">
                 {operations?.map((operation) => (
                     <li
                         className="cursor-pointer space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 hover:border-blue-200"
