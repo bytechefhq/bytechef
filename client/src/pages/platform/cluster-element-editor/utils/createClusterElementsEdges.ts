@@ -12,44 +12,18 @@ export function createEdgeForPlaceholderNode(nodeId: string, elementType: string
         id: `${nodeId}=>${nodeId}-${elementType}-placeholder-0`,
         source: nodeId,
         sourceHandle: `${elementType}-handle`,
+        style: EDGE_STYLES,
         target: `${nodeId}-${elementType}-placeholder-0`,
     };
 }
 
-export function createEdgeForMultipleElementsGhostNode(nodeId: string, elementType: string) {
+export function createEdgeForMultipleClusterElementNode(nodeId: string, targetNode: Node) {
     return {
-        ...defaultLabeledEdgeStyle,
-        id: `${nodeId}=>${nodeId}-${elementType}-ghost`,
+        id: `${nodeId}=>${nodeId}-${targetNode.id}`,
         source: nodeId,
-        sourceHandle: `${elementType}-handle`,
-        target: `${nodeId}-${elementType}-ghost`,
-    };
-}
-
-export function createEdgeForMultipleElementsPlaceholderNode(
-    currentNodeId: string,
-    elementType: string,
-    rootNodeId: string
-) {
-    return {
-        id: `${currentNodeId}=>${rootNodeId}-${elementType}-placeholder-0`,
-        source: currentNodeId,
+        sourceHandle: `${targetNode.data.clusterElementType}-handle`,
         style: EDGE_STYLES,
-        target: `${rootNodeId}-${elementType}-placeholder-0`,
-        type: 'default',
-    };
-}
-
-export function createEdgeMultipleElementsNode(
-    rootNodeId: string,
-    currentNodeId: string,
-    multipleElementNodesId: string
-) {
-    return {
-        id: `${currentNodeId}=>${rootNodeId}-${multipleElementNodesId}`,
-        source: currentNodeId,
-        style: EDGE_STYLES,
-        target: multipleElementNodesId,
+        target: targetNode.id,
         type: 'default',
     };
 }
