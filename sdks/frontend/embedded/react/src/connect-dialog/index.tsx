@@ -1,11 +1,7 @@
 import ConnectDialog from './ConnectDialog';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import './styles.css';
 import useOAuth2 from './useOAuth2';
-import * as z from 'zod';
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
 
 const JWT =
     'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNIVmliR2xqT21GTFpEWmFaMXBqTkhWcFRqUmhRa0pGV1daTlltVnFNMEZ1WVdkd1ltOU8ifQ.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.jKFzMD3fynYAEPQbL0hrfuoIN86UwbIbv7FExEUCWhYRzYhEcUBa01sB4jFsxNt3wJe_QH1Y-NCGwbp2D4TvAoS7dCi4w9FoRdUuabRqELHlwvOEpHg5ebQ6xlSeGOtzvHZv7dDQ4_2ry5x85TKHZzdZ9UmC2NcRndTP65_Na89wO7LH6Adrr4mKCHyz_yHNuK4YHUeawM0bgNQaCCS03ivHzegRAAttWQF9oRxAIfs9-cv3VnKC030j9oTri6iK6w7YFWQpOIPp8PN83TrhdHTs2g1Q5SDzb44OiQv8NEBPVd018Ss61Yt2d0xoTj7usrIJxJH25qNirHSGTtJFpg';
@@ -58,32 +54,92 @@ export default function useConnectDialog({
         scope: integration?.connectionConfig?.oauth2?.scopes?.join(' '),
     });
 
-    const formSchema = useMemo(
-        () => createFormSchema(integration?.connectionConfig?.inputs || []),
+    const [formValues, setFormValues] = useState<Record<string, string>>({});
+    const [formErrors, setFormErrors] = useState<Record<string, { message: string }>>({});
+
+    // Get validation rules based on properties
+    const validationRules = useMemo(
+        () => createValidationRules(integration?.connectionConfig?.inputs || []),
         [integration?.connectionConfig?.inputs]
     );
 
-    const form = useForm({
-        resolver: zodResolver(formSchema),
-        mode: 'onSubmit',
-    });
+    const form = useMemo(() => {
+        return {
+            register: (name: string, options: any) => ({
+                name,
+                onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+                    setFormValues(prev => ({ ...prev, [name]: e.target.value }));
+                },
+                value: formValues[name] || '',
+                ref: () => null,
+            }),
+            handleSubmit: (callback: (data: any) => void) => (e?: React.FormEvent) => {
+                if (e) e.preventDefault();
 
-    function createFormSchema(properties: any[]) {
-        if (!properties || properties.length === 0) {
-            return z.object({});
-        }
+                // Custom validation
+                const { isValid, errors, validatedData } = validateForm(formValues, validationRules);
 
-        const schema: Record<string, z.ZodTypeAny> = {};
+                if (isValid) {
+                    setFormErrors({});
+                    callback(validatedData);
+                    return true;
+                } else {
+                    setFormErrors(errors);
+                    return false;
+                }
+            },
+            formState: {
+                errors: formErrors
+            }
+        };
+    }, [validationRules, formValues, formErrors]);
 
-        properties.forEach((prop) => {
-            if (prop.required) {
-                schema[prop.name] = z.string().min(1, {message: `${prop.label} is required`});
+    // Custom validation functions
+    function validateForm(data: Record<string, string>, rules: Record<string, ValidationRule>) {
+        const errors: Record<string, { message: string }> = {};
+        const validatedData: Record<string, string> = {};
+
+        // Check each field against its rules
+        Object.keys(rules).forEach(fieldName => {
+            const rule = rules[fieldName];
+            const value = data[fieldName] || '';
+
+            // Required validation
+            if (rule.required && value.trim() === '') {
+                errors[fieldName] = { message: rule.requiredMessage || 'This field is required' };
             } else {
-                schema[prop.name] = z.string().optional();
+                validatedData[fieldName] = value;
             }
         });
 
-        return z.object(schema);
+        return {
+            isValid: Object.keys(errors).length === 0,
+            errors,
+            validatedData
+        };
+    }
+
+    // Define validation rule type
+    interface ValidationRule {
+        required: boolean;
+        requiredMessage?: string;
+    }
+
+    function createValidationRules(properties: any[]): Record<string, ValidationRule> {
+        if (!properties || properties.length === 0) {
+            return {};
+        }
+
+        const rules: Record<string, ValidationRule> = {};
+
+        properties.forEach((prop) => {
+            rules[prop.name] = {
+                required: !!prop.required,
+                requiredMessage: prop.required ? `${prop.label} is required` : undefined
+            };
+        });
+
+        return rules;
     }
 
     async function fetchIntegrationData() {
@@ -135,13 +191,13 @@ export default function useConnectDialog({
     };
 
     // Store reference to portal container
-    const portalContainerRef = useRef<HTMLDivElement | null>(null);
+    const portalContainerRef = useRef<HTMLElement | null>(null);
 
     // Create a portal container for the dialog if it doesn't exist
     useEffect(() => {
         // This effect only creates the portal container once
         // and doesn't depend on isOpen
-        let portalContainer = document.getElementById('connect-dialog-portal') as HTMLDivElement | null;
+        let portalContainer = document.getElementById('connect-dialog-portal');
 
         if (!portalContainer) {
             portalContainer = document.createElement('div');
