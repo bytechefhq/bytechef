@@ -17,12 +17,8 @@
 package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.commons.util.JsonUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.bytechef.config.ApplicationProperties;
 import jakarta.servlet.http.HttpServletRequest;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,9 +30,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 @ConditionalOnCoordinator
 public class CallbackController {
 
+    private final String publicUrl;
+
+    public CallbackController(ApplicationProperties applicationProperties) {
+        this.publicUrl = applicationProperties.getPublicUrl();
+    }
+
     @GetMapping("/callback")
     public String handleCallback(HttpServletRequest request) {
-        StringBuilder sb = new StringBuilder("redirect:%s/oauth");
+        StringBuilder sb = new StringBuilder("redirect:%s/oauth.html".formatted(publicUrl));
 
         Map<String, String[]> parameterMap = request.getParameterMap();
 
@@ -72,12 +74,6 @@ public class CallbackController {
             throw new IllegalStateException("No state parameter found in callback");
         }
 
-        String redirectUrl = sb.toString();
-
-        Map<String, String> stateMap = JsonUtils.read(
-            URLDecoder.decode(EncodingUtils.base64DecodeToString(state), StandardCharsets.UTF_8),
-            new TypeReference<>() {});
-
-        return redirectUrl.formatted(stateMap.get("origin"));
+        return sb.toString();
     }
 }
