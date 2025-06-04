@@ -1,25 +1,27 @@
 {
-  "compilerOptions": {
-    "baseUrl": "./src",
-    "target": "esnext",
-    "incremental": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@/*": ["./*"]
-    }
-  },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "target": "esnext",
+        "incremental": true,
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "paths": {
+            "@/*": ["./*"],
+            "@bytechef/use-embedded-connection-dialog": ["node_modules/@bytechef/use-embedded-connection-dialog/src"],
+            "@bytechef/use-embedded-connection-dialog/*": ["node_modules/@bytechef/use-embedded-connection-dialog/*"]
+        }
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
 }
