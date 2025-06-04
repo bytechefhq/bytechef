@@ -4,7 +4,7 @@ import {
     TaskDispatcherDefinition,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentIcon} from 'lucide-react';
-import {HTMLAttributes, MouseEvent} from 'react';
+import {HTMLAttributes, MouseEvent, useEffect, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -23,6 +23,9 @@ interface WorkflowNodesTabsItemProps extends HTMLAttributes<HTMLLIElement> {
 }
 
 const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: WorkflowNodesTabsItemProps) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const ref = useRef<HTMLLIElement>(null);
+
     let nodeName = node.name;
 
     if (node.trigger) {
@@ -37,6 +40,27 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
         event.dataTransfer.setData('application/reactflow', nodeName);
         event.dataTransfer.effectAllowed = 'move';
     };
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.disconnect();
+                }
+            },
+            {
+                rootMargin: '50px',
+                threshold: 0.1,
+            }
+        );
+
+        if (ref.current) {
+            observer.observe(ref.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
 
     return (
         <li
@@ -54,14 +78,20 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
                 event.stopPropagation();
             }}
             onDragStart={(event) => onDragStart(event)}
+            ref={ref}
         >
             {node.icon ? (
-                <InlineSVG
-                    className="mr-2 size-7 flex-none"
-                    loader={<ComponentIcon className="mr-2 size-7 flex-none" />}
-                    src={node.icon}
-                    title={node.title}
-                />
+                isVisible ? (
+                    <InlineSVG
+                        cacheRequests={true}
+                        className="mr-2 size-7 flex-none"
+                        loader={<ComponentIcon className="mr-2 size-7 flex-none" />}
+                        src={node.icon}
+                        title={node.title}
+                    />
+                ) : (
+                    <ComponentIcon className="mr-2 size-7 flex-none" />
+                )
             ) : (
                 <ComponentIcon className="mr-2 size-7 flex-none" />
             )}
