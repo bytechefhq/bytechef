@@ -19,7 +19,7 @@ export default function LabeledClusterElementsEdge({
         }))
     );
 
-    const [edgePath, labelX, labelY] = getBezierPath({
+    const [edgePath] = getBezierPath({
         sourcePosition,
         sourceX,
         sourceY,
@@ -44,10 +44,10 @@ export default function LabeledClusterElementsEdge({
     const nodeLabel = node?.data.clusterElementLabel;
 
     function getEdgeLabelPosition() {
-        const defaultPosition = `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`;
+        const defaultPosition = `translate(-50%, 0%) translate(${sourceX}px,${sourceY}px)`;
 
         if (node?.data.multipleClusterElementsNode) {
-            return `translate(-50%, -50%) translate(${targetX}px,${targetY}px)`;
+            return `translate(-50%, 0%) translate(${sourceX}px,${sourceY}px)`;
         }
 
         return defaultPosition;
@@ -59,7 +59,7 @@ export default function LabeledClusterElementsEdge({
 
             <EdgeLabelRenderer key={id}>
                 <div
-                    className="flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white px-2 py-1 text-xs font-medium shadow-sm"
+                    className="flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white px-1 py-1 text-xs font-medium"
                     style={{
                         position: 'absolute',
                         transform: getEdgeLabelPosition(),
