@@ -66,7 +66,14 @@ const generateState = () => {
 
     array = array.map((x: number) => validChars.codePointAt(x % validChars.length)!);
 
-    return String.fromCharCode.apply(null, Array.from(array));
+    const stateObj = {
+        origin: window.location.origin,
+        random: String.fromCharCode.apply(null, Array.from(array)),
+    };
+
+    const json = JSON.stringify(stateObj);
+
+    return btoa(encodeURIComponent(json));
 };
 
 const saveState = (state: string) => {
