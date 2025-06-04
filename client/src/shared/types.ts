@@ -150,6 +150,11 @@ export type TaskDispatcherDataType = BranchDataType &
 
 export type ClusterElementItemType = {
     label?: string;
+    metadata?: {
+        ui?: {
+            nodePosition?: {x: number; y: number};
+        };
+    };
     name: string;
     type: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -190,6 +195,8 @@ export type NodeDataType = {
     metadata?: {
         ui?: {
             dynamicPropertyTypes?: {[key: string]: string};
+            nodePosition?: {x: number; y: number};
+            placeholderPositions?: Record<string, {x: number; y: number}>;
         };
     };
     multipleClusterElementsNode?: boolean;

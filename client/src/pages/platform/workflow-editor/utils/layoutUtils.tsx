@@ -59,15 +59,10 @@ export const calculateNodeHeight = (node: Node) => {
 };
 
 export const calculateClusterElementsNodeHeight = (node: Node) => {
-    const isMultipleElementsGhostNode =
-        node.data.multipleClusterElementsNode && node.type === 'multipleClusterElementsGhostNode';
+    let clusterElementNodeHeight = NODE_HEIGHT;
 
-    let clusterElementNodeHeight = 150;
-
-    if (isMultipleElementsGhostNode) {
-        clusterElementNodeHeight = 20;
-    } else if (node.data.clusterElements) {
-        clusterElementNodeHeight = 100;
+    if (node.id.includes('placeholder')) {
+        clusterElementNodeHeight = 150;
     }
 
     return clusterElementNodeHeight;
@@ -142,8 +137,65 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
 
     dagre.layout(dagreGraph);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function containsNodePosition(metadata: any): metadata is {ui: {nodePosition: {x: number; y: number}}} {
+        return metadata?.ui?.nodePosition !== undefined;
+    }
+
+    if (isClusterElementsCanvas) {
+        const nodesWithPositions = nodes.filter(
+            (node) => containsNodePosition(node.data.metadata) || (node.position.x !== 0 && node.position.y !== 0)
+        );
+
+        const nodesNeedingLayout = nodes.filter(
+            (node) => !containsNodePosition(node.data.metadata) && node.position.x === 0 && node.position.y === 0
+        );
+
+        let centeringOffsetX = 0;
+
+        if (nodesNeedingLayout.length > 0) {
+            const dagrePositions = nodesNeedingLayout.map((node) => dagreGraph.node(node.id).x);
+
+            const minX = Math.min(...dagrePositions);
+            const maxX = Math.max(...dagrePositions);
+
+            const graphWidth = maxX - minX + NODE_WIDTH;
+
+            const graphCenter = minX + graphWidth / 2;
+
+            centeringOffsetX = canvasWidth / 2 - graphCenter;
+        }
+
+        const positionedNodes = [
+            ...nodesWithPositions.map((node) => ({
+                ...node,
+                position: containsNodePosition(node.data.metadata) ? node.data.metadata.ui.nodePosition : node.position,
+            })),
+
+            ...nodesNeedingLayout.map((node) => ({
+                ...node,
+                position: {
+                    x: dagreGraph.node(node.id).x + centeringOffsetX,
+                    y: dagreGraph.node(node.id).y + 150,
+                },
+            })),
+        ];
+
+        return {edges, nodes: positionedNodes};
+    }
+
     const allNodes = nodes.map((node) => {
-        const positionX = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
+        let positionX = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
+
+        const hasValidClusterElements =
+            node.data.clusterElements &&
+            Object.entries(node.data.clusterElements).some(
+                ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+            );
+
+        if (hasValidClusterElements && node.type === 'aiAgentNode') {
+            positionX -= 85;
+        }
 
         return {
             ...node,
@@ -200,9 +252,6 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
             },
             {
                 condition: sourceNode.data.rootClusterElement,
-            },
-            {
-                condition: sourceNode.type === 'multipleClusterElementsGhostNode',
             },
             {
                 condition: sourceNode.data.componentName === 'branch',
