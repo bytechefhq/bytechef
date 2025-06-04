@@ -4,33 +4,31 @@ import {SquareArrowOutUpRightIcon, XIcon} from 'lucide-react';
 import {DialogStepType} from '.';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
-import z from 'zod';
+import {twMerge} from 'tailwind-merge';
 
 interface DialogProps {
     closeDialog: () => void;
     dialogStep: DialogStepType;
-    formSchema?: any;
+    form?: any;
     handleContinue: () => void;
     handleSubmit: () => void;
     integration: any;
     isOAuth2?: boolean;
     isOpen: boolean;
     properties?: any[];
-    triggerFormSubmit?: () => void;
     registerFormSubmit?: (submitFn: (data: any) => void) => void;
 }
 
 const Dialog = ({
     closeDialog,
     dialogStep,
-    formSchema = [],
+    form,
     handleContinue,
     handleSubmit,
     integration,
     isOAuth2 = false,
     isOpen,
     properties,
-    triggerFormSubmit,
     registerFormSubmit,
 }: DialogProps) => {
     useEffect(() => {
@@ -68,19 +66,21 @@ const Dialog = ({
                 <DialogContent
                     closeDialog={closeDialog}
                     dialogStep={dialogStep}
-                    formSchema={formSchema}
+                    form={form}
                     integration={integration}
                     properties={properties}
                     registerFormSubmit={registerFormSubmit}
                 />
 
-                <DialogFooter
-                    closeDialog={closeDialog}
-                    dialogStep={dialogStep}
-                    handleContinue={handleContinue}
-                    handleSubmit={dialogStep === 'form' ? triggerFormSubmit : undefined}
-                    isOAuth2={isOAuth2}
-                />
+                {integration && (
+                    <DialogFooter
+                        closeDialog={closeDialog}
+                        dialogStep={dialogStep}
+                        handleContinue={handleContinue}
+                        handleSubmit={dialogStep === 'form' ? handleSubmit : undefined}
+                        isOAuth2={isOAuth2}
+                    />
+                )}
 
                 <DialogPoweredBy />
             </div>
@@ -89,25 +89,27 @@ const Dialog = ({
 };
 
 const DialogHeader = ({closeDialog, integration}: {closeDialog: () => void; integration: any}) => (
-    <header className="grid grid-cols-[1fr_auto_1fr] items-center">
-        <div className="flex [&_svg]:size-8" dangerouslySetInnerHTML={{__html: integration.icon}} />
+    <header
+        className={twMerge('grid grid-cols-[1fr_auto_1fr] items-center', !integration?.icon && 'flex justify-between')}
+    >
+        {integration && integration.icon && (
+            <div className="flex [&_svg]:size-8" dangerouslySetInnerHTML={{__html: integration.icon}} />
+        )}
 
         <h2 className="whitespace-nowrap text-lg font-semibold">Create Connection</h2>
 
-        <div className="flex justify-end">
-            <button className="rounded-md p-2 transition-all hover:bg-slate-100" onClick={closeDialog}>
-                <XIcon className="size-4" />
+        <button className="flex justify-end rounded-md p-2 transition-all hover:bg-slate-100" onClick={closeDialog}>
+            <XIcon className="size-4" />
 
-                <span className="sr-only">Close</span>
-            </button>
-        </div>
+            <span className="sr-only">Close</span>
+        </button>
     </header>
 );
 
 interface DialogContentProps {
     closeDialog: () => void;
     dialogStep: DialogStepType;
-    formSchema: any;
+    form: any;
     integration: any;
     properties?: any[];
     registerFormSubmit?: (submitFn: (data: any) => void) => void;
@@ -116,18 +118,11 @@ interface DialogContentProps {
 const DialogContent = ({
     closeDialog,
     dialogStep = 'initial',
-    formSchema,
+    form,
     integration,
     properties,
     registerFormSubmit,
 }: DialogContentProps) => {
-    const form = useForm({
-        resolver: zodResolver(formSchema),
-        mode: 'onSubmit',
-    });
-
-    console.log('form:', form);
-
     // Register the form's submit handler when the component mounts
     useEffect(() => {
         if (registerFormSubmit) {
@@ -174,7 +169,7 @@ const DialogContent = ({
                         const error = form.formState.errors[property.name];
 
                         return (
-                            <DialogInputFieldset
+                            <DialogInputField
                                 key={property.name}
                                 label={property.label}
                                 name={property.name}
@@ -210,7 +205,7 @@ const DialogFooter = ({
     <footer className="flex items-center justify-end gap-2">
         <button
             type="button"
-            className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bytechef focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+            className="focus-visible:ring-bytechef inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             onClick={closeDialog}
         >
             Cancel
@@ -219,7 +214,7 @@ const DialogFooter = ({
         <button
             autoFocus
             onClick={dialogStep === 'initial' ? handleContinue : handleSubmit}
-            className="inline-flex h-10 items-center justify-center rounded-md bg-bytechef px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-bytechef/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bytechef focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+            className="bg-bytechef hover:bg-bytechef/90 focus-visible:ring-bytechef inline-flex h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             type={dialogStep === 'form' ? 'submit' : 'button'}
             form="form"
         >
@@ -265,7 +260,7 @@ interface DialogInputFieldsetProps {
     error?: any;
 }
 
-const DialogInputFieldset = ({label, name, options, placeholder, required, field, error}: DialogInputFieldsetProps) => (
+const DialogInputField = ({label, name, options, placeholder, required, field, error}: DialogInputFieldsetProps) => (
     <fieldset className="space-y-2">
         <label htmlFor={name} className="text-sm font-medium">
             {label}
@@ -276,7 +271,7 @@ const DialogInputFieldset = ({label, name, options, placeholder, required, field
         {options ? (
             <select
                 id={name}
-                className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bytechef focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="focus-visible:ring-bytechef flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 {...field}
             >
                 <option value="">Select {label}</option>
@@ -290,7 +285,7 @@ const DialogInputFieldset = ({label, name, options, placeholder, required, field
         ) : (
             <input
                 id={name}
-                className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bytechef focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="focus-visible:ring-bytechef flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder={placeholder}
                 {...field}
             />
