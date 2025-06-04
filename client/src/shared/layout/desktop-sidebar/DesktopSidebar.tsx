@@ -5,7 +5,7 @@ import './DesktopSidebar.css';
 
 import reactLogo from '@/assets/logo.svg';
 import DesktopSidebarBottomMenu from '@/shared/layout/desktop-sidebar/DesktopSidebarBottomMenu';
-import useEmbeddedByteChefConnectionDialog from '@bytechef/use-embedded-connection-dialog';
+import useConnectDialog from '@bytechef-embedded/react';
 import React from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -20,7 +20,7 @@ export function DesktopSidebar({
         icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
     }[];
 }) {
-    const {DialogComponent, openDialog} = useEmbeddedByteChefConnectionDialog({});
+    const {DialogComponent, openDialog} = useConnectDialog({});
     const {pathname} = useLocation();
 
     return (

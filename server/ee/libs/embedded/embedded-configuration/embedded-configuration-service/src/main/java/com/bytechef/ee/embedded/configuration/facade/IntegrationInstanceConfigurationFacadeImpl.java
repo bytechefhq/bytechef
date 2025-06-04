@@ -288,7 +288,11 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         return getIntegrationInstanceConfigurationIntegrations(true, environment)
             .stream()
-            .filter(integrationDTO -> Objects.equals(integrationDTO.id(), integrationId))
+            .filter(integrationInstanceConfigurationDTO -> {
+                IntegrationDTO integrationDTO = integrationInstanceConfigurationDTO.integration();
+
+                return Objects.equals(integrationDTO.id(), integrationId);
+            })
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Integration instance configuration not found"));
     }
