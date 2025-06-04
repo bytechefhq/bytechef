@@ -63,6 +63,7 @@
     "dependencies": {
         "@hookform/resolvers": "^5.0.1",
         "react-hook-form": "^7.57.0",
+        "tailwind-merge": "^3.3.0",
         "zod": "^3.25.49"
     }
 }
