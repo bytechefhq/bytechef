@@ -101,7 +101,7 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
                             .required(true))
                     .apply((connectionParameters, context) -> ofHeaders(
                         Map.of(AUTHORIZATION, List.of("Bot " + connectionParameters.getRequiredString(TOKEN))))))
-            .baseUri((connectionParameters, context) -> " https://discord.com/api/v10");
+            .baseUri((connectionParameters, context) -> "https://discord.com/api/v10");
     }
 
     @Override
