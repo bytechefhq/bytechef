@@ -1,5 +1,6 @@
 import ConnectDialog from './ConnectDialog';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {createRoot} from 'react-dom/client';
 import './styles.css';
 import useOAuth2 from './useOAuth2';
 import * as z from 'zod';
@@ -17,7 +18,6 @@ interface ConnectionDialogHookReturnType {
     isOAuth2AuthorizationType: boolean;
     closeDialog: () => void;
     openDialog: () => void;
-    DialogComponent: React.FC;
 }
 
 export default function useConnectDialog({
@@ -116,9 +116,8 @@ export default function useConnectDialog({
     }
 
     const openDialog = async () => {
-        await fetchIntegrationData();
-
         setIsOpen(true);
+        await fetchIntegrationData();
     };
 
     const closeDialog = () => {
@@ -135,20 +134,132 @@ export default function useConnectDialog({
         }
     };
 
-    const DialogComponent: React.FC = () => (
-        <ConnectDialog
-            closeDialog={closeDialog}
-            dialogStep={dialogStep}
-            form={form}
-            handleContinue={handleContinue}
-            handleSubmit={handleSubmit}
-            integration={integration}
-            isOAuth2={isOAuth2}
-            isOpen={isOpen}
-            properties={integration?.connectionConfig?.inputs}
-            registerFormSubmit={registerFormSubmit}
-        />
-    );
+    // Store reference to portal container
+    const portalContainerRef = useRef<HTMLDivElement | null>(null);
+
+    // Create a portal container for the dialog if it doesn't exist
+    useEffect(() => {
+        // This effect only creates the portal container once
+        // and doesn't depend on isOpen
+        let portalContainer = document.getElementById('connect-dialog-portal') as HTMLDivElement | null;
+
+        if (!portalContainer) {
+            portalContainer = document.createElement('div');
+            portalContainer.id = 'connect-dialog-portal';
+            document.body.appendChild(portalContainer);
+            portalContainerRef.current = portalContainer;
+        } else {
+            portalContainerRef.current = portalContainer;
+        }
+
+        return () => {
+            // Clean up the portal container when the component unmounts
+            // Use requestAnimationFrame to defer DOM operations
+            requestAnimationFrame(() => {
+                if (portalContainerRef.current && portalContainerRef.current.parentNode) {
+                    portalContainerRef.current.parentNode.removeChild(portalContainerRef.current);
+                    portalContainerRef.current = null;
+                }
+            });
+        };
+    }, []);
+
+    // Store root reference to avoid synchronous unmounting during render
+    const rootRef = useRef<ReturnType<typeof createRoot> | null>(null);
+    const dialogElementRef = useRef<HTMLDivElement | null>(null);
+
+    // Render the dialog into the portal container
+    useEffect(() => {
+        // Only proceed if the dialog should be open
+        if (!isOpen) {
+            // Clean up any existing dialog when isOpen is false
+            // Use requestAnimationFrame to defer unmounting until after the current render cycle
+            requestAnimationFrame(() => {
+                if (rootRef.current) {
+                    rootRef.current.unmount();
+                    rootRef.current = null;
+                }
+
+                if (dialogElementRef.current && dialogElementRef.current.parentNode) {
+                    dialogElementRef.current.parentNode.removeChild(dialogElementRef.current);
+                    dialogElementRef.current = null;
+                }
+            });
+            return;
+        }
+
+        // Ensure the portal container exists
+        let portalContainer = document.getElementById('connect-dialog-portal');
+
+        if (!portalContainer) {
+            portalContainer = document.createElement('div');
+            portalContainer.id = 'connect-dialog-portal';
+            document.body.appendChild(portalContainer);
+            portalContainerRef.current = portalContainer;
+        }
+
+        // If we already have a dialog element and root, just update the component
+        if (rootRef.current && dialogElementRef.current) {
+            const dialogComponent = (
+                <ConnectDialog
+                    closeDialog={closeDialog}
+                    dialogStep={dialogStep}
+                    form={form}
+                    handleContinue={handleContinue}
+                    handleSubmit={handleSubmit}
+                    integration={integration}
+                    isOAuth2={isOAuth2}
+                    isOpen={isOpen}
+                    properties={integration?.connectionConfig?.inputs}
+                    registerFormSubmit={registerFormSubmit}
+                />
+            );
+            rootRef.current.render(dialogComponent);
+            return;
+        }
+
+        // Create a new div element to render our dialog into
+        const dialogElement = document.createElement('div');
+        dialogElementRef.current = dialogElement;
+        portalContainer.appendChild(dialogElement);
+
+        // Create a dialog component to render
+        const dialogComponent = (
+            <ConnectDialog
+                closeDialog={closeDialog}
+                dialogStep={dialogStep}
+                form={form}
+                handleContinue={handleContinue}
+                handleSubmit={handleSubmit}
+                integration={integration}
+                isOAuth2={isOAuth2}
+                isOpen={isOpen}
+                properties={integration?.connectionConfig?.inputs}
+                registerFormSubmit={registerFormSubmit}
+            />
+        );
+
+        // Use createRoot to render the component (React 18+)
+        const root = createRoot(dialogElement);
+        rootRef.current = root;
+        root.render(dialogComponent);
+
+        // Clean up when the component unmounts
+        return () => {
+            // Use requestAnimationFrame to defer unmounting until after the current render cycle
+            requestAnimationFrame(() => {
+                if (rootRef.current) {
+                    rootRef.current.unmount();
+                    rootRef.current = null;
+                }
+
+                if (dialogElementRef.current && dialogElementRef.current.parentNode) {
+                    dialogElementRef.current.parentNode.removeChild(dialogElementRef.current);
+                    dialogElementRef.current = null;
+                }
+            });
+        };
+    }, [isOpen]);
 
     useEffect(() => {
         if (integration?.connectionConfig?.authorizationType.startsWith('OAUTH2')) {
@@ -156,10 +267,41 @@ export default function useConnectDialog({
         }
     }, [integration?.connectionConfig?.authorizationType]);
 
+    // Update the dialog component when props change, but only if it's already open
+    useEffect(() => {
+        if (!isOpen || !rootRef.current || !dialogElementRef.current) {
+            return;
+        }
+
+        const dialogComponent = (
+            <ConnectDialog
+                closeDialog={closeDialog}
+                dialogStep={dialogStep}
+                form={form}
+                handleContinue={handleContinue}
+                handleSubmit={handleSubmit}
+                integration={integration}
+                isOAuth2={isOAuth2}
+                isOpen={isOpen}
+                properties={integration?.connectionConfig?.inputs}
+                registerFormSubmit={registerFormSubmit}
+            />
+        );
+        rootRef.current.render(dialogComponent);
+    }, [
+        dialogStep,
+        form,
+        handleContinue,
+        handleSubmit,
+        integration,
+        isOAuth2,
+        registerFormSubmit,
+        isOpen
+    ]);
+
     return {
         isOAuth2AuthorizationType,
         openDialog,
         closeDialog,
-        DialogComponent,
     };
 }

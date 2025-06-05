@@ -128,6 +128,21 @@ const DialogContent = ({
         }
     }, [registerFormSubmit, form.handleSubmit]);
 
+    // For handling responsive text alignment - moved before conditional return
+    const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth < 640);
+
+    // Move the resize effect before conditional return as well
+    React.useEffect(() => {
+        const handleResize = () => {
+            setIsSmallScreen(window.innerWidth < 640);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     if (!integration) {
         return (
             <main className="text-center">
