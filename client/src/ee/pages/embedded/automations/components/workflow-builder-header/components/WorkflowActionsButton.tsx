@@ -39,7 +39,7 @@ const WorkflowActionsButton = ({
                             </>
                         ) : (
                             <>
-                                <PlayIcon /> Run
+                                <PlayIcon /> Test
                             </>
                         )}
                     </Button>
