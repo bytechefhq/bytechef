@@ -127,15 +127,15 @@ open class FindJsonFilesTask : DefaultTask() {
             return "| $name | $label | $typeDetails | `$description` | $required |"
         }
 
-        fun toJsonKeyValuePair(): String {
+        fun toJsonKeyValuePair(name: String?, type: String?, properties: Array<Properties>?, items: Array<Properties>?): String {
             val key = name;
-            val value = getJsonValue(type, properties)
+            val value = getJsonValue(type, properties, items)
             return if (name.isNullOrEmpty()) "$value" else "\"$key\": $value"
         }
 
-        private fun getJsonValue(type: String?, properties: Array<Properties>?): Any {
+        private fun getJsonValue(type: String?, properties: Array<Properties>?, items: Array<Properties>?): Any {
             return when (type) {
-                "ARRAY" -> getJsonArray()
+                "ARRAY" -> getJsonArray(items)
                 "BOOLEAN" -> false
                 "DATE" -> "\"2021-01-01\""
                 "DATE_TIME" -> "\"2021-01-01T00:00:00\""
@@ -157,7 +157,7 @@ open class FindJsonFilesTask : DefaultTask() {
             sb.append("{\n")
             if (properties != null) {
                 for (property: Properties in properties) {
-                    sb.append(property.toJsonKeyValuePair())
+                    sb.append(property.toJsonKeyValuePair(property.name, property.type, property.properties, property.items))
                     sb.append(",\n")
                 }
 
@@ -169,12 +169,12 @@ open class FindJsonFilesTask : DefaultTask() {
             return sb.append("}").toString()
         }
 
-        private fun getJsonArray(): String {
+        private fun getJsonArray(items: Array<Properties>?): String {
             val sb = StringBuilder()
             sb.append("[\n")
             if (items != null) {
                 for (property: Properties in items!!) {
-                    sb.append(getJsonValue(property.type, property.properties))
+                    sb.append(getJsonValue(property.type, property.properties, property.items))
                     sb.append(",\n")
                 }
 
@@ -253,12 +253,12 @@ ${getPropertiesString()}
         fun getOutputJson(): String {
             return if (!properties.isNullOrEmpty()) {
                 """ {
-                   ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }}
+                   ${properties?.joinToString(",\n") { it.toJsonKeyValuePair(it.name, it.type, it.properties, it.items) }}
                     }
                """.trimIndent()
             } else if (!items.isNullOrEmpty()) {
                 """ [
-                   ${items?.joinToString(",\n") { it.toJsonKeyValuePair() }}
+                   ${items?.joinToString(",\n") { it.toJsonKeyValuePair(it.name, it.type, it.properties, it.items) }}
                     ]
                """.trimIndent()
             } else ""
@@ -348,6 +348,7 @@ This action does not produce any output.
             val propertiesSection = createPropertiesSection()
             val jsonExample = createJsonExample()
             val formattedJson = formatJson(jsonExample)
+
             return """
 ### $title
 Name: $name
@@ -375,7 +376,7 @@ ${createOutputJson()}
                 """ {
                     "label": "$title",
                     "name": "$name",
-                    "parameters": { ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }} },
+                    "parameters": { ${properties?.joinToString(",\n") { it.toJsonKeyValuePair(it.name, it.type, it.properties, it.items) }} },
                     "type": "$componentName/v$componentVersion/$name" }
                 """.trimIndent()
             }
@@ -471,7 +472,7 @@ $formattedJson
                 """ {
                     "label": "$title",
                     "name": "$name",
-                    "parameters": { ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }} },
+                    "parameters": { ${properties?.joinToString(",\n") { it.toJsonKeyValuePair(it.name, it.type, it.properties, it.items) }} },
                     "type": "$componentName/v$componentVersion/$name" }
                 """.trimIndent()
             }
