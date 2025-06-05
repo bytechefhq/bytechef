@@ -1,5 +1,5 @@
 import {render, screen, fireEvent} from '@testing-library/react';
-import '@testing-library/jest-dom';
+import {describe, it, expect, vi} from 'vitest';
 import ConnectDialog from './ConnectDialog';
 
 const mockIntegration = {
@@ -9,9 +9,9 @@ const mockIntegration = {
 };
 
 describe('Dialog', () => {
-    const closeDialog = jest.fn();
-    const handleContinue = jest.fn();
-    const handleSubmit = jest.fn();
+    const closeDialog = vi.fn();
+    const handleContinue = vi.fn();
+    const handleSubmit = vi.fn();
 
     it('renders when isOpen is true', () => {
         render(
@@ -25,7 +25,7 @@ describe('Dialog', () => {
             />
         );
 
-        expect(screen.getByText('Create Connection')).toBeInTheDocument();
+        expect(screen.getByText('Create Connection')).toBeTruthy();
     });
 
     it('does not render when isOpen is false', () => {
@@ -40,7 +40,7 @@ describe('Dialog', () => {
             />
         );
 
-        expect(screen.queryByText('Create Connection')).not.toBeInTheDocument();
+        expect(screen.queryByText('Create Connection')).toBeNull();
     });
 
     it('calls closeDialog when clicking the overlay', () => {

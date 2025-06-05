@@ -1,44 +1,46 @@
 import React, {useEffect} from 'react';
 import Logo from './assets/logo.svg';
 import {DialogStepType} from '.';
+// import styles from './styles.module.css';
+// import clsx from 'clsx';
 
 // Inline SVG icons to replace lucide-react
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M18 6 6 18" />
-    <path d="m6 6 12 12" />
-  </svg>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        {...props}
+    >
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+    </svg>
 );
 
 const SquareArrowOutUpRightIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M14 10V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4" />
-    <path d="M16 18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-    <path d="m21 3-9 9" />
-    <path d="M15 3h6v6" />
-  </svg>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        {...props}
+    >
+        <path d="M14 10V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4" />
+        <path d="M16 18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+        <path d="m21 3-9 9" />
+        <path d="M15 3h6v6" />
+    </svg>
 );
 
 interface DialogProps {
@@ -151,63 +153,69 @@ const DialogHeader = ({closeDialog, integration}: {closeDialog: () => void; inte
     return (
         <header
             style={{
-                display: 'flex', justifyContent: 'space-between'
+                display: 'flex',
+                justifyContent: 'space-between',
             }}
         >
             <div
                 style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '1rem'
+                    gap: '1rem',
                 }}
             >
                 {integration && integration.icon && (
-                    <div
-                        style={{ display: 'flex' }}
-                        dangerouslySetInnerHTML={{__html: integration.icon}}
-                    />
+                    <div style={{display: 'flex'}} dangerouslySetInnerHTML={{__html: integration.icon}} />
                 )}
 
-                <h2 style={{
-                    whiteSpace: 'nowrap',
-                    fontSize: '1.125rem', // text-lg
-                    fontWeight: 600 // font-semibold
-                }}>
+                <h2
+                    style={{
+                        whiteSpace: 'nowrap',
+                        fontSize: '1.125rem', // text-lg
+                        fontWeight: 600, // font-semibold
+                    }}
+                >
                     Create Connection
                 </h2>
             </div>
 
-            <div style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-            }}>
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                }}
+            >
                 <button
                     style={{
                         borderRadius: '0.375rem', // rounded-md
                         padding: '0.5rem', // p-2
                         transition: 'all 0.2s',
-                        backgroundColor: isCloseHovered ? '#f1f5f9' : 'transparent'
+                        backgroundColor: isCloseHovered ? '#f1f5f9' : 'transparent',
                     }}
                     onClick={closeDialog}
                     onMouseEnter={() => setIsCloseHovered(true)}
                     onMouseLeave={() => setIsCloseHovered(false)}
                 >
-                    <XIcon style={{
-                        width: '1rem',
-                        height: '1rem'
-                    }} /> {/* size-4 */}
-
-                    <span style={{
-                        position: 'absolute',
-                        width: '1px',
-                        height: '1px',
-                        padding: 0,
-                        margin: '-1px',
-                        overflow: 'hidden',
-                        clip: 'rect(0, 0, 0, 0)',
-                        whiteSpace: 'nowrap',
-                        borderWidth: 0
-                    }}>
+                    <XIcon
+                        style={{
+                            width: '1rem',
+                            height: '1rem',
+                        }}
+                    />{' '}
+                    {/* size-4 */}
+                    <span
+                        style={{
+                            position: 'absolute',
+                            width: '1px',
+                            height: '1px',
+                            padding: 0,
+                            margin: '-1px',
+                            overflow: 'hidden',
+                            clip: 'rect(0, 0, 0, 0)',
+                            whiteSpace: 'nowrap',
+                            borderWidth: 0,
+                        }}
+                    >
                         Close
                     </span>
                 </button>
@@ -242,18 +250,22 @@ const DialogContent = ({
 
     if (!integration) {
         return (
-            <main style={{ textAlign: 'center' }}>
-                <h2 style={{
-                    fontSize: '1.125rem', // text-lg
-                    fontWeight: 600 // font-semibold
-                }}>
+            <main style={{textAlign: 'center'}}>
+                <h2
+                    style={{
+                        fontSize: '1.125rem', // text-lg
+                        fontWeight: 600, // font-semibold
+                    }}
+                >
                     Unable to Load Integration
                 </h2>
 
-                <p style={{
-                    marginTop: '0.5rem', // mt-2
-                    color: '#6b7280' // text-muted-foreground (using a gray color)
-                }}>
+                <p
+                    style={{
+                        marginTop: '0.5rem', // mt-2
+                        color: '#6b7280', // text-muted-foreground (using a gray color)
+                    }}
+                >
                     We couldn't load the integration data. Please try again later.
                 </p>
 
@@ -276,7 +288,7 @@ const DialogContent = ({
                         fontWeight: 500, // font-medium
                         transitionProperty: 'color, background-color, border-color',
                         transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                        transitionDuration: '150ms'
+                        transitionDuration: '150ms',
                     }}
                 >
                     Close
@@ -286,14 +298,16 @@ const DialogContent = ({
     }
 
     return (
-        <main style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem', // gap-4
-            textAlign: 'left', // sm:text-left
-            fontSize: '0.875rem' // text-sm
-        }}>
-            {dialogStep === 'initial' && <p style={{ color: '#6b7280' }}>{integration.description}</p>}
+        <main
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem', // gap-4
+                textAlign: 'left', // sm:text-left
+                fontSize: '0.875rem', // text-sm
+            }}
+        >
+            {dialogStep === 'initial' && <p style={{color: '#6b7280'}}>{integration.description}</p>}
 
             {dialogStep === 'form' && (
                 <form
@@ -303,7 +317,7 @@ const DialogContent = ({
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '1rem', // gap-4
-                        fontSize: '0.875rem' // text-sm
+                        fontSize: '0.875rem', // text-sm
                     }}
                 >
                     {properties?.map((property) => {
@@ -349,17 +363,23 @@ const DialogFooter = ({
     dialogStep = 'initial',
     isOAuth2 = false,
 }: DialogFooterProps) => {
-    // For handling hover and focus states
     const [isCancelHovered, setIsCancelHovered] = React.useState(false);
     const [isSubmitHovered, setIsSubmitHovered] = React.useState(false);
 
+    // TODO does not work, styles from styles.module.css are not applied
+    // const buttonConnect = clsx(styles.buttonConnect, {
+    //     backgroundColor: isCancelHovered ? '#f3f4f6' : '#fff', // hover:bg-accent, bg-background
+    // });
+
     return (
-        <footer style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            gap: '0.5rem' // gap-2
-        }}>
+        <footer
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: '0.5rem', // gap-2
+            }}
+        >
             <button
                 type="button"
                 style={{
@@ -381,7 +401,7 @@ const DialogFooter = ({
                     transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
                     transitionDuration: '150ms',
                     outline: 'none', // focus-visible:outline-none
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                 }}
                 onClick={closeDialog}
                 onMouseEnter={() => setIsCancelHovered(true)}
@@ -393,25 +413,26 @@ const DialogFooter = ({
             <button
                 autoFocus
                 onClick={dialogStep === 'initial' ? handleContinue : handleSubmit}
+                // className={buttonConnect}
                 style={{
                     display: 'inline-flex',
-                    height: '2.5rem', // h-10
+                    height: '2.5rem',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderRadius: '0.375rem', // rounded-md
-                    backgroundColor: isSubmitHovered ? 'rgba(0, 112, 243, 0.9)' : 'rgb(0, 112, 243)', // bg-bytechef, hover:bg-bytechef/90
-                    paddingLeft: '1rem', // px-4
+                    borderRadius: '0.375rem',
+                    paddingLeft: '1rem',
                     paddingRight: '1rem',
-                    paddingTop: '0.5rem', // py-2
+                    paddingTop: '0.5rem',
                     paddingBottom: '0.5rem',
-                    fontSize: '0.875rem', // text-sm
-                    fontWeight: 500, // font-medium
-                    color: '#fff', // text-primary-foreground
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: '#fff',
                     transitionProperty: 'color, background-color, border-color',
                     transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
                     transitionDuration: '150ms',
-                    outline: 'none', // focus-visible:outline-none
-                    cursor: 'pointer'
+                    outline: 'none',
+                    cursor: 'pointer',
+                    backgroundColor: isSubmitHovered ? 'rgba(0, 112, 243, 0.9)' : 'rgb(0, 112, 243)',
                 }}
                 type={dialogStep === 'form' ? 'submit' : 'button'}
                 form="form"
@@ -419,13 +440,15 @@ const DialogFooter = ({
                 onMouseLeave={() => setIsSubmitHovered(false)}
             >
                 {dialogStep === 'initial' && isOAuth2 && (
-                    <span style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem' // gap-2
-                    }}>
+                    <span
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem', // gap-2
+                        }}
+                    >
                         Authorize
-                        <SquareArrowOutUpRightIcon style={{ width: '1rem', height: '1rem' }} /> {/* size-4 */}
+                        <SquareArrowOutUpRightIcon style={{width: '1rem', height: '1rem'}} /> {/* size-4 */}
                     </span>
                 )}
 
@@ -442,35 +465,39 @@ const DialogPoweredBy = () => {
     const [isLinkHovered, setIsLinkHovered] = React.useState(false);
 
     return (
-        <div style={{
-            position: 'absolute',
-            bottom: '-2rem', // -bottom-8
-            right: '50%',
-            display: 'flex',
-            transform: 'translateX(50%)', // translate-x-[50%]
-            alignItems: 'center',
-            justifyContent: 'center'
-        }}>
+        <div
+            style={{
+                position: 'absolute',
+                bottom: '-2rem', // -bottom-8
+                right: '50%',
+                display: 'flex',
+                transform: 'translateX(50%)', // translate-x-[50%]
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
             <img
                 src={Logo}
                 alt="ByteChef Logo"
                 style={{
                     marginRight: '0.5rem', // mr-2
                     width: '1rem', // size-4
-                    height: '1rem'
+                    height: '1rem',
                 }}
             />
 
-            <span style={{
-                fontSize: '0.875rem', // text-sm
-                color: 'white' // text-white
-            }}>
+            <span
+                style={{
+                    fontSize: '0.875rem', // text-sm
+                    color: 'white', // text-white
+                }}
+            >
                 Powered by
                 <a
                     style={{
                         paddingLeft: '0.25rem', // pl-1
                         fontWeight: 600, // font-semibold
-                        textDecoration: isLinkHovered ? 'underline' : 'none' // hover:underline
+                        textDecoration: isLinkHovered ? 'underline' : 'none', // hover:underline
                     }}
                     href="https://bytechef.io"
                     target="_blank"
@@ -500,22 +527,28 @@ const DialogInputField = ({label, name, options, placeholder, required, field, e
     const [isFocused, setIsFocused] = React.useState(false);
 
     return (
-        <fieldset style={{ marginBottom: '0.5rem' }}>
-            <div style={{ marginBottom: '0.5rem' }}>
+        <fieldset style={{marginBottom: '0.5rem'}}>
+            <div style={{marginBottom: '0.5rem'}}>
                 <label
                     htmlFor={name}
                     style={{
                         fontSize: '0.875rem', // text-sm
-                        fontWeight: 500 // font-medium
+                        fontWeight: 500, // font-medium
                     }}
                 >
                     {label}
 
-                    {required && <span style={{
-                        marginLeft: '0.125rem', // ml-0.5
-                        lineHeight: '0.75rem', // leading-3
-                        color: '#ef4444' // text-red-500
-                    }}>*</span>}
+                    {required && (
+                        <span
+                            style={{
+                                marginLeft: '0.125rem', // ml-0.5
+                                lineHeight: '0.75rem', // leading-3
+                                color: '#ef4444', // text-red-500
+                            }}
+                        >
+                            *
+                        </span>
+                    )}
                 </label>
             </div>
 
@@ -537,7 +570,7 @@ const DialogInputField = ({label, name, options, placeholder, required, field, e
                         outline: isFocused ? 'none' : undefined, // focus-visible:outline-none
                         boxShadow: isFocused ? '0 0 0 2px #fff, 0 0 0 4px rgb(0, 112, 243)' : undefined, // focus-visible:ring-2 focus-visible:ring-bytechef
                         cursor: field?.disabled ? 'not-allowed' : 'default', // disabled:cursor-not-allowed
-                        opacity: field?.disabled ? 0.5 : 1 // disabled:opacity-50
+                        opacity: field?.disabled ? 0.5 : 1, // disabled:opacity-50
                     }}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
@@ -569,7 +602,7 @@ const DialogInputField = ({label, name, options, placeholder, required, field, e
                         outline: isFocused ? 'none' : undefined, // focus-visible:outline-none
                         boxShadow: isFocused ? '0 0 0 2px #fff, 0 0 0 4px rgb(0, 112, 243)' : undefined, // focus-visible:ring-2 focus-visible:ring-bytechef
                         cursor: field?.disabled ? 'not-allowed' : 'text', // disabled:cursor-not-allowed
-                        opacity: field?.disabled ? 0.5 : 1 // disabled:opacity-50
+                        opacity: field?.disabled ? 0.5 : 1, // disabled:opacity-50
                     }}
                     placeholder={placeholder}
                     onFocus={() => setIsFocused(true)}
@@ -578,11 +611,17 @@ const DialogInputField = ({label, name, options, placeholder, required, field, e
                 />
             )}
 
-            {error && <p style={{
-                marginTop: '0.25rem', // mt-1
-                fontSize: '0.75rem', // text-xs
-                color: '#ef4444' // text-red-500
-            }}>{error.message}</p>}
+            {error && (
+                <p
+                    style={{
+                        marginTop: '0.25rem', // mt-1
+                        fontSize: '0.75rem', // text-xs
+                        color: '#ef4444', // text-red-500
+                    }}
+                >
+                    {error.message}
+                </p>
+            )}
         </fieldset>
     );
 };

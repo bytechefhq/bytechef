@@ -124,10 +124,10 @@ const useOAuth2 = ({
     scope = '',
 }: Oauth2Props) => {
     const extraQueryParametersRef = useRef(extraQueryParameters);
-    const popupRef = useRef<Window | null>();
+    const popupRef = useRef<Window | null>(null);
     const currentStateRef = useRef(undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const intervalRef = useRef<any>();
+    const intervalRef = useRef<any | null>(null);
 
     const [{error, loading}, setUI] = useState<{
         loading: boolean;

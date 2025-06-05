@@ -55,7 +55,7 @@ export default function useConnectDialog({
     });
 
     const [formValues, setFormValues] = useState<Record<string, string>>({});
-    const [formErrors, setFormErrors] = useState<Record<string, { message: string }>>({});
+    const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
 
     // Get validation rules based on properties
     const validationRules = useMemo(
@@ -65,10 +65,10 @@ export default function useConnectDialog({
 
     const form = useMemo(() => {
         return {
-            register: (name: string, options: any) => ({
+            register: (name: string) => ({
                 name,
                 onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-                    setFormValues(prev => ({ ...prev, [name]: e.target.value }));
+                    setFormValues((prev) => ({...prev, [name]: e.target.value}));
                 },
                 value: formValues[name] || '',
                 ref: () => null,
@@ -77,7 +77,7 @@ export default function useConnectDialog({
                 if (e) e.preventDefault();
 
                 // Custom validation
-                const { isValid, errors, validatedData } = validateForm(formValues, validationRules);
+                const {isValid, errors, validatedData} = validateForm(formValues, validationRules);
 
                 if (isValid) {
                     setFormErrors({});
@@ -89,24 +89,24 @@ export default function useConnectDialog({
                 }
             },
             formState: {
-                errors: formErrors
-            }
+                errors: formErrors,
+            },
         };
     }, [validationRules, formValues, formErrors]);
 
     // Custom validation functions
     function validateForm(data: Record<string, string>, rules: Record<string, ValidationRule>) {
-        const errors: Record<string, { message: string }> = {};
+        const errors: Record<string, {message: string}> = {};
         const validatedData: Record<string, string> = {};
 
         // Check each field against its rules
-        Object.keys(rules).forEach(fieldName => {
+        Object.keys(rules).forEach((fieldName) => {
             const rule = rules[fieldName];
             const value = data[fieldName] || '';
 
             // Required validation
             if (rule.required && value.trim() === '') {
-                errors[fieldName] = { message: rule.requiredMessage || 'This field is required' };
+                errors[fieldName] = {message: rule.requiredMessage || 'This field is required'};
             } else {
                 validatedData[fieldName] = value;
             }
@@ -115,7 +115,7 @@ export default function useConnectDialog({
         return {
             isValid: Object.keys(errors).length === 0,
             errors,
-            validatedData
+            validatedData,
         };
     }
 
@@ -135,7 +135,7 @@ export default function useConnectDialog({
         properties.forEach((prop) => {
             rules[prop.name] = {
                 required: !!prop.required,
-                requiredMessage: prop.required ? `${prop.label} is required` : undefined
+                requiredMessage: prop.required ? `${prop.label} is required` : undefined,
             };
         });
 
@@ -344,16 +344,7 @@ export default function useConnectDialog({
             />
         );
         rootRef.current.render(dialogComponent);
-    }, [
-        dialogStep,
-        form,
-        handleContinue,
-        handleSubmit,
-        integration,
-        isOAuth2,
-        registerFormSubmit,
-        isOpen
-    ]);
+    }, [dialogStep, form, handleContinue, handleSubmit, integration, isOAuth2, registerFormSubmit, isOpen]);
 
     return {
         isOAuth2AuthorizationType,
