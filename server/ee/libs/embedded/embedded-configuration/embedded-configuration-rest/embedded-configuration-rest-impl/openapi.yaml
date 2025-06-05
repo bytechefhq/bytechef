@@ -1079,6 +1079,9 @@ components:
           description: "The project id"
           type: "integer"
           format: "int64"
+        workflowVersion:
+          description: "The workflow version"
+          type: "integer"
         workflow:
           $ref: "../../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
     Environment:

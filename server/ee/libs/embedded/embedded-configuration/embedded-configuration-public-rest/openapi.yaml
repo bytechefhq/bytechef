@@ -69,7 +69,7 @@ paths:
               schema:
                 type: "string"
       security:
-        - frontendBearerAuth: [ ]
+        - jwtBearerAuth: [ ]
   /automation/workflows/{workflowReferenceCode}:
     delete:
       description: "Delete a workflow."
@@ -152,7 +152,72 @@ paths:
         "204":
           description: "Successful operation."
       security:
-        - frontendBearerAuth: [ ]
+        - jwtBearerAuth: [ ]
+  /automation/workflows/{workflowReferenceCode}/enable/{enable}:
+    patch:
+      description: "Enable/disable a workflow."
+      summary: "Enable/disable a workflow"
+      tags:
+        - "workflow"
+      operationId: "enableFrontendProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowReferenceCode"
+          description: "The workflow reference code."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "enable"
+          description: "Enable/disable the project deployment."
+          in: "path"
+          required: true
+          schema:
+            type: "boolean"
+      responses:
+        "204":
+          description: "Successful operation."
+      security:
+        - jwtBearerAuth: [ ]
+  /automation/workflows/{workflowReferenceCode}/publish:
+    post:
+      description: "Publishes existing workflow."
+      summary: "Publishes existing workflow"
+      tags:
+        - "workflow"
+      operationId: "publishFrontendProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowReferenceCode"
+          description: "The workflow reference code."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  description: The description of a connected user project workflow version.
+                  type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+      security:
+        - jwtBearerAuth: [ ]
   /integrations:
     get:
       description: "Get active integrations for particular external user."
@@ -179,7 +244,7 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
-        - frontendBearerAuth: [ ]
+        - jwtBearerAuth: [ ]
   /integrations/{id}:
     get:
       description: "Get an integration by id for particular external user."
@@ -211,7 +276,7 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
-        - frontendBearerAuth: [ ]
+        - jwtBearerAuth: [ ]
   /{externalUserId}/automation/workflows:
     get:
       description: "Get automation workflows for particular external user."
@@ -375,6 +440,83 @@ paths:
                   description: The workflow definition
                   type: "string"
         required: true
+      responses:
+        "204":
+          description: "Successful operation."
+      security:
+        - bearerAuth: [ ]
+  /{externalUserId}/automation/workflows/{workflowReferenceCode}/enable/{enable}:
+    patch:
+      description: "Enable/disable a workflow."
+      summary: "Enable/disable a workflow"
+      tags:
+        - "workflow"
+      operationId: "enableProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference code."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "enable"
+          description: "Enable/disable the project deployment."
+          in: "path"
+          required: true
+          schema:
+            type: "boolean"
+      responses:
+        "204":
+          description: "Successful operation."
+      security:
+        - bearerAuth: [ ]
+  /{externalUserId}/automation/workflows/{workflowReferenceCode}/publish:
+    post:
+      description: "Publishes existing workflow."
+      summary: "Publishes existing workflow"
+      tags:
+        - "workflow"
+      operationId: "publishProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference code."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  description: The description of a connected user project workflow version.
+                  type: "string"
       responses:
         "204":
           description: "Successful operation."
@@ -580,6 +722,9 @@ components:
         definition:
           description: "The definition of a workflow."
           type: "string"
+        enabled:
+          type: "boolean"
+          description: "If a workflow is enabled or not."
         label:
           description: "The label of a workflow."
           type: "string"
@@ -592,6 +737,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Input"
+        workflowVersion:
+          type: "integer"
+          description: "The workflow version, if null a workflow is not yet published"
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
@@ -599,7 +747,7 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-    frontendBearerAuth:
+    jwtBearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
