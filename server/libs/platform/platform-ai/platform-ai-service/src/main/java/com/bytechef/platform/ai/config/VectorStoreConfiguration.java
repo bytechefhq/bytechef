@@ -65,6 +65,7 @@ public class VectorStoreConfiguration {
     private static final String COMPONENTS = "components";
     private static final int MAX_TOKENS = 1536;
     private static final String NAME = "name";
+    private static final String COMPONENT_NAME = "componentName";
     private static final String TYPE = "type";
     private static final String WORKFLOWS = "workflows";
 
@@ -122,18 +123,16 @@ public class VectorStoreConfiguration {
     }
 
     private static void addToDocuments(
-        List<Map<String, Object>> vectorStores, String name, String json, List<Document> documents, String type) {
+        String name, String componentName, String json, List<Document> documents, String type) {
 
-        if (!containsFile(vectorStores, name, COMPONENTS)) {
-            String cleanedDocument = preprocessDocument(json);
+        String cleanedDocument = preprocessDocument(json);
 
-            if (!cleanedDocument.isEmpty()) {
-                // Split the document into chunks
-                List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
+        if (!cleanedDocument.isEmpty()) {
+            // Split the document into chunks
+            List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
 
-                for (String chunk : chunks) {
-                    documents.add(new Document(chunk, Map.of(CATEGORY, COMPONENTS, NAME, name, TYPE, type)));
-                }
+            for (String chunk : chunks) {
+                documents.add(new Document(chunk, Map.of(CATEGORY, COMPONENTS, NAME, name, TYPE, type, COMPONENT_NAME, componentName)));
             }
         }
     }
@@ -356,7 +355,6 @@ public class VectorStoreConfiguration {
     }
 
     // Function to split a document into chunks based on a maximum token limit
-
     private static List<String> splitDocument(String[] tokens) {
         List<String> chunks = new ArrayList<>();
         StringBuilder currentChunk = new StringBuilder();
@@ -483,22 +481,27 @@ public class VectorStoreConfiguration {
             String name = taskDispatcherDefinition.getName();
 
             if (name.equals("condition") || name.equals("loop")) {
-                String json = toString(taskDispatcherDefinition);
+                if (!containsFile(vectorStores, name, COMPONENTS)) {
+                    String json = toString(taskDispatcherDefinition);
 
-                addToDocuments(vectorStores, name, json, documentList, "flow");
+                    addToDocuments(name, name, json, documentList, "flow");
+                }
             }
         }
 
         for (ComponentDefinition componentDefinition : componentDefinitionService.getComponentDefinitions()) {
             String json = toString(componentDefinition);
+            String componentName = componentDefinition.getName();
 
             List<TriggerDefinition> triggers = componentDefinition.getTriggers();
 
             if (!triggers.isEmpty()) {
                 for (TriggerDefinition triggerDefinition : triggers) {
-                    String triggerJson = json + toString(triggerDefinition);
+                    if (!containsFile(vectorStores, triggerDefinition.getName(), componentName, COMPONENTS)) {
+                        String triggerJson = json + toString(triggerDefinition);
 
-                    addToDocuments(vectorStores, triggerDefinition.getName(), triggerJson, documentList, "trigger");
+                        addToDocuments(triggerDefinition.getName(), componentName, triggerJson, documentList, "trigger");
+                    }
                 }
             }
 
@@ -506,9 +509,11 @@ public class VectorStoreConfiguration {
 
             if (!actions.isEmpty()) {
                 for (ActionDefinition actionDefinition : actions) {
-                    String actionJson = json + toString(actionDefinition);
+                    if (!containsFile(vectorStores, actionDefinition.getName(), componentName, COMPONENTS)) {
+                        String actionJson = json + toString(actionDefinition);
 
-                    addToDocuments(vectorStores, actionDefinition.getName(), actionJson, documentList, "action");
+                        addToDocuments(actionDefinition.getName(), componentName, actionJson, documentList, "action");
+                    }
                 }
             }
         }
@@ -523,6 +528,13 @@ public class VectorStoreConfiguration {
 
         return !vectorStoreList.isEmpty() && vectorStoreList.stream()
             .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
+    }
+
+    private static boolean containsFile(
+        List<Map<String, Object>> vectorStoreList, String fileName, String componentName, String categoryName) {
+
+        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
+            .anyMatch(map -> fileName.equals(map.get(NAME)) && componentName.equals(map.get(COMPONENT_NAME)) && categoryName.equals(map.get(CATEGORY)));
     }
 
     private static void storeDocumentsFromPath(
