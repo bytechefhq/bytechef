@@ -26,12 +26,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-03T07:53:09.868099+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T07:17:00.413223+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkflowModel {
 
   private @Nullable String description;
 
   private @Nullable String definition;
+
+  private @Nullable Boolean enabled;
 
   private @Nullable String label;
 
@@ -39,6 +41,8 @@ public class WorkflowModel {
 
   @Valid
   private List<@Valid InputModel> inputs = new ArrayList<>();
+
+  private @Nullable Integer workflowVersion;
 
   public WorkflowModel description(String description) {
     this.description = description;
@@ -78,6 +82,26 @@ public class WorkflowModel {
 
   public void setDefinition(String definition) {
     this.definition = definition;
+  }
+
+  public WorkflowModel enabled(Boolean enabled) {
+    this.enabled = enabled;
+    return this;
+  }
+
+  /**
+   * If a workflow is enabled or not.
+   * @return enabled
+   */
+  
+  @Schema(name = "enabled", description = "If a workflow is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("enabled")
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
   }
 
   public WorkflowModel label(String label) {
@@ -148,6 +172,26 @@ public class WorkflowModel {
     this.inputs = inputs;
   }
 
+  public WorkflowModel workflowVersion(Integer workflowVersion) {
+    this.workflowVersion = workflowVersion;
+    return this;
+  }
+
+  /**
+   * The workflow version, if null a workflow is not yet published
+   * @return workflowVersion
+   */
+  
+  @Schema(name = "workflowVersion", description = "The workflow version, if null a workflow is not yet published", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowVersion")
+  public Integer getWorkflowVersion() {
+    return workflowVersion;
+  }
+
+  public void setWorkflowVersion(Integer workflowVersion) {
+    this.workflowVersion = workflowVersion;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -159,14 +203,16 @@ public class WorkflowModel {
     WorkflowModel workflow = (WorkflowModel) o;
     return Objects.equals(this.description, workflow.description) &&
         Objects.equals(this.definition, workflow.definition) &&
+        Objects.equals(this.enabled, workflow.enabled) &&
         Objects.equals(this.label, workflow.label) &&
         Objects.equals(this.workflowReferenceCode, workflow.workflowReferenceCode) &&
-        Objects.equals(this.inputs, workflow.inputs);
+        Objects.equals(this.inputs, workflow.inputs) &&
+        Objects.equals(this.workflowVersion, workflow.workflowVersion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, definition, label, workflowReferenceCode, inputs);
+    return Objects.hash(description, definition, enabled, label, workflowReferenceCode, inputs, workflowVersion);
   }
 
   @Override
@@ -175,9 +221,11 @@ public class WorkflowModel {
     sb.append("class WorkflowModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
+    sb.append("    workflowVersion: ").append(toIndentedString(workflowVersion)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -22,12 +22,14 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-04T12:03:33.327119+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-05T23:09:32.029442+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable Long connectedUserId;
 
   private @Nullable Long projectId;
+
+  private @Nullable Integer workflowVersion;
 
   private @Nullable Workflow1Model workflow;
 
@@ -71,6 +73,26 @@ public class ConnectedUserProjectWorkflowModel {
     this.projectId = projectId;
   }
 
+  public ConnectedUserProjectWorkflowModel workflowVersion(Integer workflowVersion) {
+    this.workflowVersion = workflowVersion;
+    return this;
+  }
+
+  /**
+   * The workflow version
+   * @return workflowVersion
+   */
+  
+  @Schema(name = "workflowVersion", description = "The workflow version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowVersion")
+  public Integer getWorkflowVersion() {
+    return workflowVersion;
+  }
+
+  public void setWorkflowVersion(Integer workflowVersion) {
+    this.workflowVersion = workflowVersion;
+  }
+
   public ConnectedUserProjectWorkflowModel workflow(Workflow1Model workflow) {
     this.workflow = workflow;
     return this;
@@ -102,12 +124,13 @@ public class ConnectedUserProjectWorkflowModel {
     ConnectedUserProjectWorkflowModel connectedUserProjectWorkflow = (ConnectedUserProjectWorkflowModel) o;
     return Objects.equals(this.connectedUserId, connectedUserProjectWorkflow.connectedUserId) &&
         Objects.equals(this.projectId, connectedUserProjectWorkflow.projectId) &&
+        Objects.equals(this.workflowVersion, connectedUserProjectWorkflow.workflowVersion) &&
         Objects.equals(this.workflow, connectedUserProjectWorkflow.workflow);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectedUserId, projectId, workflow);
+    return Objects.hash(connectedUserId, projectId, workflowVersion, workflow);
   }
 
   @Override
@@ -116,6 +139,7 @@ public class ConnectedUserProjectWorkflowModel {
     sb.append("class ConnectedUserProjectWorkflowModel {\n");
     sb.append("    connectedUserId: ").append(toIndentedString(connectedUserId)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
+    sb.append("    workflowVersion: ").append(toIndentedString(workflowVersion)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
     sb.append("}");
     return sb.toString();
