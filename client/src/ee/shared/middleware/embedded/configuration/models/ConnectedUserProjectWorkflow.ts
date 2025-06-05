@@ -40,6 +40,12 @@ export interface ConnectedUserProjectWorkflow {
      */
     projectId?: number;
     /**
+     * The workflow version
+     * @type {number}
+     * @memberof ConnectedUserProjectWorkflow
+     */
+    workflowVersion?: number;
+    /**
      * 
      * @type {Workflow1}
      * @memberof ConnectedUserProjectWorkflow
@@ -66,6 +72,7 @@ export function ConnectedUserProjectWorkflowFromJSONTyped(json: any, ignoreDiscr
         
         'connectedUserId': json['connectedUserId'] == null ? undefined : json['connectedUserId'],
         'projectId': json['projectId'] == null ? undefined : json['projectId'],
+        'workflowVersion': json['workflowVersion'] == null ? undefined : json['workflowVersion'],
         'workflow': json['workflow'] == null ? undefined : Workflow1FromJSON(json['workflow']),
     };
 }
@@ -83,6 +90,7 @@ export function ConnectedUserProjectWorkflowToJSONTyped(value?: ConnectedUserPro
         
         'connectedUserId': value['connectedUserId'],
         'projectId': value['projectId'],
+        'workflowVersion': value['workflowVersion'],
         'workflow': Workflow1ToJSON(value['workflow']),
     };
 }
