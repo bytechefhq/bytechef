@@ -240,21 +240,6 @@ const DialogContent = ({
         }
     }, [registerFormSubmit, form.handleSubmit]);
 
-    // For handling responsive text alignment - moved before conditional return
-    const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth < 640);
-
-    // Move the resize effect before conditional return as well
-    React.useEffect(() => {
-        const handleResize = () => {
-            setIsSmallScreen(window.innerWidth < 640);
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
     if (!integration) {
         return (
             <main style={{ textAlign: 'center' }}>
@@ -300,26 +285,12 @@ const DialogContent = ({
         );
     }
 
-    // For handling responsive text alignment
-    const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth < 640);
-
-    React.useEffect(() => {
-        const handleResize = () => {
-            setIsSmallScreen(window.innerWidth < 640);
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
     return (
         <main style={{
             display: 'flex',
             flexDirection: 'column',
             gap: '1rem', // gap-4
-            textAlign: isSmallScreen ? 'center' : 'left', // sm:text-left
+            textAlign: 'left', // sm:text-left
             fontSize: '0.875rem' // text-sm
         }}>
             {dialogStep === 'initial' && <p style={{ color: '#6b7280' }}>{integration.description}</p>}
