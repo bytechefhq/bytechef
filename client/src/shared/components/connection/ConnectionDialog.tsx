@@ -418,6 +418,27 @@ const ConnectionDialog = ({
                         {errors?.length > 0 && <Errors errors={errors} />}
 
                         <div className="flex max-h-dialog-height flex-col space-y-4 overflow-y-auto px-6">
+                            {connection?.id && (
+                                <FormField
+                                    control={control}
+                                    name="id"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>ID</FormLabel>
+
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    className="bg-gray-50 text-gray-700"
+                                                    readOnly
+                                                    value={connection.id.toString()}
+                                                />
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+
                             {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
                                 <>
                                     {!connection?.id && (
