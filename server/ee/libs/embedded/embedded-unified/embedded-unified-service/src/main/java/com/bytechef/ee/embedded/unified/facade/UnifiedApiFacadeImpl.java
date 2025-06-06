@@ -45,7 +45,6 @@ import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -87,10 +86,11 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public String create(
-        UnifiedInputModel unifiedInputModel, UnifiedApiCategory category, ModelType modelType,
-        Environment environment, Long integrationInstanceId) {
+        String externalUserId, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category,
+        Long integrationInstanceId, Environment environment, ModelType modelType) {
 
-        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
+        ComponentConnection connection = getComponentConnection(
+            externalUserId, category, integrationInstanceId, environment);
 
         String componentName = connection.getComponentName();
 
@@ -110,10 +110,11 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public void delete(
-        String id, UnifiedApiCategory category, ModelType modelType, Environment environment,
-        Long integrationInstanceId) {
+        String externalUserId, String id, UnifiedApiCategory category, Long integrationInstanceId,
+        Environment environment, ModelType modelType) {
 
-        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
+        ComponentConnection connection = getComponentConnection(
+            externalUserId, category, integrationInstanceId, environment);
 
         String componentName = connection.getComponentName();
 
@@ -128,10 +129,11 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public UnifiedOutputModel get(
-        String id, UnifiedApiCategory category, ModelType modelType, Environment environment,
-        Long integrationInstanceId) {
+        String externalUserId, String id, UnifiedApiCategory category, Long integrationInstanceId,
+        Environment environment, ModelType modelType) {
 
-        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
+        ComponentConnection connection = getComponentConnection(
+            externalUserId, category, integrationInstanceId, environment);
 
         String componentName = connection.getComponentName();
 
@@ -151,8 +153,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public CursorPageSlice<? extends UnifiedOutputModel> getPage(
-        CursorPageable cursorPageable, UnifiedApiCategory category, ModelType modelType, Environment environment,
-        Long integrationInstanceId) {
+        String externalUserId, CursorPageable cursorPageable, UnifiedApiCategory category, Long integrationInstanceId,
+        Environment environment, ModelType modelType) {
 
         boolean isSorted = StringUtils.hasText(cursorPageable.getSort());
 
@@ -161,7 +163,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 //            throw new IllegalArgumentException("Sorting is only allowed on fields: " + sortableFields);
 //        }
 
-        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
+        ComponentConnection connection = getComponentConnection(
+            externalUserId, category, integrationInstanceId, environment);
 
         String componentName = connection.getComponentName();
 
@@ -232,10 +235,11 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public void update(
-        String id, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category,
-        ModelType modelType, Environment environment, Long integrationInstanceId) {
+        String externalUserId, String id, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category,
+        Long integrationInstanceId, Environment environment, ModelType modelType) {
 
-        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
+        ComponentConnection connection = getComponentConnection(
+            externalUserId, category, integrationInstanceId, environment);
 
         String componentName = connection.getComponentName();
 
@@ -275,16 +279,13 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
     }
 
     private ComponentConnection getComponentConnection(
-        Environment environment, UnifiedApiCategory category, Long integrationInstanceId) {
+        String externalUserId, UnifiedApiCategory category, Long integrationInstanceId, Environment environment) {
 
         if (integrationInstanceId == null) {
             List<String> componentNames = unifiedApiDefinitionService.getUnifiedApiComponentDefinitions(category)
                 .stream()
                 .map(ComponentDefinition::getName)
                 .toList();
-
-            String externalUserId = SecurityUtils.getCurrentUserLogin()
-                .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
             ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 

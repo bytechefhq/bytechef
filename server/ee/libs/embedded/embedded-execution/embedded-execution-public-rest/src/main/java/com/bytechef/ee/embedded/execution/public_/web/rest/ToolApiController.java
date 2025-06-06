@@ -49,7 +49,8 @@ public class ToolApiController implements ToolApi {
 
         return ResponseEntity.ok(
             toolFacade.executeTool(
-                executeToolRequestModel.getName(), executeToolRequestModel.getParameters(), environment, xInstanceId));
+                externalUserId, executeToolRequestModel.getName(), executeToolRequestModel.getParameters(),
+                xInstanceId, environment));
     }
 
     @Override
@@ -62,9 +63,9 @@ public class ToolApiController implements ToolApi {
 
         return ResponseEntity.ok(
             toolFacade
-                .getTools(
-                    environment, categories == null ? List.of() : categories,
-                    components == null ? List.of() : components, actions == null ? List.of() : actions)
+                .getTools(,
+                    categories == null ? List.of() : categories,
+                    components == null ? List.of() : components, actions == null ? List.of() : actions, environment)
                 .entrySet()
                 .stream()
                 .collect(

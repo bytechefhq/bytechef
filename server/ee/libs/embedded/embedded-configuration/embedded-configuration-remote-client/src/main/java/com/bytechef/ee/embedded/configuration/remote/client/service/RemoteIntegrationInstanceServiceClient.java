@@ -54,6 +54,13 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     }
 
     @Override
+    public List<IntegrationInstance> getIntegrationInstances(
+        long connectedUserId, String componentName, Environment environment) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds) {
         throw new UnsupportedOperationException();
     }

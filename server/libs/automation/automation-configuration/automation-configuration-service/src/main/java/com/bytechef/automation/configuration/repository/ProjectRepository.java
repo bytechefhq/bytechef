@@ -36,7 +36,7 @@ public interface ProjectRepository
             JOIN project_deployment ON project.id = project_deployment.project_id
             WHERE project_deployment.id = :projectDeploymentId
         """)
-    Project findByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
+    Optional<Project> findByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
 
     Optional<Project> findByNameIgnoreCase(String name);
 

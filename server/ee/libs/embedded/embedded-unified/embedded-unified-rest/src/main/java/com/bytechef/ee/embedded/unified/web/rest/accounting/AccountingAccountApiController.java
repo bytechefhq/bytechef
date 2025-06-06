@@ -52,11 +52,10 @@ public class AccountingAccountApiController implements AccountApi {
 
         return ResponseEntity.ok(
             new CreatedModel(
-                unifiedApiFacade.create(
+                unifiedApiFacade.create(,
                     conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
-                    UnifiedApiDefinition.UnifiedApiCategory.CRM,
-                    AccountingModelType.ACCOUNT, Environment.valueOf(StringUtils.upperCase(environment)),
-                    xInstanceId)));
+                    UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)),
+                    AccountingModelType.ACCOUNT)));
     }
 
     @Override
@@ -65,9 +64,9 @@ public class AccountingAccountApiController implements AccountApi {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                unifiedApiFacade.get(
-                    accountId, UnifiedApiDefinition.UnifiedApiCategory.CRM, AccountingModelType.ACCOUNT,
-                    Environment.valueOf(StringUtils.upperCase(environment)), xInstanceId),
+                unifiedApiFacade.get(,
+                    accountId, UnifiedApiDefinition.UnifiedApiCategory.CRM,
+                    xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)), AccountingModelType.ACCOUNT),
                 AccountModel.class));
     }
 
@@ -78,11 +77,10 @@ public class AccountingAccountApiController implements AccountApi {
 
         return ResponseEntity.ok(
             unifiedApiFacade
-                .getPage(
+                .getPage(,
                     conversionService.convert(pageable, CursorPageRequest.class),
-                    UnifiedApiDefinition.UnifiedApiCategory.CRM,
-                    AccountingModelType.ACCOUNT, Environment.valueOf(StringUtils.upperCase(environment)),
-                    xInstanceId)
+                    UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)),
+                    AccountingModelType.ACCOUNT)
                 .map(unifiedOutputModel -> conversionService.convert(unifiedOutputModel, AccountModel.class)));
     }
 
@@ -91,11 +89,11 @@ public class AccountingAccountApiController implements AccountApi {
     public ResponseEntity<Void> updateAccount(
         String accountId, CreateUpdateAccountModel createUpdateAccountModel, Long xInstanceId, String environment) {
 
-        unifiedApiFacade.update(
-            accountId, conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
-            UnifiedApiDefinition.UnifiedApiCategory.CRM, AccountingModelType.ACCOUNT,
-            Environment.valueOf(StringUtils.upperCase(environment)),
-            xInstanceId);
+        unifiedApiFacade.update(,
+            accountId,
+            conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class), UnifiedApiDefinition.UnifiedApiCategory.CRM,
+            xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)),
+            AccountingModelType.ACCOUNT);
 
         return ResponseEntity.noContent()
             .build();

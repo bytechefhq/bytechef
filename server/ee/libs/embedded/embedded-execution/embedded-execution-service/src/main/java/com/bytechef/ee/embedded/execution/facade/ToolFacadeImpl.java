@@ -27,7 +27,6 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -85,13 +84,10 @@ public class ToolFacadeImpl implements ToolFacade {
 
     @Override
     public Map<String, List<ToolDTO>> getTools(
-        Environment environment, List<String> categoryNames, List<String> componentNames,
-        List<String> clusterElementNames) {
+        String externalUserId, List<String> categoryNames, List<String> componentNames,
+        List<String> clusterElementNames, Environment environment) {
 
-        String externalId = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
-
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalId, environment);
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
         List<Long> integrationInstanceConfigurationIds = integrationInstanceService
             .getConnectedUserIntegrationInstances(connectedUser.getId(), environment)
@@ -130,7 +126,8 @@ public class ToolFacadeImpl implements ToolFacade {
 
     @Override
     public Object executeTool(
-        String toolName, Map<String, Object> inputParameters, Environment environment, @Nullable Long instanceId) {
+        String externalUserId, String toolName, Map<String, Object> inputParameters, @Nullable Long instanceId,
+        Environment environment) {
 
         ComponentClusterElementNameResult result = getComponentClusterElementNames(toolName);
 
@@ -139,7 +136,8 @@ public class ToolFacadeImpl implements ToolFacade {
 
         String componentName = clusterElementDefinition.getComponentName();
 
-        Long connectionId = connectionIdHelper.getConnectionId(componentName, environment, instanceId);
+        Long connectionId = connectionIdHelper.getConnectionId(
+            externalUserId, componentName, instanceId, environment);
 
         return clusterElementDefinitionFacade.executeTool(
             componentName, clusterElementDefinition.getComponentVersion(), clusterElementDefinition.getName(),

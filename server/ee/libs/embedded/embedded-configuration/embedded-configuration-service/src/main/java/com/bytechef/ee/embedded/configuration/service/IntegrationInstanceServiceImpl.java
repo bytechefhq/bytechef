@@ -34,6 +34,14 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    public Optional<IntegrationInstance> fetchIntegrationInstance(
+        long connectedUserId, String componentName, Environment environment) {
+
+        return integrationInstanceRepository.findFirstByConnectedUserIdIdAndComponentNameAndEnvironment(
+            connectedUserId, componentName, environment.ordinal());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId) {
         return integrationInstanceRepository.findAllByConnectedUserId(connectedUserId);
@@ -54,17 +62,17 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds) {
-        return integrationInstanceRepository.findAllByConnectedUserIdIn(connectedUserIds);
+    public List<IntegrationInstance> getIntegrationInstances(
+        long connectedUserId, String componentName, Environment environment) {
+
+        return integrationInstanceRepository.findAllByConnectedUserIdIdAndComponentNameAndEnvironment(
+            connectedUserId, componentName, environment.ordinal());
     }
 
     @Override
-    public Optional<IntegrationInstance> fetchIntegrationInstance(
-        long connectedUserId, String componentName, Environment environment) {
-
-        return integrationInstanceRepository.findFirstByConnectedUserIdIdAndComponentNameAndEnvironment(
-            connectedUserId, componentName, environment.ordinal());
+    @Transactional(readOnly = true)
+    public List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds) {
+        return integrationInstanceRepository.findAllByConnectedUserIdIn(connectedUserIds);
     }
 
     @Override

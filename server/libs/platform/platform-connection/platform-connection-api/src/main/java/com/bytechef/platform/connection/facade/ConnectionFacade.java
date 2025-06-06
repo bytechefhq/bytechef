@@ -34,8 +34,8 @@ public interface ConnectionFacade {
     ConnectionDTO getConnection(Long id);
 
     List<ConnectionDTO> getConnections(
-        String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment,
-        Long tagId, ModeType type);
+        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId,
+        ConnectionEnvironment connectionEnvironment, ModeType type);
 
     List<Tag> getConnectionTags(ModeType type);
 

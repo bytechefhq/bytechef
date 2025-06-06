@@ -19,6 +19,7 @@ import org.springframework.lang.Nullable;
 public interface ActionFacade {
 
     Object executeAction(
-        String componentName, Integer componentVersion, String actionName, Map<String, Object> inputParameters,
-        Environment environment, @Nullable Long instanceId);
+        String externalUserId, String componentName, Integer componentVersion, String actionName,
+        Map<String, Object> inputParameters,
+        @Nullable Long instanceId, Environment environment);
 }

@@ -45,7 +45,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<Void> enableConnectedUserProjectWorkflow(
         String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
 
-        connectUserProjectFacade.enableProjectWorkflow(workflowReferenceCode, enable, getEnvironment(xEnvironment));
+        connectUserProjectFacade.enableProjectWorkflow(, workflowReferenceCode, enable, getEnvironment(xEnvironment));
 
         return ResponseEntity.noContent()
             .build();
@@ -57,7 +57,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         return ResponseEntity.ok(
             conversionService.convert(
-                connectUserProjectFacade.getProjectWorkflow(workflowReferenceCode, getEnvironment(xEnvironment)),
+                connectUserProjectFacade.getProjectWorkflow(, workflowReferenceCode, getEnvironment(xEnvironment)),
                 ConnectedUserProjectWorkflowModel.class));
     }
 
@@ -66,9 +66,9 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         String workflowReferenceCode, EnvironmentModel xEnvironment,
         PublishConnectedUserProjectWorkflowRequestModel publishConnectedUserProjectWorkflowRequestModel) {
 
-        connectUserProjectFacade.publishProjectWorkflow(
-            workflowReferenceCode, publishConnectedUserProjectWorkflowRequestModel.getDescription(),
-            getEnvironment(xEnvironment));
+        connectUserProjectFacade.publishProjectWorkflow(,
+            workflowReferenceCode,
+            publishConnectedUserProjectWorkflowRequestModel.getDescription(), getEnvironment(xEnvironment));
 
         return ResponseEntity.noContent()
             .build();

@@ -35,14 +35,11 @@ public class ConnectionIdHelper {
         this.integrationInstanceService = integrationInstanceService;
     }
 
-    public Long getConnectionId(String componentName, Environment environment, Long instanceId) {
+    public Long getConnectionId(String externalUserid, String componentName, Long instanceId, Environment environment) {
         Long connectionId;
 
         if (instanceId == null) {
-            String externalId = SecurityUtils.getCurrentUserLogin()
-                .orElseThrow(() -> new RuntimeException("User not authenticated"));
-
-            ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalId, environment);
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserid, environment);
 
             connectionId = integrationInstanceService
                 .fetchIntegrationInstance(connectedUser.getId(), componentName, environment)

@@ -34,10 +34,10 @@ public class ActionFacadeImpl implements ActionFacade {
 
     @Override
     public Object executeAction(
-        String componentName, Integer componentVersion, String actionName, Map<String, Object> inputParameters,
-        Environment environment, @Nullable Long instanceId) {
+        String externalUserId, String componentName, Integer componentVersion, String actionName,
+        Map<String, Object> inputParameters, @Nullable Long instanceId, Environment environment) {
 
-        Long connectionId = connectionIdHelper.getConnectionId(componentName, environment, instanceId);
+        Long connectionId = connectionIdHelper.getConnectionId(externalUserId, componentName, instanceId, environment);
 
         return actionDefinitionFacade.executePerform(
             componentName, componentVersion, actionName, null, null, null, null, null, inputParameters,

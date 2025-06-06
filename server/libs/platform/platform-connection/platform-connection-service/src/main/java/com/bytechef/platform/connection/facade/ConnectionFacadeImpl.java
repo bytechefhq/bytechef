@@ -156,11 +156,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @Override
     @Transactional(readOnly = true)
     public List<ConnectionDTO> getConnections(
-        String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment, Long tagId,
+        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId,
+        ConnectionEnvironment connectionEnvironment,
         ModeType type) {
 
-        List<Connection> connections = connectionService.getConnections(
-            componentName, connectionVersion, connectionEnvironment, tagId, type);
+        List<Connection> connections = CollectionUtils.filter(
+            connectionService.getConnections(
+                componentName, connectionVersion, connectionEnvironment, tagId, type),
+            connection -> connectionIds.isEmpty() || connectionIds.contains(connection.getId()));
 
         return getConnections(connections);
     }

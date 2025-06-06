@@ -7,9 +7,11 @@
 
 package com.bytechef.embedded.mcp.server.config;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.execution.facade.ToolFacade;
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpServer;
@@ -94,6 +96,8 @@ public class McpServerConfiguration {
     }
 
     private Function<Map<String, Object>, Object> getToolCallbackFunction(String toolName) {
-        return request -> toolFacade.executeTool(toolName, request, Environment.PRODUCTION, null);
+        return request -> toolFacade.executeTool(
+            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), toolName, request, null,
+            Environment.PRODUCTION);
     }
 }

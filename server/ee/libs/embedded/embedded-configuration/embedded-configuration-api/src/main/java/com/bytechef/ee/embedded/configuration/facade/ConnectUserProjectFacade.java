@@ -19,17 +19,21 @@ import java.util.List;
 public interface ConnectUserProjectFacade {
 
     String createProjectWorkflow(
-        String definition, Environment environment);
+        String externalUserId, String definition, Environment environment);
 
-    void deleteProjectWorkflow(String workflowReferenceCode, Environment environment);
+    void deleteProjectWorkflow(String externalUserId, String workflowReferenceCode, Environment environment);
 
-    void enableProjectWorkflow(String workflowReferenceCode, boolean enable, Environment environment);
+    void enableProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, boolean enable, Environment environment);
 
-    ConnectUserProjectWorkflowDTO getProjectWorkflow(String workflowReferenceCode, Environment environment);
+    ConnectUserProjectWorkflowDTO
+        getProjectWorkflow(String externalUserId, String workflowReferenceCode, Environment environment);
 
-    List<ConnectUserProjectWorkflowDTO> getProjectWorkflows(Environment environment);
+    List<ConnectUserProjectWorkflowDTO> getProjectWorkflows(String externalUserId, Environment environment);
 
-    void publishProjectWorkflow(String workflowReferenceCode, String description, Environment environment);
+    void publishProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, String description, Environment environment);
 
-    void updateProjectWorkflow(String workflowReferenceCode, String definition, Environment environment);
+    void updateProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, String definition, Environment environment);
 }

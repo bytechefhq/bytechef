@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Environment
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationBasicModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -49,18 +50,25 @@ public class IntegrationApiController implements IntegrationApi {
     @CrossOrigin
     @Override
     public ResponseEntity<IntegrationModel> getFrontendIntegration(Long id, EnvironmentModel xEnvironment) {
+        String externalId = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+
         return ResponseEntity.ok(
             conversionService.convert(
-                connectedUserIntegrationFacade.getConnectedUserIntegration(id, true, getEnvironment(xEnvironment)),
+                connectedUserIntegrationFacade.getConnectedUserIntegration(
+                    externalId, id, true, getEnvironment(xEnvironment)),
                 IntegrationModel.class));
     }
 
     @CrossOrigin
     @Override
     public ResponseEntity<List<IntegrationModel>> getFrontendIntegrations(EnvironmentModel xEnvironment) {
+        String externalId = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+
         return ResponseEntity.ok(
             connectedUserIntegrationFacade
-                .getConnectedUserIntegrations(true, getEnvironment(xEnvironment))
+                .getConnectedUserIntegrations(externalId, true, getEnvironment(xEnvironment))
                 .stream()
                 .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
                 .toList());
@@ -72,7 +80,8 @@ public class IntegrationApiController implements IntegrationApi {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                connectedUserIntegrationFacade.getConnectedUserIntegration(id, true, getEnvironment(xEnvironment)),
+                connectedUserIntegrationFacade.getConnectedUserIntegration(
+                    externalUserId, id, true, getEnvironment(xEnvironment)),
                 IntegrationModel.class));
     }
 
@@ -82,7 +91,7 @@ public class IntegrationApiController implements IntegrationApi {
 
         return ResponseEntity.ok(
             connectedUserIntegrationFacade
-                .getConnectedUserIntegrations(true, getEnvironment(xEnvironment))
+                .getConnectedUserIntegrations(externalUserId, true, getEnvironment(xEnvironment))
                 .stream()
                 .map(integrationInstanceConfigurationDTO -> conversionService.convert(
                     integrationInstanceConfigurationDTO, IntegrationBasicModel.class))

@@ -19,7 +19,8 @@ import java.util.List;
 public interface ConnectedUserIntegrationFacade {
 
     ConnectedUserIntegrationDTO getConnectedUserIntegration(
-        long integrationId, boolean enabled, Environment environment);
+        String externalUserId, long integrationId, boolean enabled, Environment environment);
 
-    List<ConnectedUserIntegrationDTO> getConnectedUserIntegrations(boolean enabled, Environment environment);
+    List<ConnectedUserIntegrationDTO>
+        getConnectedUserIntegrations(String externalUserId, boolean enabled, Environment environment);
 }

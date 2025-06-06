@@ -31,6 +31,9 @@ public interface IntegrationInstanceService {
 
     List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId, Environment environment);
 
+    List<IntegrationInstance> getIntegrationInstances(
+        long connectedUserId, String componentName, Environment environment);
+
     List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds);
 
     IntegrationInstance getIntegrationInstance(long id);

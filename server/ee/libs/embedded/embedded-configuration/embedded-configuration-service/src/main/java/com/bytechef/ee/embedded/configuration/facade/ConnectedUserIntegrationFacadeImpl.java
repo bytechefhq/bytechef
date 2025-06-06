@@ -25,7 +25,6 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
@@ -67,16 +66,13 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     @Override
     @Transactional(readOnly = true)
     public ConnectedUserIntegrationDTO getConnectedUserIntegration(
-        long integrationId, boolean enabled, Environment environment) {
+        String externalUserId, long integrationId, boolean enabled, Environment environment) {
 
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
             integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationIntegration(
                 integrationId, enabled, environment);
 
-        String externalId = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
-
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalId, environment);
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
         IntegrationDTO integrationDTO = integrationInstanceConfigurationDTO.integration();
 
@@ -112,11 +108,10 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectedUserIntegrationDTO> getConnectedUserIntegrations(boolean enabled, Environment environment) {
-        String externalId = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+    public List<ConnectedUserIntegrationDTO> getConnectedUserIntegrations(
+        String externalUserId, boolean enabled, Environment environment) {
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalId, environment);
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
         return integrationInstanceConfigurationFacade
             .getIntegrationInstanceConfigurationIntegrations(enabled, environment)

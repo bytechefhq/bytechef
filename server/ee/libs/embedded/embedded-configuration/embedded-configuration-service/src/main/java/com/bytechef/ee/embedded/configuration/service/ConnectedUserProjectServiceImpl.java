@@ -60,6 +60,12 @@ public class ConnectedUserProjectServiceImpl implements ConnectedUserProjectServ
 
     @Override
     @Transactional(readOnly = true)
+    public ConnectedUserProject getConnectUserProject(String externalUserId, Environment environment) {
+        return OptionalUtils.get(fetchConnectUserProject(externalUserId, environment));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<ConnectedUserProject> fetchConnectUserProject(String externalUserId, Environment environment) {
         return connectUserProjectRepository.findFirstByEnvironmentAndExternalUserId(
             externalUserId, environment.ordinal());
