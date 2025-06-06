@@ -111,6 +111,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:bolna"))
     implementation(project(":server:libs:modules:components:box"))
     implementation(project(":server:libs:modules:components:brevo"))
+    implementation(project(":server:libs:modules:components:calcom"))
     implementation(project(":server:libs:modules:components:calendly"))
     implementation(project(":server:libs:modules:components:capsule-crm"))
     implementation(project(":server:libs:modules:components:clickup"))
