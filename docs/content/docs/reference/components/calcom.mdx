@@ -1,0 +1,302 @@
+---
+title: "Cal.com"
+description: "A fully customizable scheduling software for individuals, businesses taking calls and developers building scheduling platforms where users meet users."
+---
+
+A fully customizable scheduling software for individuals, businesses taking calls and developers building scheduling platforms where users meet users.
+
+
+Categories: Communication
+
+
+Type: calcom/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key Authorization
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Api Key | STRING | `Can be found in Settings -> Developer -> API keys.` | true |
+
+
+
+
+
+<hr />
+
+
+
+
+
+## Triggers
+
+
+### Booking Canceled
+Name: bookingCanceled
+
+`Triggers when a booking is canceled.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| bookerUrl | STRING | Booker URL. |
+| title | STRING | Title of the booking. |
+| length | INTEGER | Length of the booking. |
+| type | STRING | Type of the booking. |
+| additionalNotes | STRING | Additional notes of the booking. |
+| description | STRING | Description of the booking. |
+| customInputs | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom inputs of the booking. |
+| eventTypeId | INTEGER | ID of the event type of the booking. |
+| userFieldsResponses | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | User field responses of the booking. |
+| responses | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(name), &#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(email), &#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(location), &#123;STRING\(label), BOOLEAN\(isHidden)&#125;\(title), &#123;STRING\(label), BOOLEAN\(isHidden)&#125;\(notes), &#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(guests), &#123;STRING\(label), BOOLEAN\(isHidden)&#125;\(rescheduleReason)&#125; </details> | Responses of the booking. |
+| startTime | STRING | Start time of the booking. |
+| endTime | STRING | End time of the booking. |
+| organizer | OBJECT <details> <summary> Properties </summary> &#123;&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\(personRecord)&#125; </details> | Organizer of the booking. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\($personRecord)] </details> | Attendees of the booking. |
+| uid | STRING | UID of the booking. |
+| bookingId | INTEGER | ID of the booking. |
+| location | STRING | Location of the booking. |
+| destinationCalendar | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(integration), STRING\(externalId), STRING\(primaryEmail), INTEGER\(userId), INTEGER\(eventTypeId), INTEGER\(credentialId), INTEGER\(delegationCredentialId), INTEGER\(domainWideDelegationCredentialId)&#125;\($calendar)] </details> | Destination calendar of the booking. |
+| cancellationReason | STRING | Cancellation reason of the booking cancellation. |
+| seatsPerTimeSlot | INTEGER | How many seats are available in the booking timeslot. |
+| seatsShowAttendees | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show attendees. |
+| iCalUID | STRING | UID of the iCal. |
+| iCalSequence | INTEGER | Sequence of the iCal. |
+| hideOrganizerEmail | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the organizer email is hidden. |
+| customReplyToEmail | STRING | Custom reply to the email. |
+| eventTitle | STRING | Event title of the booking. |
+| eventDescription | STRING | Event description of the booking. |
+| requiresConfirmation | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether booking requires confirmation. |
+| price | INTEGER | Price of the booking. |
+| currency | STRING | Currency of the price of the booking. |
+| status | STRING | Status of the booking |
+| cancelledBy | STRING | User that cancelled the booking. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Booking Canceled",
+  "name" : "bookingCanceled",
+  "type" : "calcom/v1/bookingCanceled"
+}
+```
+
+
+### Booking Created
+Name: bookingCreated
+
+`Triggers when a booking is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| bookerUrl | STRING | Booker URL. |
+| title | STRING | Title of the booking. |
+| startTime | STRING | Start time of the booking. |
+| endTime | STRING | End time of the booking. |
+| additionalNotes | STRING | Additional notes of the booking. |
+| type | STRING | Type of the booking. |
+| description | STRING | Description of the booking. |
+| eventTypeId | INTEGER | ID of the event type of the booking. |
+| hideCalendarNotes | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the calendar notes are hidden. |
+| hideCalendarEventDetails | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the calendar event details are hidden. |
+| hideOrganizerEmail | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the organizer email is hidden. |
+| schedulingType | STRING | Scheduling type of the booking |
+| seatsPerTimeSlot | INTEGER | How many seats are available in the booking timeslot. |
+| seatsShowAttendees | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show attendees. |
+| seatsShowAvailabilityCount | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show availability count. |
+| customReplyToEmail | STRING | Custom reply to the email. |
+| organizer | OBJECT <details> <summary> Properties </summary> &#123;&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\(personRecord)&#125; </details> | Organizer of the booking. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\($personRecord)] </details> | Attendees of the booking. |
+| customInputs | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom inputs of the booking. |
+| responses | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(name), &#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(email), &#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(location), &#123;STRING\(label), BOOLEAN\(isHidden)&#125;\(title), &#123;STRING\(label), BOOLEAN\(isHidden)&#125;\(notes), &#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(guests), &#123;STRING\(label), BOOLEAN\(isHidden)&#125;\(rescheduleReason)&#125; </details> | Responses of the booking. |
+| userFieldsResponses | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | User field responses of the booking. |
+| location | STRING | Location of the booking. |
+| destinationCalendar | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(integration), STRING\(externalId), STRING\(primaryEmail), INTEGER\(userId), INTEGER\(eventTypeId), INTEGER\(credentialId), INTEGER\(delegationCredentialId), INTEGER\(domainWideDelegationCredentialId)&#125;\($calendar)] </details> | Destination calendar of the booking. |
+| iCalUID | STRING | UID of the iCal. |
+| iCalSequence | INTEGER | Sequence of the iCal. |
+| requiresConfirmation | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether booking requires confirmation. |
+| oneTimePassword | STRING | One time password of the booking. |
+| uid | STRING | UID of the booking. |
+| conferenceData | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(requestId)&#125;\(createRequest)&#125; </details> | Conference data of the booking. |
+| appsStatus | ARRAY <details> <summary> Items </summary> [&#123;STRING\(appName), STRING\(type), INTEGER\(success), INTEGER\(failures), [STRING\($error)]\(errors), [STRING\($warning)]\(warnings)&#125;\($app)] </details> | Application status of the booking. |
+| eventTitle | STRING | Event title of the booking. |
+| eventDescription | STRING | Event description of the booking. |
+| price | INTEGER | Price of the booking. |
+| currency | STRING | Currency of the price of the booking. |
+| length | INTEGER | Length of the booking. |
+| bookingId | INTEGER | ID of the booking. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Metadata of the booking. |
+| status | STRING | Status of the booking |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Booking Created",
+  "name" : "bookingCreated",
+  "type" : "calcom/v1/bookingCreated"
+}
+```
+
+
+### Booking Ended
+Name: bookingEnded
+
+`Triggers when a booking ends.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | Type of the meeting that ended. |
+| title | STRING | Title of the meeting that ended. |
+| startTime | STRING | Start time of the booking. |
+| endTime | STRING | End time of the booking. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\($personRecord)] </details> | Attendees of the booking. |
+| organizer | OBJECT <details> <summary> Properties </summary> &#123;&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\(personRecord)&#125; </details> | Organizer of the booking. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Booking Ended",
+  "name" : "bookingEnded",
+  "type" : "calcom/v1/bookingEnded"
+}
+```
+
+
+### Booking Rescheduled
+Name: bookingRescheduled
+
+`Triggers when a booking is rescheduled.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| bookerUrl | STRING | Booker URL. |
+| title | STRING | Title of the booking. |
+| startTime | STRING | Start time of the booking. |
+| endTime | STRING | End time of the booking. |
+| additionalNotes | STRING | Additional notes of the booking. |
+| type | STRING | Type of the booking. |
+| description | STRING | Description of the booking. |
+| eventTypeId | INTEGER | ID of the event type of the booking. |
+| hideCalendarNotes | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the calendar notes are hidden. |
+| hideCalendarEventDetails | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the calendar event details are hidden. |
+| hideOrganizerEmail | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the organizer email is hidden. |
+| schedulingType | STRING | Scheduling type of the booking |
+| seatsPerTimeSlot | INTEGER | How many seats are available in the booking timeslot. |
+| seatsShowAttendees | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show attendees. |
+| seatsShowAvailabilityCount | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show availability count. |
+| customReplyToEmail | STRING | Custom reply to the email. |
+| organizer | OBJECT <details> <summary> Properties </summary> &#123;&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\(personRecord)&#125; </details> | Organizer of the booking. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\($personRecord)] </details> | Attendees of the booking. |
+| customInputs | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom inputs of the booking. |
+| responses | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(name), &#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(email), &#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(location), &#123;STRING\(label), BOOLEAN\(isHidden)&#125;\(title), &#123;STRING\(label), BOOLEAN\(isHidden)&#125;\(notes), &#123;&#123;STRING\(label), STRING\(value), BOOLEAN\(isHidden)&#125;\(responseValue)&#125;\(guests), &#123;STRING\(label), BOOLEAN\(isHidden)&#125;\(rescheduleReason)&#125; </details> | Responses of the booking. |
+| userFieldsResponses | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | User field responses of the booking. |
+| location | STRING | Location of the booking. |
+| destinationCalendar | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(integration), STRING\(externalId), STRING\(primaryEmail), INTEGER\(userId), INTEGER\(eventTypeId), INTEGER\(credentialId), INTEGER\(delegationCredentialId), INTEGER\(domainWideDelegationCredentialId)&#125;\($calendar)] </details> | Destination calendar of the booking. |
+| iCalUID | STRING | UID of the iCal. |
+| iCalSequence | INTEGER | Sequence of the iCal. |
+| requiresConfirmation | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether booking requires confirmation. |
+| oneTimePassword | STRING | One time password of the booking. |
+| uid | STRING | UID of the booking. |
+| videoCallData | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), INTEGER\(id), STRING\(password), STRING\(uri)&#125; </details> | Video call data of the booking. |
+| rescheduledBy | STRING | Booking rescheduled by user. |
+| conferenceData | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(requestId)&#125;\(createRequest)&#125; </details> | Conference data of the booking. |
+| appsStatus | ARRAY <details> <summary> Items </summary> [&#123;STRING\(appName), STRING\(type), INTEGER\(success), INTEGER\(failures), [STRING\($error)]\(errors), [STRING\($warning)]\(warnings)&#125;\($app)] </details> | Application status of the booking. |
+| eventTitle | STRING | Event title of the booking. |
+| eventDescription | STRING | Event description of the booking. |
+| price | INTEGER | Price of the booking. |
+| currency | STRING | Currency of the price of the booking. |
+| length | INTEGER | Length of the booking. |
+| bookingId | INTEGER | ID of the booking. |
+| rescheduleId | INTEGER | ID of the rescheduled booking. |
+| rescheduleUid | STRING | UID of the rescheduled booking. |
+| rescheduleStartTime | STRING | Rescheduled start time of the booking. |
+| rescheduleEndTime | STRING | Rescheduled end time of the booking. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Metadata of the booking. |
+| status | STRING | Status of the booking |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Booking Rescheduled",
+  "name" : "bookingRescheduled",
+  "type" : "calcom/v1/bookingRescheduled"
+}
+```
+
+
+<hr />
+
+<hr />
+
+# Additional instructions
+<hr />
+
