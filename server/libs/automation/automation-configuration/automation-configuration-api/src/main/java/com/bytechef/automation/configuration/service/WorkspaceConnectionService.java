@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-@NonNullApi
-@NonNullFields
-package com.bytechef.automation.connection;
+package com.bytechef.automation.configuration.service;
 
-import org.springframework.lang.NonNullApi;
-import org.springframework.lang.NonNullFields;
+import com.bytechef.automation.configuration.domain.WorkspaceConnection;
+import java.util.List;
+
+/**
+ * @author Ivica Cardic
+ */
+public interface WorkspaceConnectionService {
+
+    WorkspaceConnection create(long connectionId, long workspaceId);
+
+    void delete(long id);
+
+    List<WorkspaceConnection> getWorkspaceConnections(long workspaceId);
+
+    void deleteWorkspaceConnection(long connectionId);
+}

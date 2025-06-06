@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.connection.facade;
+package com.bytechef.automation.configuration.facade;
 
-import com.bytechef.automation.connection.domain.WorkspaceConnection;
-import com.bytechef.automation.connection.service.WorkspaceConnectionService;
+import com.bytechef.automation.configuration.domain.WorkspaceConnection;
+import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;

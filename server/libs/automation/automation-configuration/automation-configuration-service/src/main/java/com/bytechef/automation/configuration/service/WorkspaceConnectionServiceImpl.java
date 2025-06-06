@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.connection.service;
+package com.bytechef.automation.configuration.service;
 
-import com.bytechef.automation.connection.domain.WorkspaceConnection;
-import com.bytechef.automation.connection.repository.WorkspaceConnectionRepository;
+import com.bytechef.automation.configuration.domain.WorkspaceConnection;
+import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

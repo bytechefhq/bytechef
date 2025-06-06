@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.connection.domain;
+package com.bytechef.automation.configuration.domain;
 
 import java.time.Instant;
 import java.util.Objects;

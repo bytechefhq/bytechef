@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.connection.facade;
+package com.bytechef.automation.configuration.repository;
 
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
-import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkspaceConnectionFacade {
+@Repository
+public interface WorkspaceConnectionRepository extends ListCrudRepository<WorkspaceConnection, Long> {
 
-    long create(long workspaceId, ConnectionDTO connectionDTO);
+    List<WorkspaceConnection> findAllByWorkspaceId(long workspaceId);
 
-    void delete(long connectionId);
-
-    List<ConnectionDTO> getConnections(
-        long workspaceId, String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment,
-        Long tagId);
+    Optional<WorkspaceConnection> findByConnectionId(long connectionId);
 }
