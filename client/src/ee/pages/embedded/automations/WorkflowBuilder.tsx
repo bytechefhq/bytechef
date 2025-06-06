@@ -21,6 +21,7 @@ const WorkflowBuilder = () => {
     const {workflow} = useWorkflowDataStore();
 
     const {
+        connectedUserProjectWorkflow,
         bottomResizablePanelRef,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
@@ -44,6 +45,7 @@ const WorkflowBuilder = () => {
                     projectId={projectId}
                     runDisabled={runDisabled}
                     updateWorkflowMutation={updateWorkflowMutation}
+                    workflowVersion={connectedUserProjectWorkflow?.workflowVersion}
                 />
             )}
 

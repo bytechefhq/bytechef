@@ -13,6 +13,8 @@ import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {EditIcon} from 'lucide-react';
 import {RefObject} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
+import {Badge} from "@/components/ui/badge";
+import {ProjectStatus} from "@/shared/middleware/automation/configuration";
 
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
@@ -20,6 +22,7 @@ interface ProjectHeaderProps {
     projectId: number;
     runDisabled: boolean;
     updateWorkflowMutation: UpdateWorkflowMutationType;
+    workflowVersion?: number;
 }
 
 const WorkflowBuilderHeader = ({
@@ -28,6 +31,7 @@ const WorkflowBuilderHeader = ({
     projectId,
     runDisabled,
     updateWorkflowMutation,
+    workflowVersion
 }: ProjectHeaderProps) => {
     const {setShowEditWorkflowDialog, showEditWorkflowDialog, workflowIsRunning} = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
@@ -53,7 +57,16 @@ const WorkflowBuilderHeader = ({
 
     return (
         <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
-            <div className="flex items-center">{workflow.label}</div>
+            <div className="flex gap-2 items-cente">
+                <div>{workflow.label}</div>
+                <div></div>
+                <Badge
+                    className="flex space-x-1 bg-white"
+                    variant="outline"
+                >
+                    <span>{`V${(workflowVersion??0) + 1} DRAFT`}</span>
+                </Badge>
+            </div>
 
             <div className="flex items-center space-x-2">
                 <LoaderNotification isFetching={isFetching} isOnline={isOnline} />

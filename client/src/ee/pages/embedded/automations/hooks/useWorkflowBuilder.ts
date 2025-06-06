@@ -164,6 +164,7 @@ export const useWorkflowBuilder = () => {
 
     return {
         bottomResizablePanelRef,
+        connectedUserProjectWorkflow,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
         include: include,
