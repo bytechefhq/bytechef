@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@Order(3)
 public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TaskDispatcherPreSendProcessor {
 

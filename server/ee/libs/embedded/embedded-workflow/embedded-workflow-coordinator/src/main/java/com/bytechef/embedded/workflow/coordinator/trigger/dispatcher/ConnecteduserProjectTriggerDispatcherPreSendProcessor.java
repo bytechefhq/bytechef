@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.workflow.coordinator.trigger.dispatcher;
+package com.bytechef.embedded.workflow.coordinator.trigger.dispatcher;
 
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
+import com.bytechef.embedded.workflow.coordinator.AbstractConnectedUserProjectDispatcherPreSendProcessor;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
@@ -34,13 +34,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(2)
-public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
-    implements TriggerDispatcherPreSendProcessor {
+public class ConnecteduserProjectTriggerDispatcherPreSendProcessor
+    extends AbstractConnectedUserProjectDispatcherPreSendProcessor implements TriggerDispatcherPreSendProcessor {
 
     private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectTriggerDispatcherPreSendProcessor(
+    public ConnecteduserProjectTriggerDispatcherPreSendProcessor(
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService) {
 

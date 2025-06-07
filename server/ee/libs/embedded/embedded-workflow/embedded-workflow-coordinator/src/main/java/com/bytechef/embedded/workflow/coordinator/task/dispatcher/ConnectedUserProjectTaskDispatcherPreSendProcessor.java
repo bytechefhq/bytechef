@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.workflow.coordinator.task.dispatcher;
+package com.bytechef.embedded.workflow.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.execution.domain.Job;
@@ -22,8 +22,9 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.embedded.workflow.coordinator.AbstractConnectedUserProjectDispatcherPreSendProcessor;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -37,22 +38,26 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@Order(2)
-public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
-    implements TaskDispatcherPreSendProcessor {
+@Order(1)
+public class ConnectedUserProjectTaskDispatcherPreSendProcessor
+    extends AbstractConnectedUserProjectDispatcherPreSendProcessor implements TaskDispatcherPreSendProcessor {
 
+    private final ConnectedUserProjectService connectedUserProjectService;
     private final JobService jobService;
     private final PrincipalJobService principalJobService;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectTaskDispatcherPreSendProcessor(
-        JobService jobService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        PrincipalJobService principalJobService) {
+    public ConnectedUserProjectTaskDispatcherPreSendProcessor(
+        ConnectedUserProjectService connectedUserProjectService, JobService jobService,
+        PrincipalJobService principalJobService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
         super(projectDeploymentWorkflowService);
 
         this.jobService = jobService;
+        this.connectedUserProjectService = connectedUserProjectService;
         this.principalJobService = principalJobService;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
 
     @Override
@@ -91,6 +96,10 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
             principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION),
             null);
 
-        return projectDeploymentId != null;
+        if (projectDeploymentId == null) {
+            return false;
+        }
+
+        return connectedUserProjectService.containsProjectDeployment(projectDeploymentId);
     }
 }
