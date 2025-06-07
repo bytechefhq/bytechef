@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.lang.Nullable;
 
 /**
@@ -129,6 +130,17 @@ public class ComponentDefinition {
 
     public List<ClusterElementDefinition> getClusterElements() {
         return clusterElements;
+    }
+
+    public Map<String, Integer> getClusterElementsCount() {
+        return clusterElements.stream()
+            .collect(Collectors.groupingBy(
+                element -> {
+                    ClusterElementType type = element.getType();
+
+                    return type.name();
+                },
+                Collectors.collectingAndThen(Collectors.counting(), Long::intValue)));
     }
 
     public List<ComponentCategory> getComponentCategories() {
