@@ -21,6 +21,8 @@ public class IntegrationInstanceConfigurationErrorType extends AbstractErrorType
         new IntegrationInstanceConfigurationErrorType(100);
     public static final IntegrationInstanceConfigurationErrorType REQUIRED_WORKFLOW_CONNECTIONS =
         new IntegrationInstanceConfigurationErrorType(101);
+    public static final IntegrationInstanceConfigurationErrorType INTEGRATION_INSTANCE_CONFIGURATION_NOT_FOUND =
+        new IntegrationInstanceConfigurationErrorType(102);
 
     private IntegrationInstanceConfigurationErrorType(int errorKey) {
         super(IntegrationInstanceConfiguration.class, errorKey);

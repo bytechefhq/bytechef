@@ -27,6 +27,7 @@ import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
+import com.bytechef.ee.embedded.configuration.exception.IntegrationWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -294,7 +295,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 return Objects.equals(integrationDTO.id(), integrationId);
             })
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Integration instance configuration not found"));
+            .orElseThrow(() -> new ConfigurationException(
+                "Integration instance configuration not found",
+                IntegrationInstanceConfigurationErrorType.INTEGRATION_INSTANCE_CONFIGURATION_NOT_FOUND));
     }
 
     @Override
@@ -481,9 +484,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                         integrationInstanceConfigurationWorkflow.getWorkflowId()))
                     .findFirst()
                     .map(IntegrationWorkflow::getWorkflowReferenceCode)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                        "Project workflow with workflowId=%s not found".formatted(
-                            integrationInstanceConfigurationWorkflow.getWorkflowId())));
+                    .orElseThrow(() -> new ConfigurationException(
+                        "Integration workflow with workflowId=%s not found".formatted(
+                            integrationInstanceConfigurationWorkflow.getWorkflowId()),
+                        IntegrationWorkflowErrorType.INTEGRATION_WORKFLOW_NOT_FOUND));
 
                 String oldWorkflowId = allIntegrationWorkflows.stream()
                     .filter(curIntegrationWorkflow -> Objects.equals(
@@ -566,9 +570,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     oldIntegrationInstanceConfigurationWorkflow.getWorkflowId()))
                 .findFirst()
                 .map(IntegrationWorkflow::getWorkflowReferenceCode)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ConfigurationException(
                     "Integration workflow with workflowId=%s not found".formatted(
-                        oldIntegrationInstanceConfigurationWorkflow.getWorkflowId())));
+                        oldIntegrationInstanceConfigurationWorkflow.getWorkflowId()),
+                    IntegrationWorkflowErrorType.INTEGRATION_WORKFLOW_NOT_FOUND));
 
             String workflowId = allIntegrationWorkflows.stream()
                 .filter(curIntegrationWorkflow -> Objects.equals(
