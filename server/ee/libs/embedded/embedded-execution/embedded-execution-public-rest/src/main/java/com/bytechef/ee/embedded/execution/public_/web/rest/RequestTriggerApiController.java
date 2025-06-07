@@ -82,9 +82,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     }
 
     @Override
-    public ResponseEntity<Object> executeWorkflow(
-        String workflowReferenceCode, EnvironmentModel xEnvironment) {
-
+    public ResponseEntity<Object> executeWorkflow(String workflowReferenceCode, EnvironmentModel xEnvironment) {
         Environment environment = xEnvironment == null
             ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
 

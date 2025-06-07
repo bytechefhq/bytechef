@@ -77,14 +77,14 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public abstract class AbstractWebhookTriggerController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
+
     private final FilesFileStorage filesFileStorage;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private String publicUrld;
     private final TriggerDefinitionService triggerDefinitionService;
     private WebhookWorkflowExecutor webhookWorkflowExecutor;
     private final WorkflowService workflowService;
-
-    private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
     protected AbstractWebhookTriggerController(
         FilesFileStorage filesFileStorage, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
@@ -121,8 +121,8 @@ public abstract class AbstractWebhookTriggerController {
             webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
         }
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(
                 "doProcessTrigger: id={}, webhookRequest={}, webhookTriggerFlags={}", workflowExecutionId,
                 webhookRequest, webhookTriggerFlags);
         }
