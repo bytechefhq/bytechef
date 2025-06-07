@@ -6,14 +6,28 @@ import {
     GetConnectionsRequest,
     Tag,
 } from '@/ee/shared/middleware/embedded/connection';
+import {RequestI} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
     connection: (id: number) => [...ConnectionKeys.connections, id],
     connectionTags: ['embedded_connectionTags'],
     connections: ['embedded_connections'],
-    filteredConnections: (filters: GetConnectionsRequest) => [...ConnectionKeys.connections, filters],
+    filteredConnections: (filters: RequestI) => [...ConnectionKeys.connections, filters],
 };
+
+export const getConnectedUserConnectionsQuery =
+    (connectedUserId: number, connectionIds?: Array<number>) => (request: RequestI, enabled?: boolean) =>
+        useQuery<Connection[], Error>({
+            queryKey: ConnectionKeys.filteredConnections(request),
+            queryFn: () =>
+                new ConnectionApi().getConnectedUserConnections({
+                    componentName: request.componentName!,
+                    connectedUserId,
+                    connectionIds,
+                }),
+            enabled: enabled === undefined ? true : enabled,
+        });
 
 export const useGetConnectionsQuery = (filters: GetConnectionsRequest, enabled?: boolean) =>
     useQuery<Connection[], Error>({

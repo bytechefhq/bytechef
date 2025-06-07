@@ -2,7 +2,8 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ConnectionsFilterTitle from '@/ee/pages/embedded/connections/components/ConnectionsFilterTitle';
-import {Connection, ConnectionEnvironment} from '@/ee/shared/middleware/embedded/connection';
+import {Environment} from '@/ee/shared/middleware/embedded/configuration';
+import {Connection} from '@/ee/shared/middleware/embedded/connection';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -59,10 +60,10 @@ export const Connections = () => {
             environment === undefined
                 ? undefined
                 : environment === 1
-                  ? ConnectionEnvironment.Development
+                  ? Environment.Development
                   : environment === 2
-                    ? ConnectionEnvironment.Staging
-                    : ConnectionEnvironment.Production,
+                    ? Environment.Staging
+                    : Environment.Production,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
@@ -84,10 +85,10 @@ export const Connections = () => {
                                             environment === undefined
                                                 ? undefined
                                                 : environment === 1
-                                                  ? ConnectionEnvironment.Development
+                                                  ? Environment.Development
                                                   : environment === 2
-                                                    ? ConnectionEnvironment.Staging
-                                                    : ConnectionEnvironment.Production,
+                                                    ? Environment.Staging
+                                                    : Environment.Production,
                                     } as Connection
                                 }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
@@ -205,10 +206,10 @@ export const Connections = () => {
                                     {
                                         environment:
                                             environment === 1
-                                                ? ConnectionEnvironment.Development
+                                                ? Environment.Development
                                                 : environment === 2
-                                                  ? ConnectionEnvironment.Staging
-                                                  : ConnectionEnvironment.Production,
+                                                  ? Environment.Staging
+                                                  : Environment.Production,
                                     } as Connection
                                 }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}

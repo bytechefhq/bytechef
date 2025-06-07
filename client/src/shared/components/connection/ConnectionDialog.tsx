@@ -23,7 +23,7 @@ import ConnectionParameters from '@/shared/components/connection/ConnectionParam
 import {TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {ConnectionI} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {Authorization, ComponentDefinition, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {ConnectionEnvironment, Tag} from '@/shared/middleware/platform/connection';
+import {Environment, Tag} from '@/shared/middleware/platform/connection';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
@@ -49,8 +49,9 @@ import OAuth2Button from './OAuth2Button';
 
 export interface ConnectionDialogFormProps {
     authorizationName: string;
-    environment: ConnectionEnvironment;
+    environment: Environment;
     componentName: string;
+    id?: number;
     name: string;
     parameters: {[key: string]: object};
     tags: Array<Tag | {label: string; value: string}>;
@@ -98,11 +99,15 @@ const ConnectionDialog = ({
 
     const {toast} = useToast();
 
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const [_, copyToClipboard] = useCopyToClipboard();
+
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
             authorizationName: '',
             componentName: componentDefinition?.name,
-            environment: connection?.environment || ConnectionEnvironment.Development,
+            environment: connection?.environment || Environment.Development,
+            id: connection?.id,
             name: connection?.name || componentDefinition?.title || '',
             tags:
                 connection?.tags?.map((tag) => ({
@@ -423,18 +428,31 @@ const ConnectionDialog = ({
                                     control={control}
                                     name="id"
                                     render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>ID</FormLabel>
+                                        <FormControl>
+                                            <div className="flex">
+                                                <div className="relative flex grow items-stretch focus-within:z-10">
+                                                    <Input
+                                                        {...field}
+                                                        className="rounded-r-none bg-gray-50 text-gray-700"
+                                                        readOnly
+                                                        value={connection?.id}
+                                                    />
+                                                </div>
 
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    className="bg-gray-50 text-gray-700"
-                                                    readOnly
-                                                    value={connection.id.toString()}
-                                                />
-                                            </FormControl>
-                                        </FormItem>
+                                                <Button
+                                                    className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-sm hover:bg-gray-100"
+                                                    onClick={() => copyToClipboard(connection?.id?.toString() ?? '')}
+                                                    size="icon"
+                                                    type="button"
+                                                    variant="ghost"
+                                                >
+                                                    <ClipboardIcon
+                                                        aria-hidden="true"
+                                                        className="size-4 text-gray-400"
+                                                    />
+                                                </Button>
+                                            </div>
+                                        </FormControl>
                                     )}
                                 />
                             )}

@@ -9,11 +9,11 @@ import {WorkflowNodeParameterMutationProvider} from '@/pages/platform/workflow-e
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {ConnectionReactQueryProvider} from '@/shared/components/connection/providers/connectionReactQueryProvider';
-import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
+import {getCreateConnectedUserProjectWorkflowConnection} from '@/shared/mutations/embedded/connections.mutations';
 import {
     ConnectionKeys,
+    getConnectedUserConnectionsQuery,
     useGetConnectionTagsQuery,
-    useGetConnectionsQuery,
 } from '@/shared/queries/embedded/connections.queries';
 
 const WorkflowBuilder = () => {
@@ -21,8 +21,8 @@ const WorkflowBuilder = () => {
     const {workflow} = useWorkflowDataStore();
 
     const {
-        connectedUserProjectWorkflow,
         bottomResizablePanelRef,
+        connectedUserProjectWorkflow,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
         include,
@@ -30,24 +30,28 @@ const WorkflowBuilder = () => {
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
+        vendorConnectionIds,
+        workflowReferenceCode,
     } = useWorkflowBuilder();
+
     const {runDisabled} = useRun();
+
+    if (!connectedUserProjectWorkflow || !projectId) {
+        return <></>;
+    }
 
     return (
         <div className="flex size-full flex-col">
-            {projectId && (
-                <WorkflowBuilderHeader
-                    bottomResizablePanelRef={bottomResizablePanelRef}
-                    chatTrigger={
-                        workflow.triggers &&
-                        workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
-                    }
-                    projectId={projectId}
-                    runDisabled={runDisabled}
-                    updateWorkflowMutation={updateWorkflowMutation}
-                    workflowVersion={connectedUserProjectWorkflow?.workflowVersion}
-                />
-            )}
+            <WorkflowBuilderHeader
+                bottomResizablePanelRef={bottomResizablePanelRef}
+                chatTrigger={
+                    workflow.triggers && workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
+                }
+                projectId={projectId}
+                runDisabled={runDisabled}
+                updateWorkflowMutation={updateWorkflowMutation}
+                workflowVersion={connectedUserProjectWorkflow?.workflowVersion}
+            />
 
             <div className="flex flex-1">
                 <ResizablePanelGroup className="flex-1 bg-surface-main" direction="vertical">
@@ -55,9 +59,15 @@ const WorkflowBuilder = () => {
                         <ConnectionReactQueryProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,
-                                useCreateConnectionMutation: useCreateConnectionMutation,
+                                useCreateConnectionMutation: getCreateConnectedUserProjectWorkflowConnection(
+                                    connectedUserProjectWorkflow.connectedUserId!,
+                                    workflowReferenceCode!
+                                ),
                                 useGetConnectionTagsQuery: useGetConnectionTagsQuery,
-                                useGetConnectionsQuery,
+                                useGetConnectionsQuery: getConnectedUserConnectionsQuery(
+                                    connectedUserProjectWorkflow.connectedUserId!,
+                                    vendorConnectionIds ? vendorConnectionIds : []
+                                ),
                             }}
                         >
                             <WorkflowMutationProvider

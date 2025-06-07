@@ -2,7 +2,7 @@ import {Tag} from '@/shared/middleware/platform/connection';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {createContext, useContext} from 'react';
 
-import type {ConnectionEnvironment, CredentialStatus} from '@/shared/middleware/automation/connection';
+import type {CredentialStatus, Environment} from '@/shared/middleware/automation/connection';
 
 export interface ConnectionI {
     readonly active?: boolean;
@@ -16,7 +16,7 @@ export interface ConnectionI {
     readonly createdBy?: string;
     readonly createdDate?: Date;
     credentialStatus?: CredentialStatus;
-    environment?: ConnectionEnvironment;
+    environment?: Environment;
     readonly id?: number;
     readonly lastModifiedBy?: string;
     readonly lastModifiedDate?: Date;

@@ -23,6 +23,8 @@ import {useParams} from 'react-router-dom';
 
 export const useWorkflowBuilder = () => {
     const [include, setInclude] = useState<string[] | undefined>(undefined);
+    const [vendorConnectionIds, setVendorConnectionIds] = useState<number[] | undefined>(undefined);
+
     const {setParentId, setParentType, setWorkflow, workflow} = useWorkflowDataStore();
     const {setShowConnectionNote} = useConnectionNoteStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
@@ -114,6 +116,7 @@ export const useWorkflowBuilder = () => {
 
                 setConnectionDialogAllowed(connectionDialogAllowed);
                 setInclude(include);
+                setVendorConnectionIds(event.data.params.vendorConnectionIds);
 
                 if (jwtToken) {
                     sessionStorage.setItem('jwtToken', jwtToken);
@@ -172,5 +175,7 @@ export const useWorkflowBuilder = () => {
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
+        vendorConnectionIds,
+        workflowReferenceCode,
     };
 };
