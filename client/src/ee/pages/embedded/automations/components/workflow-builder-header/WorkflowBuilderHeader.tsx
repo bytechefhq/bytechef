@@ -55,7 +55,7 @@ const WorkflowBuilderHeader = ({
     // }
 
     return (
-        <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
+        <header className="flex items-center justify-between bg-transparent px-3 py-2.5">
             <div className="flex items-center gap-2">
                 <div>{workflow.label}</div>
 

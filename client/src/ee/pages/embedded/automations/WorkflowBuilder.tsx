@@ -54,7 +54,7 @@ const WorkflowBuilder = () => {
             />
 
             <div className="flex flex-1">
-                <ResizablePanelGroup className="flex-1 bg-surface-main" direction="vertical">
+                <ResizablePanelGroup className="flex-1 bg-transparent" direction="vertical">
                     <ResizablePanel className="relative flex" defaultSize={65}>
                         <ConnectionReactQueryProvider
                             value={{
