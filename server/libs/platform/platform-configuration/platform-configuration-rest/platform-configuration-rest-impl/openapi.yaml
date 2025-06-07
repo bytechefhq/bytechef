@@ -1673,6 +1673,11 @@ components:
         clusterElement:
           description: "Is the component cluster element."
           type: "boolean"
+        clusterElements:
+          description: "The list of all available cluster elements the component can perform."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ClusterElementDefinitionBasic"
         clusterElementTypes:
           description: "The list of cluster element types."
           type: "array"
@@ -1730,8 +1735,13 @@ components:
       - "version"
       properties:
         actionsCount:
-          default: "The number of actions a component has"
+          description: "The number of actions a component has"
           type: "integer"
+        clusterElementsCount:
+          description: "The number of cluster elements a component has"
+          type: "object"
+          additionalProperties:
+            type: "integer"
         componentCategories:
           description: "The list of categories the component belongs to."
           type: "array"
@@ -1750,7 +1760,7 @@ components:
           description: "The title"
           type: "string"
         triggersCount:
-          default: "The number of triggers a component has"
+          description: "The number of triggers a component has"
           type: "integer"
         version:
           description: "The version of a component."
