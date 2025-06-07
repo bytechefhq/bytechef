@@ -30,15 +30,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @ConditionalOnCoordinator
 public class CallbackController {
 
-    private final String publicUrl;
+    private final String redirectUri;
 
     public CallbackController(ApplicationProperties applicationProperties) {
-        this.publicUrl = applicationProperties.getPublicUrl();
+        this.redirectUri = "redirect:%s/oauth.html".formatted(
+            applicationProperties.getOauth2()
+                .getRedirectUri()
+                .replace("/callback", ""));
     }
 
     @GetMapping("/callback")
     public String handleCallback(HttpServletRequest request) {
-        StringBuilder sb = new StringBuilder("redirect:%s/oauth.html".formatted(publicUrl));
+        StringBuilder sb = new StringBuilder(redirectUri);
 
         Map<String, String[]> parameterMap = request.getParameterMap();
 
