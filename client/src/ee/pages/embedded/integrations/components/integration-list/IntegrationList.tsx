@@ -13,7 +13,6 @@ const IntegrationList = ({integrations, tags}: {integrations: Integration[]; tag
                 return (
                     <Collapsible
                         className="group"
-                        defaultOpen={!integration.integrationWorkflowIds?.length}
                         key={integration.id}
                     >
                         <IntegrationListItem
