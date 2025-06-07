@@ -3,6 +3,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
+import com.bytechef.platform.configuration.web.rest.model.ClusterElementDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ClusterElementTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentCategoryModel;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionBasicModel;
@@ -35,7 +36,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-29T06:18:38.259834+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T09:27:47.541735+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ComponentDefinitionModel {
 
   @Valid
@@ -45,6 +46,9 @@ public class ComponentDefinitionModel {
   private List<@Valid ActionDefinitionBasicModel> actions = new ArrayList<>();
 
   private Boolean clusterElement;
+
+  @Valid
+  private List<@Valid ClusterElementDefinitionBasicModel> clusterElements = new ArrayList<>();
 
   @Valid
   private List<@Valid ClusterElementTypeModel> clusterElementTypes = new ArrayList<>();
@@ -167,6 +171,34 @@ public class ComponentDefinitionModel {
 
   public void setClusterElement(Boolean clusterElement) {
     this.clusterElement = clusterElement;
+  }
+
+  public ComponentDefinitionModel clusterElements(List<@Valid ClusterElementDefinitionBasicModel> clusterElements) {
+    this.clusterElements = clusterElements;
+    return this;
+  }
+
+  public ComponentDefinitionModel addClusterElementsItem(ClusterElementDefinitionBasicModel clusterElementsItem) {
+    if (this.clusterElements == null) {
+      this.clusterElements = new ArrayList<>();
+    }
+    this.clusterElements.add(clusterElementsItem);
+    return this;
+  }
+
+  /**
+   * The list of all available cluster elements the component can perform.
+   * @return clusterElements
+   */
+  @Valid 
+  @Schema(name = "clusterElements", description = "The list of all available cluster elements the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterElements")
+  public List<@Valid ClusterElementDefinitionBasicModel> getClusterElements() {
+    return clusterElements;
+  }
+
+  public void setClusterElements(List<@Valid ClusterElementDefinitionBasicModel> clusterElements) {
+    this.clusterElements = clusterElements;
   }
 
   public ComponentDefinitionModel clusterElementTypes(List<@Valid ClusterElementTypeModel> clusterElementTypes) {
@@ -493,6 +525,7 @@ public class ComponentDefinitionModel {
     return Objects.equals(this.actionClusterElementTypes, componentDefinition.actionClusterElementTypes) &&
         Objects.equals(this.actions, componentDefinition.actions) &&
         Objects.equals(this.clusterElement, componentDefinition.clusterElement) &&
+        Objects.equals(this.clusterElements, componentDefinition.clusterElements) &&
         Objects.equals(this.clusterElementTypes, componentDefinition.clusterElementTypes) &&
         Objects.equals(this.clusterRoot, componentDefinition.clusterRoot) &&
         Objects.equals(this.componentCategories, componentDefinition.componentCategories) &&
@@ -511,7 +544,7 @@ public class ComponentDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionClusterElementTypes, actions, clusterElement, clusterElementTypes, clusterRoot, componentCategories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
+    return Objects.hash(actionClusterElementTypes, actions, clusterElement, clusterElements, clusterElementTypes, clusterRoot, componentCategories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
   }
 
   @Override
@@ -521,6 +554,7 @@ public class ComponentDefinitionModel {
     sb.append("    actionClusterElementTypes: ").append(toIndentedString(actionClusterElementTypes)).append("\n");
     sb.append("    actions: ").append(toIndentedString(actions)).append("\n");
     sb.append("    clusterElement: ").append(toIndentedString(clusterElement)).append("\n");
+    sb.append("    clusterElements: ").append(toIndentedString(clusterElements)).append("\n");
     sb.append("    clusterElementTypes: ").append(toIndentedString(clusterElementTypes)).append("\n");
     sb.append("    clusterRoot: ").append(toIndentedString(clusterRoot)).append("\n");
     sb.append("    componentCategories: ").append(toIndentedString(componentCategories)).append("\n");

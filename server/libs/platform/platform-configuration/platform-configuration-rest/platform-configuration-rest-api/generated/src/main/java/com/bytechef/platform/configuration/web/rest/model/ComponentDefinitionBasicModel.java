@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -26,10 +28,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-29T06:18:38.259834+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T09:27:47.541735+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ComponentDefinitionBasicModel {
 
   private @Nullable Integer actionsCount;
+
+  @Valid
+  private Map<String, Integer> clusterElementsCount = new HashMap<>();
 
   @Valid
   private List<@Valid ComponentCategoryModel> componentCategories = new ArrayList<>();
@@ -64,11 +69,11 @@ public class ComponentDefinitionBasicModel {
   }
 
   /**
-   * Get actionsCount
+   * The number of actions a component has
    * @return actionsCount
    */
   
-  @Schema(name = "actionsCount", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "actionsCount", description = "The number of actions a component has", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actionsCount")
   public Integer getActionsCount() {
     return actionsCount;
@@ -76,6 +81,34 @@ public class ComponentDefinitionBasicModel {
 
   public void setActionsCount(Integer actionsCount) {
     this.actionsCount = actionsCount;
+  }
+
+  public ComponentDefinitionBasicModel clusterElementsCount(Map<String, Integer> clusterElementsCount) {
+    this.clusterElementsCount = clusterElementsCount;
+    return this;
+  }
+
+  public ComponentDefinitionBasicModel putClusterElementsCountItem(String key, Integer clusterElementsCountItem) {
+    if (this.clusterElementsCount == null) {
+      this.clusterElementsCount = new HashMap<>();
+    }
+    this.clusterElementsCount.put(key, clusterElementsCountItem);
+    return this;
+  }
+
+  /**
+   * The number of cluster elements a component has
+   * @return clusterElementsCount
+   */
+  
+  @Schema(name = "clusterElementsCount", description = "The number of cluster elements a component has", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterElementsCount")
+  public Map<String, Integer> getClusterElementsCount() {
+    return clusterElementsCount;
+  }
+
+  public void setClusterElementsCount(Map<String, Integer> clusterElementsCount) {
+    this.clusterElementsCount = clusterElementsCount;
   }
 
   public ComponentDefinitionBasicModel componentCategories(List<@Valid ComponentCategoryModel> componentCategories) {
@@ -236,6 +269,7 @@ public class ComponentDefinitionBasicModel {
     }
     ComponentDefinitionBasicModel componentDefinitionBasic = (ComponentDefinitionBasicModel) o;
     return Objects.equals(this.actionsCount, componentDefinitionBasic.actionsCount) &&
+        Objects.equals(this.clusterElementsCount, componentDefinitionBasic.clusterElementsCount) &&
         Objects.equals(this.componentCategories, componentDefinitionBasic.componentCategories) &&
         Objects.equals(this.description, componentDefinitionBasic.description) &&
         Objects.equals(this.icon, componentDefinitionBasic.icon) &&
@@ -247,7 +281,7 @@ public class ComponentDefinitionBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionsCount, componentCategories, description, icon, name, title, triggersCount, version);
+    return Objects.hash(actionsCount, clusterElementsCount, componentCategories, description, icon, name, title, triggersCount, version);
   }
 
   @Override
@@ -255,6 +289,7 @@ public class ComponentDefinitionBasicModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComponentDefinitionBasicModel {\n");
     sb.append("    actionsCount: ").append(toIndentedString(actionsCount)).append("\n");
+    sb.append("    clusterElementsCount: ").append(toIndentedString(clusterElementsCount)).append("\n");
     sb.append("    componentCategories: ").append(toIndentedString(componentCategories)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
