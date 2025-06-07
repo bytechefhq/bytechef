@@ -275,8 +275,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public List<ProjectWorkflowDTO> getProjectWorkflows() {
         return projectWorkflowService.getProjectWorkflows()
             .stream()
-            .map(projectWorkflow -> new ProjectWorkflowDTO(
-                workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
+            .map(projectWorkflow -> workflowFacade.fetchWorkflow(projectWorkflow.getWorkflowId())
+                .map(workflowDTO -> new ProjectWorkflowDTO(workflowDTO, projectWorkflow))
+                .orElse(null))
+            .filter(Objects::nonNull)
             .toList();
     }
 

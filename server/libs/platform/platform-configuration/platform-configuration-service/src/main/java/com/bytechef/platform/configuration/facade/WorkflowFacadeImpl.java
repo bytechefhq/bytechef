@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,6 +45,12 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     public WorkflowFacadeImpl(ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
         this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
+    }
+
+    @Override
+    public Optional<WorkflowDTO> fetchWorkflow(String id) {
+        return workflowService.fetchWorkflow(id)
+            .map(this::toWorkflowDTO);
     }
 
     @Override

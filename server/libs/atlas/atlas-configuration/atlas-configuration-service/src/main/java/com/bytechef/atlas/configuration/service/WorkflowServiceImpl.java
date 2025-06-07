@@ -115,7 +115,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(readOnly = true)
-    public Workflow getWorkflow(String id) {
+    public Optional<Workflow> fetchWorkflow(String id) {
         Assert.notNull(id, "'id' must not be null");
 
         Cache workflowCache = Validate.notNull(cacheManager.getCache(WORKFLOW_CACHE), WORKFLOW_CACHE);
@@ -123,7 +123,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         if (workflowCache.get(id) != null) {
             Cache.ValueWrapper valueWrapper = Validate.notNull(workflowCache.get(id), "valueWrapper");
 
-            return (Workflow) valueWrapper.get();
+            return Optional.ofNullable((Workflow) valueWrapper.get());
         }
 
         Cache workflowsCache = Validate.notNull(cacheManager.getCache(WORKFLOWS_CACHE), WORKFLOWS_CACHE);
@@ -136,7 +136,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
             for (Workflow workflow : Validate.notNull(workflows, "workflows")) {
                 if (Objects.equals(workflow.getId(), id)) {
-                    return workflow;
+                    return Optional.of(workflow);
                 }
             }
         }
@@ -152,15 +152,22 @@ public class WorkflowServiceImpl implements WorkflowService {
 
                     workflowCache.put(id, workflow);
 
-                    return workflow;
+                    return Optional.of(workflow);
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
         }
 
-        throw new ConfigurationException(
-            "Workflow with id: %s does not exist".formatted(id), WorkflowErrorType.WORKFLOW_NOT_FOUND);
+        return Optional.empty();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Workflow getWorkflow(String id) {
+        return fetchWorkflow(id)
+            .orElseThrow(() -> new ConfigurationException(
+                "Workflow with id: %s does not exist".formatted(id), WorkflowErrorType.WORKFLOW_NOT_FOUND));
     }
 
     @Override

@@ -17,11 +17,14 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 public interface WorkflowFacade {
+
+    Optional<WorkflowDTO> fetchWorkflow(String id);
 
     WorkflowDTO getWorkflow(String id);
 

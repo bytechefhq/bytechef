@@ -469,7 +469,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                     removeParameter(parameterName, indexes, subParameterMap);
                 } else if (subList.get(index) instanceof List<?> subList2) {
-                    if (subList2.get(indexes.getFirst()) instanceof Map<?, ?> subParameterMap) {
+                    if (indexes.getFirst() < subList2.size() &&
+                        subList2.get(indexes.getFirst()) instanceof Map<?, ?> subParameterMap) {
+
                         indexes.removeFirst();
 
                         removeParameter(parameterName, indexes, subParameterMap);

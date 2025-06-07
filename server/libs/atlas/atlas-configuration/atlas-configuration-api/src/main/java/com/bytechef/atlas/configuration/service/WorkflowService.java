@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -33,6 +34,8 @@ public interface WorkflowService {
     void delete(List<String> ids);
 
     Workflow duplicateWorkflow(String id);
+
+    Optional<Workflow> fetchWorkflow(String id);
 
     List<Workflow> getWorkflows();
 

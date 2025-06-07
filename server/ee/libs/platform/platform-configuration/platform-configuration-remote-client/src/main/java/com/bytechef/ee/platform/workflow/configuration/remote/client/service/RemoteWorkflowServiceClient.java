@@ -12,6 +12,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +54,11 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     @Override
     public Workflow duplicateWorkflow(String id) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Workflow> fetchWorkflow(String id) {
+        return Optional.empty();
     }
 
     @Override

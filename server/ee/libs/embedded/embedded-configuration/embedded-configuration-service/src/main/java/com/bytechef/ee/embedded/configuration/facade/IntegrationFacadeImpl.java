@@ -264,12 +264,13 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     public List<IntegrationWorkflowDTO> getIntegrationWorkflows() {
-        List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows();
-
-        return CollectionUtils.map(
-            integrationWorkflows,
-            integrationWorkflow -> new IntegrationWorkflowDTO(
-                workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
+        return integrationWorkflowService.getIntegrationWorkflows()
+            .stream()
+            .map(integrationWorkflows -> workflowFacade.fetchWorkflow(integrationWorkflows.getWorkflowId())
+                .map(workflowDTO -> new IntegrationWorkflowDTO(workflowDTO, integrationWorkflows))
+                .orElse(null))
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     @Override
