@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentWorkflowConnection", description = "The connection used in a particular action task or trigger.")
 @JsonTypeName("ProjectDeploymentWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:40:36.972441+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T15:56:30.311314+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ProjectDeploymentWorkflowConnectionModel {
 
   private Long connectionId;

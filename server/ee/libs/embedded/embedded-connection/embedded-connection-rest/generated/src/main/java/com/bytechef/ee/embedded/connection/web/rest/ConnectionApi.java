@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:39:38.782847+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T21:45:51.858220+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "connection", description = "The Embedded Connection Internal API")
 public interface ConnectionApi {
@@ -40,6 +40,43 @@ public interface ConnectionApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    /**
+     * POST /connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections : Create a new connection for the connected user&#39;s project workflow
+     * Create a new connection for the connected user&#39;s project workflow.
+     *
+     * @param connectedUserId The id of a connected user. (required)
+     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param connectionModel  (required)
+     * @return The connection id. (status code 200)
+     */
+    @Operation(
+        operationId = "createConnectedUserProjectWorkflowConnection",
+        summary = "Create a new connection for the connected user's project workflow",
+        description = "Create a new connection for the connected user's project workflow.",
+        tags = { "connection" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The connection id.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<Long> createConnectedUserProjectWorkflowConnection(
+        @Parameter(name = "connectedUserId", description = "The id of a connected user.", required = true, in = ParameterIn.PATH) @PathVariable("connectedUserId") Long connectedUserId,
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody ConnectionModel connectionModel
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     /**
      * POST /connections : Create a new connection
@@ -98,6 +135,51 @@ public interface ConnectionApi {
     default ResponseEntity<Void> deleteConnection(
         @Parameter(name = "id", description = "The id of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /connected-users/{connectedUserId}/components/{componentName}/connections : Get all connected user&#39;s connections
+     * Get all connected user&#39;s connections.
+     *
+     * @param connectedUserId The id of a connected user. (required)
+     * @param componentName The component name. (required)
+     * @param connectionIds The list of allowed connection ids. (optional)
+     * @return The list of connections. (status code 200)
+     */
+    @Operation(
+        operationId = "getConnectedUserConnections",
+        summary = "Get all connected user's connections",
+        description = "Get all connected user's connections.",
+        tags = { "connection" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of connections.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectionModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/connected-users/{connectedUserId}/components/{componentName}/connections",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<List<ConnectionModel>> getConnectedUserConnections(
+        @Parameter(name = "connectedUserId", description = "The id of a connected user.", required = true, in = ParameterIn.PATH) @PathVariable("connectedUserId") Long connectedUserId,
+        @Parameter(name = "componentName", description = "The component name.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "connectionIds", description = "The list of allowed connection ids.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionIds", required = false) List<Long> connectionIds
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0 }, { \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0 } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -174,7 +256,7 @@ public interface ConnectionApi {
     default ResponseEntity<List<ConnectionModel>> getConnections(
         @Parameter(name = "componentName", description = "The component name used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentName", required = false) String componentName,
         @Parameter(name = "connectionVersion", description = "The connection version.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionVersion", required = false) Integer connectionVersion,
-        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel environment,
+        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) com.bytechef.platform.connection.web.rest.model.EnvironmentModel environment,
         @Parameter(name = "tagId", description = "The tag id of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
     ) {
         getRequest().ifPresent(request -> {

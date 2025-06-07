@@ -2,7 +2,6 @@ package com.bytechef.automation.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.automation.connection.web.rest.model.ConnectionEnvironmentModel;
 import com.bytechef.automation.connection.web.rest.model.CredentialStatusModel;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "connection_base", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("connection_base")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-20T07:34:51.837508+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T16:00:49.596496+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ConnectionBaseModel {
 
   private @Nullable Boolean active;
@@ -57,7 +56,7 @@ public class ConnectionBaseModel {
 
   private @Nullable CredentialStatusModel credentialStatus;
 
-  private @Nullable ConnectionEnvironmentModel environment;
+  private @Nullable com.bytechef.platform.connection.web.rest.model.EnvironmentModel environment;
 
   private @Nullable Long id;
 
@@ -286,7 +285,7 @@ public class ConnectionBaseModel {
     this.credentialStatus = credentialStatus;
   }
 
-  public ConnectionBaseModel environment(ConnectionEnvironmentModel environment) {
+  public ConnectionBaseModel environment(com.bytechef.platform.connection.web.rest.model.EnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -298,11 +297,11 @@ public class ConnectionBaseModel {
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
-  public ConnectionEnvironmentModel getEnvironment() {
+  public com.bytechef.platform.connection.web.rest.model.EnvironmentModel getEnvironment() {
     return environment;
   }
 
-  public void setEnvironment(ConnectionEnvironmentModel environment) {
+  public void setEnvironment(com.bytechef.platform.connection.web.rest.model.EnvironmentModel environment) {
     this.environment = environment;
   }
 
