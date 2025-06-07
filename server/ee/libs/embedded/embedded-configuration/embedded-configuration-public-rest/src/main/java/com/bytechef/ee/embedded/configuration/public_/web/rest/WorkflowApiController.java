@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowModel;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -80,6 +81,17 @@ public class WorkflowApiController implements WorkflowApi {
 
     @Override
     @CrossOrigin
+    public ResponseEntity<Void> enableFrontendProjectWorkflow(
+        String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
+
+        connectUserProjectFacade.enableProjectWorkflow(workflowReferenceCode, enable, getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    @CrossOrigin
     public ResponseEntity<List<WorkflowModel>> getFrontendProjectWorkflows(EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(
             connectUserProjectFacade.getProjectWorkflows(getEnvironment(xEnvironment))
@@ -95,8 +107,26 @@ public class WorkflowApiController implements WorkflowApi {
         CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
         EnvironmentModel xEnvironment) {
 
-        return WorkflowApi.super.updateFrontendProjectWorkflow(
-            workflowReferenceCode, createFrontendProjectWorkflowRequestModel, xEnvironment);
+        connectUserProjectFacade.updateProjectWorkflow(
+            workflowReferenceCode, createFrontendProjectWorkflowRequestModel.getDefinition(),
+            getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    @CrossOrigin
+    public ResponseEntity<Void> publishFrontendProjectWorkflow(
+        String workflowReferenceCode, EnvironmentModel xEnvironment,
+        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel) {
+
+        connectUserProjectFacade.publishProjectWorkflow(
+            workflowReferenceCode, publishFrontendProjectWorkflowRequestModel.getDescription(),
+            getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override
@@ -114,6 +144,16 @@ public class WorkflowApiController implements WorkflowApi {
         String externalUserId, String workflowReferenceCode, EnvironmentModel xEnvironment) {
 
         connectUserProjectFacade.deleteProjectWorkflow(workflowReferenceCode, getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> enableProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
+
+        connectUserProjectFacade.enableProjectWorkflow(workflowReferenceCode, enable, getEnvironment(xEnvironment));
 
         return ResponseEntity.noContent()
             .build();
@@ -138,6 +178,19 @@ public class WorkflowApiController implements WorkflowApi {
                 .stream()
                 .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
                 .toList());
+    }
+
+    @Override
+    public ResponseEntity<Void> publishProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, EnvironmentModel xEnvironment,
+        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel) {
+
+        connectUserProjectFacade.publishProjectWorkflow(
+            workflowReferenceCode, publishFrontendProjectWorkflowRequestModel.getDescription(),
+            getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override

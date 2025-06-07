@@ -17,7 +17,7 @@
 package com.bytechef.automation.connection.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.automation.connection.facade.WorkspaceConnectionFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.connection.web.rest.model.ConnectionModel;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;

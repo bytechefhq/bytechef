@@ -13,6 +13,7 @@ type ConnectedUserProjectWorkflow {
     lastModifiedBy: String
     lastModifiedDate: String
     version: Int
+    workflowVersion: Int
     connections: [ConnectedUserProjectWorkflowConnection]
 }
 

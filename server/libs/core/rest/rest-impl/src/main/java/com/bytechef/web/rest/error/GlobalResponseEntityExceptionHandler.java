@@ -63,6 +63,8 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
     public ResponseEntity<ProblemDetail> handleNoSuchElementException(
         final NoSuchElementException exception, final WebRequest request) {
 
+        logger.error(exception.getMessage(), exception);
+
         return ResponseEntity
             .of(createProblemDetail(exception, HttpStatus.NOT_FOUND, exception.getMessage(), null, null, request))
             .build();

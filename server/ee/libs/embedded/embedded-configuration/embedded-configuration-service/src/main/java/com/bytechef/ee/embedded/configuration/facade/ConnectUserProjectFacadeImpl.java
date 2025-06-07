@@ -12,12 +12,13 @@ import com.bytechef.atlas.configuration.exception.WorkflowErrorType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
@@ -31,9 +32,11 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkfl
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
@@ -73,36 +76,41 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
+    private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectFacade projectFacade;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
-    private final ProjectDeploymentService projectDeploymentService;
+    private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public ConnectUserProjectFacadeImpl(
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectedUserService connectedUserService, ConnectionService connectionService,
-        ProjectDeploymentFacade projectDeploymentFacade, ProjectFacade projectFacade, ProjectService projectService,
-        ProjectWorkflowService projectWorkflowService, WorkflowFacade workflowFacade, WorkflowService workflowService,
-        WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
-        ProjectDeploymentService projectDeploymentService) {
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectFacade projectFacade,
+        ProjectService projectService, ProjectWorkflowService projectWorkflowService, WorkflowFacade workflowFacade,
+        WorkflowService workflowService, WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserService = connectedUserService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectionService = connectionService;
         this.projectDeploymentFacade = projectDeploymentFacade;
+        this.projectDeploymentService = projectDeploymentService;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectFacade = projectFacade;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationFacade = workflowTestConfigurationFacade;
-        this.projectDeploymentService = projectDeploymentService;
+        this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
@@ -147,15 +155,12 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
 
         String workflowId = projectWorkflowService
-            .fetchProjectWorkflowId(connectedUserProject.getProjectId(), workflowReferenceCode)
-            .orElseThrow(() -> new ConfigurationException(
-                "Workflow with workflowReferenceCode: %s not exist".formatted(workflowReferenceCode),
-                WorkflowErrorType.WORKFLOW_NOT_FOUND));
+            .getProjectDeploymentWorkflowId(
+                projectDeploymentService.getProjectDeploymentId(connectedUserProject.getProjectId(), environment),
+                workflowReferenceCode);
 
-        long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
-            connectedUserProject.getProjectId(), environment);
-
-        projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, enable);
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(
+            connectedUserProject.getProjectId(), workflowId, enable, environment);
     }
 
     @Override
@@ -163,12 +168,17 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
 
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getLatestProjectWorkflow(
             connectedUserProject.getProjectId(), workflowReferenceCode);
 
+        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
+            .getConnectedUserProjectWorkflows(connectedUserProject.getId(), projectWorkflow.getId());
+
         return new ConnectUserProjectWorkflowDTO(
-            connectedUserProject.getConnectedUserId(), projectWorkflow,
-            workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()));
+            connectedUserProject.getConnectedUserId(),
+            isProjectDeploymentWorkflowEnabled(projectWorkflow, environment), projectWorkflow,
+            workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()),
+            connectedUserProjectWorkflow.getWorkflowVersion());
     }
 
     @Override
@@ -177,23 +187,29 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
 
         Project project = projectService.getProject(connectedUserProject.getProjectId());
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(project.getId());
 
-        List<String> workflowIds = projectWorkflows.stream()
+        List<ProjectWorkflow> latestProjectWorkflows = projectWorkflowService.getProjectWorkflows(
+            project.getId(), project.getLastVersion());
+
+        List<String> latestWorkflowIds = latestProjectWorkflows.stream()
             .map(ProjectWorkflow::getWorkflowId)
             .toList();
 
-        return workflowService.getWorkflows(workflowIds)
+        return workflowService.getWorkflows(latestWorkflowIds)
             .stream()
             .map(workflow -> {
-                ProjectWorkflow projectWorkflow = projectWorkflows.stream()
+                ProjectWorkflow latestProjectWorkflow = latestProjectWorkflows.stream()
                     .filter(curProjectWorkflow -> Objects.equals(curProjectWorkflow.getWorkflowId(), workflow.getId()))
                     .findFirst()
                     .orElseThrow();
 
+                ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
+                    .getConnectedUserProjectWorkflows(connectedUserProject.getId(), latestProjectWorkflow.getId());
+
                 return new ConnectUserProjectWorkflowDTO(
                     connectedUserProject.getConnectedUserId(),
-                    projectWorkflow, new WorkflowDTO(workflow, List.of(), List.of()));
+                    isProjectDeploymentWorkflowEnabled(latestProjectWorkflow, environment), latestProjectWorkflow,
+                    new WorkflowDTO(workflow, List.of(), List.of()), connectedUserProjectWorkflow.getWorkflowVersion());
             })
             .toList();
     }
@@ -204,17 +220,24 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
 
         String workflowId = projectWorkflowService
-            .fetchProjectWorkflowId(connectedUserProject.getProjectId(), workflowReferenceCode)
+            .fetchLatestProjectWorkflowId(connectedUserProject.getProjectId(), workflowReferenceCode)
             .orElseThrow(() -> new ConfigurationException(
                 "Workflow with workflowReferenceCode: %s not exist".formatted(workflowReferenceCode),
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
 
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+
+        List<ProjectDeploymentWorkflowConnection> connections = workflowTestConfigurationService
+            .fetchWorkflowTestConfiguration(workflowId)
+            .map(WorkflowTestConfiguration::getConnections)
+            .orElse(List.of())
+            .stream()
+            .map(connection -> new ProjectDeploymentWorkflowConnection(
+                connection.getConnectionId(), connection.getWorkflowConnectionKey(),
+                connection.getWorkflowNodeName()))
+            .toList();
+
         int newProjectVersion = projectFacade.publishProject(connectedUserProject.getProjectId(), description, false);
-
-        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
-
-        projectDeploymentWorkflow.setInputs(Map.of());
-        projectDeploymentWorkflow.setWorkflowId(workflowId);
 
         if (newProjectVersion == 2) {
             ProjectDeployment projectDeployment = new ProjectDeployment();
@@ -230,14 +253,15 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
             projectDeployment.setProjectId(connectedUserProject.getProjectId());
             projectDeployment.setProjectVersion(1);
 
-            projectDeploymentFacade.createProjectDeployment(
-                projectDeployment, List.of(projectDeploymentWorkflow), List.of());
+            projectDeploymentFacade.createProjectDeployment(projectDeployment, workflowId, connections);
         } else {
-            long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
-                connectedUserProject.getProjectId(), environment);
-
-            projectDeploymentFacade.updateProjectDeployment(projectDeploymentId, List.of(projectDeploymentWorkflow));
+            projectDeploymentFacade.updateProjectDeployment(
+                connectedUserProject.getProjectId(), newProjectVersion - 1, workflowReferenceCode, connections,
+                environment);
         }
+
+        connectedUserProjectWorkflowService.incrementWorkflowVersion(
+            connectedUserProject.getId(), projectWorkflow.getId());
     }
 
     @Override
@@ -247,7 +271,7 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
 
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getLatestProjectWorkflow(
             connectedUserProject.getProjectId(), workflowReferenceCode);
 
         Workflow oldWorkflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
@@ -302,5 +326,22 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
             checkWorkflowNodeConnection(
                 MapUtils.getString(taskMap, "type"), connections, projectWorkflow, MapUtils.getString(taskMap, "name"));
         }
+    }
+
+    private boolean isProjectDeploymentWorkflowEnabled(ProjectWorkflow projectWorkflow, Environment environment) {
+        // DRAFT status
+        if (projectWorkflow.getProjectVersion() == 1) {
+            return false;
+        }
+
+        projectWorkflow = projectWorkflowService.getProjectWorkflow(
+            projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion() - 1,
+            projectWorkflow.getWorkflowReferenceCode());
+
+        long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
+            projectWorkflow.getProjectId(), environment);
+
+        return projectDeploymentWorkflowService.isProjectDeploymentWorkflowEnabled(
+            projectDeploymentId, projectWorkflow.getWorkflowId());
     }
 }

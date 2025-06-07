@@ -39,6 +39,12 @@
     </changeSet>
 
     <changeSet id="20230807081736-1" author="Ivica Cardic" contextFilter="mono">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="workspace_connection"/>
+            </not>
+        </preConditions>
+
         <addForeignKeyConstraint
             baseTableName="workspace_connection"
             baseColumnNames="connection_id"

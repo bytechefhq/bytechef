@@ -63,17 +63,23 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public Optional<String> fetchLatestProjectWorkflowId(Long projectId, String workflowReferenceCode) {
+        return projectWorkflowRepository.findByProjectIdAndWorkflowReferenceCode(projectId, workflowReferenceCode)
+            .map(ProjectWorkflow::getWorkflowId);
+    }
+
+    @Override
+    public ProjectWorkflow getLatestProjectWorkflow(Long projectId, String workflowReferenceCode) {
+        return OptionalUtils.get(
+            projectWorkflowRepository.findByProjectIdAndWorkflowReferenceCode(projectId, workflowReferenceCode));
+    }
+
+    @Override
     public String getLatestWorkflowId(String workflowReferenceCode) {
         return OptionalUtils.get(
             projectWorkflowRepository
                 .findLatestProjectWorkflowByWorkflowReferenceCode(workflowReferenceCode)
                 .map(ProjectWorkflow::getWorkflowId));
-    }
-
-    @Override
-    public Optional<String> fetchProjectWorkflowId(Long projectId, String workflowReferenceCode) {
-        return projectWorkflowRepository.findByProjectIdAndWorkflowReferenceCode(projectId, workflowReferenceCode)
-            .map(ProjectWorkflow::getWorkflowId);
     }
 
     @Override
@@ -90,9 +96,10 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public ProjectWorkflow getProjectWorkflow(Long projectId, String workflowReferenceCode) {
+    public ProjectWorkflow getProjectWorkflow(long projectId, int projectVersion, String workflowReferenceCode) {
         return OptionalUtils.get(
-            projectWorkflowRepository.findByProjectIdAndWorkflowReferenceCode(projectId, workflowReferenceCode));
+            projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowReferenceCode(
+                projectId, projectVersion, workflowReferenceCode));
     }
 
     @Override

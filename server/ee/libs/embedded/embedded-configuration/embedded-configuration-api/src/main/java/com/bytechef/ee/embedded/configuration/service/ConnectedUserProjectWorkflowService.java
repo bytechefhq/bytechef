@@ -31,4 +31,6 @@ public interface ConnectedUserProjectWorkflowService {
         long connectedUserProjectId, long projectWorkflowId);
 
     boolean isConnectionUsed(long connectionId);
+
+    void incrementWorkflowVersion(long connectedUserProjectId, long projectWorkflowId);
 }

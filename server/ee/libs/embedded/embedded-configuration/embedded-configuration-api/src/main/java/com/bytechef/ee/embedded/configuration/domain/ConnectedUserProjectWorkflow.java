@@ -45,6 +45,9 @@ public class ConnectedUserProjectWorkflow {
     @Column("project_workflow_id")
     private AggregateReference<ProjectWorkflow, Long> projectWorkflowId;
 
+    @Column("workflow_version")
+    private Integer workflowVersion;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -72,11 +75,12 @@ public class ConnectedUserProjectWorkflow {
 
     @PersistenceCreator
     public ConnectedUserProjectWorkflow(
-        Long id, Long connectedUserProjectId, Long projectWorkflowId, int version) {
+        Long id, Long connectedUserProjectId, Long projectWorkflowId, Integer workflowVersion, int version) {
 
         this.id = id;
         this.connectedUserProjectId = AggregateReference.to(connectedUserProjectId);
         this.projectWorkflowId = AggregateReference.to(projectWorkflowId);
+        this.workflowVersion = workflowVersion;
         this.version = version;
     }
 
@@ -130,6 +134,10 @@ public class ConnectedUserProjectWorkflow {
         return version;
     }
 
+    public Integer getWorkflowVersion() {
+        return workflowVersion;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -144,6 +152,10 @@ public class ConnectedUserProjectWorkflow {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public void setWorkflowVersion(Integer workflowVersion) {
+        this.workflowVersion = workflowVersion;
     }
 
     public List<ConnectedUserProjectWorkflowConnection> getConnections() {
@@ -166,6 +178,7 @@ public class ConnectedUserProjectWorkflow {
             "id=" + id +
             ", connectedUserProjectId=" + connectedUserProjectId +
             ", projectWorkflowId=" + projectWorkflowId +
+            ", workflowVersion=" + workflowVersion +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

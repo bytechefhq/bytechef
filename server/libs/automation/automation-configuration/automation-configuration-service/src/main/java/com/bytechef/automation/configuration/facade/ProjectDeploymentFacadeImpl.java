@@ -137,6 +137,20 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     public long createProjectDeployment(
+        ProjectDeployment projectDeployment, String workflowId, List<ProjectDeploymentWorkflowConnection> connections) {
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setConnections(connections);
+        projectDeploymentWorkflow.setInputs(Map.of());
+        projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
+        projectDeploymentWorkflow.setWorkflowId(workflowId);
+
+        return createProjectDeployment(projectDeployment, List.of(projectDeploymentWorkflow), List.of());
+    }
+
+    @Override
+    public long createProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
         List<Tag> tags) {
 
@@ -239,6 +253,15 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    public void enableProjectDeploymentWorkflow(
+        long projectId, String workflowId, boolean enable, Environment environment) {
+
+        long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(projectId, environment);
+
+        enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, enable);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProjectDeploymentDTO getProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
@@ -283,7 +306,51 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     public List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
         long id, Environment environment, Long projectId, Long tagId, boolean includeAllFields) {
 
-        return getProjectDeployments(id, environment, projectId, tagId, includeAllFields);
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
+            id, environment, projectId, tagId, List.of());
+
+        if (includeAllFields) {
+            List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
+                .getProjectDeploymentWorkflows(CollectionUtils.map(projectDeployments, ProjectDeployment::getId));
+            List<Project> projects = getProjects(projectDeployments);
+            List<Tag> tags = getTags(projectDeployments);
+
+            return CollectionUtils.map(
+                projectDeployments,
+                projectDeployment -> {
+                    Project project = CollectionUtils.getFirst(
+                        projects, curProject -> Objects.equals(curProject.getId(), projectDeployment.getProjectId()));
+
+                    List<String> workflowIds = projectWorkflowService.getProjectWorkflowIds(
+                        projectDeployment.getProjectId(), projectDeployment.getProjectVersion());
+
+                    List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
+                        projectDeployment.getProjectId());
+
+                    return new ProjectDeploymentDTO(
+                        projectDeployment,
+                        CollectionUtils.map(
+                            CollectionUtils.filter(
+                                projectDeploymentWorkflows,
+                                projectDeploymentWorkflow -> Objects.equals(
+                                    projectDeploymentWorkflow.getProjectDeploymentId(), projectDeployment.getId()) &&
+                                    workflowIds.contains(projectDeploymentWorkflow.getWorkflowId())),
+                            projectDeploymentWorkflow -> new ProjectDeploymentWorkflowDTO(
+                                projectDeploymentWorkflow,
+                                getWorkflowLastExecutionDate(projectDeploymentWorkflow.getWorkflowId()),
+                                getStaticWebhookUrl(
+                                    projectDeploymentWorkflow.getProjectDeploymentId(),
+                                    projectDeploymentWorkflow.getWorkflowId()),
+                                getWorkflowReferenceCode(
+                                    projectDeploymentWorkflow.getWorkflowId(), projectDeployment.getProjectVersion(),
+                                    projectWorkflows))),
+                        project,
+                        getProjectDeploymentLastExecutionDate(Validate.notNull(projectDeployment.getId(), "id")),
+                        filterTags(tags, projectDeployment));
+                });
+        } else {
+            return CollectionUtils.map(projectDeployments, ProjectDeploymentDTO::new);
+        }
     }
 
     @Override
@@ -298,9 +365,52 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     public void updateProjectDeployment(
-        long projectDeploymentId, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows) {
+        long projectId, int projectVersion, String workflowReferenceCode,
+        List<ProjectDeploymentWorkflowConnection> connections, Environment environment) {
 
-        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
+            projectDeploymentService.getProjectDeploymentId(projectId, environment));
+
+        projectDeployment.setProjectVersion(projectVersion);
+
+        List<ProjectDeploymentWorkflow> oldProjectDeploymentWorkflows = projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflows(projectDeployment.getId());
+
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectWorkflowService
+            .getProjectWorkflows(projectDeployment.getProjectId(), projectVersion)
+            .stream()
+            .map(curProjectWorkflow -> {
+                ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+                projectDeploymentWorkflow.setProjectDeploymentId(projectId);
+                projectDeploymentWorkflow.setWorkflowId(curProjectWorkflow.getWorkflowId());
+
+                if (Objects.equals(curProjectWorkflow.getWorkflowReferenceCode(), workflowReferenceCode)) {
+                    projectDeploymentWorkflow.setConnections(connections);
+                    projectDeploymentWorkflow.setInputs(Map.of());
+                } else {
+                    return oldProjectDeploymentWorkflows.stream()
+                        .filter(curProjectDeploymentWorkflow -> {
+                            String projectDeploymentWorkflowReferenceCode =
+                                projectWorkflowService.getProjectDeploymentWorkflowReferenceCode(
+                                    projectDeployment.getId(), curProjectDeploymentWorkflow.getWorkflowId());
+
+                            return Objects.equals(
+                                projectDeploymentWorkflowReferenceCode, curProjectWorkflow.getWorkflowReferenceCode());
+                        })
+                        .findFirst()
+                        .map(curProjectDeploymentWorkflow -> {
+                            projectDeploymentWorkflow.setConnections(curProjectDeploymentWorkflow.getConnections());
+                            projectDeploymentWorkflow.setInputs(curProjectDeploymentWorkflow.getInputs());
+
+                            return projectDeploymentWorkflow;
+                        })
+                        .orElse(projectDeploymentWorkflow);
+                }
+
+                return projectDeploymentWorkflow;
+            })
+            .toList();
 
         updateProjectDeployment(projectDeployment, projectDeploymentWorkflows, List.of());
     }
@@ -581,56 +691,6 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private Instant getProjectDeploymentLastExecutionDate(long projectDeploymentId) {
         return OptionalUtils.mapOrElse(
             principalJobService.fetchLastJobId(projectDeploymentId, ModeType.AUTOMATION), this::getJobEndDate, null);
-    }
-
-    private List<ProjectDeploymentDTO> getProjectDeployments(
-        Long workspaceId, Environment environment, Long projectId, Long tagId, boolean includeAllFields) {
-
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            workspaceId, environment, projectId, tagId, List.of());
-
-        if (includeAllFields) {
-            List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
-                .getProjectDeploymentWorkflows(CollectionUtils.map(projectDeployments, ProjectDeployment::getId));
-            List<Project> projects = getProjects(projectDeployments);
-            List<Tag> tags = getTags(projectDeployments);
-
-            return CollectionUtils.map(
-                projectDeployments,
-                projectDeployment -> {
-                    Project project = CollectionUtils.getFirst(
-                        projects, curProject -> Objects.equals(curProject.getId(), projectDeployment.getProjectId()));
-
-                    List<String> workflowIds = projectWorkflowService.getProjectWorkflowIds(
-                        projectDeployment.getProjectId(), projectDeployment.getProjectVersion());
-
-                    List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-                        projectDeployment.getProjectId());
-
-                    return new ProjectDeploymentDTO(
-                        projectDeployment,
-                        CollectionUtils.map(
-                            CollectionUtils.filter(
-                                projectDeploymentWorkflows,
-                                projectDeploymentWorkflow -> Objects.equals(
-                                    projectDeploymentWorkflow.getProjectDeploymentId(), projectDeployment.getId()) &&
-                                    workflowIds.contains(projectDeploymentWorkflow.getWorkflowId())),
-                            projectDeploymentWorkflow -> new ProjectDeploymentWorkflowDTO(
-                                projectDeploymentWorkflow,
-                                getWorkflowLastExecutionDate(projectDeploymentWorkflow.getWorkflowId()),
-                                getStaticWebhookUrl(
-                                    projectDeploymentWorkflow.getProjectDeploymentId(),
-                                    projectDeploymentWorkflow.getWorkflowId()),
-                                getWorkflowReferenceCode(
-                                    projectDeploymentWorkflow.getWorkflowId(), projectDeployment.getProjectVersion(),
-                                    projectWorkflows))),
-                        project,
-                        getProjectDeploymentLastExecutionDate(Validate.notNull(projectDeployment.getId(), "id")),
-                        filterTags(tags, projectDeployment));
-                });
-        } else {
-            return CollectionUtils.map(projectDeployments, ProjectDeploymentDTO::new);
-        }
     }
 
     private List<Project> getProjects(List<ProjectDeployment> projectDeployments) {

@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
@@ -31,6 +32,9 @@ public interface ProjectDeploymentFacade {
     long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO);
 
     long createProjectDeployment(
+        ProjectDeployment projectDeployment, String workflowId, List<ProjectDeploymentWorkflowConnection> connections);
+
+    long createProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
         List<Tag> tags);
 
@@ -42,6 +46,8 @@ public interface ProjectDeploymentFacade {
 
     void enableProjectDeploymentWorkflow(long projectDeploymentId, String workflowId, boolean enable);
 
+    void enableProjectDeploymentWorkflow(long projectId, String workflowId, boolean enable, Environment environment);
+
     ProjectDeploymentDTO getProjectDeployment(long id);
 
     List<Tag> getProjectDeploymentTags();
@@ -52,7 +58,8 @@ public interface ProjectDeploymentFacade {
     void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO);
 
     void updateProjectDeployment(
-        long projectDeploymentId, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows);
+        long projectId, int projectVersion, String workflowReferenceCode,
+        List<ProjectDeploymentWorkflowConnection> connections, Environment environment);
 
     void updateProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,

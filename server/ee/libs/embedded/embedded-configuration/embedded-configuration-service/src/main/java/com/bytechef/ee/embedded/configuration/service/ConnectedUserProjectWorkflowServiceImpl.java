@@ -76,4 +76,20 @@ public class ConnectedUserProjectWorkflowServiceImpl implements ConnectedUserPro
             .findConnectedUserProjectWorkflowConnectionIdsByConnectionId(connectionId)
             .isEmpty();
     }
+
+    @Override
+    public void incrementWorkflowVersion(long connectedUserProjectId, long projectWorkflowId) {
+        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = getConnectedUserProjectWorkflows(
+            connectedUserProjectId, projectWorkflowId);
+
+        Integer workflowVersion = connectedUserProjectWorkflow.getWorkflowVersion();
+
+        if (workflowVersion == null) {
+            workflowVersion = 0;
+        }
+
+        connectedUserProjectWorkflow.setWorkflowVersion(workflowVersion + 1);
+
+        connectedUserProjectWorkflowRepository.save(connectedUserProjectWorkflow);
+    }
 }

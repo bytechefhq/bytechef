@@ -66,6 +66,7 @@ public interface ConnectedUserIntegrationMapper {
         @Mapping(target = "description", source = "workflow.description")
         @Mapping(target = "inputs", source = "workflow.inputs")
         @Mapping(target = "label", source = "workflow.label")
+        @Mapping(target = "workflowVersion", ignore = true)
         WorkflowModel map(IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO);
 
         @Mapping(target = "authorizationUrl", source = "oAuth2.oAuth2AuthorizationParameters.authorizationUrl")
