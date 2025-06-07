@@ -19,7 +19,8 @@ import posthog from 'posthog-js';
 import {PostHogProvider} from 'posthog-js/react';
 import {RouterProvider} from 'react-router-dom';
 
-import {getRouter} from './routes';
+import {getRouter as getMainRouter} from './routes';
+import {getRouter as getWorkflowBuilderRouter} from './workflowBuilderRoutes';
 
 window.MonacoEnvironment = {
     getWorker(moduleId: string, label: string) {
@@ -49,7 +50,8 @@ function renderApp() {
     const root = createRoot(container);
     const queryClient = new QueryClient();
 
-    const router = getRouter(queryClient);
+    const isWorkflowBuilder = window.location.pathname.includes('/workflow-builder/');
+    const router = isWorkflowBuilder ? getWorkflowBuilderRouter() : getMainRouter(queryClient);
 
     root.render(
         <React.StrictMode>
