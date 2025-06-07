@@ -15,7 +15,7 @@ export default function DatePicker({onChange, value}: {onChange: (date: Date | u
         <Popover>
             <PopoverTrigger asChild>
                 <Button
-                    className={cn('w-[240px] justify-start text-left font-normal', !date && 'text-muted-foreground')}
+                    className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
                     variant="outline"
                 >
                     <CalendarIcon className="mr-2 size-4" />
