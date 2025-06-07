@@ -6,7 +6,7 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
     const {integration, integrationInstance, workflow} = workflowExecution;
 
     return (
-        <div className="flex size-full flex-col bg-muted/50">
+        <div className="flex size-full flex-col">
             <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                 <SheetTitle>
                     <span>
