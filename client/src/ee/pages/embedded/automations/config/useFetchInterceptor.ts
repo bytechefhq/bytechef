@@ -36,10 +36,6 @@ export default function useFetchInterceptor() {
                 clearAuthentication();
                 clearCurrentWorkspaceId();
 
-                // if (!response.url.endsWith('/api/account')) {
-                //     navigate('/login');
-                // }
-
                 return response;
             }
 
