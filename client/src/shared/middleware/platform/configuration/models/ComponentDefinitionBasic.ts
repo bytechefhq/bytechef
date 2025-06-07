@@ -70,7 +70,7 @@ export interface ComponentDefinitionBasic {
      */
     title?: string;
     /**
-     * 
+     * The number of triggers a component has
      * @type {number}
      * @memberof ComponentDefinitionBasic
      */

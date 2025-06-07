@@ -16,14 +16,14 @@
 import * as runtime from '../runtime';
 import type {
   Connection,
-  ConnectionEnvironment,
+  Environment,
   UpdateConnectionRequest,
 } from '../models/index';
 import {
     ConnectionFromJSON,
     ConnectionToJSON,
-    ConnectionEnvironmentFromJSON,
-    ConnectionEnvironmentToJSON,
+    EnvironmentFromJSON,
+    EnvironmentToJSON,
     UpdateConnectionRequestFromJSON,
     UpdateConnectionRequestToJSON,
 } from '../models/index';
@@ -44,7 +44,7 @@ export interface GetWorkspaceConnectionsRequest {
     id: number;
     componentName?: string;
     connectionVersion?: number;
-    environment?: ConnectionEnvironment;
+    environment?: Environment;
     tagId?: number;
 }
 

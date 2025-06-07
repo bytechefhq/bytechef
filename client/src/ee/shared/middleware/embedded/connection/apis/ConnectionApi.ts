@@ -16,17 +16,23 @@
 import * as runtime from '../runtime';
 import type {
   Connection,
-  ConnectionEnvironment,
+  Environment,
   UpdateConnectionRequest,
 } from '../models/index';
 import {
     ConnectionFromJSON,
     ConnectionToJSON,
-    ConnectionEnvironmentFromJSON,
-    ConnectionEnvironmentToJSON,
+    EnvironmentFromJSON,
+    EnvironmentToJSON,
     UpdateConnectionRequestFromJSON,
     UpdateConnectionRequestToJSON,
 } from '../models/index';
+
+export interface CreateConnectedUserProjectWorkflowConnectionRequest {
+    connectedUserId: number;
+    workflowReferenceCode: string;
+    connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
+}
 
 export interface CreateConnectionRequest {
     connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
@@ -36,6 +42,12 @@ export interface DeleteConnectionRequest {
     id: number;
 }
 
+export interface GetConnectedUserConnectionsRequest {
+    connectedUserId: number;
+    componentName: string;
+    connectionIds?: Array<number>;
+}
+
 export interface GetConnectionRequest {
     id: number;
 }
@@ -43,7 +55,7 @@ export interface GetConnectionRequest {
 export interface GetConnectionsRequest {
     componentName?: string;
     connectionVersion?: number;
-    environment?: ConnectionEnvironment;
+    environment?: Environment;
     tagId?: number;
 }
 
@@ -56,6 +68,62 @@ export interface UpdateConnectionOperationRequest {
  * 
  */
 export class ConnectionApi extends runtime.BaseAPI {
+
+    /**
+     * Create a new connection for the connected user\'s project workflow.
+     * Create a new connection for the connected user\'s project workflow
+     */
+    async createConnectedUserProjectWorkflowConnectionRaw(requestParameters: CreateConnectedUserProjectWorkflowConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        if (requestParameters['connectedUserId'] == null) {
+            throw new runtime.RequiredError(
+                'connectedUserId',
+                'Required parameter "connectedUserId" was null or undefined when calling createConnectedUserProjectWorkflowConnection().'
+            );
+        }
+
+        if (requestParameters['workflowReferenceCode'] == null) {
+            throw new runtime.RequiredError(
+                'workflowReferenceCode',
+                'Required parameter "workflowReferenceCode" was null or undefined when calling createConnectedUserProjectWorkflowConnection().'
+            );
+        }
+
+        if (requestParameters['connection'] == null) {
+            throw new runtime.RequiredError(
+                'connection',
+                'Required parameter "connection" was null or undefined when calling createConnectedUserProjectWorkflowConnection().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections`.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId']))).replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ConnectionToJSON(requestParameters['connection']),
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     * Create a new connection for the connected user\'s project workflow.
+     * Create a new connection for the connected user\'s project workflow
+     */
+    async createConnectedUserProjectWorkflowConnection(requestParameters: CreateConnectedUserProjectWorkflowConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
+        const response = await this.createConnectedUserProjectWorkflowConnectionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Create a new connection.
@@ -131,6 +199,52 @@ export class ConnectionApi extends runtime.BaseAPI {
      */
     async deleteConnection(requestParameters: DeleteConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteConnectionRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get all connected user\'s connections.
+     * Get all connected user\'s connections
+     */
+    async getConnectedUserConnectionsRaw(requestParameters: GetConnectedUserConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Connection>>> {
+        if (requestParameters['connectedUserId'] == null) {
+            throw new runtime.RequiredError(
+                'connectedUserId',
+                'Required parameter "connectedUserId" was null or undefined when calling getConnectedUserConnections().'
+            );
+        }
+
+        if (requestParameters['componentName'] == null) {
+            throw new runtime.RequiredError(
+                'componentName',
+                'Required parameter "componentName" was null or undefined when calling getConnectedUserConnections().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['connectionIds'] != null) {
+            queryParameters['connectionIds'] = requestParameters['connectionIds'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/connected-users/{connectedUserId}/components/{componentName}/connections`.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId']))).replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionFromJSON));
+    }
+
+    /**
+     * Get all connected user\'s connections.
+     * Get all connected user\'s connections
+     */
+    async getConnectedUserConnections(requestParameters: GetConnectedUserConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Connection>> {
+        const response = await this.getConnectedUserConnectionsRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

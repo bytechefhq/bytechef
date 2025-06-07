@@ -20,6 +20,13 @@ import {
     CredentialStatusToJSON,
     CredentialStatusToJSONTyped,
 } from './CredentialStatus';
+import type { Environment } from './Environment';
+import {
+    EnvironmentFromJSON,
+    EnvironmentFromJSONTyped,
+    EnvironmentToJSON,
+    EnvironmentToJSONTyped,
+} from './Environment';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
@@ -27,13 +34,6 @@ import {
     TagToJSON,
     TagToJSONTyped,
 } from './Tag';
-import type { ConnectionEnvironment } from './ConnectionEnvironment';
-import {
-    ConnectionEnvironmentFromJSON,
-    ConnectionEnvironmentFromJSONTyped,
-    ConnectionEnvironmentToJSON,
-    ConnectionEnvironmentToJSONTyped,
-} from './ConnectionEnvironment';
 
 /**
  * Contains all required information to open a connection to a service defined by componentName parameter.
@@ -97,10 +97,10 @@ export interface Connection {
     credentialStatus?: CredentialStatus;
     /**
      * 
-     * @type {ConnectionEnvironment}
+     * @type {Environment}
      * @memberof Connection
      */
-    environment?: ConnectionEnvironment;
+    environment?: Environment;
     /**
      * The id of a connection.
      * @type {number}
@@ -177,7 +177,7 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
-        'environment': json['environment'] == null ? undefined : ConnectionEnvironmentFromJSON(json['environment']),
+        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
@@ -203,7 +203,7 @@ export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authori
         'componentName': value['componentName'],
         'connectionVersion': value['connectionVersion'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),
-        'environment': ConnectionEnvironmentToJSON(value['environment']),
+        'environment': EnvironmentToJSON(value['environment']),
         'name': value['name'],
         'parameters': value['parameters'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
