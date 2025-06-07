@@ -54,7 +54,7 @@ public abstract class AbstractWebflowUtils {
 
     public static List<Option<String>> getItemIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
