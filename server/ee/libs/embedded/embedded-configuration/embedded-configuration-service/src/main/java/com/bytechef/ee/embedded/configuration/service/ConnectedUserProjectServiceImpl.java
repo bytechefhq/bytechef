@@ -33,6 +33,11 @@ public class ConnectedUserProjectServiceImpl implements ConnectedUserProjectServ
     }
 
     @Override
+    public boolean containsProjectDeployment(long projectDeploymentId) {
+        return connectUserProjectRepository.existsByProjectDeploymentId(projectDeploymentId);
+    }
+
+    @Override
     public ConnectedUserProject create(ConnectedUserProject connectedUserProject) {
         return connectUserProjectRepository.save(connectedUserProject);
     }
@@ -56,6 +61,12 @@ public class ConnectedUserProjectServiceImpl implements ConnectedUserProjectServ
     @Transactional(readOnly = true)
     public ConnectedUserProject getConnectedUserProject(Long id) {
         return OptionalUtils.get(connectUserProjectRepository.findById(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ConnectedUserProject getConnectedUserConnectedUserProject(Long connectedUserid) {
+        return OptionalUtils.get(connectUserProjectRepository.findByConnectedUserId(connectedUserid));
     }
 
     @Override

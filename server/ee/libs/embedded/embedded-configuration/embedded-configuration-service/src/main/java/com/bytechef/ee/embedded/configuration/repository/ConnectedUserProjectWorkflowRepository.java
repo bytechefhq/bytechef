@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -22,6 +23,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConnectedUserProjectWorkflowRepository extends ListCrudRepository<ConnectedUserProjectWorkflow, Long> {
 
+    Optional<ConnectedUserProjectWorkflow> findByConnectedUserProjectIdAndProjectWorkflowId(
+        long connectedUserProjectId, long projectWorkflowId);
+
     @Query("""
         SELECT cupw.*
         FROM connected_user_project_workflow cupw
@@ -29,9 +33,6 @@ public interface ConnectedUserProjectWorkflowRepository extends ListCrudReposito
         """)
     List<ConnectedUserProjectWorkflow> findAllByConnectedUserProjectId(
         @Param("connectedUserProjectId") Long connectedUserProjectId);
-
-    ConnectedUserProjectWorkflow findByConnectedUserProjectIdAndProjectWorkflowId(
-        long connectedUserProjectId, long projectWorkflowId);
 
     @Query("""
             SELECT connected_user_project_workflow_connection.connection_id FROM connected_user_project_workflow_connection

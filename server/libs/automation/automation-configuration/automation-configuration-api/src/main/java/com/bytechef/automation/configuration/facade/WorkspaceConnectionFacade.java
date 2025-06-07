@@ -16,8 +16,8 @@
 
 package com.bytechef.automation.configuration.facade;
 
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.constant.Environment;
 import java.util.List;
 
 /**
@@ -30,6 +30,5 @@ public interface WorkspaceConnectionFacade {
     void delete(long connectionId);
 
     List<ConnectionDTO> getConnections(
-        long workspaceId, String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment,
-        Long tagId);
+        long workspaceId, String componentName, Integer connectionVersion, Environment environment, Long tagId);
 }

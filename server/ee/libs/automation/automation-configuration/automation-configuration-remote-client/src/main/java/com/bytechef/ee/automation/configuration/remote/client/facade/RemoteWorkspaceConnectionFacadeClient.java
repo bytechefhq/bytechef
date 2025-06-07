@@ -8,7 +8,7 @@
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
+import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,7 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
 
     @Override
     public List<com.bytechef.platform.connection.dto.ConnectionDTO> getConnections(
-        long workspaceId, String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment,
+        long workspaceId, String componentName, Integer connectionVersion, Environment connectionEnvironment,
         Long tagId) {
 
         throw new UnsupportedOperationException();

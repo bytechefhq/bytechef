@@ -36,7 +36,7 @@ public interface ProjectFacade {
 
     void deleteProject(long id);
 
-    void deleteWorkflow(String workflowId);
+    void deleteWorkflow(String workflowId, boolean deleteLastWorkflow);
 
     ProjectDTO duplicateProject(long id);
 

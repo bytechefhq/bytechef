@@ -95,7 +95,7 @@ public class ConnectionServiceIntTest {
         connection = connectionRepository.save(connection);
 
         assertThat(connectionService.getConnection(Validate.notNull(connection.getId(), "id"))).isEqualTo(connection);
-        assertThat(connectionService.getConnections(null, null, null, tag.getId(), ModeType.AUTOMATION)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, tag.getId(), null, ModeType.AUTOMATION)).hasSize(1);
     }
 
     @Test

@@ -63,8 +63,8 @@ public class ToolApiController implements ToolApi {
 
         return ResponseEntity.ok(
             toolFacade
-                .getTools(,
-                    categories == null ? List.of() : categories,
+                .getTools(
+                    externalUserId, categories == null ? List.of() : categories,
                     components == null ? List.of() : components, actions == null ? List.of() : actions, environment)
                 .entrySet()
                 .stream()

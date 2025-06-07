@@ -23,9 +23,9 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.dto.ConnectUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
@@ -42,12 +42,13 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.security.util.SecurityUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,9 +115,8 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
     }
 
     @Override
-    public String createProjectWorkflow(String definition, Environment environment) {
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
+    public String createProjectWorkflow(String externalUserId, String definition, Environment environment) {
+        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         ProjectWorkflow projectWorkflow = projectFacade.addWorkflow(
             connectedUserProject.getProjectId(), StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition);
@@ -137,22 +137,41 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
     }
 
     @Override
-    public void deleteProjectWorkflow(String workflowReferenceCode, Environment environment) {
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
+    public void deleteProjectWorkflow(String externalUserId, String workflowReferenceCode, Environment environment) {
+        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             connectedUserProject.getProjectId(), workflowReferenceCode);
 
+        Set<Long> connectionIds = new HashSet<>();
+
         for (ProjectWorkflow projectWorkflow : projectWorkflows) {
-            projectFacade.deleteWorkflow(projectWorkflow.getWorkflowId());
+
+            connectedUserProjectWorkflowService
+                .fetchConnectedUserProjectWorkflow(connectedUserProject.getId(), projectWorkflow.getId())
+                .ifPresent(connectedUserProjectWorkflow -> {
+                    connectionIds.addAll(
+                        connectedUserProjectWorkflow.getConnections()
+                            .stream()
+                            .map(ConnectedUserProjectWorkflowConnection::getConnectionId)
+                            .toList());
+
+                    connectedUserProjectWorkflowService.delete(connectedUserProjectWorkflow.getId());
+                });
+
+            projectFacade.deleteWorkflow(projectWorkflow.getWorkflowId(), true);
+        }
+
+        for (Long connectionId : connectionIds) {
+            connectionService.delete(connectionId);
         }
     }
 
     @Override
-    public void enableProjectWorkflow(String workflowReferenceCode, boolean enable, Environment environment) {
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
+    public void enableProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, boolean enable, Environment environment) {
+
+        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         String workflowId = projectWorkflowService
             .getProjectDeploymentWorkflowId(
@@ -164,15 +183,16 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
     }
 
     @Override
-    public ConnectUserProjectWorkflowDTO getProjectWorkflow(String workflowReferenceCode, Environment environment) {
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
+    public ConnectUserProjectWorkflowDTO getProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, Environment environment) {
+
+        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getLatestProjectWorkflow(
             connectedUserProject.getProjectId(), workflowReferenceCode);
 
         ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
-            .getConnectedUserProjectWorkflows(connectedUserProject.getId(), projectWorkflow.getId());
+            .getConnectedUserProjectWorkflow(connectedUserProject.getId(), projectWorkflow.getId());
 
         return new ConnectUserProjectWorkflowDTO(
             connectedUserProject.getConnectedUserId(),
@@ -182,9 +202,8 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
     }
 
     @Override
-    public List<ConnectUserProjectWorkflowDTO> getProjectWorkflows(Environment environment) {
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
+    public List<ConnectUserProjectWorkflowDTO> getProjectWorkflows(String externalUserId, Environment environment) {
+        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         Project project = projectService.getProject(connectedUserProject.getProjectId());
 
@@ -204,7 +223,7 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
                     .orElseThrow();
 
                 ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
-                    .getConnectedUserProjectWorkflows(connectedUserProject.getId(), latestProjectWorkflow.getId());
+                    .getConnectedUserProjectWorkflow(connectedUserProject.getId(), latestProjectWorkflow.getId());
 
                 return new ConnectUserProjectWorkflowDTO(
                     connectedUserProject.getConnectedUserId(),
@@ -215,9 +234,10 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
     }
 
     @Override
-    public void publishProjectWorkflow(String workflowReferenceCode, String description, Environment environment) {
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
+    public void publishProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, String description, Environment environment) {
+
+        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         String workflowId = projectWorkflowService
             .fetchLatestProjectWorkflowId(connectedUserProject.getProjectId(), workflowReferenceCode)
@@ -266,10 +286,9 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
 
     @Override
     public void updateProjectWorkflow(
-        String workflowReferenceCode, String definition, Environment environment) {
+        String externalUserId, String workflowReferenceCode, String definition, Environment environment) {
 
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
+        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getLatestProjectWorkflow(
             connectedUserProject.getProjectId(), workflowReferenceCode);
@@ -334,9 +353,15 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
             return false;
         }
 
-        projectWorkflow = projectWorkflowService.getProjectWorkflow(
-            projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion() - 1,
-            projectWorkflow.getWorkflowReferenceCode());
+        projectWorkflow = projectWorkflowService
+            .fetchProjectWorkflow(
+                projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion() - 1,
+                projectWorkflow.getWorkflowReferenceCode())
+            .orElse(null);
+
+        if (projectWorkflow == null) {
+            return false;
+        }
 
         long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
             projectWorkflow.getProjectId(), environment);

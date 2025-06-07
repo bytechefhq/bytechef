@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @version ee
@@ -18,6 +19,8 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public interface ConnectedUserProjectService {
+
+    boolean containsProjectDeployment(long projectDeploymentId);
 
     ConnectedUserProject create(ConnectedUserProject connectedUserProject);
 
@@ -28,6 +31,9 @@ public interface ConnectedUserProjectService {
     Optional<ConnectedUserProject> fetchConnectUserProject(String externalUserId, Environment environment);
 
     ConnectedUserProject getConnectedUserProject(Long id);
+
+    @Transactional(readOnly = true)
+    ConnectedUserProject getConnectedUserConnectedUserProject(Long connectedUserid);
 
     ConnectedUserProject getConnectUserProject(String externalUserId, Environment environment);
 

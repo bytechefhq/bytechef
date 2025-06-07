@@ -29,9 +29,9 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
@@ -93,7 +93,7 @@ public class ConnectionFacadeIntTest {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(ConnectionEnvironment.STAGING)
+            .environment(Environment.STAGING)
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -109,7 +109,7 @@ public class ConnectionFacadeIntTest {
         ConnectionDTO connectionDTO1 = ConnectionDTO.builder()
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(ConnectionEnvironment.STAGING)
+            .environment(Environment.STAGING)
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -119,7 +119,7 @@ public class ConnectionFacadeIntTest {
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(ConnectionEnvironment.STAGING)
+            .environment(Environment.STAGING)
             .name("name2")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -180,8 +180,8 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        List<ConnectionDTO> connectionDTOs =
-            connectionFacade.getConnections(null, null, connectionIds, null, null, ModeType.AUTOMATION);
+        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
+            null, null, null, null, null, ModeType.AUTOMATION);
 
         Assertions.assertThat(
             CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
@@ -248,7 +248,7 @@ public class ConnectionFacadeIntTest {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(ConnectionEnvironment.STAGING)
+            .environment(Environment.STAGING)
             .name("name")
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();

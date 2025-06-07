@@ -8,8 +8,8 @@
 package com.bytechef.runtime.platform.connection.service;
 
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.runtime.platform.connection.ConnectionContext;
 import java.util.List;
@@ -56,9 +56,13 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment, Long tagId,
-        ModeType type) {
+        String componentName, Integer connectionVersion, Long tagId, Environment environment, ModeType type) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Connection> getConnections(List<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }
 

@@ -41,7 +41,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public void deleteWorkflow(String workflowId) {
+    public void deleteWorkflow(String workflowId, boolean deleteLastWorkflow) {
         throw new UnsupportedOperationException();
     }
 

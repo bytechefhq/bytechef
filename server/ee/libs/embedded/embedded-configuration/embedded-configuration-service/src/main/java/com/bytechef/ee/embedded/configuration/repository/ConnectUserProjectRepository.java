@@ -23,6 +23,16 @@ import org.springframework.stereotype.Repository;
 public interface ConnectUserProjectRepository extends ListCrudRepository<ConnectedUserProject, Long> {
 
     @Query("""
+        SELECT COUNT(cup.*) > 0
+        FROM connected_user_project cup
+        JOIN project ON cup.project_id = project.id
+        JOIN project_deployment ON project.id = project_deployment.project_id
+        WHERE project_deployment.id = :projectDeploymentId
+        LIMIT 1
+        """)
+    boolean existsByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
+
+    @Query("""
         SELECT cup.*
         FROM connected_user_project cup
         JOIN connected_user cu ON cup.connected_user_id = cu.id
@@ -31,4 +41,6 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
         """)
     Optional<ConnectedUserProject> findFirstByEnvironmentAndExternalUserId(
         @Param("externalUserId") String externalUserId, @Param("environment") int environment);
+
+    Optional<ConnectedUserProject> findByConnectedUserId(Long connectedUserid);
 }

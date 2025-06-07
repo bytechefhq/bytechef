@@ -10,12 +10,13 @@ package com.bytechef.ee.embedded.connection.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.connection.web.rest.model.ConnectionModel;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
+import com.bytechef.platform.connection.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateConnectionRequestModel;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -37,11 +38,16 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class ConnectionApiController implements ConnectionApi {
 
+    private final ConnectedUserConnectionFacade connectedUserConnectionFacade;
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ConnectionApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+    public ConnectionApiController(
+        ConnectedUserConnectionFacade connectedUserConnectionFacade, ConnectionFacade connectionFacade,
+        ConversionService conversionService) {
+
+        this.connectedUserConnectionFacade = connectedUserConnectionFacade;
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }
@@ -54,11 +60,33 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    public ResponseEntity<Long> createConnectedUserProjectWorkflowConnection(
+        Long connectedUserId, String workflowReferenceCode, ConnectionModel connectionModel) {
+
+        return ResponseEntity.ok(
+            connectedUserConnectionFacade.createConnectedUserProjectWorkflowConnection(
+                connectedUserId, workflowReferenceCode,
+                conversionService.convert(connectionModel, ConnectionDTO.class)));
+    }
+
+    @Override
     public ResponseEntity<Void> deleteConnection(Long id) {
         connectionFacade.delete(id);
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @Override
+    public ResponseEntity<List<ConnectionModel>> getConnectedUserConnections(
+        Long connectedUserId, String componentName, List<Long> connectionIds) {
+
+        return ResponseEntity.ok(
+            connectedUserConnectionFacade
+                .getConnections(connectedUserId, componentName, connectionIds == null ? List.of() : connectionIds)
+                .stream()
+                .map(this::toConnectionModel)
+                .toList());
     }
 
     @Override
@@ -68,15 +96,14 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getConnections(
-        String componentName, Integer connectionVersion, ConnectionEnvironmentModel environment,
-        Long tagId) {
+        String componentName, Integer connectionVersion, EnvironmentModel environment, Long tagId) {
 
         return ResponseEntity.ok(
             connectionFacade
                 .getConnections(
                     componentName, connectionVersion,
-                    environment == null ? null : ConnectionEnvironment.valueOf(environment.name()),
-                    tagId, ModeType.EMBEDDED)
+                    List.of(), tagId, environment == null ? null : Environment.valueOf(environment.name()),
+                    ModeType.EMBEDDED)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());

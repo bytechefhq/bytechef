@@ -28,10 +28,10 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
@@ -155,14 +155,23 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ConnectionDTO> getConnections(List<Long> connectionIds, ModeType type) {
+        return connectionService.getConnections(connectionIds)
+            .stream()
+            .map(connection -> toConnectionDTO(
+                isConnectionUsed(Validate.notNull(connection.getId(), "id"), type), connection, List.of()))
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ConnectionDTO> getConnections(
-        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId,
-        ConnectionEnvironment connectionEnvironment,
+        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Environment environment,
         ModeType type) {
 
         List<Connection> connections = CollectionUtils.filter(
             connectionService.getConnections(
-                componentName, connectionVersion, connectionEnvironment, tagId, type),
+                componentName, connectionVersion, tagId, environment, type),
             connection -> connectionIds.isEmpty() || connectionIds.contains(connection.getId()));
 
         return getConnections(connections);

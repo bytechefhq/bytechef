@@ -20,8 +20,8 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -85,8 +85,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment, Long tagId,
-        ModeType type) {
+        String componentName, Integer connectionVersion, Long tagId, Environment environment, ModeType type) {
 
         List<Connection> connections;
 
@@ -112,13 +111,18 @@ public class ConnectionServiceImpl implements ConnectionService {
             }
         }
 
-        if (connectionEnvironment != null) {
+        if (environment != null) {
             connections = connections.stream()
-                .filter(connection -> connection.getEnvironment() == connectionEnvironment)
+                .filter(connection -> connection.getEnvironment() == environment)
                 .toList();
         }
 
         return CollectionUtils.toList(connections);
+    }
+
+    @Override
+    public List<Connection> getConnections(List<Long> connectionIds) {
+        return connectionRepository.findAllByIdIn(connectionIds);
     }
 
     @Override

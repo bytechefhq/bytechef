@@ -159,7 +159,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void deleteWorkflow(String workflowId) {
+    public void deleteWorkflow(String workflowId, boolean deleteLastWorkflow) {
         Project project = projectService.getWorkflowProject(workflowId);
 
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(project.getId());
@@ -183,7 +183,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             }
         }
 
-        projectWorkflowService.delete(project.getId(), project.getLastVersion(), workflowId);
+        projectWorkflowService.delete(project.getId(), project.getLastVersion(), workflowId, deleteLastWorkflow);
 
         workflowTestConfigurationService.delete(workflowId);
 

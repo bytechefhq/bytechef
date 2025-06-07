@@ -41,7 +41,6 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.UnifiedApiDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
@@ -302,7 +301,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        ConnectionEnvironment connectionEnvironment = connection.getEnvironment();
+        Environment connectionEnvironment = connection.getEnvironment();
 
         if (!Objects.equals(connectionEnvironment.name(), environment.name())) {
             throw new ConfigurationException(

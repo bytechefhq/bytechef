@@ -18,7 +18,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
-            "ConnectionEnvironment" to "com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel",
+            "Environment" to "com.bytechef.platform.connection.web.rest.model.EnvironmentModel",
             "CredentialStatus" to "com.bytechef.platform.connection.web.rest.model.CredentialStatusModel",
             "Page" to "org.springframework.data.domain.Page",
             "Tag" to "TagModel",
@@ -65,6 +65,8 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-api"))
+
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")

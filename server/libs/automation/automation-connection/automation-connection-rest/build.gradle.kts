@@ -18,7 +18,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
-            "ConnectionEnvironment" to "com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel",
+            "Environment" to "com.bytechef.platform.connection.web.rest.model.EnvironmentModel",
             "CredentialStatus" to "com.bytechef.platform.connection.web.rest.model.CredentialStatusModel",
             "Page" to "org.springframework.data.domain.Page",
             "Tag" to "TagModel",

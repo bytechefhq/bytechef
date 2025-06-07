@@ -9,7 +9,6 @@ package com.bytechef.ee.embedded.configuration.domain;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -68,7 +67,7 @@ public class ConnectedUserProjectWorkflow {
     private int version;
 
     @MappedCollection(idColumn = "connected_user_project_workflow_id")
-    private Set<ConnectedUserProjectWorkflowConnection> connections = Collections.emptySet();
+    private Set<ConnectedUserProjectWorkflowConnection> connections = new HashSet<>();
 
     public ConnectedUserProjectWorkflow() {
     }
@@ -82,6 +81,10 @@ public class ConnectedUserProjectWorkflow {
         this.projectWorkflowId = AggregateReference.to(projectWorkflowId);
         this.workflowVersion = workflowVersion;
         this.version = version;
+    }
+
+    public void addConnection(long connectionId) {
+        connections.add(new ConnectedUserProjectWorkflowConnection(connectionId));
     }
 
     @Override

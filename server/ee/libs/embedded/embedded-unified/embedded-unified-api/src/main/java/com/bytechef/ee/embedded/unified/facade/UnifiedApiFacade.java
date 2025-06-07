@@ -23,17 +23,22 @@ import com.bytechef.platform.constant.Environment;
 public interface UnifiedApiFacade {
 
     String create(
-        String externalUserId, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category, Long integrationInstanceId, Environment environment, ModelType modelType);
+        String externalUserId, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category,
+        Long integrationInstanceId, Environment environment, ModelType modelType);
 
     void delete(
-        String externalUserId, String id, UnifiedApiCategory category, Long integrationInstanceId, Environment environment, ModelType modelType);
+        String externalUserId, String id, UnifiedApiCategory category, Long integrationInstanceId,
+        Environment environment, ModelType modelType);
 
     UnifiedOutputModel get(
-        String externalUserId, String id, UnifiedApiCategory category, Long integrationInstanceId, Environment environment, ModelType modelType);
+        String externalUserId, String id, UnifiedApiCategory category, Long integrationInstanceId,
+        Environment environment, ModelType modelType);
 
     CursorPageSlice<? extends UnifiedOutputModel> getPage(
-        String externalUserId, CursorPageable cursorPageable, UnifiedApiCategory category, Long integrationInstanceId, Environment environment, ModelType modelType);
+        String externalUserId, CursorPageable cursorPageable, UnifiedApiCategory category, Long integrationInstanceId,
+        Environment environment, ModelType modelType);
 
     void update(
-        String externalUserId, String id, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category, Long integrationInstanceId, Environment environment, ModelType modelType);
+        String externalUserId, String id, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category,
+        Long integrationInstanceId, Environment environment, ModelType modelType);
 }

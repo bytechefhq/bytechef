@@ -44,6 +44,12 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
+    public Optional<ProjectWorkflow>
+        fetchProjectWorkflow(long projectId, int projectVersion, String workflowReferenceCode) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String getLatestWorkflowId(String workflowReferenceCode) {
         throw new UnsupportedOperationException();
     }
@@ -55,11 +61,6 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public ProjectWorkflow getProjectWorkflow(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ProjectWorkflow getProjectWorkflow(long projectId, int projectVersion, String workflowReferenceCode) {
         throw new UnsupportedOperationException();
     }
 
@@ -114,7 +115,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public void delete(long projectId, int projectVersion, String workflowId) {
+    public void delete(long projectId, int projectVersion, String workflowId, boolean deleteLastWorkflow) {
         throw new UnsupportedOperationException();
     }
 

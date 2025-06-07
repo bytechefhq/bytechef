@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.unified.web.rest.accounting;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.definition.unified.accounting.AccountingModelType;
 import com.bytechef.component.definition.unified.accounting.model.AccountUnifiedInputModel;
@@ -19,6 +20,7 @@ import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreateUpdateAc
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreatedModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.ListAccountsPageableParameterModel;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
@@ -52,9 +54,11 @@ public class AccountingAccountApiController implements AccountApi {
 
         return ResponseEntity.ok(
             new CreatedModel(
-                unifiedApiFacade.create(,
+                unifiedApiFacade.create(
+                    OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
                     conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
-                    UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)),
+                    UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
+                    Environment.valueOf(StringUtils.upperCase(environment)),
                     AccountingModelType.ACCOUNT)));
     }
 
@@ -64,8 +68,9 @@ public class AccountingAccountApiController implements AccountApi {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                unifiedApiFacade.get(,
-                    accountId, UnifiedApiDefinition.UnifiedApiCategory.CRM,
+                unifiedApiFacade.get(
+                    OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), accountId,
+                    UnifiedApiDefinition.UnifiedApiCategory.CRM,
                     xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)), AccountingModelType.ACCOUNT),
                 AccountModel.class));
     }
@@ -77,9 +82,11 @@ public class AccountingAccountApiController implements AccountApi {
 
         return ResponseEntity.ok(
             unifiedApiFacade
-                .getPage(,
+                .getPage(
+                    OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
                     conversionService.convert(pageable, CursorPageRequest.class),
-                    UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)),
+                    UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
+                    Environment.valueOf(StringUtils.upperCase(environment)),
                     AccountingModelType.ACCOUNT)
                 .map(unifiedOutputModel -> conversionService.convert(unifiedOutputModel, AccountModel.class)));
     }
@@ -89,11 +96,11 @@ public class AccountingAccountApiController implements AccountApi {
     public ResponseEntity<Void> updateAccount(
         String accountId, CreateUpdateAccountModel createUpdateAccountModel, Long xInstanceId, String environment) {
 
-        unifiedApiFacade.update(,
-            accountId,
-            conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class), UnifiedApiDefinition.UnifiedApiCategory.CRM,
-            xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)),
-            AccountingModelType.ACCOUNT);
+        unifiedApiFacade.update(
+            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), accountId,
+            conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
+            UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
+            Environment.valueOf(StringUtils.upperCase(environment)), AccountingModelType.ACCOUNT);
 
         return ResponseEntity.noContent()
             .build();

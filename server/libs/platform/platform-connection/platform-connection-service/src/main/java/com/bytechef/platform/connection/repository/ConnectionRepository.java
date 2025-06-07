@@ -60,6 +60,8 @@ public interface ConnectionRepository
         @Param("componentName") String componentName, @Param("connectionVersion") int connectionVersion,
         @Param("tagId") long tagId, @Param("type") int type);
 
+    List<Connection> findAllByIdIn(List<Long> ids);
+
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id

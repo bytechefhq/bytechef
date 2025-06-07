@@ -30,7 +30,7 @@ public interface IntegrationInstanceConfigurationWorkflowConnectionRepository
             JOIN integration_instance_configuration_workflow ON integration_instance_configuration_workflow_connection.integration_instance_configuration_workflow_id = integration_instance_configuration_workflow.id
             WHERE integration_instance_configuration_workflow.integration_instance_configuration_id = :integrationInstanceConfigurationId
             AND integration_instance_configuration_workflow.workflow_id = :workflowId
-            AND integration_instance_configuration_workflow_connection.workflow_noden_name = :workflowNodeName
+            AND integration_instance_configuration_workflow_connection.workflow_node_name = :workflowNodeName
         """)
     List<IntegrationInstanceConfigurationWorkflowConnection>
         findAllByIntegrationInstanceIdAndWorkflowIdAndOperationName(
@@ -42,7 +42,7 @@ public interface IntegrationInstanceConfigurationWorkflowConnectionRepository
             JOIN integration_instance_configuration_workflow ON integration_instance_configuration_workflow_connection.integration_instance_configuration_workflow_id = integration_instance_configuration_workflow.id
             WHERE integration_instance_configuration_workflow.integration_instance_configuration_id = :integrationInstanceConfigurationId
             AND integration_instance_configuration_workflow.workflow_id = :workflowId
-            AND integration_instance_configuration_workflow_connection.workflow_noden_name = :workflowNodeName
+            AND integration_instance_configuration_workflow_connection.workflow_node_name = :workflowNodeName
             AND integration_instance_configuration_workflow_connection.key = :key
         """)
     Optional<IntegrationInstanceConfigurationWorkflowConnection>

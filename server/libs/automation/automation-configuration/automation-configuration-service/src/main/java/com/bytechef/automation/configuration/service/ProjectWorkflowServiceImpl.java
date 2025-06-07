@@ -69,6 +69,13 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public Optional<ProjectWorkflow>
+        fetchProjectWorkflow(long projectId, int projectVersion, String workflowReferenceCode) {
+        return projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowReferenceCode(
+            projectId, projectVersion, workflowReferenceCode);
+    }
+
+    @Override
     public ProjectWorkflow getLatestProjectWorkflow(Long projectId, String workflowReferenceCode) {
         return OptionalUtils.get(
             projectWorkflowRepository.findByProjectIdAndWorkflowReferenceCode(projectId, workflowReferenceCode));
@@ -93,13 +100,6 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     @Override
     public ProjectWorkflow getProjectWorkflow(long id) {
         return OptionalUtils.get(projectWorkflowRepository.findById(id));
-    }
-
-    @Override
-    public ProjectWorkflow getProjectWorkflow(long projectId, int projectVersion, String workflowReferenceCode) {
-        return OptionalUtils.get(
-            projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowReferenceCode(
-                projectId, projectVersion, workflowReferenceCode));
     }
 
     @Override
@@ -161,8 +161,10 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public void delete(long projectId, int projectVersion, String workflowId) {
-        if (projectWorkflowRepository.countByProjectIdAndProjectVersion(projectId, projectVersion) == 1) {
+    public void delete(long projectId, int projectVersion, String workflowId, boolean deleteLastWorkflow) {
+        if (projectWorkflowRepository.countByProjectIdAndProjectVersion(projectId, projectVersion) == 1 &&
+            !deleteLastWorkflow) {
+
             throw new ConfigurationException(
                 "The last workflow id=%s cannot be deleted".formatted(workflowId),
                 ProjectErrorType.DELETE_LAST_WORKFLOW);

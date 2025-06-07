@@ -21,11 +21,11 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.connection.web.rest.model.ConnectionModel;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
+import com.bytechef.platform.connection.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateConnectionRequestModel;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -80,14 +80,13 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getWorkspaceConnections(
-        Long id, String componentName, Integer connectionVersion, ConnectionEnvironmentModel environment, Long tagId) {
+        Long id, String componentName, Integer connectionVersion, EnvironmentModel environmentModel, Long tagId) {
+
+        Environment environment = environmentModel == null ? null : Environment.valueOf(environmentModel.name());
 
         return ResponseEntity.ok(
             workspaceConnectionFacade
-                .getConnections(
-                    id, componentName, connectionVersion,
-                    environment == null ? null : ConnectionEnvironment.valueOf(environment.name()),
-                    tagId)
+                .getConnections(id, componentName, connectionVersion, environment, tagId)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());

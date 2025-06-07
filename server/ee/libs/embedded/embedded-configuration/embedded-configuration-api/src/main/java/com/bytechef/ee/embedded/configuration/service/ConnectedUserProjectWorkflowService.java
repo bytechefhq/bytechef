@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.service;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -17,18 +18,21 @@ import java.util.List;
  */
 public interface ConnectedUserProjectWorkflowService {
 
+    void addConnection(long connectedUserProjectId, long projectWorkflowId, long connectionId);
+
     ConnectedUserProjectWorkflow create(ConnectedUserProjectWorkflow connectedUserProjectWorkflow);
 
     void delete(long id);
 
+    Optional<ConnectedUserProjectWorkflow> fetchConnectedUserProjectWorkflow(
+        long connectedUserProjectId, long projectWorkflowId);
+
     ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(long id);
 
-    List<ConnectedUserProjectWorkflow> getConnectedUserProjectWorkflows();
+    ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(
+        long connectedUserProjectId, long projectWorkflowId);
 
     List<ConnectedUserProjectWorkflow> getConnectedUserProjectWorkflows(long connectedUserProjectId);
-
-    ConnectedUserProjectWorkflow getConnectedUserProjectWorkflows(
-        long connectedUserProjectId, long projectWorkflowId);
 
     boolean isConnectionUsed(long connectionId);
 

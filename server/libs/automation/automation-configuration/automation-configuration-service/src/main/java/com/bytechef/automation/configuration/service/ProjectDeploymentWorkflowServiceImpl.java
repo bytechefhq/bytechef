@@ -140,10 +140,9 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
     @Override
     @Transactional(readOnly = true)
     public boolean isProjectDeploymentWorkflowEnabled(long projectDeploymentId, String workflowId) {
-        ProjectDeploymentWorkflow projectDeploymentWorkflow = getProjectDeploymentWorkflow(
-            projectDeploymentId, workflowId);
-
-        return projectDeploymentWorkflow.isEnabled();
+        return fetchProjectDeploymentWorkflow(projectDeploymentId, workflowId)
+            .map(ProjectDeploymentWorkflow::isEnabled)
+            .orElse(false);
     }
 
     @Override

@@ -65,6 +65,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -387,20 +388,16 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
                 if (Objects.equals(curProjectWorkflow.getWorkflowReferenceCode(), workflowReferenceCode)) {
                     projectDeploymentWorkflow.setConnections(connections);
+                    projectDeploymentWorkflow.setEnabled(
+                        getFirst(curProjectWorkflow, oldProjectDeploymentWorkflows, projectDeployment)
+                            .map(ProjectDeploymentWorkflow::isEnabled)
+                            .orElse(false));
                     projectDeploymentWorkflow.setInputs(Map.of());
                 } else {
-                    return oldProjectDeploymentWorkflows.stream()
-                        .filter(curProjectDeploymentWorkflow -> {
-                            String projectDeploymentWorkflowReferenceCode =
-                                projectWorkflowService.getProjectDeploymentWorkflowReferenceCode(
-                                    projectDeployment.getId(), curProjectDeploymentWorkflow.getWorkflowId());
-
-                            return Objects.equals(
-                                projectDeploymentWorkflowReferenceCode, curProjectWorkflow.getWorkflowReferenceCode());
-                        })
-                        .findFirst()
+                    return getFirst(curProjectWorkflow, oldProjectDeploymentWorkflows, projectDeployment)
                         .map(curProjectDeploymentWorkflow -> {
                             projectDeploymentWorkflow.setConnections(curProjectDeploymentWorkflow.getConnections());
+                            projectDeploymentWorkflow.setEnabled(curProjectDeploymentWorkflow.isEnabled());
                             projectDeploymentWorkflow.setInputs(curProjectDeploymentWorkflow.getInputs());
 
                             return projectDeploymentWorkflow;
@@ -413,6 +410,21 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             .toList();
 
         updateProjectDeployment(projectDeployment, projectDeploymentWorkflows, List.of());
+    }
+
+    private Optional<ProjectDeploymentWorkflow> getFirst(
+        ProjectWorkflow curProjectWorkflow, List<ProjectDeploymentWorkflow> oldProjectDeploymentWorkflows,
+        ProjectDeployment projectDeployment) {
+        return oldProjectDeploymentWorkflows.stream()
+            .filter(curProjectDeploymentWorkflow -> {
+                String projectDeploymentWorkflowReferenceCode =
+                    projectWorkflowService.getProjectDeploymentWorkflowReferenceCode(
+                        projectDeployment.getId(), curProjectDeploymentWorkflow.getWorkflowId());
+
+                return Objects.equals(
+                    projectDeploymentWorkflowReferenceCode, curProjectWorkflow.getWorkflowReferenceCode());
+            })
+            .findFirst();
     }
 
     @Override
