@@ -28,11 +28,17 @@ import {
  */
 export interface ComponentDefinitionBasic {
     /**
-     * 
+     * The number of actions a component has
      * @type {number}
      * @memberof ComponentDefinitionBasic
      */
     actionsCount?: number;
+    /**
+     * The number of cluster elements a component has
+     * @type {{ [key: string]: number; }}
+     * @memberof ComponentDefinitionBasic
+     */
+    clusterElementsCount?: { [key: string]: number; };
     /**
      * The list of categories the component belongs to.
      * @type {Array<ComponentCategory>}
@@ -97,6 +103,7 @@ export function ComponentDefinitionBasicFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'actionsCount': json['actionsCount'] == null ? undefined : json['actionsCount'],
+        'clusterElementsCount': json['clusterElementsCount'] == null ? undefined : json['clusterElementsCount'],
         'componentCategories': json['componentCategories'] == null ? undefined : ((json['componentCategories'] as Array<any>).map(ComponentCategoryFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
@@ -119,6 +126,7 @@ export function ComponentDefinitionBasicToJSONTyped(value?: ComponentDefinitionB
     return {
         
         'actionsCount': value['actionsCount'],
+        'clusterElementsCount': value['clusterElementsCount'],
         'componentCategories': value['componentCategories'] == null ? undefined : ((value['componentCategories'] as Array<any>).map(ComponentCategoryToJSON)),
         'description': value['description'],
         'icon': value['icon'],

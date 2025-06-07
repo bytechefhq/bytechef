@@ -20,6 +20,13 @@ import {
     ConnectionDefinitionBasicToJSON,
     ConnectionDefinitionBasicToJSONTyped,
 } from './ConnectionDefinitionBasic';
+import type { ClusterElementDefinitionBasic } from './ClusterElementDefinitionBasic';
+import {
+    ClusterElementDefinitionBasicFromJSON,
+    ClusterElementDefinitionBasicFromJSONTyped,
+    ClusterElementDefinitionBasicToJSON,
+    ClusterElementDefinitionBasicToJSONTyped,
+} from './ClusterElementDefinitionBasic';
 import type { ClusterElementType } from './ClusterElementType';
 import {
     ClusterElementTypeFromJSON,
@@ -87,6 +94,12 @@ export interface ComponentDefinition {
      * @memberof ComponentDefinition
      */
     clusterElement: boolean;
+    /**
+     * The list of all available cluster elements the component can perform.
+     * @type {Array<ClusterElementDefinitionBasic>}
+     * @memberof ComponentDefinition
+     */
+    clusterElements?: Array<ClusterElementDefinitionBasic>;
     /**
      * The list of cluster element types.
      * @type {Array<ClusterElementType>}
@@ -200,6 +213,7 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
         'actionClusterElementTypes': json['actionClusterElementTypes'] == null ? undefined : json['actionClusterElementTypes'],
         'actions': json['actions'] == null ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicFromJSON)),
         'clusterElement': json['clusterElement'],
+        'clusterElements': json['clusterElements'] == null ? undefined : ((json['clusterElements'] as Array<any>).map(ClusterElementDefinitionBasicFromJSON)),
         'clusterElementTypes': json['clusterElementTypes'] == null ? undefined : ((json['clusterElementTypes'] as Array<any>).map(ClusterElementTypeFromJSON)),
         'clusterRoot': json['clusterRoot'],
         'componentCategories': json['componentCategories'] == null ? undefined : ((json['componentCategories'] as Array<any>).map(ComponentCategoryFromJSON)),
@@ -231,6 +245,7 @@ export function ComponentDefinitionToJSONTyped(value?: ComponentDefinition | nul
         'actionClusterElementTypes': value['actionClusterElementTypes'],
         'actions': value['actions'] == null ? undefined : ((value['actions'] as Array<any>).map(ActionDefinitionBasicToJSON)),
         'clusterElement': value['clusterElement'],
+        'clusterElements': value['clusterElements'] == null ? undefined : ((value['clusterElements'] as Array<any>).map(ClusterElementDefinitionBasicToJSON)),
         'clusterElementTypes': value['clusterElementTypes'] == null ? undefined : ((value['clusterElementTypes'] as Array<any>).map(ClusterElementTypeToJSON)),
         'clusterRoot': value['clusterRoot'],
         'componentCategories': value['componentCategories'] == null ? undefined : ((value['componentCategories'] as Array<any>).map(ComponentCategoryToJSON)),
