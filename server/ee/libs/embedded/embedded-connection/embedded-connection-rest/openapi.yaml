@@ -36,7 +36,7 @@ paths:
         in: "query"
         required: false
         schema:
-          $ref: "#/components/schemas/ConnectionEnvironment"
+          $ref: "#/components/schemas/Environment"
       - name: "tagId"
         description: "The tag id of used for filtering connections."
         in: "query"
@@ -176,12 +176,86 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /connected-users/{connectedUserId}/components/{componentName}/connections:
+    get:
+      description: "Get all connected user's connections."
+      summary: "Get all connected user's connections"
+      tags:
+        - "connection"
+      operationId: "getConnectedUserConnections"
+      parameters:
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "componentName"
+          description: "The component name."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "connectionIds"
+          description: "The list of allowed connection ids."
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "integer"
+              format: "int64"
+      responses:
+        "200":
+          description: "The list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Connection"
+  /connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections:
+    post:
+      description: "Create a new connection for the connected user's project workflow."
+      summary: "Create a new connection for the connected user's project workflow"
+      tags:
+        - "connection"
+      operationId: "createConnectedUserProjectWorkflowConnection"
+      parameters:
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference code."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The connection id."
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
 components:
   schemas:
     Connection:
       $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_base.yaml"
-    ConnectionEnvironment:
-      $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_environment.yaml"
+    Environment:
+      $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Tag:
       $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/Tag"
     UpdateConnectionRequest:

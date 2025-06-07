@@ -43,7 +43,7 @@ properties:
   credentialStatus:
     $ref: "./credential_status.yaml"
   environment:
-    $ref: './connection_environment.yaml'
+    $ref: '../../../../../../platform-rest/openapi/components/schemas/objects/environment.yaml'
   id:
     description: "The id of a connection."
     type: "integer"

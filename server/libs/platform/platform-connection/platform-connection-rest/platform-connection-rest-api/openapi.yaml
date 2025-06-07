@@ -8,10 +8,10 @@ servers:
 paths: {}
 components:
   schemas:
-    ConnectionEnvironment:
-      $ref: "../../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_environment.yaml"
     CredentialStatus:
       $ref: "../../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
+    Environment:
+      $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     UpdateConnectionRequest:
       description: "Contains all connection parameters that can be updated."
       type: "object"
