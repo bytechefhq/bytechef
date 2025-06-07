@@ -87,7 +87,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         }
 
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-            integrationDTO.componentName(), integrationInstanceConfigurationDTO.integrationVersion());
+            integrationDTO.componentName(), integrationDTO.componentVersion());
 
         ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
 
