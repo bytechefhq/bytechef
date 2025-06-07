@@ -21,6 +21,6 @@ public interface ConnectedUserIntegrationFacade {
     ConnectedUserIntegrationDTO getConnectedUserIntegration(
         String externalUserId, long integrationId, boolean enabled, Environment environment);
 
-    List<ConnectedUserIntegrationDTO>
-        getConnectedUserIntegrations(String externalUserId, boolean enabled, Environment environment);
+    List<ConnectedUserIntegrationDTO> getConnectedUserIntegrations(
+        String externalUserId, boolean enabled, Environment environment);
 }
