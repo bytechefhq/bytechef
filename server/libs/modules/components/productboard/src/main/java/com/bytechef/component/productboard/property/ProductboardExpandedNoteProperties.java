@@ -56,12 +56,7 @@ public class ProductboardExpandedNoteProperties {
             .required(false))
             .label("User")
             .required(false),
-        object("owner").properties(string("email").label("Email")
-            .description("Email of th owner.")
-            .required(false),
-            string("name").label("Name")
-                .description("Name of the owner.")
-                .required(false))
+        object("owner").properties(ProductboardOwnerProperties.PROPERTIES)
             .label("Owner")
             .required(false),
         array("followers").items(object().properties(string("memberId").label("Member Id")

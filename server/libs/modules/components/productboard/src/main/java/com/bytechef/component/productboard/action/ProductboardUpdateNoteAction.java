@@ -19,6 +19,7 @@ package com.bytechef.component.productboard.action;
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -27,6 +28,7 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.productboard.property.ProductboardOwnerProperties;
 import com.bytechef.component.productboard.util.ProductboardUtils;
 import java.util.Map;
 
@@ -45,23 +47,32 @@ public class ProductboardUpdateNoteAction {
                 "path", "/notes/{noteId}", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(string("noteId").label("Note ID")
-            .description("ID of the note")
+        .properties(integer("X-Version").label("X - Version")
+            .defaultValue(1)
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)),
-            object("data").properties(string("title").label("Title")
-                .description("Title of note.")
+                    "type", PropertyType.HEADER)),
+            string("noteId").label("Note ID")
+                .description("ID of the note")
+                .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.PATH)),
+            object("data").properties(string("content").label("Content")
+                .description("The content of a note. This can only be updated on notes without existing snippets.")
                 .required(false),
+                object("owner").properties(ProductboardOwnerProperties.PROPERTIES)
+                    .label("Owner")
+                    .required(false),
                 array("tags").items(string().description("A list of tags for categorizing the note."))
                     .placeholder("Add to Tags")
                     .label("Tags")
                     .description("A list of tags for categorizing the note.")
                     .required(false),
-                string("content").label("Content")
-                    .description("The content of a note. This can only be updated on notes without existing snippets.")
+                string("title").label("Title")
+                    .description("Title of note.")
                     .required(false))
                 .metadata(
                     Map.of(

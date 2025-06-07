@@ -22,10 +22,10 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.productboard.property.ProductboardFeatureProperties;
 import java.util.Map;
 
 /**
@@ -33,14 +33,14 @@ import java.util.Map;
  *
  * @generated
  */
-public class ProductboardCreateNoteAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createNote")
-        .title("Create Note")
-        .description("Creates a new note.")
+public class ProductboardGetFeatureAction {
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getFeature")
+        .title("Get feature")
+        .description("Returns detail of a specific feature.")
         .metadata(
             Map.of(
-                "method", "POST",
-                "path", "/notes", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
+                "method", "GET",
+                "path", "/features/{id}"
 
             ))
         .properties(integer("X-Version").label("X - Version")
@@ -49,32 +49,18 @@ public class ProductboardCreateNoteAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.HEADER)),
-            string("title").metadata(
-                Map.of(
-                    "type", PropertyType.BODY))
-                .label("Title")
-                .description("Title of note.")
-                .required(true),
-            string("content").metadata(
-                Map.of(
-                    "type", PropertyType.BODY))
-                .label("Content")
-                .description("HTML-encoded rich text supported by certain tags; unsupported tags will be stripped out.")
-                .required(true))
-        .output(outputSchema(object()
-            .properties(
-                object("links")
-                    .properties(
-                        string("html").description("Note is accessible via this URL in the Productboard application.")
-                            .required(false))
-                    .required(false),
-                object("data").properties(string("id").description("ID of the note.")
-                    .required(false))
-                    .required(false))
+            string("id").label("Id")
+                .description("ID of the feature")
+                .required(true)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.PATH)))
+        .output(outputSchema(object().properties(object("data").properties(ProductboardFeatureProperties.PROPERTIES)
+            .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));
 
-    private ProductboardCreateNoteAction() {
+    private ProductboardGetFeatureAction() {
     }
 }

@@ -18,6 +18,7 @@ package com.bytechef.component.productboard.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -44,13 +45,19 @@ public class ProductboardGetNoteAction {
                 "path", "/notes/{noteId}"
 
             ))
-        .properties(string("noteId").label("Note ID")
-            .description("ID of the note")
+        .properties(integer("X-Version").label("X - Version")
+            .defaultValue(1)
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)))
+                    "type", PropertyType.HEADER)),
+            string("noteId").label("Note ID")
+                .description("ID of the note")
+                .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.PATH)))
         .output(outputSchema(object()
             .properties(object("data").properties(ProductboardExpandedNoteProperties.PROPERTIES)
                 .required(false))

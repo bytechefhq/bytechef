@@ -17,13 +17,16 @@
 package com.bytechef.component.productboard;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.productboard.trigger.ProductboardNewNoteTrigger;
 import com.bytechef.component.productboard.trigger.ProductboardUpdatedFeatureTrigger;
 import com.google.auto.service.AutoService;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Monika Kušter
@@ -44,5 +47,16 @@ public class ProductboardComponentHandler extends AbstractProductboardComponentH
             .customAction(true)
             .icon("path:assets/productboard.svg")
             .categories(ComponentCategory.PROJECT_MANAGEMENT);
+    }
+
+    @Override
+    public ComponentDsl.ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ComponentDsl.ModifiableProperty<?> modifiableProperty) {
+
+        if (Objects.equals(modifiableProperty.getName(), "X-Version")) {
+            modifiableProperty.hidden(true);
+        }
+
+        return super.modifyProperty(actionDefinition, modifiableProperty);
     }
 }

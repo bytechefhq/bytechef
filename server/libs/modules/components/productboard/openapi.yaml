@@ -1,4 +1,3 @@
----
 openapi: "3.0.1"
 info:
   title: "Productboard"
@@ -7,11 +6,47 @@ info:
 servers:
   - url: "https://api.productboard.com"
 paths:
+  /features/{id}:
+    get:
+      summary: "Get feature"
+      description: "Returns detail of a specific feature."
+      operationId: "getFeature"
+      parameters:
+        - name: "X-Version"
+          in: "header"
+          required: true
+          schema:
+            type: "integer"
+            default: 1
+        - name: "id"
+          description: "ID of the feature"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        200:
+          description: "Success, the response contains valid data."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Feature"
   /notes:
     post:
       summary: "Create Note"
       description: "Creates a new note."
       operationId: "createNote"
+      parameters:
+        - name: "X-Version"
+          in: "header"
+          required: true
+          schema:
+            type: "integer"
+            default: 1
       responses:
         201:
           description: "Note created"
@@ -52,6 +87,13 @@ paths:
       summary: "List All Notes"
       description: "Returns detail of all notes order by created_at desc"
       operationId: "listNotes"
+      parameters:
+        - name: "X-Version"
+          in: "header"
+          required: true
+          schema:
+            type: "integer"
+            default: 1
       responses:
         200:
           description: "Success, the response contains valid data."
@@ -76,6 +118,12 @@ paths:
       description: "Returns detail of a specific note."
       operationId: "getNote"
       parameters:
+        - name: "X-Version"
+          in: "header"
+          required: true
+          schema:
+            type: "integer"
+            default: 1
         - name: "noteId"
           description: "ID of the note"
           in: "path"
@@ -99,6 +147,12 @@ paths:
       description: "Updates a note."
       operationId: "updateNote"
       parameters:
+        - name: "X-Version"
+          in: "header"
+          required: true
+          schema:
+            type: "integer"
+            default: 1
         - name: "noteId"
           description: "ID of the note"
           in: "path"
@@ -118,17 +172,19 @@ paths:
               properties:
                 data:
                   properties:
-                    title:
+                    content:
                       type: "string"
-                      description: "Title of note."
+                      description: "The content of a note. This can only be updated on notes without existing snippets."
+                    owner:
+                      $ref: "#/components/schemas/Owner"
                     tags:
                       description: "A list of tags for categorizing the note."
                       type: "array"
                       items:
                         type: "string"
-                    content:
+                    title:
                       type: "string"
-                      description: "The content of a note. This can only be updated on notes without existing snippets."
+                      description: "Title of note."
       responses:
         201:
           description: Note Updated
@@ -155,6 +211,12 @@ paths:
       description: "Deletes a note."
       operationId: "deleteNote"
       parameters:
+        - name: "X-Version"
+          in: "header"
+          required: true
+          schema:
+            type: "integer"
+            default: 1
         - name: "noteId"
           description: "ID of the note"
           in: "path"
@@ -168,6 +230,90 @@ paths:
           description: "Note deleted"
 components:
   schemas:
+    Feature:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          description: "ID of the feature."
+        name:
+          type: "string"
+          description: "Name of the feature."
+        description:
+          type: "string"
+          description: "HTML-encoded description of the feature."
+        type:
+          type: "string"
+          description: "Type of the feature."
+        status:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+              format: "uuid"
+              description: "ID of the status."
+            name:
+              type: "string"
+              description: "Name of the status."
+        parent:
+          type: "object"
+          properties:
+            component:
+              type: "object"
+              properties:
+                id:
+                  type: "string"
+                  format: "uuid"
+                  description: "ID of the parent component."
+                links:
+                  type: "object"
+                  properties:
+                    self:
+                      type: "string"
+                      format: "uri"
+                      description: "API link to the component."
+        links:
+          type: "object"
+          properties:
+            self:
+              type: "string"
+              format: "uri"
+              description: "API link to the feature."
+            html:
+              type: "string"
+              format: "uri"
+              description: "HTML link to the feature in Productboard."
+        archived:
+          type: "boolean"
+          description: "Whether the feature is archived."
+        timeframe:
+          type: "object"
+          properties:
+            startDate:
+              type: "string"
+              description: "Start date of the timeframe."
+            endDate:
+              type: "string"
+              description: "End date of the timeframe."
+            granularity:
+              type: "string"
+              description: "Granularity of the timeframe."
+        owner:
+          $ref: "#/components/schemas/Owner"
+        createdAt:
+          type: "string"
+          format: "date-time"
+          description: "Date and time when the feature was created."
+        updatedAt:
+          type: "string"
+          format: "date-time"
+          description: "Date and time when the feature was last updated."
+        lastHealthUpdate:
+          type: "string"
+          format: "date-time"
+          nullable: true
+          description: "Date and time of the last health update."
     ExpandedNote:
       type: "object"
       properties:
@@ -200,14 +346,7 @@ components:
               type: "string"
               description: "ID of the user."
         owner:
-          type: "object"
-          properties:
-            email:
-              type: "string"
-              description: "Email of th owner."
-            name:
-              type: "string"
-              description: "Name of the owner."
+          $ref: "#/components/schemas/Owner"
         followers:
           type: "array"
           description: "The followers of the note."
@@ -279,6 +418,18 @@ components:
             uuid:
               type: "string"
               description: "ID of the user who created the note."
+    Owner:
+      type: "object"
+      required:
+      - "email"
+      properties:
+        email:
+          type: "string"
+          description: "Email of th owner."
+        name:
+          type: "string"
+          description: "Name of the owner."
+          readOnly: true
   securitySchemes:
     bearerAuth:
       type: "http"
