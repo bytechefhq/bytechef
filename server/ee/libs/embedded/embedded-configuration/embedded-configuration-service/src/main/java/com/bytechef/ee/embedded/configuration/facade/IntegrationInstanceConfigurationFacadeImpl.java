@@ -325,11 +325,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     return toIntegrationInstanceConfigurationDTO(
                         integrationDTO,
                         integrationInstanceConfiguration,
-                        integrationInstanceConfigurationWorkflowService
-                            .getIntegrationInstanceConfigurationWorkflows(integrationInstanceConfiguration.getId())
-                            .stream()
-                            .filter(IntegrationInstanceConfigurationWorkflow::isEnabled)
-                            .toList(),
+                        integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                            integrationInstanceConfiguration.getId()),
                         integrationWorkflowService.getIntegrationWorkflows(
                             integrationInstanceConfiguration.getIntegrationId(),
                             integrationInstanceConfiguration.getIntegrationVersion()),
