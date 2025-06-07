@@ -33,7 +33,6 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
@@ -70,23 +69,23 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
     }
 
     protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
-        ObjectProperty variableProperties;
-
         if (!MapUtils.containsKey(inputParameters, ITEMS)) {
             return null;
         }
 
+        OutputResponse outputResponse;
         List<?> list = MapUtils.getRequiredList(inputParameters, ITEMS);
 
         if (list.isEmpty()) {
-            variableProperties = object();
+            outputResponse = OutputResponse.of(object());
         } else {
-            variableProperties = object().properties(
-                (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                    ITEM, list.getFirst(), PropertyFactory.PROPERTY_FACTORY),
-                integer(INDEX));
+            ModifiableValueProperty<?, ?> itemProperty = (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
+                ITEM, list.getFirst(), PropertyFactory.PROPERTY_FACTORY);
+
+            outputResponse = OutputResponse.of(
+                object().properties(itemProperty, integer(INDEX)), Map.of(ITEM, list.getFirst(), INDEX, 0));
         }
 
-        return OutputResponse.of(variableProperties);
+        return outputResponse;
     }
 }

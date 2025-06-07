@@ -258,9 +258,10 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             ObjectProperty objectProperty = (ObjectProperty) outputResponse.outputSchema();
 
             List<? extends Property> properties = objectProperty.getProperties();
+            Map<?, ?> sampleOutputMap = (Map<?, ?>) outputResponse.sampleOutput();
 
             outputResponse = new OutputResponse(
-                properties.getFirst(), outputResponse.sampleOutput(), outputResponse.placeholder());
+                properties.getFirst(), sampleOutputMap.get("variableProperties"), outputResponse.placeholder());
         }
 
         return new WorkflowNodeOutputDTO(
