@@ -34,13 +34,13 @@ import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPan
 import saveClusterElementNodesPosition from './utils/saveClusterElementNodesPosition';
 
 const WorkflowEditorLayout = ({
-    inputs,
+    includeComponents,
     parentId,
     parentType,
     runDisabled,
     showWorkflowInputs,
 }: {
-    inputs?: string[];
+    includeComponents?: string[];
     parentId: number;
     parentType: StructureParentType;
     runDisabled: boolean;
@@ -80,7 +80,7 @@ const WorkflowEditorLayout = ({
         taskDispatcherDefinitionsLoading,
         testConfigurationDisabled,
         workflowTestConfiguration,
-    } = useWorkflowLayout(inputs);
+    } = useWorkflowLayout(includeComponents);
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 

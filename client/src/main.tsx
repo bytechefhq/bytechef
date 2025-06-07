@@ -8,6 +8,7 @@ import './styles/index.css';
 import './styles/components.css';
 
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {getRouter as getEmbeddedRouter} from '@/embeddedRoutes';
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
@@ -20,7 +21,6 @@ import {PostHogProvider} from 'posthog-js/react';
 import {RouterProvider} from 'react-router-dom';
 
 import {getRouter as getMainRouter} from './routes';
-import {getRouter as getWorkflowBuilderRouter} from './workflowBuilderRoutes';
 
 window.MonacoEnvironment = {
     getWorker(moduleId: string, label: string) {
@@ -50,8 +50,9 @@ function renderApp() {
     const root = createRoot(container);
     const queryClient = new QueryClient();
 
-    const isWorkflowBuilder = window.location.pathname.includes('/workflow-builder/');
-    const router = isWorkflowBuilder ? getWorkflowBuilderRouter() : getMainRouter(queryClient);
+    const isEmbedded = window.location.pathname.includes('/embedded/');
+
+    const router = isEmbedded ? getEmbeddedRouter() : getMainRouter(queryClient);
 
     root.render(
         <React.StrictMode>

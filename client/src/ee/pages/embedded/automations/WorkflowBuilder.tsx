@@ -25,12 +25,12 @@ const WorkflowBuilder = () => {
         connectedUserProjectWorkflow,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
-        include,
+        includeComponents,
         projectId,
+        sharedConnectionIds,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
-        vendorConnectionIds,
         workflowReferenceCode,
     } = useWorkflowBuilder();
 
@@ -66,7 +66,7 @@ const WorkflowBuilder = () => {
                                 useGetConnectionTagsQuery: useGetConnectionTagsQuery,
                                 useGetConnectionsQuery: getConnectedUserConnectionsQuery(
                                     connectedUserProjectWorkflow.connectedUserId!,
-                                    vendorConnectionIds ? vendorConnectionIds : []
+                                    sharedConnectionIds ? sharedConnectionIds : []
                                 ),
                             }}
                         >
@@ -83,7 +83,7 @@ const WorkflowBuilder = () => {
                                 >
                                     {projectId && (
                                         <WorkflowEditorLayout
-                                            inputs={include}
+                                            includeComponents={includeComponents}
                                             parentId={projectId}
                                             parentType="PROJECT"
                                             runDisabled={runDisabled}

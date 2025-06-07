@@ -8,6 +8,14 @@
     <title>ByteChef</title>
   </head>
   <body>
+    <script type="module">
+      const isEmbedded = window.location.pathname.includes('/embedded/');
+
+      if (isEmbedded) {
+        document.body.classList.add('bg-transparent');
+      }
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

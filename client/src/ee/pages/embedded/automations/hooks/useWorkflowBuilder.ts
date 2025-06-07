@@ -1,4 +1,3 @@
-import useFetchInterceptor from '@/ee/pages/embedded/automations/config/useFetchInterceptor';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
@@ -22,8 +21,8 @@ import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
 
 export const useWorkflowBuilder = () => {
-    const [include, setInclude] = useState<string[] | undefined>(undefined);
-    const [vendorConnectionIds, setVendorConnectionIds] = useState<number[] | undefined>(undefined);
+    const [includeComponents, setIncludeComponents] = useState<string[] | undefined>(undefined);
+    const [sharedConnectionIds, setSharedConnectionIds] = useState<number[] | undefined>(undefined);
 
     const {setParentId, setParentType, setWorkflow, workflow} = useWorkflowDataStore();
     const {setShowConnectionNote} = useConnectionNoteStore();
@@ -39,8 +38,6 @@ export const useWorkflowBuilder = () => {
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
 
     const {workflowReferenceCode} = useParams();
-
-    useFetchInterceptor();
 
     const {data: connectedUserProjectWorkflow} = useGetConnectedUserProjectWorkflowQuery(workflowReferenceCode!);
 
@@ -109,14 +106,15 @@ export const useWorkflowBuilder = () => {
 
         const listener = (event: MessageEvent) => {
             if (event.data.type === 'EMBED_INIT') {
+                const sharedConnectionIds = event.data.params.sharedConnectionIds;
                 const connectionDialogAllowed = event.data.params.connectionDialogAllowed ?? false;
                 const environment = event.data.params.environment || 'PRODUCTION';
-                const include = event.data.params.include;
+                const includeComponents = event.data.params.includeComponents;
                 const jwtToken = event.data.params.jwtToken;
 
                 setConnectionDialogAllowed(connectionDialogAllowed);
-                setInclude(include);
-                setVendorConnectionIds(event.data.params.vendorConnectionIds);
+                setIncludeComponents(includeComponents);
+                setSharedConnectionIds(sharedConnectionIds);
 
                 if (jwtToken) {
                     sessionStorage.setItem('jwtToken', jwtToken);
@@ -170,12 +168,12 @@ export const useWorkflowBuilder = () => {
         connectedUserProjectWorkflow,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
-        include: include,
+        includeComponents,
         projectId: connectedUserProjectWorkflow?.projectId,
+        sharedConnectionIds,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
-        vendorConnectionIds,
         workflowReferenceCode,
     };
 };

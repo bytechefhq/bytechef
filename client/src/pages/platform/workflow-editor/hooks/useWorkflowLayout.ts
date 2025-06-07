@@ -11,7 +11,7 @@ import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEffect, useMemo} from 'react';
 
-export const useWorkflowLayout = (include?: string[]) => {
+export const useWorkflowLayout = (includeComponents?: string[]) => {
     const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {componentActions, setComponentDefinitions, setTaskDispatcherDefinitions, workflow} = useWorkflowDataStore();
@@ -39,7 +39,7 @@ export const useWorkflowLayout = (include?: string[]) => {
         isLoading: componentsIsLoading,
     } = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
-        include,
+        include: includeComponents,
         triggerDefinitions: true,
     });
 

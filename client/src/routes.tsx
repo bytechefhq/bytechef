@@ -2,7 +2,6 @@ import App from '@/App';
 import ApiClients from '@/ee/pages/automation/api-platform/api-clients/ApiClients';
 import ApiCollections from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import AppEvents from '@/ee/pages/embedded/app-events/AppEvents';
-import WorkflowBuilder from '@/ee/pages/embedded/automations/WorkflowBuilder';
 import Workflows from '@/ee/pages/embedded/automations/Workflows';
 import ConnectedUsers from '@/ee/pages/embedded/connected-users/ConnectedUsers';
 import {Connections as EmbeddedConnections} from '@/ee/pages/embedded/connections/Connections';
@@ -213,10 +212,6 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: <WorkflowChat />,
             path: 'chat/:environment/:workflowExecutionId',
-        },
-        {
-            element: <WorkflowBuilder />,
-            path: '/workflow-builder/:workflowReferenceCode',
         },
         {
             children: [
