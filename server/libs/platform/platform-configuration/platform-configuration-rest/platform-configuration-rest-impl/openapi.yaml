@@ -537,10 +537,8 @@ paths:
               - "componentVersion"
               - "parameters"
               properties:
-                authorizationName:
-                  description: "The name of an authorization used by this connection.\
-                    \ Used for HTTP based services."
-                  type: "string"
+                authorizationType:
+                  $ref: "../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/AuthorizationType"
                 componentName:
                   description: "The name of a component that uses this connection."
                   type: "string"
@@ -1545,19 +1543,7 @@ components:
         type:
           $ref: "#/components/schemas/AuthorizationType"
     AuthorizationType:
-      description: "Authorization type."
-      type: "string"
-      enum:
-      - "API_KEY"
-      - "BASIC_AUTH"
-      - "BEARER_TOKEN"
-      - "CUSTOM"
-      - "DIGEST_AUTH"
-      - "OAUTH2_AUTHORIZATION_CODE"
-      - "OAUTH2_AUTHORIZATION_CODE_PKCE"
-      - "OAUTH2_CLIENT_CREDENTIALS"
-      - "OAUTH2_IMPLICIT_CODE"
-      - "OAUTH2_RESOURCE_OWNER_PASSWORD"
+      $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/authorization_type.yaml"
     BooleanProperty:
       description: "A boolean property type."
       type: "object"

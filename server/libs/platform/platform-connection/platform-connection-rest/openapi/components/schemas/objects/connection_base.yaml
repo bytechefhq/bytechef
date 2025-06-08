@@ -11,10 +11,8 @@ properties:
     description: "If a connection is used in any of active workflows."
     type: "boolean"
     readOnly: true
-  authorizationName:
-    description: "The name of an authorization used by this connection. Used\
-            \ for HTTP based services."
-    type: "string"
+  authorizationType:
+    $ref: "./authorization_type.yaml"
   authorizationParameters:
     description: "The authorization parameters of a connection."
     type: "object"
