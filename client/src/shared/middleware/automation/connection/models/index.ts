@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './AuthorizationType';
 export * from './Connection';
 export * from './ConnectionBase';
 export * from './CredentialStatus';

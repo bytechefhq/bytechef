@@ -2,6 +2,7 @@ apis/ConnectionApi.ts
 apis/ConnectionTagApi.ts
 apis/index.ts
 index.ts
+models/AuthorizationType.ts
 models/Connection.ts
 models/ConnectionBase.ts
 models/CredentialStatus.ts

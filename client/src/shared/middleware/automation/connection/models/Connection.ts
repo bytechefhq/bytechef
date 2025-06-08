@@ -34,6 +34,13 @@ import {
     TagToJSON,
     TagToJSONTyped,
 } from './Tag';
+import type { AuthorizationType } from './AuthorizationType';
+import {
+    AuthorizationTypeFromJSON,
+    AuthorizationTypeFromJSONTyped,
+    AuthorizationTypeToJSON,
+    AuthorizationTypeToJSONTyped,
+} from './AuthorizationType';
 
 /**
  * Contains all required information to open a connection to a service defined by componentName parameter.
@@ -48,11 +55,11 @@ export interface Connection {
      */
     readonly active?: boolean;
     /**
-     * The name of an authorization used by this connection. Used for HTTP based services.
-     * @type {string}
+     * 
+     * @type {AuthorizationType}
      * @memberof Connection
      */
-    authorizationName?: string;
+    authorizationType?: AuthorizationType;
     /**
      * The authorization parameters of a connection.
      * @type {{ [key: string]: any; }}
@@ -175,7 +182,7 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     return {
         
         'active': json['active'] == null ? undefined : json['active'],
-        'authorizationName': json['authorizationName'] == null ? undefined : json['authorizationName'],
+        'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
         'authorizationParameters': json['authorizationParameters'] == null ? undefined : json['authorizationParameters'],
         'componentName': json['componentName'],
         'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
@@ -206,7 +213,7 @@ export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authori
 
     return {
         
-        'authorizationName': value['authorizationName'],
+        'authorizationType': AuthorizationTypeToJSON(value['authorizationType']),
         'componentName': value['componentName'],
         'connectionVersion': value['connectionVersion'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),

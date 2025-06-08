@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { AuthorizationType } from './AuthorizationType';
+import {
+    AuthorizationTypeFromJSON,
+    AuthorizationTypeFromJSONTyped,
+    AuthorizationTypeToJSON,
+    AuthorizationTypeToJSONTyped,
+} from './AuthorizationType';
+
 /**
  * Contains all required information to open a connection to a service defined by componentName parameter.
  * @export
@@ -20,11 +28,11 @@ import { mapValues } from '../runtime';
  */
 export interface GetOAuth2AuthorizationParametersRequest {
     /**
-     * The name of an authorization used by this connection. Used for HTTP based services.
-     * @type {string}
+     * 
+     * @type {AuthorizationType}
      * @memberof GetOAuth2AuthorizationParametersRequest
      */
-    authorizationName?: string;
+    authorizationType?: AuthorizationType;
     /**
      * The name of a component that uses this connection.
      * @type {string}
@@ -45,6 +53,8 @@ export interface GetOAuth2AuthorizationParametersRequest {
     parameters: { [key: string]: any; };
 }
 
+
+
 /**
  * Check if a given object implements the GetOAuth2AuthorizationParametersRequest interface.
  */
@@ -64,7 +74,7 @@ export function GetOAuth2AuthorizationParametersRequestFromJSONTyped(json: any, 
     }
     return {
         
-        'authorizationName': json['authorizationName'] == null ? undefined : json['authorizationName'],
+        'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
         'componentName': json['componentName'],
         'connectionVersion': json['connectionVersion'] == null ? undefined : json['connectionVersion'],
         'parameters': json['parameters'],
@@ -82,7 +92,7 @@ export function GetOAuth2AuthorizationParametersRequestToJSONTyped(value?: GetOA
 
     return {
         
-        'authorizationName': value['authorizationName'],
+        'authorizationType': AuthorizationTypeToJSON(value['authorizationType']),
         'componentName': value['componentName'],
         'connectionVersion': value['connectionVersion'],
         'parameters': value['parameters'],
