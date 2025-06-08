@@ -26,14 +26,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T07:17:00.413223+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkflowModel {
 
   private @Nullable String description;
 
   private @Nullable String definition;
-
-  private @Nullable Boolean enabled;
 
   private @Nullable String label;
 
@@ -54,7 +52,7 @@ public class WorkflowModel {
    * @return description
    */
   
-  @Schema(name = "description", accessMode = Schema.AccessMode.READ_ONLY, description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
     return description;
@@ -84,26 +82,6 @@ public class WorkflowModel {
     this.definition = definition;
   }
 
-  public WorkflowModel enabled(Boolean enabled) {
-    this.enabled = enabled;
-    return this;
-  }
-
-  /**
-   * If a workflow is enabled or not.
-   * @return enabled
-   */
-  
-  @Schema(name = "enabled", description = "If a workflow is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("enabled")
-  public Boolean getEnabled() {
-    return enabled;
-  }
-
-  public void setEnabled(Boolean enabled) {
-    this.enabled = enabled;
-  }
-
   public WorkflowModel label(String label) {
     this.label = label;
     return this;
@@ -114,7 +92,7 @@ public class WorkflowModel {
    * @return label
    */
   
-  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The label of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "label", description = "The label of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
   public String getLabel() {
     return label;
@@ -134,7 +112,7 @@ public class WorkflowModel {
    * @return workflowReferenceCode
    */
   
-  @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "workflowReferenceCode", description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowReferenceCode")
   public String getWorkflowReferenceCode() {
     return workflowReferenceCode;
@@ -203,7 +181,6 @@ public class WorkflowModel {
     WorkflowModel workflow = (WorkflowModel) o;
     return Objects.equals(this.description, workflow.description) &&
         Objects.equals(this.definition, workflow.definition) &&
-        Objects.equals(this.enabled, workflow.enabled) &&
         Objects.equals(this.label, workflow.label) &&
         Objects.equals(this.workflowReferenceCode, workflow.workflowReferenceCode) &&
         Objects.equals(this.inputs, workflow.inputs) &&
@@ -212,7 +189,7 @@ public class WorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, definition, enabled, label, workflowReferenceCode, inputs, workflowVersion);
+    return Objects.hash(description, definition, label, workflowReferenceCode, inputs, workflowVersion);
   }
 
   @Override
@@ -221,7 +198,6 @@ public class WorkflowModel {
     sb.append("class WorkflowModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
-    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");

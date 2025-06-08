@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("errors_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T21:45:52.018050+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:47.348833+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ErrorsInnerModel {
 
   private String id;

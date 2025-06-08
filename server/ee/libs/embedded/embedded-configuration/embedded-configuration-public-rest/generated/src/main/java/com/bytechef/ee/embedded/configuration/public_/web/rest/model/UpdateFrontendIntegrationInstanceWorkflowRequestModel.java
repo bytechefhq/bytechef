@@ -5,6 +5,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -17,33 +19,42 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateFrontendProjectWorkflowRequestModel
+ * UpdateFrontendIntegrationInstanceWorkflowRequestModel
  */
 
-@JsonTypeName("createFrontendProjectWorkflow_request")
+@JsonTypeName("updateFrontendIntegrationInstanceWorkflow_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class CreateFrontendProjectWorkflowRequestModel {
+public class UpdateFrontendIntegrationInstanceWorkflowRequestModel {
 
-  private @Nullable String definition;
+  @Valid
+  private Map<String, Object> inputs = new HashMap<>();
 
-  public CreateFrontendProjectWorkflowRequestModel definition(String definition) {
-    this.definition = definition;
+  public UpdateFrontendIntegrationInstanceWorkflowRequestModel inputs(Map<String, Object> inputs) {
+    this.inputs = inputs;
+    return this;
+  }
+
+  public UpdateFrontendIntegrationInstanceWorkflowRequestModel putInputsItem(String key, Object inputsItem) {
+    if (this.inputs == null) {
+      this.inputs = new HashMap<>();
+    }
+    this.inputs.put(key, inputsItem);
     return this;
   }
 
   /**
-   * The workflow definition
-   * @return definition
+   * Get inputs
+   * @return inputs
    */
   
-  @Schema(name = "definition", description = "The workflow definition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("definition")
-  public String getDefinition() {
-    return definition;
+  @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
+  public Map<String, Object> getInputs() {
+    return inputs;
   }
 
-  public void setDefinition(String definition) {
-    this.definition = definition;
+  public void setInputs(Map<String, Object> inputs) {
+    this.inputs = inputs;
   }
 
   @Override
@@ -54,20 +65,20 @@ public class CreateFrontendProjectWorkflowRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequest = (CreateFrontendProjectWorkflowRequestModel) o;
-    return Objects.equals(this.definition, createFrontendProjectWorkflowRequest.definition);
+    UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequest = (UpdateFrontendIntegrationInstanceWorkflowRequestModel) o;
+    return Objects.equals(this.inputs, updateFrontendIntegrationInstanceWorkflowRequest.inputs);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(definition);
+    return Objects.hash(inputs);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateFrontendProjectWorkflowRequestModel {\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("class UpdateFrontendIntegrationInstanceWorkflowRequestModel {\n");
+    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("}");
     return sb.toString();
   }

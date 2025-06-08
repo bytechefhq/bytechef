@@ -2,11 +2,13 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -19,31 +21,30 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A group of workflows that make one logical integration.
+ * A group of workflows that make one logical integration for a particular service represented by component.
  */
 
-@Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
+@Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration for a particular service represented by component.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T07:17:00.413223+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationBasicModel {
 
   private String componentName;
 
-  private CredentialStatusModel credentialStatus;
-
   private @Nullable String description;
-
-  private Boolean enabled;
 
   private String icon;
 
   private @Nullable Long id;
 
+  @Valid
+  private List<@Valid IntegrationInstanceModel> integrationInstances = new ArrayList<>();
+
   private @Nullable Integer integrationVersion;
 
   private Boolean multipleInstances = false;
 
-  private @Nullable String title;
+  private @Nullable String name;
 
   public IntegrationBasicModel() {
     super();
@@ -52,10 +53,8 @@ public class IntegrationBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public IntegrationBasicModel(String componentName, CredentialStatusModel credentialStatus, Boolean enabled, String icon, Boolean multipleInstances) {
+  public IntegrationBasicModel(String componentName, String icon, Boolean multipleInstances) {
     this.componentName = componentName;
-    this.credentialStatus = credentialStatus;
-    this.enabled = enabled;
     this.icon = icon;
     this.multipleInstances = multipleInstances;
   }
@@ -80,26 +79,6 @@ public class IntegrationBasicModel {
     this.componentName = componentName;
   }
 
-  public IntegrationBasicModel credentialStatus(CredentialStatusModel credentialStatus) {
-    this.credentialStatus = credentialStatus;
-    return this;
-  }
-
-  /**
-   * Get credentialStatus
-   * @return credentialStatus
-   */
-  @NotNull @Valid 
-  @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("credentialStatus")
-  public CredentialStatusModel getCredentialStatus() {
-    return credentialStatus;
-  }
-
-  public void setCredentialStatus(CredentialStatusModel credentialStatus) {
-    this.credentialStatus = credentialStatus;
-  }
-
   public IntegrationBasicModel description(String description) {
     this.description = description;
     return this;
@@ -118,26 +97,6 @@ public class IntegrationBasicModel {
 
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  public IntegrationBasicModel enabled(Boolean enabled) {
-    this.enabled = enabled;
-    return this;
-  }
-
-  /**
-   * If an integration is enabled or not
-   * @return enabled
-   */
-  @NotNull 
-  @Schema(name = "enabled", description = "If an integration is enabled or not", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("enabled")
-  public Boolean getEnabled() {
-    return enabled;
-  }
-
-  public void setEnabled(Boolean enabled) {
-    this.enabled = enabled;
   }
 
   public IntegrationBasicModel icon(String icon) {
@@ -180,6 +139,34 @@ public class IntegrationBasicModel {
     this.id = id;
   }
 
+  public IntegrationBasicModel integrationInstances(List<@Valid IntegrationInstanceModel> integrationInstances) {
+    this.integrationInstances = integrationInstances;
+    return this;
+  }
+
+  public IntegrationBasicModel addIntegrationInstancesItem(IntegrationInstanceModel integrationInstancesItem) {
+    if (this.integrationInstances == null) {
+      this.integrationInstances = new ArrayList<>();
+    }
+    this.integrationInstances.add(integrationInstancesItem);
+    return this;
+  }
+
+  /**
+   * The list of integration instances that represent configured and connected integrations for specific users
+   * @return integrationInstances
+   */
+  @Valid 
+  @Schema(name = "integrationInstances", description = "The list of integration instances that represent configured and connected integrations for specific users", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationInstances")
+  public List<@Valid IntegrationInstanceModel> getIntegrationInstances() {
+    return integrationInstances;
+  }
+
+  public void setIntegrationInstances(List<@Valid IntegrationInstanceModel> integrationInstances) {
+    this.integrationInstances = integrationInstances;
+  }
+
   public IntegrationBasicModel integrationVersion(Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
     return this;
@@ -220,24 +207,24 @@ public class IntegrationBasicModel {
     this.multipleInstances = multipleInstances;
   }
 
-  public IntegrationBasicModel title(String title) {
-    this.title = title;
+  public IntegrationBasicModel name(String name) {
+    this.name = name;
     return this;
   }
 
   /**
-   * The title of the integration's component.
-   * @return title
+   * The name of an integration.
+   * @return name
    */
   
-  @Schema(name = "title", description = "The title of the integration's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("title")
-  public String getTitle() {
-    return title;
+  @Schema(name = "name", description = "The name of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
   }
 
-  public void setTitle(String title) {
-    this.title = title;
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override
@@ -250,19 +237,18 @@ public class IntegrationBasicModel {
     }
     IntegrationBasicModel integrationBasic = (IntegrationBasicModel) o;
     return Objects.equals(this.componentName, integrationBasic.componentName) &&
-        Objects.equals(this.credentialStatus, integrationBasic.credentialStatus) &&
         Objects.equals(this.description, integrationBasic.description) &&
-        Objects.equals(this.enabled, integrationBasic.enabled) &&
         Objects.equals(this.icon, integrationBasic.icon) &&
         Objects.equals(this.id, integrationBasic.id) &&
+        Objects.equals(this.integrationInstances, integrationBasic.integrationInstances) &&
         Objects.equals(this.integrationVersion, integrationBasic.integrationVersion) &&
         Objects.equals(this.multipleInstances, integrationBasic.multipleInstances) &&
-        Objects.equals(this.title, integrationBasic.title);
+        Objects.equals(this.name, integrationBasic.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, credentialStatus, description, enabled, icon, id, integrationVersion, multipleInstances, title);
+    return Objects.hash(componentName, description, icon, id, integrationInstances, integrationVersion, multipleInstances, name);
   }
 
   @Override
@@ -270,14 +256,13 @@ public class IntegrationBasicModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationBasicModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
-    sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    integrationInstances: ").append(toIndentedString(integrationInstances)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    multipleInstances: ").append(toIndentedString(multipleInstances)).append("\n");
-    sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
   }

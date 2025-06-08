@@ -3,12 +3,11 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectionConfigModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,26 +27,25 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T07:17:00.413223+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationModel {
 
   private String componentName;
 
-  private CredentialStatusModel credentialStatus;
-
   private @Nullable String description;
-
-  private Boolean enabled;
 
   private String icon;
 
   private @Nullable Long id;
 
+  @Valid
+  private List<@Valid IntegrationInstanceModel> integrationInstances = new ArrayList<>();
+
   private @Nullable Integer integrationVersion;
 
   private Boolean multipleInstances = false;
 
-  private @Nullable String title;
+  private @Nullable String name;
 
   private @Nullable ConnectionConfigModel connectionConfig;
 
@@ -61,10 +59,8 @@ public class IntegrationModel {
   /**
    * Constructor with only required parameters
    */
-  public IntegrationModel(String componentName, CredentialStatusModel credentialStatus, Boolean enabled, String icon, Boolean multipleInstances) {
+  public IntegrationModel(String componentName, String icon, Boolean multipleInstances) {
     this.componentName = componentName;
-    this.credentialStatus = credentialStatus;
-    this.enabled = enabled;
     this.icon = icon;
     this.multipleInstances = multipleInstances;
   }
@@ -89,26 +85,6 @@ public class IntegrationModel {
     this.componentName = componentName;
   }
 
-  public IntegrationModel credentialStatus(CredentialStatusModel credentialStatus) {
-    this.credentialStatus = credentialStatus;
-    return this;
-  }
-
-  /**
-   * Get credentialStatus
-   * @return credentialStatus
-   */
-  @NotNull @Valid 
-  @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("credentialStatus")
-  public CredentialStatusModel getCredentialStatus() {
-    return credentialStatus;
-  }
-
-  public void setCredentialStatus(CredentialStatusModel credentialStatus) {
-    this.credentialStatus = credentialStatus;
-  }
-
   public IntegrationModel description(String description) {
     this.description = description;
     return this;
@@ -127,26 +103,6 @@ public class IntegrationModel {
 
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  public IntegrationModel enabled(Boolean enabled) {
-    this.enabled = enabled;
-    return this;
-  }
-
-  /**
-   * If an integration is enabled or not
-   * @return enabled
-   */
-  @NotNull 
-  @Schema(name = "enabled", description = "If an integration is enabled or not", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("enabled")
-  public Boolean getEnabled() {
-    return enabled;
-  }
-
-  public void setEnabled(Boolean enabled) {
-    this.enabled = enabled;
   }
 
   public IntegrationModel icon(String icon) {
@@ -189,6 +145,34 @@ public class IntegrationModel {
     this.id = id;
   }
 
+  public IntegrationModel integrationInstances(List<@Valid IntegrationInstanceModel> integrationInstances) {
+    this.integrationInstances = integrationInstances;
+    return this;
+  }
+
+  public IntegrationModel addIntegrationInstancesItem(IntegrationInstanceModel integrationInstancesItem) {
+    if (this.integrationInstances == null) {
+      this.integrationInstances = new ArrayList<>();
+    }
+    this.integrationInstances.add(integrationInstancesItem);
+    return this;
+  }
+
+  /**
+   * The list of integration instances that represent configured and connected integrations for specific users
+   * @return integrationInstances
+   */
+  @Valid 
+  @Schema(name = "integrationInstances", description = "The list of integration instances that represent configured and connected integrations for specific users", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationInstances")
+  public List<@Valid IntegrationInstanceModel> getIntegrationInstances() {
+    return integrationInstances;
+  }
+
+  public void setIntegrationInstances(List<@Valid IntegrationInstanceModel> integrationInstances) {
+    this.integrationInstances = integrationInstances;
+  }
+
   public IntegrationModel integrationVersion(Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
     return this;
@@ -229,24 +213,24 @@ public class IntegrationModel {
     this.multipleInstances = multipleInstances;
   }
 
-  public IntegrationModel title(String title) {
-    this.title = title;
+  public IntegrationModel name(String name) {
+    this.name = name;
     return this;
   }
 
   /**
-   * The title of the integration's component.
-   * @return title
+   * The name of an integration.
+   * @return name
    */
   
-  @Schema(name = "title", description = "The title of the integration's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("title")
-  public String getTitle() {
-    return title;
+  @Schema(name = "name", description = "The name of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
   }
 
-  public void setTitle(String title) {
-    this.title = title;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public IntegrationModel connectionConfig(ConnectionConfigModel connectionConfig) {
@@ -307,21 +291,20 @@ public class IntegrationModel {
     }
     IntegrationModel integration = (IntegrationModel) o;
     return Objects.equals(this.componentName, integration.componentName) &&
-        Objects.equals(this.credentialStatus, integration.credentialStatus) &&
         Objects.equals(this.description, integration.description) &&
-        Objects.equals(this.enabled, integration.enabled) &&
         Objects.equals(this.icon, integration.icon) &&
         Objects.equals(this.id, integration.id) &&
+        Objects.equals(this.integrationInstances, integration.integrationInstances) &&
         Objects.equals(this.integrationVersion, integration.integrationVersion) &&
         Objects.equals(this.multipleInstances, integration.multipleInstances) &&
-        Objects.equals(this.title, integration.title) &&
+        Objects.equals(this.name, integration.name) &&
         Objects.equals(this.connectionConfig, integration.connectionConfig) &&
         Objects.equals(this.workflows, integration.workflows);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, credentialStatus, description, enabled, icon, id, integrationVersion, multipleInstances, title, connectionConfig, workflows);
+    return Objects.hash(componentName, description, icon, id, integrationInstances, integrationVersion, multipleInstances, name, connectionConfig, workflows);
   }
 
   @Override
@@ -329,14 +312,13 @@ public class IntegrationModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
-    sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    integrationInstances: ").append(toIndentedString(integrationInstances)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    multipleInstances: ").append(toIndentedString(multipleInstances)).append("\n");
-    sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    connectionConfig: ").append(toIndentedString(connectionConfig)).append("\n");
     sb.append("    workflows: ").append(toIndentedString(workflows)).append("\n");
     sb.append("}");

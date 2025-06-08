@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendIntegrationInstanceRequestConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -17,33 +18,33 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateFrontendProjectWorkflowRequestModel
+ * CreateFrontendIntegrationInstanceRequestModel
  */
 
-@JsonTypeName("createFrontendProjectWorkflow_request")
+@JsonTypeName("createFrontendIntegrationInstance_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class CreateFrontendProjectWorkflowRequestModel {
+public class CreateFrontendIntegrationInstanceRequestModel {
 
-  private @Nullable String definition;
+  private @Nullable CreateFrontendIntegrationInstanceRequestConnectionModel connection;
 
-  public CreateFrontendProjectWorkflowRequestModel definition(String definition) {
-    this.definition = definition;
+  public CreateFrontendIntegrationInstanceRequestModel connection(CreateFrontendIntegrationInstanceRequestConnectionModel connection) {
+    this.connection = connection;
     return this;
   }
 
   /**
-   * The workflow definition
-   * @return definition
+   * Get connection
+   * @return connection
    */
-  
-  @Schema(name = "definition", description = "The workflow definition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("definition")
-  public String getDefinition() {
-    return definition;
+  @Valid 
+  @Schema(name = "connection", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connection")
+  public CreateFrontendIntegrationInstanceRequestConnectionModel getConnection() {
+    return connection;
   }
 
-  public void setDefinition(String definition) {
-    this.definition = definition;
+  public void setConnection(CreateFrontendIntegrationInstanceRequestConnectionModel connection) {
+    this.connection = connection;
   }
 
   @Override
@@ -54,20 +55,20 @@ public class CreateFrontendProjectWorkflowRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequest = (CreateFrontendProjectWorkflowRequestModel) o;
-    return Objects.equals(this.definition, createFrontendProjectWorkflowRequest.definition);
+    CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequest = (CreateFrontendIntegrationInstanceRequestModel) o;
+    return Objects.equals(this.connection, createFrontendIntegrationInstanceRequest.connection);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(definition);
+    return Objects.hash(connection);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateFrontendProjectWorkflowRequestModel {\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("class CreateFrontendIntegrationInstanceRequestModel {\n");
+    sb.append("    connection: ").append(toIndentedString(connection)).append("\n");
     sb.append("}");
     return sb.toString();
   }

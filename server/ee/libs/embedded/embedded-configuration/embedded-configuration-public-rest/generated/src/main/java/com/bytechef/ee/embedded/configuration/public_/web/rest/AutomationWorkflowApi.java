@@ -35,10 +35,10 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T07:17:00.413223+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
-@Tag(name = "workflow", description = "The Embedded Workflow Public API")
-public interface WorkflowApi {
+@Tag(name = "automation-workflow", description = "The Embedded Automation Workflow Public API")
+public interface AutomationWorkflowApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
@@ -56,7 +56,7 @@ public interface WorkflowApi {
         operationId = "createFrontendProjectWorkflow",
         summary = "Create new workflow and adds it to an existing integration",
         description = "Create new workflow and adds it to an existing integration.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow reference code.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
@@ -95,7 +95,7 @@ public interface WorkflowApi {
         operationId = "createProjectWorkflow",
         summary = "Create new workflow and adds it to an existing integration",
         description = "Create new workflow and adds it to an existing integration.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow reference code.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
@@ -134,7 +134,7 @@ public interface WorkflowApi {
         operationId = "deleteFrontendProjectWorkflow",
         summary = "Delete a workflow",
         description = "Delete a workflow.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
@@ -166,7 +166,7 @@ public interface WorkflowApi {
         operationId = "deleteProjectWorkflow",
         summary = "Delete a workflow",
         description = "Delete a workflow.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
@@ -187,8 +187,8 @@ public interface WorkflowApi {
 
 
     /**
-     * PATCH /automation/workflows/{workflowReferenceCode}/enable/{enable} : Enable/disable a workflow
-     * Enable/disable a workflow.
+     * DELETE /automation/workflows/{workflowReferenceCode}/enable : Disable a workflow
+     * Disable a workflow.
      *
      * @param workflowReferenceCode The workflow reference code. (required)
      * @param enable Enable/disable the project deployment. (required)
@@ -196,10 +196,10 @@ public interface WorkflowApi {
      * @return Successful operation. (status code 204)
      */
     @Operation(
-        operationId = "enableFrontendProjectWorkflow",
-        summary = "Enable/disable a workflow",
-        description = "Enable/disable a workflow.",
-        tags = { "workflow" },
+        operationId = "disableFrontendProjectWorkflow",
+        summary = "Disable a workflow",
+        description = "Disable a workflow.",
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -208,8 +208,82 @@ public interface WorkflowApi {
         }
     )
     @RequestMapping(
-        method = RequestMethod.PATCH,
-        value = "/automation/workflows/{workflowReferenceCode}/enable/{enable}"
+        method = RequestMethod.DELETE,
+        value = "/automation/workflows/{workflowReferenceCode}/enable"
+    )
+    
+    default ResponseEntity<Void> disableFrontendProjectWorkflow(
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "enable", description = "Enable/disable the project deployment.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * DELETE /{externalUserId}/automation/workflows/{workflowReferenceCode}/enable : Disable a workflow
+     * Disable a workflow.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param enable Enable/disable the project deployment. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "disableProjectWorkflow",
+        summary = "Disable a workflow",
+        description = "Disable a workflow.",
+        tags = { "automation-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/enable"
+    )
+    
+    default ResponseEntity<Void> disableProjectWorkflow(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "enable", description = "Enable/disable the project deployment.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * POST /automation/workflows/{workflowReferenceCode}/enable : Enable a workflow
+     * Enable a workflow.
+     *
+     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param enable Enable/disable the project deployment. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "enableFrontendProjectWorkflow",
+        summary = "Enable a workflow",
+        description = "Enable a workflow.",
+        tags = { "automation-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/automation/workflows/{workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> enableFrontendProjectWorkflow(
@@ -223,8 +297,8 @@ public interface WorkflowApi {
 
 
     /**
-     * PATCH /{externalUserId}/automation/workflows/{workflowReferenceCode}/enable/{enable} : Enable/disable a workflow
-     * Enable/disable a workflow.
+     * POST /{externalUserId}/automation/workflows/{workflowReferenceCode}/enable : Enable a workflow
+     * Enable a workflow.
      *
      * @param externalUserId The external user id. (required)
      * @param workflowReferenceCode The workflow reference code. (required)
@@ -234,9 +308,9 @@ public interface WorkflowApi {
      */
     @Operation(
         operationId = "enableProjectWorkflow",
-        summary = "Enable/disable a workflow",
-        description = "Enable/disable a workflow.",
-        tags = { "workflow" },
+        summary = "Enable a workflow",
+        description = "Enable a workflow.",
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -245,8 +319,8 @@ public interface WorkflowApi {
         }
     )
     @RequestMapping(
-        method = RequestMethod.PATCH,
-        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/enable/{enable}"
+        method = RequestMethod.POST,
+        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> enableProjectWorkflow(
@@ -272,7 +346,7 @@ public interface WorkflowApi {
         operationId = "getFrontendProjectWorkflow",
         summary = "Get a workflow by workflow reference code",
         description = "Get a workflow by workflow reference code.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -292,7 +366,7 @@ public interface WorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
+                    String exampleString = "{ \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -314,7 +388,7 @@ public interface WorkflowApi {
         operationId = "getFrontendProjectWorkflows",
         summary = "Get automation workflows for particular external user",
         description = "Get automation workflows for particular external user.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -333,7 +407,7 @@ public interface WorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
+                    String exampleString = "[ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -357,7 +431,7 @@ public interface WorkflowApi {
         operationId = "getProjectWorkflow",
         summary = "Get a workflow by workflow reference code",
         description = "Get a workflow by workflow reference code.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -378,7 +452,7 @@ public interface WorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
+                    String exampleString = "{ \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -401,7 +475,7 @@ public interface WorkflowApi {
         operationId = "getProjectWorkflows",
         summary = "Get automation workflows for particular external user",
         description = "Get automation workflows for particular external user.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -421,7 +495,7 @@ public interface WorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
+                    String exampleString = "[ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -445,7 +519,7 @@ public interface WorkflowApi {
         operationId = "publishFrontendProjectWorkflow",
         summary = "Publishes existing workflow",
         description = "Publishes existing workflow.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -483,7 +557,7 @@ public interface WorkflowApi {
         operationId = "publishProjectWorkflow",
         summary = "Publishes existing workflow",
         description = "Publishes existing workflow.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -521,7 +595,7 @@ public interface WorkflowApi {
         operationId = "updateFrontendProjectWorkflow",
         summary = "Update an existing workflow",
         description = "Update an existing workflow.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -559,7 +633,7 @@ public interface WorkflowApi {
         operationId = "updateProjectWorkflow",
         summary = "Update an existing workflow",
         description = "Update an existing workflow.",
-        tags = { "workflow" },
+        tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
