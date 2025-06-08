@@ -4,3 +4,4 @@ enum:
   - "DEVELOPMENT"
   - "STAGING"
   - "PRODUCTION"
+readOnly: true
