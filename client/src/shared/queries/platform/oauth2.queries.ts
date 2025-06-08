@@ -13,7 +13,7 @@ export const OAuth2Keys = {
         ...ConnectionKeys.connections,
         request.componentName,
         request.connectionVersion,
-        request.authorizationName,
+        request.authorizationType,
         request.parameters,
     ],
     oAuth2Properties: ['oAuth2Properties'] as const,

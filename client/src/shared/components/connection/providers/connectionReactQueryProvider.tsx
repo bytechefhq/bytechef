@@ -1,3 +1,4 @@
+import {AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {Tag} from '@/shared/middleware/platform/connection';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {createContext, useContext} from 'react';
@@ -6,7 +7,7 @@ import type {CredentialStatus, Environment} from '@/shared/middleware/automation
 
 export interface ConnectionI {
     readonly active?: boolean;
-    authorizationName?: string;
+    authorizationType?: AuthorizationType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     readonly authorizationParameters?: {[key: string]: any};
     componentName: string;

@@ -22,7 +22,12 @@ import Properties from '@/pages/platform/workflow-editor/components/properties/P
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {ConnectionI} from '@/shared/components/connection/providers/connectionReactQueryProvider';
-import {Authorization, ComponentDefinition, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {
+    Authorization,
+    AuthorizationType,
+    ComponentDefinition,
+    ComponentDefinitionBasic,
+} from '@/shared/middleware/platform/configuration';
 import {Environment, Tag} from '@/shared/middleware/platform/connection';
 import {
     ComponentDefinitionKeys,
@@ -48,7 +53,7 @@ import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
 
 export interface ConnectionDialogFormProps {
-    authorizationName: string;
+    authorizationType: string;
     environment: Environment;
     componentName: string;
     id?: number;
@@ -88,7 +93,7 @@ const ConnectionDialog = ({
     useGetConnectionTagsQuery,
     useUpdateConnectionMutation,
 }: ConnectionDialogProps) => {
-    const [authorizationName, setAuthorizationName] = useState<string>();
+    const [authorizationType, setAuthorizationType] = useState<string>();
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
     const [wizardStep, setWizardStep] = useState<'configuration_step' | 'oauth_step'>('configuration_step');
@@ -104,7 +109,7 @@ const ConnectionDialog = ({
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
-            authorizationName: '',
+            authorizationType: undefined,
             componentName: componentDefinition?.name,
             environment: connection?.environment || Environment.Development,
             id: connection?.id,
@@ -193,7 +198,7 @@ const ConnectionDialog = ({
                           : []),
                       ...connectionDefinition.authorizations.map((authorization) => ({
                           label: authorization?.title as string,
-                          value: authorization.name as string,
+                          value: authorization.type as string,
                       })),
                   ]
                 : [],
@@ -201,7 +206,7 @@ const ConnectionDialog = ({
     );
 
     const authorizations = connectionDefinition?.authorizations?.filter(
-        (authorization) => authorization.name === (authorizationName || authorizationOptions[0].value)
+        (authorization) => authorization.type === (authorizationType || authorizationOptions[0].value)
     );
 
     const errors = getErrors();
@@ -247,7 +252,7 @@ const ConnectionDialog = ({
             setWizardStep('configuration_step');
 
             if (!componentDefinition) {
-                setAuthorizationName(undefined);
+                setAuthorizationType(undefined);
                 setSelectedComponentDefinition(undefined);
             }
 
@@ -272,26 +277,26 @@ const ConnectionDialog = ({
     }
 
     function getAuthorizationType() {
-        let authorizationType = '';
+        let curAuthorizationType = '';
 
         if (connectionDefinition?.authorizations) {
             const authorization: Authorization = connectionDefinition.authorizations.filter(
-                (authorization) => authorization.name === authorizationName
+                (authorization) => authorization.type === authorizationType
             )[0];
 
             if (authorization) {
-                authorizationType = authorization.type!;
+                curAuthorizationType = authorization.type!;
             }
         }
 
-        return authorizationType;
+        return curAuthorizationType;
     }
 
     function getNewConnection(additionalParameters?: object) {
         const {componentName, environment, name, parameters, tags} = getValues();
 
         return {
-            authorizationName: authorizationName,
+            authorizationType,
             componentName,
             connectionVersion: 1,
             environment,
@@ -308,7 +313,7 @@ const ConnectionDialog = ({
         const {componentName, parameters} = getValues();
 
         return {
-            authorizationName: authorizationName,
+            authorizationType: authorizationType as AuthorizationType,
             componentName,
             connectionVersion: 1,
             parameters: {
@@ -369,7 +374,7 @@ const ConnectionDialog = ({
     const handleComponentDefinitionChange = (componentDefinition?: ComponentDefinitionBasic) => {
         if (componentDefinition) {
             setValue('componentName', componentDefinition.name);
-            setAuthorizationName(undefined);
+            setAuthorizationType(undefined);
             setSelectedComponentDefinition(componentDefinition);
 
             if (oAuth2Properties?.predefinedApps) {
@@ -385,7 +390,7 @@ const ConnectionDialog = ({
     };
 
     useEffect(() => {
-        setAuthorizationName(
+        setAuthorizationType(
             authorizationOptions && authorizationOptions.length > 0 ? authorizationOptions[0].value : undefined
         );
     }, [authorizationsExists, authorizationOptions, selectedComponentDefinition]);
@@ -565,16 +570,16 @@ const ConnectionDialog = ({
                                     {!connection?.id && showAuthorizations && (
                                         <FormField
                                             control={control}
-                                            name="authorizationName"
+                                            name="authorizationType"
                                             render={({field}) => (
                                                 <FormItem>
                                                     <FormLabel>Authorization</FormLabel>
 
                                                     <Select
                                                         onValueChange={(value) => {
-                                                            setAuthorizationName(value);
+                                                            setAuthorizationType(value);
                                                             setUsePredefinedOAuthApp(false);
-                                                            setValue('authorizationName', value);
+                                                            setValue('authorizationType', value);
                                                         }}
                                                         {...field}
                                                     >
