@@ -36,14 +36,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController(" com.bytechef.ee.embedded.configuration.public_.web.rest.WorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
-public class WorkflowApiController implements WorkflowApi {
+public class AutomationWorkflowApiController implements AutomationWorkflowApi {
 
     private final ConnectUserProjectFacade connectUserProjectFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public WorkflowApiController(ConnectUserProjectFacade connectUserProjectFacade,
-        ConversionService conversionService) {
+    public AutomationWorkflowApiController(ConnectUserProjectFacade connectUserProjectFacade,
+                                           ConversionService conversionService) {
         this.connectUserProjectFacade = connectUserProjectFacade;
         this.conversionService = conversionService;
     }
