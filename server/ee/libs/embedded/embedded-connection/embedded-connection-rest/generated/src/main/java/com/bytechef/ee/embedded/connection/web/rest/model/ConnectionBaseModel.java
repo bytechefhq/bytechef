@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.connection.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.ee.embedded.connection.web.rest.model.CredentialStatusModel;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,12 +33,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "connection_base", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("connection_base")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T21:45:51.858220+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T23:27:27.463343+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ConnectionBaseModel {
 
   private @Nullable Boolean active;
 
-  private @Nullable String authorizationName;
+  private @Nullable AuthorizationTypeModel authorizationType;
 
   @Valid
   private Map<String, Object> authorizationParameters = new HashMap<>();
@@ -109,24 +110,24 @@ public class ConnectionBaseModel {
     this.active = active;
   }
 
-  public ConnectionBaseModel authorizationName(String authorizationName) {
-    this.authorizationName = authorizationName;
+  public ConnectionBaseModel authorizationType(AuthorizationTypeModel authorizationType) {
+    this.authorizationType = authorizationType;
     return this;
   }
 
   /**
-   * The name of an authorization used by this connection. Used for HTTP based services.
-   * @return authorizationName
+   * Get authorizationType
+   * @return authorizationType
    */
-  
-  @Schema(name = "authorizationName", description = "The name of an authorization used by this connection. Used for HTTP based services.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("authorizationName")
-  public String getAuthorizationName() {
-    return authorizationName;
+  @Valid 
+  @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationType")
+  public AuthorizationTypeModel getAuthorizationType() {
+    return authorizationType;
   }
 
-  public void setAuthorizationName(String authorizationName) {
-    this.authorizationName = authorizationName;
+  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
+    this.authorizationType = authorizationType;
   }
 
   public ConnectionBaseModel authorizationParameters(Map<String, Object> authorizationParameters) {
@@ -471,7 +472,7 @@ public class ConnectionBaseModel {
     }
     ConnectionBaseModel connectionBase = (ConnectionBaseModel) o;
     return Objects.equals(this.active, connectionBase.active) &&
-        Objects.equals(this.authorizationName, connectionBase.authorizationName) &&
+        Objects.equals(this.authorizationType, connectionBase.authorizationType) &&
         Objects.equals(this.authorizationParameters, connectionBase.authorizationParameters) &&
         Objects.equals(this.componentName, connectionBase.componentName) &&
         Objects.equals(this.connectionParameters, connectionBase.connectionParameters) &&
@@ -491,7 +492,7 @@ public class ConnectionBaseModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationName, authorizationParameters, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
+    return Objects.hash(active, authorizationType, authorizationParameters, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
   }
 
   @Override
@@ -499,7 +500,7 @@ public class ConnectionBaseModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectionBaseModel {\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
-    sb.append("    authorizationName: ").append(toIndentedString(authorizationName)).append("\n");
+    sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
     sb.append("    authorizationParameters: ").append(toIndentedString(authorizationParameters)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    connectionParameters: ").append(toIndentedString(connectionParameters)).append("\n");

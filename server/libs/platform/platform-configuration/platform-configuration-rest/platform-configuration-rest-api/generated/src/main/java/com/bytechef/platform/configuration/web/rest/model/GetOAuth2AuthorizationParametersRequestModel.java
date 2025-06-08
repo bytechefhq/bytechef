@@ -2,9 +2,11 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.lang.Nullable;
@@ -24,10 +26,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "getOAuth2AuthorizationParameters_request", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("getOAuth2AuthorizationParameters_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T15:56:31.260308+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T22:18:25.217051+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class GetOAuth2AuthorizationParametersRequestModel {
 
-  private @Nullable String authorizationName;
+  private @Nullable AuthorizationTypeModel authorizationType;
 
   private String componentName;
 
@@ -48,24 +50,24 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     this.parameters = parameters;
   }
 
-  public GetOAuth2AuthorizationParametersRequestModel authorizationName(String authorizationName) {
-    this.authorizationName = authorizationName;
+  public GetOAuth2AuthorizationParametersRequestModel authorizationType(AuthorizationTypeModel authorizationType) {
+    this.authorizationType = authorizationType;
     return this;
   }
 
   /**
-   * The name of an authorization used by this connection. Used for HTTP based services.
-   * @return authorizationName
+   * Get authorizationType
+   * @return authorizationType
    */
-  
-  @Schema(name = "authorizationName", description = "The name of an authorization used by this connection. Used for HTTP based services.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("authorizationName")
-  public String getAuthorizationName() {
-    return authorizationName;
+  @Valid 
+  @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationType")
+  public AuthorizationTypeModel getAuthorizationType() {
+    return authorizationType;
   }
 
-  public void setAuthorizationName(String authorizationName) {
-    this.authorizationName = authorizationName;
+  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
+    this.authorizationType = authorizationType;
   }
 
   public GetOAuth2AuthorizationParametersRequestModel componentName(String componentName) {
@@ -145,7 +147,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
       return false;
     }
     GetOAuth2AuthorizationParametersRequestModel getOAuth2AuthorizationParametersRequest = (GetOAuth2AuthorizationParametersRequestModel) o;
-    return Objects.equals(this.authorizationName, getOAuth2AuthorizationParametersRequest.authorizationName) &&
+    return Objects.equals(this.authorizationType, getOAuth2AuthorizationParametersRequest.authorizationType) &&
         Objects.equals(this.componentName, getOAuth2AuthorizationParametersRequest.componentName) &&
         Objects.equals(this.connectionVersion, getOAuth2AuthorizationParametersRequest.connectionVersion) &&
         Objects.equals(this.parameters, getOAuth2AuthorizationParametersRequest.parameters);
@@ -153,14 +155,14 @@ public class GetOAuth2AuthorizationParametersRequestModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationName, componentName, connectionVersion, parameters);
+    return Objects.hash(authorizationType, componentName, connectionVersion, parameters);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class GetOAuth2AuthorizationParametersRequestModel {\n");
-    sb.append("    authorizationName: ").append(toIndentedString(authorizationName)).append("\n");
+    sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
