@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AppEvent';
+export * from './AuthorizationType';
 export * from './Category';
 export * from './ComponentConnection';
 export * from './ConnectedUserProjectWorkflow';

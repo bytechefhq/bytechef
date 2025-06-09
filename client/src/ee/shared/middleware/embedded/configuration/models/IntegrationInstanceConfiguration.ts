@@ -41,6 +41,13 @@ import {
     TagToJSON,
     TagToJSONTyped,
 } from './Tag';
+import type { AuthorizationType } from './AuthorizationType';
+import {
+    AuthorizationTypeFromJSON,
+    AuthorizationTypeFromJSONTyped,
+    AuthorizationTypeToJSON,
+    AuthorizationTypeToJSONTyped,
+} from './AuthorizationType';
 
 /**
  * Contains configurations and connections required for the execution of integration workflows.
@@ -115,13 +122,19 @@ export interface IntegrationInstanceConfiguration {
      */
     name: string;
     /**
-     * The authorization parameters of a connection.
+     * 
+     * @type {AuthorizationType}
+     * @memberof IntegrationInstanceConfiguration
+     */
+    authorizationType?: AuthorizationType;
+    /**
+     * The connection authorization parameters of a connection.
      * @type {{ [key: string]: any; }}
      * @memberof IntegrationInstanceConfiguration
      */
     readonly connectionAuthorizationParameters?: { [key: string]: any; };
     /**
-     * The authorization parameters of a connection.
+     * The connection parameters of a connection.
      * @type {{ [key: string]: any; }}
      * @memberof IntegrationInstanceConfiguration
      */
@@ -189,6 +202,7 @@ export function IntegrationInstanceConfigurationFromJSONTyped(json: any, ignoreD
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
+        'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
         'connectionAuthorizationParameters': json['connectionAuthorizationParameters'] == null ? undefined : json['connectionAuthorizationParameters'],
         'connectionConnectionParameters': json['connectionConnectionParameters'] == null ? undefined : json['connectionConnectionParameters'],
         'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
@@ -216,6 +230,7 @@ export function IntegrationInstanceConfigurationToJSONTyped(value?: Omit<Integra
         'integrationId': value['integrationId'],
         'integrationVersion': value['integrationVersion'],
         'name': value['name'],
+        'authorizationType': AuthorizationTypeToJSON(value['authorizationType']),
         'connectionParameters': value['connectionParameters'],
         'integration': IntegrationBasicToJSON(value['integration']),
         'integrationInstanceConfigurationWorkflows': value['integrationInstanceConfigurationWorkflows'] == null ? undefined : ((value['integrationInstanceConfigurationWorkflows'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowToJSON)),

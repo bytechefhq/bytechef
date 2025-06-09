@@ -10,6 +10,7 @@ apis/WorkflowApi.ts
 apis/index.ts
 index.ts
 models/AppEvent.ts
+models/AuthorizationType.ts
 models/Category.ts
 models/ComponentConnection.ts
 models/ConnectedUserProjectWorkflow.ts
