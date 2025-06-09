@@ -17,21 +17,35 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The environment of a project.
+ * Authorization type.
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-09T07:36:39.424295+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public enum EnvironmentModel {
+public enum AuthorizationTypeModel {
   
-  DEVELOPMENT("DEVELOPMENT"),
+  API_KEY("API_KEY"),
   
-  STAGING("STAGING"),
+  BASIC_AUTH("BASIC_AUTH"),
   
-  PRODUCTION("PRODUCTION");
+  BEARER_TOKEN("BEARER_TOKEN"),
+  
+  CUSTOM("CUSTOM"),
+  
+  DIGEST_AUTH("DIGEST_AUTH"),
+  
+  OAUTH2_AUTHORIZATION_CODE("OAUTH2_AUTHORIZATION_CODE"),
+  
+  OAUTH2_AUTHORIZATION_CODE_PKCE("OAUTH2_AUTHORIZATION_CODE_PKCE"),
+  
+  OAUTH2_CLIENT_CREDENTIALS("OAUTH2_CLIENT_CREDENTIALS"),
+  
+  OAUTH2_IMPLICIT_CODE("OAUTH2_IMPLICIT_CODE"),
+  
+  OAUTH2_RESOURCE_OWNER_PASSWORD("OAUTH2_RESOURCE_OWNER_PASSWORD");
 
   private String value;
 
-  EnvironmentModel(String value) {
+  AuthorizationTypeModel(String value) {
     this.value = value;
   }
 
@@ -46,8 +60,8 @@ public enum EnvironmentModel {
   }
 
   @JsonCreator
-  public static EnvironmentModel fromValue(String value) {
-    for (EnvironmentModel b : EnvironmentModel.values()) {
+  public static AuthorizationTypeModel fromValue(String value) {
+    for (AuthorizationTypeModel b : AuthorizationTypeModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

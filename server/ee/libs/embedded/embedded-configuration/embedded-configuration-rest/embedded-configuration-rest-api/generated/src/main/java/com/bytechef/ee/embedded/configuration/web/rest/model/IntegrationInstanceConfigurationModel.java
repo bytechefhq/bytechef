@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
@@ -34,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-05T23:09:32.029442+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-09T07:36:39.424295+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationInstanceConfigurationModel {
 
   private @Nullable String createdBy;
@@ -60,6 +61,8 @@ public class IntegrationInstanceConfigurationModel {
   private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
+
+  private @Nullable AuthorizationTypeModel authorizationType;
 
   @Valid
   private Map<String, Object> connectionAuthorizationParameters = new HashMap<>();
@@ -311,6 +314,26 @@ public class IntegrationInstanceConfigurationModel {
     this.name = name;
   }
 
+  public IntegrationInstanceConfigurationModel authorizationType(AuthorizationTypeModel authorizationType) {
+    this.authorizationType = authorizationType;
+    return this;
+  }
+
+  /**
+   * Get authorizationType
+   * @return authorizationType
+   */
+  @Valid 
+  @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationType")
+  public AuthorizationTypeModel getAuthorizationType() {
+    return authorizationType;
+  }
+
+  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
+    this.authorizationType = authorizationType;
+  }
+
   public IntegrationInstanceConfigurationModel connectionAuthorizationParameters(Map<String, Object> connectionAuthorizationParameters) {
     this.connectionAuthorizationParameters = connectionAuthorizationParameters;
     return this;
@@ -325,11 +348,11 @@ public class IntegrationInstanceConfigurationModel {
   }
 
   /**
-   * The authorization parameters of a connection.
+   * The connection authorization parameters of a connection.
    * @return connectionAuthorizationParameters
    */
   
-  @Schema(name = "connectionAuthorizationParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "connectionAuthorizationParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The connection authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionAuthorizationParameters")
   public Map<String, Object> getConnectionAuthorizationParameters() {
     return connectionAuthorizationParameters;
@@ -353,11 +376,11 @@ public class IntegrationInstanceConfigurationModel {
   }
 
   /**
-   * The authorization parameters of a connection.
+   * The connection parameters of a connection.
    * @return connectionConnectionParameters
    */
   
-  @Schema(name = "connectionConnectionParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "connectionConnectionParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The connection parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionConnectionParameters")
   public Map<String, Object> getConnectionConnectionParameters() {
     return connectionConnectionParameters;
@@ -511,6 +534,7 @@ public class IntegrationInstanceConfigurationModel {
         Objects.equals(this.lastModifiedBy, integrationInstanceConfiguration.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationInstanceConfiguration.lastModifiedDate) &&
         Objects.equals(this.name, integrationInstanceConfiguration.name) &&
+        Objects.equals(this.authorizationType, integrationInstanceConfiguration.authorizationType) &&
         Objects.equals(this.connectionAuthorizationParameters, integrationInstanceConfiguration.connectionAuthorizationParameters) &&
         Objects.equals(this.connectionConnectionParameters, integrationInstanceConfiguration.connectionConnectionParameters) &&
         Objects.equals(this.connectionParameters, integrationInstanceConfiguration.connectionParameters) &&
@@ -522,7 +546,7 @@ public class IntegrationInstanceConfigurationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, connectionAuthorizationParameters, connectionConnectionParameters, connectionParameters, integration, integrationInstanceConfigurationWorkflows, tags, version);
+    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, authorizationType, connectionAuthorizationParameters, connectionConnectionParameters, connectionParameters, integration, integrationInstanceConfigurationWorkflows, tags, version);
   }
 
   @Override
@@ -540,6 +564,7 @@ public class IntegrationInstanceConfigurationModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
     sb.append("    connectionAuthorizationParameters: ").append(toIndentedString(connectionAuthorizationParameters)).append("\n");
     sb.append("    connectionConnectionParameters: ").append(toIndentedString(connectionConnectionParameters)).append("\n");
     sb.append("    connectionParameters: ").append(toIndentedString(connectionParameters)).append("\n");

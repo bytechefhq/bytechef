@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -26,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationBasic", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfigurationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-05T23:09:32.029442+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-09T07:36:39.424295+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationInstanceConfigurationBasicModel {
 
   private @Nullable String createdBy;
@@ -52,6 +53,8 @@ public class IntegrationInstanceConfigurationBasicModel {
   private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
+
+  private @Nullable AuthorizationTypeModel authorizationType;
 
   public IntegrationInstanceConfigurationBasicModel() {
     super();
@@ -284,6 +287,26 @@ public class IntegrationInstanceConfigurationBasicModel {
     this.name = name;
   }
 
+  public IntegrationInstanceConfigurationBasicModel authorizationType(AuthorizationTypeModel authorizationType) {
+    this.authorizationType = authorizationType;
+    return this;
+  }
+
+  /**
+   * Get authorizationType
+   * @return authorizationType
+   */
+  @Valid 
+  @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationType")
+  public AuthorizationTypeModel getAuthorizationType() {
+    return authorizationType;
+  }
+
+  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
+    this.authorizationType = authorizationType;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -303,12 +326,13 @@ public class IntegrationInstanceConfigurationBasicModel {
         Objects.equals(this.integrationVersion, integrationInstanceConfigurationBasic.integrationVersion) &&
         Objects.equals(this.lastModifiedBy, integrationInstanceConfigurationBasic.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationInstanceConfigurationBasic.lastModifiedDate) &&
-        Objects.equals(this.name, integrationInstanceConfigurationBasic.name);
+        Objects.equals(this.name, integrationInstanceConfigurationBasic.name) &&
+        Objects.equals(this.authorizationType, integrationInstanceConfigurationBasic.authorizationType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name);
+    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, authorizationType);
   }
 
   @Override
@@ -326,6 +350,7 @@ public class IntegrationInstanceConfigurationBasicModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
     sb.append("}");
     return sb.toString();
   }
