@@ -43,7 +43,7 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowApiController(ConnectUserProjectFacade connectUserProjectFacade,
-                                           ConversionService conversionService) {
+        ConversionService conversionService) {
         this.connectUserProjectFacade = connectUserProjectFacade;
         this.conversionService = conversionService;
     }

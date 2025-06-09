@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.facade;
 
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -41,20 +42,21 @@ public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacad
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
-        String redirectUri) {
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters, String redirectUri) {
 
         return connectionDefinitionService.executeAuthorizationCallback(
-            componentName, connectionVersion, authorizationName, connectionParameters,
+            componentName, connectionVersion, authorizationType, connectionParameters,
             contextFactory.createContext(componentName, null), redirectUri);
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters) {
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters) {
 
         return connectionDefinitionService.getOAuth2AuthorizationParameters(
-            componentName, connectionVersion, authorizationName, connectionParameters,
+            componentName, connectionVersion, authorizationType, connectionParameters,
             contextFactory.createContext(componentName, null));
     }
 }

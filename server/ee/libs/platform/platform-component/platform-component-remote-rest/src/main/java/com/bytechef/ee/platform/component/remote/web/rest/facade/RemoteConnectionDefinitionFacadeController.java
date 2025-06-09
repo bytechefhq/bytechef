@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.component.remote.web.rest.facade;
 
 import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -52,7 +53,7 @@ public class RemoteConnectionDefinitionFacadeController {
         return ResponseEntity.ok(
             connectionDefinitionFacade.executeAuthorizationCallback(
                 authorizationCallbackRequest.componentName, authorizationCallbackRequest.connectionVersion,
-                authorizationCallbackRequest.authorizationName(), authorizationCallbackRequest.connectionParameters(),
+                authorizationCallbackRequest.authorizationType(), authorizationCallbackRequest.connectionParameters(),
                 authorizationCallbackRequest.redirectUri()));
     }
 
@@ -76,17 +77,18 @@ public class RemoteConnectionDefinitionFacadeController {
         return ResponseEntity.ok(
             connectionDefinitionFacade.getOAuth2AuthorizationParameters(
                 connectionRequest.componentName, connectionRequest.connectionVersion,
-                connectionRequest.authorizationName(), connectionRequest.connectionParameters()));
+                connectionRequest.authorizationType(), connectionRequest.connectionParameters()));
     }
 
     @SuppressFBWarnings("EI")
     public record AuthorizationCallbackRequest(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
-        String redirectUri) {
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters, String redirectUri) {
     }
 
     @SuppressFBWarnings("EI")
     public record ConnectionRequest(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters) {
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters) {
     }
 }

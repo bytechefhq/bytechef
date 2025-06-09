@@ -19,6 +19,7 @@ package com.bytechef.platform.connection.domain;
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -49,8 +50,8 @@ public final class Connection {
         INVALID, VALID
     }
 
-    @Column("authorization_name")
-    private String authorizationName;
+    @Column("authorization_type")
+    private int authorizationType;
 
     @Column
     private int environment;
@@ -131,10 +132,10 @@ public final class Connection {
     }
 
     /**
-     * Return the name of an authorization it is used with this connection.
+     * Return the type of an authorization it is used with this connection.
      */
-    public String getAuthorizationName() {
-        return authorizationName;
+    public AuthorizationType getAuthorizationType() {
+        return AuthorizationType.values()[authorizationType];
     }
 
     /**
@@ -229,8 +230,8 @@ public final class Connection {
         this.parameters.putAll(parameters);
     }
 
-    public void setAuthorizationName(String authorizationName) {
-        this.authorizationName = authorizationName;
+    public void setAuthorizationType(AuthorizationType authorizationType) {
+        this.authorizationType = authorizationType.ordinal();
     }
 
     public void setComponentName(String componentName) {
@@ -293,7 +294,7 @@ public final class Connection {
             "id=" + id +
             ", name='" + name + '\'' +
             ", componentName='" + componentName + '\'' +
-            ", authorizationName='" + authorizationName + '\'' +
+            ", authorizationType='" + authorizationType + '\'' +
             ", connectionVersion=" + connectionVersion +
             ", environment=" + environment +
             ", credentialStatus=" + credentialStatus +
@@ -310,7 +311,7 @@ public final class Connection {
 
     @SuppressFBWarnings("EI")
     public static final class Builder {
-        private String authorizationName;
+        private AuthorizationType authorizationType;
         private String componentName;
         private int connectionVersion;
         private Long id;
@@ -323,8 +324,8 @@ public final class Connection {
         private Builder() {
         }
 
-        public Builder authorizationName(String authorizationName) {
-            this.authorizationName = authorizationName;
+        public Builder authorizationType(AuthorizationType AuthorizationType) {
+            this.authorizationType = AuthorizationType;
 
             return this;
         }
@@ -380,7 +381,7 @@ public final class Connection {
         public Connection build() {
             Connection connection = new Connection();
 
-            connection.setAuthorizationName(authorizationName);
+            connection.setAuthorizationType(authorizationType);
             connection.setComponentName(componentName);
             connection.setConnectionVersion(connectionVersion);
             connection.setId(id);

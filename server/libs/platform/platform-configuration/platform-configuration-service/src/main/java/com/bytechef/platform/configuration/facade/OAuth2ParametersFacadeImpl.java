@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
@@ -42,10 +43,11 @@ public class OAuth2ParametersFacadeImpl implements OAuth2ParametersFacade {
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters,
+        AuthorizationType authorizationType) {
 
         return connectionDefinitionFacade.getOAuth2AuthorizationParameters(
-            componentName, connectionVersion, authorizationName,
+            componentName, connectionVersion, authorizationType,
             oAuth2Service.checkPredefinedParameters(componentName, connectionParameters));
     }
 }

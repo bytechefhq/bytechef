@@ -25,6 +25,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ConnectionDefinition;
@@ -203,15 +204,17 @@ public class ComponentDefinitionRegistry {
             lookupDependsOnPaths, context);
     }
 
-    public Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName) {
+    public Authorization getAuthorization(
+        String componentName, int connectionVersion, AuthorizationType authorizationType) {
+
         ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName, connectionVersion);
 
         return OptionalUtils.orElse(connectionDefinition.getAuthorizations(), List.of())
             .stream()
             .filter(authorization -> {
-                Authorization.AuthorizationType type = authorization.getType();
+                AuthorizationType curAuthorizationType = authorization.getType();
 
-                return Objects.equals(type.getName(), authorizationName);
+                return curAuthorizationType == authorizationType;
             })
             .findFirst()
             .orElseThrow(IllegalArgumentException::new);

@@ -32,6 +32,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.config.ComponentRegistryConfiguration;
 import com.bytechef.platform.component.config.ComponentRegistryConfigurationSharedMocks;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -78,7 +79,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         connection = new Connection();
 
-        connection.setAuthorizationName("api_key");
+        connection.setAuthorizationType(AuthorizationType.API_KEY);
         connection.setComponentName("petstore");
         connection.setName("PetShop Connection");
 

@@ -74,15 +74,14 @@ public class TokenRefreshHelper {
         try {
             return performFunction.apply(componentConnection, context);
         } catch (Exception exception) {
-            if (componentConnection == null ||
-                !AuthorizationUtils.isApplicable(componentConnection.authorizationName())) {
+            if (componentConnection == null || componentConnection.authorizationType() == null) {
 
                 throw exception;
             }
 
             List<Object> refreshOn = connectionDefinitionService.getAuthorizationRefreshOn(
                 componentName, componentConnection.version(),
-                Objects.requireNonNull(componentConnection.authorizationName()));
+                Objects.requireNonNull(componentConnection.authorizationType()));
 
             if (componentConnection.canCredentialsBeRefreshed() &&
                 RefreshCredentialsUtils.matches(refreshOn, exception)) {
@@ -117,7 +116,7 @@ public class TokenRefreshHelper {
                 Authorization.RefreshTokenResponse refreshTokenResponse =
                     connectionDefinitionService.executeRefresh(
                         componentConnection.componentName(), componentConnection.version(),
-                        Objects.requireNonNull(componentConnection.authorizationName()),
+                        Objects.requireNonNull(componentConnection.authorizationType()),
                         componentConnection.getParameters(), context);
 
                 parameters = new HashMap<>() {
@@ -136,7 +135,7 @@ public class TokenRefreshHelper {
             } else {
                 parameters = connectionDefinitionService.executeAcquire(
                     componentConnection.componentName(), componentConnection.version(),
-                    Objects.requireNonNull(componentConnection.authorizationName()),
+                    Objects.requireNonNull(componentConnection.authorizationType()),
                     componentConnection.getParameters(), context);
             }
 
@@ -164,6 +163,6 @@ public class TokenRefreshHelper {
 
         return new ComponentConnection(
             componentConnection.componentName(), connection.getConnectionVersion(), componentConnection.connectionId(),
-            connection.getParameters(), connection.getAuthorizationName());
+            connection.getParameters(), connection.getAuthorizationType());
     }
 }

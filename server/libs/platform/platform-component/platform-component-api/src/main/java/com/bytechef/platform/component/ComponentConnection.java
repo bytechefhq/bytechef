@@ -25,7 +25,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.lang.Nullable;
 
 /**
@@ -34,23 +33,13 @@ import org.springframework.lang.Nullable;
 @SuppressFBWarnings("EI")
 public record ComponentConnection(
     String componentName, int version, long connectionId, Map<String, ?> parameters,
-    @Nullable String authorizationName) {
-
-    public ComponentConnection {
-        if (authorizationName != null) {
-            authorizationName = authorizationName.trim();
-
-            if (authorizationName.isEmpty()) {
-                throw new IllegalArgumentException("Authorization name must not be empty or blank");
-            }
-        }
-    }
+    @Nullable AuthorizationType authorizationType) {
 
     public Map<String, ?> getConnectionParameters() {
         Map<String, Object> parameters = new HashMap<>(getParameters());
 
-        if (authorizationName() != null) {
-            parameters.put(Authorization.AUTHORIZATION_TYPE, authorizationName());
+        if (authorizationType() != null) {
+            parameters.put(Authorization.AUTHORIZATION_TYPE, authorizationType());
         }
 
         return parameters;
@@ -78,18 +67,18 @@ public record ComponentConnection(
     }
 
     @Nullable
-    public String getAuthorizationName() {
-        return authorizationName;
+    public AuthorizationType getAuthorizationType() {
+        return authorizationType;
     }
 
     public boolean isAuthorizationOauth2AuthorizationCode() {
-        return Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE.getName(), getAuthorizationName()) ||
-            Objects.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.getName(), getAuthorizationName());
+        return AuthorizationType.OAUTH2_AUTHORIZATION_CODE == authorizationType ||
+            AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE == authorizationType;
     }
 
     public boolean canCredentialsBeRefreshed() {
-        return Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE.getName()) ||
-            Objects.equals(getAuthorizationName(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE.getName()) ||
-            Objects.equals(CUSTOM.getName(), getAuthorizationName());
+        return authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
+            authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE ||
+            authorizationType == CUSTOM;
     }
 }

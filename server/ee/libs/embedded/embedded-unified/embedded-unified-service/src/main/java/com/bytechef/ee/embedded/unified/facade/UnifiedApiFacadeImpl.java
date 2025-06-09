@@ -310,7 +310,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
         return new ComponentConnection(
             connection.getComponentName(), connection.getConnectionVersion(), connectionId,
-            connection.getParameters(), connection.getAuthorizationName());
+            connection.getParameters(), connection.getAuthorizationType());
     }
 
     private String getHash(CursorPageable pageRequest) {

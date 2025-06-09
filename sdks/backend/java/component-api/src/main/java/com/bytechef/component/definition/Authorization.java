@@ -50,7 +50,7 @@ public interface Authorization {
     /**
      *
      */
-    String AUTHORIZATION_TYPE = "authorizationName";
+    String AUTHORIZATION_TYPE = "authorizationType";
 
     /**
      *

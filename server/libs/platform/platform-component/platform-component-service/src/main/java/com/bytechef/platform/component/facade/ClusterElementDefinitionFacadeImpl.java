@@ -91,7 +91,7 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
 
             componentConnection = new ComponentConnection(
                 connection.getComponentName(), connection.getConnectionVersion(), connectionId,
-                connection.getParameters(), connection.getAuthorizationName());
+                connection.getParameters(), connection.getAuthorizationType());
         }
 
         return componentConnection;

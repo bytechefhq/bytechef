@@ -332,7 +332,7 @@ public class PolyglotEngine {
             return new ComponentConnection(
                 componentConnection.getComponentName(), componentConnection.getVersion(),
                 componentConnection.getConnectionId(), componentConnection.getParameters(),
-                componentConnection.getAuthorizationName());
+                componentConnection.getAuthorizationType());
         }
     }
 

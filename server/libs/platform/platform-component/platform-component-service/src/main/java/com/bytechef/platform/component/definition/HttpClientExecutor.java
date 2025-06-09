@@ -24,6 +24,7 @@ import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -37,7 +38,6 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.OperationDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.util.AuthorizationUtils;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -177,7 +177,7 @@ class HttpClientExecutor {
         }
 
         if (!configuration.isDisableAuthorization() && (componentConnection != null) &&
-            AuthorizationUtils.isApplicable(componentConnection.authorizationName())) {
+            componentConnection.authorizationType() != null) {
 
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
@@ -186,7 +186,7 @@ class HttpClientExecutor {
             builder.interceptor(
                 getInterceptor(
                     componentName, componentVersion, componentOperationName, componentConnection.version(),
-                    componentConnection.authorizationName(), componentConnection.canCredentialsBeRefreshed(),
+                    componentConnection.authorizationType(), componentConnection.canCredentialsBeRefreshed(),
                     isAction));
         }
 
@@ -299,13 +299,13 @@ class HttpClientExecutor {
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, String componentName,
         ComponentConnection componentConnection, Context context) {
 
-        if ((componentConnection == null) || Objects.equals(componentConnection.getAuthorizationName(), "none")) {
+        if (componentConnection == null) {
             return;
         }
 
         ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
             componentName, componentConnection.version(),
-            Objects.requireNonNull(componentConnection.authorizationName()), componentConnection.getParameters(),
+            Objects.requireNonNull(componentConnection.authorizationType()), componentConnection.getParameters(),
             context);
 
         if (applyResponse != null) {
@@ -407,14 +407,14 @@ class HttpClientExecutor {
      * @param componentVersion
      * @param componentOperationName
      * @param connectionVersion
-     * @param authorizationName
+     * @param authorizationType
      * @param credentialsBeRefreshed
      * @param isAction
      * @return
      */
     private Methanol.Interceptor getInterceptor(
         String componentName, int componentVersion, String componentOperationName, int connectionVersion,
-        String authorizationName, boolean credentialsBeRefreshed, boolean isAction) {
+        AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction) {
 
         return new Methanol.Interceptor() {
             @Override
@@ -429,7 +429,7 @@ class HttpClientExecutor {
 
                 if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 400)) {
                     List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
-                        componentName, connectionVersion, authorizationName);
+                        componentName, connectionVersion, authorizationType);
 
                     if (credentialsBeRefreshed && !detectOn.isEmpty()) {
                         Object body = httpResponse.body();

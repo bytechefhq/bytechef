@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.component.service;
 
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.ComponentConnection;
@@ -34,33 +34,35 @@ import java.util.Optional;
 public interface ConnectionDefinitionService {
 
     Map<String, ?> executeAcquire(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
-        Context context);
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters, Context context);
 
     ApplyResponse executeAuthorizationApply(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
-        Context context);
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters, Context context);
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
-        Context context, String redirectUri);
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters, Context context, String redirectUri);
 
     Optional<String> executeBaseUri(String componentName, ComponentConnection connection, Context context);
 
     RefreshTokenResponse executeRefresh(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
-        Context context);
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters, Context context);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
-        Context context);
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters, Context context);
 
-    List<String> getAuthorizationDetectOn(String componentName, int connectionVersion, String authorizationName);
+    List<String> getAuthorizationDetectOn(
+        String componentName, int connectionVersion, AuthorizationType authorizationType);
 
-    List<Object> getAuthorizationRefreshOn(String componentName, int connectionVersion, String authorizationName);
+    List<Object> getAuthorizationRefreshOn(
+        String componentName, int connectionVersion, AuthorizationType authorizationType);
 
-    Authorization.AuthorizationType getAuthorizationType(
-        String componentName, int connectionVersion, String authorizationName);
+    AuthorizationType getAuthorizationType(
+        String componentName, int connectionVersion, AuthorizationType authorizationType);
 
     ConnectionDefinition getConnectionConnectionDefinition(String componentName, int connectionVersion);
 

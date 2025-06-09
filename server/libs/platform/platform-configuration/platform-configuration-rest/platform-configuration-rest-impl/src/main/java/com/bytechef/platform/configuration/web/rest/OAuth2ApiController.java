@@ -17,7 +17,9 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
+import com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import com.bytechef.platform.configuration.web.rest.model.OAuth2PropertiesModel;
@@ -54,11 +56,14 @@ public class OAuth2ApiController implements Oauth2Api {
     public ResponseEntity<OAuth2AuthorizationParametersModel> getOAuth2AuthorizationParameters(
         GetOAuth2AuthorizationParametersRequestModel parametersRequestModel) {
 
+        AuthorizationTypeModel authorizationType = parametersRequestModel.getAuthorizationType();
+
         return ResponseEntity.ok(
             conversionService.convert(
                 oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
                     parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
-                    parametersRequestModel.getParameters(), parametersRequestModel.getAuthorizationName()),
+                    parametersRequestModel.getParameters(),
+                    Authorization.AuthorizationType.valueOf(authorizationType.name())),
                 OAuth2AuthorizationParametersModel.class));
     }
 

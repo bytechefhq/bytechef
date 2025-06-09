@@ -99,7 +99,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         OAuth2AuthorizationParameters oAuth2AuthorizationParameters = oAuth2ParametersFacade
             .getOAuth2AuthorizationParameters(integrationDTO.componentName(), connectionDefinition.getVersion(),
-                integrationInstanceConfigurationDTO.connectionParameters(), authorizationType.getName());
+                integrationInstanceConfigurationDTO.connectionParameters(), authorizationType);
 
         return new ConnectedUserIntegrationDTO(
             authorization, connection, integrationInstance, integrationInstanceConfigurationDTO,

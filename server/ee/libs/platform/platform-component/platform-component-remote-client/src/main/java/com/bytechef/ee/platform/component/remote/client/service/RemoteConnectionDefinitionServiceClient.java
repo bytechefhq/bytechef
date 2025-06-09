@@ -49,7 +49,8 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public Map<String, ?> executeAcquire(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters,
         Context context) {
 
         throw new UnsupportedOperationException();
@@ -57,7 +58,8 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public ApplyResponse executeAuthorizationApply(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters,
         Context context) {
 
         throw new UnsupportedOperationException();
@@ -65,7 +67,8 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters,
         Context context, String redirectUri) {
 
         throw new UnsupportedOperationException();
@@ -78,7 +81,8 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public RefreshTokenResponse executeRefresh(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters,
         Context context) {
 
         throw new UnsupportedOperationException();
@@ -86,34 +90,36 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters,
         Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<String> getAuthorizationDetectOn(String componentName, int componentVersion, String authorizationName) {
+    public List<String>
+        getAuthorizationDetectOn(String componentName, int componentVersion, AuthorizationType authorizationType) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Object> getAuthorizationRefreshOn(
-        String componentName, int componentVersion, String authorizationName) {
+        String componentName, int componentVersion, AuthorizationType authorizationType) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public AuthorizationType getAuthorizationType(
-        String componentName, int connectionVersion, String authorizationName) {
+        String componentName, int connectionVersion, AuthorizationType authorizationType) {
 
         return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 CONNECTION_DEFINITION_SERVICE + "/get-authorization-type/{componentName}/{connectionVersion}" +
-                    "/{authorizationName}",
-                componentName, connectionVersion, authorizationName),
+                    "/{authorizationType}",
+                componentName, connectionVersion, authorizationType),
             AuthorizationType.class);
     }
 

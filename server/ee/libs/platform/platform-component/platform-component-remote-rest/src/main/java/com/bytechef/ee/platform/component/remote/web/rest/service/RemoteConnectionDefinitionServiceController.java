@@ -40,17 +40,17 @@ public class RemoteConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-authorization-type/{componentName}/{connectionVersion}/{authorizationName}",
+        value = "/get-authorization-type/{componentName}/{connectionVersion}/{authorizationType}",
         produces = {
             "application/json"
         })
     public ResponseEntity<AuthorizationType> getAuthorizationType(
         @PathVariable("componentName") String componentName,
         @PathVariable("connectionVersion") Integer connectionVersion,
-        @PathVariable("authorizationName") String authorizationName) {
+        @PathVariable("authorizationType") AuthorizationType authorizationType) {
 
         return ResponseEntity.ok(
-            connectionDefinitionService.getAuthorizationType(componentName, connectionVersion, authorizationName));
+            connectionDefinitionService.getAuthorizationType(componentName, connectionVersion, authorizationType));
     }
 
     @RequestMapping(

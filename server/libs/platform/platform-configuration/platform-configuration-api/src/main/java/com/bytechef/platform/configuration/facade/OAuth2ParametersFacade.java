@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import java.util.Map;
 
@@ -25,5 +26,6 @@ import java.util.Map;
 public interface OAuth2ParametersFacade {
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName);
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters,
+        Authorization.AuthorizationType authorizationType);
 }

@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,13 +84,13 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public long create(ConnectionDTO connectionDTO, ModeType type) {
         Connection connection = connectionDTO.toConnection();
 
-        if (StringUtils.isNotBlank(connection.getAuthorizationName()) &&
-            connection.containsParameter(Authorization.CODE)) {
+        if (connection.getAuthorizationType() != null && connection.containsParameter(Authorization.CODE)) {
 
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
 
             AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
-                connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationName());
+                connection.getComponentName(), connection.getConnectionVersion(),
+                connection.getAuthorizationType());
 
             if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
                 authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
@@ -99,7 +98,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 AuthorizationCallbackResponse authorizationCallbackResponse =
                     connectionDefinitionFacade.executeAuthorizationCallback(
                         connection.getComponentName(), connection.getConnectionVersion(),
-                        connection.getAuthorizationName(),
+                        connection.getAuthorizationType(),
                         oAuth2Service.checkPredefinedParameters(
                             connection.getComponentName(), connection.getParameters()),
                         oAuth2Service.getRedirectUri());

@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.component.remote.client.facade;
 
 import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
@@ -36,35 +37,36 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, String authorizationName,
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, String redirectUri) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-authorization-callback"),
             new AuthorizationCallbackRequest(
-                componentName, connectionVersion, authorizationName, connectionParameters, redirectUri),
+                componentName, connectionVersion, authorizationType, connectionParameters, redirectUri),
             Authorization.AuthorizationCallbackResponse.class);
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, String authorizationName,
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/get-oauth2-authorization-parameters"),
-            new ConnectionRequest(componentName, connectionVersion, authorizationName, connectionParameters),
+            new ConnectionRequest(componentName, connectionVersion, authorizationType, connectionParameters),
             OAuth2AuthorizationParameters.class);
     }
 
     private record AuthorizationCallbackRequest(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
-        String redirectUri) {
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters, String redirectUri) {
     }
 
     private record ConnectionRequest(
-        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters) {
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters) {
     }
 }

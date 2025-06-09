@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.connection.dto;
 
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.constant.Environment;
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
-    boolean active, String authorizationName, Map<String, ?> authorizationParameters, String componentName,
+    boolean active, AuthorizationType authorizationType, Map<String, ?> authorizationParameters, String componentName,
     Map<String, ?> connectionParameters, int connectionVersion, String createdBy, Instant createdDate,
     CredentialStatus credentialStatus, Environment environment, Long id, String lastModifiedBy,
     Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
@@ -40,7 +41,7 @@ public record ConnectionDTO(
         Map<String, ?> connectionParameters, List<Tag> tags) {
 
         this(
-            active, connection.getAuthorizationName(), authorizationParameters, connection.getComponentName(),
+            active, connection.getAuthorizationType(), authorizationParameters, connection.getComponentName(),
             connectionParameters, connection.getConnectionVersion(), connection.getCreatedBy(),
             connection.getCreatedDate(), connection.getCredentialStatus(), connection.getEnvironment(),
             connection.getId(), connection.getLastModifiedBy(), connection.getLastModifiedDate(), connection.getName(),
@@ -50,7 +51,7 @@ public record ConnectionDTO(
     public Connection toConnection() {
         Connection connection = new Connection();
 
-        connection.setAuthorizationName(authorizationName);
+        connection.setAuthorizationType(authorizationType);
         connection.setComponentName(componentName);
         connection.setConnectionVersion(connectionVersion);
         connection.setId(id);
@@ -69,7 +70,7 @@ public record ConnectionDTO(
     @SuppressFBWarnings("EI")
     public static final class Builder {
         private boolean active;
-        private String authorizationName;
+        private AuthorizationType authorizationType;
         private String componentName;
         private int connectionVersion;
         private String createdBy;
@@ -93,8 +94,8 @@ public record ConnectionDTO(
             return this;
         }
 
-        public Builder authorizationName(String authorizationName) {
-            this.authorizationName = authorizationName;
+        public Builder authorizationType(AuthorizationType authorizationType) {
+            this.authorizationType = authorizationType;
 
             return this;
         }
@@ -177,7 +178,7 @@ public record ConnectionDTO(
 
         public ConnectionDTO build() {
             return new ConnectionDTO(
-                active, authorizationName, Map.of(), componentName, Map.of(), connectionVersion, createdBy, createdDate,
+                active, authorizationType, Map.of(), componentName, Map.of(), connectionVersion, createdBy, createdDate,
                 credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
         }
     }
