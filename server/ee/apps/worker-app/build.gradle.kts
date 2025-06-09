@@ -97,6 +97,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:vectorstore:weaviate"))
     implementation(project(":server:libs:modules:components:airtable"))
     implementation(project(":server:libs:modules:components:aitable"))
+    implementation(project(":server:libs:modules:components:apify"))
     implementation(project(":server:libs:modules:components:apollo"))
     implementation(project(":server:libs:modules:components:app-event"))
     implementation(project(":server:libs:modules:components:approval-link"))

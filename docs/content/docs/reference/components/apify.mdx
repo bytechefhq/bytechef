@@ -1,0 +1,124 @@
+---
+title: "Apify"
+description: "Apify is the largest ecosystem where developers build, deploy, and publish data extraction and web automation tools."
+---
+
+Apify is the largest ecosystem where developers build, deploy, and publish data extraction and web automation tools.
+
+
+Categories: Marketing Automation
+
+
+Type: apify/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Get Last Run
+Name: getLastRun
+
+`Get Apify Actor last run.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| actorId | Actor ID | STRING | `ID of the actor that will be fetched.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Last Run",
+  "name" : "getLastRun",
+  "parameters" : {
+    "actorId" : ""
+  },
+  "type" : "apify/v1/getLastRun"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the newly created opportunity. |
+| name | STRING | The name of the newly created opportunity. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : ""
+}
+```
+
+
+### Start Actor
+Name: startActor
+
+`Starts an Apify Actor`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| actorId | Actor ID | STRING | `ID of the actor that will be run.` | true |
+| body | Body | STRING | `The JSON input to pass to the Actor [you can get the JSON from a run in your Apify account].` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Start Actor",
+  "name" : "startActor",
+  "parameters" : {
+    "actorId" : "",
+    "body" : ""
+  },
+  "type" : "apify/v1/startActor"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
