@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.dto;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
@@ -23,7 +24,8 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceConfigurationDTO(
-    Map<String, ?> connectionAuthorizationParameters, Map<String, ?> connectionConnectionParameters,
+    AuthorizationType authorizationType, Map<String, ?> connectionAuthorizationParameters,
+    Map<String, ?> connectionConnectionParameters,
     Map<String, ?> connectionParameters, String createdBy, Instant createdDate, String description,
     boolean enabled, Environment environment, Long id, String lastModifiedBy, Instant lastModifiedDate,
     IntegrationDTO integration, long integrationId, Integer integrationVersion, String name,
@@ -32,7 +34,8 @@ public record IntegrationInstanceConfigurationDTO(
 
     public IntegrationInstanceConfigurationDTO(IntegrationInstanceConfiguration integrationInstanceConfiguration) {
         this(
-            Map.of(), Map.of(), integrationInstanceConfiguration.getConnectionParameters(),
+            integrationInstanceConfiguration.getAuthorizationType(), Map.of(), Map.of(),
+            integrationInstanceConfiguration.getConnectionParameters(),
             integrationInstanceConfiguration.getCreatedBy(), integrationInstanceConfiguration.getCreatedDate(),
             integrationInstanceConfiguration.getDescription(), integrationInstanceConfiguration.isEnabled(),
             integrationInstanceConfiguration.getEnvironment(), integrationInstanceConfiguration.getId(),
@@ -50,7 +53,8 @@ public record IntegrationInstanceConfigurationDTO(
         List<Tag> tags) {
 
         this(
-            connectionAuthorizationParameters, connectionConnectionParameters,
+            integrationInstanceConfiguration.getAuthorizationType(), connectionAuthorizationParameters,
+            connectionConnectionParameters,
             integrationInstanceConfiguration.getConnectionParameters(), integrationInstanceConfiguration.getCreatedBy(),
             integrationInstanceConfiguration.getCreatedDate(), integrationInstanceConfiguration.getDescription(),
             integrationInstanceConfiguration.isEnabled(), integrationInstanceConfiguration.getEnvironment(),
@@ -77,6 +81,7 @@ public record IntegrationInstanceConfigurationDTO(
         integrationInstance.setIntegrationVersion(integrationVersion);
         integrationInstance.setName(name);
         integrationInstance.setTags(tags);
+        integrationInstance.setAuthorizationType(authorizationType);
         integrationInstance.setVersion(version);
 
         return integrationInstance;
@@ -98,6 +103,7 @@ public record IntegrationInstanceConfigurationDTO(
         private List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows;
         private String name;
         private List<Tag> tags;
+        private AuthorizationType authorizationType;
         private int version;
 
         private Builder() {
@@ -201,9 +207,16 @@ public record IntegrationInstanceConfigurationDTO(
             return this;
         }
 
+        public Builder authorizationType(AuthorizationType authorizationType) {
+            this.authorizationType = authorizationType;
+
+            return this;
+        }
+
         public IntegrationInstanceConfigurationDTO build() {
             return new IntegrationInstanceConfigurationDTO(
-                Map.of(), Map.of(), connectionParameters, createdBy, createdDate, description, enabled, environment, id,
+                authorizationType, Map.of(), Map.of(), connectionParameters, createdBy, createdDate, description,
+                enabled, environment, id,
                 lastModifiedBy, lastModifiedDate, integration, integrationId, integrationVersion,
                 name, integrationInstanceConfigurationWorkflows, tags, version);
         }

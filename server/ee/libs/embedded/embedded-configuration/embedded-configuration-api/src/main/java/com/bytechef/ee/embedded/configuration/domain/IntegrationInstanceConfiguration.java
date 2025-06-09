@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.domain;
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.time.Instant;
@@ -80,6 +81,9 @@ public class IntegrationInstanceConfiguration {
     @Column("last_modified_date")
     @LastModifiedDate
     private Instant lastModifiedDate;
+
+    @Column("authorization_type")
+    private int authorizationType;
 
     @Version
     private int version;
@@ -158,6 +162,10 @@ public class IntegrationInstanceConfiguration {
             .toList();
     }
 
+    public AuthorizationType getAuthorizationType() {
+        return AuthorizationType.values()[authorizationType];
+    }
+
     public int getVersion() {
         return version;
     }
@@ -216,6 +224,10 @@ public class IntegrationInstanceConfiguration {
         }
     }
 
+    public void setAuthorizationType(AuthorizationType authorizationType) {
+        this.authorizationType = authorizationType.ordinal();
+    }
+
     public void setVersion(int version) {
         this.version = version;
     }
@@ -232,6 +244,7 @@ public class IntegrationInstanceConfiguration {
             ", integrationVersion=" + integrationVersion +
             ", integrationInstanceConfigurationTags=" + integrationInstanceConfigurationTags +
             ", connectionParameters=" + connectionParameters +
+            ", authorizationType=" + authorizationType +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

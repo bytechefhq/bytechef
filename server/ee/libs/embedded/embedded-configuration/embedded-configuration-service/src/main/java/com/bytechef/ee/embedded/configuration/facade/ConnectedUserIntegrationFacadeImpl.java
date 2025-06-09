@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
-import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
@@ -89,17 +88,20 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             integrationDTO.componentName(), integrationDTO.componentVersion());
 
-        ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
-
-        Authorization authorization = Objects.requireNonNull(connectionDefinition)
-            .getAuthorizations()
-            .getFirst();
-
-        AuthorizationType authorizationType = authorization.getType();
+        ConnectionDefinition connectionDefinition = Objects.requireNonNull(componentDefinition.getConnection());
 
         OAuth2AuthorizationParameters oAuth2AuthorizationParameters = oAuth2ParametersFacade
             .getOAuth2AuthorizationParameters(integrationDTO.componentName(), connectionDefinition.getVersion(),
-                integrationInstanceConfigurationDTO.connectionParameters(), authorizationType);
+                integrationInstanceConfigurationDTO.connectionParameters(),
+                integrationInstanceConfigurationDTO.authorizationType());
+
+        Authorization authorization = Objects.requireNonNull(connectionDefinition)
+            .getAuthorizations()
+            .stream()
+            .filter(curAuthorization -> curAuthorization.getType() == integrationInstanceConfigurationDTO
+                .authorizationType())
+            .findFirst()
+            .orElseThrow();
 
         return new ConnectedUserIntegrationDTO(
             authorization, connection, integrationInstance, integrationInstanceConfigurationDTO,
