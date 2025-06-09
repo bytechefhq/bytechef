@@ -1,0 +1,43 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Apify"
+  description: "Apify is the largest ecosystem where developers build, deploy, and publish data extraction and web automation tools."
+  version: "v1"
+servers:
+  - url: "https://api.apify.com/v2"
+paths:
+  /acts/{actorId}/runs/last:
+    get:
+      summary: "Get Last Run"
+      description: "Get Apify Actor last run."
+      operationId: "getLastRun"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "actorId"
+          in: "path"
+          description: "ID of the actor that will be fetched."
+          required: true
+          schema:
+            type: "string"
+            title: "Actor ID"
+            x-dynamic-options: true
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    description: "The ID of the newly created opportunity."
+                  name:
+                    type: "string"
+                    description: "The name of the newly created opportunity."
+components:
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"
