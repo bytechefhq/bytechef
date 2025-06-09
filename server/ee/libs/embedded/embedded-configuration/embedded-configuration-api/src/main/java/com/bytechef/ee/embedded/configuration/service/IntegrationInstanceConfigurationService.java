@@ -26,6 +26,9 @@ public interface IntegrationInstanceConfigurationService {
 
     IntegrationInstanceConfiguration getIntegrationInstanceConfiguration(long id);
 
+    IntegrationInstanceConfiguration getIntegrationInstanceConfiguration(
+        long id, Environment environment, boolean enabled);
+
     List<Long> getIntegrationIds();
 
     List<IntegrationInstanceConfiguration> getIntegrationInstanceConfigurations();
@@ -45,4 +48,5 @@ public interface IntegrationInstanceConfigurationService {
     IntegrationInstanceConfiguration update(IntegrationInstanceConfiguration integrationInstanceConfiguration);
 
     void updateEnabled(long id, boolean enabled);
+
 }

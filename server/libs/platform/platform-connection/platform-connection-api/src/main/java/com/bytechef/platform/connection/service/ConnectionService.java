@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.connection.service;
 
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
@@ -28,6 +29,10 @@ import java.util.Map;
 public interface ConnectionService {
 
     Connection create(Connection connection);
+
+    Connection create(
+        AuthorizationType authorizationType, String componentName, int connectionVersion,
+        Environment environment, String name, Map<String, Object> parameters, ModeType type);
 
     void delete(long id);
 

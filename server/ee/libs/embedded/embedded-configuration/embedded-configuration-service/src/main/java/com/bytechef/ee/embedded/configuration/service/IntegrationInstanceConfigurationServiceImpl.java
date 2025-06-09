@@ -57,6 +57,15 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
     }
 
     @Override
+    public IntegrationInstanceConfiguration getIntegrationInstanceConfiguration(
+        long id, Environment environment, boolean enabled) {
+
+        return OptionalUtils.get(
+            integrationInstanceConfigurationRepository.findByIdAndEnvironmentAndEnabled(
+                id, environment.ordinal(), enabled));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<Long> getIntegrationIds() {
         return integrationInstanceConfigurationRepository.findAllIntegrationIds();

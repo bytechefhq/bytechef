@@ -19,6 +19,12 @@ import java.util.Optional;
  */
 public interface IntegrationInstanceService {
 
+    IntegrationInstance create(IntegrationInstance integrationInstance);
+
+    IntegrationInstance create(long connectedUserId, long connectionId, long integrationInstanceConfigurationId);
+
+    void delete(long id);
+
     Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment);
 
@@ -43,5 +49,4 @@ public interface IntegrationInstanceService {
     List<IntegrationInstance> getIntegrationInstances(long integrationInstanceConfigurationId);
 
     void updateEnabled(long id, boolean enable);
-
 }

@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version ee
@@ -17,6 +18,11 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public interface ConnectedUserIntegrationFacade {
+
+    void createIntegrationInstance(
+        String externalUserId, long id, Map<String, Object> connectionParameters, Environment environment);
+
+    void deleteIntegrationInstance(String externalUserId, long instanceId);
 
     ConnectedUserIntegrationDTO getConnectedUserIntegration(
         String externalUserId, long integrationId, boolean enabled, Environment environment);

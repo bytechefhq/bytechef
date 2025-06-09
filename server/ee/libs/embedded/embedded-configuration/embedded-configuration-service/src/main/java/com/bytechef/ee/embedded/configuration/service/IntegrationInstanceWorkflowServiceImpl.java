@@ -81,6 +81,11 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
     }
 
     @Override
+    public List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(List<Long> integrationInstanceIds) {
+        return integrationInstanceWorkflowRepository.findAllByIntegrationInstanceIdIn(integrationInstanceIds);
+    }
+
+    @Override
     public void update(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         IntegrationInstanceWorkflow curIntegrationInstanceWorkflow = integrationInstanceWorkflowRepository
             .findById(integrationInstanceWorkflow.getId())

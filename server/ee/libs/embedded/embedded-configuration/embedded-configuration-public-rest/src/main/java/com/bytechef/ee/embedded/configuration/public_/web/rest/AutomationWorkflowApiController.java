@@ -7,19 +7,19 @@
 
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
+import static com.bytechef.ee.embedded.configuration.public_.web.rest.util.EnvironmentUtils.getEnvironment;
+
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowModel;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -75,7 +75,7 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
 
     @Override
     @CrossOrigin
-    public ResponseEntity<WorkflowModel> getFrontendProjectWorkflow(
+    public ResponseEntity<AutomationWorkflowModel> getFrontendProjectWorkflow(
         String workflowReferenceCode, EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
@@ -83,7 +83,7 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
                 connectUserProjectFacade.getProjectWorkflow(
                     OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
                     getEnvironment(xEnvironment)),
-                WorkflowModel.class));
+                AutomationWorkflowModel.class));
     }
 
     @Override
@@ -101,13 +101,13 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
 
     @Override
     @CrossOrigin
-    public ResponseEntity<List<WorkflowModel>> getFrontendProjectWorkflows(EnvironmentModel xEnvironment) {
+    public ResponseEntity<List<AutomationWorkflowModel>> getFrontendProjectWorkflows(EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(
             connectUserProjectFacade.getProjectWorkflows(
                 OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
                 getEnvironment(xEnvironment))
                 .stream()
-                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                .map(workflow -> conversionService.convert(workflow, AutomationWorkflowModel.class))
                 .toList());
     }
 
@@ -175,24 +175,24 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowModel> getProjectWorkflow(
+    public ResponseEntity<AutomationWorkflowModel> getProjectWorkflow(
         String externalUserId, String workflowReferenceCode, EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 connectUserProjectFacade.getProjectWorkflow(
                     externalUserId, workflowReferenceCode, getEnvironment(xEnvironment)),
-                WorkflowModel.class));
+                AutomationWorkflowModel.class));
     }
 
     @Override
-    public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(
+    public ResponseEntity<List<AutomationWorkflowModel>> getProjectWorkflows(
         String externalUserId, EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
             connectUserProjectFacade.getProjectWorkflows(externalUserId, getEnvironment(xEnvironment))
                 .stream()
-                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                .map(workflow -> conversionService.convert(workflow, AutomationWorkflowModel.class))
                 .toList());
     }
 
@@ -226,10 +226,5 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
-    }
-
-    private static Environment getEnvironment(EnvironmentModel xEnvironment) {
-        return xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
     }
 }

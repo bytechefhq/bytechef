@@ -7,17 +7,17 @@
 
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
+import static com.bytechef.ee.embedded.configuration.public_.web.rest.util.EnvironmentUtils.getEnvironment;
+
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationBasicModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -62,7 +62,7 @@ public class IntegrationApiController implements IntegrationApi {
 
     @CrossOrigin
     @Override
-    public ResponseEntity<List<IntegrationModel>> getFrontendIntegrations(EnvironmentModel xEnvironment) {
+    public ResponseEntity<List<IntegrationBasicModel>> getFrontendIntegrations(EnvironmentModel xEnvironment) {
         String externalId = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
@@ -70,7 +70,7 @@ public class IntegrationApiController implements IntegrationApi {
             connectedUserIntegrationFacade
                 .getConnectedUserIntegrations(externalId, true, getEnvironment(xEnvironment))
                 .stream()
-                .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
+                .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationBasicModel.class))
                 .toList());
     }
 
@@ -103,8 +103,4 @@ public class IntegrationApiController implements IntegrationApi {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
     }
 
-    private static Environment getEnvironment(EnvironmentModel xEnvironment) {
-        return xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
-    }
 }

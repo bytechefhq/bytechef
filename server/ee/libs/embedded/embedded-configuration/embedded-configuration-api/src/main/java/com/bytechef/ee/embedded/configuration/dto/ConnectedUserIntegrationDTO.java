@@ -9,45 +9,81 @@ package com.bytechef.ee.embedded.configuration.dto;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.platform.component.domain.Authorization;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import java.util.List;
+import java.util.Objects;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.Nullable;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record ConnectedUserIntegrationDTO(
-    ConnectionConfig connectionConfig, CredentialStatus credentialStatus, boolean enabled,
-    IntegrationInstanceConfigurationDTO integrationInstanceConfiguration) {
+    ConnectionConfig connectionConfig, IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
+    List<ConnectedUserIntegrationInstance> integrationInstances,
+    OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
 
     public ConnectedUserIntegrationDTO(
-        @Nullable Connection connection, @Nullable IntegrationInstance integrationInstance,
-        IntegrationInstanceConfigurationDTO integrationInstanceConfiguration) {
+        List<Connection> connections, IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
+        List<IntegrationInstance> integrationInstances,
+        List<IntegrationInstanceWorkflow> integrationInstanceWorkflows) {
 
         this(
-            null, connection == null ? null : connection.getCredentialStatus(),
-            integrationInstance != null && integrationInstance.isEnabled(), integrationInstanceConfiguration);
+            null, integrationInstanceConfiguration,
+            toIntegrationInstances(
+                connections, integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows(),
+                integrationInstances, integrationInstanceWorkflows),
+            null, null);
     }
 
     public ConnectedUserIntegrationDTO(
-        Authorization authorization, @Nullable Connection connection, @Nullable IntegrationInstance integrationInstance,
+        Authorization authorization, List<Connection> connections,
         IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
+        List<IntegrationInstance> integrationInstances, List<IntegrationInstanceWorkflow> integrationInstanceWorkflows,
         OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
 
         this(
             new ConnectionConfig(
                 authorization.getType(), new OAuth2(oAuth2AuthorizationParameters, redirectUri),
                 authorization.getProperties()),
-            connection == null ? null : connection.getCredentialStatus(),
-            integrationInstance != null && integrationInstance.isEnabled(), integrationInstanceConfiguration);
+            integrationInstanceConfiguration,
+            toIntegrationInstances(
+                connections, integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows(),
+                integrationInstances, integrationInstanceWorkflows),
+            oAuth2AuthorizationParameters, redirectUri);
+    }
+
+    private static List<ConnectedUserIntegrationInstance> toIntegrationInstances(
+        List<Connection> connections,
+        List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflowDTOs,
+        List<IntegrationInstance> integrationInstances,
+        List<IntegrationInstanceWorkflow> integrationInstanceWorkflows) {
+
+        return integrationInstances.stream()
+            .map(integrationInstance -> new ConnectedUserIntegrationInstance(
+                getConnection(connections, integrationInstance), integrationInstance,
+                toIntegrationInstanceWorkflows(
+                    integrationInstanceConfigurationWorkflowDTOs,
+                    integrationInstance.getId(), integrationInstanceWorkflows)))
+            .toList();
+    }
+
+    public record ConnectedUserIntegrationInstance(
+        Connection connection, IntegrationInstance integrationInstance,
+        List<ConnectedUserIntegrationInstanceWorkflow> workflows) {
+    }
+
+    public record ConnectedUserIntegrationInstanceWorkflow(
+        IntegrationInstanceWorkflow integrationInstanceWorkflow, String workflowReferenceCode) {
     }
 
     public record ConnectionConfig(AuthorizationType authorizationType, List<Input> inputs, OAuth2 oauth2) {
@@ -68,7 +104,7 @@ public record ConnectedUserIntegrationDTO(
             INTEGER,
             NUMBER,
             STRING,
-            TIME
+            TIME;
         }
     }
 
@@ -85,6 +121,40 @@ public record ConnectedUserIntegrationDTO(
                 property.getName(), ((ValueProperty<?>) property).getLabel(),
                 Input.Type.valueOf(StringUtils.upperCase(String.valueOf(property.getType()))),
                 property.getRequired()))
+            .toList();
+    }
+
+    private static Connection getConnection(List<Connection> connections, IntegrationInstance integrationInstance) {
+        return connections.stream()
+            .filter(connection -> Objects.equals(connection.getId(), integrationInstance.getConnectionId()))
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private static String getWorkflowReferenceCode(
+        List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflowDTOs,
+        IntegrationInstanceWorkflow integrationInstanceWorkflow) {
+
+        return integrationInstanceConfigurationWorkflowDTOs
+            .stream()
+            .filter(integrationInstanceConfigurationWorkflowDTO -> Objects.equals(
+                integrationInstanceConfigurationWorkflowDTO.id(),
+                integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()))
+            .map(IntegrationInstanceConfigurationWorkflowDTO::workflowReferenceCode)
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private static List<ConnectedUserIntegrationInstanceWorkflow> toIntegrationInstanceWorkflows(
+        List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflowDTOs,
+        long integrationInstanceId, List<IntegrationInstanceWorkflow> integrationInstanceWorkflows) {
+
+        return integrationInstanceWorkflows.stream()
+            .filter(integrationInstanceWorkflow -> Objects.equals(
+                integrationInstanceWorkflow.getIntegrationInstanceId(), integrationInstanceId))
+            .map(integrationInstanceWorkflow -> new ConnectedUserIntegrationInstanceWorkflow(
+                integrationInstanceWorkflow,
+                getWorkflowReferenceCode(integrationInstanceConfigurationWorkflowDTOs, integrationInstanceWorkflow)))
             .toList();
     }
 }

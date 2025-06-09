@@ -43,4 +43,5 @@ public interface IntegrationInstanceWorkflowRepository extends ListCrudRepositor
     void deleteByIntegrationInstanceConfigurationWorkflowId(
         @Param("integrationInstanceConfigurationWorkflowId") long integrationInstanceConfigurationWorkflowId);
 
+    List<IntegrationInstanceWorkflow> findAllByIntegrationInstanceIdIn(List<Long> integrationInstanceIds);
 }

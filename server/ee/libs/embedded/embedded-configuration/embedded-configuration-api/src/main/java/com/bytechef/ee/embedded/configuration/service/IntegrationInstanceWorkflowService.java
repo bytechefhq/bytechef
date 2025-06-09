@@ -32,6 +32,8 @@ public interface IntegrationInstanceWorkflowService {
 
     List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(long integrationInstanceId);
 
+    List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(List<Long> integrationInstanceIds);
+
     void update(IntegrationInstanceWorkflow integrationInstanceWorkflow);
 
     void updateEnabled(Long id, boolean enabled);

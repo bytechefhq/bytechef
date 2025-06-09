@@ -34,6 +34,30 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    public IntegrationInstance create(IntegrationInstance integrationInstance) {
+        return integrationInstanceRepository.save(integrationInstance);
+    }
+
+    @Override
+    public IntegrationInstance create(
+        long connectedUserId, long connectionId, long integrationInstanceConfigurationId) {
+
+        IntegrationInstance integrationInstance = new IntegrationInstance();
+
+        integrationInstance.setConnectedUserId(connectedUserId);
+        integrationInstance.setConnectionId(connectionId);
+        integrationInstance.setIntegrationInstanceConfigurationId(integrationInstanceConfigurationId);
+        integrationInstance.setEnabled(true);
+
+        return integrationInstanceRepository.save(integrationInstance);
+    }
+
+    @Override
+    public void delete(long id) {
+        integrationInstanceRepository.deleteById(id);
+    }
+
+    @Override
     public Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment) {
 

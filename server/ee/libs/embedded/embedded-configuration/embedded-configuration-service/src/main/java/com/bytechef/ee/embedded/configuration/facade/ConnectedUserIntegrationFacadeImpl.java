@@ -7,11 +7,17 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.domain.Authorization;
@@ -23,9 +29,13 @@ import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,24 +52,74 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
+    private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
+    private final IntegrationService integrationService;
     private final OAuth2ParametersFacade oAuth2ParametersFacade;
     private final OAuth2Service oAuth2Service;
+    private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
 
+    @SuppressFBWarnings("EI")
     public ConnectedUserIntegrationFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
         ConnectionService connectionService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
-        IntegrationInstanceService integrationInstanceService, OAuth2ParametersFacade oAuth2ParametersFacade,
-        OAuth2Service oAuth2Service) {
+        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
+        OAuth2ParametersFacade oAuth2ParametersFacade, OAuth2Service oAuth2Service,
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
+        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
+        this.integrationService = integrationService;
         this.oAuth2ParametersFacade = oAuth2ParametersFacade;
         this.oAuth2Service = oAuth2Service;
+        this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
+    }
+
+    @Override
+    public void createIntegrationInstance(
+        String externalUserId, long id, Map<String, Object> connectionParameters, Environment environment) {
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(id, environment, true);
+
+        Integration integration = integrationService.getIntegration(
+            integrationInstanceConfiguration.getIntegrationId());
+
+        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+            integration.getComponentName(), integration.getComponentVersion());
+
+        ConnectionDefinition connectionDefinition = Objects.requireNonNull(componentDefinition.getConnection());
+
+        Connection connection = connectionService.create(
+            integrationInstanceConfiguration.getAuthorizationType(), integration.getComponentName(),
+            connectionDefinition.getVersion(), integrationInstanceConfiguration.getEnvironment(),
+            integrationInstanceConfiguration.getName(), connectionParameters, ModeType.EMBEDDED);
+
+        integrationInstanceService.create(
+            connectedUser.getId(), connection.getId(), integrationInstanceConfiguration.getId());
+    }
+
+    @Override
+    public void deleteIntegrationInstance(String externalUserId, long instanceId) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(instanceId);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
+
+        connectedUserService.fetchConnectedUser(externalUserId, integrationInstanceConfiguration.getEnvironment())
+            .ifPresent(connectedUser -> {
+                if (Objects.equals(connectedUser.getExternalId(), externalUserId)) {
+                    integrationInstanceService.delete(instanceId);
+                }
+            });
     }
 
     @Override
@@ -75,15 +135,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         IntegrationDTO integrationDTO = integrationInstanceConfigurationDTO.integration();
 
-        IntegrationInstance integrationInstance = integrationInstanceService
-            .fetchIntegrationInstance(connectedUser.getId(), integrationDTO.componentName(), environment)
-            .orElse(null);
-
-        Connection connection = null;
-
-        if (integrationInstance != null) {
-            connection = connectionService.getConnection(integrationInstance.getConnectionId());
-        }
+        List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
+            connectedUser.getId(), integrationDTO.componentName(), environment);
 
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             integrationDTO.componentName(), integrationDTO.componentVersion());
@@ -103,9 +156,20 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .findFirst()
             .orElseThrow();
 
+        List<Connection> connections = connectionService.getConnections(
+            integrationInstances.stream()
+                .map(IntegrationInstance::getConnectionId)
+                .toList());
+
+        List<IntegrationInstanceWorkflow> integrationInstanceWorkflows = integrationInstanceWorkflowService
+            .getIntegrationInstanceWorkflows(
+                integrationInstances.stream()
+                    .map(IntegrationInstance::getId)
+                    .toList());
+
         return new ConnectedUserIntegrationDTO(
-            authorization, connection, integrationInstance, integrationInstanceConfigurationDTO,
-            oAuth2AuthorizationParameters, oAuth2Service.getRedirectUri());
+            authorization, connections, integrationInstanceConfigurationDTO, integrationInstances,
+            integrationInstanceWorkflows, oAuth2AuthorizationParameters, oAuth2Service.getRedirectUri());
     }
 
     @Override
@@ -129,16 +193,21 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         IntegrationDTO integrationDTO = integrationInstanceConfigurationDTO.integration();
 
-        IntegrationInstance integrationInstance = integrationInstanceService
-            .fetchIntegrationInstance(connectedUser.getId(), integrationDTO.componentName(), environment)
-            .orElse(null);
+        List<IntegrationInstance> integrationInstances = integrationInstanceService
+            .getIntegrationInstances(connectedUser.getId(), integrationDTO.componentName(), environment);
 
-        Connection connection = null;
+        List<Connection> connections = connectionService.getConnections(
+            integrationInstances.stream()
+                .map(IntegrationInstance::getConnectionId)
+                .toList());
 
-        if (integrationInstance != null) {
-            connection = connectionService.getConnection(integrationInstance.getConnectionId());
-        }
+        List<IntegrationInstanceWorkflow> integrationInstanceWorkflows = integrationInstanceWorkflowService
+            .getIntegrationInstanceWorkflows(
+                integrationInstances.stream()
+                    .map(IntegrationInstance::getId)
+                    .toList());
 
-        return new ConnectedUserIntegrationDTO(connection, integrationInstance, integrationInstanceConfigurationDTO);
+        return new ConnectedUserIntegrationDTO(connections, integrationInstanceConfigurationDTO, integrationInstances,
+            integrationInstanceWorkflows);
     }
 }

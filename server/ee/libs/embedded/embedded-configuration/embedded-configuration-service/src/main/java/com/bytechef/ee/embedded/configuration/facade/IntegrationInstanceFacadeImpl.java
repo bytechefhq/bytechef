@@ -75,29 +75,28 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceFacadeImpl(
-        ConnectedUserService connectedUserService, Evaluator evaluator, PrincipalJobService principalJobService,
+        ApplicationProperties applicationProperties, ConnectedUserService connectedUserService, Evaluator evaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        ApplicationProperties applicationProperties,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService, JobService jobService,
-        TriggerLifecycleFacade triggerLifecycleFacade, ComponentConnectionFacade componentConnectionFacade,
-        WorkflowService workflowService) {
+        PrincipalJobService principalJobService, TriggerLifecycleFacade triggerLifecycleFacade,
+        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
 
+        this.componentConnectionFacade = componentConnectionFacade;
         this.connectedUserService = connectedUserService;
         this.evaluator = evaluator;
-        this.principalJobService = principalJobService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
-        this.webhookUrl = applicationProperties.getWebhookUrl();
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.jobService = jobService;
+        this.principalJobService = principalJobService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
-        this.componentConnectionFacade = componentConnectionFacade;
+        this.webhookUrl = applicationProperties.getWebhookUrl();
         this.workflowService = workflowService;
     }
 
@@ -121,8 +120,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(
-            integrationInstance.getConnectedUserId());
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(integrationInstance.getConnectedUserId());
 
         long integrationInstanceWorkflowId;
 
@@ -226,6 +224,35 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                         IntegrationInstanceConfigurationWorkflow::getWorkflowId)))
                 .collect(Collectors.toSet()),
             getIntegrationInstanceLastExecutionDate(integrationInstance.getId()));
+    }
+
+    @Override
+    public void updateIntegrationInstanceWorkflow(
+        long integrationInstanceId, String workflowId, Map<String, Object> inputs) {
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow =
+            integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(integrationInstanceId, workflowId)
+                .orElseGet(() -> {
+                    IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+                        integrationInstanceId);
+
+                    IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                        integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                            integrationInstance.getIntegrationInstanceConfigurationId(), workflowId);
+
+                    IntegrationInstanceWorkflow newIntegrationInstanceWorkflow = new IntegrationInstanceWorkflow();
+
+                    newIntegrationInstanceWorkflow.setIntegrationInstanceConfigurationWorkflowId(
+                        integrationInstanceConfigurationWorkflow.getId());
+                    newIntegrationInstanceWorkflow.setIntegrationInstanceId(integrationInstanceId);
+                    newIntegrationInstanceWorkflow.setInputs(Map.of());
+
+                    return newIntegrationInstanceWorkflow;
+                });
+
+        integrationInstanceWorkflow.setInputs(inputs);
+
+        integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
     }
 
     private void disableWorkflowTriggers(IntegrationInstanceWorkflow integrationInstanceWorkflow) {

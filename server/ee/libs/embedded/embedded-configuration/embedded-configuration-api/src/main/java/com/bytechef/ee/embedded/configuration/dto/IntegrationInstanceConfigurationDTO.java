@@ -25,10 +25,9 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceConfigurationDTO(
     AuthorizationType authorizationType, Map<String, ?> connectionAuthorizationParameters,
-    Map<String, ?> connectionConnectionParameters,
-    Map<String, ?> connectionParameters, String createdBy, Instant createdDate, String description,
-    boolean enabled, Environment environment, Long id, String lastModifiedBy, Instant lastModifiedDate,
-    IntegrationDTO integration, long integrationId, Integer integrationVersion, String name,
+    Map<String, ?> connectionConnectionParameters, Map<String, ?> connectionParameters, String createdBy,
+    Instant createdDate, String description, boolean enabled, Environment environment, Long id, String lastModifiedBy,
+    Instant lastModifiedDate, IntegrationDTO integration, long integrationId, Integer integrationVersion, String name,
     List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows, List<Tag> tags,
     int version) {
 

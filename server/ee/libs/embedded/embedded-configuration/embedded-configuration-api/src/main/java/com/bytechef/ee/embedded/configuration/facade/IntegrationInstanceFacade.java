@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceDTO;
+import java.util.Map;
 
 /**
  * @version ee
@@ -26,4 +27,7 @@ public interface IntegrationInstanceFacade {
         long integrationInstanceId, String workflowId, boolean enable);
 
     IntegrationInstanceDTO getIntegrationInstance(long id);
+
+    void updateIntegrationInstanceWorkflow(
+        long integrationInstanceId, String workflowId, Map<String, Object> inputs);
 }

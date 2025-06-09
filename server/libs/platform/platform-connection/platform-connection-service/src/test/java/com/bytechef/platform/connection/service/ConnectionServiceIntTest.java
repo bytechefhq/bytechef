@@ -18,10 +18,12 @@ package com.bytechef.platform.connection.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
@@ -71,6 +73,29 @@ public class ConnectionServiceIntTest {
         assertThat(connection)
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("tagIds", List.of(Validate.notNull(tag.getId(), "id")));
+    }
+
+    @Test
+    public void testCreateWithParameters() {
+        AuthorizationType authorizationType = AuthorizationType.BASIC_AUTH;
+        String componentName = "componentName";
+        int connectionVersion = 1;
+        Environment environment = Environment.PRODUCTION;
+        String name = "name";
+        Map<String, Object> parameters = Map.of("key1", "value1");
+        ModeType type = ModeType.AUTOMATION;
+
+        Connection connection = connectionService.create(
+            authorizationType, componentName, connectionVersion, environment, name, parameters, type);
+
+        assertThat(connection)
+            .hasFieldOrPropertyWithValue("authorizationType", authorizationType)
+            .hasFieldOrPropertyWithValue("componentName", componentName)
+            .hasFieldOrPropertyWithValue("connectionVersion", connectionVersion)
+            .hasFieldOrPropertyWithValue("environment", environment)
+            .hasFieldOrPropertyWithValue("name", name)
+            .hasFieldOrPropertyWithValue("parameters", parameters)
+            .hasFieldOrPropertyWithValue("type", type);
     }
 
     @Test

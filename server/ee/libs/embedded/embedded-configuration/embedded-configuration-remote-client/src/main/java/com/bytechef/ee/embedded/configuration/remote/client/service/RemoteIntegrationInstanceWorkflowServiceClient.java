@@ -75,6 +75,11 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
     }
 
     @Override
+    public List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(List<Long> integrationInstanceIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void update(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         throw new UnsupportedOperationException();
     }

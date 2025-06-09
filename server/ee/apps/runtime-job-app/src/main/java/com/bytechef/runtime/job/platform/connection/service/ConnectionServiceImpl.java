@@ -7,6 +7,7 @@
 
 package com.bytechef.runtime.job.platform.connection.service;
 
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
@@ -26,6 +27,14 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection create(Connection connection) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection create(
+        AuthorizationType authorizationType, String componentName, int connectionVersion, Environment environment,
+        String name, Map<String, Object> parameters, ModeType type) {
+
         throw new UnsupportedOperationException();
     }
 

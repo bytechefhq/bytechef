@@ -24,6 +24,8 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.ModeType;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +45,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     private final IntegrationInstanceService integrationInstanceService;
     private final ProjectWorkflowService projectWorkflowService;
 
+    @SuppressFBWarnings("EI")
     public ConnectedUserConnectionFacadeImpl(
         ConnectedUserService connectedUserService, ConnectionFacade connectionFacade,
         ConnectedUserProjectService connectedUserProjectService,

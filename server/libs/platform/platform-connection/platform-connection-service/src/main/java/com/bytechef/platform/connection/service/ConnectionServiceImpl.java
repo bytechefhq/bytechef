@@ -18,6 +18,7 @@ package com.bytechef.platform.connection.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
@@ -55,6 +56,30 @@ public class ConnectionServiceImpl implements ConnectionService {
         Assert.isTrue(connection.getId() == null, "'id' must be null");
 
         return connectionRepository.save(connection);
+    }
+
+    @Override
+    public Connection create(
+        AuthorizationType authorizationType, String componentName, int connectionVersion,
+        Environment environment, String name, Map<String, Object> parameters, ModeType type) {
+
+        Assert.notNull(authorizationType, "'authorizationType' must not be null");
+        Assert.hasText(componentName, "'componentName' must not be empty");
+        Assert.hasText(name, "'name' must not be empty");
+        Assert.notNull(environment, "'environment' must not be null");
+        Assert.notNull(parameters, "'parameters' must not be null");
+        Assert.notNull(type, "'type' must not be null");
+
+        Connection connection = new Connection();
+        connection.setAuthorizationType(authorizationType);
+        connection.setComponentName(componentName);
+        connection.setConnectionVersion(connectionVersion);
+        connection.setEnvironment(environment);
+        connection.setName(name);
+        connection.setParameters(parameters);
+        connection.setType(type);
+
+        return create(connection);
     }
 
     @Override
