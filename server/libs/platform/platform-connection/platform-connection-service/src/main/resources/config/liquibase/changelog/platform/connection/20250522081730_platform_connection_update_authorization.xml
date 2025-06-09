@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20250522081730" author="ByteChef">
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="0"/>
+            <where>authorization_name = 'api_key'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="1"/>
+            <where>authorization_name = 'basic_auth'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="2"/>
+            <where>authorization_name = 'bearer_token'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="3"/>
+            <where>authorization_name = 'custom'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="4"/>
+            <where>authorization_name = 'digest_auth'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="5"/>
+            <where>authorization_name = 'oauth2_authorization_code'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="6"/>
+            <where>authorization_name = 'oauth2_authorization_code_pkce'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="7"/>
+            <where>authorization_name = 'oauth2_client_credentials'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="8"/>
+            <where>authorization_name = 'oauth2_implicit_code'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueNumeric="9"/>
+            <where>authorization_name = 'oauth2_resource_owner_password'</where>
+        </update>
+        <update tableName="connection">
+            <column name="authorization_name" valueComputed="NULL"/>
+            <where>authorization_name = 'none' OR authorization_name = '' OR authorization_name IS NULL</where>
+        </update>
+
+        <renameColumn
+            tableName="connection"
+            oldColumnName="authorization_name"
+            newColumnName="authorization_type"
+            columnDataType="INT"/>
+    </changeSet>
+</databaseChangeLog>
