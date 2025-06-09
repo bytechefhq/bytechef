@@ -25,20 +25,20 @@ import org.apache.commons.lang3.StringUtils;
  */
 @SuppressFBWarnings("EI")
 public record IntegrationDTO(
-    boolean multipleInstances, Category category, String componentName, String createdBy,
-    Instant createdDate, String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
-    List<Long> integrationWorkflowIds, String lastModifiedBy, Instant lastModifiedDate,
-    Instant lastPublishedDate, Status lastStatus, Integer lastVersion, String name, List<Tag> tags, String title,
+    Category category, String componentName, int componentVersion, String createdBy, Instant createdDate,
+    String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
+    List<Long> integrationWorkflowIds, String lastModifiedBy, Instant lastModifiedDate, Instant lastPublishedDate,
+    Status lastStatus, Integer lastVersion, boolean multipleInstances, String name, List<Tag> tags, String title,
     int version) {
 
     public IntegrationDTO(Integration integration) {
         this(
-            integration.isMultipleInstances(),
             integration.getCategoryId() == null ? null : new Category(integration.getCategoryId()),
-            integration.getComponentName(), integration.getCreatedBy(), integration.getCreatedDate(),
-            integration.getDescription(), null, integration.getId(), integration.getIntegrationVersions(), null,
-            integration.getLastModifiedBy(), integration.getLastModifiedDate(), integration.getLastPublishedDate(),
-            integration.getLastStatus(), integration.getLastVersion(), integration.getName(), List.of(), null,
+            integration.getComponentName(), integration.getComponentVersion(), integration.getCreatedBy(),
+            integration.getCreatedDate(), integration.getDescription(), null, integration.getId(),
+            integration.getIntegrationVersions(), List.of(), integration.getLastModifiedBy(),
+            integration.getLastModifiedDate(), integration.getLastPublishedDate(), integration.getLastStatus(),
+            integration.getLastVersion(), integration.isMultipleInstances(), integration.getName(), List.of(), null,
             integration.getVersion());
     }
 
@@ -47,12 +47,13 @@ public record IntegrationDTO(
         List<Long> integrationWorkflowIds, List<Tag> tags) {
 
         this(
-            integration.isMultipleInstances(), category, integration.getComponentName(),
-            integration.getCreatedBy(), integration.getCreatedDate(), getDescription(componentDefinition, integration),
+            category, integration.getComponentName(), integration.getComponentVersion(), integration.getCreatedBy(),
+            integration.getCreatedDate(), getDescription(componentDefinition, integration),
             componentDefinition.getIcon(), integration.getId(), integration.getIntegrationVersions(),
             integrationWorkflowIds, integration.getLastModifiedBy(), integration.getLastModifiedDate(),
             integration.getLastPublishedDate(), integration.getLastStatus(), integration.getLastVersion(),
-            integration.getName(), tags, componentDefinition.getTitle(), integration.getVersion());
+            integration.isMultipleInstances(), integration.getName(), tags, componentDefinition.getTitle(),
+            integration.getVersion());
     }
 
     public static Builder builder() {
@@ -81,6 +82,7 @@ public record IntegrationDTO(
         private boolean multipleInstances;
         private Category category;
         private String componentName;
+        private int componentVersion = 1;
         private String createdBy;
         private Instant createdDate;
         private String description;
@@ -113,6 +115,12 @@ public record IntegrationDTO(
 
         public Builder componentName(String componentName) {
             this.componentName = componentName;
+
+            return this;
+        }
+
+        public Builder componentVersion(int componentVersion) {
+            this.componentVersion = componentVersion;
 
             return this;
         }
@@ -203,9 +211,9 @@ public record IntegrationDTO(
 
         public IntegrationDTO build() {
             return new IntegrationDTO(
-                multipleInstances, category, componentName, createdBy, createdDate, description, null, id,
+                category, componentName, componentVersion, createdBy, createdDate, description, null, id,
                 integrationVersions, integrationWorkflowIds, lastModifiedBy, lastModifiedDate, lastPublishedDate,
-                lastStatus, lastVersion, name, tags, null, version);
+                lastStatus, lastVersion, multipleInstances, name, tags, null, version);
         }
     }
 

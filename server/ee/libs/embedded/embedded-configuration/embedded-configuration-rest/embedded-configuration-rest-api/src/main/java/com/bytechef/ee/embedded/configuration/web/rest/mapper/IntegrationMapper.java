@@ -53,6 +53,7 @@ public class IntegrationMapper {
 
         @InheritInverseConfiguration
         @DelegatingConverter
+        @Mapping(target = "componentVersion", ignore = true)
         @Mapping(target = "integrationVersions", ignore = true)
         IntegrationDTO invertConvert(IntegrationModel integrationModel);
     }
