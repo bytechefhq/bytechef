@@ -1,0 +1,394 @@
+---
+openapi: "3.0.0"
+info:
+  title: "Coda"
+  description: "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps, and databases into a single platform."
+  version: "v1"
+servers:
+  - url: "https://coda.io/apis/v1"
+paths:
+  /docs:
+    get:
+      summary: "List docs"
+      description: "Returns a list of docs accessible by the user, and which they have opened at least once."
+      operationId: "listDocs"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "isOwner"
+          description: "Show only docs owned by the user."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            title: "Is Owner"
+        - name: "isPublished"
+          description: "Show only published docs."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            title: "Is Published"
+        - name: "limit"
+          description: "Maximum number of results to return in this query."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            title: "Limit"
+            minimum: 1
+      responses:
+        200:
+          description: "List of Coda docs matching the query."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocList'
+    post:
+      summary: "Copy doc"
+      description: "Copies an existing doc."
+      operationId: "copyDoc"
+      x-ai-agent-tool: true
+      requestBody:
+        description: "Parameters for copying the doc."
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - title
+                - sourceDoc
+              properties:
+                title:
+                  type: "string"
+                  description: "Title of the new doc."
+                sourceDoc:
+                  type: "string"
+                  description: "A doc ID from which to create a copy."
+                  x-dynamic-options: true
+      responses:
+        201:
+          description: "Info about the created doc."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentCreationResult'
+
+  /docs/{docId}/tables/{tableId}/rows/{rowId}:
+    put:
+      summary: "Update row"
+      description: "Updates the specified row in the table."
+      operationId: "updateRow"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "docId"
+          description: "ID of the doc."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            title: "Doc ID"
+            x-dynamic-options: true
+        - name: "tableId"
+          description: "ID or name of the table."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            title: "Table ID"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "docId"
+        - name: "rowId"
+          description: "ID or name of the row."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            title: "Row ID"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "docId"
+              - "tableId"
+      requestBody:
+        description: "Row update."
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              description: "Payload for updating a row in a table."
+              required:
+                - row
+              properties:
+                row:
+                  type: "object"
+                  description: "An edit made to a particular row."
+                  required:
+                    - cells
+                  properties:
+                    cells:
+                      type: "array"
+                      items:
+                        type: "object"
+                        description: "An edit made to a particular cell in a row."
+                        required:
+                          - column
+                          - value
+                        properties:
+                          column:
+                            type: "string"
+                            description: "Column ID."
+                            x-dynamic-options: true
+                            x-dynamic-options-dependency:
+                              - "docId"
+                              - "tableId"
+                          value:
+                            type: "string"
+                            description: "A Coda result or entity expressed as a string."
+      responses:
+        200:
+          description: "A result indicating that the update was queued for processing."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                description: "The result of a row update."
+                properties:
+                  requestId:
+                    type: "string"
+                    description: "An arbitrary unique identifier for this request."
+                  id:
+                    type: "string"
+                    description: "ID of the updated row."
+components:
+  schemas:
+    DocList:
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/Doc'
+        href:
+          type: "string"
+          description: "API link to these results."
+    Doc:
+      type: "object"
+      description: "Metadata about a Coda doc."
+      properties:
+        id:
+          type: "string"
+          description: "ID of the Coda doc."
+        type:
+          type: "string"
+          description: "The type of this resource."
+        href:
+          type: "string"
+          description: "API link to the Coda doc."
+        browserLink:
+          type: "string"
+          description: "Browser-friendly link to the Coda doc."
+        name:
+          type: "string"
+          description: "Name of the doc."
+        owner:
+          type: "string"
+          description: "Email address of the doc owner."
+        ownerName:
+          type: "string"
+          description: "Name of the doc owner."
+        createdAt:
+          type: "string"
+          description: "Timestamp for when the doc was created."
+        updatedAt:
+          type: "string"
+          description: "Timestamp for when the doc was last modified."
+        icon:
+          type: "object"
+          description: "Info about the icon."
+          properties:
+            name:
+              type: "string"
+              description: "Name of the icon."
+            type:
+              type: "string"
+              description: "MIME type of the icon."
+            browserLink:
+              type: "string"
+              description: "Browser-friendly link to an icon."
+        docSize:
+          type: "object"
+          description: "The number of components within a Coda doc."
+          properties:
+            totalRowCount:
+              type: "number"
+              description: "The number of rows contained within all tables of the doc."
+            tableAndViewCount:
+              type: "number"
+              description: "The total number of tables and views contained within the doc."
+            pageCount:
+              type: "number"
+              description: "The total number of page contained within the doc."
+            overApiSizeLimit:
+              type: "boolean"
+              description: "If true, indicates that the doc is over the API size limit."
+        sourceDoc:
+          type: "object"
+          description: "Reference to a Coda doc from which this doc was copied, if any."
+          properties:
+            id:
+              type: "string"
+              description: "ID of the Coda doc."
+            type:
+              type: "string"
+              description: "The type of this resource."
+            href:
+              type: "string"
+              description: "API link to the Coda doc."
+            browserLink:
+              type: "string"
+              description: "Browser-friendly link to the Coda doc."
+        workspaceId:
+          type: "string"
+          description: "ID of the Coda workspace containing this doc."
+        folderId:
+          type: "string"
+          description: "ID of the Coda folder containing this doc."
+        workspace:
+          type: "object"
+          description: "Reference to a Coda workspace."
+          properties:
+            id:
+              type: "string"
+              description: "ID of the Coda workspace."
+            type:
+              type: "string"
+              description: "The type of this resource."
+            browserLink:
+              type: "string"
+              description: "Browser-friendly link to the Coda workspace."
+            name:
+              type: "string"
+              description: "Name of the workspace; included if the user has access to the workspace."
+        folder:
+          type: "object"
+          description: "Reference to a Coda folder."
+          properties:
+            id:
+              type: "string"
+              description: "ID of the Coda folder."
+            type:
+              type: "string"
+              description: "The type of this resource."
+            browserLink:
+              type: "string"
+              description: "Browser-friendly link to the folder."
+            name:
+              type: "string"
+              description: "Name of the folder; included if the user has access to the folder."
+
+    DocumentCreationResult:
+      type: "object"
+      description: "The result of a doc creation."
+      properties:
+        id:
+          type: "string"
+          description: "ID of the Coda doc."
+        type:
+          type: "string"
+          description: "The type of this resource."
+        href:
+          type: "string"
+          description: "API link to the Coda doc."
+        browserLink:
+          type: "string"
+          description: "Browser-friendly link to the Coda doc."
+        name:
+          type: "string"
+          description: "Name of the doc."
+        owner:
+          type: "string"
+          description: "Email address of the doc owner."
+        ownerName:
+          type: "string"
+          description: "Name of the doc owner."
+        createdAt:
+          type: "string"
+          description: "Timestamp for when the doc was created."
+        updatedAt:
+          type: "string"
+          description: "Timestamp for when the doc was last modified."
+        icon:
+          type: "object"
+          description: "Info about the icon."
+          properties:
+            name:
+              type: "string"
+              description: "Name of the icon."
+            type:
+              type: "string"
+              description: "MIME type of the icon."
+            browserLink:
+              type: "string"
+              description: "Browser-friendly link to an icon."
+        sourceDoc:
+          type: "object"
+          description: "Reference to a Coda doc from which this doc was copied, if any."
+          properties:
+            id:
+              type: "string"
+              description: "ID of the Coda doc."
+            type:
+              type: "string"
+              description: "The type of this resource."
+            href:
+              type: "string"
+              description: "API link to the Coda doc."
+            browserLink:
+              type: "string"
+              description: "Browser-friendly link to the Coda doc."
+        workspaceId:
+          type: "string"
+          description: "ID of the Coda workspace containing this doc."
+        folderId:
+          type: "string"
+          description: "ID of the Coda folder containing this doc."
+        workspace:
+          type: "object"
+          description: "Reference to a Coda workspace."
+          properties:
+            id:
+              type: "string"
+              description: "ID of the Coda workspace."
+            type:
+              type: "string"
+              description: "The type of this resource."
+            browserLink:
+              type: "string"
+              description: "Browser-friendly link to the Coda workspace."
+            name:
+              type: "string"
+              description: "Name of the workspace; included if the user has access to the workspace."
+        folder:
+          type: "object"
+          description: "Reference to a Coda folder."
+          properties:
+            id:
+              type: "string"
+              description: "ID of the Coda folder."
+            type:
+              type: "string"
+              description: "The type of this resource."
+            browserLink:
+              type: "string"
+              description: "Browser-friendly link to the folder."
+            name:
+              type: "string"
+              description: "Name of the folder; included if the user has access to the folder."
+        requestId:
+          type: "string"
+          description: "An arbitrary unique identifier for this request."
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"

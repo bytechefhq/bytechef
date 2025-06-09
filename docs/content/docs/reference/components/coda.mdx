@@ -1,0 +1,353 @@
+---
+title: "Coda"
+description: "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps, and databases into a single platform."
+---
+
+Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps, and databases into a single platform.
+
+
+Categories: Productivity and Collaboration
+
+
+Type: coda/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### List docs
+Name: listDocs
+
+`Returns a list of docs accessible by the user, and which they have opened at least once.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| isOwner | Is Owner | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Show only docs owned by the user.` | false |
+| isPublished | Is Published | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Show only published docs.` | false |
+| limit | Limit | INTEGER | `Maximum number of results to return in this query.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List docs",
+  "name" : "listDocs",
+  "parameters" : {
+    "isOwner" : false,
+    "isPublished" : false,
+    "limit" : 1
+  },
+  "type" : "coda/v1/listDocs"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(type), STRING\(href), STRING\(browserLink), STRING\(name), STRING\(owner), STRING\(ownerName), STRING\(createdAt), STRING\(updatedAt), &#123;STRING\(name), STRING\(type), STRING\(browserLink)&#125;\(icon), &#123;NUMBER\(totalRowCount), NUMBER\(tableAndViewCount), NUMBER\(pageCount), BOOLEAN\(overApiSizeLimit)&#125;\(docSize), &#123;STRING\(id), STRING\(type), STRING\(href), STRING\(browserLink)&#125;\(sourceDoc), STRING\(workspaceId), STRING\(folderId), &#123;STRING\(id), STRING\(type), STRING\(browserLink), STRING\(name)&#125;\(workspace), &#123;STRING\(id), STRING\(type), STRING\(browserLink), STRING\(name)&#125;\(folder)&#125;] </details> |  |
+| href | STRING | API link to these results. |
+
+
+
+
+#### Output Example
+```json
+{
+  "items" : [ {
+    "id" : "",
+    "type" : "",
+    "href" : "",
+    "browserLink" : "",
+    "name" : "",
+    "owner" : "",
+    "ownerName" : "",
+    "createdAt" : "",
+    "updatedAt" : "",
+    "icon" : {
+      "name" : "",
+      "type" : "",
+      "browserLink" : ""
+    },
+    "docSize" : {
+      "totalRowCount" : 0.0,
+      "tableAndViewCount" : 0.0,
+      "pageCount" : 0.0,
+      "overApiSizeLimit" : false
+    },
+    "sourceDoc" : {
+      "id" : "",
+      "type" : "",
+      "href" : "",
+      "browserLink" : ""
+    },
+    "workspaceId" : "",
+    "folderId" : "",
+    "workspace" : {
+      "id" : "",
+      "type" : "",
+      "browserLink" : "",
+      "name" : ""
+    },
+    "folder" : {
+      "id" : "",
+      "type" : "",
+      "browserLink" : "",
+      "name" : ""
+    }
+  } ],
+  "href" : ""
+}
+```
+
+
+### Copy doc
+Name: copyDoc
+
+`Copies an existing doc.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Title | STRING | `Title of the new doc.` | true |
+| sourceDoc | Source Doc | STRING | `A doc ID from which to create a copy.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Copy doc",
+  "name" : "copyDoc",
+  "parameters" : {
+    "title" : "",
+    "sourceDoc" : ""
+  },
+  "type" : "coda/v1/copyDoc"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the Coda doc. |
+| type | STRING | The type of this resource. |
+| href | STRING | API link to the Coda doc. |
+| browserLink | STRING | Browser-friendly link to the Coda doc. |
+| name | STRING | Name of the doc. |
+| owner | STRING | Email address of the doc owner. |
+| ownerName | STRING | Name of the doc owner. |
+| createdAt | STRING | Timestamp for when the doc was created. |
+| updatedAt | STRING | Timestamp for when the doc was last modified. |
+| icon | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(type), STRING\(browserLink)&#125; </details> | Info about the icon. |
+| sourceDoc | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(type), STRING\(href), STRING\(browserLink)&#125; </details> | Reference to a Coda doc from which this doc was copied, if any. |
+| workspaceId | STRING | ID of the Coda workspace containing this doc. |
+| folderId | STRING | ID of the Coda folder containing this doc. |
+| workspace | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(type), STRING\(browserLink), STRING\(name)&#125; </details> | Reference to a Coda workspace. |
+| folder | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(type), STRING\(browserLink), STRING\(name)&#125; </details> | Reference to a Coda folder. |
+| requestId | STRING | An arbitrary unique identifier for this request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "type" : "",
+  "href" : "",
+  "browserLink" : "",
+  "name" : "",
+  "owner" : "",
+  "ownerName" : "",
+  "createdAt" : "",
+  "updatedAt" : "",
+  "icon" : {
+    "name" : "",
+    "type" : "",
+    "browserLink" : ""
+  },
+  "sourceDoc" : {
+    "id" : "",
+    "type" : "",
+    "href" : "",
+    "browserLink" : ""
+  },
+  "workspaceId" : "",
+  "folderId" : "",
+  "workspace" : {
+    "id" : "",
+    "type" : "",
+    "browserLink" : "",
+    "name" : ""
+  },
+  "folder" : {
+    "id" : "",
+    "type" : "",
+    "browserLink" : "",
+    "name" : ""
+  },
+  "requestId" : ""
+}
+```
+
+
+### Update row
+Name: updateRow
+
+`Updates the specified row in the table.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| docId | Doc ID | STRING | `ID of the doc.` | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> docId </details> | `ID or name of the table.` | true |
+| rowId | Row ID | STRING <details> <summary> Depends On </summary> docId, tableId </details> | `ID or name of the row.` | true |
+| row | Row | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(column), STRING\(value)&#125;]\(cells)&#125; </details> | `An edit made to a particular row.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update row",
+  "name" : "updateRow",
+  "parameters" : {
+    "docId" : "",
+    "tableId" : "",
+    "rowId" : "",
+    "row" : {
+      "cells" : [ {
+        "column" : "",
+        "value" : ""
+      } ]
+    }
+  },
+  "type" : "coda/v1/updateRow"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| requestId | STRING | An arbitrary unique identifier for this request. |
+| id | STRING | ID of the updated row. |
+
+
+
+
+#### Output Example
+```json
+{
+  "requestId" : "",
+  "id" : ""
+}
+```
+
+
+### Insert row
+Name: insertRow
+
+`Inserts row into a table.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| docId | Doc ID | STRING | `ID of the doc.` | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> docId </details> | `ID of the table.` | true |
+| row | | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(column), STRING\(value)&#125;]\(cells)&#125; </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Insert row",
+  "name" : "insertRow",
+  "parameters" : {
+    "docId" : "",
+    "tableId" : "",
+    "row" : {
+      "cells" : [ {
+        "column" : "",
+        "value" : ""
+      } ]
+    }
+  },
+  "type" : "coda/v1/insertRow"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| requestId | STRING | An arbitrary unique identifier for this request. |
+| addedRowIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | Row IDs for rows that will be added. |
+
+
+
+
+#### Output Example
+```json
+{
+  "requestId" : "",
+  "addedRowIds" : [ "" ]
+}
+```
+
+
+
+
