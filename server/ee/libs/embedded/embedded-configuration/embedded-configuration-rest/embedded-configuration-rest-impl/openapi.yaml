@@ -1248,12 +1248,12 @@ components:
             - "name"
           properties:
             connectionAuthorizationParameters:
-              description: "The authorization parameters of a connection."
+              description: "The connection authorization parameters of a connection."
               type: "object"
               additionalProperties: true
               readOnly: true
             connectionConnectionParameters:
-              description: "The authorization parameters of a connection."
+              description: "The connection parameters of a connection."
               type: "object"
               additionalProperties: true
               readOnly: true
@@ -1324,6 +1324,8 @@ components:
         name:
           description: "The name of an integration instance configuration."
           type: "string"
+        authorizationType:
+          $ref: "../../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/AuthorizationType"
     IntegrationInstanceConfigurationWorkflow:
       description: "Contains configuration and connections required for the execution\
         \ of a particular integration workflow."
