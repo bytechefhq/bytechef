@@ -1,0 +1,285 @@
+---
+openapi: "3.0.2"
+info:
+  title: "SendFox"
+  description: "SendFox lets you automate email campaigns, complete with custom opt-in forms and landing pages, so you're not tanking your budget to get new subscribers."
+  version: "v1"
+servers:
+  - url: "https://api.sendfox.com"
+paths:
+  /contacts:
+    post:
+      summary: "Create Contact"
+      description: "Creates a new contact."
+      operationId: "createContact"
+      x-ai-agent-tool: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Contact"
+              type: "object"
+              required:
+                - "email"
+              properties:
+                email:
+                  type: "string"
+                  description: "Email address of the contact."
+                  title: "Email Address"
+                first_name:
+                  type: "string"
+                  description: "First name of the contact."
+                  title: "First Name"
+                last_name:
+                  type: "string"
+                  description: "Last name of the contact."
+                  title: "Last Name"
+                lists:
+                  type: "array"
+                  description: "Lists to which the new contact will be added."
+                  x-dynamic-options: true
+                  items:
+                    type: "integer"
+      responses:
+        201:
+          description: "Contact created."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "ID of the contact."
+                  email:
+                    type: "string"
+                    description: "Email of the contact."
+                  first_name:
+                    type: "string"
+                    description: "First name of the contact."
+                  last_name:
+                    type: "string"
+                    description: "Last name of the contact."
+                  ip_address:
+                    type: "string"
+                    description: "IP address of the contact."
+                  unsubscribed_at:
+                    type: "string"
+                    description: "Date when the contact unsubscribed."
+                  bounced_at:
+                    type: "string"
+                    description: "Date when the contact was bounced."
+                  created_at:
+                    type: "string"
+                    description: "Date when the contact was created."
+                  updated_at:
+                    type: "string"
+                    description: "Date when the contact was updated."
+                  form_id:
+                    type: "integer"
+                    description: "Form ID of the contact."
+                  contact_import_id:
+                    type: "integer"
+                    description: "Contact import ID of the contact."
+                  via_api:
+                    type: "boolean"
+                    description: "Whether the contact was created via API."
+                  last_opened_at:
+                    type: "string"
+                    description: "Date when the contact last opened an email."
+                  last_clicked_at:
+                    type: "string"
+                    description: "Date when the contact last clicked an email."
+                  first_sent_at:
+                    type: "string"
+                    description: "Date when the first email was sent to the contact."
+                  last_sent_at:
+                    type: "string"
+                    description: "Date when the last email was sent to the contact."
+                  invalid_at:
+                    type: "string"
+                    description: "Date when the contact became invalid."
+                  inactive_at:
+                    type: "string"
+                    description: "Date when the contact became invalid."
+                  confirmed_at:
+                    type: "string"
+                    description: "Date when the contact confirmed the subscription."
+                  social_platform_id:
+                    type: "integer"
+                    description: "Social platform ID of the contact."
+                  confirmation_sent_at:
+                    type: "string"
+                    description: "Date when the confirmation for the subscription was sent to the contact."
+                  confirmation_sent_count:
+                    type: "integer"
+                    description: "How many confirmation emails were sent."
+                  created_ago:
+                    type: "string"
+                    description: "How many seconds ago was the contact created."
+                  contact_fields:
+                    type: "array"
+                    description: "Additional contact information."
+                    items:
+                      type: "object"
+                      properties:
+                        name:
+                          type: "string"
+                          description: "Name of the additional contact field."
+                        value:
+                          type: "string"
+                          description: "Value of the additional contact field."
+  /lists:
+    post:
+      summary: "Create List"
+      description: "Creates a new list."
+      operationId: "createList"
+      x-ai-agent-tool: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "List"
+              type: "object"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  description: "Name of the list."
+                  title: "Name"
+      responses:
+        201:
+          description: "List created."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  name:
+                    type: "string"
+                    description: "Name of the list."
+                  created_at:
+                    type: "string"
+                    description: "Date when the list was created."
+                  id:
+                    type: "integer"
+                    description: "ID of the list."
+  /unsubscribe:
+    patch:
+      summary: "Unsubscribe Contact"
+      description: "Unsubscribes a contact."
+      operationId: "unsubscribeContact"
+      x-ai-agent-tool: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Contact"
+              type: "object"
+              required:
+                - "email"
+              properties:
+                email:
+                  type: "string"
+                  description: "Email of the Contact."
+                  title: "Email"
+                  x-dynamic-options: true
+      responses:
+        201:
+          description: "Contact unsubscribed."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "ID of the contact."
+                  email:
+                    type: "string"
+                    description: "Email of the contact."
+                  first_name:
+                    type: "string"
+                    description: "First name of the contact."
+                  last_name:
+                    type: "string"
+                    description: "Last name of the contact."
+                  ip_address:
+                    type: "string"
+                    description: "IP address of the contact."
+                  unsubscribed_at:
+                    type: "string"
+                    description: "Date when the contact unsubscribed."
+                  bounced_at:
+                    type: "string"
+                    description: "Date when the contact was bounced."
+                  created_at:
+                    type: "string"
+                    description: "Date when the contact was created."
+                  updated_at:
+                    type: "string"
+                    description: "Date when the contact was updated."
+                  form_id:
+                    type: "integer"
+                    description: "Form ID of the contact."
+                  contact_import_id:
+                    type: "integer"
+                    description: "Contact import ID of the contact."
+                  via_api:
+                    type: "boolean"
+                    description: "Whether the contact was created via API."
+                  last_opened_at:
+                    type: "string"
+                    description: "Date when the contact last opened an email."
+                  last_clicked_at:
+                    type: "string"
+                    description: "Date when the contact last clicked an email."
+                  first_sent_at:
+                    type: "string"
+                    description: "Date when the first email was sent to the contact."
+                  last_sent_at:
+                    type: "string"
+                    description: "Date when the last email was sent to the contact."
+                  invalid_at:
+                    type: "string"
+                    description: "Date when the contact became invalid."
+                  inactive_at:
+                    type: "string"
+                    description: "Date when the contact became invalid."
+                  confirmed_at:
+                    type: "string"
+                    description: "Date when the contact confirmed the subscription."
+                  social_platform_id:
+                    type: "integer"
+                    description: "Social platform ID of the contact."
+                  confirmation_sent_at:
+                    type: "string"
+                    description: "Date when the confirmation for the subscription was sent to the contact."
+                  confirmation_sent_count:
+                    type: "integer"
+                    description: "How many confirmation emails were sent."
+                  created_ago:
+                    type: "string"
+                    description: "How many seconds ago was the contact created."
+                  contact_fields:
+                    type: "array"
+                    description: "Additional contact information."
+                    items:
+                      type: "object"
+                      properties:
+                        name:
+                          type: "string"
+                          description: "Name of the additional contact field."
+                        value:
+                          type: "string"
+                          description: "Value of the additional contact field."
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://sendfox.com/oauth/authorize"
+          tokenUrl: "https://sendfox.com/oauth/token"
+          refreshUrl: "https://sendfox.com/oauth/token"

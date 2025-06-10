@@ -262,6 +262,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:schedule"))
     implementation(project(":server:libs:modules:components:scrape-graph-ai"))
     implementation(project(":server:libs:modules:components:script"))
+    implementation(project(":server:libs:modules:components:sendfox"))
     implementation(project(":server:libs:modules:components:sendgrid"))
     implementation(project(":server:libs:modules:components:shopify"))
     implementation(project(":server:libs:modules:components:slack"))
