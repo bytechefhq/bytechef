@@ -17,6 +17,8 @@
 package com.bytechef.component.microsoft.teams.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -61,10 +63,18 @@ public class MicrosoftTeamsCreateChannelAction {
                     .properties(
                         string(ID)
                             .description("ID of the channel."),
+                        dateTime("createdDateTime")
+                            .description("The date and time when the channel was created."),
                         string(DISPLAY_NAME)
                             .description("Name of the channel that will appear to the user in Microsoft Teams."),
                         string(DESCRIPTION)
-                            .description("Description of the channel."))))
+                            .description("Description of the channel."),
+                        bool("isFavoriteByDefault")
+                            .description("Indicates whether the channel is marked as favorite by default."),
+                        string("webUrl")
+                            .description("URL to access the channel in a web browser."),
+                        bool("isArchived")
+                            .description("Indicates whether the channel is archived."))))
         .perform(MicrosoftTeamsCreateChannelAction::perform);
 
     private MicrosoftTeamsCreateChannelAction() {

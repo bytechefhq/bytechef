@@ -72,24 +72,68 @@ public class NutshellCreateCompanyAction {
                             .items(
                                 object()
                                     .properties(
-                                        string(ID),
-                                        string("type"),
-                                        string(NAME),
-                                        string(DESCRIPTION),
+                                        string(ID)
+                                            .description("ID of the company."),
+                                        string("type")
+                                            .description("The type of this entity, e.g. 'contacts', 'leads'."),
+                                        string(NAME)
+                                            .description("The company full name."),
+                                        string(DESCRIPTION)
+                                            .description(
+                                                "A brief explanation of this company which appears under their name."),
                                         array(EMAILS)
+                                            .description("All email addresses associated with a company.")
                                             .items(
                                                 object()
                                                     .properties(
-                                                        bool(IS_PRIMARY),
-                                                        string(NAME),
-                                                        string(VALUE))),
+                                                        bool(IS_PRIMARY)
+                                                            .description(
+                                                                "Indicates if this is the primary email address."),
+                                                        string(NAME)
+                                                            .description(
+                                                                "A label for the email address, e.g. 'work', " +
+                                                                    "'personal', 'support'."),
+                                                        string(VALUE)
+                                                            .description("The email address itself."))),
                                         array(PHONES)
+                                            .description("All phone numbers associated with a company.")
                                             .items(
                                                 object()
                                                     .properties(
-                                                        bool(IS_PRIMARY),
-                                                        string(NAME),
-                                                        string(VALUE))))))))
+                                                        bool(IS_PRIMARY)
+                                                            .description(
+                                                                "Indicates if this is the primary phone number."),
+                                                        string(NAME)
+                                                            .description(
+                                                                "A label for the phone number, e.g. 'work', " +
+                                                                    "'home', 'mobile'."),
+                                                        object(VALUE)
+                                                            .properties(
+                                                                string("countryCode")
+                                                                    .description(
+                                                                        "Phone number prefix for calling individuals " +
+                                                                            "in other countries."),
+                                                                string("number")
+                                                                    .description(
+                                                                        "The unformatted phone number with only digits."),
+                                                                string("extension")
+                                                                    .description(
+                                                                        "An additional code to reach a specific " +
+                                                                            "person or department which share a " +
+                                                                            "number."),
+                                                                string("numberFormatted")
+                                                                    .description(
+                                                                        "The phone number formatted for human " +
+                                                                            "readability."),
+                                                                string("E164")
+                                                                    .description(
+                                                                        "The phone number formatted for " +
+                                                                            "international use; a common programatic " +
+                                                                            "standard for working with phone numbers."),
+                                                                string("countryCodeAndNumber")
+                                                                    .description(
+                                                                        "The phone number formatted for human " +
+                                                                            "readability with the country code.")))))))))
         .perform(NutshellCreateCompanyAction::perform);
 
     private NutshellCreateCompanyAction() {

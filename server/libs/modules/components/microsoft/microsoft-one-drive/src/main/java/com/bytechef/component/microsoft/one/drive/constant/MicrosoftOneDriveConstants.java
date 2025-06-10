@@ -74,9 +74,10 @@ public class MicrosoftOneDriveConstants {
                         .properties(
                             string("quickXorHash")
                                 .description(
-                                    "A proprietary hash of the file that can be used to determine if the contents of the file change.")),
+                                    "A proprietary hash of the file that can be used to determine if the contents of " +
+                                        "the file change.")),
                     string("mimeType")
-                        .description("The MIME type for the file..")));
+                        .description("The MIME type for the file.")));
 
     public static final ModifiableObjectProperty FOLDER_OUTPUT_PROPERTY = object()
         .properties(

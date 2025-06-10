@@ -18,6 +18,8 @@ package com.bytechef.component.discord.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -67,8 +69,42 @@ public class DiscordCreateChannelAction {
                 .label("Type")
                 .options(option("0", 0), option("2", 2), option("4", 4))
                 .required(false))
-        .output(outputSchema(object()
-            .properties(string("id").required(false), integer("type").required(false), string("name").required(false))
+        .output(outputSchema(object().properties(string("id").description("ID of the channel.")
+            .required(false),
+            integer("type").description("Type of the channel.")
+                .required(false),
+            string("last_message_id").description("ID of the last message sent in this channel.")
+                .required(false),
+            integer("flags").description("Channel flags combined as a bitfield.")
+                .required(false),
+            string("guild_id").description("ID of the guild to which the channel belongs.")
+                .required(false),
+            string("name").description("Name of the channel.")
+                .required(false),
+            string("parent_id").description("For guild channels: id of the parent category for a channel")
+                .required(false),
+            integer("rate_limit_per_user")
+                .description("Amount of seconds a user has to wait before sending another message")
+                .required(false),
+            string("topic").description("Topic of the channel.")
+                .required(false),
+            integer("position")
+                .description("Sorting position of the channel (channels with the same position are sorted by id)")
+                .required(false),
+            array("permission_overwrites")
+                .items(object().properties(string("id").description("ID of the role or user this overwrite applies to.")
+                    .required(false),
+                    integer("type").description("Type of overwrite, 0 for role, 1 for member.")
+                        .required(false),
+                    string("allow").description("Permissions allowed by this overwrite.")
+                        .required(false),
+                    string("deny").description("Permissions denied by this overwrite.")
+                        .required(false))
+                    .description("Explicit permission overwrites for members and roles."))
+                .description("Explicit permission overwrites for members and roles.")
+                .required(false),
+            bool("nsfw").description("Whether the channel is marked as NSFW (Not Safe For Work).")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

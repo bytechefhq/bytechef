@@ -45,16 +45,18 @@ public class ZohoCrmListUsersAction {
                 .label("Type")
                 .description("What type of user to return in list.")
                 .options(
-                    option("All users", "AllUsers"),
-                    option("Active users", "ActiveUsers"),
-                    option("Inactive users", "DeactiveUsers"),
-                    option("Confirmed users", "ConfirmedUsers"),
-                    option("Non-confirmed users", "NotConfirmedUsers"),
-                    option("Deleted users", "DeletedUsers"),
-                    option("Active confirmed users", "ActiveConfirmedUsers"),
-                    option("Admin users", "AdminUsers"),
-                    option("Active confirmed admins", "ActiveConfirmedAdmins"),
-                    option("Current user", "CurrentUser"))
+                    option("All users", "AllUsers", "All users (both active and inactive)."),
+                    option("Active users", "ActiveUsers", "Only active users."),
+                    option("Inactive users", "DeactiveUsers", "Users who have been deactivated."),
+                    option("Confirmed users", "ConfirmedUsers", "Users who have confirmed their accounts."),
+                    option("Non-confirmed users", "NotConfirmedUsers", "Users who have not confirmed their accounts."),
+                    option("Deleted users", "DeletedUsers", "Users who have been deleted."),
+                    option("Active confirmed users", "ActiveConfirmedUsers",
+                        "Users who are both active and confirmed."),
+                    option("Admin users", "AdminUsers", "Retrieves users with Administrator privileges."),
+                    option("Active confirmed admins", "ActiveConfirmedAdmins",
+                        "Retrieves active and confirmed administrators."),
+                    option("Current user", "CurrentUser", "Currently logged-in CRM user."))
                 .defaultValue("AllUsers")
                 .required(true))
         .output(
@@ -65,25 +67,36 @@ public class ZohoCrmListUsersAction {
                             .items(
                                 object()
                                     .properties(
-                                        string("country"),
-                                        string("language"),
-                                        string("id"),
+                                        string("country")
+                                            .description("Country of the user."),
+                                        string("language")
+                                            .description("Language in which the user accesses the CRM."),
+                                        string("id")
+                                            .description("ID of the user."),
                                         object("profile")
                                             .properties(
-                                                string("name"),
-                                                string("id")),
+                                                string("name")
+                                                    .description("Name of the profile of the user."),
+                                                string("id")
+                                                    .description("ID of the profile of the user.")),
                                         object("created_by")
                                             .properties(
                                                 string("name"),
                                                 string("id")),
-                                        string("full_name"),
-                                        string("status"),
+                                        string("full_name")
+                                            .description("Full name of the user."),
+                                        string("status")
+                                            .description("Status of the user (active/inactive)."),
                                         object("role")
                                             .properties(
-                                                string("name"),
-                                                string("id")),
-                                        string("first_name"),
-                                        string("email"))))))
+                                                string("name")
+                                                    .description("Name of the role of the user."),
+                                                string("id")
+                                                    .description("ID of the role of the user.")),
+                                        string("first_name")
+                                            .description("first name of the user."),
+                                        string("email")
+                                            .description("Email address of the user."))))))
         .perform(ZohoCrmListUsersAction::perform);
 
     private ZohoCrmListUsersAction() {

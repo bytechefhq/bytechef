@@ -17,6 +17,7 @@
 package com.bytechef.component.vtiger.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -43,23 +44,40 @@ public class VTigerGetMeAction {
                     .properties(
                         object("result")
                             .properties(
-                                string("id"),
-                                string("user_name"),
-                                string("user_type"),
-                                string("email"),
-                                string("phone_home"),
-                                string("phone_work"),
-                                string("phone_mobile"),
-                                string("userlable"),
-                                string("address_street"),
-                                string("address_city"),
-                                string("address_state"),
-                                string("address_country"),
-                                string("roleid"),
-                                string("language"),
-                                string("is_admin"),
-                                string("is_owner"),
-                                string("status")))))
+                                string("id")
+                                    .description("ID of the user."),
+                                string("user_name")
+                                    .description("Username of the user."),
+                                string("user_type")
+                                    .description("Type of the user."),
+                                string("email")
+                                    .description("Email address of the user."),
+                                string("phone_home")
+                                    .description("Home phone number of the user."),
+                                string("phone_work")
+                                    .description("Work phone number of the user."),
+                                string("phone_mobile")
+                                    .description("Mobile phone number of the user."),
+                                string("userlable")
+                                    .description("Label of the user."),
+                                string("address_street")
+                                    .description("Street address of the user."),
+                                string("address_city")
+                                    .description("City of the user."),
+                                string("address_state")
+                                    .description("State of the user."),
+                                string("address_country")
+                                    .description("Country of the user."),
+                                string("roleid")
+                                    .description("Role ID of the user."),
+                                string("language")
+                                    .description("Language of the user."),
+                                bool("is_admin")
+                                    .description("Indicates if the user is an admin."),
+                                bool("is_owner")
+                                    .description("Indicates if the user is an owner."),
+                                string("status")
+                                    .description("Status of the user.")))))
         .perform(VTigerGetMeAction::perform);
 
     private VTigerGetMeAction() {

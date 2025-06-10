@@ -81,12 +81,16 @@ public class ZohoCrmAddUserAction {
                             .items(
                                 object()
                                     .properties(
-                                        string("code"),
+                                        string("code")
+                                            .description("Code returned by the API."),
                                         object("details")
                                             .properties(
-                                                string("id")),
-                                        string("message"),
-                                        string("status"))))))
+                                                string("id")
+                                                    .description("ID of the user.")),
+                                        string("message")
+                                            .description("Message returned by the API."),
+                                        string("status")
+                                            .description("Status of the request."))))))
         .perform(ZohoCrmAddUserAction::perform);
 
     private ZohoCrmAddUserAction() {

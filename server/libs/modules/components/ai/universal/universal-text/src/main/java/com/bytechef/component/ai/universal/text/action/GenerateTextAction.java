@@ -68,7 +68,7 @@ public class GenerateTextAction implements AiTextAction {
                         .required(true),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
-                .output(outputSchema(string()), sampleOutput("Generated text.")),
+                .output(outputSchema(string().description("Generated text.")), sampleOutput("Generated text.")),
             provider, this, propertyService);
     }
 

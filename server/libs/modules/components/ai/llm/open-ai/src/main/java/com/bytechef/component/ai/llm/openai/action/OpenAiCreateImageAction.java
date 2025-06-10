@@ -106,8 +106,10 @@ public class OpenAiCreateImageAction {
             outputSchema(
                 object()
                     .properties(
-                        string("url"),
-                        string("b64Json"))))
+                        string("url")
+                            .description("URL of the generated image."),
+                        string("b64Json")
+                            .description("Base64 encoded JSON of the generated image."))))
         .perform(OpenAiCreateImageAction::perform);
 
     public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {

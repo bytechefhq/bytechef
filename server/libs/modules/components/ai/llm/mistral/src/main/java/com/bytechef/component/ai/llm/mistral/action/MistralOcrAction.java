@@ -86,30 +86,55 @@ public class MistralOcrAction {
                 object()
                     .properties(
                         array("pages")
+                            .description("List of OCR info for pages.")
                             .items(
                                 object()
                                     .properties(
-                                        integer("index"),
-                                        string("markdown"),
+                                        integer("index")
+                                            .description("The page index in a pdf document starting from 0."),
+                                        string("markdown")
+                                            .description("The markdown string response of the page."),
                                         array("images")
+                                            .description("List of all extracted images in the page.")
                                             .items(
                                                 object()
                                                     .properties(
-                                                        string("id"),
-                                                        integer("top_left_x"),
-                                                        integer("top_left_y"),
-                                                        integer("bottom_right_x"),
-                                                        integer("bottom_right_y"))),
+                                                        string("id")
+                                                            .description("Image ID for extracted image in a page."),
+                                                        integer("top_left_x")
+                                                            .description(
+                                                                "X coordinate of top-left corner of the extracted " +
+                                                                    "image."),
+                                                        integer("top_left_y")
+                                                            .description(
+                                                                "Y coordinate of top-left corner of the extracted " +
+                                                                    "image."),
+                                                        integer("bottom_right_x")
+                                                            .description(
+                                                                "X coordinate of bottom-right corner of the " +
+                                                                    "extracted image."),
+                                                        integer("bottom_right_y")
+                                                            .description(
+                                                                "Y coordinate of bottom-right corner of the " +
+                                                                    "extracted image."))),
                                         object("dimensions")
+                                            .description("The dimensions of the PDF Page's screenshot image.")
                                             .properties(
-                                                integer("dpi"),
-                                                integer("height"),
-                                                integer("width")))),
-                        string("model"),
+                                                integer("dpi")
+                                                    .description("Dots per inch of the page-image."),
+                                                integer("height")
+                                                    .description("Height of the image in pixels."),
+                                                integer("width")
+                                                    .description("Width of the image in pixels.")))),
+                        string("model")
+                            .description("The model used to generate the OCR."),
                         object("usage_info")
+                            .description("Usage info for the OCR request.")
                             .properties(
-                                integer("pages_processed"),
-                                integer("doc_size_bytes")))))
+                                integer("pages_processed")
+                                    .description("Number of pages processed."),
+                                integer("doc_size_bytes")
+                                    .description("Document size in bytes.")))))
         .perform(MistralOcrAction::perform);
 
     private MistralOcrAction() {

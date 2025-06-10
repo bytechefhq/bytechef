@@ -45,11 +45,38 @@ public class ZohoCrmGetOrganizationAction {
                             .items(
                                 object()
                                     .properties(
-                                        string("type"),
-                                        string("id"),
-                                        string("phone"),
-                                        string("company_name"),
-                                        string("primary_email"))))))
+                                        string("country")
+                                            .description("Country of the organization."),
+                                        string("city")
+                                            .description("City of the organization."),
+                                        string("street")
+                                            .description("Street address of the organization."),
+                                        string("zip")
+                                            .description("ZIP code of the organization."),
+                                        string("photo_id")
+                                            .description("ID of the organization photo file."),
+                                        string("description")
+                                            .description("Description of the organization."),
+                                        string("alias")
+                                            .description("Alias name of the organization."),
+                                        string("created_time")
+                                            .description("Date and time when the organization was created."),
+                                        string("type")
+                                            .description(
+                                                "Represents the environment type of the org. " +
+                                                    "The possible values are production, sandbox, bigin and developer."),
+                                        string("currency")
+                                            .description("Base/home currency details of the organization."),
+                                        string("id")
+                                            .description("ID of the organization."),
+                                        string("phone")
+                                            .description("Phone number of the organization."),
+                                        string("company_name")
+                                            .description("Name of the company in the organization"),
+                                        string("primary_email")
+                                            .description("Primary email address of the organization."),
+                                        string("website")
+                                            .description("Website of the organization."))))))
         .perform(ZohoCrmGetOrganizationAction::perform);
 
     private ZohoCrmGetOrganizationAction() {
