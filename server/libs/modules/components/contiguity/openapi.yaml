@@ -150,4 +150,3 @@ components:
       type: "http"
       scheme: "bearer"
       description: "Token can be created in Contiguity.co account dashboard."
-
