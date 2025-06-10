@@ -20,10 +20,10 @@ import jakarta.annotation.Generated;
  * A group of tasks that make one logical workflow.
  */
 
-@Schema(name = "Workflow", description = "A group of tasks that make one logical workflow.")
-@JsonTypeName("Workflow")
+@Schema(name = "AutomationWorkflow", description = "A group of tasks that make one logical workflow.")
+@JsonTypeName("AutomationWorkflow")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-10T07:38:50.872123+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class WorkflowModel {
+public class AutomationWorkflowModel {
 
   private @Nullable String description;
 
@@ -33,7 +33,9 @@ public class WorkflowModel {
 
   private @Nullable String workflowReferenceCode;
 
-  public WorkflowModel description(String description) {
+  private @Nullable Integer workflowVersion;
+
+  public AutomationWorkflowModel description(String description) {
     this.description = description;
     return this;
   }
@@ -53,7 +55,7 @@ public class WorkflowModel {
     this.description = description;
   }
 
-  public WorkflowModel definition(String definition) {
+  public AutomationWorkflowModel definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -73,7 +75,7 @@ public class WorkflowModel {
     this.definition = definition;
   }
 
-  public WorkflowModel label(String label) {
+  public AutomationWorkflowModel label(String label) {
     this.label = label;
     return this;
   }
@@ -93,7 +95,7 @@ public class WorkflowModel {
     this.label = label;
   }
 
-  public WorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+  public AutomationWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -113,6 +115,26 @@ public class WorkflowModel {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 
+  public AutomationWorkflowModel workflowVersion(Integer workflowVersion) {
+    this.workflowVersion = workflowVersion;
+    return this;
+  }
+
+  /**
+   * The workflow version, if null a workflow is not yet published
+   * @return workflowVersion
+   */
+  
+  @Schema(name = "workflowVersion", description = "The workflow version, if null a workflow is not yet published", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowVersion")
+  public Integer getWorkflowVersion() {
+    return workflowVersion;
+  }
+
+  public void setWorkflowVersion(Integer workflowVersion) {
+    this.workflowVersion = workflowVersion;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -121,26 +143,28 @@ public class WorkflowModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowModel workflow = (WorkflowModel) o;
-    return Objects.equals(this.description, workflow.description) &&
-        Objects.equals(this.definition, workflow.definition) &&
-        Objects.equals(this.label, workflow.label) &&
-        Objects.equals(this.workflowReferenceCode, workflow.workflowReferenceCode);
+    AutomationWorkflowModel automationWorkflow = (AutomationWorkflowModel) o;
+    return Objects.equals(this.description, automationWorkflow.description) &&
+        Objects.equals(this.definition, automationWorkflow.definition) &&
+        Objects.equals(this.label, automationWorkflow.label) &&
+        Objects.equals(this.workflowReferenceCode, automationWorkflow.workflowReferenceCode) &&
+        Objects.equals(this.workflowVersion, automationWorkflow.workflowVersion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, definition, label, workflowReferenceCode);
+    return Objects.hash(description, definition, label, workflowReferenceCode, workflowVersion);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class WorkflowModel {\n");
+    sb.append("class AutomationWorkflowModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
+    sb.append("    workflowVersion: ").append(toIndentedString(workflowVersion)).append("\n");
     sb.append("}");
     return sb.toString();
   }

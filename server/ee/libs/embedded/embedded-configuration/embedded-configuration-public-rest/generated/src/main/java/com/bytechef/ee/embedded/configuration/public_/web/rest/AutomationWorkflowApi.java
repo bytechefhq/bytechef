@@ -5,10 +5,10 @@
  */
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-10T07:38:50.872123+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "automation-workflow", description = "The Embedded Automation Workflow Public API")
 public interface AutomationWorkflowApi {
@@ -349,7 +349,7 @@ public interface AutomationWorkflowApi {
         tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = AutomationWorkflowModel.class))
             })
         }
     )
@@ -359,14 +359,14 @@ public interface AutomationWorkflowApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<WorkflowModel> getFrontendProjectWorkflow(
+    default ResponseEntity<AutomationWorkflowModel> getFrontendProjectWorkflow(
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
+                    String exampleString = "{ \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -391,7 +391,7 @@ public interface AutomationWorkflowApi {
         tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = AutomationWorkflowModel.class)))
             })
         }
     )
@@ -401,13 +401,13 @@ public interface AutomationWorkflowApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<WorkflowModel>> getFrontendProjectWorkflows(
+    default ResponseEntity<List<AutomationWorkflowModel>> getFrontendProjectWorkflows(
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
+                    String exampleString = "[ { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -434,7 +434,7 @@ public interface AutomationWorkflowApi {
         tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = AutomationWorkflowModel.class))
             })
         }
     )
@@ -444,7 +444,7 @@ public interface AutomationWorkflowApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<WorkflowModel> getProjectWorkflow(
+    default ResponseEntity<AutomationWorkflowModel> getProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
@@ -452,7 +452,7 @@ public interface AutomationWorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
+                    String exampleString = "{ \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -478,7 +478,7 @@ public interface AutomationWorkflowApi {
         tags = { "automation-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = AutomationWorkflowModel.class)))
             })
         }
     )
@@ -488,14 +488,14 @@ public interface AutomationWorkflowApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<WorkflowModel>> getProjectWorkflows(
+    default ResponseEntity<List<AutomationWorkflowModel>> getProjectWorkflows(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"STRING\", \"required\" : false } ], \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
+                    String exampleString = "[ { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

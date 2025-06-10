@@ -5,7 +5,6 @@
  */
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-10T07:38:50.872123+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "integration-instance-workflow", description = "The Embedded Integration Instance Workflow Public API")
 public interface IntegrationInstanceWorkflowApi {
@@ -43,14 +42,11 @@ public interface IntegrationInstanceWorkflowApi {
     }
 
     /**
-     * DELETE /integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable : Disable a workflow
+     * DELETE /integration-instances{id}/workflows/${workflowReferenceCode}/enable : Disable a workflow
      * Disable a workflow.
      *
-     * @param id The id of an integration. (required)
-     * @param instanceId The id of an integration instance. (required)
+     * @param id The id of an integration instance. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
-     * @param xEnvironment The environment. (optional)
-     * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (optional)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -69,16 +65,12 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable",
-        consumes = { "application/json" }
+        value = "/integration-instances{id}/workflows/${workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> disableFrontendIntegrationInstanceWorkflow(
-        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "instanceId", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("instanceId") Long instanceId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
-        @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
+        @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -86,15 +78,12 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * DELETE /{externalUserId}/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable : Disable a workflow
+     * DELETE /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable : Disable a workflow
      * Disable a workflow.
      *
      * @param externalUserId The external user id. (required)
-     * @param id The id of an integration. (required)
-     * @param instanceId The id of an integration instance. (required)
+     * @param id The id of an integration instance. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
-     * @param xEnvironment The environment. (optional)
-     * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (optional)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -113,17 +102,13 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/{externalUserId}/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable",
-        consumes = { "application/json" }
+        value = "/{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> disableIntegrationInstanceWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "instanceId", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("instanceId") Long instanceId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
-        @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
+        @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -131,14 +116,11 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * POST /integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable : Enable a workflow
+     * POST /integration-instances{id}/workflows/${workflowReferenceCode}/enable : Enable a workflow
      * Enable a workflow.
      *
-     * @param id The id of an integration. (required)
-     * @param instanceId The id of an integration instance. (required)
+     * @param id The id of an integration instance. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
-     * @param xEnvironment The environment. (optional)
-     * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (optional)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -157,16 +139,12 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable",
-        consumes = { "application/json" }
+        value = "/integration-instances{id}/workflows/${workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> enableFrontendIntegrationInstanceWorkflow(
-        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "instanceId", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("instanceId") Long instanceId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
-        @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
+        @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -174,15 +152,12 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * POST /{externalUserId}/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable : Enable a workflow
+     * POST /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable : Enable a workflow
      * Enable a workflow.
      *
      * @param externalUserId The external user id. (required)
-     * @param id The id of an integration. (required)
-     * @param instanceId The id of an integration instance. (required)
+     * @param id The id of an integration instance. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
-     * @param xEnvironment The environment. (optional)
-     * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (optional)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -201,17 +176,13 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/{externalUserId}/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable",
-        consumes = { "application/json" }
+        value = "/{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> enableIntegrationInstanceWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "instanceId", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("instanceId") Long instanceId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
-        @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
+        @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -219,13 +190,11 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * PUT /integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode} : Update integration instance workflow
+     * PUT /integration-instances{id}/workflows/${workflowReferenceCode} : Update integration instance workflow
      * Update a workflow for a specific integration instance.
      *
-     * @param id The id of an integration. (required)
-     * @param instanceId The id of an integration instance. (required)
+     * @param id The id of an integration instance. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
-     * @param xEnvironment The environment. (optional)
      * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (optional)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
@@ -245,15 +214,13 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}",
+        value = "/integration-instances{id}/workflows/${workflowReferenceCode}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateFrontendIntegrationInstanceWorkflow(
-        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "instanceId", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("instanceId") Long instanceId,
+        @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
         @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -262,14 +229,12 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * PUT /{externalUserId}/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode} : Update integration instance workflow
+     * PUT /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode} : Update integration instance workflow
      * Update a workflow for a specific integration instance.
      *
      * @param externalUserId The external user id. (required)
-     * @param id The id of an integration. (required)
-     * @param instanceId The id of an integration instance. (required)
+     * @param id The id of an integration instance. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
-     * @param xEnvironment The environment. (optional)
      * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (optional)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
@@ -289,16 +254,14 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/{externalUserId}/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}",
+        value = "/{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateIntegrationInstanceWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "instanceId", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("instanceId") Long instanceId,
+        @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
         @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

@@ -19,12 +19,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * IntegrationInstanceWorkflowsInnerModel
+ * IntegrationInstanceAllOfWorkflowsModel
  */
 
-@JsonTypeName("IntegrationInstance_workflows_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class IntegrationInstanceWorkflowsInnerModel {
+@JsonTypeName("IntegrationInstance_allOf_workflows")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-10T07:38:50.872123+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+public class IntegrationInstanceAllOfWorkflowsModel {
 
   private @Nullable Boolean enabled;
 
@@ -33,7 +33,7 @@ public class IntegrationInstanceWorkflowsInnerModel {
 
   private @Nullable String workflowReferenceCode;
 
-  public IntegrationInstanceWorkflowsInnerModel enabled(Boolean enabled) {
+  public IntegrationInstanceAllOfWorkflowsModel enabled(Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -53,12 +53,12 @@ public class IntegrationInstanceWorkflowsInnerModel {
     this.enabled = enabled;
   }
 
-  public IntegrationInstanceWorkflowsInnerModel inputs(Map<String, Object> inputs) {
+  public IntegrationInstanceAllOfWorkflowsModel inputs(Map<String, Object> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public IntegrationInstanceWorkflowsInnerModel putInputsItem(String key, Object inputsItem) {
+  public IntegrationInstanceAllOfWorkflowsModel putInputsItem(String key, Object inputsItem) {
     if (this.inputs == null) {
       this.inputs = new HashMap<>();
     }
@@ -81,7 +81,7 @@ public class IntegrationInstanceWorkflowsInnerModel {
     this.inputs = inputs;
   }
 
-  public IntegrationInstanceWorkflowsInnerModel workflowReferenceCode(String workflowReferenceCode) {
+  public IntegrationInstanceAllOfWorkflowsModel workflowReferenceCode(String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -109,10 +109,10 @@ public class IntegrationInstanceWorkflowsInnerModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    IntegrationInstanceWorkflowsInnerModel integrationInstanceWorkflowsInner = (IntegrationInstanceWorkflowsInnerModel) o;
-    return Objects.equals(this.enabled, integrationInstanceWorkflowsInner.enabled) &&
-        Objects.equals(this.inputs, integrationInstanceWorkflowsInner.inputs) &&
-        Objects.equals(this.workflowReferenceCode, integrationInstanceWorkflowsInner.workflowReferenceCode);
+    IntegrationInstanceAllOfWorkflowsModel integrationInstanceAllOfWorkflows = (IntegrationInstanceAllOfWorkflowsModel) o;
+    return Objects.equals(this.enabled, integrationInstanceAllOfWorkflows.enabled) &&
+        Objects.equals(this.inputs, integrationInstanceAllOfWorkflows.inputs) &&
+        Objects.equals(this.workflowReferenceCode, integrationInstanceAllOfWorkflows.workflowReferenceCode);
   }
 
   @Override
@@ -123,7 +123,7 @@ public class IntegrationInstanceWorkflowsInnerModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IntegrationInstanceWorkflowsInnerModel {\n");
+    sb.append("class IntegrationInstanceAllOfWorkflowsModel {\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");

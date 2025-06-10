@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectionConfigModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationWorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -23,11 +23,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * IntegrationModel
+ * A group of workflows that make one logical integration for a particular service represented by component.
  */
 
+@Schema(name = "Integration", description = "A group of workflows that make one logical integration for a particular service represented by component.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T21:20:46.699383+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-10T07:38:50.872123+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationModel {
 
   private String componentName;
@@ -50,7 +51,7 @@ public class IntegrationModel {
   private @Nullable ConnectionConfigModel connectionConfig;
 
   @Valid
-  private List<@Valid WorkflowModel> workflows = new ArrayList<>();
+  private List<IntegrationWorkflowModel> workflows = new ArrayList<>();
 
   public IntegrationModel() {
     super();
@@ -253,12 +254,12 @@ public class IntegrationModel {
     this.connectionConfig = connectionConfig;
   }
 
-  public IntegrationModel workflows(List<@Valid WorkflowModel> workflows) {
+  public IntegrationModel workflows(List<IntegrationWorkflowModel> workflows) {
     this.workflows = workflows;
     return this;
   }
 
-  public IntegrationModel addWorkflowsItem(WorkflowModel workflowsItem) {
+  public IntegrationModel addWorkflowsItem(IntegrationWorkflowModel workflowsItem) {
     if (this.workflows == null) {
       this.workflows = new ArrayList<>();
     }
@@ -273,11 +274,11 @@ public class IntegrationModel {
   @Valid 
   @Schema(name = "workflows", description = "The list of workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflows")
-  public List<@Valid WorkflowModel> getWorkflows() {
+  public List<IntegrationWorkflowModel> getWorkflows() {
     return workflows;
   }
 
-  public void setWorkflows(List<@Valid WorkflowModel> workflows) {
+  public void setWorkflows(List<IntegrationWorkflowModel> workflows) {
     this.workflows = workflows;
   }
 

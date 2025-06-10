@@ -6,6 +6,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/Integratio
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/IntegrationInstanceApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/IntegrationInstanceWorkflowApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AuthorizationTypeModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AutomationWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ConnectionConfigModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendIntegrationInstanceRequestConnectionModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendIntegrationInstanceRequestModel.java
@@ -15,9 +16,11 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Envi
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputTypeModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationBasicModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceAllOfWorkflowsModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceBasicModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceModel.java
-src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceWorkflowsInnerModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/OAuth2Model.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/PublishFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendIntegrationInstanceWorkflowRequestModel.java

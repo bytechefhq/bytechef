@@ -3,14 +3,10 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceAllOfWorkflowsModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -26,10 +22,10 @@ import jakarta.annotation.Generated;
  * The integration instance represents a configured integration for a specific user, containing connection and status information
  */
 
-@Schema(name = "IntegrationInstance", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
-@JsonTypeName("IntegrationInstance")
+@Schema(name = "IntegrationInstanceBasic", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
+@JsonTypeName("IntegrationInstanceBasic")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-10T07:38:50.872123+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class IntegrationInstanceModel {
+public class IntegrationInstanceBasicModel {
 
   private @Nullable Long id;
 
@@ -37,10 +33,7 @@ public class IntegrationInstanceModel {
 
   private @Nullable Boolean enabled;
 
-  @Valid
-  private List<@Valid IntegrationInstanceAllOfWorkflowsModel> workflows = new ArrayList<>();
-
-  public IntegrationInstanceModel id(Long id) {
+  public IntegrationInstanceBasicModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -60,7 +53,7 @@ public class IntegrationInstanceModel {
     this.id = id;
   }
 
-  public IntegrationInstanceModel credentialStatus(CredentialStatusModel credentialStatus) {
+  public IntegrationInstanceBasicModel credentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
     return this;
   }
@@ -80,7 +73,7 @@ public class IntegrationInstanceModel {
     this.credentialStatus = credentialStatus;
   }
 
-  public IntegrationInstanceModel enabled(Boolean enabled) {
+  public IntegrationInstanceBasicModel enabled(Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -100,34 +93,6 @@ public class IntegrationInstanceModel {
     this.enabled = enabled;
   }
 
-  public IntegrationInstanceModel workflows(List<@Valid IntegrationInstanceAllOfWorkflowsModel> workflows) {
-    this.workflows = workflows;
-    return this;
-  }
-
-  public IntegrationInstanceModel addWorkflowsItem(IntegrationInstanceAllOfWorkflowsModel workflowsItem) {
-    if (this.workflows == null) {
-      this.workflows = new ArrayList<>();
-    }
-    this.workflows.add(workflowsItem);
-    return this;
-  }
-
-  /**
-   * Get workflows
-   * @return workflows
-   */
-  @Valid 
-  @Schema(name = "workflows", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflows")
-  public List<@Valid IntegrationInstanceAllOfWorkflowsModel> getWorkflows() {
-    return workflows;
-  }
-
-  public void setWorkflows(List<@Valid IntegrationInstanceAllOfWorkflowsModel> workflows) {
-    this.workflows = workflows;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -136,26 +101,24 @@ public class IntegrationInstanceModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    IntegrationInstanceModel integrationInstance = (IntegrationInstanceModel) o;
-    return Objects.equals(this.id, integrationInstance.id) &&
-        Objects.equals(this.credentialStatus, integrationInstance.credentialStatus) &&
-        Objects.equals(this.enabled, integrationInstance.enabled) &&
-        Objects.equals(this.workflows, integrationInstance.workflows);
+    IntegrationInstanceBasicModel integrationInstanceBasic = (IntegrationInstanceBasicModel) o;
+    return Objects.equals(this.id, integrationInstanceBasic.id) &&
+        Objects.equals(this.credentialStatus, integrationInstanceBasic.credentialStatus) &&
+        Objects.equals(this.enabled, integrationInstanceBasic.enabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, credentialStatus, enabled, workflows);
+    return Objects.hash(id, credentialStatus, enabled);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IntegrationInstanceModel {\n");
+    sb.append("class IntegrationInstanceBasicModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-    sb.append("    workflows: ").append(toIndentedString(workflows)).append("\n");
     sb.append("}");
     return sb.toString();
   }
