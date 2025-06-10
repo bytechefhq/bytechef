@@ -6,6 +6,8 @@ bytechef:
     provider: jms
   file-storage:
     provider: jdbc
+  oauth2:
+    redirect-uri:
   workflow:
     output-storage:
       provider: jdbc

@@ -132,6 +132,7 @@ public class ConnectionServiceIntTest {
 
     private static Connection getConnection() {
         return Connection.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .name("name")
             .parameters(Map.of("key1", "value1"))

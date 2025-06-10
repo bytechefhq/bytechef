@@ -24,6 +24,7 @@ import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
@@ -40,10 +41,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    AuthorityService.class, ConnectionService.class, PrincipalJobFacade.class, PrincipalJobService.class,
-    JobFacade.class, JobService.class, TaskExecutionService.class, TriggerDefinitionService.class,
-    TriggerExecutionService.class, TriggerLifecycleFacade.class, UserService.class, ComponentConnectionFacade.class,
-    WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class
+    AuthorityService.class, ConnectionFacade.class, ConnectionService.class, PrincipalJobFacade.class,
+    PrincipalJobService.class, JobFacade.class, JobService.class, TaskExecutionService.class,
+    TriggerDefinitionService.class, TriggerExecutionService.class, TriggerLifecycleFacade.class, UserService.class,
+    ComponentConnectionFacade.class, WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class,
+    WorkflowTestConfigurationService.class
 
 })
 public @interface ProjectIntTestConfigurationSharedMocks {

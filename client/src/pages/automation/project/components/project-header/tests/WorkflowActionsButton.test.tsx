@@ -26,7 +26,7 @@ const renderWorkflowActionsButton = (chatTrigger: boolean, workflowIsRunning?: b
 it('should show the workflow RUN button when chat trigger is false', () => {
     renderWorkflowActionsButton(false);
 
-    expect(screen.getByText('Run')).toBeInTheDocument();
+    expect(screen.getByText('Test')).toBeInTheDocument();
 
     expect(screen.queryByText('Chat')).not.toBeInTheDocument();
 });
@@ -36,7 +36,7 @@ it('should show the workflow STOP button when workflow is running', () => {
 
     expect(screen.getByText('Stop')).toBeInTheDocument();
 
-    expect(screen.queryByText('Run')).not.toBeInTheDocument();
+    expect(screen.queryByText('Test')).not.toBeInTheDocument();
     expect(screen.queryByText('Chat')).not.toBeInTheDocument();
 });
 
@@ -45,19 +45,19 @@ it('should show the CHAT button instead of RUN when chat trigger is true', () =>
 
     expect(screen.getByText('Chat')).toBeInTheDocument();
 
-    expect(screen.queryByText('Run')).not.toBeInTheDocument();
+    expect(screen.queryByText('Test')).not.toBeInTheDocument();
 });
 
 it('should disable the button when runDisabled is true', () => {
     renderWorkflowActionsButton(false, false, true);
 
-    expect(screen.getByText('Run')).toBeDisabled();
+    expect(screen.getByText('Test')).toBeDisabled();
 });
 
 it('should call onRunClick when run button is clicked', async () => {
     renderWorkflowActionsButton(false, false, false);
 
-    fireEvent.click(screen.getByText('Run'));
+    fireEvent.click(screen.getByText('Test'));
 
     await waitFor(() => expect(mockOnRunClick).toHaveBeenCalled());
 });

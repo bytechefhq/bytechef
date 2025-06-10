@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -91,6 +92,7 @@ public class ConnectionFacadeIntTest {
     @Test
     public void testCreate() {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .connectionVersion(1)
             .environment(Environment.STAGING)
@@ -107,6 +109,7 @@ public class ConnectionFacadeIntTest {
     @Test
     public void testDelete() {
         ConnectionDTO connectionDTO1 = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .connectionVersion(1)
             .environment(Environment.STAGING)
@@ -117,6 +120,7 @@ public class ConnectionFacadeIntTest {
         long connectionId1 = connectionFacade.create(connectionDTO1, ModeType.AUTOMATION);
 
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .connectionVersion(1)
             .environment(Environment.STAGING)
@@ -181,7 +185,7 @@ public class ConnectionFacadeIntTest {
         connection = connectionRepository.save(connection);
 
         List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
-            null, null, null, null, null, ModeType.AUTOMATION);
+            null, null, List.of(), null, null, ModeType.AUTOMATION);
 
         Assertions.assertThat(
             CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
@@ -246,6 +250,7 @@ public class ConnectionFacadeIntTest {
         Tag tag1 = new Tag("tag1");
 
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .connectionVersion(1)
             .environment(Environment.STAGING)

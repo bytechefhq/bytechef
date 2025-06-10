@@ -18,6 +18,7 @@ package com.bytechef.platform.connection.repository;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
@@ -101,6 +102,7 @@ public class ConnectionRepositoryIntTest {
 
     private static Connection getConnection() {
         return Connection.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .name("name")
             .parameters(Map.of("key1", "value1"))
