@@ -58,7 +58,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
 
         return ResponseEntity.ok(
             new DeleteWorkflowNodeParameter200ResponseModel().parameters(
-                (Map<String, Object>) workflowNodeParameterFacade.deleteParameter(
+                (Map<String, Object>) workflowNodeParameterFacade.deleteWorkflowNodeParameter(
                     id, deleteWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
                     deleteWorkflowNodeParameterRequestModel.getPath())));
     }
@@ -68,7 +68,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
         getWorkflowNodeParameterDisplayConditions(String id, String workflowNodeName) {
 
         DisplayConditionResultDTO displayConditionResultDTO =
-            workflowNodeParameterFacade.getDisplayConditions(id, workflowNodeName);
+            workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(id, workflowNodeName);
 
         return ResponseEntity.ok(
             new GetWorkflowNodeParameterDisplayConditions200ResponseModel()
@@ -80,7 +80,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     public ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
         String id, UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
 
-        UpdateParameterResultDTO updateParameterResultDTO = workflowNodeParameterFacade.updateParameter(
+        UpdateParameterResultDTO updateParameterResultDTO = workflowNodeParameterFacade.updateWorkflowNodeParameter(
             id, updateWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
             updateWorkflowNodeParameterRequestModel.getPath(), updateWorkflowNodeParameterRequestModel.getValue(),
             updateWorkflowNodeParameterRequestModel.getType(),

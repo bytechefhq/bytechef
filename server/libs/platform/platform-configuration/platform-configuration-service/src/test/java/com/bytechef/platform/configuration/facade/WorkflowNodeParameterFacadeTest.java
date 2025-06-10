@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 public class WorkflowNodeParameterFacadeTest {
 
     private static final WorkflowNodeParameterFacadeImpl WORKFLOW_NODE_PARAMETER_FACADE =
-        new WorkflowNodeParameterFacadeImpl(null, SpelEvaluator.create(), null, null, null, null, null);
+        new WorkflowNodeParameterFacadeImpl(null, null, SpelEvaluator.create(), null, null, null, null, null);
 
     @Test
     public void testEvaluate() {

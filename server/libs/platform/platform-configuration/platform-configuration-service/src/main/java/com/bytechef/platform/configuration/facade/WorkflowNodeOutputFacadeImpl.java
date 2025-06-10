@@ -24,12 +24,17 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.domain.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.dto.ClusterElementOutputDTO;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -59,6 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     private final ActionDefinitionService actionDefinitionService;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -69,7 +75,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeOutputFacadeImpl(
-        ActionDefinitionService actionDefinitionService, Evaluator evaluator,
+        ActionDefinitionService actionDefinitionService,
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
@@ -77,6 +84,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionService = actionDefinitionService;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -84,6 +92,27 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+    }
+
+    @Override
+    public ClusterElementOutputDTO getClusterElementOutput(
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementName) {
+
+        ClusterElementOutputDTO clusterElementOutputDTO = null;
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        List<WorkflowTask> workflowTasks = workflow.getTasks(true);
+
+        for (WorkflowTask workflowTask : workflowTasks) {
+            if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
+                clusterElementOutputDTO = getClusterElementOutputDTO(
+                    workflowId, workflowTask, clusterElementType, clusterElementName);
+
+                break;
+            }
+        }
+
+        return clusterElementOutputDTO;
     }
 
     @Override
@@ -225,6 +254,43 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .anyMatch(workflowTask -> Objects.equals(workflowTask.getName(), workflowNodeName));
     }
 
+    private ClusterElementOutputDTO getClusterElementOutputDTO(
+        String workflowId, WorkflowTask workflowTask, String clusterElementTypeName, String clusterElementName) {
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+
+        com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType clusterElementType =
+            clusterElementDefinitionService.getClusterElementType(
+                workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName);
+
+        ClusterElement clusterElement = clusterElementMap.getClusterElements(clusterElementType)
+            .stream()
+            .filter(curClusterElement -> Objects.equals(curClusterElement.getName(), clusterElementName))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Cluster element %s not found".formatted(clusterElementName)));
+
+        WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
+
+        ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService.getClusterElementDefinition(
+            workflowNodeType.name(), workflowNodeType.version(), clusterElementWorkflowNodeType.operation());
+
+        OutputResponse outputResponse = clusterElementDefinition.getOutputResponse();
+
+        OutputResponse finalOutputResponse = outputResponse;
+
+        Class<? extends BaseProperty> type = workflowNodeType.operation() == null
+            ? Property.class : com.bytechef.platform.component.domain.Property.class;
+
+        outputResponse = workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, clusterElementName)
+            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
+            .orElseGet(() -> checkOutput(workflowId, finalOutputResponse, null));
+
+        return new ClusterElementOutputDTO(clusterElementDefinition, outputResponse, clusterElementName);
+    }
+
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTask workflowTask) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
@@ -265,7 +331,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         return new WorkflowNodeOutputDTO(
-            workflowTask.getName(), outputResponse, null, actionDefinition, taskDispatcherDefinition);
+            actionDefinition, null, outputResponse, taskDispatcherDefinition, null, workflowTask.getName());
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTrigger workflowTrigger) {
@@ -285,6 +351,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
 
-        return new WorkflowNodeOutputDTO(workflowTrigger.getName(), outputResponse, triggerDefinition, null, null);
+        return new WorkflowNodeOutputDTO(
+            null, null, outputResponse, null, triggerDefinition, workflowTrigger.getName());
     }
 }

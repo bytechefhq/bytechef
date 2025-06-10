@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
@@ -26,18 +27,19 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefin
  * @author Ivica Cardic
  */
 public record WorkflowNodeOutputDTO(
-    String workflowNodeName, BaseProperty outputSchema, Object sampleOutput, Object placeholder,
-    TriggerDefinition triggerDefinition, ActionDefinition actionDefinition,
-    TaskDispatcherDefinition taskDispatcherDefinition) {
+    ActionDefinition actionDefinition, ClusterElementDefinition clusterElementDefinition, BaseProperty outputSchema,
+    Object placeholder, Object sampleOutput, TaskDispatcherDefinition taskDispatcherDefinition,
+    TriggerDefinition triggerDefinition, String workflowNodeName) {
 
     public WorkflowNodeOutputDTO(
-        String workflowNodeName, OutputResponse outputResponse, TriggerDefinition triggerDefinition,
-        ActionDefinition actionDefinition, TaskDispatcherDefinition taskDispatcherDefinition) {
+        ActionDefinition actionDefinition, ClusterElementDefinition clusterElementDefinition,
+        OutputResponse outputResponse, TaskDispatcherDefinition taskDispatcherDefinition,
+        TriggerDefinition triggerDefinition, String workflowNodeName) {
 
         this(
-            workflowNodeName, outputResponse == null ? null : outputResponse.outputSchema(),
-            outputResponse == null ? null : outputResponse.sampleOutput(),
-            outputResponse == null ? null : outputResponse.placeholder(), triggerDefinition, actionDefinition,
-            taskDispatcherDefinition);
+            actionDefinition, clusterElementDefinition, outputResponse == null ? null : outputResponse.outputSchema(),
+            outputResponse == null ? null : outputResponse.placeholder(),
+            outputResponse == null ? null : outputResponse.sampleOutput(), taskDispatcherDefinition, triggerDefinition,
+            workflowNodeName);
     }
 }

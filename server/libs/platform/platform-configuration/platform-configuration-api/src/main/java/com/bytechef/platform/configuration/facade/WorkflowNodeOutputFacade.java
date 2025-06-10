@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.platform.configuration.dto.ClusterElementOutputDTO;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,9 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public interface WorkflowNodeOutputFacade {
+
+    ClusterElementOutputDTO getClusterElementOutput(
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementName);
 
     WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName);
 

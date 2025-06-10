@@ -27,6 +27,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.DynamicPropertiesProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
 import com.bytechef.platform.component.domain.OptionsDataSource;
@@ -34,6 +35,7 @@ import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.component.domain.PropertiesDataSource;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
@@ -74,6 +76,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     private static final String UI = "ui";
 
     private final ActionDefinitionService actionDefinitionService;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionService triggerDefinitionService;
@@ -83,12 +86,14 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeParameterFacadeImpl(
-        ActionDefinitionService actionDefinitionService, Evaluator evaluator,
+        ActionDefinitionService actionDefinitionService,
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionService triggerDefinitionService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionService = actionDefinitionService;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -98,16 +103,21 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
-    public Map<String, ?> deleteParameter(String workflowId, String workflowNodeName, String path) {
+    public Map<String, ?> deleteClusterElementParameter(
+        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        String path) {
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(workflowNodeName, definitionMap);
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
+            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap);
 
         String[] pathItems = path.split("\\.");
 
-        setDynamicPropertyTypeItem(path, null, getMetadataMap(workflowNodeName, definitionMap));
+        setDynamicPropertyTypeItem(path, null, getMetadataMap(
+            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap));
         setParameter(pathItems, null, true, workflowNodeStructure.parameterMap);
 
         workflowService.update(
@@ -117,7 +127,28 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
-    public DisplayConditionResultDTO getDisplayConditions(String workflowId, String workflowNodeName) {
+    public Map<String, ?> deleteWorkflowNodeParameter(String workflowId, String workflowNodeName, String path) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
+
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
+            workflowNodeName, null, null, definitionMap);
+
+        String[] pathItems = path.split("\\.");
+
+        setDynamicPropertyTypeItem(path, null, getMetadataMap(workflowNodeName, null, null, definitionMap));
+        setParameter(pathItems, null, true, workflowNodeStructure.parameterMap);
+
+        workflowService.update(
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+
+        return workflowNodeStructure.parameterMap;
+    }
+
+    @Override
+    public DisplayConditionResultDTO getClusterElementDisplayConditions(
+        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName) {
         Map<String, Boolean> displayConditionMap = new HashMap<>();
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -125,7 +156,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
         WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
-            workflowNodeName, definitionMap);
+            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap);
 
         Set<String> keySet = workflowNodeStructure.parameterMap.keySet();
 
@@ -142,7 +173,79 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
-    public UpdateParameterResultDTO updateParameter(
+    public DisplayConditionResultDTO getWorkflowNodeDisplayConditions(String workflowId, String workflowNodeName) {
+        Map<String, Boolean> displayConditionMap = new HashMap<>();
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
+
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
+            workflowNodeName, null, null, definitionMap);
+
+        Set<String> keySet = workflowNodeStructure.parameterMap.keySet();
+
+        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
+
+        for (String parameterName : new HashSet<>(keySet)) {
+            displayConditionMap.putAll(
+                checkDisplayConditionsAndParameters(
+                    parameterName, workflowNodeName, workflow, workflowNodeStructure.operationType,
+                    workflowNodeStructure.parameterMap, inputMap, Map.of(), workflowNodeStructure.properties, false));
+        }
+
+        return new DisplayConditionResultDTO(displayConditionMap, workflowNodeStructure.missingRequiredProperties);
+    }
+
+    @Override
+    public UpdateParameterResultDTO updateClusterElementParameter(
+        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        String parameterPath, Object value, String type, boolean includeInMetadata) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
+
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
+            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap);
+
+        Map<String, Object> metadataMap = getMetadataMap(
+            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap);
+
+        Map<String, ?> dynamicPropertyTypesMap = getDynamicPropertyTypesMap(metadataMap);
+
+        String[] parameterPathParts = parameterPath.split("\\.");
+
+        setParameter(parameterPathParts, value, false, workflowNodeStructure.parameterMap);
+
+        // For now only check the first, root level of properties on which other properties could depend on
+
+        checkDependOn(
+            parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
+            dynamicPropertyTypesMap);
+
+        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflow.getId());
+
+        Map<String, Boolean> displayConditionMap = checkDisplayConditionsAndParameters(
+            parameterPath, workflowNodeName, workflow, workflowNodeStructure.operationType,
+            workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
+            true);
+
+        if (includeInMetadata) {
+            setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
+        }
+
+        workflowService.update(
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+
+        return new UpdateParameterResultDTO(
+            displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
+            workflowNodeStructure.parameterMap);
+    }
+
+    @Override
+    public UpdateParameterResultDTO updateWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,
         boolean includeInMetadata) {
 
@@ -150,9 +253,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(workflowNodeName, definitionMap);
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
+            workflowNodeName, null, null, definitionMap);
 
-        Map<String, Object> metadataMap = getMetadataMap(workflowNodeName, definitionMap);
+        Map<String, Object> metadataMap = getMetadataMap(workflowNodeName, null, null, definitionMap);
 
         Map<String, ?> dynamicPropertyTypesMap = getDynamicPropertyTypesMap(metadataMap);
 
@@ -395,7 +499,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String displayCondition = property.getDisplayCondition();
 
-        if (operationType == WorkflowNodeStructure.OperationType.TASK ||
+        if (operationType == WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT ||
+            operationType == WorkflowNodeStructure.OperationType.TASK ||
             operationType == WorkflowNodeStructure.OperationType.TASK_DISPATCHER) {
 
             WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
@@ -576,7 +681,43 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> getMetadataMap(String workflowNodeName, Map<String, ?> definitionMap) {
+    private static Map<String, ?> getClusterElementMap(
+        String clusterElementTypeName, String clusterElementName, Map<String, ?> taskMap) {
+
+        Map<String, ?> clusterElementsMap = (Map<String, ?>) taskMap.get(WorkflowExtConstants.CLUSTER_ELEMENTS);
+
+        Map<String, ?> clusterElementMap = null;
+
+        if (clusterElementsMap.get(clusterElementTypeName) instanceof Map<?, ?> map) {
+            clusterElementMap = (Map<String, ?>) map;
+        } else if (clusterElementsMap.get(clusterElementTypeName) instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    String name = (String) map.get(WorkflowConstants.NAME);
+
+                    if (name.equals(clusterElementName)) {
+                        clusterElementMap = (Map<String, ?>) map;
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (clusterElementMap == null) {
+            throw new ConfigurationException(
+                "Cluster element with name: %s does not exist".formatted(clusterElementName),
+                WorkflowErrorType.CLUSTER_ELEMENT_NOT_FOUND);
+        }
+
+        return clusterElementMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getMetadataMap(
+        String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        Map<String, ?> definitionMap) {
+
         Map<String, Object> metadataMap;
 
         Map<String, ?> triggerMap = getTrigger(
@@ -592,12 +733,19 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     WorkflowErrorType.WORKFLOW_NODE_NOT_FOUND);
             }
 
-            metadataMap = (Map<String, Object>) taskMap.get(METADATA);
+            if (clusterElementTypeName == null) {
+                metadataMap = (Map<String, Object>) taskMap.get(METADATA);
 
-            if (metadataMap == null) {
-                metadataMap = new HashMap<>();
+                if (metadataMap == null) {
+                    metadataMap = new HashMap<>();
 
-                ((Map<String, Object>) taskMap).put(METADATA, metadataMap);
+                    ((Map<String, Object>) taskMap).put(METADATA, metadataMap);
+                }
+            } else {
+                Map<String, ?> clusterElementMap = getClusterElementMap(
+                    clusterElementTypeName, clusterElementName, taskMap);
+
+                metadataMap = (Map<String, Object>) clusterElementMap.get(METADATA);
             }
         } else {
             metadataMap = (Map<String, Object>) triggerMap.get(METADATA);
@@ -704,16 +852,22 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @SuppressWarnings("unchecked")
-    private WorkflowNodeStructure getWorkflowNodeStructure(String workflowNodeName, Map<String, ?> definitionMap) {
+    private WorkflowNodeStructure getWorkflowNodeStructure(
+        String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        Map<String, ?> definitionMap) {
+
         Map<String, ?> parameterMap;
         List<? extends BaseProperty> properties;
 
+        // We need a mutable map
         Map<String, ?> triggerMap = getTrigger(
             workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowExtConstants.TRIGGERS));
 
         WorkflowNodeStructure.OperationType operationType;
 
         if (triggerMap == null) {
+            // We need a mutable map
+
             Map<String, ?> taskMap = getTask(
                 workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
 
@@ -723,26 +877,44 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     WorkflowErrorType.WORKFLOW_NODE_NOT_FOUND);
             }
 
-            parameterMap = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
-                (String) taskMap.get(WorkflowConstants.TYPE));
+            if (clusterElementTypeName == null) {
+                parameterMap = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);
+                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
+                    (String) taskMap.get(WorkflowConstants.TYPE));
 
-            if (workflowNodeType.operation() == null) {
-                operationType = WorkflowNodeStructure.OperationType.TASK_DISPATCHER;
+                if (workflowNodeType.operation() == null) {
+                    operationType = WorkflowNodeStructure.OperationType.TASK_DISPATCHER;
 
-                TaskDispatcherDefinition taskDispatcherDefinition =
-                    taskDispatcherDefinitionService.getTaskDispatcherDefinition(
-                        workflowNodeType.name(), workflowNodeType.version());
+                    TaskDispatcherDefinition taskDispatcherDefinition =
+                        taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+                            workflowNodeType.name(), workflowNodeType.version());
 
-                properties = taskDispatcherDefinition.getProperties();
+                    properties = taskDispatcherDefinition.getProperties();
+                } else {
+                    operationType = WorkflowNodeStructure.OperationType.TASK;
+
+                    ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
+                        workflowNodeType.name(), workflowNodeType.version(),
+                        workflowNodeType.operation());
+
+                    properties = actionDefinition.getProperties();
+                }
             } else {
-                operationType = WorkflowNodeStructure.OperationType.TASK;
+                Map<String, ?> clusterElementMap = getClusterElementMap(
+                    clusterElementTypeName, clusterElementName, taskMap);
 
-                ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
-                    workflowNodeType.name(), workflowNodeType.version(),
-                    workflowNodeType.operation());
+                parameterMap = (Map<String, ?>) clusterElementMap.get(WorkflowConstants.PARAMETERS);
 
-                properties = actionDefinition.getProperties();
+                operationType = WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT;
+
+                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
+                    (String) taskMap.get(WorkflowConstants.TYPE));
+
+                ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService
+                    .getClusterElementDefinition(
+                        workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
+
+                properties = clusterElementDefinition.getProperties();
             }
         } else {
             operationType = WorkflowNodeStructure.OperationType.TRIGGER;
@@ -962,6 +1134,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         List<String> missingRequiredProperties) {
 
         enum OperationType {
+            CLUSTER_ELEMENT,
             TASK,
             TASK_DISPATCHER,
             TRIGGER
