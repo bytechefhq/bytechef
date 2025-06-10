@@ -23,6 +23,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -183,7 +184,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
             }
         }
 
-        projectWorkflowService.delete(project.getId(), project.getLastVersion(), workflowId, deleteLastWorkflow);
+        for (ProjectVersion projectVersion : project.getProjectVersions()) {
+            projectWorkflowService.delete(project.getId(), projectVersion.getVersion(), workflowId, deleteLastWorkflow);
+        }
 
         workflowTestConfigurationService.delete(workflowId);
 

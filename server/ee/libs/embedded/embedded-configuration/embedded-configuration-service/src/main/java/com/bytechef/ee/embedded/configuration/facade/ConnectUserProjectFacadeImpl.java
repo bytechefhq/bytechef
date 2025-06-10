@@ -146,7 +146,6 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
         Set<Long> connectionIds = new HashSet<>();
 
         for (ProjectWorkflow projectWorkflow : projectWorkflows) {
-
             connectedUserProjectWorkflowService
                 .fetchConnectedUserProjectWorkflow(connectedUserProject.getId(), projectWorkflow.getId())
                 .ifPresent(connectedUserProjectWorkflow -> {
