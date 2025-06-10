@@ -242,6 +242,7 @@ const IntegrationInstanceConfigurationDialog = ({
         } else {
             createIntegrationInstanceConfigurationMutation.mutate({
                 ...formData,
+                authorizationType: oAuth2Authorization?.type || connectionDefinition?.authorizations?.[0].type,
                 integrationInstanceConfigurationWorkflows: formData.integrationInstanceConfigurationWorkflows?.map(
                     (integrationInstanceConfigurationWorkflow) => {
                         return {
