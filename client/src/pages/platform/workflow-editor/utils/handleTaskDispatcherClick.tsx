@@ -60,6 +60,7 @@ export default async function handleTaskDispatcherClick({
 
     const newNodeData: NodeDataType = {
         ...taskDispatcherDefinition,
+        clusterElements: undefined,
         componentName: name,
         description: undefined,
         icon: icon ? <InlineSVG className="size-9 text-gray-700" src={icon} /> : fallbackIcon,
