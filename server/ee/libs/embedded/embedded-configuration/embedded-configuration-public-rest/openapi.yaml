@@ -37,7 +37,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/Workflow"
+                  $ref: "#/components/schemas/AutomationWorkflow"
     post:
       description: "Create new workflow and adds it to an existing integration."
       summary: "Create new workflow and adds it to an existing integration"
@@ -118,7 +118,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                $ref: "#/components/schemas/AutomationWorkflow"
     put:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
@@ -248,6 +248,120 @@ paths:
           description: "Successful operation."
       security:
         - jwtBearerAuth: [ ]
+  /integration-instances/{id}:
+    delete:
+      description: "Delete an integration instance."
+      summary: "Delete an integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "deleteFrontendIntegrationInstance"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - jwtBearerAuth: [ ]
+  /integration-instances{id}/workflows/${workflowReferenceCode}:
+    put:
+      description: "Update a workflow for a specific integration instance."
+      summary: "Update integration instance workflow"
+      tags:
+        - "integration-instance-workflow"
+      operationId: "updateFrontendIntegrationInstanceWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                inputs:
+                  type: "object"
+                  additionalProperties: true
+      responses:
+        "204":
+          description: "Successful operation."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - jwtBearerAuth: [ ]
+  /integration-instances{id}/workflows/${workflowReferenceCode}/enable:
+    post:
+      description: "Enable a workflow."
+      summary: "Enable a workflow"
+      tags:
+        - "integration-instance-workflow"
+      operationId: "enableFrontendIntegrationInstanceWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - jwtBearerAuth: [ ]
+    delete:
+      description: "Disable a workflow."
+      summary: "Disable a workflow"
+      tags:
+        - "integration-instance-workflow"
+      operationId: "disableFrontendIntegrationInstanceWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - jwtBearerAuth: [ ]
   /integrations:
     get:
       description: "Get active integrations for particular external user."
@@ -270,7 +384,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/Integration"
+                  $ref: "#/components/schemas/IntegrationBasic"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
@@ -347,190 +461,6 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - jwtBearerAuth: [ ]
-  /integrations/{id}/instances/{instanceId}:
-    delete:
-      description: "Delete an integration instance."
-      summary: "Delete an integration instance"
-      tags:
-        - "integration-instance"
-      operationId: "deleteFrontendIntegrationInstance"
-      parameters:
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-        - name: "id"
-          description: "The id of an integration."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "instanceId"
-          description: "The id of an integration instance."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "204":
-          description: "Successful operation."
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-      security:
-        - jwtBearerAuth: [ ]
-  /integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}:
-    put:
-      description: "Update a workflow for a specific integration instance."
-      summary: "Update integration instance workflow"
-      tags:
-        - "integration-instance-workflow"
-      operationId: "updateFrontendIntegrationInstanceWorkflow"
-      parameters:
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-        - name: "id"
-          description: "The id of an integration."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "instanceId"
-          description: "The id of an integration instance."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference of the workflow to delete."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                inputs:
-                  type: "object"
-                  additionalProperties: true
-      responses:
-        "204":
-          description: "Successful operation."
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-      security:
-        - jwtBearerAuth: [ ]
-  /integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable:
-    post:
-      description: "Enable a workflow."
-      summary: "Enable a workflow"
-      tags:
-        - "integration-instance-workflow"
-      operationId: "enableFrontendIntegrationInstanceWorkflow"
-      parameters:
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-        - name: "id"
-          description: "The id of an integration."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "instanceId"
-          description: "The id of an integration instance."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference of the workflow to delete."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                inputs:
-                  type: "object"
-                  additionalProperties: true
-      responses:
-        "204":
-          description: "Successful operation."
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-      security:
-        - jwtBearerAuth: [ ]
-    delete:
-      description: "Disable a workflow."
-      summary: "Disable a workflow"
-      tags:
-        - "integration-instance-workflow"
-      operationId: "disableFrontendIntegrationInstanceWorkflow"
-      parameters:
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-        - name: "id"
-          description: "The id of an integration."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "instanceId"
-          description: "The id of an integration instance."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference of the workflow to delete."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                inputs:
-                  type: "object"
-                  additionalProperties: true
-      responses:
-        "204":
-          description: "Successful operation."
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-      security:
-        - jwtBearerAuth: [ ]
   /{externalUserId}/automation/workflows:
     get:
       description: "Get automation workflows for particular external user."
@@ -559,7 +489,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/Workflow"
+                  $ref: "#/components/schemas/AutomationWorkflow"
     post:
       description: "Create new workflow and adds it to an existing integration."
       summary: "Create new workflow and adds it to an existing integration"
@@ -658,7 +588,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                $ref: "#/components/schemas/AutomationWorkflow"
     put:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
@@ -812,6 +742,144 @@ paths:
           description: "Successful operation."
       security:
         - bearerAuth: [ ]
+  /{externalUserId}/integration-instances/{id}:
+    delete:
+      description: "Delete an integration instance."
+      summary: "Delete an integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "deleteIntegrationInstance"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: [ ]
+  /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}:
+    put:
+      description: "Update a workflow for a specific integration instance."
+      summary: "Update integration instance workflow"
+      tags:
+        - "integration-instance-workflow"
+      operationId: "updateIntegrationInstanceWorkflow"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                inputs:
+                  type: "object"
+                  additionalProperties: true
+      responses:
+        "204":
+          description: "Successful operation."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: [ ]
+  /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable:
+    post:
+      description: "Enable a workflow."
+      summary: "Enable a workflow"
+      tags:
+        - "integration-instance-workflow"
+      operationId: "enableIntegrationInstanceWorkflow"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: "Disable a workflow."
+      summary: "Disable a workflow"
+      tags:
+        - "integration-instance-workflow"
+      operationId: "disableIntegrationInstanceWorkflow"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - jwtBearerAuth: [ ]
   /{externalUserId}/integrations:
     get:
       description: "Get active integrations for particular external user."
@@ -929,216 +997,17 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/integrations/{id}/instances/{instanceId}:
-    delete:
-      description: "Delete an integration instance."
-      summary: "Delete an integration instance"
-      tags:
-        - "integration-instance"
-      operationId: "deleteIntegrationInstance"
-      parameters:
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-        - name: "externalUserId"
-          description: "The external user id."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "id"
-          description: "The id of an integration."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "instanceId"
-          description: "The id of an integration instance."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "204":
-          description: "Successful operation."
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-      security:
-        - bearerAuth: [ ]
-  /{externalUserId}/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}:
-    put:
-      description: "Update a workflow for a specific integration instance."
-      summary: "Update integration instance workflow"
-      tags:
-        - "integration-instance-workflow"
-      operationId: "updateIntegrationInstanceWorkflow"
-      parameters:
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-        - name: "externalUserId"
-          description: "The external user id."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "id"
-          description: "The id of an integration."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "instanceId"
-          description: "The id of an integration instance."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference of the workflow to delete."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                inputs:
-                  type: "object"
-                  additionalProperties: true
-      responses:
-        "204":
-          description: "Successful operation."
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-      security:
-        - bearerAuth: [ ]
-  /{externalUserId}/integrations/{id}/instances{instanceId}/workflows/${workflowReferenceCode}/enable:
-    post:
-      description: "Enable a workflow."
-      summary: "Enable a workflow"
-      tags:
-        - "integration-instance-workflow"
-      operationId: "enableIntegrationInstanceWorkflow"
-      parameters:
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-        - name: "externalUserId"
-          description: "The external user id."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "id"
-          description: "The id of an integration."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "instanceId"
-          description: "The id of an integration instance."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference of the workflow to delete."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                inputs:
-                  type: "object"
-                  additionalProperties: true
-      responses:
-        "204":
-          description: "Successful operation."
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-      security:
-        - bearerAuth: [ ]
-    delete:
-      description: "Disable a workflow."
-      summary: "Disable a workflow"
-      tags:
-        - "integration-instance-workflow"
-      operationId: "disableIntegrationInstanceWorkflow"
-      parameters:
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-        - name: "externalUserId"
-          description: "The external user id."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "id"
-          description: "The id of an integration."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "instanceId"
-          description: "The id of an integration instance."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference of the workflow to delete."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                inputs:
-                  type: "object"
-                  additionalProperties: true
-      responses:
-        "204":
-          description: "Successful operation."
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-      security:
-        - jwtBearerAuth: [ ]
 components:
   schemas:
+    AutomationWorkflow:
+      description: "A group of tasks that make one logical workflow."
+      allOf:
+        - $ref: "#/components/schemas/Workflow"
+        - type: "object"
+          properties:
+            workflowVersion:
+              type: "integer"
+              description: "The workflow version, if null a workflow is not yet published"
     ConnectionConfig:
       description: "Contains all required information to open a connection to a service defined by componentName parameter."
       type: "object"
@@ -1192,6 +1061,7 @@ components:
           description: "The name of an integration."
           type: "string"
     Integration:
+      description: "A group of workflows that make one logical integration for a particular service represented by component."
       allOf:
         - $ref: "#/components/schemas/IntegrationBasic"
         - type: object
@@ -1202,8 +1072,8 @@ components:
               description: "The list of workflows."
               type: "array"
               items:
-                $ref: "#/components/schemas/Workflow"
-    IntegrationInstance:
+                $ref: "#/components/schemas/IntegrationWorkflow"
+    IntegrationInstanceBasic:
       description: "The integration instance represents a configured integration for a specific user, containing connection and status information"
       type: "object"
       properties:
@@ -1216,20 +1086,37 @@ components:
         enabled:
           description: "If an integration instance is enabled or not"
           type: "boolean"
-        workflows:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              enabled:
-                type: "boolean"
-                description: "If a workflow is enabled or not."
-              inputs:
+    IntegrationInstance:
+      description: "The integration instance represents a configured integration for a specific user, containing connection and status information"
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/IntegrationInstanceBasic"
+        - type: "object"
+          properties:
+            workflows:
+              type: "array"
+              items:
                 type: "object"
-                additionalProperties: true
-              workflowReferenceCode:
-                description: "The reference code of a workflow."
-                type: "string"
+                properties:
+                  enabled:
+                    type: "boolean"
+                    description: "If a workflow is enabled or not."
+                  inputs:
+                    type: "object"
+                    additionalProperties: true
+                  workflowReferenceCode:
+                    description: "The reference code of a workflow."
+                    type: "string"
+    IntegrationWorkflow:
+      description: "A group of tasks that make one logical workflow."
+      allOf:
+        - $ref: "#/components/schemas/Workflow"
+        - type: "object"
+          properties:
+            inputs:
+              type: array
+              items:
+                $ref: "#/components/schemas/Input"
     Input:
       type: "object"
       required:
@@ -1298,13 +1185,6 @@ components:
         workflowReferenceCode:
           description: "The reference code of a workflow."
           type: "string"
-        inputs:
-          type: array
-          items:
-            $ref: "#/components/schemas/Input"
-        workflowVersion:
-          type: "integer"
-          description: "The workflow version, if null a workflow is not yet published"
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
