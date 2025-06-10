@@ -34,7 +34,7 @@ npm run run watch
 
 ```bash
 cd test-apps/react
-npm link @bytechef/use-embedded-connection-dialog
+npm link @bytechef-embedded/react
 npm install
 npm run dev
 ```

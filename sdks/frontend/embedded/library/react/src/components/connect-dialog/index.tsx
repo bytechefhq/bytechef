@@ -3,9 +3,6 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import useOAuth2 from './useOAuth2';
 
-const JWT =
-    'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNIVmliR2xqT21GTFpEWmFaMXBqTkhWcFRqUmhRa0pGV1daTlltVnFNMEZ1WVdkd1ltOU8ifQ.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.jKFzMD3fynYAEPQbL0hrfuoIN86UwbIbv7FExEUCWhYRzYhEcUBa01sB4jFsxNt3wJe_QH1Y-NCGwbp2D4TvAoS7dCi4w9FoRdUuabRqELHlwvOEpHg5ebQ6xlSeGOtzvHZv7dDQ4_2ry5x85TKHZzdZ9UmC2NcRndTP65_Na89wO7LH6Adrr4mKCHyz_yHNuK4YHUeawM0bgNQaCCS03ivHzegRAAttWQF9oRxAIfs9-cv3VnKC030j9oTri6iK6w7YFWQpOIPp8PN83TrhdHTs2g1Q5SDzb44OiQv8NEBPVd018Ss61Yt2d0xoTj7usrIJxJH25qNirHSGTtJFpg';
-
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
 
 export type DialogStepType = 'initial' | 'form';
@@ -18,10 +15,12 @@ interface ConnectionDialogHookReturnType {
 
 export default function useConnectDialog({
     baseUrl = 'http://localhost:9555',
-    integrationId = '1050',
+    integrationId,
+    jwtToken,
 }: {
     baseUrl?: string;
-    integrationId?: string;
+    integrationId: string;
+    jwtToken: string;
 }): ConnectionDialogHookReturnType {
     const [dialogStep, setDialogStep] = useState<DialogStepType>('initial');
     const [integration, setIntegration] = useState<any>(null);
@@ -148,7 +147,7 @@ export default function useConnectDialog({
         try {
             const response = await fetch(url, {
                 headers: {
-                    Authorization: `Bearer ${JWT}`,
+                    Authorization: `Bearer ${jwtToken}`,
                     'x-environment': 'development',
                 },
             });
