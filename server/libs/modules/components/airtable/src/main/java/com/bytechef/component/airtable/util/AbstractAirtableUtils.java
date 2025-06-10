@@ -47,7 +47,7 @@ public abstract class AbstractAirtableUtils {
 
     public static List<Option<String>> getRecordIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
@@ -55,7 +55,7 @@ public abstract class AbstractAirtableUtils {
 
     public static List<ComponentDsl.ModifiableValueProperty<?, ?>> getFieldsProperties(
         Parameters inputParameters, Parameters connectionParameters,
-        Map<String, String> dependencyPaths, Context context) {
+        Map<String, String> lookupDependsOnPaths, Context context) {
 
         return List.of();
     }
