@@ -1421,7 +1421,7 @@ public class ComponentInitOpenApiGenerator {
         ApiResponses apiResponses = operation.getResponses();
         OutputEntry outputEntry = null;
 
-        for (String responseCode : List.of("200", "201", "default")) {
+        for (String responseCode : List.of("200", "201", "202", "default")) {
             apiResponse = apiResponses.get(responseCode);
 
             if (apiResponse != null) {
