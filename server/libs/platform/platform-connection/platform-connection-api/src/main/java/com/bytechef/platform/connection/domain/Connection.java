@@ -324,8 +324,8 @@ public final class Connection {
         private Builder() {
         }
 
-        public Builder authorizationType(AuthorizationType AuthorizationType) {
-            this.authorizationType = AuthorizationType;
+        public Builder authorizationType(AuthorizationType authorizationType) {
+            this.authorizationType = authorizationType;
 
             return this;
         }

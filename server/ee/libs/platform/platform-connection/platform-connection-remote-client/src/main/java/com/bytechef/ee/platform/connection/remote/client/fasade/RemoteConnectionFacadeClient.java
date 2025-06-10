@@ -1,3 +1,10 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
 package com.bytechef.ee.platform.connection.remote.client.fasade;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -5,9 +12,8 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * @version ee

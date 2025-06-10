@@ -15,10 +15,9 @@ import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.connection.domain.Connection;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 
 /**
