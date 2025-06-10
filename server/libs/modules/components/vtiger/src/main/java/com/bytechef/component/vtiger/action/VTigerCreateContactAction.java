@@ -61,12 +61,17 @@ public class VTigerCreateContactAction {
                     .properties(
                         object("result")
                             .properties(
-                                string(FIRSTNAME),
-                                string(LASTNAME),
-                                string(EMAIL),
-                                string("phone"),
+                                string(FIRSTNAME)
+                                    .description("First name of the contact."),
+                                string(LASTNAME)
+                                    .description("Last name of the contact."),
+                                string(EMAIL)
+                                    .description("Email address of the contact."),
+                                string("phone")
+                                    .description("Phone number of the contact."),
                                 string("assigned_user_id"),
-                                string("id")))))
+                                string("id")
+                                    .description("ID of the contact.")))))
         .perform(VTigerCreateContactAction::perform);
 
     private VTigerCreateContactAction() {

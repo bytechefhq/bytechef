@@ -65,13 +65,15 @@ public class NutshellCreateLeadAction {
                             .items(
                                 object()
                                     .properties(
-                                        string(ID),
-                                        string("type"),
-                                        string(NAME),
-                                        string(DESCRIPTION),
-                                        object(LINKS)
-                                            .properties(
-                                                string(OWNER)))))))
+                                        string(ID)
+                                            .description("ID of the lead"),
+                                        string("type")
+                                            .description("The type of this entity, e.g. 'contacts', 'leads'."),
+                                        string(NAME)
+                                            .description("The full name of the lead."),
+                                        string(DESCRIPTION)
+                                            .description(
+                                                "Description of the lead, which appears under their name."))))))
         .perform(NutshellCreateCompanyAction::perform);
 
     private NutshellCreateLeadAction() {

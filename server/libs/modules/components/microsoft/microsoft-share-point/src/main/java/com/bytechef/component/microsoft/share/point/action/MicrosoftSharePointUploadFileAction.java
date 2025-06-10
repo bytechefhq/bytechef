@@ -17,12 +17,15 @@
 package com.bytechef.component.microsoft.share.point.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FILE;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
@@ -61,7 +64,51 @@ public class MicrosoftSharePointUploadFileAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID))))
+                        dateTime("createdDateTime")
+                            .description("The date and time when the file was created."),
+                        string("eTag")
+                            .description("eTag for the entire item (metadata + content)."),
+                        string(ID)
+                            .description("ID of the file."),
+                        dateTime("lastModifiedDateTime")
+                            .description("The date and time when the file was last modified."),
+                        string(NAME)
+                            .description("Name of the file."),
+                        integer("size")
+                            .description("Size of the file in bytes."),
+                        string("webUrl")
+                            .description("URL to access the file in a web browser."),
+                        object("createdBy")
+                            .properties(
+                                object("user")
+                                    .properties(
+                                        string("email")
+                                            .description("Email of the user who created the file."),
+                                        string(ID)
+                                            .description("ID of the user who created the file."),
+                                        string("displayName")
+                                            .description("Display name of the user who created the file."))),
+                        object("lastModifiedBy")
+                            .properties(
+                                object("user")
+                                    .properties(
+                                        string("email")
+                                            .description("Email of the user who last modified the file."),
+                                        string(ID)
+                                            .description("ID of the user who last modified file."),
+                                        string("displayName")
+                                            .description("Display name of the user who last modified the file."))),
+                        object(FILE)
+                            .properties(
+                                object("hashes")
+                                    .description("Hashes of the file's binary content")
+                                    .properties(
+                                        string("quickXorHash")
+                                            .description(
+                                                "A proprietary hash of the file that can be used to determine if the " +
+                                                    "contents of the file change.")),
+                                string("mimeType")
+                                    .description("The MIME type for the file..")))))
         .perform(MicrosoftSharePointUploadFileAction::perform);
 
     private MicrosoftSharePointUploadFileAction() {
@@ -72,9 +119,8 @@ public class MicrosoftSharePointUploadFileAction {
 
         return context
             .http(http -> http.put(
-                "/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" + getFolderId(inputParameters)
-                    +
-                    ":/" + fileEntry.getName() + ":/content"))
+                "/sites/%s/drive/items/%s:/%s:/content".formatted(
+                    inputParameters.getRequiredString(SITE_ID), getFolderId(inputParameters), fileEntry.getName())))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(fileEntry))
             .execute()

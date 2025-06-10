@@ -17,9 +17,13 @@
 package com.bytechef.component.microsoft.share.point.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
@@ -60,20 +64,61 @@ public class MicrosoftSharePointCreateFolderAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string(NAME))))
+                        dateTime("createdDateTime")
+                            .description("The date and time when the folder was created."),
+                        string("eTag"),
+                        string(ID)
+                            .description("ID of the folder."),
+                        dateTime("lastModifiedDateTime")
+                            .description("The date and time when the folder was last modified."),
+                        string(NAME)
+                            .description("Name of the folder."),
+                        integer("size")
+                            .description("Size of the folder in bytes."),
+                        string("webUrl")
+                            .description("URL to access the folder in a web browser."),
+                        string("cTag"),
+                        object("commentSettings")
+                            .properties(
+                                object("commentingDisabled")
+                                    .description("Indicates whether commenting is disabled for the folder.")
+                                    .properties(
+                                        bool("isDisabled")
+                                            .description("Value indicating whether commenting is disabled."))),
+                        object("createdBy")
+                            .properties(
+                                object("user")
+                                    .properties(
+                                        string(ID)
+                                            .description("ID of the user who created the folder."),
+                                        string(DISPLAY_NAME)
+                                            .description("Display name of the user who created the folder."))),
+                        object("lastModifiedBy")
+                            .properties(
+                                object("user")
+                                    .properties(
+                                        string(ID)
+                                            .description("ID of the user who last modified the folder."),
+                                        string(DISPLAY_NAME)
+                                            .description("Display name of the user who last modified the folder."))),
+                        object("folder")
+                            .properties(
+                                integer("childCount")
+                                    .description("Number of items contained in the folder.")),
+                        object("shared")
+                            .properties(
+                                string("scope")
+                                    .description("The scope of the shared item.")))))
         .perform(MicrosoftSharePointCreateFolderAction::perform);
 
     private MicrosoftSharePointCreateFolderAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
         return context
             .http(http -> http.post(
-                "/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" + getFolderId(inputParameters)
-                    +
-                    "/children"))
+                "/sites/%s/drive/items/%s/children".formatted(
+                    inputParameters.getRequiredString(SITE_ID), getFolderId(inputParameters))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(

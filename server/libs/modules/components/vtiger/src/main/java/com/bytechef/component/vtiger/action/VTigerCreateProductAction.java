@@ -60,10 +60,13 @@ public class VTigerCreateProductAction {
                     .properties(
                         object("results")
                             .properties(
-                                string(PRODUCT_NAME),
-                                string(PRODUCT_TYPE),
+                                string(PRODUCT_NAME)
+                                    .description("Name of the product."),
+                                string(PRODUCT_TYPE)
+                                    .description("Type of the product."),
                                 string("assigned_user_id"),
-                                string("id")))))
+                                string("id")
+                                    .description("ID of the product.")))))
         .perform(VTigerCreateProductAction::perform);
 
     private VTigerCreateProductAction() {

@@ -17,12 +17,15 @@
 package com.bytechef.component.microsoft.share.point.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
 
@@ -52,12 +55,37 @@ public class MicrosoftSharePointCreateListAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID)
-                            .description("ID of the list."),
+                        dateTime("createdDateTime")
+                            .description("The date and time when the list was created."),
                         string(DESCRIPTION)
                             .description("Description of the list."),
+                        string("eTag"),
+                        string(ID)
+                            .description("ID of the list."),
+                        dateTime("lastModifiedDateTime")
+                            .description("The date and time when the list was last modified."),
+                        string(NAME)
+                            .description("Name of the list."),
+                        string("webUrl")
+                            .description("URL to access the list in a web browser."),
                         string(DISPLAY_NAME)
-                            .description("The displayable title of the list."))))
+                            .description("The displayable title of the list."),
+                        object("createdBy")
+                            .properties(
+                                object("user")
+                                    .properties(
+                                        string(ID)
+                                            .description("ID of the user who created the list."),
+                                        string(DISPLAY_NAME)
+                                            .description("Display name of the user who created the list."))),
+                        object("list")
+                            .properties(
+                                bool("contentTypesEnabled")
+                                    .description("Specifies whether content types are enabled for this list."),
+                                bool("hidden")
+                                    .description(
+                                        "Specifies whether this list is hidden in the SharePoint user interface."),
+                                string("template")))))
         .perform(MicrosoftSharePointCreateListAction::perform);
 
     private MicrosoftSharePointCreateListAction() {

@@ -17,13 +17,10 @@
 package com.bytechef.component.microsoft.one.drive.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
@@ -58,14 +55,7 @@ public class MicrosoftOneDriveNewFileTrigger {
                 .description("If no folder is specified, the root folder will be used.")
                 .options((TriggerOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
-        .output(
-            outputSchema(
-                array()
-                    .items(
-                        object()
-                            .properties(
-                                string(ID),
-                                string(NAME)))))
+        .output(outputSchema(FILE_OUTPUT_PROPERTY))
         .poll(MicrosoftOneDriveNewFileTrigger::poll);
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";

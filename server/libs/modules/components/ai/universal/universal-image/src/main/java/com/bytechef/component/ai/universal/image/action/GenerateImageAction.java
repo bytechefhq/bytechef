@@ -104,8 +104,10 @@ public class GenerateImageAction implements AiImageAction {
                     outputSchema(
                         object()
                             .properties(
-                                string("url"),
-                                string("b64Json")))),
+                                string("url")
+                                    .description("URL of the generated image."),
+                                string("b64Json")
+                                    .description("Base64 encoded JSON of the generated image.")))),
             provider, this, propertyService);
     }
 

@@ -52,7 +52,13 @@ public class BashExecuteAction {
                 .description("Script written in bash. Multiple commands are possible with the ';' separator.")
                 .placeholder("ls -la")
                 .required(true))
-        .output(outputSchema(string()), sampleOutput("Sample result"))
+        .output(
+            outputSchema(
+                string()
+                    .description(
+                        "The output of the executed bash commands, including any standard output or error messages " +
+                            "generated during execution.")),
+            sampleOutput("Sample result"))
         .perform(BashExecuteAction::perform);
 
     protected static String perform(

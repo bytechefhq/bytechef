@@ -96,7 +96,7 @@ public class OpenAiCreateSpeechAction {
                 .minValue(0.25)
                 .maxValue(4.0)
                 .required(false))
-        .output(outputSchema(fileEntry()))
+        .output(outputSchema(fileEntry().description("The generated audio file.")))
         .perform(OpenAiCreateSpeechAction::perform);
 
     private OpenAiCreateSpeechAction() {
