@@ -375,13 +375,13 @@ include("sdks:backend:java:workflow-api")
 
 // EE
 
-include("server:ee:apps:runtime-app")
 include("server:ee:apps:api-gateway-app")
 include("server:ee:apps:config-server-app")
 include("server:ee:apps:configuration-app")
 include("server:ee:apps:connection-app")
 include("server:ee:apps:coordinator-app")
 include("server:ee:apps:execution-app")
+include("server:ee:apps:runtime-job-app")
 include("server:ee:apps:scheduler-app")
 include("server:ee:apps:webhook-app")
 include("server:ee:apps:worker-app")
