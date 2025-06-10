@@ -230,6 +230,8 @@ public class SecurityConfiguration {
                 .permitAll()
                 .requestMatchers(mvc.pattern("/approvals/**"))
                 .permitAll()
+                .requestMatchers(mvc.pattern("/assets/**"))
+                .permitAll()
                 .requestMatchers(mvc.pattern("/callback"))
                 .permitAll()
                 .requestMatchers(mvc.pattern("/file-entries/**"))
