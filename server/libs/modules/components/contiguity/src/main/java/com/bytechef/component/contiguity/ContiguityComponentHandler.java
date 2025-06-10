@@ -22,7 +22,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinit
 import com.google.auto.service.AutoService;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Nikolina Špehar
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ContiguityComponentHandler extends AbstractContiguityComponentHandler {
@@ -31,6 +31,7 @@ public class ContiguityComponentHandler extends AbstractContiguityComponentHandl
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .icon("path:assets/contiguity.svg")
-            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
+            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
+            .customAction(true);
     }
 }
