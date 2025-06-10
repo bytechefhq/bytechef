@@ -18,6 +18,7 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,6 +40,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
+    @CrossOrigin
     public ResponseEntity<Void> createFrontendIntegrationInstance(
         Long id, EnvironmentModel xEnvironment,
         CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel) {
@@ -59,6 +61,18 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
+    @CrossOrigin
+    public ResponseEntity<Void> deleteFrontendIntegrationInstance(Long id) {
+        String externalUserId = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+
+        connectedUserIntegrationFacade.deleteIntegrationInstance(externalUserId, id);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     public ResponseEntity<Void> createIntegrationInstance(
         String externalUserId, Long id, EnvironmentModel xEnvironment,
         CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel) {
@@ -70,17 +84,6 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
             externalUserId, id, Objects.requireNonNull(connection)
                 .getParameters(),
             getEnvironment(xEnvironment));
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
-    public ResponseEntity<Void> deleteFrontendIntegrationInstance(Long id) {
-        String externalUserId = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
-
-        connectedUserIntegrationFacade.deleteIntegrationInstance(externalUserId, id);
 
         return ResponseEntity.noContent()
             .build();
