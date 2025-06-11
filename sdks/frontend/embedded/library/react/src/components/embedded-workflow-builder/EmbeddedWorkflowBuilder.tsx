@@ -5,7 +5,7 @@
  * This interface defines all the configuration options needed to initialize and render
  * the embedded workflow builder iframe.
  */
-interface WorkflowBuilderProps {
+interface EmbeddedWorkflowBuilderProps {
     /**
      * The base URL of the ByteChef application.
      * This URL is used to construct the iframe src attribute.
@@ -16,7 +16,9 @@ interface WorkflowBuilderProps {
     /**
      * Whether to allow the connection dialog to be shown in the workflow builder.
      * When true, users can create and manage connections directly in the workflow builder.
-     * When false, users can only use existing connections.
+     * When false, users can only use existing connections. Those existing connections can be
+     * either shared connections created inside ByteChef and defined by `sharedConnectionIds`
+     * or integration connections created via `ConnectDialog`.
      */
     connectionDialogAllowed: boolean
 
@@ -65,7 +67,7 @@ interface WorkflowBuilderProps {
  * @returns A React component that renders the embedded workflow builder
  */
 
-const EmbeddedWorkflowBuilder = ({baseUrl = 'http://127.0.0.1:5173', connectionDialogAllowed, environment = 'PRODUCTION', includeComponents, jwtToken, sharedConnectionIds, workflowReferenceCode}:WorkflowBuilderProps) => {
+const EmbeddedWorkflowBuilder = ({baseUrl = 'http://127.0.0.1:5173', connectionDialogAllowed, environment = 'PRODUCTION', includeComponents, jwtToken, sharedConnectionIds, workflowReferenceCode}:EmbeddedWorkflowBuilderProps) => {
     /**
      * Handles the iframe load event.
      *
