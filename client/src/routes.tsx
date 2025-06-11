@@ -30,6 +30,7 @@ import McpServers from '@/pages/automation/mcp-servers/McpServers';
 import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
 import Project from '@/pages/automation/project/Project';
 import Projects from '@/pages/automation/projects/Projects';
+import Tasks from '@/pages/automation/tasks/tasks';
 import WorkflowChat from '@/pages/automation/workflow-chat/WorkflowChat';
 import {WorkflowExecutions as AutomationWorkflowExecutions} from '@/pages/automation/workflow-executions/WorkflowExecutions';
 import Home from '@/pages/home/Home';
@@ -212,6 +213,10 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: <WorkflowChat />,
             path: 'chat/:environment/:workflowExecutionId',
+        },
+        {
+            element: <Tasks />,
+            path: 'tasks',
         },
         {
             children: [
