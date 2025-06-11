@@ -5,7 +5,18 @@ import useOAuth2 from './useOAuth2';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
 
-export type DialogStepType = 'initial' | 'form';
+export const DIALOG_STEPS = {
+    initial: 'Description',
+    workflows: 'Workflows',
+    form: 'Custom Data',
+} as const;
+
+export type DialogStepKeyType = keyof typeof DIALOG_STEPS;
+
+export interface DialogStepType {
+    key: DialogStepKeyType;
+    label: string;
+}
 
 interface ConnectionDialogHookReturnType {
     isOAuth2AuthorizationType: boolean;
@@ -13,21 +24,91 @@ interface ConnectionDialogHookReturnType {
     openDialog: () => void;
 }
 
+function createApiClient(baseUrl: string, jwtToken: string) {
+    const defaultHeaders = {
+        Authorization: `Bearer ${jwtToken}`,
+        'x-environment': 'development',
+        'Content-Type': 'application/json',
+    };
+
+    return {
+        async fetch<T>(
+            endpoint: string,
+            options: {
+                method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+                body?: any;
+                headers?: Record<string, string>;
+            } = {}
+        ): Promise<T> {
+            const {method = 'GET', body, headers = {}} = options;
+            const url = `${baseUrl}${endpoint}`;
+
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: {...defaultHeaders, ...headers},
+                    ...(body && {body: JSON.stringify(body)}),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Response status: ${response.status}`);
+                }
+
+                // Only try to parse JSON if we expect a response body
+                if (method === 'GET' || response.headers.get('content-length') !== '0') {
+                    return await response.json();
+                }
+
+                return {} as T;
+            } catch (error: any) {
+                console.error(`API Error (${endpoint}):`, error?.message);
+                throw error;
+            }
+        },
+    };
+}
+
+function debounce<T extends (...args: any[]) => any>(fn: T, delay: number): (...args: Parameters<T>) => void {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    return function (this: any, ...args: Parameters<T>) {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+
+        timeoutId = setTimeout(() => {
+            fn.apply(this, args);
+
+            timeoutId = null;
+        }, delay);
+    };
+}
+
+interface UseConnectDialogProps {
+    baseUrl?: string;
+    integrationId: string;
+    jwtToken: string;
+}
+
 export default function useConnectDialog({
     baseUrl = 'http://localhost:9555',
     integrationId,
     jwtToken,
-}: {
-    baseUrl?: string;
-    integrationId: string;
-    jwtToken: string;
-}): ConnectionDialogHookReturnType {
-    const [dialogStep, setDialogStep] = useState<DialogStepType>('initial');
+}: UseConnectDialogProps): ConnectionDialogHookReturnType {
+    const [dialogStep, setDialogStep] = useState<DialogStepKeyType>('initial');
     const [integration, setIntegration] = useState<any>(null);
     const [isOAuth2, setIsOAuth2] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const [formValues, setFormValues] = useState<Record<string, string>>({});
+    const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
+    const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([]);
 
+    const inputRefs = useRef<Record<string, HTMLInputElement>>({});
+    const portalContainerRef = useRef<HTMLElement | null>(null);
+    const rootRef = useRef<ReturnType<typeof createRoot> | null>(null);
     const formSubmitRef = useRef<((data: any) => void) | null>(null);
+
+    const {fetch} = useMemo(() => createApiClient(baseUrl, jwtToken), [baseUrl, jwtToken]);
 
     const registerFormSubmit = useCallback((submitFn: (data: any) => void) => {
         formSubmitRef.current = submitFn;
@@ -35,7 +116,24 @@ export default function useConnectDialog({
 
     const handleSubmit = useCallback(() => {
         if (formSubmitRef.current) {
-            formSubmitRef.current(saveConnection);
+            const submitFunction = formSubmitRef.current(saveConnection);
+
+            submitFunction();
+        }
+    }, []);
+
+    const handleWorkflowToggle = useCallback((workflowId: string, isSelected: boolean) => {
+        if (isSelected) {
+            setSelectedWorkflows((selectedWorkflows) => [...selectedWorkflows, workflowId]);
+
+            fetch(`/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowId}/enable`, {
+                method: 'POST',
+            });
+        } else {
+            fetch(`/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowId}/enable`, {
+                method: 'DELETE',
+            });
+            setSelectedWorkflows((selectedWorkflows) => selectedWorkflows.filter((id) => id !== workflowId));
         }
     }, []);
 
@@ -53,10 +151,6 @@ export default function useConnectDialog({
         scope: integration?.connectionConfig?.oauth2?.scopes?.join(' '),
     });
 
-    const [formValues, setFormValues] = useState<Record<string, string>>({});
-    const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
-
-    // Get validation rules based on properties
     const validationRules = useMemo(
         () => createValidationRules(integration?.connectionConfig?.inputs || []),
         [integration?.connectionConfig?.inputs]
@@ -66,24 +160,43 @@ export default function useConnectDialog({
         return {
             register: (name: string) => ({
                 name,
-                onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-                    setFormValues((prev) => ({...prev, [name]: e.target.value}));
+                defaultValue: formValues[name] || '',
+                ref: (element: HTMLInputElement) => {
+                    if (element) {
+                        inputRefs.current[name] = element;
+                    }
                 },
-                value: formValues[name] || '',
-                ref: () => null,
-            }),
-            handleSubmit: (callback: (data: any) => void) => (e?: React.FormEvent) => {
-                if (e) e.preventDefault();
+                onInput: (event: React.FormEvent<HTMLInputElement>) => {
+                    const value = event.currentTarget.value;
 
-                // Custom validation
-                const {isValid, errors, validatedData} = validateForm(formValues, validationRules);
+                    setFormValues((prev) => ({...prev, [name]: value}));
+                },
+            }),
+            handleSubmit: (callback: (data: any) => void) => (event?: React.FormEvent) => {
+                if (event) {
+                    event.preventDefault();
+                }
+
+                const currentValues = Object.entries(inputRefs.current).reduce(
+                    (acc, [name, ref]) => {
+                        acc[name] = ref.value;
+
+                        return acc;
+                    },
+                    {} as Record<string, string>
+                );
+
+                const {isValid, errors, validatedData} = validateForm(currentValues, validationRules);
 
                 if (isValid) {
                     setFormErrors({});
+
                     callback(validatedData);
+
                     return true;
                 } else {
                     setFormErrors(errors);
+
                     return false;
                 }
             },
@@ -91,19 +204,16 @@ export default function useConnectDialog({
                 errors: formErrors,
             },
         };
-    }, [validationRules, formValues, formErrors]);
+    }, [validationRules, formErrors]);
 
-    // Custom validation functions
-    function validateForm(data: Record<string, string>, rules: Record<string, ValidationRule>) {
+    function validateForm(data: Record<string, string>, rules: Record<string, ValidationRuleType>) {
         const errors: Record<string, {message: string}> = {};
         const validatedData: Record<string, string> = {};
 
-        // Check each field against its rules
         Object.keys(rules).forEach((fieldName) => {
             const rule = rules[fieldName];
             const value = data[fieldName] || '';
 
-            // Required validation
             if (rule.required && value.trim() === '') {
                 errors[fieldName] = {message: rule.requiredMessage || 'This field is required'};
             } else {
@@ -118,18 +228,17 @@ export default function useConnectDialog({
         };
     }
 
-    // Define validation rule type
-    interface ValidationRule {
+    interface ValidationRuleType {
         required: boolean;
         requiredMessage?: string;
     }
 
-    function createValidationRules(properties: any[]): Record<string, ValidationRule> {
+    function createValidationRules(properties: any[]): Record<string, ValidationRuleType> {
         if (!properties || properties.length === 0) {
             return {};
         }
 
-        const rules: Record<string, ValidationRule> = {};
+        const rules: Record<string, ValidationRuleType> = {};
 
         properties.forEach((prop) => {
             rules[prop.name] = {
@@ -141,38 +250,21 @@ export default function useConnectDialog({
         return rules;
     }
 
-    async function fetchIntegrationData() {
-        const url = `${baseUrl}/api/embedded/v1/integrations/${integrationId}`;
-
-        try {
-            const response = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${jwtToken}`,
-                    'x-environment': 'development',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
-            }
-
-            const integrationData = await response.json();
-
-            setIntegration(integrationData);
-        } catch (error: any) {
-            console.error(error?.message);
-        }
-    }
-
     async function saveConnection() {
-        console.log('saveConnection called');
+        await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
+            method: 'POST',
+            body: formValues,
+        });
 
         closeDialog();
     }
 
     const openDialog = async () => {
         setIsOpen(true);
-        await fetchIntegrationData();
+
+        const integrationData = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
+
+        setIntegration(integrationData);
     };
 
     const closeDialog = () => {
@@ -181,169 +273,156 @@ export default function useConnectDialog({
         setIsOpen(false);
     };
 
-    const handleContinue = () => {
-        if (isOAuth2) {
-            getAuth();
-        } else {
-            setDialogStep('form');
-        }
-    };
+    const getCurrentStep = useCallback((): DialogStepType => {
+        return {
+            key: dialogStep,
+            label: DIALOG_STEPS[dialogStep],
+        };
+    }, [dialogStep]);
 
-    // Store reference to portal container
-    const portalContainerRef = useRef<HTMLElement | null>(null);
+    const handleClick = useCallback(
+        (event: React.MouseEvent<HTMLButtonElement>) => {
+            if ((event.target as HTMLButtonElement).name === 'backButton') {
+                setDialogStep('workflows');
 
-    // Create a portal container for the dialog if it doesn't exist
-    useEffect(() => {
-        // This effect only creates the portal container once
-        // and doesn't depend on isOpen
-        let portalContainer = document.getElementById('connect-dialog-portal');
+                return;
+            }
 
-        if (!portalContainer) {
-            portalContainer = document.createElement('div');
-            portalContainer.id = 'connect-dialog-portal';
-            document.body.appendChild(portalContainer);
-            portalContainerRef.current = portalContainer;
-        } else {
-            portalContainerRef.current = portalContainer;
-        }
-
-        return () => {
-            // Clean up the portal container when the component unmounts
-            // Use requestAnimationFrame to defer DOM operations
-            requestAnimationFrame(() => {
-                if (portalContainerRef.current && portalContainerRef.current.parentNode) {
-                    portalContainerRef.current.parentNode.removeChild(portalContainerRef.current);
-                    portalContainerRef.current = null;
+            if (dialogStep === 'initial') {
+                setDialogStep('workflows');
+            } else if (dialogStep === 'workflows') {
+                if (isOAuth2) {
+                    getAuth();
+                } else {
+                    setDialogStep('form');
                 }
-            });
+            } else if (dialogStep === 'form') {
+                handleSubmit();
+            }
+        },
+        [dialogStep, isOAuth2, getAuth, handleSubmit]
+    );
+
+    const debouncedFetchesRef = useRef<Record<string, (...args: any[]) => void>>({});
+
+    const handleWorkflowInputChange = useCallback(
+        (workflowReferenceCode: string, inputName: string, value: string) => {
+            const matchingWorkflow = integration?.workflows?.find(
+                (workflow: any) => workflow.workflowReferenceCode === workflowReferenceCode
+            );
+
+            const matchingWorkflowInput = matchingWorkflow?.inputs?.find((input: any) => input.name === inputName);
+
+            const body = {
+                ...matchingWorkflow,
+                inputs: [
+                    ...matchingWorkflow.inputs.filter((input: any) => input.name !== inputName),
+                    {
+                        ...matchingWorkflowInput,
+                        value: value,
+                    },
+                ],
+            };
+
+            const debouncedFetchKey = `${workflowReferenceCode}_${inputName}`;
+
+            if (!debouncedFetchesRef.current[debouncedFetchKey]) {
+                debouncedFetchesRef.current[debouncedFetchKey] = debounce((payload) => {
+                    fetch(
+                        `/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowReferenceCode}`,
+                        {
+                            body: payload,
+                            method: 'PUT',
+                        }
+                    );
+                }, 500);
+            }
+
+            debouncedFetchesRef.current[debouncedFetchKey](body);
+        },
+        [fetch, integration?.workflows, integrationId]
+    );
+
+    // Create portal container only once
+    useEffect(() => {
+        let container = document.getElementById('connect-dialog-portal');
+
+        if (!container) {
+            container = document.createElement('div');
+
+            container.id = 'connect-dialog-portal';
+
+            document.body.appendChild(container);
+            portalContainerRef.current = container;
+        }
+
+        // Cleanup on unmount
+        return () => {
+            if (portalContainerRef.current) {
+                document.body.removeChild(portalContainerRef.current);
+            }
         };
     }, []);
 
-    // Store root reference to avoid synchronous unmounting during render
-    const rootRef = useRef<ReturnType<typeof createRoot> | null>(null);
-    const dialogElementRef = useRef<HTMLDivElement | null>(null);
-
-    // Render the dialog into the portal container
+    // Handle creation and updates
     useEffect(() => {
-        // Only proceed if the dialog should be open
+        // Clean up when closed
         if (!isOpen) {
-            // Clean up any existing dialog when isOpen is false
-            // Use requestAnimationFrame to defer unmounting until after the current render cycle
-            requestAnimationFrame(() => {
-                if (rootRef.current) {
-                    rootRef.current.unmount();
-                    rootRef.current = null;
-                }
+            if (rootRef.current) {
+                rootRef.current.unmount();
 
-                if (dialogElementRef.current && dialogElementRef.current.parentNode) {
-                    dialogElementRef.current.parentNode.removeChild(dialogElementRef.current);
-                    dialogElementRef.current = null;
-                }
-            });
+                rootRef.current = null;
+            }
             return;
         }
 
-        // Ensure the portal container exists
-        let portalContainer = document.getElementById('connect-dialog-portal');
-
-        if (!portalContainer) {
-            portalContainer = document.createElement('div');
-            portalContainer.id = 'connect-dialog-portal';
-            document.body.appendChild(portalContainer);
-            portalContainerRef.current = portalContainer;
+        // Create root if needed
+        if (!rootRef.current && portalContainerRef.current) {
+            rootRef.current = createRoot(portalContainerRef.current);
         }
 
-        // If we already have a dialog element and root, just update the component
-        if (rootRef.current && dialogElementRef.current) {
-            const dialogComponent = (
+        // Always render with current state
+        if (rootRef.current) {
+            const currentStep = getCurrentStep();
+
+            rootRef.current.render(
                 <ConnectDialog
                     closeDialog={closeDialog}
-                    dialogStep={dialogStep}
+                    dialogStep={dialogStep} // Keep this as just the key for now
+                    dialogStepLabel={currentStep.label} // Add the label
                     form={form}
-                    handleContinue={handleContinue}
-                    handleSubmit={handleSubmit}
+                    handleWorkflowToggle={handleWorkflowToggle}
+                    handleWorkflowInputChange={handleWorkflowInputChange}
+                    handleClick={handleClick}
                     integration={integration}
                     isOAuth2={isOAuth2}
                     isOpen={isOpen}
                     properties={integration?.connectionConfig?.inputs}
                     registerFormSubmit={registerFormSubmit}
+                    selectedWorkflows={selectedWorkflows}
                 />
             );
-            rootRef.current.render(dialogComponent);
-            return;
         }
-
-        // Create a new div element to render our dialog into
-        const dialogElement = document.createElement('div');
-        dialogElementRef.current = dialogElement;
-        portalContainer.appendChild(dialogElement);
-
-        // Create a dialog component to render
-        const dialogComponent = (
-            <ConnectDialog
-                closeDialog={closeDialog}
-                dialogStep={dialogStep}
-                form={form}
-                handleContinue={handleContinue}
-                handleSubmit={handleSubmit}
-                integration={integration}
-                isOAuth2={isOAuth2}
-                isOpen={isOpen}
-                properties={integration?.connectionConfig?.inputs}
-                registerFormSubmit={registerFormSubmit}
-            />
-        );
-
-        // Use createRoot to render the component (React 18+)
-        const root = createRoot(dialogElement);
-        rootRef.current = root;
-        root.render(dialogComponent);
-
-        // Clean up when the component unmounts
-        return () => {
-            // Use requestAnimationFrame to defer unmounting until after the current render cycle
-            requestAnimationFrame(() => {
-                if (rootRef.current) {
-                    rootRef.current.unmount();
-                    rootRef.current = null;
-                }
-
-                if (dialogElementRef.current && dialogElementRef.current.parentNode) {
-                    dialogElementRef.current.parentNode.removeChild(dialogElementRef.current);
-                    dialogElementRef.current = null;
-                }
-            });
-        };
-    }, [isOpen]);
+    }, [
+        isOpen,
+        dialogStep,
+        form,
+        formValues,
+        handleClick,
+        integration,
+        isOAuth2,
+        registerFormSubmit,
+        handleWorkflowToggle,
+        selectedWorkflows,
+        getCurrentStep,
+        handleWorkflowInputChange,
+    ]);
 
     useEffect(() => {
         if (integration?.connectionConfig?.authorizationType.startsWith('OAUTH2')) {
             setIsOAuth2(true);
         }
     }, [integration?.connectionConfig?.authorizationType]);
-
-    // Update the dialog component when props change, but only if it's already open
-    useEffect(() => {
-        if (!isOpen || !rootRef.current || !dialogElementRef.current) {
-            return;
-        }
-
-        const dialogComponent = (
-            <ConnectDialog
-                closeDialog={closeDialog}
-                dialogStep={dialogStep}
-                form={form}
-                handleContinue={handleContinue}
-                handleSubmit={handleSubmit}
-                integration={integration}
-                isOAuth2={isOAuth2}
-                isOpen={isOpen}
-                properties={integration?.connectionConfig?.inputs}
-                registerFormSubmit={registerFormSubmit}
-            />
-        );
-        rootRef.current.render(dialogComponent);
-    }, [dialogStep, form, handleContinue, handleSubmit, integration, isOAuth2, registerFormSubmit, isOpen]);
 
     return {
         isOAuth2AuthorizationType,
