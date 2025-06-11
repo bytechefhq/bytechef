@@ -1,72 +1,70 @@
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import Logo from './assets/logo.svg';
-import {DialogStepType} from '.';
-// import styles from './styles.module.css';
-// import clsx from 'clsx';
+import XIcon from './assets/x.svg';
+import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
+import {DialogStepKeyType, DialogStepKeyType} from '.';
+import styles from './styles.module.css';
 
-// Inline SVG icons to replace lucide-react
-const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        {...props}
-    >
-        <path d="M18 6 6 18" />
-        <path d="m6 6 12 12" />
-    </svg>
-);
+const Toggle = ({
+    id,
+    pressed,
+    onPressedChange,
+}: {
+    id: string;
+    pressed: boolean;
+    onPressedChange: (pressed: boolean) => void;
+}) => (
+    <>
+        <input
+            className={styles.toggleCheckbox}
+            id={`react-switch-${id}`}
+            type="checkbox"
+            checked={pressed}
+            onChange={(event) => onPressedChange(event.target.checked)}
+        />
 
-const SquareArrowOutUpRightIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        {...props}
-    >
-        <path d="M14 10V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4" />
-        <path d="M16 18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-        <path d="m21 3-9 9" />
-        <path d="M15 3h6v6" />
-    </svg>
+        <label
+            className={styles.toggleLabel}
+            htmlFor={`react-switch-${id}`}
+            style={{
+                backgroundColor: pressed ? '#1071e5' : '#e2e8f0',
+            }}
+        >
+            <span className={styles.toggleButton} />
+        </label>
+    </>
 );
 
 interface DialogProps {
     closeDialog: () => void;
-    dialogStep: DialogStepType;
+    dialogStepKey: DialogStepKeyType; // Use the key type
+    dialogStepLabel: string; // Add label
     form?: any;
-    handleContinue: () => void;
-    handleSubmit: () => void;
+    handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
+    handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
     integration: any;
     isOAuth2?: boolean;
     isOpen: boolean;
     properties?: any[];
     registerFormSubmit?: (submitFn: (data: any) => void) => void;
+    selectedWorkflows: string[];
 }
 
 const ConnectDialog = ({
     closeDialog,
-    dialogStep,
+    dialogStepKey,
+    dialogStepLabel,
     form,
-    handleContinue,
-    handleSubmit,
+    handleClick,
+    handleWorkflowToggle,
+    handleWorkflowInputChange,
     integration,
     isOAuth2 = false,
     isOpen,
     properties,
     registerFormSubmit,
+    selectedWorkflows,
 }: DialogProps) => {
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -89,53 +87,27 @@ const ConnectDialog = ({
     }
 
     return (
-        <div
-            data-testid="dialog-overlay"
-            style={{
-                position: 'fixed',
-                inset: 0,
-                zIndex: 50,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            }}
-            onClick={closeDialog}
-        >
-            <div
-                style={{
-                    position: 'fixed',
-                    left: '50%',
-                    top: '50%',
-                    zIndex: 50,
-                    display: 'grid',
-                    width: '100%',
-                    maxWidth: '32rem', // max-w-lg
-                    transform: 'translate(-50%, -50%)',
-                    gap: '2rem', // gap-8
-                    border: '1px solid #e5e7eb', // border
-                    backgroundColor: '#fff', // bg-background
-                    padding: '1.5rem', // p-6
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)', // shadow-lg
-                    transitionDuration: '200ms', // duration-200
-                    borderRadius: '0.5rem', // sm:rounded-lg
-                }}
-                onClick={(event) => event.stopPropagation()}
-            >
-                <DialogHeader closeDialog={closeDialog} integration={integration} />
+        <div className={styles.dialogOverlay} data-testid="dialog-overlay" onClick={closeDialog}>
+            <div className={styles.dialogContainer} onClick={(event) => event.stopPropagation()}>
+                <DialogHeader closeDialog={closeDialog} dialogStepLabel={dialogStepLabel} integration={integration} />
 
                 <DialogContent
                     closeDialog={closeDialog}
-                    dialogStep={dialogStep}
+                    dialogStepKey={dialogStepKey}
                     form={form}
+                    handleWorkflowToggle={handleWorkflowToggle}
+                    handleWorkflowInputChange={handleWorkflowInputChange}
                     integration={integration}
                     properties={properties}
                     registerFormSubmit={registerFormSubmit}
+                    selectedWorkflows={selectedWorkflows}
                 />
 
                 {integration && (
                     <DialogFooter
                         closeDialog={closeDialog}
-                        dialogStep={dialogStep}
-                        handleContinue={handleContinue}
-                        handleSubmit={dialogStep === 'form' ? handleSubmit : undefined}
+                        dialogStepKey={dialogStepKey}
+                        handleClick={handleClick}
                         isOAuth2={isOAuth2}
                     />
                 )}
@@ -146,151 +118,128 @@ const ConnectDialog = ({
     );
 };
 
-const DialogHeader = ({closeDialog, integration}: {closeDialog: () => void; integration: any}) => {
-    // For handling hover state on close button
-    const [isCloseHovered, setIsCloseHovered] = React.useState(false);
+const DialogHeader = ({
+    closeDialog,
+    dialogStepLabel,
+    integration,
+}: {
+    closeDialog: () => void;
+    dialogStepLabel: string;
+    integration: any;
+}) => (
+    <header className={styles.dialogHeader}>
+        <div>
+            {integration && integration.icon && (
+                <div className={styles.integrationIcon} dangerouslySetInnerHTML={{__html: integration.icon}} />
+            )}
 
-    return (
-        <header
-            style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-            }}
-        >
-            <div
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                }}
-            >
-                {integration && integration.icon && (
-                    <div style={{display: 'flex'}} dangerouslySetInnerHTML={{__html: integration.icon}} />
+            <h2>Create Connection | {dialogStepLabel}</h2>
+        </div>
+
+        <div>
+            <button aria-label="Close Dialog" className={styles.closeButton} onClick={closeDialog}>
+                <img src={XIcon} />
+            </button>
+        </div>
+    </header>
+);
+
+interface DialogWorkflowsContainerProps {
+    handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
+    handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
+    selectedWorkflows: string[];
+    workflows: any[];
+}
+
+const DialogWorkflowsContainer = ({
+    handleWorkflowToggle,
+    handleWorkflowInputChange,
+    selectedWorkflows,
+    workflows,
+}: DialogWorkflowsContainerProps) => (
+    <ul className={styles.workflowsList}>
+        {workflows.map((workflow: any) => (
+            <li key={workflow.workflowReferenceCode}>
+                <div>
+                    <span>{workflow.label}</span>
+
+                    <Toggle
+                        id={workflow.workflowReferenceCode}
+                        pressed={selectedWorkflows.includes(workflow.workflowReferenceCode)}
+                        onPressedChange={(pressed) => handleWorkflowToggle(workflow.workflowReferenceCode, pressed)}
+                    />
+                </div>
+
+                {selectedWorkflows.includes(workflow.workflowReferenceCode) && (
+                    <div className={styles.workflowInputsContainer}>
+                        <span>INPUTS</span>
+
+                        {workflow.inputs.length === 0 ? (
+                            <p className={styles.noInputsMessage}>No inputs required for this workflow.</p>
+                        ) : (
+                            <ul>
+                                {workflow.inputs.map((input: any) => (
+                                    <li key={input.name}>
+                                        <DialogInputField
+                                            onChange={(event) =>
+                                                handleWorkflowInputChange(
+                                                    workflow.workflowReferenceCode,
+                                                    input.name,
+                                                    event.target.value
+                                                )
+                                            }
+                                            label={input.label}
+                                            name={input.name}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 )}
-
-                <h2
-                    style={{
-                        whiteSpace: 'nowrap',
-                        fontSize: '1.125rem', // text-lg
-                        fontWeight: 600, // font-semibold
-                    }}
-                >
-                    Create Connection
-                </h2>
-            </div>
-
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                }}
-            >
-                <button
-                    style={{
-                        borderRadius: '0.375rem', // rounded-md
-                        padding: '0.5rem', // p-2
-                        transition: 'all 0.2s',
-                        backgroundColor: isCloseHovered ? '#f1f5f9' : 'transparent',
-                    }}
-                    onClick={closeDialog}
-                    onMouseEnter={() => setIsCloseHovered(true)}
-                    onMouseLeave={() => setIsCloseHovered(false)}
-                >
-                    <XIcon
-                        style={{
-                            width: '1rem',
-                            height: '1rem',
-                        }}
-                    />{' '}
-                    {/* size-4 */}
-                    <span
-                        style={{
-                            position: 'absolute',
-                            width: '1px',
-                            height: '1px',
-                            padding: 0,
-                            margin: '-1px',
-                            overflow: 'hidden',
-                            clip: 'rect(0, 0, 0, 0)',
-                            whiteSpace: 'nowrap',
-                            borderWidth: 0,
-                        }}
-                    >
-                        Close
-                    </span>
-                </button>
-            </div>
-        </header>
-    );
-};
+            </li>
+        ))}
+    </ul>
+);
 
 interface DialogContentProps {
     closeDialog: () => void;
-    dialogStep: DialogStepType;
-    form: any;
+    dialogStepKey: DialogStepKeyType;
+    form?: any;
+    handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
+    handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
     integration: any;
     properties?: any[];
     registerFormSubmit?: (submitFn: (data: any) => void) => void;
+    selectedWorkflows: string[];
 }
 
 const DialogContent = ({
     closeDialog,
-    dialogStep = 'initial',
+    dialogStepKey = 'initial',
     form,
+    handleWorkflowToggle,
+    handleWorkflowInputChange,
     integration,
     properties,
     registerFormSubmit,
+    selectedWorkflows,
 }: DialogContentProps) => {
     // Register the form's submit handler when the component mounts
     useEffect(() => {
-        if (registerFormSubmit) {
+        if (registerFormSubmit && form) {
             registerFormSubmit(form.handleSubmit);
         }
-    }, [registerFormSubmit, form.handleSubmit]);
+    }, [registerFormSubmit, form.handleSubmit, form]);
 
     if (!integration) {
         return (
-            <main style={{textAlign: 'center'}}>
-                <h2
-                    style={{
-                        fontSize: '1.125rem', // text-lg
-                        fontWeight: 600, // font-semibold
-                    }}
-                >
-                    Unable to Load Integration
-                </h2>
+            <main className={styles.dialogContent}>
+                <h2>Unable to Load Integration</h2>
 
-                <p
-                    style={{
-                        marginTop: '0.5rem', // mt-2
-                        color: '#6b7280', // text-muted-foreground (using a gray color)
-                    }}
-                >
-                    We couldn't load the integration data. Please try again later.
-                </p>
+                <p>We couldn't load the integration data. Please try again later.</p>
 
-                <button
-                    onClick={closeDialog}
-                    style={{
-                        marginTop: '1rem', // mt-4
-                        display: 'inline-flex',
-                        height: '2.5rem', // h-10
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '0.375rem', // rounded-md
-                        border: '1px solid #e5e7eb', // border border-input
-                        backgroundColor: '#fff', // bg-background
-                        paddingLeft: '1rem', // px-4
-                        paddingRight: '1rem',
-                        paddingTop: '0.5rem', // py-2
-                        paddingBottom: '0.5rem',
-                        fontSize: '0.875rem', // text-sm
-                        fontWeight: 500, // font-medium
-                        transitionProperty: 'color, background-color, border-color',
-                        transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                        transitionDuration: '150ms',
-                    }}
-                >
+                <button className={styles.buttonSecondary} onClick={closeDialog}>
                     Close
                 </button>
             </main>
@@ -298,34 +247,22 @@ const DialogContent = ({
     }
 
     return (
-        <main
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem', // gap-4
-                textAlign: 'left', // sm:text-left
-                fontSize: '0.875rem', // text-sm
-            }}
-        >
-            {dialogStep === 'initial' && <p style={{color: '#6b7280'}}>{integration.description}</p>}
+        <main className={styles.dialogContent}>
+            {dialogStepKey === 'initial' && <p>{integration.description}</p>}
 
-            {dialogStep === 'form' && (
-                <form
-                    id="form"
-                    onSubmit={form.handleSubmit((data: any) => console.log(data))}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '1rem', // gap-4
-                        fontSize: '0.875rem', // text-sm
-                    }}
-                >
+            {dialogStepKey === 'workflows' && !!integration.workflows?.length && (
+                <DialogWorkflowsContainer
+                    handleWorkflowToggle={handleWorkflowToggle}
+                    handleWorkflowInputChange={handleWorkflowInputChange}
+                    selectedWorkflows={selectedWorkflows}
+                    workflows={integration.workflows}
+                />
+            )}
+
+            {dialogStepKey === 'form' && (
+                <form id="form" onSubmit={form.handleSubmit((data: any) => console.log(data))}>
                     {properties?.map((property) => {
-                        const field = form.register(property.name, {
-                            required: property.required,
-                            value: property.defaultValue || '',
-                            validate: property.validate,
-                        });
+                        const field = form.register(property.name);
 
                         const error = form.formState.errors[property.name];
 
@@ -350,280 +287,103 @@ const DialogContent = ({
 
 interface DialogFooterProps {
     closeDialog: () => void;
-    dialogStep: DialogStepType;
-    handleContinue?: () => void;
-    handleSubmit?: () => void;
+    dialogStepKey: DialogStepKeyType;
+    handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     isOAuth2?: boolean;
 }
 
-const DialogFooter = ({
-    closeDialog,
-    handleContinue,
-    handleSubmit,
-    dialogStep = 'initial',
-    isOAuth2 = false,
-}: DialogFooterProps) => {
-    const [isCancelHovered, setIsCancelHovered] = React.useState(false);
-    const [isSubmitHovered, setIsSubmitHovered] = React.useState(false);
-
-    // TODO does not work, styles from styles.module.css are not applied
-    // const buttonConnect = clsx(styles.buttonConnect, {
-    //     backgroundColor: isCancelHovered ? '#f3f4f6' : '#fff', // hover:bg-accent, bg-background
-    // });
-
-    return (
-        <footer
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                gap: '0.5rem', // gap-2
-            }}
-        >
-            <button
-                type="button"
-                style={{
-                    display: 'inline-flex',
-                    height: '2.5rem', // h-10
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '0.375rem', // rounded-md
-                    border: '1px solid #e5e7eb', // border border-input
-                    backgroundColor: isCancelHovered ? '#f3f4f6' : '#fff', // hover:bg-accent, bg-background
-                    paddingLeft: '1rem', // px-4
-                    paddingRight: '1rem',
-                    paddingTop: '0.5rem', // py-2
-                    paddingBottom: '0.5rem',
-                    fontSize: '0.875rem', // text-sm
-                    fontWeight: 500, // font-medium
-                    color: isCancelHovered ? '#111827' : 'inherit', // hover:text-accent-foreground
-                    transitionProperty: 'color, background-color, border-color',
-                    transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                    transitionDuration: '150ms',
-                    outline: 'none', // focus-visible:outline-none
-                    cursor: 'pointer',
-                }}
-                onClick={closeDialog}
-                onMouseEnter={() => setIsCancelHovered(true)}
-                onMouseLeave={() => setIsCancelHovered(false)}
-            >
-                Cancel
+const DialogFooter = ({closeDialog, handleClick, dialogStepKey = 'initial', isOAuth2 = false}: DialogFooterProps) => (
+    <footer className={styles.dialogFooter}>
+        {dialogStepKey === 'form' && (
+            <button name="backButton" onClick={handleClick} className={styles.backButton}>
+                Back
             </button>
+        )}
 
-            <button
-                autoFocus
-                onClick={dialogStep === 'initial' ? handleContinue : handleSubmit}
-                // className={buttonConnect}
-                style={{
-                    display: 'inline-flex',
-                    height: '2.5rem',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '0.375rem',
-                    paddingLeft: '1rem',
-                    paddingRight: '1rem',
-                    paddingTop: '0.5rem',
-                    paddingBottom: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    color: '#fff',
-                    transitionProperty: 'color, background-color, border-color',
-                    transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                    transitionDuration: '150ms',
-                    outline: 'none',
-                    cursor: 'pointer',
-                    backgroundColor: isSubmitHovered ? 'rgba(0, 112, 243, 0.9)' : 'rgb(0, 112, 243)',
-                }}
-                type={dialogStep === 'form' ? 'submit' : 'button'}
-                form="form"
-                onMouseEnter={() => setIsSubmitHovered(true)}
-                onMouseLeave={() => setIsSubmitHovered(false)}
-            >
-                {dialogStep === 'initial' && isOAuth2 && (
-                    <span
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem', // gap-2
-                        }}
-                    >
-                        Authorize
-                        <SquareArrowOutUpRightIcon style={{width: '1rem', height: '1rem'}} /> {/* size-4 */}
-                    </span>
-                )}
+        <button type="button" className={styles.buttonSecondary} onClick={closeDialog}>
+            Cancel
+        </button>
 
-                {dialogStep === 'initial' && !isOAuth2 && 'Continue'}
-
-                {dialogStep !== 'initial' && 'Connect'}
-            </button>
-        </footer>
-    );
-};
-
-const DialogPoweredBy = () => {
-    // For handling hover state on link
-    const [isLinkHovered, setIsLinkHovered] = React.useState(false);
-
-    return (
-        <div
-            style={{
-                position: 'absolute',
-                bottom: '-2rem', // -bottom-8
-                right: '50%',
-                display: 'flex',
-                transform: 'translateX(50%)', // translate-x-[50%]
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}
+        <button
+            autoFocus
+            onClick={handleClick}
+            className={styles.buttonPrimary}
+            type={dialogStepKey === 'form' ? 'submit' : 'button'}
+            form="form"
         >
-            <img
-                src={Logo}
-                alt="ByteChef Logo"
-                style={{
-                    marginRight: '0.5rem', // mr-2
-                    width: '1rem', // size-4
-                    height: '1rem',
-                }}
-            />
+            {dialogStepKey === 'workflows' && isOAuth2 && (
+                <span>
+                    Authorize
+                    <img data-testid="authorize-icon" src={SquareArrowOutUpRightIcon} />
+                </span>
+            )}
 
-            <span
-                style={{
-                    fontSize: '0.875rem', // text-sm
-                    color: 'white', // text-white
-                }}
-            >
-                Powered by
-                <a
-                    style={{
-                        paddingLeft: '0.25rem', // pl-1
-                        fontWeight: 600, // font-semibold
-                        textDecoration: isLinkHovered ? 'underline' : 'none', // hover:underline
-                    }}
-                    href="https://bytechef.io"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onMouseEnter={() => setIsLinkHovered(true)}
-                    onMouseLeave={() => setIsLinkHovered(false)}
-                >
-                    ByteChef
-                </a>
-            </span>
-        </div>
-    );
-};
+            {dialogStepKey === 'initial' && 'Continue'}
+
+            {dialogStepKey === 'form' && !isOAuth2 && 'Connect'}
+
+            {dialogStepKey === 'workflows' && !isOAuth2 && 'Continue'}
+        </button>
+    </footer>
+);
+
+const DialogPoweredBy = () => (
+    <div className={styles.poweredByContainer}>
+        <img src={Logo} alt="ByteChef Logo" />
+
+        <span>
+            Powered by
+            <a href="https://bytechef.io" target="_blank" rel="noopener noreferrer">
+                ByteChef
+            </a>
+        </span>
+    </div>
+);
 
 interface DialogInputFieldsetProps {
     label: string;
     name: string;
     placeholder?: string;
     options?: string[];
+    onChange?: (value: string) => void;
     required?: boolean;
     field?: any;
     error?: any;
 }
 
-const DialogInputField = ({label, name, options, placeholder, required, field, error}: DialogInputFieldsetProps) => {
-    // For handling focus states
-    const [isFocused, setIsFocused] = React.useState(false);
+const DialogInputField = ({
+    label,
+    name,
+    options,
+    placeholder,
+    required,
+    field,
+    error,
+    onChange,
+}: DialogInputFieldsetProps) => (
+    <fieldset className={styles.dialogInputField}>
+        <label htmlFor={name}>
+            {label}
 
-    return (
-        <fieldset style={{marginBottom: '0.5rem'}}>
-            <div style={{marginBottom: '0.5rem'}}>
-                <label
-                    htmlFor={name}
-                    style={{
-                        fontSize: '0.875rem', // text-sm
-                        fontWeight: 500, // font-medium
-                    }}
-                >
-                    {label}
+            {required && <span className={styles.requiredIndicator}>*</span>}
+        </label>
 
-                    {required && (
-                        <span
-                            style={{
-                                marginLeft: '0.125rem', // ml-0.5
-                                lineHeight: '0.75rem', // leading-3
-                                color: '#ef4444', // text-red-500
-                            }}
-                        >
-                            *
-                        </span>
-                    )}
-                </label>
-            </div>
+        {options ? (
+            <select id={name} {...field}>
+                <option value="">Select {label}</option>
 
-            {options ? (
-                <select
-                    id={name}
-                    style={{
-                        display: 'flex',
-                        height: '2.5rem', // h-10
-                        width: '100%', // w-full
-                        borderRadius: '0.375rem', // rounded-md
-                        border: '1px solid #e5e7eb', // border border-input
-                        backgroundColor: 'transparent', // bg-transparent
-                        paddingLeft: '0.75rem', // px-3
-                        paddingRight: '0.75rem',
-                        paddingTop: '0.5rem', // py-2
-                        paddingBottom: '0.5rem',
-                        fontSize: '0.875rem', // text-sm
-                        outline: isFocused ? 'none' : undefined, // focus-visible:outline-none
-                        boxShadow: isFocused ? '0 0 0 2px #fff, 0 0 0 4px rgb(0, 112, 243)' : undefined, // focus-visible:ring-2 focus-visible:ring-bytechef
-                        cursor: field?.disabled ? 'not-allowed' : 'default', // disabled:cursor-not-allowed
-                        opacity: field?.disabled ? 0.5 : 1, // disabled:opacity-50
-                    }}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    {...field}
-                >
-                    <option value="">Select {label}</option>
+                {options.map((option) => (
+                    <option key={option} value={option}>
+                        {option}
+                    </option>
+                ))}
+            </select>
+        ) : (
+            <input id={name} {...field} onChange={onChange} placeholder={placeholder} />
+        )}
 
-                    {options.map((option) => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </select>
-            ) : (
-                <input
-                    id={name}
-                    style={{
-                        display: 'flex',
-                        height: '2.5rem', // h-10
-                        width: '100%', // w-full
-                        borderRadius: '0.375rem', // rounded-md
-                        border: '1px solid #e5e7eb', // border border-input
-                        backgroundColor: 'transparent', // bg-transparent
-                        paddingLeft: '0.75rem', // px-3
-                        paddingRight: '0.75rem',
-                        paddingTop: '0.5rem', // py-2
-                        paddingBottom: '0.5rem',
-                        fontSize: '0.875rem', // text-sm
-                        outline: isFocused ? 'none' : undefined, // focus-visible:outline-none
-                        boxShadow: isFocused ? '0 0 0 2px #fff, 0 0 0 4px rgb(0, 112, 243)' : undefined, // focus-visible:ring-2 focus-visible:ring-bytechef
-                        cursor: field?.disabled ? 'not-allowed' : 'text', // disabled:cursor-not-allowed
-                        opacity: field?.disabled ? 0.5 : 1, // disabled:opacity-50
-                    }}
-                    placeholder={placeholder}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    {...field}
-                />
-            )}
-
-            {error && (
-                <p
-                    style={{
-                        marginTop: '0.25rem', // mt-1
-                        fontSize: '0.75rem', // text-xs
-                        color: '#ef4444', // text-red-500
-                    }}
-                >
-                    {error.message}
-                </p>
-            )}
-        </fieldset>
-    );
-};
+        {error && <span className={styles.inputError}>{error.message}</span>}
+    </fieldset>
+);
 
 export default ConnectDialog;
