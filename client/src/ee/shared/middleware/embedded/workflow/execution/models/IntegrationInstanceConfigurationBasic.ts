@@ -20,6 +20,13 @@ import {
     EnvironmentToJSON,
     EnvironmentToJSONTyped,
 } from './Environment';
+import type { AuthorizationType } from './AuthorizationType';
+import {
+    AuthorizationTypeFromJSON,
+    AuthorizationTypeFromJSONTyped,
+    AuthorizationTypeToJSON,
+    AuthorizationTypeToJSONTyped,
+} from './AuthorizationType';
 
 /**
  * Contains configurations and connections required for the execution of integration workflows.
@@ -93,6 +100,12 @@ export interface IntegrationInstanceConfigurationBasic {
      * @memberof IntegrationInstanceConfigurationBasic
      */
     name: string;
+    /**
+     * 
+     * @type {AuthorizationType}
+     * @memberof IntegrationInstanceConfigurationBasic
+     */
+    authorizationType?: AuthorizationType;
 }
 
 
@@ -126,6 +139,7 @@ export function IntegrationInstanceConfigurationBasicFromJSONTyped(json: any, ig
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
+        'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
     };
 }
 
@@ -146,6 +160,7 @@ export function IntegrationInstanceConfigurationBasicToJSONTyped(value?: Omit<In
         'integrationId': value['integrationId'],
         'integrationVersion': value['integrationVersion'],
         'name': value['name'],
+        'authorizationType': AuthorizationTypeToJSON(value['authorizationType']),
     };
 }
 

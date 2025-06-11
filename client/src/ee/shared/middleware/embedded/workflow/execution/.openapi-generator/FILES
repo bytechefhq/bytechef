@@ -1,6 +1,7 @@
 apis/WorkflowExecutionApi.ts
 apis/index.ts
 index.ts
+models/AuthorizationType.ts
 models/ComponentConnection.ts
 models/Environment.ts
 models/ExecutionError.ts

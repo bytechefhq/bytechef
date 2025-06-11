@@ -43,12 +43,6 @@ export interface UpdateWorkflowNodeParameterRequest {
      * @memberof UpdateWorkflowNodeParameterRequest
      */
     value?: object;
-    /**
-     * The workflow node name.
-     * @type {string}
-     * @memberof UpdateWorkflowNodeParameterRequest
-     */
-    workflowNodeName: string;
 }
 
 /**
@@ -57,7 +51,6 @@ export interface UpdateWorkflowNodeParameterRequest {
 export function instanceOfUpdateWorkflowNodeParameterRequest(value: object): value is UpdateWorkflowNodeParameterRequest {
     if (!('path' in value) || value['path'] === undefined) return false;
     if (!('type' in value) || value['type'] === undefined) return false;
-    if (!('workflowNodeName' in value) || value['workflowNodeName'] === undefined) return false;
     return true;
 }
 
@@ -75,7 +68,6 @@ export function UpdateWorkflowNodeParameterRequestFromJSONTyped(json: any, ignor
         'path': json['path'],
         'type': json['type'],
         'value': json['value'] == null ? undefined : json['value'],
-        'workflowNodeName': json['workflowNodeName'],
     };
 }
 
@@ -94,7 +86,6 @@ export function UpdateWorkflowNodeParameterRequestToJSONTyped(value?: UpdateWork
         'path': value['path'],
         'type': value['type'],
         'value': value['value'],
-        'workflowNodeName': value['workflowNodeName'],
     };
 }
 

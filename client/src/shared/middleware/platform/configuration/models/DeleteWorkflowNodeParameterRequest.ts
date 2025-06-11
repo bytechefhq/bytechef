@@ -25,12 +25,6 @@ export interface DeleteWorkflowNodeParameterRequest {
      * @memberof DeleteWorkflowNodeParameterRequest
      */
     path: string;
-    /**
-     * The workflow node name.
-     * @type {string}
-     * @memberof DeleteWorkflowNodeParameterRequest
-     */
-    workflowNodeName: string;
 }
 
 /**
@@ -38,7 +32,6 @@ export interface DeleteWorkflowNodeParameterRequest {
  */
 export function instanceOfDeleteWorkflowNodeParameterRequest(value: object): value is DeleteWorkflowNodeParameterRequest {
     if (!('path' in value) || value['path'] === undefined) return false;
-    if (!('workflowNodeName' in value) || value['workflowNodeName'] === undefined) return false;
     return true;
 }
 
@@ -53,7 +46,6 @@ export function DeleteWorkflowNodeParameterRequestFromJSONTyped(json: any, ignor
     return {
         
         'path': json['path'],
-        'workflowNodeName': json['workflowNodeName'],
     };
 }
 
@@ -69,7 +61,6 @@ export function DeleteWorkflowNodeParameterRequestToJSONTyped(value?: DeleteWork
     return {
         
         'path': value['path'],
-        'workflowNodeName': value['workflowNodeName'],
     };
 }
 

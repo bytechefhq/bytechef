@@ -22,6 +22,13 @@ import {
     WorkflowNodeOutputToJSON,
 } from '../models/index';
 
+export interface GetClusterElementOutputRequest {
+    id: string;
+    workflowNodeName: string;
+    clusterElementType: string;
+    clusterElementName: string;
+}
+
 export interface GetPreviousWorkflowNodeOutputsRequest {
     id: string;
     lastWorkflowNodeName?: string;
@@ -36,6 +43,62 @@ export interface GetWorkflowNodeOutputRequest {
  * 
  */
 export class WorkflowNodeOutputApi extends runtime.BaseAPI {
+
+    /**
+     * Get cluster element node output used in a workflow.
+     * Get cluster element node output used in a workflow
+     */
+    async getClusterElementOutputRaw(requestParameters: GetClusterElementOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeOutput>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getClusterElementOutput().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling getClusterElementOutput().'
+            );
+        }
+
+        if (requestParameters['clusterElementType'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElementType',
+                'Required parameter "clusterElementType" was null or undefined when calling getClusterElementOutput().'
+            );
+        }
+
+        if (requestParameters['clusterElementName'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElementName',
+                'Required parameter "clusterElementName" was null or undefined when calling getClusterElementOutput().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/{id}/outputs/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeOutputFromJSON(jsonValue));
+    }
+
+    /**
+     * Get cluster element node output used in a workflow.
+     * Get cluster element node output used in a workflow
+     */
+    async getClusterElementOutput(requestParameters: GetClusterElementOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeOutput> {
+        const response = await this.getClusterElementOutputRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get all workflow node outputs used in a workflow.

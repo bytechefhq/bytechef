@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './AuthorizationType';
 export * from './ComponentConnection';
 export * from './Environment';
 export * from './ExecutionError';

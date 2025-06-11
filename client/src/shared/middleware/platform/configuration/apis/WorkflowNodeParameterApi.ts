@@ -34,9 +34,25 @@ import {
     UpdateWorkflowNodeParameterRequestToJSON,
 } from '../models/index';
 
+export interface DeleteClusterElementParameterRequest {
+    id: string;
+    workflowNodeName: string;
+    clusterElementType: string;
+    clusterElementName: string;
+    deleteWorkflowNodeParameterRequest?: DeleteWorkflowNodeParameterRequest;
+}
+
 export interface DeleteWorkflowNodeParameterOperationRequest {
     id: string;
+    workflowNodeName: string;
     deleteWorkflowNodeParameterRequest?: DeleteWorkflowNodeParameterRequest;
+}
+
+export interface GetClusterElementParameterDisplayConditionsRequest {
+    id: string;
+    workflowNodeName: string;
+    clusterElementType: string;
+    clusterElementName: string;
 }
 
 export interface GetWorkflowNodeParameterDisplayConditionsRequest {
@@ -44,8 +60,17 @@ export interface GetWorkflowNodeParameterDisplayConditionsRequest {
     workflowNodeName: string;
 }
 
+export interface UpdateClusterElementParameterRequest {
+    id: string;
+    workflowNodeName: string;
+    clusterElementType: string;
+    clusterElementName: string;
+    updateWorkflowNodeParameterRequest?: UpdateWorkflowNodeParameterRequest;
+}
+
 export interface UpdateWorkflowNodeParameterOperationRequest {
     id: string;
+    workflowNodeName: string;
     updateWorkflowNodeParameterRequest?: UpdateWorkflowNodeParameterRequest;
 }
 
@@ -53,6 +78,65 @@ export interface UpdateWorkflowNodeParameterOperationRequest {
  * 
  */
 export class WorkflowNodeParameterApi extends runtime.BaseAPI {
+
+    /**
+     * Deletes a cluster element parameter.
+     * Deletes a cluster element parameter
+     */
+    async deleteClusterElementParameterRaw(requestParameters: DeleteClusterElementParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteWorkflowNodeParameter200Response>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deleteClusterElementParameter().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling deleteClusterElementParameter().'
+            );
+        }
+
+        if (requestParameters['clusterElementType'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElementType',
+                'Required parameter "clusterElementType" was null or undefined when calling deleteClusterElementParameter().'
+            );
+        }
+
+        if (requestParameters['clusterElementName'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElementName',
+                'Required parameter "clusterElementName" was null or undefined when calling deleteClusterElementParameter().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: DeleteWorkflowNodeParameterRequestToJSON(requestParameters['deleteWorkflowNodeParameterRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => DeleteWorkflowNodeParameter200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Deletes a cluster element parameter.
+     * Deletes a cluster element parameter
+     */
+    async deleteClusterElementParameter(requestParameters: DeleteClusterElementParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteWorkflowNodeParameter200Response> {
+        const response = await this.deleteClusterElementParameterRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Deletes a workflow node parameter.
@@ -66,6 +150,13 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling deleteWorkflowNodeParameter().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -73,7 +164,7 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflows/{id}/parameters`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/workflows/{id}/parameters/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -89,6 +180,62 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
      */
     async deleteWorkflowNodeParameter(requestParameters: DeleteWorkflowNodeParameterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteWorkflowNodeParameter200Response> {
         const response = await this.deleteWorkflowNodeParameterRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get an action or trigger property options shown in the editor.
+     * Get an action or trigger property options shown in the editor
+     */
+    async getClusterElementParameterDisplayConditionsRaw(requestParameters: GetClusterElementParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeParameterDisplayConditions200Response>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getClusterElementParameterDisplayConditions().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling getClusterElementParameterDisplayConditions().'
+            );
+        }
+
+        if (requestParameters['clusterElementType'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElementType',
+                'Required parameter "clusterElementType" was null or undefined when calling getClusterElementParameterDisplayConditions().'
+            );
+        }
+
+        if (requestParameters['clusterElementName'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElementName',
+                'Required parameter "clusterElementName" was null or undefined when calling getClusterElementParameterDisplayConditions().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}/display-conditions`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetWorkflowNodeParameterDisplayConditions200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Get an action or trigger property options shown in the editor.
+     * Get an action or trigger property options shown in the editor
+     */
+    async getClusterElementParameterDisplayConditions(requestParameters: GetClusterElementParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetWorkflowNodeParameterDisplayConditions200Response> {
+        const response = await this.getClusterElementParameterDisplayConditionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -135,6 +282,65 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
+     * Updates a cluster element parameter.
+     * Updates a cluster element parameter
+     */
+    async updateClusterElementParameterRaw(requestParameters: UpdateClusterElementParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UpdateWorkflowNodeParameter200Response>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateClusterElementParameter().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling updateClusterElementParameter().'
+            );
+        }
+
+        if (requestParameters['clusterElementType'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElementType',
+                'Required parameter "clusterElementType" was null or undefined when calling updateClusterElementParameter().'
+            );
+        }
+
+        if (requestParameters['clusterElementName'] == null) {
+            throw new runtime.RequiredError(
+                'clusterElementName',
+                'Required parameter "clusterElementName" was null or undefined when calling updateClusterElementParameter().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateWorkflowNodeParameterRequestToJSON(requestParameters['updateWorkflowNodeParameterRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UpdateWorkflowNodeParameter200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Updates a cluster element parameter.
+     * Updates a cluster element parameter
+     */
+    async updateClusterElementParameter(requestParameters: UpdateClusterElementParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UpdateWorkflowNodeParameter200Response> {
+        const response = await this.updateClusterElementParameterRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Updates a workflow node parameter.
      * Updates a workflow node parameter
      */
@@ -146,6 +352,13 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling updateWorkflowNodeParameter().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -153,7 +366,7 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflows/{id}/parameters`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/workflows/{id}/parameters/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
