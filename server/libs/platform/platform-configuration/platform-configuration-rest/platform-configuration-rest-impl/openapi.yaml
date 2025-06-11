@@ -1062,7 +1062,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeOutput"
-  /workflows/{id}/parameters:
+  /workflows/{id}/outputs/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}:
+    get:
+      description: "Get cluster element node output used in a workflow."
+      summary: "Get cluster element node output used in a workflow"
+      tags:
+        - "workflow-node-output"
+      operationId: "getClusterElementOutput"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "clusterElementType"
+          description: "The name of a cluster element type."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "clusterElementName"
+          description: "The name of a cluster element name."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowNodeOutput"
+  /workflows/{id}/parameters/{workflowNodeName}:
     delete:
       description: "Deletes a workflow node parameter."
       summary: "Deletes a workflow node parameter"
@@ -1072,6 +1111,12 @@ paths:
       parameters:
         - name: "id"
           description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
           in: "path"
           required: true
           schema:
@@ -1087,9 +1132,6 @@ paths:
               properties:
                 path:
                   description: "The workflow node parameter path."
-                  type: "string"
-                workflowNodeName:
-                  description: "The workflow node name."
                   type: "string"
       responses:
         "200":
@@ -1111,6 +1153,12 @@ paths:
       parameters:
         - name: "id"
           description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
           in: "path"
           required: true
           schema:
@@ -1138,9 +1186,140 @@ paths:
                 value:
                   description: "The value."
                   type: "object"
-                workflowNodeName:
-                  description: "The workflow node name."
+      responses:
+        "200":
+          description: "The updated workflow node parameters."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  metadata:
+                    description: "Key-value map of metadata."
+                    type: "object"
+                    additionalProperties: true
+                  parameters:
+                    description: "Key-value map of parameters."
+                    type: "object"
+                    additionalProperties: true
+                  displayConditions:
+                    description: "Key-value map of display condition rules."
+                    type: "object"
+                    additionalProperties:
+                      type: "boolean"
+                  missingRequiredProperties:
+                    type: "array"
+                    items:
+                      type: "string"
+  /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}:
+    delete:
+      description: "Deletes a cluster element parameter."
+      summary: "Deletes a cluster element parameter"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "deleteClusterElementParameter"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "clusterElementType"
+          description: "The name of a cluster element type."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "clusterElementName"
+          description: "The name of a cluster element name."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "path"
+                - "workflowNodeName"
+              properties:
+                path:
+                  description: "The workflow node parameter path."
                   type: "string"
+      responses:
+        "200":
+          description: "The updated workflow node parameters."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  parameters:
+                    type: "object"
+                    additionalProperties: true
+    patch:
+      description: "Updates a cluster element parameter."
+      summary: "Updates a cluster element parameter"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "updateClusterElementParameter"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "clusterElementType"
+          description: "The name of a cluster element type."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "clusterElementName"
+          description: "The name of a cluster element name."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "path"
+                - "type"
+                - "workflowNodeName"
+              properties:
+                includeInMetadata:
+                  description: "If path and value type should be included in metadata "
+                  type: "boolean"
+                  default: false
+                path:
+                  description: "The workflow node parameter path."
+                  type: "string"
+                type:
+                  description: "The type of a property."
+                  type: "string"
+                value:
+                  description: "The value."
+                  type: "object"
       responses:
         "200":
           description: "The updated workflow node parameters."
@@ -1184,6 +1363,54 @@ paths:
           description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
           in: "path"
           required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow node parameter display conditions."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  displayConditions:
+                    type: "object"
+                    additionalProperties:
+                      type: "boolean"
+                  missingRequiredProperties:
+                    type: "array"
+                    items:
+                      type: "string"
+  /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}/display-conditions:
+    get:
+      description: "Get an action or trigger property options shown in the editor."
+      summary: "Get an action or trigger property options shown in the editor"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "getClusterElementParameterDisplayConditions"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "clusterElementType"
+          description: "The name of a cluster element type."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "clusterElementName"
+          description: "The name of a cluster element name."
+          required: true
+          in: "path"
           schema:
             type: "string"
       responses:
