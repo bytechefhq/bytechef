@@ -16,6 +16,7 @@
 
 package com.bytechef.component.microsoft.outlook.trigger;
 
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
@@ -33,6 +34,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.microsoft.outlook.definition.Format;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -50,9 +52,9 @@ import org.mockito.Mockito;
 class MicrosoftOutlook365NewEmailTriggerTest {
 
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Parameters parameters = mock(Parameters.class);
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
@@ -77,8 +79,10 @@ class MicrosoftOutlook365NewEmailTriggerTest {
                 .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedTriggerContext))
                 .thenReturn(List.of(secondMail));
 
-            when(parameters.getLocalDateTime(eq(LAST_TIME_CHECKED), any()))
+            when(mockedParameters.getLocalDateTime(eq(LAST_TIME_CHECKED), any()))
                 .thenReturn(startDate);
+            when(mockedParameters.getRequired(FORMAT, Format.class))
+                .thenReturn(Format.FULL);
             when(mockedTriggerContext.http(any()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
@@ -91,7 +95,8 @@ class MicrosoftOutlook365NewEmailTriggerTest {
                 .thenReturn(Map.of(VALUE, List.of(firstMail), ODATA_NEXT_LINK, "link"));
 
             PollOutput pollOutput =
-                MicrosoftOutlook365NewEmailTrigger.poll(parameters, parameters, parameters, mockedTriggerContext);
+                MicrosoftOutlook365NewEmailTrigger.poll(mockedParameters, mockedParameters, mockedParameters,
+                    mockedTriggerContext);
 
             assertEquals(List.of(firstMail, secondMail), pollOutput.records());
             assertFalse(pollOutput.pollImmediately());
