@@ -45,6 +45,17 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
     }
 
     @Override
+    public ResponseEntity<WorkflowNodeOutputModel> getClusterElementOutput(
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementName) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                workflowNodeOutputFacade.getClusterElementOutput(
+                    workflowId, workflowNodeName, clusterElementType, clusterElementName),
+                WorkflowNodeOutputModel.class));
+    }
+
+    @Override
     public ResponseEntity<WorkflowNodeOutputModel> getWorkflowNodeOutput(String workflowId, String workflowNodeName) {
         return ResponseEntity.ok(
             conversionService.convert(
