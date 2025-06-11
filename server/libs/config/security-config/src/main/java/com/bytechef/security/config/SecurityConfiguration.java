@@ -17,7 +17,6 @@
 package com.bytechef.security.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
 import com.bytechef.config.ApplicationProperties;
@@ -67,10 +66,9 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
-import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
  * @author Ivica Cardic
@@ -104,25 +102,27 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain actuatorFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
+    public SecurityFilterChain actuatorFilterChain(
+        HttpSecurity http, PathPatternRequestMatcher.Builder mvc) throws Exception {
+
         http
             .securityMatcher("/actuator/**")
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers(mvc.pattern("/actuator/health"))
+                .requestMatchers(mvc.matcher("/actuator/health"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/health/**"))
+                .requestMatchers(mvc.matcher("/actuator/health/**"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/info"))
+                .requestMatchers(mvc.matcher("/actuator/info"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/metrics"))
+                .requestMatchers(mvc.matcher("/actuator/metrics"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/metrics/**"))
+                .requestMatchers(mvc.matcher("/actuator/metrics/**"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/prometheus"))
+                .requestMatchers(mvc.matcher("/actuator/prometheus"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/actuator/**"))
+                .requestMatchers(mvc.matcher("/actuator/**"))
                 .hasAuthority(AuthorityConstants.SYSTEM_ADMIN))
             .httpBasic(withDefaults())
             .exceptionHandling(exceptions -> exceptions
@@ -140,7 +140,7 @@ public class SecurityConfiguration {
     @Bean
     @Order(3)
     public SecurityFilterChain apiFilterChain(
-        HttpSecurity http, MvcRequestMatcher.Builder mvc,
+        HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
         List<AuthenticationProviderContributor> authenticationProviderContributors,
         List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors)
         throws Exception {
@@ -178,21 +178,21 @@ public class SecurityConfiguration {
                     .policy(
                         "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers(mvc.pattern("/api/authenticate"))
+                .requestMatchers(mvc.matcher("/api/authenticate"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/api/register"))
+                .requestMatchers(mvc.matcher("/api/register"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/api/activate"))
+                .requestMatchers(mvc.matcher("/api/activate"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/api/account/reset-password/init"))
+                .requestMatchers(mvc.matcher("/api/account/reset-password/init"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/api/account/reset-password/finish"))
+                .requestMatchers(mvc.matcher("/api/account/reset-password/finish"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/api/**"))
+                .requestMatchers(mvc.matcher("/api/**"))
                 .authenticated()
-                .requestMatchers(mvc.pattern("/graphql"))
+                .requestMatchers(mvc.matcher("/graphql"))
                 .authenticated()
-                .requestMatchers(mvc.pattern("/sse"))
+                .requestMatchers(mvc.matcher("/sse"))
                 .authenticated())
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
@@ -201,7 +201,7 @@ public class SecurityConfiguration {
             .exceptionHandling(exceptionHanding -> exceptionHanding
                 .defaultAuthenticationEntryPointFor(
                     new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                    new OrRequestMatcher(antMatcher("/api/**"), antMatcher("/graphql"))))
+                    new OrRequestMatcher(mvc.matcher("/api/**"), mvc.matcher("/graphql"))))
             .formLogin(formLogin -> formLogin
                 .loginPage("/")
                 .loginProcessingUrl("/api/authentication")
@@ -220,37 +220,37 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(4)
-    public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, PathPatternRequestMatcher.Builder mvc) throws Exception {
         http
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"))
+                .requestMatchers(mvc.matcher("/*.ico"), mvc.matcher("/*.png"), mvc.matcher("/*.svg"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/approvals/**"))
+                .requestMatchers(mvc.matcher("/approvals/**"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/assets/**"))
+                .requestMatchers(mvc.matcher("/assets/**"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/callback"))
+                .requestMatchers(mvc.matcher("/callback"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/file-entries/**"))
+                .requestMatchers(mvc.matcher("/file-entries/**"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/i18n/**"))
+                .requestMatchers(mvc.matcher("/i18n/**"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/icons/**"))
+                .requestMatchers(mvc.matcher("/icons/**"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/index.html"))
+                .requestMatchers(mvc.matcher("/index.html"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/oauth.html"))
+                .requestMatchers(mvc.matcher("/oauth.html"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/swagger-ui/**"))
+                .requestMatchers(mvc.matcher("/swagger-ui/**"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/swagger-ui.html"))
+                .requestMatchers(mvc.matcher("/swagger-ui.html"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/v3/api-docs/**"))
+                .requestMatchers(mvc.matcher("/v3/api-docs/**"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/webhooks/**"))
+                .requestMatchers(mvc.matcher("/webhooks/**"))
                 .permitAll()
                 .anyRequest()
                 .denyAll());
@@ -261,16 +261,16 @@ public class SecurityConfiguration {
     @Bean
     @Profile("dev")
     @Order(1)
-    public SecurityFilterChain graphqlDevFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc)
+    public SecurityFilterChain graphqlDevFilterChain(HttpSecurity http, PathPatternRequestMatcher.Builder mvc)
         throws Exception {
 
         http
             .securityMatcher("/graphql", "/graphiql")
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(mvc.pattern("/graphiql"))
+                .requestMatchers(mvc.matcher("/graphiql"))
                 .permitAll()
-                .requestMatchers(mvc.pattern("/graphql"))
+                .requestMatchers(mvc.matcher("/graphql"))
                 .authenticated())
             .httpBasic(withDefaults())
             .exceptionHandling(exceptions -> exceptions
@@ -280,8 +280,8 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
-        return new MvcRequestMatcher.Builder(introspector);
+    PathPatternRequestMatcher.Builder mvc() {
+        return PathPatternRequestMatcher.withDefaults();
     }
 
     @Bean
