@@ -290,6 +290,7 @@ Name: getMail
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Message Id | STRING | `Id of the message.` | true |
+| format | Format | STRING <details> <summary> Options </summary> SIMPLE, FULL </details> | `The format to return the message in.` | true |
 
 #### Example JSON Structure
 ```json
@@ -297,7 +298,8 @@ Name: getMail
   "label" : "Get Mail",
   "name" : "getMail",
   "parameters" : {
-    "id" : ""
+    "id" : "",
+    "format" : ""
   },
   "type" : "microsoftOutlook365/v1/getMail"
 }
@@ -305,42 +307,9 @@ Name: getMail
 
 #### Output
 
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the message. |
-| subject | STRING | Subject of the message. |
-| bodyPreview | STRING | The first 255 characters of the message body. |
-| body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content)&#125; </details> | The body of the message. It can be in HTML or text format. |
-| from | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(name), STRING\(address)&#125;\(emailAddress)&#125; </details> | The owner of the mailbox from which the message is sent. |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : "",
-  "subject" : "",
-  "bodyPreview" : "",
-  "body" : {
-    "contentType" : "",
-    "content" : ""
-  },
-  "from" : {
-    "emailAddress" : {
-      "name" : "",
-      "address" : ""
-    }
-  }
-}
-```
 
 
 ### Reply to Email
@@ -462,6 +431,7 @@ Name: sendEmail
 | ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The Cc recipients for the message.` | false |
 | replyTo | Reply To | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The email addresses to use when replying.` | false |
 | body | Body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content), STRING\(content)&#125; </details> | `The body of the message. It can be in HTML or text format.` | true |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | false |
 
 #### Example JSON Structure
 ```json
@@ -477,7 +447,13 @@ Name: sendEmail
     "body" : {
       "contentType" : "",
       "content" : ""
-    }
+    },
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ]
   },
   "type" : "microsoftOutlook365/v1/sendEmail"
 }
@@ -502,35 +478,25 @@ Name: newEmail
 
 Type: POLLING
 
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| format | Format | STRING <details> <summary> Options </summary> SIMPLE, FULL </details> | `The format to return the message in.` | true |
+
 
 #### Output
 
-
-
-Type: ARRAY
-
-
-Items Type: OBJECT
-
-
-#### Properties
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the message. |
-| subject | STRING | Subject of the message. |
-| bodyPreview | STRING | The first 255 characters of the message body. |
-| body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content)&#125; </details> | The body of the message. It can be in HTML or text format. |
-| from | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(name), STRING\(address)&#125;\(emailAddress)&#125; </details> | The owner of the mailbox from which the message is sent. |
-
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
 {
   "label" : "New Email",
   "name" : "newEmail",
+  "parameters" : {
+    "format" : ""
+  },
   "type" : "microsoftOutlook365/v1/newEmail"
 }
 ```
