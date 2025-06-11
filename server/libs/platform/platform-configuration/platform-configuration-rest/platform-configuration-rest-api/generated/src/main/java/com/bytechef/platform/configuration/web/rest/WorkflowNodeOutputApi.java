@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T22:18:25.217051+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:59.617601+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "workflow-node-output", description = "The Platform Workflow Node Output Internal API")
 public interface WorkflowNodeOutputApi {
@@ -40,6 +40,53 @@ public interface WorkflowNodeOutputApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    /**
+     * GET /workflows/{id}/outputs/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName} : Get cluster element node output used in a workflow
+     * Get cluster element node output used in a workflow.
+     *
+     * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
+     * @param clusterElementType The name of a cluster element type. (required)
+     * @param clusterElementName The name of a cluster element name. (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "getClusterElementOutput",
+        summary = "Get cluster element node output used in a workflow",
+        description = "Get cluster element node output used in a workflow.",
+        tags = { "workflow-node-output" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowNodeOutputModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/workflows/{id}/outputs/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<WorkflowNodeOutputModel> getClusterElementOutput(
+        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "clusterElementType", description = "The name of a cluster element type.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementType") String clusterElementType,
+        @Parameter(name = "clusterElementName", description = "The name of a cluster element name.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementName") String clusterElementName
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"triggerDefinition\" : { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputFunctionDefined\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputDefined\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 1, \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" }, \"outputSchema\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : false, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : false, \"type\" : \"ARRAY\", \"required\" : false, \"expressionEnabled\" : true }, \"workflowNodeName\" : \"workflowNodeName\", \"placeholder\" : \"{}\", \"actionDefinition\" : { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputFunctionDefined\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputDefined\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\" }, \"taskDispatcherDefinition\" : { \"variablePropertiesDefined\" : true, \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"outputDefined\" : true, \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\", \"version\" : 0 }, \"sampleOutput\" : \"{}\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     /**
      * GET /workflows/{id}/outputs : Get all dynamic workflow node outputs used in a workflow

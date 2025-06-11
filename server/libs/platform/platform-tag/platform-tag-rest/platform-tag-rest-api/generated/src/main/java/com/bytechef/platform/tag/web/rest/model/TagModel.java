@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Tag", description = "A tag.")
 @JsonTypeName("Tag")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-06T15:56:32.741354+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:41:00.810045+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class TagModel {
 
   private @Nullable String createdBy;

@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T22:18:25.217051+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:59.617601+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "workflow-node-parameter", description = "The Platform Workflow Node Parameter Internal API")
 public interface WorkflowNodeParameterApi {
@@ -46,10 +46,61 @@ public interface WorkflowNodeParameterApi {
     }
 
     /**
-     * DELETE /workflows/{id}/parameters : Deletes a workflow node parameter
+     * DELETE /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName} : Deletes a cluster element parameter
+     * Deletes a cluster element parameter.
+     *
+     * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
+     * @param clusterElementType The name of a cluster element type. (required)
+     * @param clusterElementName The name of a cluster element name. (required)
+     * @param deleteWorkflowNodeParameterRequestModel  (optional)
+     * @return The updated workflow node parameters. (status code 200)
+     */
+    @Operation(
+        operationId = "deleteClusterElementParameter",
+        summary = "Deletes a cluster element parameter",
+        description = "Deletes a cluster element parameter.",
+        tags = { "workflow-node-parameter" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated workflow node parameters.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = DeleteWorkflowNodeParameter200ResponseModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = "/workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<DeleteWorkflowNodeParameter200ResponseModel> deleteClusterElementParameter(
+        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "clusterElementType", description = "The name of a cluster element type.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementType") String clusterElementType,
+        @Parameter(name = "clusterElementName", description = "The name of a cluster element name.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementName") String clusterElementName,
+        @Parameter(name = "DeleteWorkflowNodeParameterRequestModel", description = "") @Valid @RequestBody(required = false) DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequestModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"parameters\" : { \"key\" : \"\" } }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * DELETE /workflows/{id}/parameters/{workflowNodeName} : Deletes a workflow node parameter
      * Deletes a workflow node parameter.
      *
      * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
      * @param deleteWorkflowNodeParameterRequestModel  (optional)
      * @return The updated workflow node parameters. (status code 200)
      */
@@ -66,19 +117,67 @@ public interface WorkflowNodeParameterApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/workflows/{id}/parameters",
+        value = "/workflows/{id}/parameters/{workflowNodeName}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
     default ResponseEntity<DeleteWorkflowNodeParameter200ResponseModel> deleteWorkflowNodeParameter(
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "DeleteWorkflowNodeParameterRequestModel", description = "") @Valid @RequestBody(required = false) DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"parameters\" : { \"key\" : \"\" } }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}/display-conditions : Get an action or trigger property options shown in the editor
+     * Get an action or trigger property options shown in the editor.
+     *
+     * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
+     * @param clusterElementType The name of a cluster element type. (required)
+     * @param clusterElementName The name of a cluster element name. (required)
+     * @return The workflow node parameter display conditions. (status code 200)
+     */
+    @Operation(
+        operationId = "getClusterElementParameterDisplayConditions",
+        summary = "Get an action or trigger property options shown in the editor",
+        description = "Get an action or trigger property options shown in the editor.",
+        tags = { "workflow-node-parameter" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The workflow node parameter display conditions.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = GetWorkflowNodeParameterDisplayConditions200ResponseModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}/display-conditions",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<GetWorkflowNodeParameterDisplayConditions200ResponseModel> getClusterElementParameterDisplayConditions(
+        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "clusterElementType", description = "The name of a cluster element type.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementType") String clusterElementType,
+        @Parameter(name = "clusterElementName", description = "The name of a cluster element name.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementName") String clusterElementName
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"missingRequiredProperties\" : [ \"missingRequiredProperties\", \"missingRequiredProperties\" ], \"displayConditions\" : { \"key\" : true } }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -133,10 +232,61 @@ public interface WorkflowNodeParameterApi {
 
 
     /**
-     * PATCH /workflows/{id}/parameters : Updates a workflow node parameter
+     * PATCH /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName} : Updates a cluster element parameter
+     * Updates a cluster element parameter.
+     *
+     * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
+     * @param clusterElementType The name of a cluster element type. (required)
+     * @param clusterElementName The name of a cluster element name. (required)
+     * @param updateWorkflowNodeParameterRequestModel  (optional)
+     * @return The updated workflow node parameters. (status code 200)
+     */
+    @Operation(
+        operationId = "updateClusterElementParameter",
+        summary = "Updates a cluster element parameter",
+        description = "Updates a cluster element parameter.",
+        tags = { "workflow-node-parameter" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated workflow node parameters.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = UpdateWorkflowNodeParameter200ResponseModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PATCH,
+        value = "/workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateClusterElementParameter(
+        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "clusterElementType", description = "The name of a cluster element type.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementType") String clusterElementType,
+        @Parameter(name = "clusterElementName", description = "The name of a cluster element name.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementName") String clusterElementName,
+        @Parameter(name = "UpdateWorkflowNodeParameterRequestModel", description = "") @Valid @RequestBody(required = false) UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"missingRequiredProperties\" : [ \"missingRequiredProperties\", \"missingRequiredProperties\" ], \"metadata\" : { \"key\" : \"\" }, \"displayConditions\" : { \"key\" : true }, \"parameters\" : { \"key\" : \"\" } }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PATCH /workflows/{id}/parameters/{workflowNodeName} : Updates a workflow node parameter
      * Updates a workflow node parameter.
      *
      * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
      * @param updateWorkflowNodeParameterRequestModel  (optional)
      * @return The updated workflow node parameters. (status code 200)
      */
@@ -153,13 +303,14 @@ public interface WorkflowNodeParameterApi {
     )
     @RequestMapping(
         method = RequestMethod.PATCH,
-        value = "/workflows/{id}/parameters",
+        value = "/workflows/{id}/parameters/{workflowNodeName}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
     default ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "UpdateWorkflowNodeParameterRequestModel", description = "") @Valid @RequestBody(required = false) UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel
     ) {
         getRequest().ifPresent(request -> {

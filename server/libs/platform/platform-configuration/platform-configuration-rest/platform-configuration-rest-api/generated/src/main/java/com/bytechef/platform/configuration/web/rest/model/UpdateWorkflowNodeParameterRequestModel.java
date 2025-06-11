@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateWorkflowNodeParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T22:18:25.217051+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:59.617601+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class UpdateWorkflowNodeParameterRequestModel {
 
   private Boolean includeInMetadata = false;
@@ -32,8 +32,6 @@ public class UpdateWorkflowNodeParameterRequestModel {
 
   private @Nullable Object value;
 
-  private String workflowNodeName;
-
   public UpdateWorkflowNodeParameterRequestModel() {
     super();
   }
@@ -41,10 +39,9 @@ public class UpdateWorkflowNodeParameterRequestModel {
   /**
    * Constructor with only required parameters
    */
-  public UpdateWorkflowNodeParameterRequestModel(String path, String type, String workflowNodeName) {
+  public UpdateWorkflowNodeParameterRequestModel(String path, String type) {
     this.path = path;
     this.type = type;
-    this.workflowNodeName = workflowNodeName;
   }
 
   public UpdateWorkflowNodeParameterRequestModel includeInMetadata(Boolean includeInMetadata) {
@@ -127,26 +124,6 @@ public class UpdateWorkflowNodeParameterRequestModel {
     this.value = value;
   }
 
-  public UpdateWorkflowNodeParameterRequestModel workflowNodeName(String workflowNodeName) {
-    this.workflowNodeName = workflowNodeName;
-    return this;
-  }
-
-  /**
-   * The workflow node name.
-   * @return workflowNodeName
-   */
-  @NotNull 
-  @Schema(name = "workflowNodeName", description = "The workflow node name.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("workflowNodeName")
-  public String getWorkflowNodeName() {
-    return workflowNodeName;
-  }
-
-  public void setWorkflowNodeName(String workflowNodeName) {
-    this.workflowNodeName = workflowNodeName;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -159,13 +136,12 @@ public class UpdateWorkflowNodeParameterRequestModel {
     return Objects.equals(this.includeInMetadata, updateWorkflowNodeParameterRequest.includeInMetadata) &&
         Objects.equals(this.path, updateWorkflowNodeParameterRequest.path) &&
         Objects.equals(this.type, updateWorkflowNodeParameterRequest.type) &&
-        Objects.equals(this.value, updateWorkflowNodeParameterRequest.value) &&
-        Objects.equals(this.workflowNodeName, updateWorkflowNodeParameterRequest.workflowNodeName);
+        Objects.equals(this.value, updateWorkflowNodeParameterRequest.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(includeInMetadata, path, type, value, workflowNodeName);
+    return Objects.hash(includeInMetadata, path, type, value);
   }
 
   @Override
@@ -176,7 +152,6 @@ public class UpdateWorkflowNodeParameterRequestModel {
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
-    sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
     return sb.toString();
   }

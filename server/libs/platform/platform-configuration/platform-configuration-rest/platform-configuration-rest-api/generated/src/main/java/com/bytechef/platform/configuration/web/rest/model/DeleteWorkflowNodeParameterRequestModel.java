@@ -21,12 +21,10 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("deleteWorkflowNodeParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-08T22:18:25.217051+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:59.617601+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class DeleteWorkflowNodeParameterRequestModel {
 
   private String path;
-
-  private String workflowNodeName;
 
   public DeleteWorkflowNodeParameterRequestModel() {
     super();
@@ -35,9 +33,8 @@ public class DeleteWorkflowNodeParameterRequestModel {
   /**
    * Constructor with only required parameters
    */
-  public DeleteWorkflowNodeParameterRequestModel(String path, String workflowNodeName) {
+  public DeleteWorkflowNodeParameterRequestModel(String path) {
     this.path = path;
-    this.workflowNodeName = workflowNodeName;
   }
 
   public DeleteWorkflowNodeParameterRequestModel path(String path) {
@@ -60,26 +57,6 @@ public class DeleteWorkflowNodeParameterRequestModel {
     this.path = path;
   }
 
-  public DeleteWorkflowNodeParameterRequestModel workflowNodeName(String workflowNodeName) {
-    this.workflowNodeName = workflowNodeName;
-    return this;
-  }
-
-  /**
-   * The workflow node name.
-   * @return workflowNodeName
-   */
-  @NotNull 
-  @Schema(name = "workflowNodeName", description = "The workflow node name.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("workflowNodeName")
-  public String getWorkflowNodeName() {
-    return workflowNodeName;
-  }
-
-  public void setWorkflowNodeName(String workflowNodeName) {
-    this.workflowNodeName = workflowNodeName;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -89,13 +66,12 @@ public class DeleteWorkflowNodeParameterRequestModel {
       return false;
     }
     DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequest = (DeleteWorkflowNodeParameterRequestModel) o;
-    return Objects.equals(this.path, deleteWorkflowNodeParameterRequest.path) &&
-        Objects.equals(this.workflowNodeName, deleteWorkflowNodeParameterRequest.workflowNodeName);
+    return Objects.equals(this.path, deleteWorkflowNodeParameterRequest.path);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(path, workflowNodeName);
+    return Objects.hash(path);
   }
 
   @Override
@@ -103,7 +79,6 @@ public class DeleteWorkflowNodeParameterRequestModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class DeleteWorkflowNodeParameterRequestModel {\n");
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
-    sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -35,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-09T07:36:39.424295+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:41:01.372087+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationInstanceConfigurationModel {
 
   private @Nullable String createdBy;

@@ -1,4 +1,4 @@
-package com.bytechef.platform.configuration.web.rest.model;
+package com.bytechef.ee.embedded.workflow.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Authorization type.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:59.617601+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:41:01.946692+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public enum AuthorizationTypeModel {
   
   API_KEY("API_KEY"),
