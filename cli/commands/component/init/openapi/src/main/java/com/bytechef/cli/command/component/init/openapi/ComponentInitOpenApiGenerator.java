@@ -2010,18 +2010,17 @@ public class ComponentInitOpenApiGenerator {
                         }
                     }
                     case "string" -> {
-                        if (Objects.equals(schema.getFormat(), "date")) {
-                            builder.add("date($S)", propertyName);
-                        } else if (Objects.equals(schema.getFormat(), "date-time")) {
-                            builder.add("dateTime($S)", propertyName);
-                        } else if (Objects.equals(schema.getFormat(), "binary")) {
-                            builder.add("fileEntry($S)",
+                        switch (schema.getFormat()) {
+                            case "date" -> builder.add("date($S)", propertyName);
+                            case "date-time" -> builder.add("dateTime($S)", propertyName);
+                            case "binary" -> builder.add("fileEntry($S)",
                                 StringUtils.isEmpty(propertyName) ? "fileEntry" : propertyName);
-                        } else {
-                            if (StringUtils.isEmpty(propertyName)) {
-                                builder.add("string()");
-                            } else {
-                                builder.add("string($S)", propertyName);
+                            case null, default -> {
+                                if (StringUtils.isEmpty(propertyName)) {
+                                    builder.add("string()");
+                                } else {
+                                    builder.add("string($S)", propertyName);
+                                }
                             }
                         }
 
@@ -2077,26 +2076,26 @@ public class ComponentInitOpenApiGenerator {
             String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
             String optionType;
 
-            if (Objects.equals(type, "integer")) {
-                optionType = "Long";
-            } else if (Objects.equals(type, "string")) {
-                optionType = "String";
-            } else if (Objects.equals(type, "array")) {
-                String itemsType = schema.getItems()
-                    .getType();
+            switch (type) {
+                case "integer" -> optionType = "Long";
+                case "string" -> optionType = "String";
+                case "array" -> {
+                    String itemsType = schema.getItems()
+                        .getType();
 
-                if (Objects.equals(itemsType, "integer")) {
-                    optionType = "Long";
-                } else if (Objects.equals(itemsType, "string")) {
-                    optionType = "String";
-                } else {
-                    throw new IllegalArgumentException("Parameter type %s is not supported yet.".formatted(itemsType));
+                    if (Objects.equals(itemsType, "integer")) {
+                        optionType = "Long";
+                    } else if (Objects.equals(itemsType, "string")) {
+                        optionType = "String";
+                    } else {
+                        throw new IllegalArgumentException(
+                            "Parameter type %s is not supported yet.".formatted(itemsType));
+                    }
+
+                    type = itemsType;
                 }
-
-                type = itemsType;
-
-            } else {
-                throw new IllegalArgumentException("Parameter type %s is not supported yet.".formatted(type));
+                case null, default ->
+                    throw new IllegalArgumentException("Parameter type %s is not supported yet.".formatted(type));
             }
 
             dynamicOptionsMap.put(buildOptionsFunctionsName(propertyName), type);
