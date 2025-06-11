@@ -1,2 +1,342 @@
-.button-connect {
+:root {
+    --bytechef-blue: #1071e5;
+    --bytechef-blue-hover: #0b50a3;
+    --gray-200: #f1f5f9;
+    --gray-300: #e2e8f0;
+    --gray-500: #6b7280;
+    --bytechef-red: rgb(220, 38, 38);
+    --bytechef-red-hover: rgba(220, 38, 38, 0.9);
+}
+
+body {
+    font-family: "Inter", sans-serif;
+}
+
+h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+p {
+    color: var(--gray-500);
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    box-shadow: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+    padding: 8px 16px;
+    line-height: 1.25rem;
+    outline: none;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    width: auto;
+}
+
+/* Button variants */
+.buttonPrimary {
+    composes: button;
+    background-color: var(--bytechef-blue);
+    border-color: var(--bytechef-blue);
+    color: white;
+}
+
+.buttonPrimary:hover {
+    background-color: var(--bytechef-blue-hover);
+    border-color: var(--bytechef-blue-hover);
+}
+
+.buttonSecondary {
+    composes: button;
+    background-color: white;
+    color: inherit;
+}
+
+.buttonSecondary:hover {
+    background-color: var(--gray-200);
+    border-color: var(--gray-200);
+}
+
+.buttonDestructive {
+    composes: button;
+    background-color: var(--bytechef-red);
+    color: white;
+    border-color: var(--bytechef-red);
+}
+
+.buttonDestructive:hover {
+    background-color: var(--bytechef-red-hover);
+    border-color: var(--bytechef-red-hover);
+}
+
+/* Dialog styles */
+
+/* Dialog overlay*/
+.dialogOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Dialog Container */
+.dialogContainer {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 50;
+    display: grid;
+    width: 100%;
+    max-width: 32rem;
+    transform: translate(-50%, -50%);
+    gap: 2rem;
+    border: 1px solid #e5e7eb;
+    background-color: #fff;
+    padding: 1.5rem;
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(170, 161, 161, 0.05);
+    transition-duration: 200ms;
+    border-radius: 0.5rem;
+}
+
+/* Dialog Header */
+.dialogHeader {
+    display: flex;
+    justify-content: space-between;
+}
+
+.dialogHeader div {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+}
+
+.dialogHeader div:last-child {
+    justify-content: flex-end;
+}
+
+.dialogHeader h2 {
+    white-space: nowrap;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.dialogHeader .closeButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: all 0.2s;
+    background-color: transparent;
+}
+
+.dialogHeader .closeButton:hover {
+    background-color: var(--gray-200);
+}
+
+.dialogHeader .closeButton img {
+    height: 1rem;
+    width: 1rem;
+}
+
+.dialogHeader .integrationIcon {
+    display: flex;
+    height: 32px;
+    width: 32px;
+}
+
+/* Dialog Content */
+.dialogContent {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+    font-size: 1rem;
+}
+
+.dialogContent p {
+    margin-top: 0.5rem;
+}
+
+.dialogContent form {
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+/* DialogInputField */
+.dialogInputField {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.dialogInputField label {
+    font-size: 0.875rem;
+}
+
+.dialogInputField .requiredIndicator {
+    color: var(--bytechef-red);
+    margin-left: 0.125rem;
+    line-height: 0.75rem;
+    font-size: 1rem;
+}
+
+.dialogInputField input,
+.dialogInputField select {
+    display: flex;
+    border-radius: 0.375rem;
+    border: 1px solid #e5e7eb;
+    background-color: transparent;
+    padding: 0.5rem 0.75rem;
+    line-height: 1.25rem;
+    font-size: 0.875rem;
+}
+
+.dialogInputField .inputError {
+    color: var(--bytechef-red);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* Dialog Footer */
+.dialogFooter {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.dialogFooter .buttonPrimary span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dialogFooter .buttonPrimary span img {
+    color: white;
+    filter: brightness(0) invert(1);
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Powered by ByteChef styles */
+.poweredByContainer {
+    position: absolute;
+    bottom: -2rem;
+    right: 50%;
+    display: flex;
+    transform: translateX(50%);
+    align-items: center;
+    justify-content: center;
+}
+
+.poweredByContainer span {
+    color: white;
+    font-size: 1rem;
+}
+
+.poweredByContainer img {
+    margin-right: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+}
+
+.poweredByContainer a {
+    padding-left: 4px;
+    /* font-weight: 600; */
+    text-decoration: none;
+}
+
+.poweredByContainer a:hover {
+    text-decoration: underline;
+}
+
+/* Workflows Container */
+.workflowsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.workflowsContainer > span {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    font-weight: bold;
+}
+
+.workflowsContainer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.workflowsContainer ul li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Toggle component */
+.toggleCheckbox {
+    height: 0;
+    width: 0;
+    visibility: hidden;
+}
+
+.toggleLabel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    width: 36px;
+    height: 20px;
+    background: grey;
+    border-radius: 100px;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.toggleLabel .toggleButton {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 45px;
+    transition: 0.2s;
+    background: #fff;
+    box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
+}
+
+.toggleCheckbox:checked + .toggleLabel .toggleButton {
+    left: calc(100% - 2px);
+    transform: translateX(-100%);
+}
+
+.toggleLabel:active .toggleButton {
+    width: 36px;
 }
