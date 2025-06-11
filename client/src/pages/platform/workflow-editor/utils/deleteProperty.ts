@@ -29,9 +29,9 @@ export default function deleteProperty(
         {
             deleteWorkflowNodeParameterRequest: {
                 path,
-                workflowNodeName: currentComponent?.workflowNodeName,
             },
             id: workflowId,
+            workflowNodeName: currentComponent?.workflowNodeName,
         },
         {
             onSuccess: (response) => {

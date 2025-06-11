@@ -50,8 +50,8 @@ export default function saveProperty({
                 path: decodedPath,
                 type,
                 value,
-                workflowNodeName: currentComponent.workflowNodeName,
             },
+            workflowNodeName: currentComponent.workflowNodeName,
         },
         {
             onSuccess: (response) => {
