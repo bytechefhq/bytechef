@@ -32,7 +32,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class SpaWebFilter extends OncePerRequestFilter {
 
     private static final List<String> NON_SPA_PATH_PREFIXES = Arrays.asList(
-        "/actuator", "/api", "/approvals", "/auditevents", "/callback", "/file-entries", "/graphql", "/graphiql",
+        "/actuator", "/api", "/approvals", "/callback", "/file-entries", "/graphql", "/graphiql",
         "/icons", "/mcp", "/sse", "/v3/api-docs", "/webhooks");
 
     /**
