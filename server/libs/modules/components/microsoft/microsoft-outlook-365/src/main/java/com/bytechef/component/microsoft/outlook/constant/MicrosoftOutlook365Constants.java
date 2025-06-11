@@ -20,7 +20,10 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.outlook.definition.Format.FULL;
+import static com.bytechef.component.microsoft.outlook.definition.Format.SIMPLE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
@@ -34,6 +37,7 @@ public class MicrosoftOutlook365Constants {
 
     public static final String ADDRESS = "address";
     public static final String ALL_DAY = "allDay";
+    public static final String ATTACHMENTS = "attachments";
     public static final String ATTENDEES = "attendees";
     public static final String BCC_RECIPIENTS = "bccRecipients";
     public static final String BODY = "body";
@@ -42,19 +46,20 @@ public class MicrosoftOutlook365Constants {
     public static final String CC_RECIPIENTS = "ccRecipients";
     public static final String COMMENT = "comment";
     public static final String CONTENT = "content";
+    public static final String CONTENT_BYTES = "contentBytes";
     public static final String CONTENT_TYPE = "contentType";
     public static final String DATE_RANGE = "dateRange";
     public static final String DATE_TIME = "dateTime";
     public static final String END = "end";
     public static final String EMAIL_ADDRESS = "emailAddress";
     public static final String EVENT = "event";
+    public static final String FORMAT = "format";
     public static final String FROM = "from";
     public static final String I_CAL_UID = "iCalUId";
     public static final String ID = "id";
     public static final String IS_ONLINE_MEETING = "isOnlineMeeting";
     public static final String NAME = "name";
     public static final String ODATA_NEXT_LINK = "@odata.nextLink";
-    public static final String RECIPIENT = "recipient";
     public static final String REMINDER_MINUTES_BEFORE_START = "reminderMinutesBeforeStart";
     public static final String REPLY_TO = "replyTo";
     public static final String START = "start";
@@ -90,6 +95,15 @@ public class MicrosoftOutlook365Constants {
                 .description("URL for an online meeting."),
             bool(REMINDER_MINUTES_BEFORE_START)
                 .description("The number of minutes before the event start time that the reminder alert occurs."));
+
+    public static final ModifiableStringProperty FORMAT_PROPERTY = string(FORMAT)
+        .label("Format")
+        .description("The format to return the message in.")
+        .options(
+            option("Simple", SIMPLE.name(), "Returns email message's from, to, subject, body and attachments."),
+            option("Full", FULL.name(), "Returns all properties of the email message."))
+        .defaultValue(SIMPLE.name())
+        .required(true);
 
     public static final ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
