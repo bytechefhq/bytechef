@@ -16,12 +16,28 @@
 
 package com.bytechef.component.microsoft.outlook.util;
 
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ADDRESS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_BYTES;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TypeReference;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +48,31 @@ import java.util.Map;
 public class MicrosoftOutlook365Utils {
 
     private MicrosoftOutlook365Utils() {
+    }
+
+    public static SimpleMessage createSimpleMessage(Context context, Map<?, ?> messageBody, String id) {
+        String from = null;
+        if (messageBody.get(FROM) instanceof Map<?, ?> fromMap &&
+            fromMap.get(EMAIL_ADDRESS) instanceof Map<?, ?> emailAddressMap) {
+
+            from = (String) emailAddressMap.get(ADDRESS);
+        }
+
+        String bodyHtml = null;
+        if (messageBody.get(BODY) instanceof Map<?, ?> map) {
+            bodyHtml = (String) map.get(CONTENT);
+        }
+
+        return new SimpleMessage(
+            (String) messageBody.get(ID),
+            (String) messageBody.get(SUBJECT),
+            from,
+            getRecipients(messageBody, TO_RECIPIENTS),
+            getRecipients(messageBody, CC_RECIPIENTS),
+            getRecipients(messageBody, BCC_RECIPIENTS),
+            (String) messageBody.get("bodyPreview"),
+            bodyHtml,
+            getFileEntries(context, messageBody, id));
     }
 
     public static List<Map<?, ?>> getItemsFromNextPage(String link, Context context) {
@@ -66,5 +107,56 @@ public class MicrosoftOutlook365Utils {
             .getBody(new TypeReference<>() {});
 
         return body.get(VALUE);
+    }
+
+    private static List<FileEntry> getFileEntries(Context context, Map<?, ?> messageBody, String id) {
+        List<FileEntry> fileEntries = new ArrayList<>();
+
+        if ((boolean) messageBody.get("hasAttachments")) {
+            Map<String, Object> attachmentsBody = context
+                .http(http -> http.get("/me/messages/%s/attachments".formatted(id)))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (attachmentsBody.get(VALUE) instanceof List<?> attachments) {
+                for (Object attachment : attachments) {
+                    if (attachment instanceof Map<?, ?> map) {
+                        String contentBytes = (String) map.get(CONTENT_BYTES);
+                        byte[] decodedBytes = EncodingUtils.base64Decode(contentBytes);
+
+                        FileEntry fileEntry = context.file(
+                            file -> file.storeContent((String) map.get(NAME),
+                                new ByteArrayInputStream(decodedBytes)));
+
+                        fileEntries.add(fileEntry);
+                    }
+                }
+            }
+        }
+
+        return fileEntries;
+    }
+
+    private static List<String> getRecipients(Map<?, ?> body, String recipientType) {
+        List<String> recipients = new ArrayList<>();
+
+        if (body.get(recipientType) instanceof List<?> list) {
+            for (Object recipient : list) {
+                if (recipient instanceof Map<?, ?> recipientMap &&
+                    recipientMap.get(EMAIL_ADDRESS) instanceof Map<?, ?> emailAddressMap) {
+
+                    recipients.add((String) emailAddressMap.get(ADDRESS));
+                }
+            }
+        }
+
+        return recipients;
+    }
+
+    @SuppressFBWarnings("EI")
+    public record SimpleMessage(
+        String id, String subject, String from, List<String> to, List<String> cc, List<String> bcc, String bodyPlain,
+        String bodyHtml, List<FileEntry> attachments) {
     }
 }

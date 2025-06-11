@@ -16,12 +16,14 @@
 
 package com.bytechef.component.microsoft.outlook.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MESSAGE_OUTPUT_PROPERTY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT_PROPERTY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
+import static com.bytechef.component.microsoft.outlook.definition.Format.SIMPLE;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.createSimpleMessage;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getItemsFromNextPage;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -31,6 +33,8 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.microsoft.outlook.definition.Format;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -47,7 +51,8 @@ public class MicrosoftOutlook365NewEmailTrigger {
         .title("New Email")
         .description("Triggers when new mail is received.")
         .type(TriggerType.POLLING)
-        .output(outputSchema(array().items(MESSAGE_OUTPUT_PROPERTY)))
+        .properties(FORMAT_PROPERTY)
+        .output()
         .poll(MicrosoftOutlook365NewEmailTrigger::poll);
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
@@ -88,7 +93,19 @@ public class MicrosoftOutlook365NewEmailTrigger {
             addValidEmail(map, startDate, now, maps, zoneId);
         }
 
-        return new PollOutput(maps, Map.of(LAST_TIME_CHECKED, now), false);
+        Format format = inputParameters.getRequired(FORMAT, Format.class);
+
+        if (format.equals(SIMPLE)) {
+            List<MicrosoftOutlook365Utils.SimpleMessage> simpleMessages = new ArrayList<>();
+
+            for (Map<?, ?> map : maps) {
+                simpleMessages.add(createSimpleMessage(context, map, (String) map.get(ID)));
+            }
+
+            return new PollOutput(simpleMessages, Map.of(LAST_TIME_CHECKED, now), false);
+        } else {
+            return new PollOutput(maps, Map.of(LAST_TIME_CHECKED, now), false);
+        }
     }
 
     private static void addValidEmail(

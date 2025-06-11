@@ -17,10 +17,12 @@
 package com.bytechef.component.microsoft.outlook.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MESSAGE_OUTPUT_PROPERTY;
+import static com.bytechef.component.microsoft.outlook.definition.Format.SIMPLE;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.createSimpleMessage;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -28,10 +30,12 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.microsoft.outlook.definition.Format;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
+import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftOutlook365GetMailAction {
 
@@ -43,17 +47,28 @@ public class MicrosoftOutlook365GetMailAction {
                 .label("Message Id")
                 .description("Id of the message.")
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
-                .required(true))
-        .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
+                .required(true),
+            FORMAT_PROPERTY)
+        .output()
         .perform(MicrosoftOutlook365GetMailAction::perform);
 
     private MicrosoftOutlook365GetMailAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(http -> http.get("/me/messages/%s".formatted(inputParameters.getRequiredString(ID))))
+        String id = inputParameters.getRequiredString(ID);
+
+        Map<String, Object> messageBody = context.http(http -> http.get("/me/messages/%s".formatted(id)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+
+        Format format = inputParameters.getRequired(FORMAT, Format.class);
+
+        if (format.equals(SIMPLE)) {
+            return createSimpleMessage(context, messageBody, id);
+        } else {
+            return messageBody;
+        }
     }
 }
