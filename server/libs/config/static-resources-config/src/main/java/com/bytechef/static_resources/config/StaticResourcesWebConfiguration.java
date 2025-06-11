@@ -19,20 +19,13 @@ package com.bytechef.static_resources.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.Ordered;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
-import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 /**
  * @author Igor Beslic
@@ -59,24 +52,5 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
         if (logger.isInfoEnabled()) {
             logger.debug("Serving static web content at {}", resources.getWeb());
         }
-    }
-
-    @Bean
-    public SimpleUrlHandlerMapping oauthHandlerMapping() {
-        SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-
-        mapping.setUrlMap(Map.of("/oauth.html", oauthResourceHandler()));
-        mapping.setOrder(Ordered.HIGHEST_PRECEDENCE);
-
-        return mapping;
-    }
-
-    @Bean
-    public ResourceHttpRequestHandler oauthResourceHandler() {
-        ResourceHttpRequestHandler handler = new ResourceHttpRequestHandler();
-
-        handler.setLocations(List.of(new ClassPathResource("public/")));
-
-        return handler;
     }
 }
