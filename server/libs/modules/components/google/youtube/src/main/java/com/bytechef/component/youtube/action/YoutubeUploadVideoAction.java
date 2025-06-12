@@ -150,9 +150,7 @@ public class YoutubeUploadVideoAction {
     private YoutubeUploadVideoAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String url = context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos"))
             .header("Content-Type", "application/octet-stream")
             .queryParameters("uploadType", "resumable", "part", "snippet,status")
@@ -171,13 +169,11 @@ public class YoutubeUploadVideoAction {
 
         Map<String, Object> response = context.http(http -> http.put(url))
             .header("Content-Type", "application/octet-stream")
-            .body(
-                Body.of(
-                    inputParameters.getRequiredFileEntry(FILE)))
+            .body(Body.of(inputParameters.getRequiredFileEntry(FILE)))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return (Map<String, Object>) response.get(SNIPPET);
+        return response.get(SNIPPET);
     }
 }

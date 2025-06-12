@@ -18,7 +18,10 @@ package com.bytechef.component.youtube.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.ID;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.ITEMS;
 import static com.bytechef.component.youtube.constant.YoutubeConstants.SNIPPET;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.TITLE;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -40,7 +43,7 @@ public class YoutubeUtils {
         Map<String, Object> response =
             triggerContext.http(http -> http.get("https://www.googleapis.com/youtube/v3/search"))
                 .queryParameters(
-                    "part", "snippet",
+                    "part", SNIPPET,
                     "type", "channel",
                     "q", identifier)
                 .configuration(responseType(Http.ResponseType.JSON))
@@ -49,9 +52,9 @@ public class YoutubeUtils {
 
         String channelId = "";
 
-        if (response.get("items") instanceof List<?> channels &&
+        if (response.get(ITEMS) instanceof List<?> channels &&
             channels.getFirst() instanceof Map<?, ?> channelMap &&
-            channelMap.get("id") instanceof Map<?, ?> channelIdMap) {
+            channelMap.get(ID) instanceof Map<?, ?> channelIdMap) {
 
             channelId = (String) channelIdMap.get("channelId");
         }
@@ -65,23 +68,23 @@ public class YoutubeUtils {
 
         Map<String, Object> response =
             context.http(http -> http.get("https://www.googleapis.com/youtube/v3/videoCategories"))
-                .queryParameters("part", "snippet",
+                .queryParameters(
+                    "part", SNIPPET,
                     "regionCode", "US")
                 .configuration(responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
 
-        List<Option<String>> videoCategoryIdOptions = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-        if (response.get("items") instanceof List<?> itemsList) {
-            for (Object item : itemsList) {
-                if (item instanceof Map<?, ?> itemMap &&
-                    itemMap.get(SNIPPET) instanceof Map<?, ?> snippetMap) {
-                    videoCategoryIdOptions.add(option((String) snippetMap.get("title"), (String) itemMap.get("id")));
+        if (response.get(ITEMS) instanceof List<?> items) {
+            for (Object item : items) {
+                if (item instanceof Map<?, ?> itemMap && itemMap.get(SNIPPET) instanceof Map<?, ?> snippetMap) {
+                    options.add(option((String) snippetMap.get(TITLE), (String) itemMap.get(ID)));
                 }
             }
         }
 
-        return videoCategoryIdOptions;
+        return options;
     }
 }

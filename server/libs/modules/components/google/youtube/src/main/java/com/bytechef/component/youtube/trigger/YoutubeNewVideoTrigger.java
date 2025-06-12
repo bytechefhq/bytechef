@@ -21,7 +21,10 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.ID;
 import static com.bytechef.component.youtube.constant.YoutubeConstants.IDENTIFIER;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.ITEMS;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.SNIPPET;
 import static com.bytechef.component.youtube.constant.YoutubeConstants.VIDEO;
 import static com.bytechef.component.youtube.util.YoutubeUtils.getChannelId;
 
@@ -116,7 +119,7 @@ public class YoutubeNewVideoTrigger {
         Map<String, Object> response =
             triggerContext.http(http -> http.get("https://www.googleapis.com/youtube/v3/search"))
                 .queryParameters(
-                    "part", "snippet",
+                    "part", SNIPPET,
                     "channelId", channelId,
                     "type", "video",
                     "order", "date")
@@ -126,12 +129,12 @@ public class YoutubeNewVideoTrigger {
 
         List<Map<?, ?>> newVideos = new ArrayList<>();
 
-        if (response.get("items") instanceof List<?> items) {
+        if (response.get(ITEMS) instanceof List<?> items) {
             for (Object item : items) {
                 if (item instanceof Map<?, ?> itemMap &&
-                    itemMap.get("id") instanceof Map<?, ?> idMap &&
+                    itemMap.get(ID) instanceof Map<?, ?> idMap &&
                     idMap.get("videoId") instanceof String videoId &&
-                    itemMap.get("snippet") instanceof Map<?, ?> snippet) {
+                    itemMap.get(SNIPPET) instanceof Map<?, ?> snippet) {
 
                     allVideosUpdated.add(videoId);
 

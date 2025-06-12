@@ -53,12 +53,11 @@ class YoutubeUploadVideoActionTest {
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<String> nameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
-    private final ArgumentCaptor<String> valueArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void perform() {
+    void testPerform() {
         when(mockedParameters.getRequiredFileEntry(FILE))
             .thenReturn(mockedFileEntry);
         when(mockedParameters.getRequiredString(TITLE))
@@ -74,7 +73,7 @@ class YoutubeUploadVideoActionTest {
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.header(nameArgumentCaptor.capture(), valueArgumentCaptor.capture()))
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -89,14 +88,12 @@ class YoutubeUploadVideoActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(SNIPPET, Map.of()));
 
-        Map<String, Object> result = YoutubeUploadVideoAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Object result = YoutubeUploadVideoAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
-
-        assertEquals(List.of("Content-Type", "Content-Type"), nameArgumentCaptor.getAllValues());
-        assertEquals(List.of("application/octet-stream", "application/octet-stream"),
-            valueArgumentCaptor.getAllValues());
+        assertEquals(
+            List.of("Content-Type", "application/octet-stream", "Content-Type", "application/octet-stream"),
+            stringArgumentCaptor.getAllValues());
 
         Object[] queryArguments = queryArgumentCaptor.getValue();
         Object[] expectedQueryArguments = {
@@ -112,11 +109,11 @@ class YoutubeUploadVideoActionTest {
             TAGS, List.of()),
             STATUS, Map.of(PRIVACY_STATUS, "private"));
 
-        List<Body> body = bodyArgumentCaptor.getAllValues();
+        List<Body> bodies = bodyArgumentCaptor.getAllValues();
 
-        assertEquals(body1, body.get(0)
+        assertEquals(body1, bodies.get(0)
             .getContent());
-        assertEquals(mockedFileEntry, body.get(1)
+        assertEquals(mockedFileEntry, bodies.get(1)
             .getContent());
     }
 }
