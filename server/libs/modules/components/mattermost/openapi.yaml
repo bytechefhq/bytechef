@@ -30,7 +30,6 @@ paths:
                 message:
                   type: "string"
                   description: "The message contents."
-
       responses:
         201:
           description: "Successful operation"

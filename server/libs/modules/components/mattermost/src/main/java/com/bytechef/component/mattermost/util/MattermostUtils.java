@@ -21,6 +21,7 @@ import static com.bytechef.component.mattermost.constant.MattermostConstants.DIS
 import static com.bytechef.component.mattermost.constant.MattermostConstants.ID;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -29,9 +30,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Marija Horvat
  */
 public class MattermostUtils extends AbstractMattermostUtils {
+
     private MattermostUtils() {
     }
 
@@ -41,7 +43,7 @@ public class MattermostUtils extends AbstractMattermostUtils {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/channels"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 

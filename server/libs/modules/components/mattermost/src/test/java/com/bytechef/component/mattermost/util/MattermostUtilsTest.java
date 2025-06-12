@@ -17,6 +17,8 @@
 package com.bytechef.component.mattermost.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.mattermost.constant.MattermostConstants.DISPLAY_NAME;
+import static com.bytechef.component.mattermost.constant.MattermostConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -29,7 +31,6 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Marija Horvat
  */
-public class MattermostUtilsTest {
+class MattermostUtilsTest {
 
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
@@ -45,13 +46,7 @@ public class MattermostUtilsTest {
     private final Response mockedResponse = mock(Response.class);
 
     @Test
-    void testChannelIdOptions() {
-        List<Map<String, Object>> channels = new ArrayList<>();
-        Map<String, Object> channelMap = new LinkedHashMap<>();
-        channelMap.put("display_name", "Channel 1");
-        channelMap.put("id", "channel_id_1");
-        channels.add(channelMap);
-
+    void testGetChannelIdOptions() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -59,7 +54,7 @@ public class MattermostUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(channels);
+            .thenReturn(List.of(Map.of(DISPLAY_NAME, "Channel 1", ID, "channel_id_1")));
 
         List<Option<String>> options = MattermostUtils.getChannelIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);

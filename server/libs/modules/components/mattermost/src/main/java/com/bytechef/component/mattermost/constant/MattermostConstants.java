@@ -27,5 +27,4 @@ public class MattermostConstants {
 
     private MattermostConstants() {
     }
-
 }
