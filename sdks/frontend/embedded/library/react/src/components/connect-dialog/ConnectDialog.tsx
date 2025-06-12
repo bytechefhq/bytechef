@@ -4,7 +4,14 @@ import XIcon from './assets/x.svg';
 import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
 import {DialogStepKeyType, DialogStepType} from '.';
 import styles from './styles.module.css';
-import {FormType, IntegrationType, PropertyType, WorkflowInputType, WorkflowType} from './types';
+import {
+    FormType,
+    IntegrationType,
+    PropertyType,
+    RegisterFormSubmitFunction,
+    WorkflowInputType,
+    WorkflowType,
+} from './types';
 
 interface ToggleProps {
     id: string;
@@ -41,11 +48,11 @@ interface DialogProps {
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
-    integration: IntegrationType;
+    integration?: IntegrationType;
     isOAuth2?: boolean;
     isOpen: boolean;
     properties?: PropertyType[];
-    registerFormSubmit?: (submitFn: (data: {[key: string]: unknown}) => void) => void;
+    registerFormSubmit?: RegisterFormSubmitFunction;
     selectedWorkflows: string[];
 }
 
@@ -88,17 +95,29 @@ const ConnectDialog = ({
             <div className={styles.dialogContainer} onClick={(event) => event.stopPropagation()}>
                 <DialogHeader closeDialog={closeDialog} dialogStep={dialogStep} integration={integration} />
 
-                <DialogContent
-                    closeDialog={closeDialog}
-                    dialogStepKey={dialogStep.key}
-                    form={form}
-                    handleWorkflowToggle={handleWorkflowToggle}
-                    handleWorkflowInputChange={handleWorkflowInputChange}
-                    integration={integration}
-                    properties={properties}
-                    registerFormSubmit={registerFormSubmit}
-                    selectedWorkflows={selectedWorkflows}
-                />
+                {integration ? (
+                    <DialogContent
+                        closeDialog={closeDialog}
+                        dialogStepKey={dialogStep.key}
+                        form={form}
+                        handleWorkflowToggle={handleWorkflowToggle}
+                        handleWorkflowInputChange={handleWorkflowInputChange}
+                        integration={integration}
+                        properties={properties}
+                        registerFormSubmit={registerFormSubmit}
+                        selectedWorkflows={selectedWorkflows}
+                    />
+                ) : (
+                    <main className={styles.dialogContentFallback}>
+                        <h2>Unable to Load Integration</h2>
+
+                        <p>We couldn't load the integration data. Please try again later.</p>
+
+                        <button className={styles.buttonSecondary} onClick={closeDialog}>
+                            Close
+                        </button>
+                    </main>
+                )}
 
                 {integration && (
                     <DialogFooter
@@ -118,7 +137,7 @@ const ConnectDialog = ({
 interface DialogHeaderProps {
     closeDialog: () => void;
     dialogStep: DialogStepType;
-    integration: IntegrationType;
+    integration?: IntegrationType;
 }
 
 const DialogHeader = ({closeDialog, dialogStep, integration}: DialogHeaderProps) => (
@@ -128,7 +147,7 @@ const DialogHeader = ({closeDialog, dialogStep, integration}: DialogHeaderProps)
                 <div className={styles.integrationIcon} dangerouslySetInnerHTML={{__html: integration.icon}} />
             )}
 
-            <h2>Create Connection | {dialogStep.label}</h2>
+            <h2>Create Connection | {integration ? dialogStep.label : 'Error'}</h2>
         </div>
 
         <div>
@@ -213,12 +232,11 @@ interface DialogContentProps {
     handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
     integration: IntegrationType;
     properties?: PropertyType[];
-    registerFormSubmit?: (submitFn: (data: object) => void) => void;
+    registerFormSubmit?: RegisterFormSubmitFunction;
     selectedWorkflows: string[];
 }
 
 const DialogContent = ({
-    closeDialog,
     dialogStepKey = 'initial',
     form,
     handleWorkflowToggle,
@@ -234,20 +252,6 @@ const DialogContent = ({
             registerFormSubmit(form.handleSubmit);
         }
     }, [registerFormSubmit, form]);
-
-    if (!integration) {
-        return (
-            <main className={styles.dialogContent}>
-                <h2>Unable to Load Integration</h2>
-
-                <p>We couldn't load the integration data. Please try again later.</p>
-
-                <button className={styles.buttonSecondary} onClick={closeDialog}>
-                    Close
-                </button>
-            </main>
-        );
-    }
 
     return (
         <main className={styles.dialogContent}>
