@@ -20,9 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDef
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.ATTACHMENTS;
@@ -99,18 +97,6 @@ public final class SendgridSendEmailAction {
                 .description("A list of attachments you want to include with the email.")
                 .items(fileEntry())
                 .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(TYPE),
-                        string(FROM),
-                        array(TO)
-                            .items(string()),
-                        string(SUBJECT),
-                        string(TEXT),
-                        array(ATTACHMENTS)
-                            .items(fileEntry()))))
         .perform(SendgridSendEmailAction::perform);
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();

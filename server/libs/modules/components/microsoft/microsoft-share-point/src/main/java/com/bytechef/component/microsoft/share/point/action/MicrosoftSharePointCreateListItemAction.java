@@ -18,12 +18,9 @@ package com.bytechef.component.microsoft.share.point.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.COLUMNS;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FIELDS;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
@@ -57,11 +54,7 @@ public class MicrosoftSharePointCreateListItemAction {
             dynamicProperties(COLUMNS)
                 .propertiesLookupDependsOn(SITE_ID, LIST_ID)
                 .properties(MicrosoftSharePointUtils::createPropertiesForListItem))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(ID))))
+        .output()
         .perform(MicrosoftSharePointCreateListItemAction::perform);
 
     private MicrosoftSharePointCreateListItemAction() {
