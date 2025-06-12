@@ -178,7 +178,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| result | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(user_name), STRING\(user_type), STRING\(email), STRING\(phone_home), STRING\(phone_work), STRING\(phone_mobile), STRING\(userlable), STRING\(address_street), STRING\(address_city), STRING\(address_state), STRING\(address_country), STRING\(roleid), STRING\(language), STRING\(is_admin), STRING\(is_owner), STRING\(status)&#125; </details> |  |
+| result | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(user_name), STRING\(user_type), STRING\(email), STRING\(phone_home), STRING\(phone_work), STRING\(phone_mobile), STRING\(userlable), STRING\(address_street), STRING\(address_city), STRING\(address_state), STRING\(address_country), STRING\(roleid), STRING\(language), BOOLEAN\(is_admin), BOOLEAN\(is_owner), STRING\(status)&#125; </details> |  |
 
 
 
@@ -201,8 +201,8 @@ Type: OBJECT
     "address_country" : "",
     "roleid" : "",
     "language" : "",
-    "is_admin" : "",
-    "is_owner" : "",
+    "is_admin" : false,
+    "is_owner" : false,
     "status" : ""
   }
 }

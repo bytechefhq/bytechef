@@ -136,9 +136,9 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| pages | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(index), STRING\(markdown), [&#123;STRING\(id), INTEGER\(top_left_x), INTEGER\(top_left_y), INTEGER\(bottom_right_x), INTEGER\(bottom_right_y)&#125;]\(images), &#123;INTEGER\(dpi), INTEGER\(height), INTEGER\(width)&#125;\(dimensions)&#125;] </details> |  |
-| model | STRING |  |
-| usage_info | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(pages_processed), INTEGER\(doc_size_bytes)&#125; </details> |  |
+| pages | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(index), STRING\(markdown), [&#123;STRING\(id), INTEGER\(top_left_x), INTEGER\(top_left_y), INTEGER\(bottom_right_x), INTEGER\(bottom_right_y)&#125;]\(images), &#123;INTEGER\(dpi), INTEGER\(height), INTEGER\(width)&#125;\(dimensions)&#125;] </details> | List of OCR info for pages. |
+| model | STRING | The model used to generate the OCR. |
+| usage_info | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(pages_processed), INTEGER\(doc_size_bytes)&#125; </details> | Usage info for the OCR request. |
 
 
 

@@ -676,18 +676,23 @@ Type: POLLING
 
 
 
-Type: ARRAY
-
-
-Items Type: OBJECT
+Type: OBJECT
 
 
 #### Properties
+
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-
+| createdDateTime | DATE_TIME | The date and time when the file was created. |
+| eTag | STRING |  |
+| id | STRING | ID of the file. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the file was last modified. |
+| name | STRING | Name of the created file. |
+| size | INTEGER | Size of the file in bytes. |
+| webUrl | STRING | URL to access the file in a web browser. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| file | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(quickXorHash)&#125;\(hashes), STRING\(mimeType)&#125; </details> |  |
 
 
 
