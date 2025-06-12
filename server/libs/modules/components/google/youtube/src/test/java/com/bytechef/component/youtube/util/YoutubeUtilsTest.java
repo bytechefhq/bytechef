@@ -47,7 +47,7 @@ class YoutubeUtilsTest {
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
-    void getChannelId() {
+    void testGetChannelId() {
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
