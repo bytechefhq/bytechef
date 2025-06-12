@@ -80,8 +80,12 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | STRING | ID of the channel. |
+| createdDateTime | DATE_TIME | The date and time when the channel was created. |
 | displayName | STRING | Name of the channel that will appear to the user in Microsoft Teams. |
 | description | STRING | Description of the channel. |
+| isFavoriteByDefault | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the channel is marked as favorite by default. |
+| webUrl | STRING | URL to access the channel in a web browser. |
+| isArchived | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the channel is archived. |
 
 
 
@@ -90,8 +94,12 @@ Type: OBJECT
 ```json
 {
   "id" : "",
+  "createdDateTime" : "2021-01-01T00:00:00",
   "displayName" : "",
-  "description" : ""
+  "description" : "",
+  "isFavoriteByDefault" : false,
+  "webUrl" : "",
+  "isArchived" : false
 }
 ```
 

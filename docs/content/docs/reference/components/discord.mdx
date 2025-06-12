@@ -79,9 +79,20 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| content | STRING |  |
-| tts | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| type | INTEGER | Type of the message. |
+| id | STRING | ID of the message. |
+| content | STRING | Contents of the message. |
+| tts | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this was a TTS message. |
+| mentions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(username)&#125;] </details> | Users specifically mentioned in the message. |
+| mention_roles | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(name)&#125;] </details> | Roles specifically mentioned in this message. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(filename), STRING\(title), STRING\(description), STRING\(content_type), INTEGER\(size), STRING\(url), STRING\(proxy_url)&#125;] </details> | Any attached files. |
+| timestamp | STRING | When this message was sent. |
+| flags | INTEGER | message flags combined as a bitfield. |
+| components | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | Sent if the message contains components like buttons, action rows, or other interactive components. |
+| channel_id | STRING | ID of the channel the message was sent in. |
+| author | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(username)&#125; </details> | The author of this message. |
+| pinned | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this message is pinned. |
+| mention_everyone | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this message mentions everyone. |
 
 
 
@@ -89,9 +100,38 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "type" : 1,
   "id" : "",
   "content" : "",
-  "tts" : false
+  "tts" : false,
+  "mentions" : [ {
+    "id" : "",
+    "username" : ""
+  } ],
+  "mention_roles" : [ {
+    "id" : "",
+    "name" : ""
+  } ],
+  "attachments" : [ {
+    "id" : "",
+    "filename" : "",
+    "title" : "",
+    "description" : "",
+    "content_type" : "",
+    "size" : 1,
+    "url" : "",
+    "proxy_url" : ""
+  } ],
+  "timestamp" : "",
+  "flags" : 1,
+  "components" : [ { } ],
+  "channel_id" : "",
+  "author" : {
+    "id" : "",
+    "username" : ""
+  },
+  "pinned" : false,
+  "mention_everyone" : false
 }
 ```
 
@@ -134,9 +174,18 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| type | INTEGER |  |
-| name | STRING |  |
+| id | STRING | ID of the channel. |
+| type | INTEGER | Type of the channel. |
+| last_message_id | STRING | ID of the last message sent in this channel. |
+| flags | INTEGER | Channel flags combined as a bitfield. |
+| guild_id | STRING | ID of the guild to which the channel belongs. |
+| name | STRING | Name of the channel. |
+| parent_id | STRING | For guild channels: id of the parent category for a channel |
+| rate_limit_per_user | INTEGER | Amount of seconds a user has to wait before sending another message |
+| topic | STRING | Topic of the channel. |
+| position | INTEGER | Sorting position of the channel (channels with the same position are sorted by id) |
+| permission_overwrites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), INTEGER\(type), STRING\(allow), STRING\(deny)&#125;] </details> | Explicit permission overwrites for members and roles. |
+| nsfw | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the channel is marked as NSFW (Not Safe For Work). |
 
 
 
@@ -146,7 +195,21 @@ Type: OBJECT
 {
   "id" : "",
   "type" : 1,
-  "name" : ""
+  "last_message_id" : "",
+  "flags" : 1,
+  "guild_id" : "",
+  "name" : "",
+  "parent_id" : "",
+  "rate_limit_per_user" : 1,
+  "topic" : "",
+  "position" : 1,
+  "permission_overwrites" : [ {
+    "id" : "",
+    "type" : 1,
+    "allow" : "",
+    "deny" : ""
+  } ],
+  "nsfw" : false
 }
 ```
 
@@ -191,7 +254,20 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id)&#125; </details> |  |
+| type | INTEGER | Type of the message. |
+| id | STRING | ID of the message. |
+| content | STRING | Contents of the message. |
+| tts | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this was a TTS message. |
+| mentions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(username)&#125;] </details> | Users specifically mentioned in the message. |
+| mention_roles | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(name)&#125;] </details> | Roles specifically mentioned in this message. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(filename), STRING\(title), STRING\(description), STRING\(content_type), INTEGER\(size), STRING\(url), STRING\(proxy_url)&#125;] </details> | Any attached files. |
+| timestamp | STRING | When this message was sent. |
+| flags | INTEGER | message flags combined as a bitfield. |
+| components | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | Sent if the message contains components like buttons, action rows, or other interactive components. |
+| channel_id | STRING | ID of the channel the message was sent in. |
+| author | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(username)&#125; </details> | The author of this message. |
+| pinned | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this message is pinned. |
+| mention_everyone | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this message mentions everyone. |
 
 
 
@@ -199,9 +275,38 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "body" : {
-    "id" : ""
-  }
+  "type" : 1,
+  "id" : "",
+  "content" : "",
+  "tts" : false,
+  "mentions" : [ {
+    "id" : "",
+    "username" : ""
+  } ],
+  "mention_roles" : [ {
+    "id" : "",
+    "name" : ""
+  } ],
+  "attachments" : [ {
+    "id" : "",
+    "filename" : "",
+    "title" : "",
+    "description" : "",
+    "content_type" : "",
+    "size" : 1,
+    "url" : "",
+    "proxy_url" : ""
+  } ],
+  "timestamp" : "",
+  "flags" : 1,
+  "components" : [ { } ],
+  "channel_id" : "",
+  "author" : {
+    "id" : "",
+    "username" : ""
+  },
+  "pinned" : false,
+  "mention_everyone" : false
 }
 ```
 

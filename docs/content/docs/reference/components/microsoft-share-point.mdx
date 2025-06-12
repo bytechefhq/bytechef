@@ -79,8 +79,19 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
+| createdDateTime | DATE_TIME | The date and time when the folder was created. |
+| eTag | STRING |  |
+| id | STRING | ID of the folder. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the folder was last modified. |
+| name | STRING | Name of the folder. |
+| size | INTEGER | Size of the folder in bytes. |
+| webUrl | STRING | URL to access the folder in a web browser. |
+| cTag | STRING |  |
+| commentSettings | OBJECT <details> <summary> Properties </summary> &#123;&#123;BOOLEAN\(isDisabled)&#125;\(commentingDisabled)&#125; </details> |  |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| folder | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(childCount)&#125; </details> |  |
+| shared | OBJECT <details> <summary> Properties </summary> &#123;STRING\(scope)&#125; </details> |  |
 
 
 
@@ -88,8 +99,37 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
   "id" : "",
-  "name" : ""
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "cTag" : "",
+  "commentSettings" : {
+    "commentingDisabled" : {
+      "isDisabled" : false
+    }
+  },
+  "createdBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "folder" : {
+    "childCount" : 1
+  },
+  "shared" : {
+    "scope" : ""
+  }
 }
 ```
 
@@ -132,9 +172,16 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the list. |
+| createdDateTime | DATE_TIME | The date and time when the list was created. |
 | description | STRING | Description of the list. |
+| eTag | STRING |  |
+| id | STRING | ID of the list. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the list was last modified. |
+| name | STRING | Name of the list. |
+| webUrl | STRING | URL to access the list in a web browser. |
 | displayName | STRING | The displayable title of the list. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| list | OBJECT <details> <summary> Properties </summary> &#123;BOOLEAN\(contentTypesEnabled), BOOLEAN\(hidden), STRING\(template)&#125; </details> |  |
 
 
 
@@ -142,9 +189,25 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "id" : "",
+  "createdDateTime" : "2021-01-01T00:00:00",
   "description" : "",
-  "displayName" : ""
+  "eTag" : "",
+  "id" : "",
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "webUrl" : "",
+  "displayName" : "",
+  "createdBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "list" : {
+    "contentTypesEnabled" : false,
+    "hidden" : false,
+    "template" : ""
+  }
 }
 ```
 
@@ -178,26 +241,9 @@ Name: createListItem
 
 #### Output
 
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : ""
-}
-```
 
 
 ### Upload File
@@ -243,7 +289,16 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
+| createdDateTime | DATE_TIME | The date and time when the file was created. |
+| eTag | STRING | eTag for the entire item (metadata + content). |
+| id | STRING | ID of the file. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the file was last modified. |
+| name | STRING | Name of the file. |
+| size | INTEGER | Size of the file in bytes. |
+| webUrl | STRING | URL to access the file in a web browser. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(email), STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(email), STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| file | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(quickXorHash)&#125;\(hashes), STRING\(mimeType)&#125; </details> |  |
 
 
 
@@ -251,7 +306,33 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "id" : ""
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
+  "id" : "",
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "createdBy" : {
+    "user" : {
+      "email" : "",
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "email" : "",
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "file" : {
+    "hashes" : {
+      "quickXorHash" : ""
+    },
+    "mimeType" : ""
+  }
 }
 ```
 

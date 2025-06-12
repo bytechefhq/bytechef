@@ -128,7 +128,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| org | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(id), STRING\(phone), STRING\(company_name), STRING\(primary_email)&#125;] </details> |  |
+| org | ARRAY <details> <summary> Items </summary> [&#123;STRING\(country), STRING\(city), STRING\(street), STRING\(zip), STRING\(photo_id), STRING\(description), STRING\(alias), STRING\(created_time), STRING\(type), STRING\(currency), STRING\(id), STRING\(phone), STRING\(company_name), STRING\(primary_email), STRING\(website)&#125;] </details> |  |
 
 
 
@@ -137,11 +137,21 @@ Type: OBJECT
 ```json
 {
   "org" : [ {
+    "country" : "",
+    "city" : "",
+    "street" : "",
+    "zip" : "",
+    "photo_id" : "",
+    "description" : "",
+    "alias" : "",
+    "created_time" : "",
     "type" : "",
+    "currency" : "",
     "id" : "",
     "phone" : "",
     "company_name" : "",
-    "primary_email" : ""
+    "primary_email" : "",
+    "website" : ""
   } ]
 }
 ```
