@@ -2,6 +2,7 @@ import ConnectDialog from './ConnectDialog';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import useOAuth2 from './useOAuth2';
+import {FormType, IntegrationType, PropertyType, WorkflowInputType, WorkflowType} from './types';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
 
@@ -36,7 +37,7 @@ function createApiClient(baseUrl: string, jwtToken: string) {
             endpoint: string,
             options: {
                 method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-                body?: any;
+                body?: object;
                 headers?: Record<string, string>;
             } = {}
         ): Promise<T> {
@@ -60,18 +61,19 @@ function createApiClient(baseUrl: string, jwtToken: string) {
                 }
 
                 return {} as T;
-            } catch (error: any) {
-                console.error(`API Error (${endpoint}):`, error?.message);
+            } catch (error: unknown) {
+                console.error(`API Error (${endpoint}):`, (error as Error).message);
+
                 throw error;
             }
         },
     };
 }
 
-function debounce<T extends (...args: any[]) => any>(fn: T, delay: number): (...args: Parameters<T>) => void {
+function debounce<T extends (...args: unknown[]) => unknown>(fn: T, delay: number): (...args: Parameters<T>) => void {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-    return function (this: any, ...args: Parameters<T>) {
+    return function (this: unknown, ...args: Parameters<T>) {
         if (timeoutId) {
             clearTimeout(timeoutId);
         }
@@ -96,7 +98,7 @@ export default function useConnectDialog({
     jwtToken,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
     const [dialogStep, setDialogStep] = useState<DialogStepKeyType>('initial');
-    const [integration, setIntegration] = useState<any>(null);
+    const [integration, setIntegration] = useState<IntegrationType>(null);
     const [isOAuth2, setIsOAuth2] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -106,13 +108,22 @@ export default function useConnectDialog({
     const inputRefs = useRef<Record<string, HTMLInputElement>>({});
     const portalContainerRef = useRef<HTMLElement | null>(null);
     const rootRef = useRef<ReturnType<typeof createRoot> | null>(null);
-    const formSubmitRef = useRef<((data: any) => void) | null>(null);
+    const formSubmitRef = useRef<((data: {[key: string]: unknown}) => void) | null>(null);
 
     const {fetch} = useMemo(() => createApiClient(baseUrl, jwtToken), [baseUrl, jwtToken]);
 
-    const registerFormSubmit = useCallback((submitFn: (data: any) => void) => {
+    const registerFormSubmit = useCallback((submitFn: (data: {[key: string]: unknown}) => void) => {
         formSubmitRef.current = submitFn;
     }, []);
+
+    const saveConnection = useCallback(async () => {
+        await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
+            method: 'POST',
+            body: formValues,
+        });
+
+        closeDialog();
+    }, [fetch, integrationId, formValues]);
 
     const handleSubmit = useCallback(() => {
         if (formSubmitRef.current) {
@@ -120,43 +131,90 @@ export default function useConnectDialog({
 
             submitFunction();
         }
-    }, []);
+    }, [saveConnection]);
 
-    const handleWorkflowToggle = useCallback((workflowId: string, isSelected: boolean) => {
-        if (isSelected) {
-            setSelectedWorkflows((selectedWorkflows) => [...selectedWorkflows, workflowId]);
+    const handleWorkflowToggle = useCallback(
+        (workflowId: string, isSelected: boolean) => {
+            if (isSelected) {
+                setSelectedWorkflows((selectedWorkflows) => [...selectedWorkflows, workflowId]);
 
-            fetch(`/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowId}/enable`, {
-                method: 'POST',
-            });
-        } else {
-            fetch(`/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowId}/enable`, {
-                method: 'DELETE',
-            });
-            setSelectedWorkflows((selectedWorkflows) => selectedWorkflows.filter((id) => id !== workflowId));
-        }
-    }, []);
+                fetch(`/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowId}/enable`, {
+                    method: 'POST',
+                });
+            } else {
+                fetch(`/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowId}/enable`, {
+                    method: 'DELETE',
+                });
+                setSelectedWorkflows((selectedWorkflows) => selectedWorkflows.filter((id) => id !== workflowId));
+            }
+        },
+        [fetch, integrationId]
+    );
 
     const isOAuth2AuthorizationType = useMemo(
-        () => OAUTH2_TYPES.includes(integration?.connectionConfig?.authorizationType),
+        () =>
+            integration?.connectionConfig?.authorizationType &&
+            OAUTH2_TYPES.includes(integration?.connectionConfig?.authorizationType),
         [integration]
     );
 
     const {getAuth} = useOAuth2({
         ...integration?.connectionConfig?.oauth2,
+        authorizationUrl: integration?.connectionConfig?.oauth2?.authorizationUrl || '',
+        clientId: integration?.connectionConfig?.oauth2?.clientId || '',
+        redirectUri: integration?.connectionConfig?.oauth2?.redirectUri || '',
         onCodeSuccess: (payload) => console.log('onCodeSuccess called: ', payload),
         onError: (error: string) => console.error(error),
         onTokenSuccess: (payload) => console.log('onTokenSuccess called: ', payload),
         responseType: isOAuth2AuthorizationType ? 'code' : 'token',
-        scope: integration?.connectionConfig?.oauth2?.scopes?.join(' '),
+        scope: integration?.connectionConfig?.oauth2?.scopes?.join(' ') || '',
     });
+
+    const createValidationRules = useCallback((properties: PropertyType[]): Record<string, ValidationRuleType> => {
+        if (!properties || properties.length === 0) {
+            return {};
+        }
+
+        const rules: Record<string, ValidationRuleType> = {};
+
+        properties.forEach((prop) => {
+            rules[prop.name] = {
+                required: !!prop.required,
+                requiredMessage: prop.required ? `${prop.label} is required` : undefined,
+            };
+        });
+
+        return rules;
+    }, []);
 
     const validationRules = useMemo(
         () => createValidationRules(integration?.connectionConfig?.inputs || []),
-        [integration?.connectionConfig?.inputs]
+        [createValidationRules, integration?.connectionConfig?.inputs]
     );
 
-    const form = useMemo(() => {
+    const validateForm = useCallback((data: Record<string, string>, rules: Record<string, ValidationRuleType>) => {
+        const errors: Record<string, {message: string}> = {};
+        const validatedData: Record<string, string> = {};
+
+        Object.keys(rules).forEach((fieldName) => {
+            const rule = rules[fieldName];
+            const value = data[fieldName] || '';
+
+            if (rule.required && value.trim() === '') {
+                errors[fieldName] = {message: rule.requiredMessage || 'This field is required'};
+            } else {
+                validatedData[fieldName] = value;
+            }
+        });
+
+        return {
+            isValid: Object.keys(errors).length === 0,
+            errors,
+            validatedData,
+        };
+    }, []);
+
+    const form: FormType = useMemo(() => {
         return {
             register: (name: string) => ({
                 name,
@@ -172,7 +230,7 @@ export default function useConnectDialog({
                     setFormValues((prev) => ({...prev, [name]: value}));
                 },
             }),
-            handleSubmit: (callback: (data: any) => void) => (event?: React.FormEvent) => {
+            handleSubmit: (callback: (data: {[key: string]: unknown}) => void) => (event?: React.FormEvent) => {
                 if (event) {
                     event.preventDefault();
                 }
@@ -204,65 +262,17 @@ export default function useConnectDialog({
                 errors: formErrors,
             },
         };
-    }, [validationRules, formErrors]);
-
-    function validateForm(data: Record<string, string>, rules: Record<string, ValidationRuleType>) {
-        const errors: Record<string, {message: string}> = {};
-        const validatedData: Record<string, string> = {};
-
-        Object.keys(rules).forEach((fieldName) => {
-            const rule = rules[fieldName];
-            const value = data[fieldName] || '';
-
-            if (rule.required && value.trim() === '') {
-                errors[fieldName] = {message: rule.requiredMessage || 'This field is required'};
-            } else {
-                validatedData[fieldName] = value;
-            }
-        });
-
-        return {
-            isValid: Object.keys(errors).length === 0,
-            errors,
-            validatedData,
-        };
-    }
+    }, [formErrors, formValues, validateForm, validationRules]);
 
     interface ValidationRuleType {
         required: boolean;
         requiredMessage?: string;
     }
 
-    function createValidationRules(properties: any[]): Record<string, ValidationRuleType> {
-        if (!properties || properties.length === 0) {
-            return {};
-        }
-
-        const rules: Record<string, ValidationRuleType> = {};
-
-        properties.forEach((prop) => {
-            rules[prop.name] = {
-                required: !!prop.required,
-                requiredMessage: prop.required ? `${prop.label} is required` : undefined,
-            };
-        });
-
-        return rules;
-    }
-
-    async function saveConnection() {
-        await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
-            method: 'POST',
-            body: formValues,
-        });
-
-        closeDialog();
-    }
-
     const openDialog = async () => {
         setIsOpen(true);
 
-        const integrationData = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
+        const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
 
         setIntegration(integrationData);
     };
@@ -308,7 +318,7 @@ export default function useConnectDialog({
     const handleWorkflowInputChange = useCallback(
         (workflowReferenceCode: string, inputName: string, value: string) => {
             const matchingWorkflow = integration?.workflows?.find(
-                (workflow: any) => workflow.workflowReferenceCode === workflowReferenceCode
+                (workflow: WorkflowType) => workflow.workflowReferenceCode === workflowReferenceCode
             );
 
             const matchingWorkflowInput = matchingWorkflow?.inputs?.find((input: any) => input.name === inputName);
@@ -316,7 +326,9 @@ export default function useConnectDialog({
             const body = {
                 ...matchingWorkflow,
                 inputs: [
-                    ...matchingWorkflow.inputs.filter((input: any) => input.name !== inputName),
+                    ...(matchingWorkflow?.inputs as WorkflowInputType[]).filter(
+                        (input: WorkflowInputType) => input.name !== inputName
+                    ),
                     {
                         ...matchingWorkflowInput,
                         value: value,
@@ -331,7 +343,7 @@ export default function useConnectDialog({
                     fetch(
                         `/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowReferenceCode}`,
                         {
-                            body: payload,
+                            body: payload as object,
                             method: 'PUT',
                         }
                     );
@@ -388,8 +400,7 @@ export default function useConnectDialog({
             rootRef.current.render(
                 <ConnectDialog
                     closeDialog={closeDialog}
-                    dialogStep={dialogStep} // Keep this as just the key for now
-                    dialogStepLabel={currentStep.label} // Add the label
+                    dialogStep={currentStep}
                     form={form}
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
@@ -419,7 +430,7 @@ export default function useConnectDialog({
     ]);
 
     useEffect(() => {
-        if (integration?.connectionConfig?.authorizationType.startsWith('OAUTH2')) {
+        if (integration?.connectionConfig?.authorizationType?.startsWith('OAUTH2')) {
             setIsOAuth2(true);
         }
     }, [integration?.connectionConfig?.authorizationType]);
