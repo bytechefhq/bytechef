@@ -2,18 +2,17 @@ import {useEffect} from 'react';
 import Logo from './assets/logo.svg';
 import XIcon from './assets/x.svg';
 import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
-import {DialogStepKeyType, DialogStepKeyType} from '.';
+import {DialogStepKeyType, DialogStepType} from '.';
 import styles from './styles.module.css';
+import {FormType, IntegrationType, PropertyType, WorkflowInputType, WorkflowType} from './types';
 
-const Toggle = ({
-    id,
-    pressed,
-    onPressedChange,
-}: {
+interface ToggleProps {
     id: string;
     pressed: boolean;
     onPressedChange: (pressed: boolean) => void;
-}) => (
+}
+
+const Toggle = ({id, pressed, onPressedChange}: ToggleProps) => (
     <>
         <input
             className={styles.toggleCheckbox}
@@ -37,24 +36,22 @@ const Toggle = ({
 
 interface DialogProps {
     closeDialog: () => void;
-    dialogStepKey: DialogStepKeyType; // Use the key type
-    dialogStepLabel: string; // Add label
-    form?: any;
+    dialogStep: DialogStepType;
+    form?: FormType;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
-    integration: any;
+    integration: IntegrationType;
     isOAuth2?: boolean;
     isOpen: boolean;
-    properties?: any[];
-    registerFormSubmit?: (submitFn: (data: any) => void) => void;
+    properties?: PropertyType[];
+    registerFormSubmit?: (submitFn: (data: {[key: string]: unknown}) => void) => void;
     selectedWorkflows: string[];
 }
 
 const ConnectDialog = ({
     closeDialog,
-    dialogStepKey,
-    dialogStepLabel,
+    dialogStep,
     form,
     handleClick,
     handleWorkflowToggle,
@@ -89,11 +86,11 @@ const ConnectDialog = ({
     return (
         <div className={styles.dialogOverlay} data-testid="dialog-overlay" onClick={closeDialog}>
             <div className={styles.dialogContainer} onClick={(event) => event.stopPropagation()}>
-                <DialogHeader closeDialog={closeDialog} dialogStepLabel={dialogStepLabel} integration={integration} />
+                <DialogHeader closeDialog={closeDialog} dialogStep={dialogStep} integration={integration} />
 
                 <DialogContent
                     closeDialog={closeDialog}
-                    dialogStepKey={dialogStepKey}
+                    dialogStepKey={dialogStep.key}
                     form={form}
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
@@ -106,7 +103,7 @@ const ConnectDialog = ({
                 {integration && (
                     <DialogFooter
                         closeDialog={closeDialog}
-                        dialogStepKey={dialogStepKey}
+                        dialogStepKey={dialogStep.key}
                         handleClick={handleClick}
                         isOAuth2={isOAuth2}
                     />
@@ -118,22 +115,20 @@ const ConnectDialog = ({
     );
 };
 
-const DialogHeader = ({
-    closeDialog,
-    dialogStepLabel,
-    integration,
-}: {
+interface DialogHeaderProps {
     closeDialog: () => void;
-    dialogStepLabel: string;
-    integration: any;
-}) => (
+    dialogStep: DialogStepType;
+    integration: IntegrationType;
+}
+
+const DialogHeader = ({closeDialog, dialogStep, integration}: DialogHeaderProps) => (
     <header className={styles.dialogHeader}>
         <div>
             {integration && integration.icon && (
                 <div className={styles.integrationIcon} dangerouslySetInnerHTML={{__html: integration.icon}} />
             )}
 
-            <h2>Create Connection | {dialogStepLabel}</h2>
+            <h2>Create Connection | {dialogStep.label}</h2>
         </div>
 
         <div>
@@ -148,7 +143,7 @@ interface DialogWorkflowsContainerProps {
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
     selectedWorkflows: string[];
-    workflows: any[];
+    workflows: WorkflowType[];
 }
 
 const DialogWorkflowsContainer = ({
@@ -158,59 +153,67 @@ const DialogWorkflowsContainer = ({
     workflows,
 }: DialogWorkflowsContainerProps) => (
     <ul className={styles.workflowsList}>
-        {workflows.map((workflow: any) => (
-            <li key={workflow.workflowReferenceCode}>
-                <div>
-                    <span>{workflow.label}</span>
+        {workflows.map((workflow) => {
+            const {inputs, label, workflowReferenceCode} = workflow;
 
-                    <Toggle
-                        id={workflow.workflowReferenceCode}
-                        pressed={selectedWorkflows.includes(workflow.workflowReferenceCode)}
-                        onPressedChange={(pressed) => handleWorkflowToggle(workflow.workflowReferenceCode, pressed)}
-                    />
-                </div>
+            if (!workflowReferenceCode) {
+                return null;
+            }
 
-                {selectedWorkflows.includes(workflow.workflowReferenceCode) && (
-                    <div className={styles.workflowInputsContainer}>
-                        <span>INPUTS</span>
+            return (
+                <li key={workflowReferenceCode}>
+                    <div>
+                        <span>{label}</span>
 
-                        {workflow.inputs.length === 0 ? (
-                            <p className={styles.noInputsMessage}>No inputs required for this workflow.</p>
-                        ) : (
-                            <ul>
-                                {workflow.inputs.map((input: any) => (
-                                    <li key={input.name}>
-                                        <DialogInputField
-                                            onChange={(event) =>
-                                                handleWorkflowInputChange(
-                                                    workflow.workflowReferenceCode,
-                                                    input.name,
-                                                    event.target.value
-                                                )
-                                            }
-                                            label={input.label}
-                                            name={input.name}
-                                        />
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                        <Toggle
+                            id={workflowReferenceCode}
+                            pressed={selectedWorkflows.includes(workflowReferenceCode)}
+                            onPressedChange={(pressed) => handleWorkflowToggle(workflowReferenceCode, pressed)}
+                        />
                     </div>
-                )}
-            </li>
-        ))}
+
+                    {selectedWorkflows.includes(workflowReferenceCode) && (
+                        <div className={styles.workflowInputsContainer}>
+                            <span>INPUTS</span>
+
+                            {inputs?.length === 0 ? (
+                                <p className={styles.noInputsMessage}>No inputs defined for this workflow.</p>
+                            ) : (
+                                <ul>
+                                    {inputs?.map((input: WorkflowInputType) => (
+                                        <li key={input.name}>
+                                            <DialogInputField
+                                                onChange={(event) =>
+                                                    handleWorkflowInputChange(
+                                                        workflowReferenceCode,
+                                                        input.name,
+                                                        event.target.value
+                                                    )
+                                                }
+                                                label={input.label}
+                                                name={input.name}
+                                            />
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    )}
+                </li>
+            );
+        })}
     </ul>
 );
 
 interface DialogContentProps {
     closeDialog: () => void;
     dialogStepKey: DialogStepKeyType;
-    form?: any;
+    form?: FormType;
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
-    integration: any;
-    properties?: any[];
-    registerFormSubmit?: (submitFn: (data: any) => void) => void;
+    integration: IntegrationType;
+    properties?: PropertyType[];
+    registerFormSubmit?: (submitFn: (data: object) => void) => void;
     selectedWorkflows: string[];
 }
 
@@ -230,7 +233,7 @@ const DialogContent = ({
         if (registerFormSubmit && form) {
             registerFormSubmit(form.handleSubmit);
         }
-    }, [registerFormSubmit, form.handleSubmit, form]);
+    }, [registerFormSubmit, form]);
 
     if (!integration) {
         return (
@@ -259,8 +262,8 @@ const DialogContent = ({
                 />
             )}
 
-            {dialogStepKey === 'form' && (
-                <form id="form" onSubmit={form.handleSubmit((data: any) => console.log(data))}>
+            {dialogStepKey === 'form' && !!form && (
+                <form id="form" onSubmit={form.handleSubmit}>
                     {properties?.map((property) => {
                         const field = form.register(property.name);
 
@@ -345,10 +348,12 @@ interface DialogInputFieldsetProps {
     name: string;
     placeholder?: string;
     options?: string[];
-    onChange?: (value: string) => void;
+    onChange?: (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => void;
     required?: boolean;
-    field?: any;
-    error?: any;
+    field?: React.InputHTMLAttributes<HTMLInputElement | HTMLSelectElement>;
+    error?: {
+        message: string;
+    };
 }
 
 const DialogInputField = ({
