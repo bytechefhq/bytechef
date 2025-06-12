@@ -2,7 +2,15 @@ import ConnectDialog from './ConnectDialog';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import useOAuth2 from './useOAuth2';
-import {FormType, IntegrationType, PropertyType, WorkflowInputType, WorkflowType} from './types';
+import {
+    FormSubmitHandler,
+    FormType,
+    IntegrationType,
+    PropertyType,
+    RegisterFormSubmitFunction,
+    WorkflowInputType,
+    WorkflowType,
+} from './types';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
 
@@ -98,7 +106,7 @@ export default function useConnectDialog({
     jwtToken,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
     const [dialogStep, setDialogStep] = useState<DialogStepKeyType>('initial');
-    const [integration, setIntegration] = useState<IntegrationType>(null);
+    const [integration, setIntegration] = useState<IntegrationType | undefined>(undefined);
     const [isOAuth2, setIsOAuth2] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -108,11 +116,11 @@ export default function useConnectDialog({
     const inputRefs = useRef<Record<string, HTMLInputElement>>({});
     const portalContainerRef = useRef<HTMLElement | null>(null);
     const rootRef = useRef<ReturnType<typeof createRoot> | null>(null);
-    const formSubmitRef = useRef<((data: {[key: string]: unknown}) => void) | null>(null);
+    const formSubmitRef = useRef<FormSubmitHandler | null>(null);
 
     const {fetch} = useMemo(() => createApiClient(baseUrl, jwtToken), [baseUrl, jwtToken]);
 
-    const registerFormSubmit = useCallback((submitFn: (data: {[key: string]: unknown}) => void) => {
+    const registerFormSubmit = useCallback<RegisterFormSubmitFunction>((submitFn) => {
         formSubmitRef.current = submitFn;
     }, []);
 
@@ -127,7 +135,7 @@ export default function useConnectDialog({
 
     const handleSubmit = useCallback(() => {
         if (formSubmitRef.current) {
-            const submitFunction = formSubmitRef.current(saveConnection);
+            const submitFunction = formSubmitRef.current(() => saveConnection());
 
             submitFunction();
         }
@@ -313,7 +321,7 @@ export default function useConnectDialog({
         [dialogStep, isOAuth2, getAuth, handleSubmit]
     );
 
-    const debouncedFetchesRef = useRef<Record<string, (...args: any[]) => void>>({});
+    const debouncedFetchesRef = useRef<Record<string, (...args: unknown[]) => void>>({});
 
     const handleWorkflowInputChange = useCallback(
         (workflowReferenceCode: string, inputName: string, value: string) => {
@@ -321,7 +329,9 @@ export default function useConnectDialog({
                 (workflow: WorkflowType) => workflow.workflowReferenceCode === workflowReferenceCode
             );
 
-            const matchingWorkflowInput = matchingWorkflow?.inputs?.find((input: any) => input.name === inputName);
+            const matchingWorkflowInput = matchingWorkflow?.inputs?.find(
+                (input: WorkflowInputType) => input.name === inputName
+            );
 
             const body = {
                 ...matchingWorkflow,

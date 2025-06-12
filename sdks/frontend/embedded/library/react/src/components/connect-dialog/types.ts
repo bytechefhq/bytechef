@@ -50,3 +50,9 @@ export interface FormType {
         errors: Record<string, {message: string}>;
     };
 }
+
+export type FormSubmitHandler = (
+    callback: (data: {[key: string]: unknown}) => void
+) => (event?: React.FormEvent) => boolean;
+
+export type RegisterFormSubmitFunction = (submitFn: FormSubmitHandler | null) => void;
