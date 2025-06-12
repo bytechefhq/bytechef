@@ -178,6 +178,21 @@ p {
     width: 100%;
 }
 
+.dialogContentFallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialogContentFallback h2 {
+    font-weight: normal;
+}
+
+.dialogContentFallback button {
+    margin-top: 2rem;
+}
+
 /* DialogInputField */
 .dialogInputField {
     border: none;
