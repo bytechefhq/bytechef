@@ -26,7 +26,7 @@ class NutshellComponentHandlerTest {
 
     @Test
     void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/nutshell.json", new NutshellComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/nutshell_v1.json", new NutshellComponentHandler().getDefinition());
     }
 
 }
