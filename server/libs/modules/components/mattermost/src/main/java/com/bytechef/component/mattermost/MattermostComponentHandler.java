@@ -29,7 +29,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import com.google.auto.service.AutoService;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Marija Horvat
  */
 @AutoService(OpenApiComponentHandler.class)
 public class MattermostComponentHandler extends AbstractMattermostComponentHandler {
@@ -59,5 +59,4 @@ public class MattermostComponentHandler extends AbstractMattermostComponentHandl
             .baseUri((connectionParameters, context) -> "http://" + connectionParameters.getRequiredString(DOMAIN)
                 + "/api/v4");
     }
-
 }
