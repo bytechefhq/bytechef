@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.youtube.util.YoutubeUtils;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +42,9 @@ import org.mockito.MockedStatic;
  * @author Nikolina Spehar
  */
 class YoutubeNewVideoTriggerTest {
+
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(IDENTIFIER, "testIdentifier"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
@@ -53,15 +55,11 @@ class YoutubeNewVideoTriggerTest {
         ArgumentCaptor.forClass(TriggerContext.class);
 
     @Test
-    void poll() {
+    void testPoll() {
         try (MockedStatic<YoutubeUtils> youtubeUtilsMockedStatic = mockStatic(YoutubeUtils.class)) {
-
             youtubeUtilsMockedStatic.when(() -> YoutubeUtils.getChannelId(
                 stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()))
                 .thenReturn("channelId");
-
-            when(mockedParameters.getRequiredString(IDENTIFIER))
-                .thenReturn("testIdentifier");
 
             when(mockedTriggerContext.http(any()))
                 .thenReturn(mockedExecutor);

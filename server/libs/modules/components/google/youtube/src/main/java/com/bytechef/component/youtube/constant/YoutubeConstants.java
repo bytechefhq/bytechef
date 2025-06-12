@@ -24,7 +24,9 @@ public class YoutubeConstants {
     public static final String CATEGORY_ID = "categoryId";
     public static final String DESCRIPTION = "description";
     public static final String FILE = "file";
+    public static final String ID = "id";
     public static final String IDENTIFIER = "identifier";
+    public static final String ITEMS = "items";
     public static final String LOCATION = "location";
     public static final String PRIVACY_STATUS = "privacyStatus";
     public static final String SNIPPET = "snippet";
