@@ -51,11 +51,15 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.woocommerce.util.WoocommerceUtils;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Marija Horvat
  */
 public class WoocommerceCreateProductAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createProduct")
         .title("Create Product")
         .description("Create a new product.")
@@ -119,37 +123,27 @@ public class WoocommerceCreateProductAction {
                 .label("Categories")
                 .description("List of categories.")
                 .required(false)
+                .options((ActionOptionsFunction<String>) WoocommerceUtils::getCategoryIdOptions)
+                .items(string()),
+            array(TAGS)
+                .label("Tags")
+                .description("List of tags.")
+                .options((ActionOptionsFunction<String>) WoocommerceUtils::getTagIdOptions)
+                .required(false)
+                .items(string()),
+            array(IMAGES)
+                .label("Images")
+                .description("List of images.")
+                .required(false)
                 .items(
                     object()
                         .properties(
-                            integer(ID)
-                                .label("Id")
-                                .description("Category ID.")
-                                .options((ActionOptionsFunction<String>) WoocommerceUtils::getCategoryIdOptions)),
-                    array(TAGS)
-                        .label("Tags")
-                        .description("List of tags.")
-                        .required(false)
-                        .items(
-                            object()
-                                .properties(
-                                    integer(ID)
-                                        .label("Id")
-                                        .description("Tag ID.")
-                                        .options((ActionOptionsFunction<String>) WoocommerceUtils::getTagIdOptions)),
-                            array(IMAGES)
-                                .label("Images")
-                                .description("List of images.")
-                                .required(false)
-                                .items(
-                                    object()
-                                        .properties(
-                                            string(SRC)
-                                                .label("Src")
-                                                .description("Image URL."),
-                                            string(NAME)
-                                                .label("Name")
-                                                .description("Image name."))))))
+                            string(SRC)
+                                .label("Src")
+                                .description("Image URL."),
+                            string(NAME)
+                                .label("Name")
+                                .description("Image name."))))
         .output(outputSchema(PRODUCT_OUTPUT_PROPERTY))
         .perform(WoocommerceCreateProductAction::perform);
 
@@ -157,6 +151,9 @@ public class WoocommerceCreateProductAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
+        List<Map<String, String>> categories = convertValuesToMaps(inputParameters.getList(CATEGORIES, String.class));
+        List<Map<String, String>> tags = convertValuesToMaps(inputParameters.getList(TAGS, String.class));
+
         return context.http(http -> http.post("/products"))
             .body(
                 Body.of(
@@ -169,11 +166,21 @@ public class WoocommerceCreateProductAction {
                     STOCK_STATUS, inputParameters.getString(STOCK_STATUS),
                     WEIGHT, inputParameters.getString(WEIGHT),
                     DIMENSIONS, inputParameters.getMap(DIMENSIONS),
-                    CATEGORIES, inputParameters.getMap(CATEGORIES),
-                    TAGS, inputParameters.getMap(TAGS),
+                    CATEGORIES, categories,
+                    TAGS, tags,
                     IMAGES, inputParameters.getMap(IMAGES)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();
+    }
+
+    private static List<Map<String, String>> convertValuesToMaps(List<String> values) {
+        if (values == null || values.isEmpty()) {
+            return null;
+        }
+
+        return values.stream()
+            .map(value -> Map.of(ID, value))
+            .collect(Collectors.toList());
     }
 }
