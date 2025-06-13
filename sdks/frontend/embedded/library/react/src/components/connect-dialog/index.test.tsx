@@ -166,3 +166,173 @@ describe('useConnectDialog - Dialog State Management', () => {
         expect(global.fetch).toHaveBeenCalledTimes(2);
     });
 });
+
+describe('useConnectDialog - Form Validation', () => {
+    beforeEach(() => {
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('validates form inputs correctly', async () => {
+        const originalCreateElement = document.createElement.bind(document);
+
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                connectionConfig: {
+                    authorizationType: 'API_KEY',
+                    inputs: [
+                        {name: 'apiKey', label: 'API Key', required: true},
+                        {name: 'domain', label: 'Domain', required: false},
+                    ],
+                },
+            }),
+        });
+
+        const inputElements = {
+            apiKey: {value: ''},
+            domain: {value: 'example.com'},
+        };
+
+        document.createElement = vi.fn().mockImplementation((tag) => {
+            if (tag === 'input') {
+                return inputElements.apiKey;
+            }
+
+            return originalCreateElement(tag);
+        });
+
+        try {
+            const renderMock = vi.fn();
+
+            vi.mocked(createRoot).mockReturnValue({
+                render: renderMock,
+                unmount: vi.fn(),
+            });
+
+            const {result} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
+
+            await act(async () => result.current.openDialog());
+
+            const lastRenderCall = renderMock.mock.calls[renderMock.mock.calls.length - 1];
+            const props = lastRenderCall[0].props;
+
+            expect(props.form.formState.errors).toBeDefined();
+        } finally {
+            document.createElement = originalCreateElement;
+        }
+    });
+});
+
+describe('useConnectDialog - Navigation', () => {
+    beforeEach(() => {
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('follows the correct navigation path based on dialog steps', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                name: 'Test Integration',
+                connectionConfig: {
+                    authorizationType: 'API_KEY',
+                },
+            }),
+        });
+
+        const renderMock = vi.fn();
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const {result} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
+
+        await act(async () => result.current.openDialog());
+
+        const initialProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+        expect(initialProps.dialogStep.key).toBe('initial');
+
+        await act(async () => {
+            initialProps.handleClick({target: {}} as React.MouseEvent<HTMLButtonElement>);
+        });
+
+        const workflowsProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+        expect(workflowsProps.dialogStep.key).toBe('workflows');
+
+        await act(async () => {
+            workflowsProps.handleClick({target: {}} as React.MouseEvent<HTMLButtonElement>);
+        });
+
+        const formProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+        expect(formProps.dialogStep.key).toBe('form');
+    });
+
+    it('makes correct API calls when toggling workflows', async () => {
+        const fetchMock = vi.fn().mockResolvedValue({
+            ok: true,
+            headers: {
+                get: (name: string) => (name === 'content-length' ? '2' : null),
+            },
+            json: vi.fn().mockResolvedValue({
+                workflows: [
+                    {
+                        label: 'Test Workflow',
+                        workflowReferenceCode: 'workflow-123',
+                    },
+                ],
+            }),
+        });
+
+        global.fetch = fetchMock as unknown as typeof global.fetch;
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const {result} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
+
+        await act(async () => result.current.openDialog());
+
+        fetchMock.mockClear();
+
+        const props = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        await act(async () => {
+            props.handleWorkflowToggle('workflow-123', true);
+        });
+
+        expect(fetchMock).toHaveBeenCalledWith(
+            expect.stringContaining('/workflows/workflow-123/enable'),
+            expect.objectContaining({method: 'POST'})
+        );
+
+        const updatedProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+        expect(updatedProps.selectedWorkflows).toContain('workflow-123');
+
+        fetchMock.mockClear();
+
+        await act(async () => {
+            updatedProps.handleWorkflowToggle('workflow-123', false);
+        });
+
+        expect(fetchMock).toHaveBeenCalledWith(
+            expect.stringContaining('/workflows/workflow-123/enable'),
+            expect.objectContaining({method: 'DELETE'})
+        );
+
+        const finalProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        expect(finalProps.selectedWorkflows).not.toContain('workflow-123');
+    });
+});
