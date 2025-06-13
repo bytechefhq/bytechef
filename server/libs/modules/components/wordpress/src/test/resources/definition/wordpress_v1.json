@@ -30980,7 +30980,7 @@
     "test" : null,
     "version" : 1
   },
-  "customAction" : null,
+  "customAction" : true,
   "customActionHelp" : null,
   "description" : "WordPress is a web content management system.",
   "icon" : "path:assets/wordpress.svg",
