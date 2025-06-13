@@ -171,57 +171,61 @@ const DialogWorkflowsContainer = ({
     selectedWorkflows,
     workflows,
 }: DialogWorkflowsContainerProps) => (
-    <ul className={styles.workflowsList}>
-        {workflows.map((workflow) => {
-            const {inputs, label, workflowReferenceCode} = workflow;
+    <div data-testid="workflows-container" className={styles.workflowsContainer}>
+        {workflows?.length === 0 && <p>No workflows available for this integration.</p>}
 
-            if (!workflowReferenceCode) {
-                return null;
-            }
+        <ul className={styles.workflowsList}>
+            {workflows.map((workflow) => {
+                const {inputs, label, workflowReferenceCode} = workflow;
 
-            return (
-                <li key={workflowReferenceCode}>
-                    <div>
-                        <span>{label}</span>
+                if (!workflowReferenceCode) {
+                    return null;
+                }
 
-                        <Toggle
-                            id={workflowReferenceCode}
-                            pressed={selectedWorkflows.includes(workflowReferenceCode)}
-                            onPressedChange={(pressed) => handleWorkflowToggle(workflowReferenceCode, pressed)}
-                        />
-                    </div>
+                return (
+                    <li key={workflowReferenceCode}>
+                        <div>
+                            <span>{label}</span>
 
-                    {selectedWorkflows.includes(workflowReferenceCode) && (
-                        <div className={styles.workflowInputsContainer}>
-                            <span>INPUTS</span>
-
-                            {inputs?.length === 0 ? (
-                                <p className={styles.noInputsMessage}>No inputs defined for this workflow.</p>
-                            ) : (
-                                <ul>
-                                    {inputs?.map((input: WorkflowInputType) => (
-                                        <li key={input.name}>
-                                            <DialogInputField
-                                                onChange={(event) =>
-                                                    handleWorkflowInputChange(
-                                                        workflowReferenceCode,
-                                                        input.name,
-                                                        event.target.value
-                                                    )
-                                                }
-                                                label={input.label}
-                                                name={input.name}
-                                            />
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
+                            <Toggle
+                                id={workflowReferenceCode}
+                                pressed={selectedWorkflows.includes(workflowReferenceCode)}
+                                onPressedChange={(pressed) => handleWorkflowToggle(workflowReferenceCode, pressed)}
+                            />
                         </div>
-                    )}
-                </li>
-            );
-        })}
-    </ul>
+
+                        {selectedWorkflows.includes(workflowReferenceCode) && (
+                            <div className={styles.workflowInputsContainer}>
+                                <span>INPUTS</span>
+
+                                {inputs?.length === 0 ? (
+                                    <p className={styles.noInputsMessage}>No inputs defined for this workflow.</p>
+                                ) : (
+                                    <ul>
+                                        {inputs?.map((input: WorkflowInputType) => (
+                                            <li key={input.name}>
+                                                <DialogInputField
+                                                    onChange={(event) =>
+                                                        handleWorkflowInputChange(
+                                                            workflowReferenceCode,
+                                                            input.name,
+                                                            event.target.value
+                                                        )
+                                                    }
+                                                    label={input.label}
+                                                    name={input.name}
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        )}
+                    </li>
+                );
+            })}
+        </ul>
+    </div>
 );
 
 interface DialogContentProps {
