@@ -18,11 +18,15 @@ package com.bytechef.component.woocommerce.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.ID;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,25 @@ import java.util.Map;
 public class WoocommerceUtils {
 
     private WoocommerceUtils() {
+    }
+
+    public static WebhookEnableOutput createWebhook(String webhookUrl, TriggerContext context, String topic) {
+        Map<String, ?> body = context.http(http -> http.post("/webhooks"))
+            .body(
+                Http.Body.of(
+                    "delivery_url", webhookUrl,
+                    "name", "New Webhook",
+                    "topic", topic))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return new WebhookEnableOutput(Map.of(ID, body.get(ID)), null);
+    }
+
+    public static void deleteWebhook(Integer webhookId, Context context) {
+        context.http(http -> http.delete("/webhooks/" + webhookId))
+            .execute();
     }
 
     public static List<Option<String>> getCategoryIdOptions(
@@ -50,9 +73,10 @@ public class WoocommerceUtils {
 
         for (Object item : response) {
             if (item instanceof Map<?, ?> map) {
-                categoriesId.add(option((String) map.get("name"), (String) map.get("id")));
+                categoriesId.add(option((String) map.get("name"), (String) map.get(ID)));
             }
         }
+
         return categoriesId;
     }
 
@@ -66,14 +90,15 @@ public class WoocommerceUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> customersId = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
         for (Object item : response) {
             if (item instanceof Map<?, ?> map) {
-                customersId.add(option((String) map.get("username"), (String) map.get("id")));
+                options.add(option((String) map.get("username"), (String) map.get(ID)));
             }
         }
-        return customersId;
+
+        return options;
     }
 
     public static List<Option<String>> getPaymentIdOptions(
@@ -86,14 +111,15 @@ public class WoocommerceUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> paymentsId = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
         for (Object item : response) {
             if (item instanceof Map<?, ?> map) {
-                paymentsId.add(option((String) map.get("title"), (String) map.get("id")));
+                options.add(option((String) map.get("title"), (String) map.get(ID)));
             }
         }
-        return paymentsId;
+
+        return options;
     }
 
     public static List<Option<String>> getProductIdOptions(
@@ -106,14 +132,15 @@ public class WoocommerceUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> productsId = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
         for (Object item : response) {
             if (item instanceof Map<?, ?> map) {
-                productsId.add(option((String) map.get("name"), (String) map.get("id")));
+                options.add(option((String) map.get("name"), (String) map.get(ID)));
             }
         }
-        return productsId;
+
+        return options;
     }
 
     public static List<Option<String>> getTagIdOptions(
@@ -126,19 +153,14 @@ public class WoocommerceUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> tagsId = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
         for (Object item : response) {
             if (item instanceof Map<?, ?> map) {
-                tagsId.add(option((String) map.get("name"), (String) map.get("id")));
+                options.add(option((String) map.get("name"), (String) map.get(ID)));
             }
         }
-        return tagsId;
-    }
 
-    public static void deleteWebhook(Integer webhookId, Context context) {
-        context.http(http -> http.delete("/webhooks/" + webhookId))
-            .execute();
+        return options;
     }
-
 }
