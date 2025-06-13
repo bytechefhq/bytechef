@@ -20,7 +20,7 @@ interface EmbeddedWorkflowBuilderProps {
      * either shared connections created inside ByteChef and defined by `sharedConnectionIds`
      * or integration connections created via `ConnectDialog`.
      */
-    connectionDialogAllowed: boolean
+    connectionDialogAllowed: boolean;
 
     /**
      * The environment to use for the workflow builder.
@@ -53,7 +53,7 @@ interface EmbeddedWorkflowBuilderProps {
      * The unique reference code for the workflow being edited.
      * This is used to load the correct workflow in the builder.
      */
-    workflowReferenceCode: string
+    workflowReferenceCode: string;
 }
 
 /**
@@ -67,7 +67,15 @@ interface EmbeddedWorkflowBuilderProps {
  * @returns A React component that renders the embedded workflow builder
  */
 
-const EmbeddedWorkflowBuilder = ({baseUrl = 'http://127.0.0.1:5173', connectionDialogAllowed, environment = 'PRODUCTION', includeComponents, jwtToken, sharedConnectionIds, workflowReferenceCode}:EmbeddedWorkflowBuilderProps) => {
+const EmbeddedWorkflowBuilder = ({
+    baseUrl = 'http://127.0.0.1:5173',
+    connectionDialogAllowed,
+    environment = 'PRODUCTION',
+    includeComponents,
+    jwtToken,
+    sharedConnectionIds,
+    workflowReferenceCode,
+}: EmbeddedWorkflowBuilderProps) => {
     /**
      * Handles the iframe load event.
      *
@@ -79,16 +87,19 @@ const EmbeddedWorkflowBuilder = ({baseUrl = 'http://127.0.0.1:5173', connectionD
         const iframe = document.querySelector('iframe');
 
         if (iframe && iframe.contentWindow) {
-            iframe.contentWindow.postMessage({
-                type: 'EMBED_INIT',
-                params: {
-                    connectionDialogAllowed,
-                    environment,
-                    includeComponents,
-                    jwtToken,
-                    sharedConnectionIds
-                }
-            }, '*');
+            iframe.contentWindow.postMessage(
+                {
+                    type: 'EMBED_INIT',
+                    params: {
+                        connectionDialogAllowed,
+                        environment,
+                        includeComponents,
+                        jwtToken,
+                        sharedConnectionIds,
+                    },
+                },
+                '*'
+            );
         }
     };
 
@@ -98,12 +109,12 @@ const EmbeddedWorkflowBuilder = ({baseUrl = 'http://127.0.0.1:5173', connectionD
                 src={`${baseUrl}/embedded/workflow-builder/${workflowReferenceCode}`}
                 width="100%"
                 height="100%"
-                style={{ border: "none" }}
+                style={{border: 'none'}}
                 title="Workflow Builder"
                 onLoad={handleIframeLoad}
             />
         </div>
-    )
-}
+    );
+};
 
 export default EmbeddedWorkflowBuilder;

@@ -1,1 +1,1 @@
-export { default } from './EmbeddedWorkflowBuilder';
+export {default} from './EmbeddedWorkflowBuilder';
