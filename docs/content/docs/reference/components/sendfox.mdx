@@ -1,0 +1,293 @@
+---
+title: "SendFox"
+description: "SendFox lets you automate email campaigns, complete with custom opt-in forms and landing pages, so you're not tanking your budget to get new subscribers."
+---
+
+SendFox lets you automate email campaigns, complete with custom opt-in forms and landing pages, so you're not tanking your budget to get new subscribers.
+
+
+Categories: Advertising
+
+
+Type: sendfox/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Contact
+Name: createContact
+
+`Creates a new contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| email | Email Address | STRING | `Email address of the contact.` | true |
+| first_name | First Name | STRING | `First name of the contact.` | false |
+| last_name | Last Name | STRING | `Last name of the contact.` | false |
+| lists | Lists | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | `Lists to which the new contact will be added.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "email" : "",
+    "first_name" : "",
+    "last_name" : "",
+    "lists" : [ 1 ]
+  },
+  "type" : "sendfox/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | ID of the contact. |
+| email | STRING | Email of the contact. |
+| first_name | STRING | First name of the contact. |
+| last_name | STRING | Last name of the contact. |
+| ip_address | STRING | IP address of the contact. |
+| unsubscribed_at | STRING | Date when the contact unsubscribed. |
+| bounced_at | STRING | Date when the contact was bounced. |
+| created_at | STRING | Date when the contact was created. |
+| updated_at | STRING | Date when the contact was updated. |
+| form_id | INTEGER | Form ID of the contact. |
+| contact_import_id | INTEGER | Contact import ID of the contact. |
+| via_api | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact was created via API. |
+| last_opened_at | STRING | Date when the contact last opened an email. |
+| last_clicked_at | STRING | Date when the contact last clicked an email. |
+| first_sent_at | STRING | Date when the first email was sent to the contact. |
+| last_sent_at | STRING | Date when the last email was sent to the contact. |
+| invalid_at | STRING | Date when the contact became invalid. |
+| inactive_at | STRING | Date when the contact became invalid. |
+| confirmed_at | STRING | Date when the contact confirmed the subscription. |
+| social_platform_id | INTEGER | Social platform ID of the contact. |
+| confirmation_sent_at | STRING | Date when the confirmation for the subscription was sent to the contact. |
+| confirmation_sent_count | INTEGER | How many confirmation emails were sent. |
+| created_ago | STRING | How many seconds ago was the contact created. |
+| contact_fields | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(value)&#125;] </details> | Additional contact information. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "email" : "",
+  "first_name" : "",
+  "last_name" : "",
+  "ip_address" : "",
+  "unsubscribed_at" : "",
+  "bounced_at" : "",
+  "created_at" : "",
+  "updated_at" : "",
+  "form_id" : 1,
+  "contact_import_id" : 1,
+  "via_api" : false,
+  "last_opened_at" : "",
+  "last_clicked_at" : "",
+  "first_sent_at" : "",
+  "last_sent_at" : "",
+  "invalid_at" : "",
+  "inactive_at" : "",
+  "confirmed_at" : "",
+  "social_platform_id" : 1,
+  "confirmation_sent_at" : "",
+  "confirmation_sent_count" : 1,
+  "created_ago" : "",
+  "contact_fields" : [ {
+    "name" : "",
+    "value" : ""
+  } ]
+}
+```
+
+
+### Create List
+Name: createList
+
+`Creates a new list.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | `Name of the list.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create List",
+  "name" : "createList",
+  "parameters" : {
+    "name" : ""
+  },
+  "type" : "sendfox/v1/createList"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | Name of the list. |
+| created_at | STRING | Date when the list was created. |
+| id | INTEGER | ID of the list. |
+
+
+
+
+#### Output Example
+```json
+{
+  "name" : "",
+  "created_at" : "",
+  "id" : 1
+}
+```
+
+
+### Unsubscribe Contact
+Name: unsubscribeContact
+
+`Unsubscribes a contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| email | Email | STRING | `Email of the Contact.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Unsubscribe Contact",
+  "name" : "unsubscribeContact",
+  "parameters" : {
+    "email" : ""
+  },
+  "type" : "sendfox/v1/unsubscribeContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | ID of the contact. |
+| email | STRING | Email of the contact. |
+| first_name | STRING | First name of the contact. |
+| last_name | STRING | Last name of the contact. |
+| ip_address | STRING | IP address of the contact. |
+| unsubscribed_at | STRING | Date when the contact unsubscribed. |
+| bounced_at | STRING | Date when the contact was bounced. |
+| created_at | STRING | Date when the contact was created. |
+| updated_at | STRING | Date when the contact was updated. |
+| form_id | INTEGER | Form ID of the contact. |
+| contact_import_id | INTEGER | Contact import ID of the contact. |
+| via_api | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact was created via API. |
+| last_opened_at | STRING | Date when the contact last opened an email. |
+| last_clicked_at | STRING | Date when the contact last clicked an email. |
+| first_sent_at | STRING | Date when the first email was sent to the contact. |
+| last_sent_at | STRING | Date when the last email was sent to the contact. |
+| invalid_at | STRING | Date when the contact became invalid. |
+| inactive_at | STRING | Date when the contact became invalid. |
+| confirmed_at | STRING | Date when the contact confirmed the subscription. |
+| social_platform_id | INTEGER | Social platform ID of the contact. |
+| confirmation_sent_at | STRING | Date when the confirmation for the subscription was sent to the contact. |
+| confirmation_sent_count | INTEGER | How many confirmation emails were sent. |
+| created_ago | STRING | How many seconds ago was the contact created. |
+| contact_fields | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(value)&#125;] </details> | Additional contact information. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "email" : "",
+  "first_name" : "",
+  "last_name" : "",
+  "ip_address" : "",
+  "unsubscribed_at" : "",
+  "bounced_at" : "",
+  "created_at" : "",
+  "updated_at" : "",
+  "form_id" : 1,
+  "contact_import_id" : 1,
+  "via_api" : false,
+  "last_opened_at" : "",
+  "last_clicked_at" : "",
+  "first_sent_at" : "",
+  "last_sent_at" : "",
+  "invalid_at" : "",
+  "inactive_at" : "",
+  "confirmed_at" : "",
+  "social_platform_id" : 1,
+  "confirmation_sent_at" : "",
+  "confirmation_sent_count" : 1,
+  "created_ago" : "",
+  "contact_fields" : [ {
+    "name" : "",
+    "value" : ""
+  } ]
+}
+```
+
+
+
+
