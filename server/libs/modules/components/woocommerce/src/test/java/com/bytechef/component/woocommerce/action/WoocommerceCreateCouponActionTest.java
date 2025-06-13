@@ -18,7 +18,6 @@ package com.bytechef.component.woocommerce.action;
 
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.AMOUNT;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.CODE;
-import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.DATE_EXPIRES;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.DESCRIPTION;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.DISCOUNT_TYPE;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.EXCLUDE_SALE_ITEMS;
@@ -28,6 +27,7 @@ import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.PRODUCT_IDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -41,21 +41,25 @@ class WoocommerceCreateCouponActionTest extends AbstractWoocommerceActionTest {
 
     @Test
     void testPerform() {
-        Parameters parameters = MockParametersFactory.create(
-            Map.of(
-                CODE, "1",
-                AMOUNT, "2",
-                DISCOUNT_TYPE, "percent",
-                DESCRIPTION, "This is a coupon.",
-                DATE_EXPIRES, "2025-06-05",
-                INDIVIDUAL_USE, true,
-                PRODUCT_IDS, List.of("product1", "product2", "product3"),
-                EXCLUDE_SALE_ITEMS, false,
-                MINIMUM_AMOUNT, "10",
-                MAXIMUM_AMOUNT, "100"));
+        Map<String, Object> bodyMap = Map.of(
+            CODE, "1",
+            AMOUNT, "2",
+            DISCOUNT_TYPE, "percent",
+            DESCRIPTION, "This is a coupon.",
+            INDIVIDUAL_USE, true,
+            PRODUCT_IDS, List.of("product1", "product2", "product3"),
+            EXCLUDE_SALE_ITEMS, false,
+            MINIMUM_AMOUNT, "10",
+            MAXIMUM_AMOUNT, "100");
 
-        Object result = WoocommerceCreateCouponAction.perform(parameters, parameters, mockedContext);
+        Parameters mockedParameters = MockParametersFactory.create(bodyMap);
+
+        Object result = WoocommerceCreateCouponAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(bodyMap, body.getContent());
     }
 }

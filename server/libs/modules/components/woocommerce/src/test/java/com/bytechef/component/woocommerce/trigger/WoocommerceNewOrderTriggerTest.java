@@ -16,14 +16,15 @@
 
 package com.bytechef.component.woocommerce.trigger;
 
-import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.woocommerce.util.WoocommerceUtils;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 /**
  * @author Marija Horvat
@@ -34,17 +35,29 @@ class WoocommerceNewOrderTriggerTest extends AbstractWoocommerceTriggerTest {
     void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
 
+        woocommerceUtilsMockedStatic.when(() -> WoocommerceUtils.createWebhook(
+            stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedWebhookEnableOutput);
+
         TriggerDefinition.WebhookEnableOutput webhookEnableOutput = WoocommerceNewOrderTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedTriggerContext);
 
-        assertEquals(new TriggerDefinition.WebhookEnableOutput(Map.of(ID, "3"), null), webhookEnableOutput);
+        assertEquals(mockedWebhookEnableOutput, webhookEnableOutput);
+        assertEquals(List.of(webhookUrl, "order.created"), stringArgumentCaptor.getAllValues());
+        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
+    }
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+    @Test
+    void testWebhookDisable() {
+        woocommerceUtilsMockedStatic.when(() -> WoocommerceUtils.deleteWebhook(
+            integerArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()))
+            .thenAnswer(Answers.RETURNS_DEFAULTS);
 
-        Map<String, Object> expectedBody = Map.of(
-            "delivery_url", webhookUrl, "name", "New Order Webhook", "topic", "order.created");
+        WoocommerceNewOrderTrigger.webhookDisable(
+            mockedParameters, mockedParameters, mockedParameters, "testWorkflowExecutionId", mockedTriggerContext);
 
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(123, integerArgumentCaptor.getValue());
+        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 
     @Test
@@ -54,11 +67,10 @@ class WoocommerceNewOrderTriggerTest extends AbstractWoocommerceTriggerTest {
         when(mockedWebhookBody.getContent())
             .thenReturn(mockWebhookContent);
 
-        Object result = WoocommerceNewOrderTrigger.webhookRequest(
+        Object result = WoocommerceNewCouponTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
             mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(mockWebhookContent, result);
     }
-
 }

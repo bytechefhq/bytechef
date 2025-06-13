@@ -26,7 +26,8 @@ class WoocommerceComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/woocommerce_v1.json",
+        JsonFileAssert.assertEquals(
+            "definition/woocommerce_v1.json",
             new WoocommerceComponentHandler().getDefinition());
     }
 }

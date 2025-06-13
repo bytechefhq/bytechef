@@ -40,6 +40,7 @@ import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -53,41 +54,46 @@ class WoocommerceCreateOrderActionTest extends AbstractWoocommerceActionTest {
 
     @Test
     void testPerform() {
-        Parameters parameters = MockParametersFactory.create(
-            Map.of(
-                CUSTOMER_ID, "1",
-                LINE_ITEMS, List.of(
-                    Map.of(PRODUCT_ID, "1", QUANTITY, 1), Map.of(PRODUCT_ID, "2", QUANTITY, 2)),
-                STATUS, "completed",
-                CUSTOMER_NOTE, "This is customer note.",
-                BILLING, Map.ofEntries(
-                    entry(FIRST_NAME, "firstName"),
-                    entry(LAST_NAME, "lastName"),
-                    entry(COMPANY, "company"),
-                    entry(ADDRESS_1, "test street 1"),
-                    entry(ADDRESS_2, "test street 2"),
-                    entry(CITY, "Test city"),
-                    entry(STATE, "Test state"),
-                    entry(POSTCODE, "1"),
-                    entry(COUNTRY, "Test Country"),
-                    entry(EMAIL, "test@test.com"),
-                    entry(PHONE, "+123456")),
-                SHIPPING, Map.ofEntries(
-                    entry(FIRST_NAME, "firstName"),
-                    entry(LAST_NAME, "lastName"),
-                    entry(COMPANY, "company"),
-                    entry(ADDRESS_1, "test street 1"),
-                    entry(ADDRESS_2, "test street 2"),
-                    entry(CITY, "Test city"),
-                    entry(STATE, "Test state"),
-                    entry(POSTCODE, "1"),
-                    entry(COUNTRY, "Test Country"),
-                    entry(PHONE, "+123456")),
-                PAYMENT_METHOD, "credit_card",
-                SET_PAID, true));
+        Map<String, Object> bodyMap = Map.of(
+            CUSTOMER_ID, "1",
+            LINE_ITEMS, List.of(
+                Map.of(PRODUCT_ID, "1", QUANTITY, 1), Map.of(PRODUCT_ID, "2", QUANTITY, 2)),
+            STATUS, "completed",
+            CUSTOMER_NOTE, "This is customer note.",
+            BILLING, Map.ofEntries(
+                entry(FIRST_NAME, "firstName"),
+                entry(LAST_NAME, "lastName"),
+                entry(COMPANY, "company"),
+                entry(ADDRESS_1, "test street 1"),
+                entry(ADDRESS_2, "test street 2"),
+                entry(CITY, "Test city"),
+                entry(STATE, "Test state"),
+                entry(POSTCODE, "1"),
+                entry(COUNTRY, "Test Country"),
+                entry(EMAIL, "test@test.com"),
+                entry(PHONE, "+123456")),
+            SHIPPING, Map.ofEntries(
+                entry(FIRST_NAME, "firstName"),
+                entry(LAST_NAME, "lastName"),
+                entry(COMPANY, "company"),
+                entry(ADDRESS_1, "test street 1"),
+                entry(ADDRESS_2, "test street 2"),
+                entry(CITY, "Test city"),
+                entry(STATE, "Test state"),
+                entry(POSTCODE, "1"),
+                entry(COUNTRY, "Test Country"),
+                entry(PHONE, "+123456")),
+            PAYMENT_METHOD, "credit_card",
+            SET_PAID, true);
 
-        Object result = WoocommerceCreateOrderAction.perform(parameters, parameters, mockedContext);
+        Parameters mockedParameters = MockParametersFactory.create(bodyMap);
+
+        Object result = WoocommerceCreateOrderAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(bodyMap, body.getContent());
     }
 }
