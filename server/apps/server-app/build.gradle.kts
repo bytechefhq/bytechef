@@ -253,6 +253,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:rabbitmq"))
     implementation(project(":server:libs:modules:components:random-helper"))
     implementation(project(":server:libs:modules:components:reckon"))
+    implementation(project(":server:libs:modules:components:reddit"))
     implementation(project(":server:libs:modules:components:resend"))
     implementation(project(":server:libs:modules:components:request"))
     implementation(project(":server:libs:modules:components:rocketchat"))
