@@ -223,6 +223,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:mailerlite"))
     implementation(project(":server:libs:modules:components:map"))
     implementation(project(":server:libs:modules:components:math-helper"))
+    implementation(project(":server:libs:modules:components:mattermost"))
     implementation(project(":server:libs:modules:components:mautic"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-excel"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-one-drive"))
