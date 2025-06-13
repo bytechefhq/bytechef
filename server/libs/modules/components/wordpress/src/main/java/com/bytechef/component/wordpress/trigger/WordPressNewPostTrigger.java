@@ -24,7 +24,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.wordpress.constant.WordpressConstants.ALL_POSTS;
-import static com.bytechef.component.wordpress.constant.WordpressConstants.WEBSITE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
@@ -233,8 +232,7 @@ public class WordPressNewPostTrigger {
         List<String> allPosts = closureParameters.getList(ALL_POSTS, String.class, List.of());
         List<String> allPostsUpdated = new ArrayList<>();
 
-        List<Map<String, Object>> posts = triggerContext.http(http -> http.get(
-            "%s/wp-json/wp/v2/posts".formatted(connectionParameters.getRequiredString(WEBSITE))))
+        List<Map<String, Object>> posts = triggerContext.http(http -> http.get("/wp/v2/posts"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

@@ -101,7 +101,7 @@ paths:
                   modified:
                     type: "string"
                     description: "The date the post was last modified, in the site's timezone."
-                  "modified_gmt":
+                  modified_gmt:
                     type: "string"
                     description: "The date the post was last modified, in GMT."
                   password:
@@ -200,18 +200,18 @@ paths:
                     description: "Tags of the post."
                     items:
                       type: "string"
-                  "permalink_template":
+                  permalink_template:
                     type: "string"
                     description: "Permalink template of the post."
-                  "generated_slug":
+                  generated_slug:
                     type: "string"
                     description: "Generated slug of the post."
-                  "class_list":
+                  class_list:
                     type: "array"
                     description: "Class list of the post."
                     items:
                       type: "string"
-                  "_links":
+                  _links:
                     type: "object"
                     description: "Links to other related resources."
                     properties:
@@ -279,7 +279,7 @@ paths:
                             embeddable:
                               type: "boolean"
                               description: "Indicates whether the resource can be embedded."
-                      "version-history":
+                      version-history:
                         type: "array"
                         description: "Link to the version history of this post."
                         items:
@@ -292,7 +292,7 @@ paths:
                             count:
                               type: "integer"
                               description: "Count of the versions."
-                      "predecessor-version":
+                      predecessor-version:
                         type: "array"
                         description: "Predecessor version of this post."
                         items:
@@ -305,7 +305,7 @@ paths:
                             id:
                               type: "integer"
                               description: "id of the predecessor version."
-                      "wp:attachment":
+                      wp:attachment:
                         type: "array"
                         description: "Link to media items attached to this post."
                         items:
@@ -315,7 +315,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:term":
+                      wp:term:
                         type: "array"
                         description: "Terms of this post."
                         items:
@@ -331,7 +331,7 @@ paths:
                             embeddable:
                               type: "boolean"
                               description: "Indicates whether the resource can be embedded."
-                      "wp:action-publish":
+                      wp:action-publish:
                         type: "array"
                         description: "Action link to publish this post."
                         items:
@@ -341,7 +341,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-unfiltered-html":
+                      wp:action-unfiltered-html:
                         type: "array"
                         description: "Action link for unfiltered HTML editing."
                         items:
@@ -351,7 +351,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-sticky":
+                      wp:action-sticky:
                         type: "array"
                         description: "Link to top of this post."
                         items:
@@ -361,7 +361,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-assign-author":
+                      wp:action-assign-author:
                         type: "array"
                         description: "Action link to assign a new author to this post."
                         items:
@@ -371,7 +371,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-create-categories":
+                      wp:action-create-categories:
                         type: "array"
                         description: "Action link to create a new category for this post."
                         items:
@@ -381,7 +381,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-assign-categories":
+                      wp:action-assign-categories:
                         type: "array"
                         description: "Action link to assign a new category to this post."
                         items:
@@ -391,7 +391,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-assign-tags":
+                      wp:action-assign-tags:
                         type: "array"
                         description: "Action link to assign a new tag to this post."
                         items:
@@ -401,7 +401,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-create-tags":
+                      wp:action-create-tags:
                         type: "array"
                         description: "Action link to create a new tag for this post."
                         items:
@@ -467,7 +467,7 @@ paths:
                   modified:
                     type: "string"
                     description: "The date the post was last modified, in the site's timezone."
-                  "modified_gmt":
+                  modified_gmt:
                     type: "string"
                     description: "The date the post was last modified, in GMT."
                   slug:
@@ -516,14 +516,14 @@ paths:
                   author:
                     type: "integer"
                     description: "The ID for the author of the post."
-                  "featured_media":
+                  featured_media:
                     type: "integer"
                     description: "The ID of the featured media for the post."
-                  "comment_status":
+                  comment_status:
                     type: "string"
                     enum: [ "open", "closed" ]
                     description: "Whether comments are allowed for the post."
-                  "ping_status":
+                  ping_status:
                     type: "string"
                     enum: [ "open", "closed" ]
                     description: "Whether pingbacks or trackbacks are allowed."
@@ -553,12 +553,12 @@ paths:
                     description: "Tags of the post."
                     items:
                       type: "string"
-                  "class_list":
+                  class_list:
                     type: "array"
                     description: "Class list of the post."
                     items:
                       type: "string"
-                  "_links":
+                  _links:
                     type: "object"
                     description: "Links to other related resources."
                     properties:
@@ -621,7 +621,7 @@ paths:
                             embeddable:
                               type: "boolean"
                               description: "Indicates whether the resource can be embedded."
-                      "version-history":
+                      version-history:
                         type: "array"
                         description: "Link to the version history of this post."
                         items:
@@ -633,7 +633,7 @@ paths:
                             count:
                               type: "integer"
                               description: "Count of the versions."
-                      "predecessor-version":
+                      predecessor-version:
                         type: "array"
                         description: "Link to the predecessor version of this post."
                         items:
@@ -645,7 +645,7 @@ paths:
                             id:
                               type: "integer"
                               description: "Id of the predecessor version."
-                      "wp:attachment":
+                      wp:attachment:
                         type: "array"
                         description: "Link to media items attached to this post."
                         items:
@@ -654,7 +654,7 @@ paths:
                             href:
                               type: "string"
                               description: "URL to the linked resource."
-                      "wp:term":
+                      wp:term:
                         type: "array"
                         description: "Terms of this post."
                         items:
@@ -774,7 +774,7 @@ paths:
                   modified:
                     type: "string"
                     description: "The date the post was last modified, in the site's timezone."
-                  "modified_gmt":
+                  modified_gmt:
                     type: "string"
                     description: "The date the post was last modified, in GMT."
                   password:
@@ -835,14 +835,14 @@ paths:
                   author:
                     type: "integer"
                     description: "The ID for the author of the post."
-                  "featured_media":
+                  featured_media:
                     type: "integer"
                     description: "The ID of the featured media for the post."
-                  "comment_status":
+                  comment_status:
                     type: "string"
                     enum: [ "open", "closed" ]
                     description: "Whether comments are allowed for the post."
-                  "ping_status":
+                  ping_status:
                     type: "string"
                     enum: [ "open", "closed" ]
                     description: "Whether pingbacks or trackbacks are allowed."
@@ -872,18 +872,18 @@ paths:
                     description: "Tags of the post."
                     items:
                       type: "string"
-                  "permalink_template":
+                  permalink_template:
                     type: "string"
                     description: "Permalink template of the post."
-                  "generated_slug":
+                  generated_slug:
                     type: "string"
                     description: "Generated slug of the post."
-                  "class_list":
+                  class_list:
                     type: "array"
                     description: "Class list of the post."
                     items:
                       type: "string"
-                  "_links":
+                  _links:
                     type: "object"
                     description: "Links to other related resources."
                     properties:
@@ -946,7 +946,7 @@ paths:
                             embeddable:
                               type: "boolean"
                               description: "Indicates whether the resource can be embedded."
-                      "version-history":
+                      version-history:
                         type: "array"
                         description: "Link to the version history of this post."
                         items:
@@ -958,7 +958,7 @@ paths:
                             count:
                               type: "integer"
                               description: "Count of the versions."
-                      "wp:attachment":
+                      wp:attachment:
                         type: "array"
                         description: "Link to media items attached to this post."
                         items:
@@ -967,7 +967,7 @@ paths:
                             href:
                               type: "string"
                               description: "URL to the linked resource."
-                      "wp:action-publish":
+                      wp:action-publish:
                         type: "array"
                         description: "Action link to publish this post."
                         items:
@@ -976,7 +976,7 @@ paths:
                             href:
                               type: "string"
                               description: "URL to the linked resource."
-                      "wp:action-unfiltered-html":
+                      wp:action-unfiltered-html:
                         type: "array"
                         description: "Action link for unfiltered HTML editing."
                         items:
@@ -985,7 +985,7 @@ paths:
                             href:
                               type: "string"
                               description: "URL to the linked resource."
-                      "wp:action-assign-author":
+                      wp:action-assign-author:
                         type: "array"
                         description: "Action link to assign a new author to this post."
                         items:
@@ -1074,11 +1074,9 @@ paths:
                     description: "Unique identifier for the page."
                   date:
                     type: "string"
-
                     description: "The date the page was published, in the site's timezone."
                   date_gmt:
                     type: "string"
-
                     description: "The date the page was published, in GMT."
                   guid:
                     type: "object"
@@ -1092,11 +1090,9 @@ paths:
                         description: "GUID for the page, raw."
                   modified:
                     type: "string"
-
                     description: "The date the page was last modified, in the site's timezone."
-                  "modified_gmt":
+                  modified_gmt:
                     type: "string"
-
                     description: "The date the page was last modified, in GMT."
                   password:
                     type: "string"
@@ -1157,20 +1153,20 @@ paths:
                   author:
                     type: "integer"
                     description: "The ID for the author of the page."
-                  "featured_media":
+                  featured_media:
                     type: "integer"
                     description: "The ID of the featured media for the page."
                   parent:
                     type: "integer"
                     description: "The ID of the parent page, if any."
-                  "menu_order":
+                  menu_order:
                     type: "integer"
                     description: "The order of the page in menus."
-                  "comment_status":
+                  comment_status:
                     type: "string"
                     enum: [ "open", "closed" ]
                     description: "Whether comments are allowed for the page."
-                  "ping_status":
+                  ping_status:
                     type: "string"
                     enum: [ "open", "closed" ]
                     description: "Whether pingbacks or trackbacks are allowed."
@@ -1184,18 +1180,18 @@ paths:
                       footnotes:
                         type: "string"
                         description: "Footnotes of the page."
-                  "permalink_template":
+                  permalink_template:
                     type: "string"
                     description: "Permalink template of the page."
-                  "generated_slug":
+                  generated_slug:
                     type: "string"
                     description: "Generated slug of the page."
-                  "class_list":
+                  class_list:
                     type: "array"
                     description: "Class list of the page."
                     items:
                       type: "string"
-                  "_links":
+                  _links:
                     type: "object"
                     description: "Links to other related resources."
                     properties:
@@ -1263,7 +1259,7 @@ paths:
                             embeddable:
                               type: "boolean"
                               description: "Indicates whether the resource can be embedded."
-                      "version-history":
+                      version-history:
                         type: "array"
                         description: "Link to the version history of this page."
                         items:
@@ -1276,7 +1272,7 @@ paths:
                             count:
                               type: "integer"
                               description: "Count of the versions."
-                      "wp:attachment":
+                      wp:attachment:
                         type: "array"
                         description: "Link to media items attached to this page."
                         items:
@@ -1286,7 +1282,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-publish":
+                      wp:action-publish:
                         type: "array"
                         description: "Action link to publish this page."
                         items:
@@ -1296,7 +1292,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-unfiltered-html":
+                      wp:action-unfiltered-html:
                         type: "array"
                         description: "Action link for unfiltered HTML editing."
                         items:
@@ -1306,7 +1302,7 @@ paths:
                               type: "string"
                               format: "uri"
                               description: "URL to the linked resource."
-                      "wp:action-assign-author":
+                      wp:action-assign-author:
                         type: "array"
                         description: "Action link to assign a new author to this page."
                         items:
