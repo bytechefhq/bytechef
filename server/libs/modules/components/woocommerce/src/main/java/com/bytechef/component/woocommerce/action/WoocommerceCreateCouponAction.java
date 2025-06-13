@@ -49,6 +49,7 @@ import com.bytechef.component.woocommerce.util.WoocommerceUtils;
  * @author Marija Horvat
  */
 public class WoocommerceCreateCouponAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCoupon")
         .title("Create Coupon")
         .description("Create a new coupon.")
@@ -80,7 +81,8 @@ public class WoocommerceCreateCouponAction {
             bool(INDIVIDUAL_USE)
                 .label("Individual Use")
                 .description(
-                    "If true, the coupon can only be used individually. Other applied coupons will be removed from the cart.")
+                    "If true, the coupon can only be used individually. Other applied coupons will be removed from " +
+                        "the cart.")
                 .required(false),
             array(PRODUCT_IDS)
                 .label("Product Ids")

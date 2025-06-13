@@ -37,10 +37,11 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class WoocommerceComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("wooCommerce")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("woocommerce")
         .title("WooCommerce")
         .description(
-            "WooCommerce is a e-commerce plugin for WordPress that allows you to turn a standard WordPress website into a fully functional online store.")
+            "WooCommerce is a e-commerce plugin for WordPress that allows you to turn a standard WordPress website " +
+                "into a fully functional online store.")
         .icon("path:assets/woocommerce.svg")
         .categories(ComponentCategory.E_COMMERCE)
         .customAction(true)

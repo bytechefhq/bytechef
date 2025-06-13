@@ -16,14 +16,14 @@
 
 package com.bytechef.component.woocommerce.trigger;
 
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.ID;
+import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.TRIGGER_OUTPUT_PROPERTY;
+import static com.bytechef.component.woocommerce.util.WoocommerceUtils.createWebhook;
 import static com.bytechef.component.woocommerce.util.WoocommerceUtils.deleteWebhook;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -32,8 +32,6 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.definition.TypeReference;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -44,7 +42,7 @@ public class WoocommerceNewOrderTrigger {
         .title("New Order")
         .description("Triggers when any order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-//        .output(outputSchema(TRIGGER_OUTPUT_PROPERTY))
+        .output(outputSchema(TRIGGER_OUTPUT_PROPERTY))
         .webhookEnable(WoocommerceNewOrderTrigger::webhookEnable)
         .webhookDisable(WoocommerceNewOrderTrigger::webhookDisable)
         .webhookRequest(WoocommerceNewOrderTrigger::webhookRequest);
@@ -53,17 +51,10 @@ public class WoocommerceNewOrderTrigger {
     }
 
     protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
 
-        Map<String, ?> body = context.http(http -> http.post("/webhooks"))
-            .body(
-                Body.of("delivery_url", webhookUrl, "name", "New Order Webhook", "topic", "order.created"))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return new WebhookEnableOutput(Map.of(ID, body.get(ID)), null);
+        return createWebhook(webhookUrl, context, "order.created");
     }
 
     protected static void webhookDisable(

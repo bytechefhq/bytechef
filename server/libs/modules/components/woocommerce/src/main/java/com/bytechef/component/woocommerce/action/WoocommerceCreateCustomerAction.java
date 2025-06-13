@@ -40,12 +40,14 @@ import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Marija Horvat
  */
 public class WoocommerceCreateCustomerAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCustomer")
         .title("Create Customer")
         .description("Create a new customer.")
@@ -148,7 +150,7 @@ public class WoocommerceCreateCustomerAction {
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
         return context.http(http -> http.post("/customers"))
             .body(
-                Context.Http.Body.of(
+                Http.Body.of(
                     EMAIL, inputParameters.getRequiredString(EMAIL),
                     FIRST_NAME, inputParameters.getRequiredString(FIRST_NAME),
                     LAST_NAME, inputParameters.getRequiredString(LAST_NAME),

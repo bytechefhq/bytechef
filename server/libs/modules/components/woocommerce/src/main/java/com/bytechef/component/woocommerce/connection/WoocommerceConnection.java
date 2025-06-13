@@ -24,14 +24,14 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.DOMAIN;
 
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 /**
  * @author Marija Horvat
  */
 public class WoocommerceConnection {
 
-    public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
             authorization(AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
