@@ -82,105 +82,105 @@ public class WoocommerceCreateOrderAction {
                                 .options((ActionOptionsFunction<String>) WoocommerceUtils::getProductIdOptions),
                             integer(QUANTITY)
                                 .label("Quantity")
-                                .description("Quantity ordered.")),
-                    string(STATUS)
-                        .label("Status")
-                        .description("Order status.")
-                        .options(
-                            option("Pending", "pending"),
-                            option("Processing", "processing"),
-                            option("On-hold", "on-hold"),
-                            option("Completed", "completed"),
-                            option("Cancelled", "cancelled"),
-                            option("Refunded", "refunded"),
-                            option("Failed", "failed"))
-                        .required(false),
-                    string(CUSTOMER_NOTE)
-                        .label("Customer Note")
-                        .description("Note left by customer during checkout.")
-                        .required(false),
-                    object(BILLING)
-                        .label("Billing")
-                        .description("List of billing address data.")
-                        .required(false)
-                        .properties(
-                            string(FIRST_NAME)
-                                .label("First Name")
-                                .description("First name."),
-                            string(LAST_NAME)
-                                .label("Last Name")
-                                .description("Last name."),
-                            string(COMPANY)
-                                .label("Company")
-                                .description("Company name."),
-                            string(ADDRESS_1)
-                                .label("Address 1")
-                                .description("Address line 1."),
-                            string(ADDRESS_2)
-                                .label("Address 2")
-                                .description("Address line 2."),
-                            string(CITY)
-                                .label("City")
-                                .description("City name."),
-                            string(STATE)
-                                .label("State")
-                                .description("ISO code or name of the state, province or district."),
-                            string(POSTCODE)
-                                .label("Postcode")
-                                .description("Postal code."),
-                            string(COUNTRY)
-                                .label("Country")
-                                .description("ISO code of the country."),
-                            string(EMAIL)
-                                .label("Email")
-                                .description("Email address."),
-                            string(PHONE)
-                                .label("Phone")
-                                .description("Phone number.")),
-                    object(SHIPPING)
-                        .label("Shipping")
-                        .description("List of shipping address data.")
-                        .required(false)
-                        .properties(string(FIRST_NAME)
-                            .label("First Name")
-                            .description("First name."),
-                            string(LAST_NAME)
-                                .label("Last Name")
-                                .description("Last name."),
-                            string(COMPANY)
-                                .label("Company")
-                                .description("Company name."),
-                            string(ADDRESS_1)
-                                .label("Address 1")
-                                .description("Address line 1."),
-                            string(ADDRESS_2)
-                                .label("Address 2")
-                                .description("Address line 2."),
-                            string(CITY)
-                                .label("City")
-                                .description("City name."),
-                            string(STATE)
-                                .label("State")
-                                .description("ISO code or name of the state, province or district."),
-                            string(POSTCODE)
-                                .label("Postcode")
-                                .description("Postal code."),
-                            string(COUNTRY)
-                                .label("Country")
-                                .description("ISO code of the country."),
-                            string(PHONE)
-                                .label("Phone")
-                                .description("Phone number.")),
-                    string(PAYMENT_METHOD)
-                        .label("Payment Method")
-                        .description("Payment method ID.")
-                        .options((ActionOptionsFunction<String>) WoocommerceUtils::getPaymentIdOptions)
-                        .required(false),
-                    bool(SET_PAID)
-                        .label("Set Paid")
-                        .description(
-                            "Define if the order is paid. It will set the status to processing and reduce stock items.")
-                        .required(false)))
+                                .description("Quantity ordered."))),
+            string(STATUS)
+                .label("Status")
+                .description("Order status.")
+                .options(
+                    option("Pending", "pending"),
+                    option("Processing", "processing"),
+                    option("On-hold", "on-hold"),
+                    option("Completed", "completed"),
+                    option("Cancelled", "cancelled"),
+                    option("Refunded", "refunded"),
+                    option("Failed", "failed"))
+                .required(false),
+            string(CUSTOMER_NOTE)
+                .label("Customer Note")
+                .description("Note left by customer during checkout.")
+                .required(false),
+            object(BILLING)
+                .label("Billing")
+                .description("List of billing address data.")
+                .required(false)
+                .properties(
+                    string(FIRST_NAME)
+                        .label("First Name")
+                        .description("First name."),
+                    string(LAST_NAME)
+                        .label("Last Name")
+                        .description("Last name."),
+                    string(COMPANY)
+                        .label("Company")
+                        .description("Company name."),
+                    string(ADDRESS_1)
+                        .label("Address 1")
+                        .description("Address line 1."),
+                    string(ADDRESS_2)
+                        .label("Address 2")
+                        .description("Address line 2."),
+                    string(CITY)
+                        .label("City")
+                        .description("City name."),
+                    string(STATE)
+                        .label("State")
+                        .description("ISO code or name of the state, province or district."),
+                    string(POSTCODE)
+                        .label("Postcode")
+                        .description("Postal code."),
+                    string(COUNTRY)
+                        .label("Country")
+                        .description("ISO code of the country."),
+                    string(EMAIL)
+                        .label("Email")
+                        .description("Email address."),
+                    string(PHONE)
+                        .label("Phone")
+                        .description("Phone number.")),
+            object(SHIPPING)
+                .label("Shipping")
+                .description("List of shipping address data.")
+                .required(false)
+                .properties(string(FIRST_NAME)
+                    .label("First Name")
+                    .description("First name."),
+                    string(LAST_NAME)
+                        .label("Last Name")
+                        .description("Last name."),
+                    string(COMPANY)
+                        .label("Company")
+                        .description("Company name."),
+                    string(ADDRESS_1)
+                        .label("Address 1")
+                        .description("Address line 1."),
+                    string(ADDRESS_2)
+                        .label("Address 2")
+                        .description("Address line 2."),
+                    string(CITY)
+                        .label("City")
+                        .description("City name."),
+                    string(STATE)
+                        .label("State")
+                        .description("ISO code or name of the state, province or district."),
+                    string(POSTCODE)
+                        .label("Postcode")
+                        .description("Postal code."),
+                    string(COUNTRY)
+                        .label("Country")
+                        .description("ISO code of the country."),
+                    string(PHONE)
+                        .label("Phone")
+                        .description("Phone number.")),
+            string(PAYMENT_METHOD)
+                .label("Payment Method")
+                .description("Payment method ID.")
+                .options((ActionOptionsFunction<String>) WoocommerceUtils::getPaymentIdOptions)
+                .required(false),
+            bool(SET_PAID)
+                .label("Set Paid")
+                .description(
+                    "Define if the order is paid. It will set the status to processing and reduce stock items.")
+                .required(false))
         .output(outputSchema(ORDER_OUTPUT_PROPERTY))
         .perform(WoocommerceCreateOrderAction::perform);
 
@@ -192,7 +192,7 @@ public class WoocommerceCreateOrderAction {
             .body(
                 Body.of(
                     CUSTOMER_ID, inputParameters.getRequiredString(CUSTOMER_ID),
-                    LINE_ITEMS, inputParameters.getRequiredArray(LINE_ITEMS),
+                    LINE_ITEMS, inputParameters.getRequiredList(LINE_ITEMS),
                     STATUS, inputParameters.getString(STATUS),
                     CUSTOMER_NOTE, inputParameters.getString(CUSTOMER_NOTE),
                     BILLING, inputParameters.getMap(BILLING),

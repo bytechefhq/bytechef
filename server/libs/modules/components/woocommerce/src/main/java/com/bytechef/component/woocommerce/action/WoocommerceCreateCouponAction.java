@@ -116,7 +116,7 @@ public class WoocommerceCreateCouponAction {
                     DESCRIPTION, inputParameters.getString(DESCRIPTION),
                     DATE_EXPIRES, inputParameters.getDate(DATE_EXPIRES),
                     INDIVIDUAL_USE, inputParameters.getBoolean(INDIVIDUAL_USE),
-                    PRODUCT_IDS, inputParameters.getArray(PRODUCT_IDS),
+                    PRODUCT_IDS, inputParameters.getList(PRODUCT_IDS),
                     EXCLUDE_SALE_ITEMS, inputParameters.getBoolean(EXCLUDE_SALE_ITEMS),
                     MINIMUM_AMOUNT, inputParameters.getString(MINIMUM_AMOUNT),
                     MAXIMUM_AMOUNT, inputParameters.getString(MAXIMUM_AMOUNT)))
