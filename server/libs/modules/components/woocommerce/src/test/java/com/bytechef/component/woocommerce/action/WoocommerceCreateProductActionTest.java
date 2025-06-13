@@ -16,9 +16,11 @@
 
 package com.bytechef.component.woocommerce.action;
 
+import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.CATEGORIES;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.DESCRIPTION;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.DIMENSIONS;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.HEIGHT;
+import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.ID;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.LENGTH;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.MANAGE_STOCK;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.NAME;
@@ -30,8 +32,10 @@ import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.WIDTH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +46,7 @@ class WoocommerceCreateProductActionTest extends AbstractWoocommerceActionTest {
 
     @Test
     void testPerform() {
-        Parameters parameters = MockParametersFactory.create(
+        Parameters mockedParameters = MockParametersFactory.create(
             Map.of(
                 NAME, "Product",
                 REGULAR_PRICE, "10",
@@ -52,13 +56,33 @@ class WoocommerceCreateProductActionTest extends AbstractWoocommerceActionTest {
                 STOCK_QUANTITY, 100,
                 STOCK_STATUS, "instock",
                 WEIGHT, "1",
+                CATEGORIES, List.of("category1", "category2"),
                 DIMENSIONS, Map.of(
                     LENGTH, "1",
                     WIDTH, "2",
                     HEIGHT, "3")));
 
-        Object result = WoocommerceCreateProductAction.perform(parameters, parameters, mockedContext);
+        Object result = WoocommerceCreateProductAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
+
+        Map<String, Object> expectedBody = Map.of(
+            NAME, "Product",
+            REGULAR_PRICE, "10",
+            TYPE, "simple",
+            DESCRIPTION, "This is a test product.",
+            MANAGE_STOCK, true,
+            STOCK_QUANTITY, 100,
+            STOCK_STATUS, "instock",
+            WEIGHT, "1",
+            CATEGORIES, List.of(Map.of(ID, "category1"), Map.of(ID, "category2")),
+            DIMENSIONS, Map.of(
+                LENGTH, "1",
+                WIDTH, "2",
+                HEIGHT, "3"));
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(expectedBody, body.getContent());
     }
 }

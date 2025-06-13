@@ -17,6 +17,7 @@
 package com.bytechef.component.woocommerce.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -28,6 +29,8 @@ import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
@@ -40,14 +43,15 @@ import org.mockito.ArgumentCaptor;
  */
 class WoocommerceUtilsTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Response mockedResponse = mock(Response.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -56,6 +60,26 @@ class WoocommerceUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
+    }
+
+    @Test
+    void createWebhook() {
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+
+        String webhookUrl = "https://example.com/webhook";
+        String topic = "order.created";
+
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(ID, 123));
+
+        WebhookEnableOutput result = WoocommerceUtils.createWebhook(webhookUrl, mockedTriggerContext, topic);
+
+        assertEquals(new WebhookEnableOutput(Map.of(ID, 123), null), result);
+        Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(
+            Map.of("delivery_url", webhookUrl, "name", "New Webhook", "topic", topic), body.getContent());
     }
 
     @Test

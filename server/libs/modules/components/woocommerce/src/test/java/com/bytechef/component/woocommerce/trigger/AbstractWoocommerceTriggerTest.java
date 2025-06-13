@@ -17,13 +17,9 @@
 package com.bytechef.component.woocommerce.trigger;
 
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.ID;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mockStatic;
 
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -31,10 +27,13 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.woocommerce.util.WoocommerceUtils;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
@@ -46,23 +45,21 @@ abstract class AbstractWoocommerceTriggerTest {
     protected final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     protected final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     protected final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
+    protected Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, 123));
     protected final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    protected final Executor mockedExecutor = mock(Executor.class);
-    protected final Response mockedResponse = mock(Response.class);
-    protected final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    protected final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    protected final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    protected final ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
+        ArgumentCaptor.forClass(TriggerContext.class);
+    protected MockedStatic<WoocommerceUtils> woocommerceUtilsMockedStatic;
 
     @BeforeEach
     void beforeEach() {
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(ID, "3"));
+        woocommerceUtilsMockedStatic = mockStatic(WoocommerceUtils.class);
+    }
+
+    @AfterEach
+    void afterEach() {
+        woocommerceUtilsMockedStatic.close();
     }
 }
