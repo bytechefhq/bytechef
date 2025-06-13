@@ -28,7 +28,6 @@ export interface DialogStepType {
 }
 
 interface ConnectionDialogHookReturnType {
-    isOAuth2AuthorizationType: boolean;
     closeDialog: () => void;
     openDialog: () => void;
 }
@@ -440,13 +439,12 @@ export default function useConnectDialog({
     ]);
 
     useEffect(() => {
-        if (integration?.connectionConfig?.authorizationType?.startsWith('OAUTH2')) {
+        if (isOAuth2AuthorizationType) {
             setIsOAuth2(true);
         }
-    }, [integration?.connectionConfig?.authorizationType]);
+    }, [isOAuth2AuthorizationType]);
 
     return {
-        isOAuth2AuthorizationType,
         openDialog,
         closeDialog,
     };
