@@ -39,15 +39,22 @@ import java.util.List;
 public class WordpressComponentHandler extends AbstractWordpressComponentHandler {
 
     @Override
-    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
-        return modifiableComponentDefinition
-            .icon("path:assets/wordpress.svg")
-            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(WordPressNewPostTrigger.TRIGGER_DEFINITION);
     }
 
     @Override
-    public ModifiableConnectionDefinition
-        modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .icon("path:assets/wordpress.svg")
+            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
+            .customAction(true);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "%s/wp-json"
                 .formatted(connectionParameters.getRequiredString(WEBSITE)))
@@ -66,10 +73,5 @@ public class WordpressComponentHandler extends AbstractWordpressComponentHandler
                             .label("Wordpress Website")
                             .description("Wordpress website of your Wordpress site. Can be found in user settings.")
                             .required(true)));
-    }
-
-    @Override
-    public List<ModifiableTriggerDefinition> getTriggers() {
-        return List.of(WordPressNewPostTrigger.TRIGGER_DEFINITION);
     }
 }
