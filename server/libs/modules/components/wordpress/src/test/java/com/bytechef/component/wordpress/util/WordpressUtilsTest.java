@@ -43,7 +43,7 @@ class WordpressUtilsTest {
     private static final Response mockedResponse = mock(Response.class);
 
     @Test
-    void getCategoriesOptions() {
+    void testGetCategoriesOptions() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))

@@ -44,7 +44,7 @@ class WordPressNewPostTriggerTest {
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
     @Test
-    void poll() {
+    void testPoll() {
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
