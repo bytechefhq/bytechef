@@ -1,5 +1,5 @@
 import * as React from "react"
-import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
+import { RadioGroup as RadioGroupPrimitive } from "radix-ui"
 import { cn } from "@/shared/util/cn-utils"
 import { DotFilledIcon } from "@radix-ui/react-icons"
 
