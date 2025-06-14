@@ -248,6 +248,31 @@ paths:
           description: "Successful operation."
       security:
         - jwtBearerAuth: [ ]
+  /me:
+    patch:
+      description: "Update data of an external user."
+      summary: "Update data of an external user"
+      tags:
+        - "connected-user"
+      operationId: "updateFrontendConnectedUser"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              additionalProperties: true
+      responses:
+        "200":
+          description: "The workflow reference code."
+      security:
+        - jwtBearerAuth: [ ]
   /integration-instances/{id}:
     delete:
       description: "Delete an integration instance."
@@ -461,6 +486,37 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - jwtBearerAuth: [ ]
+  /{externalUserId}:
+    patch:
+      description: "Update data of an external user."
+      summary: "Update data of an external user"
+      tags:
+        - "connected-user"
+      operationId: "updateConnectedUser"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              additionalProperties: true
+      responses:
+        "200":
+          description: "The workflow reference code."
+      security:
+        - bearerAuth: [ ]
   /{externalUserId}/automation/workflows:
     get:
       description: "Get automation workflows for particular external user."
