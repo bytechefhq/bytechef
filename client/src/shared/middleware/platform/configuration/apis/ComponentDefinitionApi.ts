@@ -37,14 +37,6 @@ export interface GetComponentDefinitionVersionsRequest {
     componentName: string;
 }
 
-export interface GetComponentDefinitionsRequest {
-    modeType: GetComponentDefinitionsModeTypeEnum;
-    actionDefinitions?: boolean;
-    connectionDefinitions?: boolean;
-    triggerDefinitions?: boolean;
-    include?: Array<string>;
-}
-
 export interface GetConnectionComponentDefinitionRequest {
     componentName: string;
     connectionVersion: number;
@@ -137,61 +129,6 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all component definitions.
-     * Get all component definitions
-     */
-    async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
-        if (requestParameters['modeType'] == null) {
-            throw new runtime.RequiredError(
-                'modeType',
-                'Required parameter "modeType" was null or undefined when calling getComponentDefinitions().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['modeType'] != null) {
-            queryParameters['modeType'] = requestParameters['modeType'];
-        }
-
-        if (requestParameters['actionDefinitions'] != null) {
-            queryParameters['actionDefinitions'] = requestParameters['actionDefinitions'];
-        }
-
-        if (requestParameters['connectionDefinitions'] != null) {
-            queryParameters['connectionDefinitions'] = requestParameters['connectionDefinitions'];
-        }
-
-        if (requestParameters['triggerDefinitions'] != null) {
-            queryParameters['triggerDefinitions'] = requestParameters['triggerDefinitions'];
-        }
-
-        if (requestParameters['include'] != null) {
-            queryParameters['include'] = requestParameters['include'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/component-definitions`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicFromJSON));
-    }
-
-    /**
-     * Get all component definitions.
-     * Get all component definitions
-     */
-    async getComponentDefinitions(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
-        const response = await this.getComponentDefinitionsRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Get a connection component definition.
      * Get a connection component definition
      */
@@ -269,12 +206,3 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
     }
 
 }
-
-/**
- * @export
- */
-export const GetComponentDefinitionsModeTypeEnum = {
-    AUTOMATION: 0,
-    EMBEDDED: 1
-} as const;
-export type GetComponentDefinitionsModeTypeEnum = typeof GetComponentDefinitionsModeTypeEnum[keyof typeof GetComponentDefinitionsModeTypeEnum];

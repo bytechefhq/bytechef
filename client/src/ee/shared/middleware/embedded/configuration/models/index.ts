@@ -3,7 +3,9 @@
 export * from './AppEvent';
 export * from './AuthorizationType';
 export * from './Category';
+export * from './ComponentCategory';
 export * from './ComponentConnection';
+export * from './ComponentDefinitionBasic';
 export * from './ConnectedUserProjectWorkflow';
 export * from './Connection';
 export * from './ConnectionBase';
@@ -24,6 +26,7 @@ export * from './IntegrationVersion';
 export * from './Page';
 export * from './PublishConnectedUserProjectWorkflowRequest';
 export * from './PublishIntegrationRequest';
+export * from './StartWebhookTriggerTest200Response';
 export * from './Tag';
 export * from './UpdateConnectionRequest';
 export * from './UpdateTagsRequest';

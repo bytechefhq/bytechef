@@ -2,7 +2,9 @@
 /* eslint-disable */
 export * from './AuthorizationType';
 export * from './Category';
+export * from './ComponentCategory';
 export * from './ComponentConnection';
+export * from './ComponentDefinitionBasic';
 export * from './Connection';
 export * from './ConnectionBase';
 export * from './CreateProjectDeploymentWorkflowJob200Response';
@@ -17,6 +19,7 @@ export * from './ProjectDeploymentWorkflowConnection';
 export * from './ProjectStatus';
 export * from './ProjectVersion';
 export * from './PublishProjectRequest';
+export * from './StartWebhookTriggerTest200Response';
 export * from './Tag';
 export * from './UpdateConnectionRequest';
 export * from './UpdateTagsRequest';

@@ -7,7 +7,6 @@ apis/NotificationEventApi.ts
 apis/Oauth2Api.ts
 apis/TaskDispatcherDefinitionApi.ts
 apis/TriggerDefinitionApi.ts
-apis/WebhookTriggerTestApi.ts
 apis/WorkflowNodeDescriptionApi.ts
 apis/WorkflowNodeDynamicPropertiesApi.ts
 apis/WorkflowNodeOptionApi.ts
@@ -35,6 +34,7 @@ models/ComponentDefinitionBasic.ts
 models/ConnectionDefinition.ts
 models/ConnectionDefinitionBasic.ts
 models/ControlType.ts
+models/CredentialStatus.ts
 models/DateProperty.ts
 models/DateTimeProperty.ts
 models/DeleteWorkflowNodeParameter200Response.ts
@@ -64,7 +64,6 @@ models/Resources.ts
 models/SaveWorkflowTestConfigurationConnectionRequest.ts
 models/SaveWorkflowTestConfigurationInputsRequest.ts
 models/ScriptTestExecution.ts
-models/StartWebhookTriggerTest200Response.ts
 models/StringProperty.ts
 models/Tag.ts
 models/TaskDispatcherDefinition.ts
