@@ -8,6 +8,8 @@ servers:
 tags:
   - name: "category"
     description: "The Automation Category API"
+  - name: "component-definition"
+    description: "The Automation Component Definition Internal API"
   - name: "connection"
     description: "The Automation Connection Internal API"
   - name: "connection-tag"
@@ -20,11 +22,56 @@ tags:
     description: "The Automation Project Tag Internal API"
   - name: "project"
     description: "The Automation Project Internal API"
+  - name: "webhook-trigger-test"
+    description: "The Automation Webhook Trigger Internal API"
   - name: "workflow"
     description: "The Automation Workflow Internal API"
   - name: "workspace"
     description: "The Automation Workspace Internal API"
 paths:
+  /component-definitions:
+    get:
+      description: "Get all component definitions."
+      summary: "Get all component definitions"
+      tags:
+        - "component-definition"
+      operationId: "getComponentDefinitions"
+      parameters:
+        - name: "actionDefinitions"
+          description: "Use for filtering components which define action definitions."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "connectionDefinitions"
+          description: "Use for filtering components which define connection definitions."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "triggerDefinitions"
+          description: "Use for filtering components which define trigger definitions."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "include"
+          description: "The list of component names to include in the result."
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml/#/components/schemas/ComponentDefinitionBasic"
   /connections:
     post:
       description: "Create a new connection."
@@ -746,6 +793,48 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Workspace"
+  /webhooks/{workflowId}/test/start:
+    post:
+      description: "Test a webhook trigger."
+      summary: "Test a webhook trigger"
+      tags:
+        - "webhook-trigger-test"
+      operationId: "startWebhookTriggerTest"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Returns the webhook URL."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  webhookUrl:
+                    description: "The webhook URL."
+                    type: "string"
+  /webhooks/{workflowId}/test/stop:
+    post:
+      description: "Test a webhook trigger."
+      summary: "Test a webhook trigger"
+      tags:
+        - "webhook-trigger-test"
+      operationId: "stopWebhookTriggerTest"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
   /workflows:
     get:
       description: "Get all workflows."
