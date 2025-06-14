@@ -1,4 +1,4 @@
-package com.bytechef.automation.connection.web.rest.model;
+package com.bytechef.ee.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets credential_status
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:57.880886+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:32:02.287716+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public enum CredentialStatusModel {
   
   VALID("VALID"),

@@ -3,7 +3,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.automation.connection.web.rest;
+package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:57.880886+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:41:02.320122+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "connection-tag", description = "The Automation Connection Tag Internal API")
 public interface ConnectionTagApi {

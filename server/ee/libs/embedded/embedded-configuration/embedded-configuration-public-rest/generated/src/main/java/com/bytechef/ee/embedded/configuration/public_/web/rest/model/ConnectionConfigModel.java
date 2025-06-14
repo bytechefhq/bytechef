@@ -2,13 +2,11 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OAuth2Model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,17 +27,17 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionConfig", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("ConnectionConfig")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:58.066055+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:31:59.759754+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ConnectionConfigModel {
 
-  private @Nullable AuthorizationTypeModel authorizationType;
+  private com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel authorizationType = null;
 
   @Valid
   private List<@Valid InputModel> inputs = new ArrayList<>();
 
   private @Nullable OAuth2Model oauth2;
 
-  public ConnectionConfigModel authorizationType(AuthorizationTypeModel authorizationType) {
+  public ConnectionConfigModel authorizationType(com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
     return this;
   }
@@ -51,11 +49,11 @@ public class ConnectionConfigModel {
   @Valid 
   @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationType")
-  public AuthorizationTypeModel getAuthorizationType() {
+  public com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel getAuthorizationType() {
     return authorizationType;
   }
 
-  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
+  public void setAuthorizationType(com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
 

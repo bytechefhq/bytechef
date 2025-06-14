@@ -3,9 +3,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.ee.embedded.connection.web.rest;
+package com.bytechef.ee.embedded.configuration.web.rest;
 
-import com.bytechef.ee.embedded.connection.web.rest.model.ConnectionModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:58.383332+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:32:02.287716+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "connection", description = "The Embedded Connection Internal API")
 public interface ConnectionApi {
@@ -256,7 +257,7 @@ public interface ConnectionApi {
     default ResponseEntity<List<ConnectionModel>> getConnections(
         @Parameter(name = "componentName", description = "The component name used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentName", required = false) String componentName,
         @Parameter(name = "connectionVersion", description = "The connection version.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionVersion", required = false) Integer connectionVersion,
-        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) com.bytechef.platform.connection.web.rest.model.EnvironmentModel environment,
+        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) EnvironmentModel environment,
         @Parameter(name = "tagId", description = "The tag id of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
     ) {
         getRequest().ifPresent(request -> {
