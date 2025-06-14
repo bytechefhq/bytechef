@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.execution.repository;
 
 import com.bytechef.commons.util.CollectionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -90,18 +91,20 @@ public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepos
         if (startDate != null) {
             query += "AND start_date >= ? ";
 
-            arguments.add(startDate);
+            arguments.add(Timestamp.from(startDate));
         }
 
         if (endDate != null) {
             query += "AND end_date <= ? ";
 
-            arguments.add(endDate);
+            arguments.add(Timestamp.from(endDate));
         }
 
         if (instanceIds != null && !instanceIds.isEmpty()) {
             query += "AND principal_id IN(%s) ".formatted(
-                String.join(",", CollectionUtils.map(instanceIds, String::valueOf)));
+                String.join(",", Collections.nCopies(instanceIds.size(), "?")));
+
+            arguments.addAll(instanceIds);
         }
 
         if (!CollectionUtils.isEmpty(workflowIds)) {
