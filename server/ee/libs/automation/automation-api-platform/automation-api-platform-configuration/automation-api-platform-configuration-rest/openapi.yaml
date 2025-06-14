@@ -600,6 +600,12 @@ components:
         - "POST"
         - "PUT"
     Tag:
-      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
+      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
     UpdateTagsRequest:
-      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
+      description: "The request object that contains the array of tags."
+      type: "object"
+      properties:
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"

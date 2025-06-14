@@ -17,9 +17,7 @@
 package com.bytechef.automation.configuration.web.rest.mapper.config;
 
 import com.bytechef.automation.configuration.web.rest.adapter.AutomationConfigurationConversionServiceAdapter;
-import com.bytechef.platform.category.web.rest.adapter.PlatformCategoryConversionServiceAdapter;
 import com.bytechef.platform.configuration.web.rest.adapter.PlatformConfigurationConversionServiceAdapter;
-import com.bytechef.platform.tag.web.rest.adapter.PlatformTagConversionServiceAdapter;
 import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -29,8 +27,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  */
 @MapperConfig(componentModel = "spring", uses = {
     DateTimeMapper.class, AutomationConfigurationConversionServiceAdapter.class,
-    PlatformCategoryConversionServiceAdapter.class, PlatformConfigurationConversionServiceAdapter.class,
-    PlatformTagConversionServiceAdapter.class
+    PlatformConfigurationConversionServiceAdapter.class,
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.automation.configuration.web.rest.adapter",

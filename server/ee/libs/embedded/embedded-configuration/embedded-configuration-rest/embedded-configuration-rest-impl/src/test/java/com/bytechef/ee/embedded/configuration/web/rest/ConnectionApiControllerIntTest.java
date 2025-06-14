@@ -15,13 +15,13 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.ConnectionMapper;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.web.rest.model.TagModel;
-import com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;

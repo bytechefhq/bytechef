@@ -12,7 +12,7 @@ properties:
     type: "boolean"
     readOnly: true
   authorizationType:
-    $ref: "./authorization_type.yaml"
+    $ref: "../../../../../../platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/AuthorizationType"
   authorizationParameters:
     description: "The authorization parameters of a connection."
     type: "object"
@@ -67,7 +67,7 @@ properties:
   tags:
     type: "array"
     items:
-      $ref: "../../../../../../platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
+      $ref: "../../../../../../platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
   __version:
     type: "integer"
     format: "int32"

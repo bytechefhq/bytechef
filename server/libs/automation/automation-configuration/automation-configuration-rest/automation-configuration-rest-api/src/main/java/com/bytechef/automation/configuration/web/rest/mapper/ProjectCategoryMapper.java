@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.tag.web.rest.mapper;
+package com.bytechef.automation.configuration.web.rest.mapper;
 
-import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.web.rest.mapper.config.PlatformTagMapperSpringConfig;
-import com.bytechef.platform.tag.web.rest.model.TagModel;
-import org.mapstruct.InheritInverseConfiguration;
+import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
+import com.bytechef.automation.configuration.web.rest.model.CategoryModel;
+import com.bytechef.platform.category.domain.Category;
 import org.mapstruct.Mapper;
-import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformTagMapperSpringConfig.class)
-public interface TagMapper extends Converter<Tag, TagModel> {
+@Mapper(config = AutomationConfigurationMapperSpringConfig.class)
+public interface ProjectCategoryMapper extends Converter<Category, CategoryModel> {
 
-    TagModel convert(Tag tag);
-
-    @InheritInverseConfiguration
-    @DelegatingConverter
-    Tag invertConvert(TagModel tagModel);
+    @Override
+    CategoryModel convert(Category source);
 }

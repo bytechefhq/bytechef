@@ -538,7 +538,7 @@ paths:
               - "parameters"
               properties:
                 authorizationType:
-                  $ref: "../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/AuthorizationType"
+                  $ref: "#/components/schemas/AuthorizationType"
                 componentName:
                   description: "The name of a component that uses this connection."
                   type: "string"
@@ -1770,7 +1770,19 @@ components:
         type:
           $ref: "#/components/schemas/AuthorizationType"
     AuthorizationType:
-      $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/authorization_type.yaml"
+      description: "The authorization type."
+      type: "string"
+      enum:
+        - "API_KEY"
+        - "BASIC_AUTH"
+        - "BEARER_TOKEN"
+        - "CUSTOM"
+        - "DIGEST_AUTH"
+        - "OAUTH2_AUTHORIZATION_CODE"
+        - "OAUTH2_AUTHORIZATION_CODE_PKCE"
+        - "OAUTH2_CLIENT_CREDENTIALS"
+        - "OAUTH2_IMPLICIT_CODE"
+        - "OAUTH2_RESOURCE_OWNER_PASSWORD"
     BooleanProperty:
       description: "A boolean property type."
       type: "object"
@@ -2069,6 +2081,8 @@ components:
       - "TEXT_AREA"
       - "TIME"
       - "URL"
+    CredentialStatus:
+      $ref: "../../../platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
     DateProperty:
       description: "A date property type."
       type: "object"
@@ -2125,6 +2139,8 @@ components:
             type: "string"
           propertiesDataSource:
             $ref: "#/components/schemas/PropertiesDataSource"
+    Environment:
+      $ref: "../../../platform-rest/openapi/components/schemas/objects/environment.yaml"
     ExecutionError:
       description: "Contains information about an error that happened during execution."
       type: "object"
@@ -2521,6 +2537,8 @@ components:
               $ref: "#/components/schemas/Option"
           optionsDataSource:
             $ref: "#/components/schemas/OptionsDataSource"
+    Tag:
+      $ref: "../../../platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
     TaskDispatcherDefinition:
       description: "A task dispatcher defines a strategy for dispatching tasks to\
         \ be executed."

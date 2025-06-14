@@ -4,10 +4,7 @@ dependencies {
     annotationProcessor(libs.org.mapstruct.mapstruct.processor)
     annotationProcessor(libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions)
 
-    api(project(":server:libs:platform:platform-category:platform-category-rest:platform-category-rest-api"))
     api(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-api"))
-    api(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-api"))
-    api(project(":server:libs:platform:platform-tag:platform-tag-rest:platform-tag-rest-api"))
 
     api(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
 

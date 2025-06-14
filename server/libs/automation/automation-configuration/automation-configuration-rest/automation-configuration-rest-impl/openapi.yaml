@@ -1003,7 +1003,7 @@ paths:
 components:
   schemas:
     Category:
-      $ref: "../../../../platform/platform-category/platform-category-rest/platform-category-rest-api/openapi.yaml#/components/schemas/Category"
+      $ref: "../../../../platform/platform-category/platform-category-rest/openapi.yaml#/components/schemas/Category"
     Connection:
       description: "Contains all required information to open a connection to a service\
         \ defined by componentName parameter."
@@ -1272,11 +1272,32 @@ components:
         status:
           $ref: '#/components/schemas/ProjectStatus'
     Tag:
-      $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
+      $ref: "../../../../platform/platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
     UpdateConnectionRequest:
-      $ref: "../../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateConnectionRequest"
+      description: "Contains all connection parameters that can be updated."
+      type: "object"
+      required:
+        - "name"
+        - "tags"
+      properties:
+        name:
+          description: "The name of a connection."
+          type: "string"
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+        __version:
+          type: "integer"
+          format: "int32"
     UpdateTagsRequest:
-      $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
+      description: "The request object that contains the array of tags."
+      type: "object"
+      properties:
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
     Workflow:
       description: "The blueprint that describe the execution of a job."
       x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware']

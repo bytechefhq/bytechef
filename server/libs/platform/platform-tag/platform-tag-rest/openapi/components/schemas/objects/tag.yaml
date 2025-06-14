@@ -1,0 +1,31 @@
+description: "A tag."
+required:
+  - "name"
+properties:
+  createdBy:
+    description: "The created by."
+    type: "string"
+    readOnly: true
+  createdDate:
+    description: "The created date."
+    type: "string"
+    format: "date-time"
+    readOnly: true
+  id:
+    description: "The id of the tag."
+    type: "integer"
+    format: "int64"
+  lastModifiedBy:
+    description: "The last modified by."
+    type: "string"
+    readOnly: true
+  lastModifiedDate:
+    description: "The last modified date."
+    type: "string"
+    format: "date-time"
+    readOnly: true
+  name:
+    description: "The name of the tag."
+    type: "string"
+  __version:
+    type: "integer"

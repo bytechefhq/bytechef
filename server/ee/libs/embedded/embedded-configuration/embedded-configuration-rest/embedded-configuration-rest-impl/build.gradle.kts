@@ -19,14 +19,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/../embedded-configuration-rest-api/generated")
     schemaMappings.set(
         mapOf(
-            "AuthorizationType" to "com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel",
-            "Category" to "com.bytechef.platform.category.web.rest.model.CategoryModel",
-            "CredentialStatus" to "com.bytechef.platform.connection.web.rest.model.CredentialStatusModel",
-            "DataStreamComponent" to "com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel",
             "Page" to "org.springframework.data.domain.Page",
-            "Tag" to "TagModel",
-            "UpdateConnectionRequest" to "com.bytechef.platform.connection.web.rest.model.UpdateConnectionRequestModel",
-            "UpdateTagsRequest" to "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel",
             "WorkflowConnection" to "com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel",
             "WorkflowFormat" to "com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel",
             "WorkflowInput" to "WorkflowInputModel",
@@ -37,7 +30,6 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     )
     importMappings.set(
         mapOf(
-            "TagModel" to "com.bytechef.platform.tag.web.rest.model.TagModel",
             "WorkflowInputModel" to "com.bytechef.platform.configuration.web.rest.model.WorkflowInputModel",
             "WorkflowOutputModel" to "com.bytechef.platform.configuration.web.rest.model.WorkflowOutputModel",
             "WorkflowTaskModel" to "com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel",

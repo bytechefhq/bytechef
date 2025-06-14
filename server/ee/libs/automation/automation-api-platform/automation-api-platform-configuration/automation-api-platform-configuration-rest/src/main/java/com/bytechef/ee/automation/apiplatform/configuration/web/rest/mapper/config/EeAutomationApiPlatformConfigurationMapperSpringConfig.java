@@ -8,7 +8,6 @@
 package com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config;
 
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.adapter.EeAutomationApiPlatformConfigurationConversionServiceAdapter;
-import com.bytechef.platform.tag.web.rest.adapter.PlatformTagConversionServiceAdapter;
 import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -19,8 +18,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    DateTimeMapper.class, EeAutomationApiPlatformConfigurationConversionServiceAdapter.class,
-    PlatformTagConversionServiceAdapter.class
+    DateTimeMapper.class, EeAutomationApiPlatformConfigurationConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.ee.automation.apiplatform.configuration.web.rest.adapter",

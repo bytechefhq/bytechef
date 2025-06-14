@@ -17,11 +17,6 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     modelNameSuffix.set("Model")
     modelPackage.set("com.bytechef.ee.embedded.configuration.public_.web.rest.model")
     outputDir.set("$projectDir/generated")
-    schemaMappings.set(
-        mapOf(
-            "AuthorizationType" to "com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel",
-        )
-    )
 }
 
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")

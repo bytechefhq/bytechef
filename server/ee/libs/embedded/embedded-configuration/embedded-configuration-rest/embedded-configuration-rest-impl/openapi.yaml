@@ -1310,7 +1310,7 @@ components:
           type: "integer"
           format: "int32"
     Category:
-      $ref: "../../../../../../libs/platform/platform-category/platform-category-rest/platform-category-rest-api/openapi.yaml#/components/schemas/Category"
+      $ref: "../../../../../../libs/platform/platform-category/platform-category-rest/openapi.yaml#/components/schemas/Category"
     ConnectedUserProjectWorkflow:
       type: "object"
       properties:
@@ -1326,11 +1326,26 @@ components:
           description: "The workflow version"
           type: "integer"
         workflow:
-          $ref: "../../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+          $ref: "#/components/schemas/Workflow"
     Connection:
       $ref: "../../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_base.yaml"
     UpdateConnectionRequest:
-      $ref: "../../../../../../libs/platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateConnectionRequest"
+      description: "Contains all connection parameters that can be updated."
+      type: "object"
+      required:
+        - "name"
+        - "tags"
+      properties:
+        name:
+          description: "The name of a connection."
+          type: "string"
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+        __version:
+          type: "integer"
+          format: "int32"
     Environment:
       $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Integration:
@@ -1721,9 +1736,15 @@ components:
     Page:
       $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/page.yaml"
     Tag:
-      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
+      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
     UpdateTagsRequest:
-      $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
+      description: "The request object that contains the array of tags."
+      type: "object"
+      properties:
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
     Workflow:
       description: "The blueprint that describe the execution of a job."
       x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware']

@@ -3,7 +3,7 @@ plugins {
 }
 
 val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
-    apiPackage.set("com.bytechef.ee.platform.api,connector.configuration.web.rest")
+    apiPackage.set("com.bytechef.ee.platform.apiconnector.configuration.web.rest")
     configOptions.set(
         mapOf(
             "interfaceOnly" to "true",
