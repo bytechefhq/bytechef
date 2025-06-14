@@ -5,7 +5,7 @@ import {
     ConnectionTagApi,
     GetWorkspaceConnectionsRequest,
     Tag,
-} from '@/shared/middleware/automation/connection';
+} from '@/shared/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {

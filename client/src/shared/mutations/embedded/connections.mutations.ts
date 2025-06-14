@@ -1,4 +1,4 @@
-import {Connection, ConnectionApi} from '@/ee/shared/middleware/embedded/connection';
+import {Connection, ConnectionApi} from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateConnectionMutationProps {

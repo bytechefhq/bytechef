@@ -1,4 +1,4 @@
-import {Connection, Tag} from '@/ee/shared/middleware/embedded/connection';
+import {Connection, Tag} from '@/ee/shared/middleware/embedded/configuration';
 
 import ConnectionListItem from './ConnectionListItem';
 

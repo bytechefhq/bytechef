@@ -5,7 +5,7 @@ import {
     ConnectionTagApi,
     GetConnectionsRequest,
     Tag,
-} from '@/ee/shared/middleware/embedded/connection';
+} from '@/ee/shared/middleware/embedded/configuration';
 import {RequestI} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {useQuery} from '@tanstack/react-query';
 

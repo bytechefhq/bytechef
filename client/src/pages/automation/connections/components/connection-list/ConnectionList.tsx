@@ -1,4 +1,4 @@
-import {Connection, Tag} from '@/shared/middleware/automation/connection';
+import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 
 import ConnectionListItem from './ConnectionListItem';
 

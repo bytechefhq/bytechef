@@ -19,7 +19,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {Connection, Tag} from '@/ee/shared/middleware/embedded/connection';
+import {Connection, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/embedded/connectionTags.mutations';
 import {

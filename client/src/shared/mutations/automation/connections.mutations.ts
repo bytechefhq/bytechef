@@ -1,5 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {Connection, ConnectionApi} from '@/shared/middleware/automation/connection';
+import {Connection, ConnectionApi} from '@/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateConnectionMutationProps {
