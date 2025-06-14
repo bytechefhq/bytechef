@@ -1,4 +1,4 @@
-import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ActionDefinitionApi,
@@ -11,7 +11,6 @@ import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinition
 import {
     ClickedDefinitionType,
     NodeDataType,
-    StructureParentType,
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';

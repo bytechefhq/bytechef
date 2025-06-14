@@ -8,12 +8,12 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/shared/queries/embedded/connections.queries';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -72,12 +72,14 @@ export const Connections = () => {
         <LayoutContainer
             header={
                 connections &&
-                connections.length > 0 && (
+                connections.length > 0 &&
+                componentDefinitions && (
                     <Header
                         centerTitle={true}
                         position="main"
                         right={
                             <ConnectionDialog
+                                componentDefinitions={componentDefinitions}
                                 connection={
                                     {
                                         environment:
@@ -193,30 +195,40 @@ export const Connections = () => {
         >
             <PageLoader
                 errors={[allConnectionsError, connectionsError, tagsError]}
-                loading={allConnectionsIsLoading || connectionsIsLoading || tagsIsLoading}
+                loading={allConnectionsIsLoading || componentsLoading || connectionsIsLoading || tagsIsLoading}
             >
-                {connections && connections?.length > 0 ? (
-                    connections && tags && <ConnectionList connections={connections} tags={tags} />
+                {componentDefinitions && connections && connections?.length > 0 ? (
+                    connections &&
+                    tags && (
+                        <ConnectionList
+                            componentDefinitions={componentDefinitions}
+                            connections={connections}
+                            tags={tags}
+                        />
+                    )
                 ) : (
                     <EmptyList
                         button={
-                            <ConnectionDialog
-                                connection={
-                                    {
-                                        environment:
-                                            environment === 1
-                                                ? Environment.Development
-                                                : environment === 2
-                                                  ? Environment.Staging
-                                                  : Environment.Production,
-                                    } as Connection
-                                }
-                                connectionTagsQueryKey={ConnectionKeys.connectionTags}
-                                connectionsQueryKey={ConnectionKeys.connections}
-                                triggerNode={<Button>Create Connection</Button>}
-                                useCreateConnectionMutation={useCreateConnectionMutation}
-                                useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                            />
+                            componentDefinitions && (
+                                <ConnectionDialog
+                                    componentDefinitions={componentDefinitions}
+                                    connection={
+                                        {
+                                            environment:
+                                                environment === 1
+                                                    ? Environment.Development
+                                                    : environment === 2
+                                                      ? Environment.Staging
+                                                      : Environment.Production,
+                                        } as Connection
+                                    }
+                                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                                    connectionsQueryKey={ConnectionKeys.connections}
+                                    triggerNode={<Button>Create Connection</Button>}
+                                    useCreateConnectionMutation={useCreateConnectionMutation}
+                                    useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                                />
+                            )
                         }
                         icon={<Link2Icon className="size-24 text-gray-300" />}
                         message="You do not have any Connections created yet."

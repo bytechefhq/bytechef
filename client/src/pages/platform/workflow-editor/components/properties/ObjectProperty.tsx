@@ -1,3 +1,4 @@
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, PropertyType} from '@/shared/middleware/platform/configuration';
@@ -7,7 +8,6 @@ import resolvePath from 'object-resolve-path';
 import {Fragment, useCallback, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {useWorkflowNodeParameterMutation} from '../../providers/workflowNodeParameterMutationProvider';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import {encodeParameters, encodePath} from '../../utils/encodingUtils';
 import getParameterItemType from '../../utils/getParameterItemType';
@@ -35,7 +35,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
     const {workflow} = useWorkflowDataStore();
-    const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
+    const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
     const {additionalProperties, label, name, placeholder, properties} = property;
 

@@ -37,7 +37,6 @@ import {
     ComponentPropertiesType,
     NodeDataType,
     PropertyAllType,
-    StructureParentType,
     TabNameType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
@@ -84,8 +83,7 @@ const TABS: Array<{label: string; name: TabNameType}> = [
 
 interface WorkflowNodeDetailsPanelProps {
     className?: string;
-    parentId: number;
-    parentType: StructureParentType;
+    invalidateWorkflowQueries: () => void;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
@@ -93,8 +91,7 @@ interface WorkflowNodeDetailsPanelProps {
 
 const WorkflowNodeDetailsPanel = ({
     className,
-    parentId,
-    parentType,
+    invalidateWorkflowQueries,
     previousComponentDefinitions,
     updateWorkflowMutation,
     workflowNodeOutputs,
@@ -420,8 +417,7 @@ const WorkflowNodeDetailsPanel = ({
                         field: 'operation',
                         value: newOperationName,
                     },
-                    parentId,
-                    parentType,
+                    invalidateWorkflowQueries,
                     queryClient,
                     updateWorkflowMutation,
                 });
@@ -438,8 +434,7 @@ const WorkflowNodeDetailsPanel = ({
                         field: 'operation',
                         value: newOperationName,
                     },
-                    parentId,
-                    parentType,
+                    invalidateWorkflowQueries,
                     queryClient,
                     updateWorkflowMutation,
                 });
@@ -448,6 +443,7 @@ const WorkflowNodeDetailsPanel = ({
             }
 
             saveWorkflowDefinition({
+                invalidateWorkflowQueries,
                 nodeData,
                 onSuccess: () => {
                     setCurrentComponent({
@@ -475,9 +471,6 @@ const WorkflowNodeDetailsPanel = ({
                         workflowNodeName,
                     });
                 },
-                parentId,
-                parentType,
-                queryClient,
                 updateWorkflowMutation,
             });
         },
@@ -486,8 +479,7 @@ const WorkflowNodeDetailsPanel = ({
             currentComponent,
             queryClient,
             currentNode,
-            parentId,
-            parentType,
+            invalidateWorkflowQueries,
             updateWorkflowMutation,
             currentNodeIndex,
             currentOperationProperties,
@@ -499,8 +491,7 @@ const WorkflowNodeDetailsPanel = ({
     const handlePanelClose = useCallback(() => {
         if (clusterElementsCanvasOpen) {
             saveClusterElementNodesPosition({
-                parentId,
-                parentType,
+                invalidateWorkflowQueries,
                 queryClient,
                 updateWorkflowMutation,
                 workflow,
@@ -513,8 +504,7 @@ const WorkflowNodeDetailsPanel = ({
     }, [
         clusterElementsCanvasOpen,
         setClusterElementsCanvasOpen,
-        parentId,
-        parentType,
+        invalidateWorkflowQueries,
         queryClient,
         updateWorkflowMutation,
         workflow,
@@ -954,10 +944,9 @@ const WorkflowNodeDetailsPanel = ({
                                 {activeTab === 'description' &&
                                     (nodeDefinition ? (
                                         <DescriptionTab
+                                            invalidateWorkflowQueries={invalidateWorkflowQueries}
                                             key={`${currentNode?.componentName}-${currentNode?.type}_description`}
                                             nodeDefinition={nodeDefinition}
-                                            parentId={parentId}
-                                            parentType={parentType}
                                             updateWorkflowMutation={updateWorkflowMutation}
                                         />
                                     ) : (

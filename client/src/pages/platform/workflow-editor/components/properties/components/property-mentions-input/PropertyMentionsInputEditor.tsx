@@ -1,6 +1,6 @@
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
-import {useWorkflowNodeParameterMutation} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {
     encodeParameters,
@@ -100,7 +100,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
         );
-        const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
+        const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
         const memoizedWorkflowTask = useMemo(() => {
             return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(

@@ -20,6 +20,7 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
 import {
     useDeleteConnectionMutation,
@@ -39,11 +40,12 @@ import InlineSVG from 'react-inlinesvg';
 import TagList from '../../../../../components/TagList';
 
 interface ConnectionListItemProps {
+    componentDefinitions: ComponentDefinitionBasic[];
     connection: Connection;
     remainingTags?: Tag[];
 }
 
-const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps) => {
+const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: ConnectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -205,8 +207,9 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                     </AlertDialogContent>
                 </AlertDialog>
 
-                {showEditDialog && (
+                {showEditDialog && componentDefinitions && (
                     <ConnectionDialog
+                        componentDefinitions={componentDefinitions}
                         connection={connection}
                         connectionTagsQueryKey={ConnectionKeys.connectionTags}
                         connectionsQueryKey={ConnectionKeys.connections}

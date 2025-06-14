@@ -3,8 +3,8 @@ import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
@@ -39,7 +39,9 @@ const PropertyCodeEditorSheetRightPanelConnectionsPopover = ({
         resolver: zodResolver(connectionFormSchema),
     });
 
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true});
+    const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
+
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery!({connectionDefinitions: true});
 
     return (
         <Popover onOpenChange={setOpen} open={open}>

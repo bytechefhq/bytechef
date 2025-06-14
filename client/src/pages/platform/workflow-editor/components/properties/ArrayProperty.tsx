@@ -1,6 +1,7 @@
 import {Button} from '@/components/ui/button';
 import ArrayPropertyItem from '@/pages/platform/workflow-editor/components/properties/components/ArrayPropertyItem';
 import SubPropertyPopover from '@/pages/platform/workflow-editor/components/properties/components/SubPropertyPopover';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/platform/configuration';
@@ -9,7 +10,6 @@ import {PlusIcon} from '@radix-ui/react-icons';
 import resolvePath from 'object-resolve-path';
 import {Fragment, useCallback, useEffect, useState} from 'react';
 
-import {useWorkflowNodeParameterMutation} from '../../providers/workflowNodeParameterMutationProvider';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import {encodeParameters, encodePath} from '../../utils/encodingUtils';
 import getParameterItemType from '../../utils/getParameterItemType';
@@ -35,7 +35,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
     const {workflow} = useWorkflowDataStore();
-    const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
+    const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
     const {additionalProperties, name} = property;
 

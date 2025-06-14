@@ -1,8 +1,8 @@
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
-import {useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -25,8 +25,13 @@ const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
 }: PropertyCodeEditorSheetRightPanelConnectionsSelectProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
-    const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery, useGetConnectionsQuery} =
-        useConnectionQuery();
+    const {
+        ConnectionKeys,
+        useCreateConnectionMutation,
+        useGetComponentDefinitionsQuery,
+        useGetConnectionTagsQuery,
+        useGetConnectionsQuery,
+    } = useWorkflowEditor();
 
     let connectionId: number | undefined;
 
@@ -37,6 +42,10 @@ const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: componentConnection.componentName,
         componentVersion: componentConnection.componentVersion,
+    });
+
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
+        connectionDefinitions: true,
     });
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
@@ -109,9 +118,10 @@ const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
                 </SelectContent>
             </Select>
 
-            {showNewConnectionDialog && (
+            {showNewConnectionDialog && componentDefinitions && (
                 <ConnectionDialog
                     componentDefinition={componentDefinition}
+                    componentDefinitions={componentDefinitions}
                     connectionTagsQueryKey={ConnectionKeys!.connectionTags}
                     connectionsQueryKey={ConnectionKeys!.connections}
                     onClose={() => setShowNewConnectionDialog(false)}

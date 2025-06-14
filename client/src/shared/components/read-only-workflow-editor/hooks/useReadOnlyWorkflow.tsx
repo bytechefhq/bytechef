@@ -1,5 +1,5 @@
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useMemo} from 'react';
 
 import useReadOnlyWorkflowStore from '../stores/useReadOnlyWorkflowStore';
@@ -13,7 +13,9 @@ const useReadOnlyWorkflow = () => {
         [workflow?.workflowTriggerComponentNames, workflow?.workflowTaskComponentNames]
     );
 
-    const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery(
+    const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
+
+    const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery!(
         {include: workflowComponentNames},
         workflowComponentNames !== undefined
     );

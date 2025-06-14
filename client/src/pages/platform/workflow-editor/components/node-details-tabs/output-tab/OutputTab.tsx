@@ -5,12 +5,8 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Input} from '@/components/ui/input';
-import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
-import {
-    GetComponentDefinitionsModeTypeEnum,
-    TriggerType,
-    WebhookTriggerTestApi,
-} from '@/shared/middleware/platform/configuration';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {TriggerType} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
     useSaveWorkflowNodeTestOutputMutation,
@@ -41,8 +37,6 @@ interface OutputTabProps {
     workflowId: string;
 }
 
-const webhookTriggerTestApi = new WebhookTriggerTestApi();
-
 const OutputTab = ({
     connectionMissing,
     currentNode,
@@ -58,9 +52,10 @@ const OutputTab = ({
 
     const startWebhookTestRef = useRef(false);
 
-    const {currentType} = useModeTypeStore();
     const [copiedValue, copyToClipboard] = useCopyToClipboard();
     const queryClient = useQueryClient();
+
+    const {webhookTriggerTestApi} = useWorkflowEditor();
 
     const {
         data: workflowNodeOutput,
@@ -133,12 +128,8 @@ const OutputTab = ({
             setStartWebhookTestDate(new Date());
             setStartWebhookTest(true);
 
-            webhookTriggerTestApi
+            webhookTriggerTestApi!
                 .startWebhookTriggerTest({
-                    modeType:
-                        currentType === ModeType.AUTOMATION
-                            ? GetComponentDefinitionsModeTypeEnum.AUTOMATION
-                            : GetComponentDefinitionsModeTypeEnum.EMBEDDED,
                     workflowId,
                 })
                 .then((response) => {
@@ -180,11 +171,11 @@ const OutputTab = ({
         }
     }, [
         currentNode.name,
-        currentType,
         currentNode.trigger,
         currentNode?.triggerType,
         saveWorkflowNodeTestOutputMutation,
         queryClient,
+        webhookTriggerTestApi,
         workflowId,
         workflowNodeOutputRefetch,
         workflowNodeTestOutputExistsRefetch,
@@ -196,14 +187,10 @@ const OutputTab = ({
         setStartWebhookTest(false);
         setWebhookTestCancelEnabled(false);
 
-        webhookTriggerTestApi.stopWebhookTriggerTest({
-            modeType:
-                currentType === ModeType.AUTOMATION
-                    ? GetComponentDefinitionsModeTypeEnum.AUTOMATION
-                    : GetComponentDefinitionsModeTypeEnum.EMBEDDED,
+        webhookTriggerTestApi!.stopWebhookTriggerTest({
             workflowId,
         });
-    }, [currentType, workflowId, workflowNodeOutputRefetch]);
+    }, [webhookTriggerTestApi, workflowId, workflowNodeOutputRefetch]);
 
     const testing = saveWorkflowNodeTestOutputMutation.isPending || startWebhookTest;
 

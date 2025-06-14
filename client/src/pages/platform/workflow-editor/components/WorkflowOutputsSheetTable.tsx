@@ -11,7 +11,7 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
-import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {CableIcon, EditIcon, Trash2Icon} from 'lucide-react';
@@ -27,7 +27,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const {updateWorkflowMutation} = useWorkflowMutation();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const {componentDefinitions} = useWorkflowDataStore();
 
@@ -40,7 +40,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
 
         outputs.splice(index, 1);
 
-        updateWorkflowMutation.mutate({
+        updateWorkflowMutation!.mutate({
             id: workflow.id!,
             workflow: {
                 definition: JSON.stringify(

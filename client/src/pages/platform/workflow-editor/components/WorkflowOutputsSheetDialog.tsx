@@ -13,7 +13,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
-import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -55,7 +55,7 @@ const WorkflowOutputsSheetDialog = ({
         resolver: zodResolver(formSchema),
     });
 
-    const {updateWorkflowMutation} = useWorkflowMutation();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     function closeDialog() {
         setIsOpen(false);
@@ -80,7 +80,7 @@ const WorkflowOutputsSheetDialog = ({
             outputs[outputIndex] = output;
         }
 
-        updateWorkflowMutation.mutate(
+        updateWorkflowMutation!.mutate(
             {
                 id: workflow.id!,
                 workflow: {

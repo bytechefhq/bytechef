@@ -3,11 +3,13 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {Environment, ProjectDeployment} from '@/shared/middleware/automation/configuration';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -211,20 +213,28 @@ const ProjectDeployments = () => {
             >
                 {projectDeployments && projectDeployments?.length > 0 ? (
                     <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
-                        {Array.from(projectDeploymentMap.keys())?.map(
-                            (projectId) =>
-                                projects &&
-                                tags && (
-                                    <ProjectDeploymentList
-                                        key={projectId}
-                                        project={projects.find((currentProject) => currentProject.id === projectId)!}
-                                        projectDeployments={projectDeploymentMap.get(projectId)!}
-                                        tags={tags}
-                                    />
-                                )
-                        )}
+                        <WorkflowReadOnlyProvider
+                            value={{
+                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
+                            }}
+                        >
+                            {Array.from(projectDeploymentMap.keys())?.map(
+                                (projectId) =>
+                                    projects &&
+                                    tags && (
+                                        <ProjectDeploymentList
+                                            key={projectId}
+                                            project={
+                                                projects.find((currentProject) => currentProject.id === projectId)!
+                                            }
+                                            projectDeployments={projectDeploymentMap.get(projectId)!}
+                                            tags={tags}
+                                        />
+                                    )
+                            )}
 
-                        <ReadOnlyWorkflowSheet />
+                            <ReadOnlyWorkflowSheet />
+                        </WorkflowReadOnlyProvider>
                     </div>
                 ) : (
                     <EmptyList

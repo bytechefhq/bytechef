@@ -16,12 +16,11 @@ import WorkflowRightSidebar from '@/pages/platform/workflow-editor/components/Wo
 import WorkflowInputsSheet from '@/pages/platform/workflow-editor/components/workflow-inputs/WorkflowInputsSheet';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
-import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
-import {StructureParentType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -35,14 +34,10 @@ import saveClusterElementNodesPosition from './utils/saveClusterElementNodesPosi
 
 const WorkflowEditorLayout = ({
     includeComponents,
-    parentId,
-    parentType,
     runDisabled,
     showWorkflowInputs,
 }: {
     includeComponents?: string[];
-    parentId: number;
-    parentType: StructureParentType;
     runDisabled: boolean;
     showWorkflowInputs: boolean;
 }) => {
@@ -82,7 +77,7 @@ const WorkflowEditorLayout = ({
         workflowTestConfiguration,
     } = useWorkflowLayout(includeComponents);
 
-    const {updateWorkflowMutation} = useWorkflowMutation();
+    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
     const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(currentComponent?.componentName as string);
 
@@ -101,11 +96,10 @@ const WorkflowEditorLayout = ({
                 loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
             >
                 <div className={twMerge('relative mx-3 mb-3 flex w-full', projectLeftSidebarOpen && 'ml-0')}>
-                    {componentDefinitions && taskDispatcherDefinitions && parentId && (
+                    {componentDefinitions && taskDispatcherDefinitions && (
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
-                            parentId={parentId}
-                            parentType={parentType}
+                            invalidateWorkflowQueries={invalidateWorkflowQueries!}
                             projectLeftSidebarOpen={projectLeftSidebarOpen}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
@@ -135,10 +129,9 @@ const WorkflowEditorLayout = ({
 
             {currentComponent && !isRootClusterElement && (
                 <WorkflowNodeDetailsPanel
-                    parentId={parentId}
-                    parentType={parentType}
+                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
                     previousComponentDefinitions={previousComponentDefinitions}
-                    updateWorkflowMutation={updateWorkflowMutation}
+                    updateWorkflowMutation={updateWorkflowMutation!}
                     workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                 />
             )}
@@ -149,10 +142,9 @@ const WorkflowEditorLayout = ({
 
                     if (!open) {
                         saveClusterElementNodesPosition({
-                            parentId,
-                            parentType,
+                            invalidateWorkflowQueries: invalidateWorkflowQueries!,
                             queryClient,
-                            updateWorkflowMutation,
+                            updateWorkflowMutation: updateWorkflowMutation!,
                             workflow,
                         });
 
@@ -173,10 +165,9 @@ const WorkflowEditorLayout = ({
 
                     <WorkflowNodeDetailsPanel
                         className="fixed inset-y-0 right-0 rounded-l-none border-none"
-                        parentId={parentId}
-                        parentType={parentType}
+                        invalidateWorkflowQueries={invalidateWorkflowQueries!}
                         previousComponentDefinitions={previousComponentDefinitions}
-                        updateWorkflowMutation={updateWorkflowMutation}
+                        updateWorkflowMutation={updateWorkflowMutation!}
                         workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                     />
 
@@ -200,9 +191,8 @@ const WorkflowEditorLayout = ({
             )}
 
             <WorkflowInputsSheet
+                invalidateWorkflowQueries={invalidateWorkflowQueries!}
                 onSheetOpenChange={setShowWorkflowInputsSheet}
-                parentId={parentId}
-                parentType={parentType}
                 sheetOpen={showWorkflowInputsSheet}
                 workflowTestConfiguration={workflowTestConfiguration}
             />
@@ -214,9 +204,8 @@ const WorkflowEditorLayout = ({
             />
 
             <WorkflowCodeEditorSheet
+                invalidateWorkflowQueries={invalidateWorkflowQueries!}
                 onSheetOpenClose={setShowWorkflowCodeEditorSheet}
-                parentId={parentId}
-                parentType={parentType}
                 runDisabled={runDisabled}
                 sheetOpen={showWorkflowCodeEditorSheet}
                 testConfigurationDisabled={testConfigurationDisabled}

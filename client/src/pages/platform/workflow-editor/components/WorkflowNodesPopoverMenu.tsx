@@ -17,7 +17,7 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import {convertNameToCamelCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
-import {useWorkflowMutation} from '../providers/workflowMutationProvider';
+import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
@@ -55,7 +55,9 @@ const WorkflowNodesPopoverMenu = ({
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [trigger, setTrigger] = useState(false);
 
-    const {parentId, parentType, workflow} = useWorkflowDataStore();
+    const {invalidateWorkflowQueries} = useWorkflowEditor();
+
+    const {workflow} = useWorkflowDataStore();
 
     const {edges, nodes} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -66,7 +68,7 @@ const WorkflowNodesPopoverMenu = ({
 
     const {rootClusterElementNodeData} = useWorkflowEditorStore();
 
-    const {updateWorkflowMutation} = useWorkflowMutation();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const queryClient = useQueryClient();
 
@@ -93,12 +95,6 @@ const WorkflowNodesPopoverMenu = ({
 
     const handleComponentClick = useCallback(
         async (clickedItem: ClickedDefinitionType) => {
-            if (!parentId || !parentType) {
-                console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
-
-                return <></>;
-            }
-
             const {clusterElement, componentVersion, name, taskDispatcher, trigger, version} = clickedItem;
 
             if (taskDispatcher) {
@@ -112,14 +108,13 @@ const WorkflowNodesPopoverMenu = ({
 
                 await handleTaskDispatcherClick({
                     edge,
-                    parentId,
-                    parentType,
+                    invalidateWorkflowQueries: invalidateWorkflowQueries!,
                     queryClient,
                     sourceNodeId,
                     taskDispatcherContext,
                     taskDispatcherDefinition: clickedItem,
                     taskDispatcherName: name as 'condition' | 'loop',
-                    updateWorkflowMutation,
+                    updateWorkflowMutation: updateWorkflowMutation!,
                     workflow,
                 });
 
@@ -137,7 +132,7 @@ const WorkflowNodesPopoverMenu = ({
                 (!('actionsCount' in clickedItem) || !clickedItem.actionsCount) &&
                 rootClusterElementDefinition
             ) {
-                if (parentId && clickedItem) {
+                if (clickedItem) {
                     const getClusterElementDefinitionRequest = {
                         clusterElementName: convertNameToCamelCase(clickedItem.type),
                         componentName: clickedItem.componentName || '',
@@ -161,12 +156,11 @@ const WorkflowNodesPopoverMenu = ({
                     handleClusterElementClick({
                         clickedClusterElementDefinition,
                         data: clusterData,
-                        parentId,
-                        parentType,
+                        invalidateWorkflowQueries: invalidateWorkflowQueries!,
                         queryClient,
                         rootClusterElementDefinition,
                         setPopoverOpen,
-                        updateWorkflowMutation,
+                        updateWorkflowMutation: updateWorkflowMutation!,
                     });
                 }
 
@@ -209,12 +203,6 @@ const WorkflowNodesPopoverMenu = ({
             setTrigger(false);
         };
     }, []);
-
-    if (!parentId || !parentType) {
-        console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
-
-        return <></>;
-    }
 
     return (
         <Popover
@@ -262,8 +250,7 @@ const WorkflowNodesPopoverMenu = ({
                             clusterElementType={clusterElementType}
                             componentDefinition={componentDefinitionToBeAdded}
                             edgeId={edgeId}
-                            parentId={parentId}
-                            parentType={parentType}
+                            invalidateWorkflowQueries={invalidateWorkflowQueries!}
                             rootClusterElementDefinition={rootClusterElementDefinition}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}

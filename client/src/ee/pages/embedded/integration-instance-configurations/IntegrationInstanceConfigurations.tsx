@@ -5,6 +5,7 @@ import IntegrationInstanceConfigurationsFilterTitle from '@/ee/pages/embedded/in
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
 import {Environment, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -284,26 +285,32 @@ const IntegrationInstanceConfigurations = () => {
                 integrationInstanceConfigurations &&
                 integrationInstanceConfigurations?.length > 0 ? (
                     <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
-                        {Array.from(integrationInstanceConfigurationMap.keys())?.map(
-                            (integrationId) =>
-                                integrations &&
-                                tags && (
-                                    <IntegrationInstanceConfigurationList
-                                        integration={
-                                            integrations.find(
-                                                (currentIntegration) => currentIntegration.id === integrationId
-                                            )!
-                                        }
-                                        integrationInstanceConfigurations={
-                                            integrationInstanceConfigurationMap.get(integrationId)!
-                                        }
-                                        key={integrationId}
-                                        tags={tags}
-                                    />
-                                )
-                        )}
+                        <WorkflowReadOnlyProvider
+                            value={{
+                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
+                            }}
+                        >
+                            {Array.from(integrationInstanceConfigurationMap.keys())?.map(
+                                (integrationId) =>
+                                    integrations &&
+                                    tags && (
+                                        <IntegrationInstanceConfigurationList
+                                            integration={
+                                                integrations.find(
+                                                    (currentIntegration) => currentIntegration.id === integrationId
+                                                )!
+                                            }
+                                            integrationInstanceConfigurations={
+                                                integrationInstanceConfigurationMap.get(integrationId)!
+                                            }
+                                            key={integrationId}
+                                            tags={tags}
+                                        />
+                                    )
+                            )}
 
-                        <ReadOnlyWorkflowSheet />
+                            <ReadOnlyWorkflowSheet />
+                        </WorkflowReadOnlyProvider>
                     </div>
                 ) : (
                     <EmptyList

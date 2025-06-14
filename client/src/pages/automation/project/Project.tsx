@@ -6,19 +6,18 @@ import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/usePr
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
-import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {WorkflowNodeParameterMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
-import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
+import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {ConnectionReactQueryProvider} from '@/shared/components/connection/providers/connectionReactQueryProvider';
+import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
-import {useEffect} from 'react';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {useQueryClient} from '@tanstack/react-query';
 
 const Project = () => {
-    const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore();
-    const {setRightSidebarOpen} = useRightSidebarStore();
+    const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
 
@@ -38,13 +37,7 @@ const Project = () => {
 
     const {runDisabled} = useRun();
 
-    useEffect(() => {
-        return () => {
-            setProjectLeftSidebarOpen(false);
-
-            setRightSidebarOpen(false);
-        };
-    }, [setProjectLeftSidebarOpen, setRightSidebarOpen]);
+    const queryClient = useQueryClient();
 
     return (
         <div className="flex w-full flex-col">
@@ -75,36 +68,27 @@ const Project = () => {
                             />
                         )}
 
-                        <ConnectionReactQueryProvider
+                        <WorkflowEditorProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,
+                                deleteWorkflowNodeParameterMutation,
+                                invalidateWorkflowQueries: () => {
+                                    queryClient.invalidateQueries({
+                                        queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
+                                    });
+                                    // queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
+                                },
+                                updateWorkflowMutation: updateWorkflowEditorMutation,
+                                updateWorkflowNodeParameterMutation,
                                 useCreateConnectionMutation: useCreateConnectionMutation,
+                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
                                 useGetConnectionTagsQuery: useGetConnectionTagsQuery,
                                 useGetConnectionsQuery,
+                                webhookTriggerTestApi: new WebhookTriggerTestApi(),
                             }}
                         >
-                            <WorkflowMutationProvider
-                                value={{
-                                    updateWorkflowMutation: updateWorkflowEditorMutation,
-                                }}
-                            >
-                                <WorkflowNodeParameterMutationProvider
-                                    value={{
-                                        deleteWorkflowNodeParameterMutation,
-                                        updateWorkflowNodeParameterMutation,
-                                    }}
-                                >
-                                    {projectId && (
-                                        <WorkflowEditorLayout
-                                            parentId={projectId}
-                                            parentType="PROJECT"
-                                            runDisabled={runDisabled}
-                                            showWorkflowInputs={true}
-                                        />
-                                    )}
-                                </WorkflowNodeParameterMutationProvider>
-                            </WorkflowMutationProvider>
-                        </ConnectionReactQueryProvider>
+                            {projectId && <WorkflowEditorLayout runDisabled={runDisabled} showWorkflowInputs={true} />}
+                        </WorkflowEditorProvider>
                     </ResizablePanel>
 
                     <ResizableHandle className="bg-muted" />

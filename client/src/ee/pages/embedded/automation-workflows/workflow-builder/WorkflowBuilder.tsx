@@ -4,17 +4,19 @@ import {useWorkflowBuilder} from '@/ee/pages/embedded/automation-workflows/workf
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
-import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {WorkflowNodeParameterMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
+import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {ConnectionReactQueryProvider} from '@/shared/components/connection/providers/connectionReactQueryProvider';
+import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {getCreateConnectedUserProjectWorkflowConnection} from '@/shared/mutations/embedded/connections.mutations';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {
     ConnectionKeys,
     getConnectedUserConnectionsQuery,
     useGetConnectionTagsQuery,
 } from '@/shared/queries/embedded/connections.queries';
+import {useQueryClient} from '@tanstack/react-query';
 
 const WorkflowBuilder = () => {
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
@@ -36,6 +38,8 @@ const WorkflowBuilder = () => {
 
     const {runDisabled} = useRun();
 
+    const queryClient = useQueryClient();
+
     if (!connectedUserProjectWorkflow || !projectId) {
         return <></>;
     }
@@ -56,43 +60,39 @@ const WorkflowBuilder = () => {
             <div className="flex flex-1">
                 <ResizablePanelGroup className="flex-1 bg-transparent" direction="vertical">
                     <ResizablePanel className="relative flex" defaultSize={65}>
-                        <ConnectionReactQueryProvider
+                        <WorkflowEditorProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,
+                                deleteWorkflowNodeParameterMutation,
+                                invalidateWorkflowQueries: () => {
+                                    queryClient.invalidateQueries({
+                                        queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
+                                    });
+                                    // queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
+                                },
+                                updateWorkflowMutation: updateWorkflowEditorMutation,
+                                updateWorkflowNodeParameterMutation,
                                 useCreateConnectionMutation: getCreateConnectedUserProjectWorkflowConnection(
                                     connectedUserProjectWorkflow.connectedUserId!,
                                     workflowReferenceCode!
                                 ),
+                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
                                 useGetConnectionTagsQuery: useGetConnectionTagsQuery,
                                 useGetConnectionsQuery: getConnectedUserConnectionsQuery(
                                     connectedUserProjectWorkflow.connectedUserId!,
                                     sharedConnectionIds ? sharedConnectionIds : []
                                 ),
+                                webhookTriggerTestApi: new WebhookTriggerTestApi(),
                             }}
                         >
-                            <WorkflowMutationProvider
-                                value={{
-                                    updateWorkflowMutation: updateWorkflowEditorMutation,
-                                }}
-                            >
-                                <WorkflowNodeParameterMutationProvider
-                                    value={{
-                                        deleteWorkflowNodeParameterMutation,
-                                        updateWorkflowNodeParameterMutation,
-                                    }}
-                                >
-                                    {projectId && (
-                                        <WorkflowEditorLayout
-                                            includeComponents={includeComponents}
-                                            parentId={projectId}
-                                            parentType="PROJECT"
-                                            runDisabled={runDisabled}
-                                            showWorkflowInputs={false}
-                                        />
-                                    )}
-                                </WorkflowNodeParameterMutationProvider>
-                            </WorkflowMutationProvider>
-                        </ConnectionReactQueryProvider>
+                            {projectId && (
+                                <WorkflowEditorLayout
+                                    includeComponents={includeComponents}
+                                    runDisabled={runDisabled}
+                                    showWorkflowInputs={false}
+                                />
+                            )}
+                        </WorkflowEditorProvider>
                     </ResizablePanel>
 
                     <ResizableHandle className="bg-muted" />

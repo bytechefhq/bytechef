@@ -1,3 +1,4 @@
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -5,7 +6,6 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
@@ -33,11 +33,13 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         return noInputs && noConnections;
     }, [workflow]);
 
+    const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
+
     const {
         data: componentDefinitions,
         error: componentsError,
         isLoading: componentsIsLoading,
-    } = useGetComponentDefinitionsQuery({
+    } = useGetComponentDefinitionsQuery!({
         actionDefinitions: true,
         include: includeComponents,
         triggerDefinitions: true,

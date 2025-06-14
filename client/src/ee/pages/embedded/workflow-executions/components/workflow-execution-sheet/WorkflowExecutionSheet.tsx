@@ -1,5 +1,7 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
 import WorkflowExecutionSheetWorkflowPanel from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheetWorkflowPanel';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
 import {useGetWorkflowExecutionQuery} from '@/shared/queries/embedded/workflowExecutions.queries';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
@@ -33,7 +35,15 @@ const WorkflowExecutionSheet = () => {
                     )}
                 </div>
 
-                {workflowExecution && <WorkflowExecutionSheetWorkflowPanel workflowExecution={workflowExecution} />}
+                {workflowExecution && (
+                    <WorkflowReadOnlyProvider
+                        value={{
+                            useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
+                        }}
+                    >
+                        <WorkflowExecutionSheetWorkflowPanel workflowExecution={workflowExecution} />
+                    </WorkflowReadOnlyProvider>
+                )}
             </SheetContent>
         </Sheet>
     );

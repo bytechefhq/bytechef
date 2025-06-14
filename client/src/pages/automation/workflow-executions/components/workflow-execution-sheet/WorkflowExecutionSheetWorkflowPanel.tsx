@@ -3,11 +3,8 @@ import {Badge} from '@/components/ui/badge';
 import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowEditor from '@/pages/platform/workflow-editor/components/WorkflowEditor';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
-import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
-import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
-import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
-import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
+import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {ReactFlowProvider} from '@xyflow/react';
 import {useEffect, useRef, useState} from 'react';
 
@@ -25,12 +22,6 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
         taskDispatcherDefinitionsError,
         taskDispatcherDefinitionsLoading,
     } = useWorkflowLayout();
-
-    const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
-        useUpdateWorkflowMutation,
-        workflowId: workflow?.id as string,
-        workflowKeys: WorkflowKeys,
-    });
 
     const {data: workflowDetails, isLoading: isWorkflowDetailsLoading} = useGetWorkflowQuery(
         workflow!.id as string,
@@ -71,27 +62,22 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
                 <SheetCloseButton />
             </SheetHeader>
 
-            <WorkflowMutationProvider
-                value={{
-                    updateWorkflowMutation: updateWorkflowEditorMutation,
-                }}
-            >
-                <ReactFlowProvider>
-                    <PageLoader
-                        errors={[componentsError, taskDispatcherDefinitionsError]}
-                        loading={componentsIsLoading || taskDispatcherDefinitionsLoading || isWorkflowDetailsLoading}
-                    >
-                        {componentDefinitions && taskDispatcherDefinitions && workflow && (
-                            <WorkflowEditor
-                                componentDefinitions={componentDefinitions}
-                                customCanvasWidth={canvasWidth}
-                                readOnlyWorkflow={workflowDetails}
-                                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                            />
-                        )}
-                    </PageLoader>
-                </ReactFlowProvider>
-            </WorkflowMutationProvider>
+            <ReactFlowProvider>
+                <PageLoader
+                    errors={[componentsError, taskDispatcherDefinitionsError]}
+                    loading={componentsIsLoading || taskDispatcherDefinitionsLoading || isWorkflowDetailsLoading}
+                >
+                    {componentDefinitions && taskDispatcherDefinitions && workflow && (
+                        <WorkflowEditor
+                            componentDefinitions={componentDefinitions}
+                            customCanvasWidth={canvasWidth}
+                            invalidateWorkflowQueries={() => {}}
+                            readOnlyWorkflow={workflowDetails}
+                            taskDispatcherDefinitions={taskDispatcherDefinitions}
+                        />
+                    )}
+                </PageLoader>
+            </ReactFlowProvider>
         </div>
     );
 };

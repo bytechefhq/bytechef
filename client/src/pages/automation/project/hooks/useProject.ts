@@ -1,11 +1,11 @@
 import {Type} from '@/pages/automation/projects/Projects';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {RequestI} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
@@ -19,6 +19,7 @@ import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.qu
 import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
+import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
@@ -53,6 +54,10 @@ export const useProject = () => {
         +projectWorkflowId!,
         !!projectId && !!projectWorkflowId
     );
+
+    const useGetComponentDefinitionsQuery = (request: GetComponentDefinitionsRequestI, enabled?: boolean) => {
+        return useGetComponentDefinitionsQuery(request, enabled);
+    };
 
     const useGetConnectionsQuery = (request: RequestI, enabled?: boolean) => {
         return useGetWorkspaceConnectionsQuery(

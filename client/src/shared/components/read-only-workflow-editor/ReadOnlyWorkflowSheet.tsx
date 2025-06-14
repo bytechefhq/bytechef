@@ -2,10 +2,6 @@ import PageLoader from '@/components/PageLoader';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowEditor from '@/pages/platform/workflow-editor/components/WorkflowEditor';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
-import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
-import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
-import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {ReactFlowProvider} from '@xyflow/react';
 
 import useReadOnlyWorkflow from './hooks/useReadOnlyWorkflow';
@@ -21,12 +17,6 @@ const ReadOnlyWorkflowSheet = () => {
         taskDispatcherDefinitionsError,
         taskDispatcherDefinitionsLoading,
     } = useWorkflowLayout();
-
-    const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
-        useUpdateWorkflowMutation,
-        workflowId: workflow?.id as string,
-        workflowKeys: WorkflowKeys,
-    });
 
     return (
         <Sheet
@@ -44,26 +34,21 @@ const ReadOnlyWorkflowSheet = () => {
                     <SheetCloseButton />
                 </SheetHeader>
 
-                <WorkflowMutationProvider
-                    value={{
-                        updateWorkflowMutation: updateWorkflowEditorMutation,
-                    }}
-                >
-                    <ReactFlowProvider>
-                        <PageLoader
-                            errors={[componentsError, taskDispatcherDefinitionsError]}
-                            loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
-                        >
-                            {componentDefinitions && taskDispatcherDefinitions && workflow && (
-                                <WorkflowEditor
-                                    componentDefinitions={componentDefinitions}
-                                    readOnlyWorkflow={workflow}
-                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                />
-                            )}
-                        </PageLoader>
-                    </ReactFlowProvider>
-                </WorkflowMutationProvider>
+                <ReactFlowProvider>
+                    <PageLoader
+                        errors={[componentsError, taskDispatcherDefinitionsError]}
+                        loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
+                    >
+                        {componentDefinitions && taskDispatcherDefinitions && workflow && (
+                            <WorkflowEditor
+                                componentDefinitions={componentDefinitions}
+                                invalidateWorkflowQueries={() => {}}
+                                readOnlyWorkflow={workflow}
+                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            />
+                        )}
+                    </PageLoader>
+                </ReactFlowProvider>
             </SheetContent>
         </Sheet>
     );

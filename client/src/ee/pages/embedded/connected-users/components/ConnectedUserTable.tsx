@@ -12,8 +12,8 @@ import CredentialsStatus from '@/ee/pages/embedded/connected-users/components/Cr
 import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
 import {ConnectedUser, CredentialStatus} from '@/ee/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/shared/mutations/embedded/connectedUsers.mutations';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/shared/queries/embedded/connectedUsers.queries';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {EllipsisVerticalIcon} from 'lucide-react';

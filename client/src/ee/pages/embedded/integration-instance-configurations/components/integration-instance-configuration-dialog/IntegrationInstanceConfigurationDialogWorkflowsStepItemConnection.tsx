@@ -6,6 +6,7 @@ import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
@@ -37,6 +38,8 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
         componentName: componentConnection.componentName,
         componentVersion: componentConnection.componentVersion,
     });
+
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
     const {data: connections} = useGetConnectionsQuery(
         {
@@ -133,10 +136,11 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                 render={({field}) => <input type="hidden" {...field} />}
             />
 
-            {showNewConnectionDialog && (
+            {showNewConnectionDialog && componentDefinitions && (
                 <Portal.Root>
                     <ConnectionDialog
                         componentDefinition={componentDefinition}
+                        componentDefinitions={componentDefinitions}
                         connectionTagsQueryKey={ConnectionKeys.connectionTags}
                         connectionsQueryKey={ConnectionKeys.connections}
                         onClose={() => setShowNewConnectionDialog(false)}

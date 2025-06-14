@@ -17,7 +17,7 @@ import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/prop
 import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
 import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
-import {useWorkflowNodeParameterMutation} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -195,8 +195,7 @@ const Property = ({
         return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
     }, [controlType, property.items, type]);
 
-    const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
-        useWorkflowNodeParameterMutation();
+    const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
     if (!path && name) {
         path = name;

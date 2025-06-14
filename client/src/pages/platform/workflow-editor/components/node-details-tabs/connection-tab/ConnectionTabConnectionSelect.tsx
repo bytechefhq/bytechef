@@ -3,10 +3,10 @@ import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
-import {ConnectionI, useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {
     ComponentConnection,
     ComponentDefinition,
@@ -46,8 +46,15 @@ const ConnectionTabConnectionSelect = ({
     const {connectionDialogAllowed, currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
         useWorkflowNodeDetailsPanelStore();
 
-    const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery, useGetConnectionsQuery} =
-        useConnectionQuery();
+    const {
+        ConnectionKeys,
+        useCreateConnectionMutation,
+        useGetComponentDefinitionsQuery,
+        useGetConnectionTagsQuery,
+        useGetConnectionsQuery,
+    } = useWorkflowEditor();
+
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
     if (workflowTestConfigurationConnection) {
         if (connectionId !== workflowTestConfigurationConnection.connectionId) {
@@ -207,9 +214,10 @@ const ConnectionTabConnectionSelect = ({
                 />
             )}
 
-            {showConnectionDialog && (
+            {showConnectionDialog && componentDefinitions && (
                 <ConnectionDialog
                     componentDefinition={componentDefinition}
+                    componentDefinitions={componentDefinitions}
                     connectionTagsQueryKey={ConnectionKeys!.connectionTags}
                     connectionsQueryKey={ConnectionKeys!.connections}
                     onClose={() => setShowConnectionDialog(false)}

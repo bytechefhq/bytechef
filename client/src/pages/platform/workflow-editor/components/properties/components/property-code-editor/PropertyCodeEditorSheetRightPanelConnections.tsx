@@ -5,10 +5,9 @@ import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
     connectionFormSchema,
 } from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsPopover';
 import PropertyCodeEditorSheetRightPanelConnectionsSelect from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsSelect';
-import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
-import {useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
@@ -32,14 +31,20 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
 
     const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
 
-    const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery} = useConnectionQuery();
+    const {
+        ConnectionKeys,
+        updateWorkflowMutation,
+        useCreateConnectionMutation,
+        useGetComponentDefinitionsQuery,
+        useGetConnectionTagsQuery,
+    } = useWorkflowEditor();
+
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
         workflowId: workflow.id!,
         workflowNodeName,
     });
-
-    const {updateWorkflowMutation} = useWorkflowMutation();
 
     const handleOnSubmit = (values: z.infer<typeof connectionFormSchema>) => {
         if (!workflow?.definition) {
@@ -76,7 +81,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
             ],
         };
 
-        updateWorkflowMutation.mutate({
+        updateWorkflowMutation!.mutate({
             id: workflow.id!,
             workflow: {
                 definition: JSON.stringify(workflowDefinition, null, SPACE),
@@ -118,7 +123,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
             ],
         };
 
-        updateWorkflowMutation.mutate({
+        updateWorkflowMutation!.mutate({
             id: workflow.id!,
             workflow: {
                 definition: JSON.stringify(workflowDefinition, null, SPACE),
@@ -214,8 +219,9 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                     </div>
                 )}
 
-                {showNewConnectionDialog && (
+                {showNewConnectionDialog && componentDefinitions && (
                     <ConnectionDialog
+                        componentDefinitions={componentDefinitions}
                         connectionTagsQueryKey={ConnectionKeys!.connectionTags}
                         connectionsQueryKey={ConnectionKeys!.connections}
                         onClose={() => setShowNewConnectionDialog(false)}

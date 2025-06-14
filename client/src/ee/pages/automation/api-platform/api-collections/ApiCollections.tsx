@@ -9,9 +9,11 @@ import {useGetApiCollectionTagsQuery} from '@/ee/queries/apiCollectionTags.queri
 import {useGetApiCollectionsQuery} from '@/ee/queries/apiCollections.queries';
 import {Environment} from '@/ee/shared/middleware/automation/api-platform';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {Link2Icon} from 'lucide-react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 
@@ -110,7 +112,13 @@ const ApiCollections = () => {
                     <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
                         <ApiCollectionList apiCollections={apiCollections} tags={tags} />
 
-                        <ReadOnlyWorkflowSheet />
+                        <WorkflowReadOnlyProvider
+                            value={{
+                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
+                            }}
+                        >
+                            <ReadOnlyWorkflowSheet />
+                        </WorkflowReadOnlyProvider>
                     </div>
                 ) : (
                     <EmptyList

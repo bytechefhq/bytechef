@@ -36,7 +36,7 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
     );
 
     const queryClient = useQueryClient();
-    const {updateWorkflowMutation} = useWorkflowMutation();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const targetNodeId = useMemo(() => edgeId.split('=>')[1], [edgeId]);
 

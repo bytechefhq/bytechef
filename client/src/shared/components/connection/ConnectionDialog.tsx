@@ -19,9 +19,9 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
-import {ConnectionI} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {
     Authorization,
     AuthorizationType,
@@ -30,10 +30,7 @@ import {
     Environment,
     Tag,
 } from '@/shared/middleware/platform/configuration';
-import {
-    ComponentDefinitionKeys,
-    useGetComponentDefinitionsQuery,
-} from '@/shared/queries/platform/componentDefinitions.queries';
+import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {
     useGetConnectionDefinitionQuery,
     useGetConnectionDefinitionsQuery,
@@ -65,6 +62,7 @@ export interface ConnectionDialogFormProps {
 
 interface ConnectionDialogProps {
     componentDefinition?: ComponentDefinition;
+    componentDefinitions: ComponentDefinitionBasic[];
     connection?: ConnectionI | undefined;
     connectionTagsQueryKey: QueryKey;
     connectionsQueryKey: QueryKey;
@@ -84,6 +82,7 @@ interface ConnectionDialogProps {
 
 const ConnectionDialog = ({
     componentDefinition,
+    componentDefinitions,
     connection,
     connectionTagsQueryKey,
     connectionsQueryKey,
@@ -124,12 +123,6 @@ const ConnectionDialog = ({
     });
 
     const {control, formState, getValues, handleSubmit, reset: formReset, setValue} = form;
-
-    const {
-        data: componentDefinitions,
-        error: componentDefinitionsError,
-        isLoading: componentDefinitionsLoading,
-    } = useGetComponentDefinitionsQuery({connectionDefinitions: true});
 
     const {
         data: connectionDefinition,
@@ -326,10 +319,6 @@ const ConnectionDialog = ({
     function getErrors() {
         const errors: string[] = [];
 
-        if (componentDefinitionsError && !componentDefinitionsLoading) {
-            errors.push(componentDefinitionsError.message);
-        }
-
         if (connectionDefinitionError && !connectionDefinitionLoading) {
             errors.push(connectionDefinitionError.message);
         }
@@ -409,378 +398,367 @@ const ConnectionDialog = ({
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            {!componentDefinitionsLoading && (
-                <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
-                    <Form {...form}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 pb-4 pt-6">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
+            <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
+                <Form {...form}>
+                    <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 pb-4 pt-6">
+                        <div className="flex flex-col space-y-1">
+                            <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
+
+                            {!connection?.id && (
+                                <DialogDescription>
+                                    Create your connection to connect to the chosen service
+                                </DialogDescription>
+                            )}
+                        </div>
+
+                        <DialogCloseButton />
+                    </DialogHeader>
+
+                    {errors?.length > 0 && <Errors errors={errors} />}
+
+                    <div className="flex max-h-dialog-height flex-col space-y-4 overflow-y-auto px-6">
+                        {connection?.id && (
+                            <FormField
+                                control={control}
+                                name="id"
+                                render={({field}) => (
+                                    <FormControl>
+                                        <div className="flex">
+                                            <div className="relative flex grow items-stretch focus-within:z-10">
+                                                <Input
+                                                    {...field}
+                                                    className="rounded-r-none bg-gray-50 text-gray-700"
+                                                    readOnly
+                                                    value={connection?.id}
+                                                />
+                                            </div>
+
+                                            <Button
+                                                className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-sm hover:bg-gray-100"
+                                                onClick={() => copyToClipboard(connection?.id?.toString() ?? '')}
+                                                size="icon"
+                                                type="button"
+                                                variant="ghost"
+                                            >
+                                                <ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />
+                                            </Button>
+                                        </div>
+                                    </FormControl>
+                                )}
+                            />
+                        )}
+
+                        {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
+                            <>
+                                {!connection?.id && (
+                                    <FormField
+                                        control={control}
+                                        name="componentName"
+                                        render={({field}) => {
+                                            let items: Array<ComboBoxItemType> | undefined;
+
+                                            if (!componentDefinition && componentDefinitions) {
+                                                items = componentDefinitions.map((componentDefinitionItem) => ({
+                                                    ...componentDefinitionItem,
+                                                    componentDefinition: componentDefinitionItem,
+                                                    icon: componentDefinitionItem.icon,
+                                                    label: componentDefinitionItem.title,
+                                                    value: componentDefinitionItem.name,
+                                                }));
+                                            } else if (connectionDefinitions?.length) {
+                                                items = connectionDefinitions.map((connectionDefinitionItem) => ({
+                                                    ...connectionDefinitionItem,
+                                                    componentDefinition: selectedComponentDefinition,
+                                                    icon: selectedComponentDefinition?.icon,
+                                                    label: connectionDefinitionItem.componentTitle,
+                                                    value: connectionDefinitionItem.componentName,
+                                                }));
+                                            }
+
+                                            return (
+                                                <ComponentSelectionInput
+                                                    componentDefinition={componentDefinition}
+                                                    field={field}
+                                                    handleComponentDefinitionChange={handleComponentDefinitionChange}
+                                                    items={items}
+                                                    selectedComponentDefinition={selectedComponentDefinition}
+                                                />
+                                            );
+                                        }}
+                                        rules={{required: true}}
+                                    />
+                                )}
+
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
+
+                                            <FormControl>
+                                                <Input placeholder="My Connection" {...field} />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    rules={{required: true}}
+                                />
 
                                 {!connection?.id && (
-                                    <DialogDescription>
-                                        Create your connection to connect to the chosen service
-                                    </DialogDescription>
-                                )}
-                            </div>
-
-                            <DialogCloseButton />
-                        </DialogHeader>
-
-                        {errors?.length > 0 && <Errors errors={errors} />}
-
-                        <div className="flex max-h-dialog-height flex-col space-y-4 overflow-y-auto px-6">
-                            {connection?.id && (
-                                <FormField
-                                    control={control}
-                                    name="id"
-                                    render={({field}) => (
-                                        <FormControl>
-                                            <div className="flex">
-                                                <div className="relative flex grow items-stretch focus-within:z-10">
-                                                    <Input
-                                                        {...field}
-                                                        className="rounded-r-none bg-gray-50 text-gray-700"
-                                                        readOnly
-                                                        value={connection?.id}
-                                                    />
-                                                </div>
-
-                                                <Button
-                                                    className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-sm hover:bg-gray-100"
-                                                    onClick={() => copyToClipboard(connection?.id?.toString() ?? '')}
-                                                    size="icon"
-                                                    type="button"
-                                                    variant="ghost"
-                                                >
-                                                    <ClipboardIcon
-                                                        aria-hidden="true"
-                                                        className="size-4 text-gray-400"
-                                                    />
-                                                </Button>
-                                            </div>
-                                        </FormControl>
-                                    )}
-                                />
-                            )}
-
-                            {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
-                                <>
-                                    {!connection?.id && (
-                                        <FormField
-                                            control={control}
-                                            name="componentName"
-                                            render={({field}) => {
-                                                let items: Array<ComboBoxItemType> | undefined;
-
-                                                if (!componentDefinition && componentDefinitions) {
-                                                    items = componentDefinitions.map((componentDefinitionItem) => ({
-                                                        ...componentDefinitionItem,
-                                                        componentDefinition: componentDefinitionItem,
-                                                        icon: componentDefinitionItem.icon,
-                                                        label: componentDefinitionItem.title,
-                                                        value: componentDefinitionItem.name,
-                                                    }));
-                                                } else if (connectionDefinitions?.length) {
-                                                    items = connectionDefinitions.map((connectionDefinitionItem) => ({
-                                                        ...connectionDefinitionItem,
-                                                        componentDefinition: selectedComponentDefinition,
-                                                        icon: selectedComponentDefinition?.icon,
-                                                        label: connectionDefinitionItem.componentTitle,
-                                                        value: connectionDefinitionItem.componentName,
-                                                    }));
-                                                }
-
-                                                return (
-                                                    <ComponentSelectionInput
-                                                        componentDefinition={componentDefinition}
-                                                        field={field}
-                                                        handleComponentDefinitionChange={
-                                                            handleComponentDefinitionChange
-                                                        }
-                                                        items={items}
-                                                        selectedComponentDefinition={selectedComponentDefinition}
-                                                    />
-                                                );
-                                            }}
-                                            rules={{required: true}}
-                                        />
-                                    )}
-
                                     <FormField
-                                        control={form.control}
-                                        name="name"
+                                        control={control}
+                                        name="environment"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Name</FormLabel>
+                                                <FormLabel>Environment</FormLabel>
 
                                                 <FormControl>
-                                                    <Input placeholder="My Connection" {...field} />
+                                                    <Select
+                                                        defaultValue={field.value}
+                                                        onValueChange={(value) => field.onChange(value)}
+                                                    >
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select environment" />
+                                                        </SelectTrigger>
+
+                                                        <SelectContent>
+                                                            <SelectItem value="DEVELOPMENT">Development</SelectItem>
+
+                                                            <SelectItem value="STAGING">Staging</SelectItem>
+
+                                                            <SelectItem value="PRODUCTION">Production</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
                                                 </FormControl>
 
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                         rules={{required: true}}
+                                        shouldUnregister={false}
                                     />
+                                )}
 
-                                    {!connection?.id && (
-                                        <FormField
-                                            control={control}
-                                            name="environment"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Environment</FormLabel>
+                                {!connection?.id && showConnectionProperties && !!connectionDefinition.properties && (
+                                    <Properties
+                                        control={control}
+                                        formState={formState}
+                                        properties={connectionDefinition?.properties}
+                                    />
+                                )}
 
-                                                    <FormControl>
-                                                        <Select
-                                                            defaultValue={field.value}
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                        >
-                                                            <SelectTrigger className="w-full">
-                                                                <SelectValue placeholder="Select environment" />
-                                                            </SelectTrigger>
+                                {!connection?.id && showAuthorizations && (
+                                    <FormField
+                                        control={control}
+                                        name="authorizationType"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Authorization</FormLabel>
 
-                                                            <SelectContent>
-                                                                <SelectItem value="DEVELOPMENT">Development</SelectItem>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        setAuthorizationType(value);
+                                                        setUsePredefinedOAuthApp(false);
+                                                        setValue('authorizationType', value);
+                                                    }}
+                                                    {...field}
+                                                >
+                                                    <SelectTrigger className="mt-1">
+                                                        <FormControl>
+                                                            <SelectValue placeholder="Select..." />
+                                                        </FormControl>
+                                                    </SelectTrigger>
 
-                                                                <SelectItem value="STAGING">Staging</SelectItem>
+                                                    <SelectContent>
+                                                        {authorizationOptions.map((authorizationOption) => (
+                                                            <SelectItem
+                                                                key={authorizationOption.value!}
+                                                                value={authorizationOption.value!}
+                                                            >
+                                                                {authorizationOption.label!}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
 
-                                                                <SelectItem value="PRODUCTION">Production</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                            rules={{required: true}}
-                                            shouldUnregister={false}
-                                        />
-                                    )}
-
-                                    {!connection?.id &&
-                                        showConnectionProperties &&
-                                        !!connectionDefinition.properties && (
-                                            <Properties
-                                                control={control}
-                                                formState={formState}
-                                                properties={connectionDefinition?.properties}
-                                            />
+                                                <FormMessage />
+                                            </FormItem>
                                         )}
+                                    />
+                                )}
 
-                                    {!connection?.id && showAuthorizations && (
-                                        <FormField
+                                {showRedirectUriInput && oAuth2Properties?.redirectUri && (
+                                    <div>
+                                        <Label>Redirect URI</Label>
+
+                                        <RedirectUriInput redirectUri={oAuth2Properties.redirectUri} />
+                                    </div>
+                                )}
+
+                                {!connection?.id &&
+                                    showAuthorizationProperties &&
+                                    !!authorizations?.length &&
+                                    authorizations[0]?.properties && (
+                                        <Properties
                                             control={control}
-                                            name="authorizationType"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Authorization</FormLabel>
-
-                                                    <Select
-                                                        onValueChange={(value) => {
-                                                            setAuthorizationType(value);
-                                                            setUsePredefinedOAuthApp(false);
-                                                            setValue('authorizationType', value);
-                                                        }}
-                                                        {...field}
-                                                    >
-                                                        <SelectTrigger className="mt-1">
-                                                            <FormControl>
-                                                                <SelectValue placeholder="Select..." />
-                                                            </FormControl>
-                                                        </SelectTrigger>
-
-                                                        <SelectContent>
-                                                            {authorizationOptions.map((authorizationOption) => (
-                                                                <SelectItem
-                                                                    key={authorizationOption.value!}
-                                                                    value={authorizationOption.value!}
-                                                                >
-                                                                    {authorizationOption.label!}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
+                                            formState={formState}
+                                            properties={authorizations[0]?.properties}
                                         />
                                     )}
 
-                                    {showRedirectUriInput && oAuth2Properties?.redirectUri && (
-                                        <div>
-                                            <Label>Redirect URI</Label>
-
-                                            <RedirectUriInput redirectUri={oAuth2Properties.redirectUri} />
-                                        </div>
-                                    )}
-
-                                    {!connection?.id &&
-                                        showAuthorizationProperties &&
-                                        !!authorizations?.length &&
-                                        authorizations[0]?.properties && (
-                                            <Properties
-                                                control={control}
-                                                formState={formState}
-                                                properties={authorizations[0]?.properties}
-                                            />
-                                        )}
-
-                                    {showOAuth2AppPredefined && (
-                                        <div>
-                                            <a
-                                                className="text-sm text-blue-600"
-                                                href="#"
-                                                onClick={() => setUsePredefinedOAuthApp(!usePredefinedOAuthApp)}
-                                            >
-                                                <span>
-                                                    I want to use {usePredefinedOAuthApp ? 'predefined' : 'my own'} app
-                                                    credentials
-                                                </span>
-                                            </a>
-                                        </div>
-                                    )}
-
-                                    {!tagsLoading && (
-                                        <FormField
-                                            control={control}
-                                            name="tags"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Tags</FormLabel>
-
-                                                    <FormControl>
-                                                        <CreatableSelect
-                                                            field={field}
-                                                            isMulti
-                                                            menuPlacement="top"
-                                                            onCreateOption={(inputValue: string) => {
-                                                                setValue('tags', [
-                                                                    ...getValues().tags!,
-                                                                    {
-                                                                        label: inputValue,
-                                                                        name: inputValue,
-                                                                        value: inputValue,
-                                                                    },
-                                                                ]);
-                                                            }}
-                                                            options={remainingTags?.map((tag: Tag) => ({
-                                                                label: tag.name,
-                                                                value: tag.name.toLowerCase().replace(/\W/g, ''),
-                                                                ...tag,
-                                                            }))}
-                                                        />
-                                                    </FormControl>
-
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    )}
-                                </>
-                            )}
-
-                            {!oAuth2AuthorizationParametersLoading && wizardStep === 'oauth_step' && (
-                                <>
-                                    <Alert className="border-blue-50 bg-blue-50 text-blue-700">
-                                        <RocketIcon className="size-4" />
-
-                                        <AlertTitle>Heads up!</AlertTitle>
-
-                                        <AlertDescription>
-                                            Excellent! You can connect and create the
-                                            <span className="mx-0.5 font-semibold">
-                                                {selectedComponentDefinition?.title}
+                                {showOAuth2AppPredefined && (
+                                    <div>
+                                        <a
+                                            className="text-sm text-blue-600"
+                                            href="#"
+                                            onClick={() => setUsePredefinedOAuthApp(!usePredefinedOAuthApp)}
+                                        >
+                                            <span>
+                                                I want to use {usePredefinedOAuthApp ? 'predefined' : 'my own'} app
+                                                credentials
                                             </span>
-                                            connection under name
-                                            <span className="mx-0.5 font-semibold">{`'${getValues()?.name}'`}</span>.
-                                        </AlertDescription>
-                                    </Alert>
+                                        </a>
+                                    </div>
+                                )}
 
-                                    {scopes && scopes.length > 0 && <Scopes scopes={scopes} />}
-                                </>
-                            )}
-                        </div>
+                                {!tagsLoading && (
+                                    <FormField
+                                        control={control}
+                                        name="tags"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Tags</FormLabel>
 
-                        {connection?.id && connectionDefinition && (
-                            <div className="px-6 pt-4">
-                                <ConnectionParameters
-                                    authorizationParameters={connection.authorizationParameters}
-                                    connectionDefinition={connectionDefinition}
-                                    connectionParameters={connection.connectionParameters}
-                                />
-                            </div>
+                                                <FormControl>
+                                                    <CreatableSelect
+                                                        field={field}
+                                                        isMulti
+                                                        menuPlacement="top"
+                                                        onCreateOption={(inputValue: string) => {
+                                                            setValue('tags', [
+                                                                ...getValues().tags!,
+                                                                {
+                                                                    label: inputValue,
+                                                                    name: inputValue,
+                                                                    value: inputValue,
+                                                                },
+                                                            ]);
+                                                        }}
+                                                        options={remainingTags?.map((tag: Tag) => ({
+                                                            label: tag.name,
+                                                            value: tag.name.toLowerCase().replace(/\W/g, ''),
+                                                            ...tag,
+                                                        }))}
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+                            </>
                         )}
 
-                        <DialogFooter className="px-6 pb-6 pt-4">
-                            {wizardStep === 'oauth_step' && (
-                                <Button
-                                    onClick={() => {
-                                        connectionMutation.reset();
+                        {!oAuth2AuthorizationParametersLoading && wizardStep === 'oauth_step' && (
+                            <>
+                                <Alert className="border-blue-50 bg-blue-50 text-blue-700">
+                                    <RocketIcon className="size-4" />
 
-                                        setOAuth2Error(undefined);
+                                    <AlertTitle>Heads up!</AlertTitle>
 
-                                        setWizardStep('configuration_step');
-                                    }}
-                                    type="button"
-                                    variant="outline"
-                                >
-                                    Previous
-                                </Button>
-                            )}
+                                    <AlertDescription>
+                                        Excellent! You can connect and create the
+                                        <span className="mx-0.5 font-semibold">
+                                            {selectedComponentDefinition?.title}
+                                        </span>
+                                        connection under name
+                                        <span className="mx-0.5 font-semibold">{`'${getValues()?.name}'`}</span>.
+                                    </AlertDescription>
+                                </Alert>
 
-                            {wizardStep === 'configuration_step' && (
-                                <Button onClick={closeDialog} type="button" variant="outline">
-                                    Cancel
-                                </Button>
-                            )}
+                                {scopes && scopes.length > 0 && <Scopes scopes={scopes} />}
+                            </>
+                        )}
+                    </div>
 
-                            {showOAuth2Step && (
-                                <>
-                                    {wizardStep === 'configuration_step' && (
-                                        <Button
-                                            onClick={handleSubmit(() => {
-                                                setWizardStep('oauth_step');
-                                            })}
-                                            type="submit"
-                                        >
-                                            Next
-                                        </Button>
+                    {connection?.id && connectionDefinition && (
+                        <div className="px-6 pt-4">
+                            <ConnectionParameters
+                                authorizationParameters={connection.authorizationParameters}
+                                connectionDefinition={connectionDefinition}
+                                connectionParameters={connection.connectionParameters}
+                            />
+                        </div>
+                    )}
+
+                    <DialogFooter className="px-6 pb-6 pt-4">
+                        {wizardStep === 'oauth_step' && (
+                            <Button
+                                onClick={() => {
+                                    connectionMutation.reset();
+
+                                    setOAuth2Error(undefined);
+
+                                    setWizardStep('configuration_step');
+                                }}
+                                type="button"
+                                variant="outline"
+                            >
+                                Previous
+                            </Button>
+                        )}
+
+                        {wizardStep === 'configuration_step' && (
+                            <Button onClick={closeDialog} type="button" variant="outline">
+                                Cancel
+                            </Button>
+                        )}
+
+                        {showOAuth2Step && (
+                            <>
+                                {wizardStep === 'configuration_step' && (
+                                    <Button
+                                        onClick={handleSubmit(() => {
+                                            setWizardStep('oauth_step');
+                                        })}
+                                        type="submit"
+                                    >
+                                        Next
+                                    </Button>
+                                )}
+
+                                {wizardStep === 'oauth_step' &&
+                                    oAuth2AuthorizationParameters?.authorizationUrl &&
+                                    oAuth2AuthorizationParameters?.clientId && (
+                                        <OAuth2Button
+                                            authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
+                                            clientId={oAuth2AuthorizationParameters.clientId}
+                                            extraQueryParameters={oAuth2AuthorizationParameters?.extraQueryParameters}
+                                            onClick={(getAuth: () => void) => {
+                                                getAuth();
+                                            }}
+                                            onCodeSuccess={handleCodeSuccess}
+                                            onError={(error: string) => setOAuth2Error(error)}
+                                            onTokenSuccess={handleTokenSuccess}
+                                            redirectUri={oAuth2Properties?.redirectUri ?? ''}
+                                            responseType={isOAuth2AuthorizationType ? 'code' : 'token'}
+                                            scope={oAuth2AuthorizationParameters?.scopes?.join(' ')}
+                                        />
                                     )}
+                            </>
+                        )}
 
-                                    {wizardStep === 'oauth_step' &&
-                                        oAuth2AuthorizationParameters?.authorizationUrl &&
-                                        oAuth2AuthorizationParameters?.clientId && (
-                                            <OAuth2Button
-                                                authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
-                                                clientId={oAuth2AuthorizationParameters.clientId}
-                                                extraQueryParameters={
-                                                    oAuth2AuthorizationParameters?.extraQueryParameters
-                                                }
-                                                onClick={(getAuth: () => void) => {
-                                                    getAuth();
-                                                }}
-                                                onCodeSuccess={handleCodeSuccess}
-                                                onError={(error: string) => setOAuth2Error(error)}
-                                                onTokenSuccess={handleTokenSuccess}
-                                                redirectUri={oAuth2Properties?.redirectUri ?? ''}
-                                                responseType={isOAuth2AuthorizationType ? 'code' : 'token'}
-                                                scope={oAuth2AuthorizationParameters?.scopes?.join(' ')}
-                                            />
-                                        )}
-                                </>
-                            )}
-
-                            {!showOAuth2Step && (
-                                <Button onClick={handleSubmit(() => saveConnection())} type="submit">
-                                    Save
-                                </Button>
-                            )}
-                        </DialogFooter>
-                    </Form>
-                </DialogContent>
-            )}
+                        {!showOAuth2Step && (
+                            <Button onClick={handleSubmit(() => saveConnection())} type="submit">
+                                Save
+                            </Button>
+                        )}
+                    </DialogFooter>
+                </Form>
+            </DialogContent>
         </Dialog>
     );
 };
