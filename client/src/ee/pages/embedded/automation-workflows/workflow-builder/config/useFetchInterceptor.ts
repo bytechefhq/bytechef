@@ -20,8 +20,8 @@ export default function useFetchInterceptor() {
                         ...config,
                         headers: {
                             ...config.headers,
+                            Authorization: `Bearer ${sessionStorage.getItem('jwtToken') || ''}`,
                             'X-ENVIRONMENT': sessionStorage.getItem('environment')?.toUpperCase() || '',
-                            'X-JWT-TOKEN': sessionStorage.getItem('jwtToken') || '',
                             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
                         },
                     },
