@@ -153,7 +153,10 @@ function App() {
         navigation = filteredAutomationNavigation;
     } else if (location.pathname.includes('/embedded/')) {
         navigation = embeddedNavigation.filter((navItem) => {
-            if ((ff_1779 && navItem.href === '/embedded/automation-workflows') || navItem.href !== '/embedded/automation-workflows') {
+            if (
+                (ff_1779 && navItem.href === '/embedded/automation-workflows') ||
+                navItem.href !== '/embedded/automation-workflows'
+            ) {
                 return true;
             }
         });
