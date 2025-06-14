@@ -2,7 +2,7 @@ import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/ee/pages/embedded/automations/config/useFetchInterceptor';
 import {Outlet} from 'react-router-dom';
 
-const EmbeddedApp = () => {
+const EmbeddedWorkflowBuilderApp = () => {
     useFetchInterceptor();
 
     return (
@@ -13,4 +13,4 @@ const EmbeddedApp = () => {
     );
 };
 
-export default EmbeddedApp;
+export default EmbeddedWorkflowBuilderApp;

@@ -8,7 +8,7 @@ import './styles/index.css';
 import './styles/components.css';
 
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {getRouter as getEmbeddedRouter} from '@/embeddedRoutes';
+import {getRouter as getEmbeddedRouter} from '@/embeddedWorkflowBuilderRoutes';
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
@@ -50,9 +50,9 @@ function renderApp() {
     const root = createRoot(container);
     const queryClient = new QueryClient();
 
-    const isEmbedded = window.location.pathname.includes('/embedded/');
+    const isEmbeddedWorkflowBuilder = window.location.pathname.includes('/embedded/workflow-builder');
 
-    const router = isEmbedded ? getEmbeddedRouter() : getMainRouter(queryClient);
+    const router = isEmbeddedWorkflowBuilder ? getEmbeddedRouter() : getMainRouter(queryClient);
 
     root.render(
         <React.StrictMode>

@@ -1,4 +1,4 @@
-import EmbeddedApp from '@/EmbeddedApp';
+import EmbeddedWorkflowBuilderApp from '@/EmbeddedWorkflowBuilderApp';
 import WorkflowBuilder from '@/ee/pages/embedded/automations/WorkflowBuilder';
 import {createBrowserRouter} from 'react-router-dom';
 
@@ -11,7 +11,7 @@ export const getRouter = () =>
                     path: 'workflow-builder/:workflowReferenceCode',
                 },
             ],
-            element: <EmbeddedApp />,
+            element: <EmbeddedWorkflowBuilderApp />,
             path: '/embedded',
         },
     ]);
