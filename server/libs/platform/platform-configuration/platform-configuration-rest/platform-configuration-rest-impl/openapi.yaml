@@ -2511,6 +2511,9 @@ components:
             description: "The minimum string length."
             type: "integer"
             format: "int32"
+          regex:
+            description: "The regular expression pattern for validation."
+            type: "string"
           options:
             description: "The list of valid property options."
             type: "array"
