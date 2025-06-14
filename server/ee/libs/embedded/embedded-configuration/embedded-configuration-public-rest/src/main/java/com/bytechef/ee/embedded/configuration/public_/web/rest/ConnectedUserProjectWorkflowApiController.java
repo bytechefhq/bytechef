@@ -13,7 +13,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
@@ -36,14 +36,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController(" com.bytechef.ee.embedded.configuration.public_.web.rest.WorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
-public class AutomationWorkflowApiController implements AutomationWorkflowApi {
+public class ConnectedUserProjectWorkflowApiController implements ConnectedUserProjectWorkflowApi {
 
     private final ConnectUserProjectFacade connectUserProjectFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public AutomationWorkflowApiController(ConnectUserProjectFacade connectUserProjectFacade,
-        ConversionService conversionService) {
+    public ConnectedUserProjectWorkflowApiController(
+        ConnectUserProjectFacade connectUserProjectFacade, ConversionService conversionService) {
+
         this.connectUserProjectFacade = connectUserProjectFacade;
         this.conversionService = conversionService;
     }
@@ -75,7 +76,7 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
 
     @Override
     @CrossOrigin
-    public ResponseEntity<AutomationWorkflowModel> getFrontendProjectWorkflow(
+    public ResponseEntity<ConnectedUserProjectWorkflowModel> getFrontendProjectWorkflow(
         String workflowReferenceCode, EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
@@ -83,7 +84,7 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
                 connectUserProjectFacade.getProjectWorkflow(
                     OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
                     getEnvironment(xEnvironment)),
-                AutomationWorkflowModel.class));
+                ConnectedUserProjectWorkflowModel.class));
     }
 
     @Override
@@ -101,13 +102,14 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
 
     @Override
     @CrossOrigin
-    public ResponseEntity<List<AutomationWorkflowModel>> getFrontendProjectWorkflows(EnvironmentModel xEnvironment) {
+    public ResponseEntity<List<ConnectedUserProjectWorkflowModel>>
+        getFrontendProjectWorkflows(EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(
             connectUserProjectFacade.getProjectWorkflows(
                 OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
                 getEnvironment(xEnvironment))
                 .stream()
-                .map(workflow -> conversionService.convert(workflow, AutomationWorkflowModel.class))
+                .map(workflow -> conversionService.convert(workflow, ConnectedUserProjectWorkflowModel.class))
                 .toList());
     }
 
@@ -175,24 +177,24 @@ public class AutomationWorkflowApiController implements AutomationWorkflowApi {
     }
 
     @Override
-    public ResponseEntity<AutomationWorkflowModel> getProjectWorkflow(
+    public ResponseEntity<ConnectedUserProjectWorkflowModel> getProjectWorkflow(
         String externalUserId, String workflowReferenceCode, EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 connectUserProjectFacade.getProjectWorkflow(
                     externalUserId, workflowReferenceCode, getEnvironment(xEnvironment)),
-                AutomationWorkflowModel.class));
+                ConnectedUserProjectWorkflowModel.class));
     }
 
     @Override
-    public ResponseEntity<List<AutomationWorkflowModel>> getProjectWorkflows(
+    public ResponseEntity<List<ConnectedUserProjectWorkflowModel>> getProjectWorkflows(
         String externalUserId, EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
             connectUserProjectFacade.getProjectWorkflows(externalUserId, getEnvironment(xEnvironment))
                 .stream()
-                .map(workflow -> conversionService.convert(workflow, AutomationWorkflowModel.class))
+                .map(workflow -> conversionService.convert(workflow, ConnectedUserProjectWorkflowModel.class))
                 .toList());
     }
 

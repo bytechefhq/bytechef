@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.mapper;
 
 import com.bytechef.ee.embedded.configuration.dto.ConnectUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.EmbeddedConfigurationPublicMapperSpringConfig;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -22,11 +22,11 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(
     config = EmbeddedConfigurationPublicMapperSpringConfig.class, implementationName = "EmbeddedPublic<CLASS_NAME>Impl")
 public interface ConnectUserProjectWorkflowMapper
-    extends Converter<ConnectUserProjectWorkflowDTO, AutomationWorkflowModel> {
+    extends Converter<ConnectUserProjectWorkflowDTO, ConnectedUserProjectWorkflowModel> {
 
     @Override
     @Mapping(target = "definition", source = "workflow.definition")
     @Mapping(target = "description", source = "workflow.description")
     @Mapping(target = "label", source = "workflow.label")
-    AutomationWorkflowModel convert(ConnectUserProjectWorkflowDTO workflow);
+    ConnectedUserProjectWorkflowModel convert(ConnectUserProjectWorkflowDTO workflow);
 }
