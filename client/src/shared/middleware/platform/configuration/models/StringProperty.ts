@@ -86,6 +86,12 @@ export interface StringProperty extends ValueProperty {
      */
     minLength?: number;
     /**
+     * The regular expression pattern for validation.
+     * @type {string}
+     * @memberof StringProperty
+     */
+    regex?: string;
+    /**
      * The list of valid property options.
      * @type {Array<Option>}
      * @memberof StringProperty
@@ -123,6 +129,7 @@ export function StringPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
         'exampleValue': json['exampleValue'] == null ? undefined : json['exampleValue'],
         'maxLength': json['maxLength'] == null ? undefined : json['maxLength'],
         'minLength': json['minLength'] == null ? undefined : json['minLength'],
+        'regex': json['regex'] == null ? undefined : json['regex'],
         'options': json['options'] == null ? undefined : ((json['options'] as Array<any>).map(OptionFromJSON)),
         'optionsDataSource': json['optionsDataSource'] == null ? undefined : OptionsDataSourceFromJSON(json['optionsDataSource']),
     };
@@ -144,6 +151,7 @@ export function StringPropertyToJSONTyped(value?: StringProperty | null, ignoreD
         'exampleValue': value['exampleValue'],
         'maxLength': value['maxLength'],
         'minLength': value['minLength'],
+        'regex': value['regex'],
         'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionToJSON)),
         'optionsDataSource': OptionsDataSourceToJSON(value['optionsDataSource']),
     };
