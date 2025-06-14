@@ -33,7 +33,17 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include:
+          - configprops
+          - env
+          - health
+          - info
+          - logfile
+          - loggers
+          - prometheus
+          - threaddump
+          - caches
+          - liquibase
   endpoint:
     env:
       show-values: when_authorized
