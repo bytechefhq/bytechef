@@ -1,6 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './CategoryApi';
+export * from './ConnectionApi';
+export * from './ConnectionTagApi';
 export * from './ProjectApi';
 export * from './ProjectDeploymentApi';
 export * from './ProjectDeploymentTagApi';

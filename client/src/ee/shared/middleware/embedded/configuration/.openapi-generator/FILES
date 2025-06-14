@@ -1,6 +1,8 @@
 apis/AppEventApi.ts
 apis/CategoryApi.ts
 apis/ConnectedUserProjectWorkflowApi.ts
+apis/ConnectionApi.ts
+apis/ConnectionTagApi.ts
 apis/IntegrationApi.ts
 apis/IntegrationInstanceApi.ts
 apis/IntegrationInstanceConfigurationApi.ts
@@ -14,7 +16,10 @@ models/AuthorizationType.ts
 models/Category.ts
 models/ComponentConnection.ts
 models/ConnectedUserProjectWorkflow.ts
+models/Connection.ts
+models/ConnectionBase.ts
 models/CreateIntegrationInstanceConfigurationWorkflowJob200Response.ts
+models/CredentialStatus.ts
 models/Environment.ts
 models/Integration.ts
 models/IntegrationBasic.ts
@@ -31,6 +36,7 @@ models/Page.ts
 models/PublishConnectedUserProjectWorkflowRequest.ts
 models/PublishIntegrationRequest.ts
 models/Tag.ts
+models/UpdateConnectionRequest.ts
 models/UpdateTagsRequest.ts
 models/Workflow.ts
 models/Workflow1.ts

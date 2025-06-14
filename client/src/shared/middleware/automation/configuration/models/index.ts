@@ -1,8 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './AuthorizationType';
 export * from './Category';
 export * from './ComponentConnection';
+export * from './Connection';
+export * from './ConnectionBase';
 export * from './CreateProjectDeploymentWorkflowJob200Response';
+export * from './CredentialStatus';
 export * from './Environment';
 export * from './Project';
 export * from './ProjectBasic';
@@ -14,6 +18,7 @@ export * from './ProjectStatus';
 export * from './ProjectVersion';
 export * from './PublishProjectRequest';
 export * from './Tag';
+export * from './UpdateConnectionRequest';
 export * from './UpdateTagsRequest';
 export * from './Workflow';
 export * from './Workflow1';
