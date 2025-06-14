@@ -17,9 +17,7 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "paths": {
-            "@/*": ["./*"],
-            "@bytechef/use-embedded-connection-dialog": ["node_modules/@bytechef/use-embedded-connection-dialog/src"],
-            "@bytechef/use-embedded-connection-dialog/*": ["node_modules/@bytechef/use-embedded-connection-dialog/*"]
+            "@/*": ["./*"]
         }
     },
     "include": ["src"],
