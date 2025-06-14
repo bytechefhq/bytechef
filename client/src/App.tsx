@@ -84,7 +84,7 @@ const embeddedNavigation: NavigationType[] = [
     },
     {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
     {
-        href: '/embedded/workflows',
+        href: '/embedded/automation-workflows',
         icon: Workflow,
         name: 'Automations',
     },
@@ -149,11 +149,11 @@ function App() {
 
     let navigation: NavigationType[] = [];
 
-    if (location.pathname.includes('automation')) {
+    if (location.pathname.includes('/automation/')) {
         navigation = filteredAutomationNavigation;
-    } else if (location.pathname.includes('embedded')) {
+    } else if (location.pathname.includes('/embedded/')) {
         navigation = embeddedNavigation.filter((navItem) => {
-            if ((ff_1779 && navItem.href === '/embedded/workflows') || navItem.href !== '/embedded/workflows') {
+            if ((ff_1779 && navItem.href === '/embedded/automation-workflows') || navItem.href !== '/embedded/automation-workflows') {
                 return true;
             }
         });

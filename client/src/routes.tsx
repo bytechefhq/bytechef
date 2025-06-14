@@ -2,7 +2,7 @@ import App from '@/App';
 import ApiClients from '@/ee/pages/automation/api-platform/api-clients/ApiClients';
 import ApiCollections from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import AppEvents from '@/ee/pages/embedded/app-events/AppEvents';
-import Workflows from '@/ee/pages/embedded/automations/Workflows';
+import AutomationWorkflows from '@/ee/pages/embedded/automation-workflows/AutomationWorkflows';
 import ConnectedUsers from '@/ee/pages/embedded/connected-users/ConnectedUsers';
 import {Connections as EmbeddedConnections} from '@/ee/pages/embedded/connections/Connections';
 import IntegrationInstanceConfigurations from '@/ee/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations';
@@ -453,10 +453,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <Workflows />
+                                            <AutomationWorkflows />
                                         </PrivateRoute>
                                     ),
-                                    path: 'workflows',
+                                    path: 'automation-workflows',
                                 },
                                 {
                                     element: (

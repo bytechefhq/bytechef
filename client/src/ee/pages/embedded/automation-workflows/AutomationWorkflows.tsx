@@ -6,7 +6,7 @@ import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav
 import {Settings2Icon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
-const Workflows = () => {
+const AutomationWorkflows = () => {
     const [searchParams] = useSearchParams();
 
     const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
@@ -55,4 +55,4 @@ const Workflows = () => {
     );
 };
 
-export default Workflows;
+export default AutomationWorkflows;
