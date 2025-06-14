@@ -2,7 +2,7 @@
 
 module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx}', './*.html'],
-    darkMode: 'class',
+    darkMode: ['class', 'class'],
     important: true,
     plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate'), require('@tailwindcss/typography')],
     theme: {

@@ -3,6 +3,7 @@ import {defineConfig, loadEnv} from 'vite';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import basicSsl from '@vitejs/plugin-basic-ssl';
+import * as path from "node:path";
 
 // https://vitejs.dev/config/
 export default ({mode}) => {
@@ -23,6 +24,11 @@ export default ({mode}) => {
             },
         },
         plugins: [react(), tsconfigPaths(), svgr(), isHttps() && basicSsl()],
+        resolve: {
+            alias: {
+                "@": path.resolve(__dirname, "./src"),
+            },
+        },
         server: {
             host: '127.0.0.1',
             proxy: {

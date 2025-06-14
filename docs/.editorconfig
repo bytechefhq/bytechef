@@ -2,8 +2,6 @@
 # coding styles between different editors and IDEs
 # editorconfig.org
 
-root = true
-
 [*]
 
 # We recommend you to keep these unchanged
