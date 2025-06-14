@@ -62,6 +62,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : false,
       "type" : "STRING"
     } ],

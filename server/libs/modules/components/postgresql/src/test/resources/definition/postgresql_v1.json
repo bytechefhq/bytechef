@@ -32,6 +32,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : "SELECT id, name FROM customer WHERE age > :age AND height <= :height",
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -116,6 +117,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : null,
         "type" : "STRING"
       } ],
@@ -173,6 +175,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -193,6 +196,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -239,6 +243,7 @@
           "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : true,
           "type" : "STRING"
         }, {
@@ -295,6 +300,7 @@
           } ],
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : true,
           "type" : "STRING"
         } ],
@@ -363,6 +369,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -383,6 +390,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -403,6 +411,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -449,6 +458,7 @@
           "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : true,
           "type" : "STRING"
         }, {
@@ -505,6 +515,7 @@
           } ],
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : true,
           "type" : "STRING"
         } ],
@@ -573,6 +584,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -593,6 +605,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -613,6 +626,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     } ],
@@ -651,6 +665,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price",
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -836,6 +851,7 @@
           "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : null,
           "type" : "STRING"
         }, {
@@ -968,6 +984,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : null,
         "type" : "STRING"
       } ],
@@ -1042,6 +1059,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : true,
         "type" : "STRING"
       }, {
@@ -1062,6 +1080,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : true,
         "type" : "STRING"
       } ],
@@ -1093,6 +1112,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -1132,6 +1152,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     } ],
@@ -1183,6 +1204,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -1203,6 +1225,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -1223,6 +1246,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -1251,6 +1275,7 @@
       } ],
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     } ],

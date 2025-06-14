@@ -7,36 +7,33 @@
     "output" : null,
     "outputResponse" : {
       "outputSchema" : {
+        "additionalProperties" : null,
         "advancedOption" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "OBJECT",
+        "controlType" : "OBJECT_BUILDER",
         "defaultValue" : null,
         "description" : null,
+        "displayCondition" : null,
         "exampleValue" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
         "label" : null,
-        "placeholder" : null,
-        "options" : null,
-        "additionalProperties" : null,
+        "metadata" : { },
         "multipleValues" : null,
+        "name" : null,
+        "options" : null,
+        "placeholder" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "approved",
-          "type" : "BOOLEAN",
+          "controlType" : "SELECT",
           "defaultValue" : null,
           "description" : null,
+          "displayCondition" : null,
           "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
           "label" : null,
-          "placeholder" : null,
+          "metadata" : { },
+          "name" : "approved",
           "options" : [ {
             "description" : null,
             "label" : "True",
@@ -46,49 +43,46 @@
             "label" : "False",
             "value" : true
           } ],
-          "controlType" : "SELECT"
+          "placeholder" : null,
+          "required" : null,
+          "type" : "BOOLEAN"
         } ],
-        "controlType" : "OBJECT_BUILDER"
+        "required" : null,
+        "type" : "OBJECT"
       },
+      "placeholder" : null,
       "sampleOutput" : {
         "approved" : true
-      },
-      "placeholder" : null
-    },
-    "sampleOutput" : {
-      "approved" : true
+      }
     },
     "outputSchema" : {
+      "additionalProperties" : null,
       "advancedOption" : null,
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : null,
-      "type" : "OBJECT",
+      "controlType" : "OBJECT_BUILDER",
       "defaultValue" : null,
       "description" : null,
+      "displayCondition" : null,
       "exampleValue" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
       "label" : null,
-      "placeholder" : null,
-      "options" : null,
-      "additionalProperties" : null,
+      "metadata" : { },
       "multipleValues" : null,
+      "name" : null,
+      "options" : null,
+      "placeholder" : null,
       "properties" : [ {
         "advancedOption" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : "approved",
-        "type" : "BOOLEAN",
+        "controlType" : "SELECT",
         "defaultValue" : null,
         "description" : null,
+        "displayCondition" : null,
         "exampleValue" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
         "label" : null,
-        "placeholder" : null,
+        "metadata" : { },
+        "name" : "approved",
         "options" : [ {
           "description" : null,
           "label" : "True",
@@ -98,15 +92,21 @@
           "label" : "False",
           "value" : true
         } ],
-        "controlType" : "SELECT"
+        "placeholder" : null,
+        "required" : null,
+        "type" : "BOOLEAN"
       } ],
-      "controlType" : "OBJECT_BUILDER"
+      "required" : null,
+      "type" : "OBJECT"
+    },
+    "sampleOutput" : {
+      "approved" : true
     }
   },
   "properties" : null,
   "resources" : null,
   "taskProperties" : null,
   "title" : "Wait for Approval",
-  "version" : 1,
-  "variableProperties" : null
+  "variableProperties" : null,
+  "version" : 1
 }

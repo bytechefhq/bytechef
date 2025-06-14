@@ -1,4 +1,8 @@
 {
+  "actionClusterElementTypes" : {
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "load" : [ "EMBEDDING" ]
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -12,31 +16,32 @@
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "perform" : { },
+    "processErrorResponse" : null,
     "properties" : [ {
       "advancedOption" : null,
+      "controlType" : "TEXT",
+      "defaultValue" : null,
       "description" : "The query to be executed.",
       "displayCondition" : null,
+      "exampleValue" : null,
       "expressionEnabled" : null,
       "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "query",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
       "label" : "Query",
-      "placeholder" : null,
-      "controlType" : "TEXT",
       "languageId" : null,
       "maxLength" : null,
+      "metadata" : { },
       "minLength" : null,
+      "name" : "query",
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "placeholder" : null,
+      "regex" : null,
+      "required" : true,
+      "type" : "STRING"
     } ],
     "title" : "Search Data",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -45,134 +50,132 @@
     "metadata" : null,
     "name" : "load",
     "outputDefinition" : null,
+    "perform" : { },
+    "processErrorResponse" : null,
     "properties" : [ ],
     "title" : "Load Data",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "componentCategories" : [ {
-    "name" : "artificial-intelligence",
-    "label" : "Artificial Intelligence"
+  "clusterElementType" : [ {
+    "key" : "documentReader",
+    "label" : "Document Reader",
+    "multipleElements" : false,
+    "name" : "DOCUMENT_READER",
+    "required" : true
+  }, {
+    "key" : "documentTransformer",
+    "label" : "Document Transformer",
+    "multipleElements" : true,
+    "name" : "DOCUMENT_TRANSFORMER",
+    "required" : false
+  }, {
+    "key" : "embedding",
+    "label" : "Embedding",
+    "multipleElements" : false,
+    "name" : "EMBEDDING",
+    "required" : true
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "The URL of the Weaviate instance.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "url",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : "https://jahgfduszftiq.c0.europe-west3.gcp.weaviate.cloud",
-        "label" : "Weaviate Url",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "The API key for the Weaviate API.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "apiKey",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Weaviate API Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  },
-  "customAction" : null,
-  "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Weaviate VectorStore.",
+    "element" : { },
     "help" : null,
     "name" : "vectorStore",
     "outputDefinition" : null,
     "properties" : null,
     "title" : "Weaviate VectorStore",
     "type" : {
-      "name" : "VECTOR_STORE",
       "key" : "vectorStore",
       "label" : "Vector Store",
       "multipleElements" : false,
+      "name" : "VECTOR_STORE",
       "required" : true
-    },
-    "element" : { }
+    }
   } ],
+  "componentCategories" : [ {
+    "label" : "Artificial Intelligence",
+    "name" : "artificial-intelligence"
+  } ],
+  "connection" : {
+    "authorizationRequired" : null,
+    "authorizations" : [ {
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "description" : null,
+      "detectOn" : null,
+      "name" : "custom",
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "properties" : [ {
+        "advancedOption" : null,
+        "controlType" : "TEXT",
+        "defaultValue" : null,
+        "description" : "The URL of the Weaviate instance.",
+        "displayCondition" : null,
+        "exampleValue" : "https://jahgfduszftiq.c0.europe-west3.gcp.weaviate.cloud",
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "label" : "Weaviate Url",
+        "languageId" : null,
+        "maxLength" : null,
+        "metadata" : { },
+        "minLength" : null,
+        "name" : "url",
+        "options" : null,
+        "optionsDataSource" : null,
+        "placeholder" : null,
+        "regex" : null,
+        "required" : true,
+        "type" : "STRING"
+      }, {
+        "advancedOption" : null,
+        "controlType" : "TEXT",
+        "defaultValue" : null,
+        "description" : "The API key for the Weaviate API.",
+        "displayCondition" : null,
+        "exampleValue" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "label" : "Weaviate API Key",
+        "languageId" : null,
+        "maxLength" : null,
+        "metadata" : { },
+        "minLength" : null,
+        "name" : "apiKey",
+        "options" : null,
+        "optionsDataSource" : null,
+        "placeholder" : null,
+        "regex" : null,
+        "required" : true,
+        "type" : "STRING"
+      } ],
+      "refresh" : null,
+      "refreshOn" : null,
+      "refreshToken" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "title" : null,
+      "tokenUrl" : null,
+      "type" : "CUSTOM"
+    } ],
+    "baseUri" : null,
+    "properties" : null,
+    "test" : null,
+    "version" : 1
+  },
+  "customAction" : null,
+  "customActionHelp" : null,
   "description" : "Weaviate is an open-source vector search engine and database that enables efficient storage, retrieval, and management of high-dimensional data, often used in machine learning and AI applications.",
   "icon" : "path:assets/weaviate.svg",
-  "tags" : null,
   "metadata" : null,
   "name" : "weaviate",
   "resources" : null,
+  "tags" : null,
   "title" : "Weaviate",
   "triggers" : null,
   "unifiedApi" : null,
-  "version" : 1,
-  "actionClusterElementTypes" : {
-    "load" : [ "EMBEDDING" ],
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
-  },
-  "clusterElementType" : [ {
-    "name" : "DOCUMENT_READER",
-    "key" : "documentReader",
-    "label" : "Document Reader",
-    "multipleElements" : false,
-    "required" : true
-  }, {
-    "name" : "DOCUMENT_TRANSFORMER",
-    "key" : "documentTransformer",
-    "label" : "Document Transformer",
-    "multipleElements" : true,
-    "required" : false
-  }, {
-    "name" : "EMBEDDING",
-    "key" : "embedding",
-    "label" : "Embedding",
-    "multipleElements" : false,
-    "required" : true
-  } ]
+  "version" : 1
 }

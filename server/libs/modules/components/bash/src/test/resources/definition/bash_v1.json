@@ -13,7 +13,7 @@
           "advancedOption" : null,
           "controlType" : "TEXT",
           "defaultValue" : null,
-          "description" : "The output of the executed bash commands, including any standard output or error messages generated during execution.",
+          "description" : null,
           "displayCondition" : null,
           "exampleValue" : null,
           "expressionEnabled" : null,
@@ -27,6 +27,7 @@
           "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : null,
           "type" : "STRING"
         },
@@ -37,7 +38,7 @@
         "advancedOption" : null,
         "controlType" : "TEXT",
         "defaultValue" : null,
-        "description" : "The output of the executed bash commands, including any standard output or error messages generated during execution.",
+        "description" : null,
         "displayCondition" : null,
         "exampleValue" : null,
         "expressionEnabled" : null,
@@ -51,6 +52,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : null,
         "type" : "STRING"
       },
@@ -76,6 +78,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : "ls -la",
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     } ],

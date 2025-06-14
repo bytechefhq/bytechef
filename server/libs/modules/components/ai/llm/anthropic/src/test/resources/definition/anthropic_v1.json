@@ -64,6 +64,7 @@
       } ],
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -122,6 +123,7 @@
           } ],
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : true,
           "type" : "STRING"
         }, {
@@ -142,6 +144,7 @@
           "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : true,
           "type" : "STRING"
         }, {
@@ -184,6 +187,7 @@
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
+              "regex" : null,
               "required" : true,
               "type" : "STRING"
             }, {
@@ -204,6 +208,7 @@
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
+              "regex" : null,
               "required" : true,
               "type" : "STRING"
             }, {
@@ -224,6 +229,7 @@
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
+              "regex" : null,
               "required" : true,
               "type" : "STRING"
             }, {
@@ -244,6 +250,7 @@
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
+              "regex" : null,
               "required" : true,
               "type" : "STRING"
             } ],
@@ -338,6 +345,7 @@
         } ],
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : false,
         "type" : "STRING"
       }, {
@@ -358,6 +366,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : false,
         "type" : "STRING"
       } ],
@@ -453,6 +462,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : null,
         "type" : "STRING"
       } ],
@@ -527,6 +537,7 @@
       } ],
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -638,6 +649,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : null,
         "type" : "STRING"
       } ],
@@ -698,6 +710,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : true,
         "type" : "STRING"
       } ],
