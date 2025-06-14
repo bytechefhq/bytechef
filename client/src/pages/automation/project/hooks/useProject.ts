@@ -1,7 +1,9 @@
+import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {Type} from '@/pages/automation/projects/Projects';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
+import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -26,9 +28,11 @@ import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 
 export const useProject = () => {
-    const {setParentId, setParentType, setWorkflow, workflow} = useWorkflowDataStore();
+    const {setWorkflow, workflow} = useWorkflowDataStore();
     const {setCopilotPanelOpen} = useCopilotStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
+    const {setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore();
+    const {setRightSidebarOpen} = useRightSidebarStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
@@ -170,12 +174,12 @@ export const useProject = () => {
     }, [currentWorkflow]);
 
     useEffect(() => {
-        if (projectId) {
-            setParentId(parseInt(projectId!));
+        return () => {
+            setProjectLeftSidebarOpen(false);
 
-            setParentType('PROJECT');
-        }
-    }, [projectId, setParentId, setParentType]);
+            setRightSidebarOpen(false);
+        };
+    }, [setProjectLeftSidebarOpen, setRightSidebarOpen]);
 
     return {
         bottomResizablePanelRef,
@@ -191,6 +195,7 @@ export const useProject = () => {
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
+        useGetComponentDefinitionsQuery,
         useGetConnectionsQuery,
     };
 };

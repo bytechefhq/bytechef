@@ -7,7 +7,7 @@ import {CheckIcon, PenIcon, PlusIcon, TrashIcon} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
-import {useWorkflowMutation} from '../providers/workflowMutationProvider';
+import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import saveRootTaskDispatcher from '../utils/saveRootTaskDispatcher';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
@@ -26,11 +26,11 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {nodes, parentId, parentType, workflow} = useWorkflowDataStore(
+    const {invalidateWorkflowQueries} = useWorkflowEditor();
+
+    const {nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
-            parentId: state.parentId,
-            parentType: state.parentType,
             workflow: state.workflow,
         }))
     );
@@ -58,28 +58,28 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
     const saveBranchChange = useCallback(
         (branchParameters: object) => {
-            if (!parentId || !parentType) {
-                console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
-
-                return;
-            }
-
             if (!workflow.definition || !parentBranchNodeData) {
                 return;
             }
 
             saveRootTaskDispatcher({
+                invalidateWorkflowQueries: invalidateWorkflowQueries!,
                 nodes,
-                parentId,
                 parentNodeData: parentBranchNodeData,
-                parentType,
                 queryClient,
-                updateWorkflowMutation,
+                updateWorkflowMutation: updateWorkflowMutation!,
                 updatedParameters: branchParameters,
                 workflowDefinition: workflow.definition,
             });
         },
-        [nodes, parentBranchNodeData, parentId, parentType, queryClient, updateWorkflowMutation, workflow.definition]
+        [
+            invalidateWorkflowQueries,
+            nodes,
+            parentBranchNodeData,
+            queryClient,
+            updateWorkflowMutation,
+            workflow.definition,
+        ]
     );
 
     const handleCreateCaseClick = useCallback(() => {

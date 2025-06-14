@@ -1,6 +1,6 @@
 import {TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
 import {ComponentDefinition, Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {NodeDataType, PropertyAllType, StructureParentType, TaskDispatcherContextType} from '@/shared/types';
+import {NodeDataType, PropertyAllType, TaskDispatcherContextType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -20,8 +20,7 @@ interface SaveTaskDispatcherSubtaskFieldChangeProps {
     currentNodeIndex: number;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
-    parentId: number;
-    parentType: StructureParentType;
+    invalidateWorkflowQueries: () => void;
     queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, {id: string; workflow: Workflow}, unknown>;
 }
@@ -31,9 +30,7 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     currentNodeIndex,
     currentOperationProperties,
     fieldUpdate,
-    parentId,
-    parentType,
-    queryClient,
+    invalidateWorkflowQueries,
     updateWorkflowMutation,
 }: SaveTaskDispatcherSubtaskFieldChangeProps): void {
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
@@ -191,6 +188,7 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     const recursivelyUpdatedTasks = getRecursivelyUpdatedTasks(workflowDefinitionTasks, updatedTaskDispatcherTask);
 
     saveWorkflowDefinition({
+        invalidateWorkflowQueries,
         onSuccess: () => {
             let commonUpdates: NodeDataType = {
                 componentName,
@@ -224,9 +222,6 @@ export default function saveTaskDispatcherSubtaskFieldChange({
                 name: workflowNodeName || '',
             });
         },
-        parentId,
-        parentType,
-        queryClient,
         taskDispatcherContext,
         updateWorkflowMutation,
         updatedWorkflowTasks: recursivelyUpdatedTasks,

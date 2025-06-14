@@ -1,7 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
-import {StructureParentType} from '@/shared/types';
 import {PlusIcon, SlidersIcon} from 'lucide-react';
 
 import WorkflowInputsDeleteDialog from './WorkflowInputsDeleteDialog';
@@ -10,17 +9,15 @@ import WorkflowInputsTable from './WorkflowInputsTable';
 import useWorkflowInputs from './hooks/useWorkflowInputs';
 
 interface WorkflowInputsSheetProps {
+    invalidateWorkflowQueries: () => void;
     onSheetOpenChange: (open: boolean) => void;
-    parentId: number;
-    parentType: StructureParentType;
     sheetOpen: boolean;
     workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
 const WorkflowInputsSheet = ({
+    invalidateWorkflowQueries,
     onSheetOpenChange,
-    parentId,
-    parentType,
     sheetOpen,
     workflowTestConfiguration,
 }: WorkflowInputsSheetProps) => {
@@ -36,7 +33,7 @@ const WorkflowInputsSheet = ({
         openEditDialog,
         saveWorkflowInput,
         workflow,
-    } = useWorkflowInputs({parentId, parentType, workflowTestConfiguration});
+    } = useWorkflowInputs({invalidateWorkflowQueries, workflowTestConfiguration});
 
     return (
         <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>

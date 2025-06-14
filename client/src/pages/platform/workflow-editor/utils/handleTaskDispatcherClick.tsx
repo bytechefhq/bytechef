@@ -3,7 +3,6 @@ import {
     ClickedDefinitionType,
     NodeDataType,
     PropertyAllType,
-    StructureParentType,
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
@@ -23,8 +22,7 @@ const fallbackIcon = <ComponentIcon className="size-9 text-gray-700" />;
 
 interface HandleTaskDispatcherClickProps {
     edge?: Edge;
-    parentId: number;
-    parentType: StructureParentType;
+    invalidateWorkflowQueries: () => void;
     queryClient: QueryClient;
     sourceNodeId?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
@@ -36,8 +34,7 @@ interface HandleTaskDispatcherClickProps {
 
 export default async function handleTaskDispatcherClick({
     edge,
-    parentId,
-    parentType,
+    invalidateWorkflowQueries,
     queryClient,
     sourceNodeId,
     taskDispatcherContext,
@@ -117,6 +114,7 @@ export default async function handleTaskDispatcherClick({
     }
 
     saveWorkflowDefinition({
+        invalidateWorkflowQueries,
         nodeData: {
             ...newNodeData,
             parameters: config.getInitialParameters(taskDispatcherDefinition?.properties as Array<PropertyAllType>),
@@ -129,10 +127,7 @@ export default async function handleTaskDispatcherClick({
                 queryClient,
                 workflow,
             }),
-        parentId,
-        parentType,
         placeholderId: hasTaskDispatcherId ? undefined : sourceNodeId,
-        queryClient,
         taskDispatcherContext,
         updateWorkflowMutation,
     });

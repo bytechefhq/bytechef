@@ -128,6 +128,7 @@ async function createWorkflowNodeData(
 
 interface SaveDroppedNodeProps {
     captureComponentUsed: (name: string, actionName?: string, triggerName?: string) => void;
+    invalidateWorkflowQueries: () => void;
     nodeData: NodeDataType;
     operationName?: string;
     options?: {
@@ -135,20 +136,16 @@ interface SaveDroppedNodeProps {
         placeholderId?: string;
         taskDispatcherContext?: TaskDispatcherContextType;
     };
-    queryClient: QueryClient;
-    parentId: number;
-    parentType: StructureParentType;
+
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
 async function saveDroppedNode({
     captureComponentUsed,
+    invalidateWorkflowQueries,
     nodeData,
     operationName,
     options,
-    parentId,
-    parentType,
-    queryClient,
     updateWorkflowMutation,
 }: SaveDroppedNodeProps) {
     if (nodeData.trigger) {
@@ -161,60 +158,42 @@ async function saveDroppedNode({
 
     saveWorkflowDefinition({
         ...options,
+        invalidateWorkflowQueries,
         nodeData,
-        parentId,
-        parentType,
-        queryClient,
         updateWorkflowMutation,
     });
 }
 
 export default function useHandleDrop({
-    parentId,
-    parentType,
+    invalidateWorkflowQueries,
 }: {
-    parentId?: number;
-    parentType?: StructureParentType;
+    invalidateWorkflowQueries: () => void;
 }): [
     (targetNode: Node, droppedNode: ClickedDefinitionType) => void,
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
     (droppedNode: ClickedDefinitionType) => void,
 ] {
     const {captureComponentUsed} = useAnalytics();
-    const {updateWorkflowMutation} = useWorkflowMutation();
+    const {updateWorkflowMutation} = useWorkflowEditor();
     const queryClient = useQueryClient();
 
     async function handleDropOnPlaceholderNode(targetNode: Node, droppedNode: ClickedDefinitionType) {
-        if (!parentId || !parentType) {
-            console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
-
-            return;
-        }
-
         const {nodeData, operationName} = await createWorkflowNodeData(droppedNode, queryClient);
 
         await saveDroppedNode({
             captureComponentUsed,
+            invalidateWorkflowQueries,
             nodeData,
             operationName,
             options: {
                 placeholderId: targetNode.id,
                 taskDispatcherContext: getTaskDispatcherContext({node: targetNode}),
             },
-            parentId,
-            parentType,
-            queryClient,
-            updateWorkflowMutation,
+            updateWorkflowMutation: updateWorkflowMutation!,
         });
     }
 
     async function handleDropOnWorkflowEdge(targetEdge: Edge, droppedNode: ClickedDefinitionType) {
-        if (!parentId || !parentType) {
-            console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
-
-            return;
-        }
-
         const {nodes} = useWorkflowDataStore.getState();
         const {nodeData, operationName} = await createWorkflowNodeData(droppedNode, queryClient);
 
@@ -222,36 +201,26 @@ export default function useHandleDrop({
 
         await saveDroppedNode({
             captureComponentUsed,
+            invalidateWorkflowQueries,
             nodeData,
             operationName,
             options: {
                 nodeIndex: insertIndex,
                 taskDispatcherContext: getTaskDispatcherContext({edge: targetEdge, nodes}),
             },
-            parentId,
-            parentType,
-            queryClient,
-            updateWorkflowMutation,
+            updateWorkflowMutation: updateWorkflowMutation!,
         });
     }
 
     async function handleDropOnTriggerNode(droppedNode: ClickedDefinitionType) {
-        if (!parentId || !parentType) {
-            console.error(`Parent "${parentId}" of type "${parentType}" not found.`);
-
-            return;
-        }
-
         const {nodeData, operationName} = await createWorkflowNodeData(droppedNode, queryClient);
 
         await saveDroppedNode({
             captureComponentUsed,
+            invalidateWorkflowQueries,
             nodeData,
             operationName,
-            parentId,
-            parentType,
-            queryClient,
-            updateWorkflowMutation,
+            updateWorkflowMutation: updateWorkflowMutation!,
         });
     }
 

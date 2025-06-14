@@ -24,7 +24,7 @@ export const useWorkflowBuilder = () => {
     const [includeComponents, setIncludeComponents] = useState<string[] | undefined>(undefined);
     const [sharedConnectionIds, setSharedConnectionIds] = useState<number[] | undefined>(undefined);
 
-    const {setParentId, setParentType, setWorkflow, workflow} = useWorkflowDataStore();
+    const {setWorkflow, workflow} = useWorkflowDataStore();
     const {setShowConnectionNote} = useConnectionNoteStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {setRightSidebarOpen} = useRightSidebarStore();
@@ -154,14 +154,6 @@ export const useWorkflowBuilder = () => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connectedUserProjectWorkflow]);
-
-    useEffect(() => {
-        if (connectedUserProjectWorkflow) {
-            setParentId(connectedUserProjectWorkflow.projectId);
-
-            setParentType('PROJECT');
-        }
-    }, [connectedUserProjectWorkflow, setParentId, setParentType]);
 
     return {
         bottomResizablePanelRef,

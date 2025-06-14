@@ -1,11 +1,9 @@
-import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {SPACE} from '@/shared/constants';
 import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {StructureParentType, WorkflowDefinitionType, WorkflowInputType} from '@/shared/types';
+import {WorkflowDefinitionType, WorkflowInputType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -13,18 +11,20 @@ import {useForm} from 'react-hook-form';
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
 
 interface UseWorkflowInputsProps {
-    parentId: number;
-    parentType: StructureParentType;
+    invalidateWorkflowQueries: () => void;
     workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
-export default function useWorkflowInputs({parentId, parentType, workflowTestConfiguration}: UseWorkflowInputsProps) {
+export default function useWorkflowInputs({
+    invalidateWorkflowQueries,
+    workflowTestConfiguration,
+}: UseWorkflowInputsProps) {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const queryClient = useQueryClient();
-    const {updateWorkflowMutation} = useWorkflowMutation();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const {setWorkflow, workflow} = useWorkflowDataStore();
 
@@ -144,7 +144,7 @@ export default function useWorkflowInputs({parentId, parentType, workflowTestCon
             inputs[currentInputIndex] = input;
         }
 
-        updateWorkflowMutation.mutate(
+        updateWorkflowMutation!.mutate(
             {
                 id: workflow.id!,
                 workflow: {
@@ -180,15 +180,7 @@ export default function useWorkflowInputs({parentId, parentType, workflowTestCon
                         inputs,
                     });
 
-                    if (parentType === 'PROJECT') {
-                        queryClient.invalidateQueries({
-                            queryKey: ProjectWorkflowKeys.projectWorkflows(parentId),
-                        });
-                    } else if (parentType === 'INTEGRATION') {
-                        queryClient.invalidateQueries({
-                            queryKey: IntegrationWorkflowKeys.integrationWorkflows(parentId),
-                        });
-                    }
+                    invalidateWorkflowQueries();
                 },
             }
         );
@@ -203,7 +195,7 @@ export default function useWorkflowInputs({parentId, parentType, workflowTestCon
 
         inputs.splice(index, 1);
 
-        updateWorkflowMutation.mutate(
+        updateWorkflowMutation!.mutate(
             {
                 id: workflow.id!,
                 workflow: {
@@ -220,13 +212,7 @@ export default function useWorkflowInputs({parentId, parentType, workflowTestCon
             },
             {
                 onSuccess: () => {
-                    if (parentType === 'PROJECT') {
-                        queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(parentId)});
-                    } else if (parentType === 'INTEGRATION') {
-                        queryClient.invalidateQueries({
-                            queryKey: IntegrationWorkflowKeys.integrationWorkflows(parentId),
-                        });
-                    }
+                    invalidateWorkflowQueries();
 
                     setWorkflow({
                         ...workflow,

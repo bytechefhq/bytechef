@@ -27,7 +27,7 @@ export const useIntegration = ({
 }) => {
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
-    const {setParentId, setParentType, setWorkflow, workflow} = useWorkflowDataStore();
+    const {setWorkflow, workflow} = useWorkflowDataStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
@@ -123,14 +123,6 @@ export const useIntegration = ({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [curWorkflow]);
-
-    useEffect(() => {
-        if (integrationId) {
-            setParentId(integrationId);
-
-            setParentType('INTEGRATION');
-        }
-    }, [integrationId, setParentId, setParentType]);
 
     return {
         bottomResizablePanelRef,

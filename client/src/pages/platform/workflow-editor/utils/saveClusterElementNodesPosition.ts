@@ -1,5 +1,5 @@
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {ClusterElementItemType, StructureParentType, UpdateWorkflowMutationType} from '@/shared/types';
+import {ClusterElementItemType, UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 
 import useClusterElementsDataStore from '../../cluster-element-editor/stores/useClusterElementsDataStore';
@@ -8,17 +8,14 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface SaveClusterElementNodesPositionProps {
-    parentId: number;
-    parentType: StructureParentType;
+    invalidateWorkflowQueries: () => void;
     queryClient: QueryClient;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
 }
 
 export default function saveClusterElementNodesPosition({
-    parentId,
-    parentType,
-    queryClient,
+    invalidateWorkflowQueries,
     updateWorkflowMutation,
     workflow,
 }: SaveClusterElementNodesPositionProps) {
@@ -143,10 +140,8 @@ export default function saveClusterElementNodesPosition({
     }
 
     saveWorkflowDefinition({
+        invalidateWorkflowQueries,
         nodeData: updatedNodeData,
-        parentId,
-        parentType,
-        queryClient,
         updateWorkflowMutation,
     });
 }

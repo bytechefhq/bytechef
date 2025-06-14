@@ -3,7 +3,6 @@ import {
     ClickedOperationType,
     NodeDataType,
     PropertyAllType,
-    StructureParentType,
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
@@ -19,11 +18,10 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleTaskDispatcherSubtaskOperationClickProps {
+    invalidateWorkflowQueries: () => void;
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;
     placeholderId?: string;
-    parentId: number;
-    parentType: StructureParentType;
     queryClient: QueryClient;
     taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -31,10 +29,9 @@ interface HandleTaskDispatcherSubtaskOperationClickProps {
 }
 
 export default function handleTaskDispatcherSubtaskOperationClick({
+    invalidateWorkflowQueries,
     operation,
     operationDefinition,
-    parentId,
-    parentType,
     placeholderId,
     queryClient,
     taskDispatcherContext,
@@ -82,6 +79,7 @@ export default function handleTaskDispatcherSubtaskOperationClick({
     const taskAfterCurrentIndex = workflow.tasks?.length;
 
     saveWorkflowDefinition({
+        invalidateWorkflowQueries,
         nodeData: {
             ...newWorkflowNodeData,
             parameters: getParametersWithDefaultValues({
@@ -95,10 +93,7 @@ export default function handleTaskDispatcherSubtaskOperationClick({
                 queryClient,
                 workflow,
             }),
-        parentId,
-        parentType,
         placeholderId,
-        queryClient,
         taskDispatcherContext,
         updateWorkflowMutation,
     });

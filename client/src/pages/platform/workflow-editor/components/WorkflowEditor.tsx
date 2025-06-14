@@ -10,7 +10,7 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
-import {ClickedDefinitionType, StructureParentType} from '@/shared/types';
+import {ClickedDefinitionType} from '@/shared/types';
 import {Background, BackgroundVariant, Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -38,13 +38,12 @@ type ConditionalWorkflowEditorPropsType =
       }
     | {
           readOnlyWorkflow?: never;
-          parentId: number;
-          parentType: StructureParentType;
       };
 
 type WorkflowEditorPropsType = {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
+    invalidateWorkflowQueries: () => void;
     projectLeftSidebarOpen?: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 };
@@ -52,8 +51,7 @@ type WorkflowEditorPropsType = {
 const WorkflowEditor = ({
     componentDefinitions,
     customCanvasWidth,
-    parentId,
-    parentType,
+    invalidateWorkflowQueries,
     projectLeftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
@@ -81,8 +79,7 @@ const WorkflowEditor = ({
     const {setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop({
-        parentId,
-        parentType,
+        invalidateWorkflowQueries,
     });
 
     const nodeTypes = useMemo(

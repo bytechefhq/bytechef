@@ -4,24 +4,18 @@ import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
-import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
-import {StructureParentType} from '@/shared/types';
 import Editor from '@monaco-editor/react';
-import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
-import {useParams} from 'react-router-dom';
 
 const workflowTestApi = new WorkflowTestApi();
 
 interface WorkflowCodeEditorSheetProps {
+    invalidateWorkflowQueries: () => void;
     onSheetOpenClose: (open: boolean) => void;
-    parentId: number;
-    parentType: StructureParentType;
     runDisabled: boolean;
     sheetOpen: boolean;
     testConfigurationDisabled: boolean;
@@ -30,9 +24,8 @@ interface WorkflowCodeEditorSheetProps {
 }
 
 const WorkflowCodeEditorSheet = ({
+    invalidateWorkflowQueries,
     onSheetOpenClose,
-    parentId,
-    parentType,
     runDisabled,
     sheetOpen,
     testConfigurationDisabled,
@@ -45,11 +38,7 @@ const WorkflowCodeEditorSheet = ({
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
 
-    const {updateWorkflowMutation} = useWorkflowMutation();
-
-    const {projectWorkflowId} = useParams();
-
-    const queryClient = useQueryClient();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const handleRunClick = () => {
         setWorkflowTestExecution(undefined);
@@ -76,7 +65,7 @@ const WorkflowCodeEditorSheet = ({
             try {
                 JSON.parse(definition);
 
-                updateWorkflowMutation.mutate(
+                updateWorkflowMutation!.mutate(
                     {
                         id: workflow.id,
                         workflow: {
@@ -89,15 +78,7 @@ const WorkflowCodeEditorSheet = ({
                         onSuccess: () => {
                             setDirty(false);
 
-                            if (parentType === 'PROJECT' && projectWorkflowId) {
-                                queryClient.invalidateQueries({
-                                    queryKey: ProjectWorkflowKeys.projectWorkflow(parentId, +projectWorkflowId),
-                                });
-                            } else if (parentType === 'INTEGRATION' && workflow.id) {
-                                queryClient.invalidateQueries({
-                                    queryKey: IntegrationWorkflowKeys.integrationWorkflow(parentId, +workflow.id),
-                                });
-                            }
+                            invalidateWorkflowQueries();
                         },
                     }
                 );

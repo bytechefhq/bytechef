@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
-import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {
     ClusterElementDefinitionApi,
     ClusterElementDefinitionBasic,
@@ -36,9 +36,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [clusterElementDefinition, setClusterElementDefinition] = useState<ClusterElementDefinitionBasic[]>([]);
 
     const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {parentId, parentType, workflow} = useWorkflowDataStore();
+    const {workflow} = useWorkflowDataStore();
     const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
         useWorkflowEditorStore();
+
+    const {invalidateWorkflowQueries} = useWorkflowEditor();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -96,23 +98,22 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const queryClient = useQueryClient();
 
-    const {updateWorkflowMutation} = useWorkflowMutation();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const isClusterElement = 'clusterElementType' in data;
 
     const handleDeleteNodeClick = (data: NodeDataType) => {
-        if (data && parentId && parentType) {
+        if (data) {
             handleDeleteTask({
                 clusterElementsCanvasOpen,
                 currentNode,
                 data,
-                parentId,
-                parentType,
+                invalidateWorkflowQueries: invalidateWorkflowQueries!,
                 queryClient,
                 rootClusterElementNodeData,
                 setCurrentNode,
                 setRootClusterElementNodeData,
-                updateWorkflowMutation,
+                updateWorkflowMutation: updateWorkflowMutation!,
                 workflow,
             });
         }

@@ -349,5 +349,3 @@ export type ParallelChildTasksType = {[parallelId: string]: {tasks: string[]}};
 export type WorkflowInputType = WorkflowInput & {
     testValue?: string;
 };
-
-export type StructureParentType = 'INTEGRATION' | 'PROJECT';

@@ -1,16 +1,8 @@
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {
-    BranchCaseType,
-    NodeDataType,
-    StructureParentType,
-    WorkflowDefinitionType,
-    WorkflowTaskType,
-} from '@/shared/types';
+import {BranchCaseType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
@@ -22,8 +14,7 @@ interface HandleDeleteTaskProps {
     clusterElementsCanvasOpen?: boolean;
     currentNode?: NodeDataType;
     data: NodeDataType;
-    parentId: number;
-    parentType: StructureParentType;
+    invalidateWorkflowQueries: () => void;
     queryClient: QueryClient;
     setRootClusterElementNodeData?: (node: NodeDataType) => void;
     setCurrentNode?: (node: NodeDataType) => void;
@@ -35,8 +26,7 @@ export default function handleDeleteTask({
     clusterElementsCanvasOpen,
     currentNode,
     data,
-    parentId,
-    parentType,
+    invalidateWorkflowQueries,
     queryClient,
     rootClusterElementNodeData,
     setCurrentNode,
@@ -266,21 +256,7 @@ export default function handleDeleteTask({
                     }),
                 });
 
-                if (parentType === 'PROJECT') {
-                    queryClient.invalidateQueries({
-                        queryKey: ProjectWorkflowKeys.projectWorkflows(parentId),
-                    });
-
-                    queryClient.invalidateQueries({
-                        queryKey: ProjectWorkflowKeys.workflows,
-                    });
-                }
-
-                if (parentType === 'INTEGRATION') {
-                    queryClient.invalidateQueries({
-                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(parentId),
-                    });
-                }
+                invalidateWorkflowQueries();
 
                 if (currentNode?.name === data.name && !currentNode?.clusterElementType) {
                     useWorkflowNodeDetailsPanelStore.getState().reset();

@@ -9,7 +9,7 @@ import {
     TaskDispatcherDefinition,
     TriggerDefinition,
 } from '@/shared/middleware/platform/configuration';
-import {StructureParentType, UpdateWorkflowMutationType} from '@/shared/types';
+import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
@@ -20,13 +20,12 @@ import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcher
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 
 interface DescriptionTabProps {
+    invalidateWorkflowQueries: () => void;
     nodeDefinition: ComponentDefinition | ClusterElementDefinition | TaskDispatcherDefinition | TriggerDefinition;
-    parentId: number;
-    parentType: StructureParentType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
-const DescriptionTab = ({nodeDefinition, parentId, parentType, updateWorkflowMutation}: DescriptionTabProps) => {
+const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkflowMutation}: DescriptionTabProps) => {
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
     const {nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -56,8 +55,7 @@ const DescriptionTab = ({nodeDefinition, parentId, parentType, updateWorkflowMut
                     field: 'label',
                     value: event.target.value,
                 },
-                parentId,
-                parentType,
+                invalidateWorkflowQueries,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -73,8 +71,7 @@ const DescriptionTab = ({nodeDefinition, parentId, parentType, updateWorkflowMut
                     field: 'label',
                     value: event.target.value,
                 },
-                parentId,
-                parentType,
+                invalidateWorkflowQueries,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -84,6 +81,7 @@ const DescriptionTab = ({nodeDefinition, parentId, parentType, updateWorkflowMut
 
         saveWorkflowDefinition({
             decorative: true,
+            invalidateWorkflowQueries,
             nodeData: {
                 ...currentNode,
                 label: event.target.value,
@@ -103,9 +101,6 @@ const DescriptionTab = ({nodeDefinition, parentId, parentType, updateWorkflowMut
                     label: event.target.value,
                 });
             },
-            parentId,
-            parentType,
-            queryClient,
             updateWorkflowMutation,
         });
     }, 300);
@@ -129,8 +124,7 @@ const DescriptionTab = ({nodeDefinition, parentId, parentType, updateWorkflowMut
                     field: 'description',
                     value: event.target.value,
                 },
-                parentId,
-                parentType,
+                invalidateWorkflowQueries,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -146,8 +140,7 @@ const DescriptionTab = ({nodeDefinition, parentId, parentType, updateWorkflowMut
                     field: 'description',
                     value: event.target.value,
                 },
-                parentId,
-                parentType,
+                invalidateWorkflowQueries,
                 queryClient,
                 updateWorkflowMutation,
             });
@@ -157,6 +150,7 @@ const DescriptionTab = ({nodeDefinition, parentId, parentType, updateWorkflowMut
 
         saveWorkflowDefinition({
             decorative: true,
+            invalidateWorkflowQueries,
             nodeData: {
                 ...currentNode,
                 description: event.target.value,
@@ -176,9 +170,6 @@ const DescriptionTab = ({nodeDefinition, parentId, parentType, updateWorkflowMut
                     description: event.target.value,
                 });
             },
-            parentId,
-            parentType,
-            queryClient,
             updateWorkflowMutation,
         });
     }, 300);

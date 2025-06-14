@@ -1,15 +1,7 @@
 import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {Workflow, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
-import {
-    BranchCaseType,
-    NodeDataType,
-    StructureParentType,
-    TaskDispatcherContextType,
-    WorkflowDefinitionType,
-} from '@/shared/types';
-import {QueryClient, UseMutationResult} from '@tanstack/react-query';
+import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
+import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
@@ -23,13 +15,11 @@ type UpdateWorkflowRequestType = {
 
 interface SaveWorkflowDefinitionProps {
     decorative?: boolean;
+    invalidateWorkflowQueries: () => void;
     nodeData?: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
     placeholderId?: string;
-    parentId: number;
-    parentType: StructureParentType;
-    queryClient: QueryClient;
     taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
     updatedWorkflowTasks?: Array<WorkflowTask>;
@@ -37,13 +27,11 @@ interface SaveWorkflowDefinitionProps {
 
 export default async function saveWorkflowDefinition({
     decorative,
+    invalidateWorkflowQueries,
     nodeData,
     nodeIndex,
     onSuccess,
-    parentId,
-    parentType,
     placeholderId,
-    queryClient,
     taskDispatcherContext,
     updateWorkflowMutation,
     updatedWorkflowTasks,
@@ -86,14 +74,12 @@ export default async function saveWorkflowDefinition({
 
         executeWorkflowMutation({
             definitionUpdate: {triggers: [newTrigger]},
+            invalidateWorkflowQueries,
             onSuccess: () => {
                 if (onSuccess) {
                     onSuccess();
                 }
             },
-            parentId,
-            parentType,
-            queryClient,
             updateWorkflowMutation,
             workflow,
             workflowDefinition,
@@ -230,10 +216,8 @@ export default async function saveWorkflowDefinition({
 
     executeWorkflowMutation({
         definitionUpdate: {tasks: updatedWorkflowDefinitionTasks},
+        invalidateWorkflowQueries,
         onSuccess,
-        parentId,
-        parentType,
-        queryClient,
         updateWorkflowMutation,
         workflow,
         workflowDefinition,
@@ -241,25 +225,21 @@ export default async function saveWorkflowDefinition({
 }
 
 interface ExecuteWorkflowMutationProps {
-    workflow: Workflow;
-    workflowDefinition: WorkflowDefinitionType;
     definitionUpdate: {
         tasks?: Array<WorkflowTask>;
         triggers?: Array<WorkflowTrigger>;
     };
+    invalidateWorkflowQueries: () => void;
     onSuccess?: () => void;
-    parentId: number;
-    parentType: StructureParentType;
-    queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
+    workflow: Workflow;
+    workflowDefinition: WorkflowDefinitionType;
 }
 
 function executeWorkflowMutation({
     definitionUpdate,
+    invalidateWorkflowQueries,
     onSuccess,
-    parentId,
-    parentType,
-    queryClient,
     updateWorkflowMutation,
     workflow,
     workflowDefinition,
@@ -285,14 +265,7 @@ function executeWorkflowMutation({
                     onSuccess();
                 }
 
-                if (parentType === 'PROJECT') {
-                    queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(parentId)});
-                    queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
-                } else if (parentType === 'INTEGRATION') {
-                    queryClient.invalidateQueries({
-                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(parentId),
-                    });
-                }
+                invalidateWorkflowQueries();
             },
         }
     );

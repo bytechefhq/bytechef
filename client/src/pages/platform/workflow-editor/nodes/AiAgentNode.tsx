@@ -37,7 +37,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hasIcons, setHasIcons] = useState(false);
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {parentId, parentType, workflow} = useWorkflowDataStore();
+    const {workflow} = useWorkflowDataStore();
     const {clusterElementsCanvasOpen} = useWorkflowEditorStore();
 
     const iconsList = useMemo(() => {
@@ -86,7 +86,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const queryClient = useQueryClient();
 
-    const {updateWorkflowMutation} = useWorkflowMutation();
+    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
     const isSelected = currentNode?.name === data.name;
 
@@ -101,14 +101,13 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const handleNodeClick = useNodeClickHandler(data, id);
 
     const handleDeleteNodeClick = (data: NodeDataType) => {
-        if (data && parentId && parentType) {
+        if (data) {
             handleDeleteTask({
                 currentNode,
                 data,
-                parentId,
-                parentType,
+                invalidateWorkflowQueries: invalidateWorkflowQueries!,
                 queryClient,
-                updateWorkflowMutation,
+                updateWorkflowMutation: updateWorkflowMutation!,
                 workflow,
             });
         }

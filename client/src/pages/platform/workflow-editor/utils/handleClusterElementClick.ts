@@ -3,7 +3,7 @@ import {
     ClusterElementDefinitionBasic,
     ComponentDefinition,
 } from '@/shared/middleware/platform/configuration';
-import {PropertyAllType, StructureParentType, UpdateWorkflowMutationType} from '@/shared/types';
+import {PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 
 import {initializeClusterElementsObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
@@ -18,8 +18,7 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 interface HandleClusterElementClickProps {
     clickedClusterElementDefinition: ClusterElementDefinition;
     data: ClusterElementDefinitionBasic;
-    parentId: number;
-    parentType: StructureParentType;
+    invalidateWorkflowQueries: () => void;
     queryClient: QueryClient;
     rootClusterElementDefinition: ComponentDefinition;
     setPopoverOpen: (open: boolean) => void;
@@ -29,8 +28,7 @@ interface HandleClusterElementClickProps {
 export default function handleClusterElementClick({
     clickedClusterElementDefinition,
     data,
-    parentId,
-    parentType,
+    invalidateWorkflowQueries,
     queryClient,
     rootClusterElementDefinition,
     setPopoverOpen,
@@ -112,6 +110,7 @@ export default function handleClusterElementClick({
     }
 
     saveWorkflowDefinition({
+        invalidateWorkflowQueries,
         nodeData: updatedNodeData,
         onSuccess: () => {
             handleComponentAddedSuccess({
@@ -120,9 +119,6 @@ export default function handleClusterElementClick({
                 workflow,
             });
         },
-        parentId,
-        parentType,
-        queryClient,
         updateWorkflowMutation,
     });
 

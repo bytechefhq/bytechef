@@ -3,7 +3,7 @@ import defaultNodes from '@/shared/defaultNodes';
 
 /* eslint-disable sort-keys */
 import {ComponentDefinitionBasic, TaskDispatcherDefinition, Workflow} from '@/shared/middleware/platform/configuration';
-import {ComponentOperationType, DataPillType, StructureParentType} from '@/shared/types';
+import {ComponentOperationType, DataPillType} from '@/shared/types';
 import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeChanges} from '@xyflow/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
@@ -26,18 +26,12 @@ interface WorkflowDataStateI {
     setEdges: (edges: Edge[]) => void;
     onEdgesChange: OnEdgesChange;
 
-    parentType: StructureParentType | undefined;
-    setParentType: (parentType: StructureParentType | undefined) => void;
-
     latestComponentDefinition: ComponentDefinitionBasic | null;
     setLatestComponentDefinition: (latestComponentDefinition: ComponentDefinitionBasic | null) => void;
 
     nodes: Node[];
     setNodes: (nodes: Node[]) => void;
     onNodesChange: OnNodesChange;
-
-    parentId: number | undefined;
-    setParentId: (parentId: number | undefined) => void;
 
     reset: () => void;
 
@@ -82,12 +76,6 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                     nodes: applyNodeChanges(changes, get().nodes),
                 });
             },
-
-            parentId: undefined,
-            setParentId: (parentId) => set((state) => ({...state, parentId})),
-
-            parentType: undefined,
-            setParentType: (parentType) => set((state) => ({...state, parentType})),
 
             reset: () =>
                 set(() => ({
