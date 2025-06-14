@@ -7,12 +7,16 @@
 
 package com.bytechef.ee.embedded.connected.user.service;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.repository.ConnectedUserRepository;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -89,5 +93,29 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
         return connectedUserRepository.findAll(
             environment == null ? null : environment.ordinal(), search, createDateFrom, createDateTo, integrationId,
             pageRequest);
+    }
+
+    @Override
+    public void updateConnectedUser(String externalUserId, Environment environment, Map<String, Object> metadata) {
+        ConnectedUser connectedUser = getConnectedUser(externalUserId, environment);
+
+        Map<String, String> filteredMetadata = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : metadata.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (key.equalsIgnoreCase("name") && value instanceof String) {
+                connectedUser.setName((String) value);
+            } else if (key.equalsIgnoreCase("email") && value instanceof String) {
+                connectedUser.setEmail((String) value);
+            } else {
+                filteredMetadata.put(key, value == null ? null : value.toString());
+            }
+        }
+
+        connectedUser.setMetadata(MapUtils.concat(connectedUser.getMetadata(), filteredMetadata));
+
+        connectedUserRepository.save(connectedUser);
     }
 }

@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.connected.user.service;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.constant.Environment;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 
@@ -35,4 +36,6 @@ public interface ConnectedUserService {
     Page<ConnectedUser> getConnectedUsers(
         Environment environment, String name, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
         int pageNumber);
+
+    void updateConnectedUser(String externalUserId, Environment environment, Map<String, Object> metadata);
 }
