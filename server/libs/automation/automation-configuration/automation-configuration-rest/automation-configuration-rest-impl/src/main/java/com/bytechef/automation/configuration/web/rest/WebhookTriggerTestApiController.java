@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest;
+package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
-import com.bytechef.platform.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
 import com.bytechef.platform.constant.ModeType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
+@RestController("com.bytechef.automation.configuration.web.rest.WebhookTriggerTestApiController")
+@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
 @ConditionalOnCoordinator
 public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
@@ -39,10 +39,9 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
     }
 
     @Override
-    public ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
-        Integer modeType, String workflowId) {
+    public ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(String workflowId) {
 
-        String webhookUrl = webhookTriggerTestFacade.enableTrigger(workflowId, ModeType.values()[modeType]);
+        String webhookUrl = webhookTriggerTestFacade.enableTrigger(workflowId, ModeType.AUTOMATION);
 
         return ResponseEntity.ok(
             new StartWebhookTriggerTest200ResponseModel()
@@ -50,8 +49,8 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
     }
 
     @Override
-    public ResponseEntity<Void> stopWebhookTriggerTest(Integer modeType, String workflowId) {
-        webhookTriggerTestFacade.disableTrigger(workflowId, ModeType.values()[modeType]);
+    public ResponseEntity<Void> stopWebhookTriggerTest(String workflowId) {
+        webhookTriggerTestFacade.disableTrigger(workflowId, ModeType.AUTOMATION);
 
         return ResponseEntity.noContent()
             .build();

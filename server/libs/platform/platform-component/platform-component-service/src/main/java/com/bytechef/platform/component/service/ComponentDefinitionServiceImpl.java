@@ -20,6 +20,8 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
+import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,10 +37,15 @@ import org.springframework.stereotype.Service;
 @Service("componentDefinitionService")
 public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
 
+    private final List<ComponentDefinitionFilter> componentDefinitionFilters;
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
     @SuppressFBWarnings("EI2")
-    public ComponentDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
+    public ComponentDefinitionServiceImpl(
+        List<ComponentDefinitionFilter> componentDefinitionFilters,
+        ComponentDefinitionRegistry componentDefinitionRegistry) {
+
+        this.componentDefinitionFilters = componentDefinitionFilters;
         this.componentDefinitionRegistry = componentDefinitionRegistry;
     }
 
@@ -66,10 +73,17 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include,
+        ModeType modeType) {
+
+        ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
+            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(modeType))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + modeType));
 
         List<ComponentDefinition> components = getComponentDefinitions()
             .stream()
+            .filter(componentDefinitionFilter::filter)
             .filter(filter(actionDefinitions, connectionDefinitions, triggerDefinitions, include))
             .distinct()
             .toList();

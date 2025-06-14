@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.component.remote.web.rest.service;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.constant.ModeType;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -56,14 +57,15 @@ public class RemoteComponentDefinitionServiceController {
         @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
         @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
         @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions,
-        @RequestParam(value = "include", required = false) List<String> include) {
+        @RequestParam(value = "include", required = false) List<String> include,
+        @RequestParam(value = "modeType", required = false) ModeType modeType) {
 
         return ResponseEntity.ok(
             actionDefinitions == null && connectionDefinitions == null && triggerDefinitions == null
                 && include == null
                     ? componentDefinitionService.getComponentDefinitions()
                     : componentDefinitionService.getComponentDefinitions(
-                        actionDefinitions, connectionDefinitions, triggerDefinitions, include));
+                        actionDefinitions, connectionDefinitions, triggerDefinitions, include, modeType));
     }
 
     @RequestMapping(

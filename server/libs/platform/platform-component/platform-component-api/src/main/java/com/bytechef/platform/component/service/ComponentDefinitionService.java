@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.service;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.constant.ModeType;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -33,7 +34,8 @@ public interface ComponentDefinitionService {
     List<ComponentDefinition> getComponentDefinitions();
 
     List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include);
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include,
+        ModeType modeType);
 
     List<ComponentDefinition> getComponentDefinitionVersions(String name);
 

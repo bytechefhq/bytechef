@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest;
+package com.bytechef.automation.configuration.web.rest;
 
+import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestTestConfiguration;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
-import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
+import com.bytechef.platform.constant.ModeType;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,9 +38,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @Disabled
-@ContextConfiguration(classes = WorkflowConfigurationRestTestConfiguration.class)
+@ContextConfiguration(classes = AutomationConfigurationRestTestConfiguration.class)
 @WebMvcTest(ComponentDefinitionApiController.class)
-@WorkflowConfigurationRestTestConfigurationSharedMocks
 public class ComponentDefinitionApiControllerIntTest {
 
     @Autowired
@@ -59,7 +58,7 @@ public class ComponentDefinitionApiControllerIntTest {
 
     @Test
     public void testGetComponentDefinitions() {
-        Mockito.when(componentDefinitionService.getComponentDefinitions(null, null, null, null))
+        Mockito.when(componentDefinitionService.getComponentDefinitions(null, null, null, null, ModeType.AUTOMATION))
             .thenReturn(List.of(new ComponentDefinition("component1"), new ComponentDefinition("component2")));
 
         try {

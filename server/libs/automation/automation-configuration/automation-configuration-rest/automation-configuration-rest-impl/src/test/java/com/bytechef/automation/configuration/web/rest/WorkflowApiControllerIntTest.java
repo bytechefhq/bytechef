@@ -28,7 +28,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
-import com.bytechef.automation.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
+import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestTestConfiguration;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
@@ -50,7 +50,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = ProjectConfigurationRestTestConfiguration.class)
+@ContextConfiguration(classes = AutomationConfigurationRestTestConfiguration.class)
 @WebMvcTest(WorkflowApiController.class)
 public class WorkflowApiControllerIntTest {
 

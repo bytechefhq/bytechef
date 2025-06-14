@@ -30,7 +30,7 @@ import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
-import com.bytechef.ee.embedded.configuration.web.rest.config.IntegrationConfigurationRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CategoryModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationModel;
@@ -61,7 +61,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @Disabled
-@ContextConfiguration(classes = IntegrationConfigurationRestTestConfiguration.class)
+@ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
 @WebMvcTest(value = IntegrationApiController.class)
 public class IntegrationApiControllerIntTest {
 

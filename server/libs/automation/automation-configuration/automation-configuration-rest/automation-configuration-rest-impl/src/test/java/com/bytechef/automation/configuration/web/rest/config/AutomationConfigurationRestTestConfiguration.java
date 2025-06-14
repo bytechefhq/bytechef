@@ -28,16 +28,12 @@ import org.springframework.context.annotation.Import;
     "com.bytechef.automation.configuration.web.rest",
     "com.bytechef.automation.configuration.web.rest.adapter",
     "com.bytechef.automation.configuration.web.rest.mapper",
-    "com.bytechef.platform.category.web.rest.adapter",
-    "com.bytechef.platform.category.web.rest.mapper",
     "com.bytechef.platform.configuration.web.rest.adapter",
     "com.bytechef.platform.configuration.web.rest.mapper",
-    "com.bytechef.platform.tag.web.rest.adapter",
-    "com.bytechef.platform.tag.web.rest.mapper",
     "com.bytechef.web.rest.mapper"
 })
 @Configuration
 @Import(JacksonConfiguration.class)
-public class ProjectConfigurationRestTestConfiguration {
+public class AutomationConfigurationRestTestConfiguration {
 
 }
