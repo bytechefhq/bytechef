@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:59.617601+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T16:28:06.599832+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class StringPropertyModel extends ValuePropertyModel {
 
   private @Nullable String languageId;
@@ -46,6 +46,8 @@ public class StringPropertyModel extends ValuePropertyModel {
   private @Nullable Integer maxLength;
 
   private @Nullable Integer minLength;
+
+  private @Nullable String regex;
 
   @Valid
   private List<@Valid OptionModel> options = new ArrayList<>();
@@ -161,6 +163,26 @@ public class StringPropertyModel extends ValuePropertyModel {
 
   public void setMinLength(Integer minLength) {
     this.minLength = minLength;
+  }
+
+  public StringPropertyModel regex(String regex) {
+    this.regex = regex;
+    return this;
+  }
+
+  /**
+   * The regular expression pattern for validation.
+   * @return regex
+   */
+  
+  @Schema(name = "regex", description = "The regular expression pattern for validation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("regex")
+  public String getRegex() {
+    return regex;
+  }
+
+  public void setRegex(String regex) {
+    this.regex = regex;
   }
 
   public StringPropertyModel options(List<@Valid OptionModel> options) {
@@ -280,6 +302,7 @@ public class StringPropertyModel extends ValuePropertyModel {
         Objects.equals(this.exampleValue, stringProperty.exampleValue) &&
         Objects.equals(this.maxLength, stringProperty.maxLength) &&
         Objects.equals(this.minLength, stringProperty.minLength) &&
+        Objects.equals(this.regex, stringProperty.regex) &&
         Objects.equals(this.options, stringProperty.options) &&
         Objects.equals(this.optionsDataSource, stringProperty.optionsDataSource) &&
         super.equals(o);
@@ -287,7 +310,7 @@ public class StringPropertyModel extends ValuePropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(languageId, defaultValue, exampleValue, maxLength, minLength, options, optionsDataSource, super.hashCode());
+    return Objects.hash(languageId, defaultValue, exampleValue, maxLength, minLength, regex, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -300,6 +323,7 @@ public class StringPropertyModel extends ValuePropertyModel {
     sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    maxLength: ").append(toIndentedString(maxLength)).append("\n");
     sb.append("    minLength: ").append(toIndentedString(minLength)).append("\n");
+    sb.append("    regex: ").append(toIndentedString(regex)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
     sb.append("}");
