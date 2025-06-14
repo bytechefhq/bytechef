@@ -10,8 +10,12 @@ tags:
     description: "The Embedded App Event Internal API"
   - name: "category"
     description: "The Embedded Category Internal API"
+  - name: "connection-tag"
+    description: "The Embedded Connection Tag Internal API"
   - name: "connected-user-project-workflow"
     description: "The Embedded Connected User Project Workflow Internal API"
+  - name: "connection"
+    description: "The Embedded Connection Internal API"
   - name: "integration-tag"
     description: "The Embedded Tag Internal API"
   - name: "integration"
@@ -119,6 +123,245 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /connections:
+    get:
+      description: "Get all connections."
+      summary: "Get all connections"
+      tags:
+        - "connection"
+      operationId: "getConnections"
+      parameters:
+        - name: "componentName"
+          description: "The component name used for filtering connections."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "connectionVersion"
+          description: "The connection version."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+        - name: "environment"
+          description: "The environment."
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Environment"
+        - name: "tagId"
+          description: "The tag id of used for filtering connections."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Connection"
+    post:
+      description: "Create a new connection."
+      summary: "Create a new connection"
+      tags:
+        - "connection"
+      operationId: "createConnection"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The connection id."
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+  /connections/tags:
+    get:
+      description: "Get connection tags."
+      summary: "Get connection tags"
+      tags:
+        - "connection-tag"
+      operationId: "getConnectionTags"
+      responses:
+        "200":
+          description: "The list of connection tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
+  /connections/{id}:
+    delete:
+      description: "Delete a connection."
+      summary: "Delete a connection"
+      tags:
+        - "connection"
+      operationId: "deleteConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+    get:
+      description: "Get a connection by id."
+      summary: "Get a connection by id"
+      tags:
+        - "connection"
+      operationId: "getConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Connection"
+    patch:
+      description: "Update an existing connection."
+      summary: "Update an existing connection"
+      tags:
+        - "connection"
+      operationId: "updateConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConnectionRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+  /connections/{id}/tags:
+    put:
+      description: "Updates tags of an existing connection."
+      summary: "Updates tags of an existing connection"
+      tags:
+        - "connection-tag"
+      operationId: "updateConnectionTags"
+      parameters:
+        - name: "id"
+          description: "The id of the connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagsRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+  /connected-users/{connectedUserId}/components/{componentName}/connections:
+    get:
+      description: "Get all connected user's connections."
+      summary: "Get all connected user's connections"
+      tags:
+        - "connection"
+      operationId: "getConnectedUserConnections"
+      parameters:
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "componentName"
+          description: "The component name."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "connectionIds"
+          description: "The list of allowed connection ids."
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "integer"
+              format: "int64"
+      responses:
+        "200":
+          description: "The list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Connection"
+  /connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections:
+    post:
+      description: "Create a new connection for the connected user's project workflow."
+      summary: "Create a new connection for the connected user's project workflow"
+      tags:
+        - "connection"
+      operationId: "createConnectedUserProjectWorkflowConnection"
+      parameters:
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference code."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The connection id."
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
   /connected-user-project-workflows/{workflowReferenceCode}:
     get:
       description: "Get connected user project workflow."
@@ -1084,6 +1327,10 @@ components:
           type: "integer"
         workflow:
           $ref: "../../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+    Connection:
+      $ref: "../../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_base.yaml"
+    UpdateConnectionRequest:
+      $ref: "../../../../../../libs/platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateConnectionRequest"
     Environment:
       $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Integration:

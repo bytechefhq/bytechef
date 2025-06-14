@@ -19,9 +19,11 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     schemaMappings.set(
         mapOf(
             "Category" to "com.bytechef.platform.category.web.rest.model.CategoryModel",
+            "CredentialStatus" to "com.bytechef.platform.connection.web.rest.model.CredentialStatusModel",
             "DataStreamComponent" to "com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel",
             "Page" to "org.springframework.data.domain.Page",
             "Tag" to "TagModel",
+            "UpdateConnectionRequest" to "com.bytechef.platform.connection.web.rest.model.UpdateConnectionRequestModel",
             "UpdateTagsRequest" to "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel",
             "WorkflowConnection" to "com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel",
             "WorkflowFormat" to "com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel",

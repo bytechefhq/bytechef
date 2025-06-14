@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.connection.web.rest;
+package com.bytechef.automation.configuration.web.rest;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

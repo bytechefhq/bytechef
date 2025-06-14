@@ -5,16 +5,16 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.connection.web.rest;
+package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
-import com.bytechef.ee.embedded.connection.web.rest.model.ConnectionModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateConnectionRequestModel;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.ee.embedded.connection.web.rest.ConnectionApiController")
+@RestController("com.bytechef.ee.embedded.configuration.web.rest.ConnectionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnCoordinator
 public class ConnectionApiController implements ConnectionApi {

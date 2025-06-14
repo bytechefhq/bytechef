@@ -18,6 +18,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
+            "AuthorizationType" to "com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel",
             "Page" to "org.springframework.data.domain.Page",
             "Category" to "com.bytechef.ee.embedded.configuration.web.rest.model.CategoryModel",
             "DataStreamComponent" to "com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel",

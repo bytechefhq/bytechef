@@ -8,6 +8,10 @@ servers:
 tags:
   - name: "category"
     description: "The Automation Category API"
+  - name: "connection"
+    description: "The Automation Connection Internal API"
+  - name: "connection-tag"
+    description: "The Automation Connection Tag Internal API"
   - name: "project-deployment-tag"
     description: "The Automation Project Deployment Tag Internal API"
   - name: "project-deployment"
@@ -21,6 +25,130 @@ tags:
   - name: "workspace"
     description: "The Automation Workspace Internal API"
 paths:
+  /connections:
+    post:
+      description: "Create a new connection."
+      summary: "Create a new connection"
+      tags:
+        - "connection"
+      operationId: "createConnection"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The connection id."
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+  /connections/tags:
+    get:
+      description: "Get connection tags."
+      summary: "Get connection tags"
+      tags:
+        - "connection-tag"
+      operationId: "getConnectionTags"
+      responses:
+        "200":
+          description: "The list of connection tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
+  /connections/{id}:
+    delete:
+      description: "Delete a connection."
+      summary: "Delete a connection"
+      tags:
+        - "connection"
+      operationId: "deleteConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+    get:
+      description: "Get a connection by id."
+      summary: "Get a connection by id"
+      tags:
+        - "connection"
+      operationId: "getConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Connection"
+    patch:
+      description: "Update an existing connection."
+      summary: "Update an existing connection"
+      tags:
+        - "connection"
+      operationId: "updateConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConnectionRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+  /connections/{id}/tags:
+    put:
+      description: "Updates tags of an existing connection."
+      summary: "Updates tags of an existing connection"
+      tags:
+        - "connection-tag"
+      operationId: "updateConnectionTags"
+      parameters:
+        - name: "id"
+          description: "The id of the connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagsRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /project-deployments:
     post:
       description: "Create a new project deployment."
@@ -715,6 +843,55 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+  /workspaces/{id}/connections:
+    get:
+      description: "Get all workspace connections."
+      summary: "Get all workspace connections"
+      tags:
+        - "connection"
+      operationId: "getWorkspaceConnections"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "componentName"
+          description: "The component name used for filtering connections."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "connectionVersion"
+          description: "The connection version."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+        - name: "environment"
+          description: "The environment."
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Environment"
+        - name: "tagId"
+          description: "The tag id of used for filtering connections."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Connection"
   /workspaces/{id}/project-deployments:
     get:
       description: "Get project deployments."
@@ -827,6 +1004,16 @@ components:
   schemas:
     Category:
       $ref: "../../../../platform/platform-category/platform-category-rest/platform-category-rest-api/openapi.yaml#/components/schemas/Category"
+    Connection:
+      description: "Contains all required information to open a connection to a service\
+        \ defined by componentName parameter."
+      allOf:
+        - $ref: "../../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_base.yaml"
+        - type: object
+          properties:
+            workspaceId:
+              type: integer
+              format: int64
     Environment:
       $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Project:
@@ -1086,6 +1273,8 @@ components:
           $ref: '#/components/schemas/ProjectStatus'
     Tag:
       $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
+    UpdateConnectionRequest:
+      $ref: "../../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateConnectionRequest"
     UpdateTagsRequest:
       $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
     Workflow:

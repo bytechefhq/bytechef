@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.connection.web.rest;
+package com.bytechef.ee.embedded.configuration.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,8 +13,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.embedded.connection.web.rest.mapper.ConnectionMapper;
-import com.bytechef.ee.embedded.connection.web.rest.model.ConnectionModel;
+import com.bytechef.ee.embedded.configuration.web.rest.mapper.ConnectionMapper;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -299,7 +299,7 @@ public class ConnectionApiControllerIntTest {
             .build();
     }
 
-    @ComponentScan(basePackages = "com.bytechef.ee.embedded.connection.web.rest")
+    @ComponentScan(basePackages = "com.bytechef.ee.embedded.configuration.web.rest")
     @Configuration
     public static class ConnectionRestTestConfiguration {
     }

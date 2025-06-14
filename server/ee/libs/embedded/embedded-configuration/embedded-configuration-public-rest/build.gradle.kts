@@ -17,6 +17,11 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     modelNameSuffix.set("Model")
     modelPackage.set("com.bytechef.ee.embedded.configuration.public_.web.rest.model")
     outputDir.set("$projectDir/generated")
+    schemaMappings.set(
+        mapOf(
+            "AuthorizationType" to "com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel",
+        )
+    )
 }
 
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
@@ -44,6 +49,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:rest:rest-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-api"))
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
 

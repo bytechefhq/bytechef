@@ -7,6 +7,7 @@ dependencies {
     api(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     api(project(":server:libs:platform:platform-category:platform-category-rest:platform-category-rest-api"))
     api(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-api"))
+    api(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-api"))
     api(project(":server:libs:platform:platform-tag:platform-tag-rest:platform-tag-rest-api"))
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")

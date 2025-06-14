@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.connection.web.rest;
+package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
-import com.bytechef.automation.connection.web.rest.model.ConnectionModel;
+import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.automation.connection.web.rest.ConnectionApiController")
+@RestController("com.bytechef.automation.configuration.web.rest.ConnectionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
 @ConditionalOnCoordinator
 public class ConnectionApiController implements ConnectionApi {
