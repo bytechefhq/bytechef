@@ -2852,6 +2852,7 @@ public final class ComponentDsl {
         private List<String> optionsLookupDependsOn;
         private Integer maxLength;
         private Integer minLength;
+        private String regex;
         private List<? extends Option<String>> options;
         private OptionsFunction optionsFunction;
 
@@ -2907,6 +2908,12 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableStringProperty regex(String regex) {
+            this.regex = regex;
+
+            return this;
+        }
+
         @SafeVarargs
         public final ModifiableStringProperty options(Option<String>... options) {
             if (options != null) {
@@ -2945,12 +2952,14 @@ public final class ComponentDsl {
             return controlType == that.controlType
                 && Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(maxLength, that.maxLength) && Objects.equals(minLength, that.minLength)
+                && Objects.equals(regex, that.regex)
                 && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), controlType, optionsLookupDependsOn, maxLength, minLength, options,
+            return Objects.hash(super.hashCode(), controlType, optionsLookupDependsOn, maxLength, minLength, regex,
+                options,
                 optionsFunction);
         }
 
@@ -2980,6 +2989,11 @@ public final class ComponentDsl {
         @Override
         public Optional<Integer> getMinLength() {
             return Optional.ofNullable(minLength);
+        }
+
+        @Override
+        public Optional<String> getRegex() {
+            return Optional.ofNullable(regex);
         }
 
         @Override

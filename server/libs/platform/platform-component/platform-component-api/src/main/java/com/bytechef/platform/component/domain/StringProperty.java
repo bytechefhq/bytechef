@@ -32,6 +32,7 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
     private String languageId;
     private Integer maxLength;
     private Integer minLength;
+    private String regex;
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
 
@@ -44,6 +45,7 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
         this.languageId = OptionalUtils.orElse(stringProperty.getLanguageId(), null);
         this.maxLength = OptionalUtils.orElse(stringProperty.getMaxLength(), null);
         this.minLength = OptionalUtils.orElse(stringProperty.getMinLength(), null);
+        this.regex = OptionalUtils.orElse(stringProperty.getRegex(), null);
         this.options = CollectionUtils.map(
             OptionalUtils.orElse(stringProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
@@ -70,6 +72,11 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
         return minLength;
     }
 
+    @Nullable
+    public String getRegex() {
+        return regex;
+    }
+
     public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
@@ -87,12 +94,13 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
             return false;
         if (!super.equals(o))
             return false;
-        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
+        return Objects.equals(regex, that.regex) && Objects.equals(options, that.options)
+            && Objects.equals(optionsDataSource, that.optionsDataSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), options, optionsDataSource);
+        return Objects.hash(super.hashCode(), regex, options, optionsDataSource);
     }
 
     @Override
@@ -113,6 +121,7 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
             ", options=" + options +
             ", minLength=" + minLength +
             ", maxLength=" + maxLength +
+            ", regex='" + regex + '\'' +
             ", languageId='" + languageId + '\'' +
             "} " + super.toString();
     }

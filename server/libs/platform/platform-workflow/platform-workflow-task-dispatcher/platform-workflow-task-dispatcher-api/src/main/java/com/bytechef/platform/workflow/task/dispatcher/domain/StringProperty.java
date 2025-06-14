@@ -29,6 +29,7 @@ public class StringProperty extends ValueProperty<String> {
 
     private Integer maxLength;
     private Integer minLength;
+    private String regex;
     private List<Option> options;
 
     private StringProperty() {
@@ -41,6 +42,7 @@ public class StringProperty extends ValueProperty<String> {
 
         this.maxLength = OptionalUtils.orElse(stringProperty.getMaxLength(), null);
         this.minLength = OptionalUtils.orElse(stringProperty.getMinLength(), null);
+        this.regex = OptionalUtils.orElse(stringProperty.getRegex(), null);
         this.options = CollectionUtils.map(OptionalUtils.orElse(stringProperty.getOptions(), List.of()), Option::new);
     }
 
@@ -55,6 +57,10 @@ public class StringProperty extends ValueProperty<String> {
 
     public Integer getMinLength() {
         return minLength;
+    }
+
+    public String getRegex() {
+        return regex;
     }
 
     public List<Option> getOptions() {
@@ -75,12 +81,12 @@ public class StringProperty extends ValueProperty<String> {
             return false;
         }
 
-        return Objects.equals(options, that.options);
+        return Objects.equals(regex, that.regex) && Objects.equals(options, that.options);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), options);
+        return Objects.hash(super.hashCode(), regex, options);
     }
 
     @Override
@@ -100,6 +106,7 @@ public class StringProperty extends ValueProperty<String> {
             ", options=" + options +
             ", minLength=" + minLength +
             ", maxLength=" + maxLength +
+            ", regex='" + regex + '\'' +
             "} " + super.toString();
     }
 }

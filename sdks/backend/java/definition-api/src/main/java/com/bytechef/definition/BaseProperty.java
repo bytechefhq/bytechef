@@ -218,6 +218,12 @@ public interface BaseProperty {
          * @return
          */
         Optional<Integer> getMinLength();
+
+        /**
+         *
+         * @return
+         */
+        Optional<String> getRegex();
     }
 
     /**

@@ -1115,6 +1115,7 @@ public final class TaskDispatcherDsl {
         private ControlType controlType;
         private Integer maxLength;
         private Integer minLength;
+        private String regex;
 
         private ModifiableStringProperty() {
             this(null);
@@ -1150,6 +1151,12 @@ public final class TaskDispatcherDsl {
 
         public ModifiableStringProperty minLength(int minLength) {
             this.minLength = minLength;
+
+            return this;
+        }
+
+        public ModifiableStringProperty regex(String regex) {
+            this.regex = regex;
 
             return this;
         }
@@ -1190,6 +1197,11 @@ public final class TaskDispatcherDsl {
         @Override
         public Optional<Integer> getMinLength() {
             return Optional.ofNullable(minLength);
+        }
+
+        @Override
+        public Optional<String> getRegex() {
+            return Optional.ofNullable(regex);
         }
 
         @Override
