@@ -1,5 +1,4 @@
-import {AuthorizationType} from '@/shared/middleware/platform/configuration';
-import {Tag} from '@/shared/middleware/platform/connection';
+import {AuthorizationType, Tag} from '@/shared/middleware/platform/configuration';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {createContext, useContext} from 'react';
 

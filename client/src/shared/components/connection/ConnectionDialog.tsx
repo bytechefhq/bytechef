@@ -27,8 +27,9 @@ import {
     AuthorizationType,
     ComponentDefinition,
     ComponentDefinitionBasic,
+    Environment,
+    Tag,
 } from '@/shared/middleware/platform/configuration';
-import {Environment, Tag} from '@/shared/middleware/platform/connection';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
