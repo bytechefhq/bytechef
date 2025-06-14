@@ -1,8 +1,8 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {Integration, IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {FocusEventHandler} from 'react';
 import InlineSVG from 'react-inlinesvg';
 

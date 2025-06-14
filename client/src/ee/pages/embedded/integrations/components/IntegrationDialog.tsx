@@ -21,13 +21,13 @@ import {
     useCreateIntegrationMutation,
     useUpdateIntegrationMutation,
 } from '@/shared/mutations/embedded/integrations.mutations';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
 import {
     IntegrationCategoryKeys,
     useGetIntegrationCategoriesQuery,
 } from '@/shared/queries/embedded/integrationCategories.queries';
 import {IntegrationTagKeys, useGetIntegrationTagsQuery} from '@/shared/queries/embedded/integrationTags.quries';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import React, {ReactNode, useState} from 'react';

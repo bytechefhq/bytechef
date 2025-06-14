@@ -1,12 +1,8 @@
-import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
-
 /* eslint-disable sort-keys */
 import {
     ComponentDefinition,
     ComponentDefinitionApi,
-    ComponentDefinitionBasic,
     GetComponentDefinitionRequest,
-    GetComponentDefinitionsModeTypeEnum,
     GetConnectionComponentDefinitionRequest,
 } from '@/shared/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
@@ -52,20 +48,3 @@ export const useGetConnectionComponentDefinitionQuery = (
         queryFn: () => new ComponentDefinitionApi().getConnectionComponentDefinition(request),
         enabled: enabled === undefined ? true : enabled,
     });
-
-export const useGetComponentDefinitionsQuery = (request: GetComponentDefinitionsRequestI, enabled?: boolean) => {
-    const {currentType} = useModeTypeStore();
-
-    return useQuery<ComponentDefinitionBasic[], Error>({
-        queryKey: ComponentDefinitionKeys.filteredComponentDefinitions(request),
-        queryFn: () =>
-            new ComponentDefinitionApi().getComponentDefinitions({
-                ...request,
-                modeType:
-                    currentType === ModeType.AUTOMATION
-                        ? GetComponentDefinitionsModeTypeEnum.AUTOMATION
-                        : GetComponentDefinitionsModeTypeEnum.EMBEDDED,
-            }),
-        enabled: enabled === undefined ? true : enabled,
-    });
-};

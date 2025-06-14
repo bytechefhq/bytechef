@@ -6,7 +6,7 @@ import {
     GetConnectionsRequest,
     Tag,
 } from '@/ee/shared/middleware/embedded/configuration';
-import {RequestI} from '@/shared/components/connection/providers/connectionReactQueryProvider';
+import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
