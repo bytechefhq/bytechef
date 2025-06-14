@@ -30,6 +30,7 @@ import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CategoryModel;
@@ -63,6 +64,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @Disabled
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
 @WebMvcTest(value = IntegrationApiController.class)
+@EmbeddedConfigurationRestConfigurationSharedMocks
 public class IntegrationApiControllerIntTest {
 
     @MockitoBean

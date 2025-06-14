@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
+import com.bytechef.platform.configuration.web.rest.config.PlatformConfigurationRestTestConfiguration;
 import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
@@ -38,7 +38,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @Disabled
-@ContextConfiguration(classes = WorkflowConfigurationRestTestConfiguration.class)
+@ContextConfiguration(classes = PlatformConfigurationRestTestConfiguration.class)
 @WebMvcTest(TaskDispatcherDefinitionApiController.class)
 @WorkflowConfigurationRestTestConfigurationSharedMocks
 public class TaskDispatcherDefinitionApiControllerIntTest {

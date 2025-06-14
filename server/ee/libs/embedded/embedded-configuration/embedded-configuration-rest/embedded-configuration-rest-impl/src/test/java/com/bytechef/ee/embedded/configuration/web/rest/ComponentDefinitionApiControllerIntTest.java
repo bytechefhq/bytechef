@@ -16,6 +16,7 @@
 
 package com.bytechef.ee.embedded.configuration.web.rest;
 
+import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -40,6 +41,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @Disabled
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
 @WebMvcTest(ComponentDefinitionApiController.class)
+@EmbeddedConfigurationRestConfigurationSharedMocks
 public class ComponentDefinitionApiControllerIntTest {
 
     @Autowired

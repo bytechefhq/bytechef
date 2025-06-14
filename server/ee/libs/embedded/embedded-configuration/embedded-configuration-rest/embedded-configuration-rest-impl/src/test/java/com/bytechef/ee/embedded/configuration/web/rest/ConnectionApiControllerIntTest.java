@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.ConnectionMapper;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
@@ -48,6 +49,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  */
 @Disabled
 @WebMvcTest(value = ConnectionApiController.class)
+@EmbeddedConfigurationRestConfigurationSharedMocks
 public class ConnectionApiControllerIntTest {
 
     @MockitoBean

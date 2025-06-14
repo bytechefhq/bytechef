@@ -13,6 +13,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.security.util.SecurityUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ public class ConnectedUserApiController implements ConnectedUserApi {
 
     private final ConnectedUserService connectedUserService;
 
+    @SuppressFBWarnings("EI")
     public ConnectedUserApiController(ConnectedUserService connectedUserService) {
         this.connectedUserService = connectedUserService;
     }

@@ -30,6 +30,7 @@ import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.ee.embedded.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
@@ -54,6 +55,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  */
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
 @WebMvcTest(WorkflowApiController.class)
+@EmbeddedConfigurationRestConfigurationSharedMocks
 public class WorkflowApiControllerIntTest {
 
     public static final String DEFINITION = """

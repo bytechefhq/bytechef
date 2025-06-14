@@ -44,7 +44,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public abstract class AbstractPublicApiAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String AUTH_TOKEN_HEADER_NAME = "Authorization";
+    protected static final String AUTH_TOKEN_HEADER_NAME = "Authorization";
 
     private final AuthenticationManager authenticationManager;
     private final RequestMatcher requestMatcher;

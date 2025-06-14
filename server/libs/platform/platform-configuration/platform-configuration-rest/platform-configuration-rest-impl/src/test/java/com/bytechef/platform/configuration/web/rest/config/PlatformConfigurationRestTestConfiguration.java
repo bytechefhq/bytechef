@@ -16,8 +16,6 @@
 
 package com.bytechef.platform.configuration.web.rest.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,12 +26,5 @@ import org.springframework.context.annotation.Configuration;
     "com.bytechef.platform.configuration.web.rest"
 })
 @Configuration
-public class WorkflowConfigurationRestTestConfiguration {
-
-    private final ObjectMapper objectMapper;
-
-    @SuppressFBWarnings("EI")
-    public WorkflowConfigurationRestTestConfiguration(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+public class PlatformConfigurationRestTestConfiguration {
 }

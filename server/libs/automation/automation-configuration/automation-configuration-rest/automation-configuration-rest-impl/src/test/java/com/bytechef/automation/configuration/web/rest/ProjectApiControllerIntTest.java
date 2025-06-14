@@ -29,6 +29,7 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestTestConfiguration;
 import com.bytechef.automation.configuration.web.rest.mapper.ProjectMapper;
 import com.bytechef.automation.configuration.web.rest.model.CategoryModel;
@@ -63,6 +64,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @Disabled
 @ContextConfiguration(classes = AutomationConfigurationRestTestConfiguration.class)
 @WebMvcTest(value = ProjectApiController.class)
+@AutomationConfigurationRestConfigurationSharedMocks
 public class ProjectApiControllerIntTest {
 
     @MockitoBean

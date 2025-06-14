@@ -43,6 +43,7 @@ public class CRLFLogConverter extends CompositeConverter<ILoggingEvent> {
     private static final String[] SAFE_LOGGERS = {
         "org.springframework.boot.autoconfigure",
         "org.springframework.boot.diagnostics",
+        "org.quartz.core",
     };
     private static final Map<String, AnsiElement> ELEMENTS;
 

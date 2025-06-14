@@ -49,6 +49,23 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
+            "controlType" : "DATE_TIME",
+            "defaultValue" : null,
+            "description" : "The date and time when the channel was created.",
+            "displayCondition" : null,
+            "exampleValue" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "label" : null,
+            "metadata" : { },
+            "name" : "createdDateTime",
+            "options" : null,
+            "optionsDataSource" : null,
+            "placeholder" : null,
+            "required" : null,
+            "type" : "DATE_TIME"
+          }, {
+            "advancedOption" : null,
             "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Name of the channel that will appear to the user in Microsoft Teams.",
@@ -89,6 +106,75 @@
             "regex" : null,
             "required" : null,
             "type" : "STRING"
+          }, {
+            "advancedOption" : null,
+            "controlType" : "SELECT",
+            "defaultValue" : null,
+            "description" : "Indicates whether the channel is marked as favorite by default.",
+            "displayCondition" : null,
+            "exampleValue" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "label" : null,
+            "metadata" : { },
+            "name" : "isFavoriteByDefault",
+            "options" : [ {
+              "description" : null,
+              "label" : "True",
+              "value" : true
+            }, {
+              "description" : null,
+              "label" : "False",
+              "value" : false
+            } ],
+            "placeholder" : null,
+            "required" : null,
+            "type" : "BOOLEAN"
+          }, {
+            "advancedOption" : null,
+            "controlType" : "TEXT",
+            "defaultValue" : null,
+            "description" : "URL to access the channel in a web browser.",
+            "displayCondition" : null,
+            "exampleValue" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "label" : null,
+            "languageId" : null,
+            "maxLength" : null,
+            "metadata" : { },
+            "minLength" : null,
+            "name" : "webUrl",
+            "options" : null,
+            "optionsDataSource" : null,
+            "placeholder" : null,
+            "regex" : null,
+            "required" : null,
+            "type" : "STRING"
+          }, {
+            "advancedOption" : null,
+            "controlType" : "SELECT",
+            "defaultValue" : null,
+            "description" : "Indicates whether the channel is archived.",
+            "displayCondition" : null,
+            "exampleValue" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "label" : null,
+            "metadata" : { },
+            "name" : "isArchived",
+            "options" : [ {
+              "description" : null,
+              "label" : "True",
+              "value" : true
+            }, {
+              "description" : null,
+              "label" : "False",
+              "value" : false
+            } ],
+            "placeholder" : null,
+            "required" : null,
+            "type" : "BOOLEAN"
           } ],
           "required" : null,
           "type" : "OBJECT"
@@ -136,6 +222,23 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
+          "controlType" : "DATE_TIME",
+          "defaultValue" : null,
+          "description" : "The date and time when the channel was created.",
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : { },
+          "name" : "createdDateTime",
+          "options" : null,
+          "optionsDataSource" : null,
+          "placeholder" : null,
+          "required" : null,
+          "type" : "DATE_TIME"
+        }, {
+          "advancedOption" : null,
           "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Name of the channel that will appear to the user in Microsoft Teams.",
@@ -176,6 +279,75 @@
           "regex" : null,
           "required" : null,
           "type" : "STRING"
+        }, {
+          "advancedOption" : null,
+          "controlType" : "SELECT",
+          "defaultValue" : null,
+          "description" : "Indicates whether the channel is marked as favorite by default.",
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : { },
+          "name" : "isFavoriteByDefault",
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "placeholder" : null,
+          "required" : null,
+          "type" : "BOOLEAN"
+        }, {
+          "advancedOption" : null,
+          "controlType" : "TEXT",
+          "defaultValue" : null,
+          "description" : "URL to access the channel in a web browser.",
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "languageId" : null,
+          "maxLength" : null,
+          "metadata" : { },
+          "minLength" : null,
+          "name" : "webUrl",
+          "options" : null,
+          "optionsDataSource" : null,
+          "placeholder" : null,
+          "regex" : null,
+          "required" : null,
+          "type" : "STRING"
+        }, {
+          "advancedOption" : null,
+          "controlType" : "SELECT",
+          "defaultValue" : null,
+          "description" : "Indicates whether the channel is archived.",
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : { },
+          "name" : "isArchived",
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "placeholder" : null,
+          "required" : null,
+          "type" : "BOOLEAN"
         } ],
         "required" : null,
         "type" : "OBJECT"
@@ -1096,6 +1268,23 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
+            "controlType" : "DATE_TIME",
+            "defaultValue" : null,
+            "description" : "The date and time when the channel was created.",
+            "displayCondition" : null,
+            "exampleValue" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "label" : null,
+            "metadata" : { },
+            "name" : "createdDateTime",
+            "options" : null,
+            "optionsDataSource" : null,
+            "placeholder" : null,
+            "required" : null,
+            "type" : "DATE_TIME"
+          }, {
+            "advancedOption" : null,
             "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Name of the channel that will appear to the user in Microsoft Teams.",
@@ -1136,6 +1325,75 @@
             "regex" : null,
             "required" : null,
             "type" : "STRING"
+          }, {
+            "advancedOption" : null,
+            "controlType" : "SELECT",
+            "defaultValue" : null,
+            "description" : "Indicates whether the channel is marked as favorite by default.",
+            "displayCondition" : null,
+            "exampleValue" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "label" : null,
+            "metadata" : { },
+            "name" : "isFavoriteByDefault",
+            "options" : [ {
+              "description" : null,
+              "label" : "True",
+              "value" : true
+            }, {
+              "description" : null,
+              "label" : "False",
+              "value" : false
+            } ],
+            "placeholder" : null,
+            "required" : null,
+            "type" : "BOOLEAN"
+          }, {
+            "advancedOption" : null,
+            "controlType" : "TEXT",
+            "defaultValue" : null,
+            "description" : "URL to access the channel in a web browser.",
+            "displayCondition" : null,
+            "exampleValue" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "label" : null,
+            "languageId" : null,
+            "maxLength" : null,
+            "metadata" : { },
+            "minLength" : null,
+            "name" : "webUrl",
+            "options" : null,
+            "optionsDataSource" : null,
+            "placeholder" : null,
+            "regex" : null,
+            "required" : null,
+            "type" : "STRING"
+          }, {
+            "advancedOption" : null,
+            "controlType" : "SELECT",
+            "defaultValue" : null,
+            "description" : "Indicates whether the channel is archived.",
+            "displayCondition" : null,
+            "exampleValue" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "label" : null,
+            "metadata" : { },
+            "name" : "isArchived",
+            "options" : [ {
+              "description" : null,
+              "label" : "True",
+              "value" : true
+            }, {
+              "description" : null,
+              "label" : "False",
+              "value" : false
+            } ],
+            "placeholder" : null,
+            "required" : null,
+            "type" : "BOOLEAN"
           } ],
           "required" : null,
           "type" : "OBJECT"
@@ -1183,6 +1441,23 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
+          "controlType" : "DATE_TIME",
+          "defaultValue" : null,
+          "description" : "The date and time when the channel was created.",
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : { },
+          "name" : "createdDateTime",
+          "options" : null,
+          "optionsDataSource" : null,
+          "placeholder" : null,
+          "required" : null,
+          "type" : "DATE_TIME"
+        }, {
+          "advancedOption" : null,
           "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Name of the channel that will appear to the user in Microsoft Teams.",
@@ -1223,6 +1498,75 @@
           "regex" : null,
           "required" : null,
           "type" : "STRING"
+        }, {
+          "advancedOption" : null,
+          "controlType" : "SELECT",
+          "defaultValue" : null,
+          "description" : "Indicates whether the channel is marked as favorite by default.",
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : { },
+          "name" : "isFavoriteByDefault",
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "placeholder" : null,
+          "required" : null,
+          "type" : "BOOLEAN"
+        }, {
+          "advancedOption" : null,
+          "controlType" : "TEXT",
+          "defaultValue" : null,
+          "description" : "URL to access the channel in a web browser.",
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "languageId" : null,
+          "maxLength" : null,
+          "metadata" : { },
+          "minLength" : null,
+          "name" : "webUrl",
+          "options" : null,
+          "optionsDataSource" : null,
+          "placeholder" : null,
+          "regex" : null,
+          "required" : null,
+          "type" : "STRING"
+        }, {
+          "advancedOption" : null,
+          "controlType" : "SELECT",
+          "defaultValue" : null,
+          "description" : "Indicates whether the channel is archived.",
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : { },
+          "name" : "isArchived",
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "placeholder" : null,
+          "required" : null,
+          "type" : "BOOLEAN"
         } ],
         "required" : null,
         "type" : "OBJECT"
