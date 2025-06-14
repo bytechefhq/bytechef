@@ -5,6 +5,7 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {Settings2Icon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
+import ConnectedUsersLeftSidebarNav from './components/ConnectedUsersLeftSidebarNav';
 
 const AutomationWorkflows = () => {
     const [searchParams] = useSearchParams();
@@ -39,6 +40,7 @@ const AutomationWorkflows = () => {
                         }
                         title="Environments"
                     />
+                    <ConnectedUsersLeftSidebarNav />
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Automation Workflows" />}
