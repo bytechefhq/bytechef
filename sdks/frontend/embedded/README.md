@@ -1,17 +1,17 @@
-# @bytechef-embedded/react
+# @bytechef/embedded-react
 
 ByteChef Embedded React SDK.
 
 ## Installation
 
 ```bash
-npm install @bytechef-embedded/react
+npm install @bytechef/embedded-react
 ```
 
 ## Usage
 
 ```tsx
-import useConnectDialog from '@bytechef-embedded/react';
+import useConnectDialog from '@bytechef/embedded-react';
 
 const Component = () => {
     const {openDialog, closeDialog} = useConnectDialog();
@@ -34,7 +34,7 @@ npm run run watch
 
 ```bash
 cd test-apps/react
-npm link @bytechef-embedded/react
+npm link @bytechef/embedded-react
 npm install
 npm run dev
 ```

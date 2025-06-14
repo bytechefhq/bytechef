@@ -1,4 +1,4 @@
-import {useConnectDialog} from '@bytechef-embedded/react';
+import {useConnectDialog} from '@bytechef/embedded-react';
 import React, { useState, useCallback } from 'react';
 
 function App() {
