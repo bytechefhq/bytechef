@@ -2,7 +2,7 @@ package com.bytechef.ee.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.configuration.web.rest.model.Workflow1Model;
+import com.bytechef.ee.embedded.configuration.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:32:02.287716+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:35:00.658914+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable Long connectedUserId;
@@ -31,7 +31,7 @@ public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable Integer workflowVersion;
 
-  private @Nullable Workflow1Model workflow;
+  private @Nullable WorkflowModel workflow;
 
   public ConnectedUserProjectWorkflowModel connectedUserId(Long connectedUserId) {
     this.connectedUserId = connectedUserId;
@@ -93,7 +93,7 @@ public class ConnectedUserProjectWorkflowModel {
     this.workflowVersion = workflowVersion;
   }
 
-  public ConnectedUserProjectWorkflowModel workflow(Workflow1Model workflow) {
+  public ConnectedUserProjectWorkflowModel workflow(WorkflowModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -105,11 +105,11 @@ public class ConnectedUserProjectWorkflowModel {
   @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")
-  public Workflow1Model getWorkflow() {
+  public WorkflowModel getWorkflow() {
     return workflow;
   }
 
-  public void setWorkflow(Workflow1Model workflow) {
+  public void setWorkflow(WorkflowModel workflow) {
     this.workflow = workflow;
   }
 

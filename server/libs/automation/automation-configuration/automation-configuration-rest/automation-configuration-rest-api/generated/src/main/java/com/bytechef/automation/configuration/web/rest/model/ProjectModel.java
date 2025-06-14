@@ -2,8 +2,9 @@ package com.bytechef.automation.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.automation.configuration.web.rest.model.CategoryModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel;
-import com.bytechef.platform.tag.web.rest.model.TagModel;
+import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -30,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:41:02.320122+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:34:59.863878+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ProjectModel {
 
   private @Nullable String createdBy;
@@ -56,7 +57,7 @@ public class ProjectModel {
 
   private @Nullable Integer lastVersion;
 
-  private @Nullable com.bytechef.platform.category.web.rest.model.CategoryModel category;
+  private @Nullable CategoryModel category;
 
   @Valid
   private List<Long> projectWorkflowIds = new ArrayList<>();
@@ -280,7 +281,7 @@ public class ProjectModel {
     this.lastVersion = lastVersion;
   }
 
-  public ProjectModel category(com.bytechef.platform.category.web.rest.model.CategoryModel category) {
+  public ProjectModel category(CategoryModel category) {
     this.category = category;
     return this;
   }
@@ -292,11 +293,11 @@ public class ProjectModel {
   @Valid 
   @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("category")
-  public com.bytechef.platform.category.web.rest.model.CategoryModel getCategory() {
+  public CategoryModel getCategory() {
     return category;
   }
 
-  public void setCategory(com.bytechef.platform.category.web.rest.model.CategoryModel category) {
+  public void setCategory(CategoryModel category) {
     this.category = category;
   }
 

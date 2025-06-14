@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.connected.user.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.connected.user.web.rest.model.CredentialStatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -22,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:40:58.322958+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:36:10.918665+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ConnectedUserIntegrationInstanceModel {
 
   private @Nullable String componentName;
@@ -39,7 +40,7 @@ public class ConnectedUserIntegrationInstanceModel {
 
   private @Nullable Long connectionId;
 
-  private @Nullable com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus;
+  private @Nullable CredentialStatusModel credentialStatus;
 
   public ConnectedUserIntegrationInstanceModel componentName(String componentName) {
     this.componentName = componentName;
@@ -181,7 +182,7 @@ public class ConnectedUserIntegrationInstanceModel {
     this.connectionId = connectionId;
   }
 
-  public ConnectedUserIntegrationInstanceModel credentialStatus(com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus) {
+  public ConnectedUserIntegrationInstanceModel credentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
     return this;
   }
@@ -193,11 +194,11 @@ public class ConnectedUserIntegrationInstanceModel {
   @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")
-  public com.bytechef.platform.connection.web.rest.model.CredentialStatusModel getCredentialStatus() {
+  public CredentialStatusModel getCredentialStatus() {
     return credentialStatus;
   }
 
-  public void setCredentialStatus(com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus) {
+  public void setCredentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
 

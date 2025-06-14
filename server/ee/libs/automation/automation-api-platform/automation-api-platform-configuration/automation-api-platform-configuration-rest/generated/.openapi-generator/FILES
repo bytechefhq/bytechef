@@ -11,3 +11,6 @@ src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/mode
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/CreateApiClient200ResponseModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/HttpMethodModel.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/TagModel.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/UpdateTagsRequestModel.java
+src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

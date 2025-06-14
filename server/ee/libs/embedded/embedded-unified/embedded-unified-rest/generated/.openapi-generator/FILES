@@ -21,3 +21,4 @@ src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/ListAccountsPa
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/OpportunityModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/PhonesInnerModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/WarningsInnerModel.java
+src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

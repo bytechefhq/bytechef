@@ -3,7 +3,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionEndpointModel;
-import com.bytechef.platform.tag.web.rest.model.TagModel;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:41:01.137288+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:35:00.400192+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ApiCollectionModel {
 
   private @Nullable Integer collectionVersion;

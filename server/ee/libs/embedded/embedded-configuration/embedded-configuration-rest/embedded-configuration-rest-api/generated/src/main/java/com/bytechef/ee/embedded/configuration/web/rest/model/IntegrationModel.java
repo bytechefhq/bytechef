@@ -2,8 +2,9 @@ package com.bytechef.ee.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.web.rest.model.CategoryModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationStatusModel;
-import com.bytechef.platform.tag.web.rest.model.TagModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -30,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:32:02.287716+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:35:00.658914+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class IntegrationModel {
 
   private String componentName;
@@ -62,7 +63,7 @@ public class IntegrationModel {
 
   private @Nullable String name;
 
-  private @Nullable com.bytechef.platform.category.web.rest.model.CategoryModel category;
+  private @Nullable CategoryModel category;
 
   @Valid
   private List<Long> integrationWorkflowIds = new ArrayList<>();
@@ -344,7 +345,7 @@ public class IntegrationModel {
     this.name = name;
   }
 
-  public IntegrationModel category(com.bytechef.platform.category.web.rest.model.CategoryModel category) {
+  public IntegrationModel category(CategoryModel category) {
     this.category = category;
     return this;
   }
@@ -356,11 +357,11 @@ public class IntegrationModel {
   @Valid 
   @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("category")
-  public com.bytechef.platform.category.web.rest.model.CategoryModel getCategory() {
+  public CategoryModel getCategory() {
     return category;
   }
 
-  public void setCategory(com.bytechef.platform.category.web.rest.model.CategoryModel category) {
+  public void setCategory(CategoryModel category) {
     this.category = category;
   }
 

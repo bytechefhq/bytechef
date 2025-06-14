@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -26,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationBasic", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfigurationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:32:02.287716+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:35:00.658914+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class IntegrationInstanceConfigurationBasicModel {
 
   private @Nullable String createdBy;
@@ -53,7 +54,7 @@ public class IntegrationInstanceConfigurationBasicModel {
 
   private String name;
 
-  private com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel authorizationType = null;
+  private @Nullable AuthorizationTypeModel authorizationType;
 
   public IntegrationInstanceConfigurationBasicModel() {
     super();
@@ -286,7 +287,7 @@ public class IntegrationInstanceConfigurationBasicModel {
     this.name = name;
   }
 
-  public IntegrationInstanceConfigurationBasicModel authorizationType(com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel authorizationType) {
+  public IntegrationInstanceConfigurationBasicModel authorizationType(AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
     return this;
   }
@@ -298,11 +299,11 @@ public class IntegrationInstanceConfigurationBasicModel {
   @Valid 
   @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationType")
-  public com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel getAuthorizationType() {
+  public AuthorizationTypeModel getAuthorizationType() {
     return authorizationType;
   }
 
-  public void setAuthorizationType(com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel authorizationType) {
+  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
 

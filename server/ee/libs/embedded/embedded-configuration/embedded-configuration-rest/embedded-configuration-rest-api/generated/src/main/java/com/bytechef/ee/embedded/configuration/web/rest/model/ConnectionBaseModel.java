@@ -5,7 +5,7 @@ import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CredentialStatusModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
-import com.bytechef.platform.tag.web.rest.model.TagModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "connection_base", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("connection_base")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:32:02.287716+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:35:00.658914+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ConnectionBaseModel {
 
   private @Nullable Boolean active;

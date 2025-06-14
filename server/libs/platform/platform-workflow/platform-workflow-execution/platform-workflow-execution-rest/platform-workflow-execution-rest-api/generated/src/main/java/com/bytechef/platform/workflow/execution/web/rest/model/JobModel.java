@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:41:02.383180+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T06:40:05.358162+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class JobModel {
 
   private @Nullable String createdBy;
@@ -84,7 +84,7 @@ public class JobModel {
     
     COMPLETED("COMPLETED");
 
-    private String value;
+    private final String value;
 
     StatusEnum(String value) {
       this.value = value;

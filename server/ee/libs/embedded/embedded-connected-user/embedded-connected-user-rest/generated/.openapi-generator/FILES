@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 README.md
 pom.xml
 src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/ApiUtil.java
@@ -6,3 +7,4 @@ src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/model/ConnectedUs
 src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/model/ConnectedUserModel.java
 src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/model/CredentialStatusModel.java
 src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/model/EnvironmentModel.java
+src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

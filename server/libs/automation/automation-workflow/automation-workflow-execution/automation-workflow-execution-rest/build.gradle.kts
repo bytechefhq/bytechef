@@ -21,7 +21,6 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
             "Category" to "com.bytechef.automation.configuration.web.rest.model.CategoryModel",
             "ComponentConnection" to "com.bytechef.platform.configuration.web.rest.model.ComponentConnection",
             "ComponentDefinitionBasic" to "com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasic",
-            "DataStreamComponent" to "com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel",
             "Environment" to "com.bytechef.automation.configuration.web.rest.model.EnvironmentModel",
             "ExecutionError" to "com.bytechef.platform.workflow.execution.web.rest.model.ExecutionErrorModel",
             "Job" to "com.bytechef.platform.workflow.execution.web.rest.model.JobModel",
@@ -70,6 +69,7 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.org.mapstruct)
     implementation(libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations)
+    implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")

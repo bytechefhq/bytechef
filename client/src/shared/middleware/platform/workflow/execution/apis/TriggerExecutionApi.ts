@@ -29,10 +29,6 @@ export interface GetTriggerExecutionRequest {
     id: number;
 }
 
-export interface GetTriggerExecutionsPageRequest {
-    pageNumber?: number;
-}
-
 /**
  * 
  */
@@ -77,12 +73,8 @@ export class TriggerExecutionApi extends runtime.BaseAPI {
      * Get a page of trigger execution.
      * Get a page of trigger execution
      */
-    async getTriggerExecutionsPageRaw(requestParameters: GetTriggerExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
+    async getTriggerExecutionsPageRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
         const queryParameters: any = {};
-
-        if (requestParameters['pageNumber'] != null) {
-            queryParameters['pageNumber'] = requestParameters['pageNumber'];
-        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -100,8 +92,8 @@ export class TriggerExecutionApi extends runtime.BaseAPI {
      * Get a page of trigger execution.
      * Get a page of trigger execution
      */
-    async getTriggerExecutionsPage(requestParameters: GetTriggerExecutionsPageRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Page> {
-        const response = await this.getTriggerExecutionsPageRaw(requestParameters, initOverrides);
+    async getTriggerExecutionsPage(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Page> {
+        const response = await this.getTriggerExecutionsPageRaw(initOverrides);
         return await response.value();
     }
 

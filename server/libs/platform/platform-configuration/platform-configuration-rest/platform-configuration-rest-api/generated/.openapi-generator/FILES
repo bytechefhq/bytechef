@@ -41,6 +41,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/DateTimePropert
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteWorkflowNodeParameter200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ExecutionErrorModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/FileEntryPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
@@ -66,6 +67,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/SaveWorkflowTes
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ScriptTestExecutionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/StartWebhookTriggerTest200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/StringPropertyModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/TagModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherOperationRequestModel.java
@@ -89,3 +91,4 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTaskMod
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTestConfigurationConnectionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTestConfigurationModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTriggerModel.java
+src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

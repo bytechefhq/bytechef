@@ -8,3 +8,4 @@ src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/Webhook
 src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/WorkflowBasic1Model.java
 src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/WorkflowExecutionBasicModel.java
 src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/WorkflowExecutionModel.java
+src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

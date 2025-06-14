@@ -7,3 +7,4 @@ src/main/java/com/bytechef/automation/workflow/execution/web/rest/model/WebhookR
 src/main/java/com/bytechef/automation/workflow/execution/web/rest/model/WorkflowBasic1Model.java
 src/main/java/com/bytechef/automation/workflow/execution/web/rest/model/WorkflowExecutionBasicModel.java
 src/main/java/com/bytechef/automation/workflow/execution/web/rest/model/WorkflowExecutionModel.java
+src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

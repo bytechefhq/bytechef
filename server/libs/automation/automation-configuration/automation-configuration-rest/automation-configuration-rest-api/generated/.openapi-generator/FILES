@@ -11,6 +11,7 @@ src/main/java/com/bytechef/automation/configuration/web/rest/ProjectTagApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WorkspaceApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/AuthorizationTypeModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ComponentConnectionModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ConnectionBaseModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ConnectionModel.java
@@ -26,8 +27,12 @@ src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectModel.
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectStatusModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectVersionModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/PublishProjectRequestModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/TagModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/UpdateConnectionRequestModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/UpdateTagsRequestModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/Workflow1Model.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkflowBasic1Model.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkflowBasicModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkflowModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkspaceModel.java
+src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

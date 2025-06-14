@@ -22,14 +22,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
             "Page" to "org.springframework.data.domain.Page",
             "ProjectBasic" to "com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel",
             "ProjectDeploymentBasic" to  "com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel",
-            "ProjectStatus" to "com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel",
-            "Tag" to "TagModel",
-            "UpdateTagsRequest" to "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel",
-        )
-    )
-    importMappings.set(
-        mapOf(
-            "TagModel" to "com.bytechef.platform.tag.web.rest.model.TagModel"
+            "ProjectStatus" to "com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel"
         )
     )
 }
@@ -66,7 +59,6 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:rest:rest-api"))
-    implementation(project(":server:libs:platform:platform-tag:platform-tag-rest:platform-tag-rest-api"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
 
     testImplementation("org.springframework:spring-webflux")

@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "CustomComponent", description = "An custom component.")
 @JsonTypeName("CustomComponent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:41:02.309815+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T05:56:49.855655+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class CustomComponentModel {
 
   private @Nullable Integer componentVersion;
@@ -55,7 +55,7 @@ public class CustomComponentModel {
     
     RUBY("RUBY");
 
-    private String value;
+    private final String value;
 
     LanguageEnum(String value) {
       this.value = value;

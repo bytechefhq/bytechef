@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 README.md
 pom.xml
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/ActionApi.java
@@ -13,3 +14,4 @@ src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExecuteT
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExecuteWorkflows400ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/FunctionModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ToolModel.java
+src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

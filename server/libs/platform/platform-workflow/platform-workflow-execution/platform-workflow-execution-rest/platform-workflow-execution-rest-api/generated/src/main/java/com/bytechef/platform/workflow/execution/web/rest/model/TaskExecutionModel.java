@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T06:41:02.383180+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T06:40:05.358162+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -90,7 +90,7 @@ public class TaskExecutionModel {
     
     COMPLETED("COMPLETED");
 
-    private String value;
+    private final String value;
 
     StatusEnum(String value) {
       this.value = value;
