@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:40:13.987216+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T16:32:17.357738+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "component-definition", description = "The Platform Component Definition Internal API")
 public interface ComponentDefinitionApi {
@@ -113,55 +113,6 @@ public interface ComponentDefinitionApi {
     
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitionVersions(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 1 }, { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 1 } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * GET /component-definitions : Get all component definitions
-     * Get all component definitions.
-     *
-     * @param modeType The application mode. (required)
-     * @param actionDefinitions Use for filtering components which define action definitions. (optional)
-     * @param connectionDefinitions Use for filtering components which define connection definitions. (optional)
-     * @param triggerDefinitions Use for filtering components which define trigger definitions. (optional)
-     * @param include The list of component names to include in the result. (optional)
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "getComponentDefinitions",
-        summary = "Get all component definitions",
-        description = "Get all component definitions.",
-        tags = { "component-definition" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ComponentDefinitionBasicModel.class)))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/component-definitions",
-        produces = { "application/json" }
-    )
-    
-    default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
-        @NotNull @Parameter(name = "modeType", description = "The application mode.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "modeType", required = true) Integer modeType,
-        @Parameter(name = "actionDefinitions", description = "Use for filtering components which define action definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
-        @Parameter(name = "connectionDefinitions", description = "Use for filtering components which define connection definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
-        @Parameter(name = "triggerDefinitions", description = "Use for filtering components which define trigger definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions,
-        @Parameter(name = "include", description = "The list of component names to include in the result.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "include", required = false) List<String> include
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

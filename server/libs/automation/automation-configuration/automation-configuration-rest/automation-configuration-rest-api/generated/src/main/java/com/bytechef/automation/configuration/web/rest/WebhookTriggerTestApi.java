@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.platform.configuration.web.rest;
+package com.bytechef.automation.configuration.web.rest;
 
-import com.bytechef.platform.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
+import com.bytechef.automation.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:40:13.987216+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:59:26.399237+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
-@Tag(name = "webhook-trigger-test", description = "the webhook-trigger-test API")
+@Tag(name = "webhook-trigger-test", description = "The Automation Webhook Trigger Internal API")
 public interface WebhookTriggerTestApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -46,7 +46,6 @@ public interface WebhookTriggerTestApi {
      * POST /webhooks/{workflowId}/test/start : Test a webhook trigger
      * Test a webhook trigger.
      *
-     * @param modeType The application mode. (required)
      * @param workflowId The id of a workflow. (required)
      * @return Returns the webhook URL. (status code 200)
      */
@@ -68,7 +67,6 @@ public interface WebhookTriggerTestApi {
     )
     
     default ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
-        @NotNull @Parameter(name = "modeType", description = "The application mode.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "modeType", required = true) Integer modeType,
         @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
     ) {
         getRequest().ifPresent(request -> {
@@ -89,7 +87,6 @@ public interface WebhookTriggerTestApi {
      * POST /webhooks/{workflowId}/test/stop : Test a webhook trigger
      * Test a webhook trigger.
      *
-     * @param modeType The application mode. (required)
      * @param workflowId The id of a workflow. (required)
      * @return Successful operation. (status code 204)
      */
@@ -108,7 +105,6 @@ public interface WebhookTriggerTestApi {
     )
     
     default ResponseEntity<Void> stopWebhookTriggerTest(
-        @NotNull @Parameter(name = "modeType", description = "The application mode.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "modeType", required = true) Integer modeType,
         @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

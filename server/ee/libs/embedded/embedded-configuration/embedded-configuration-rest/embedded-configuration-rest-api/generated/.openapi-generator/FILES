@@ -3,6 +3,7 @@ pom.xml
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/AppEventApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/CategoryApi.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/ComponentDefinitionApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/ConnectedUserProjectWorkflowApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/ConnectionApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/ConnectionTagApi.java
@@ -11,11 +12,14 @@ src/main/java/com/bytechef/ee/embedded/configuration/web/rest/IntegrationInstanc
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/IntegrationInstanceConfigurationApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/IntegrationInstanceConfigurationTagApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/IntegrationTagApi.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/WebhookTriggerTestApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/AppEventModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/AuthorizationTypeModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/CategoryModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentCategoryModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentConnectionModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConnectedUserProjectWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConnectionBaseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConnectionModel.java
@@ -35,6 +39,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/IntegrationS
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/IntegrationVersionModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/PublishConnectedUserProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/PublishIntegrationRequestModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/StartWebhookTriggerTest200ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/TagModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/UpdateConnectionRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/UpdateTagsRequestModel.java

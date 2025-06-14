@@ -2,6 +2,7 @@ package org.openapitools.configuration;
 
 import com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.ControlTypeModel;
+import com.bytechef.platform.configuration.web.rest.model.CredentialStatusModel;
 import com.bytechef.platform.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerTypeModel;
@@ -30,6 +31,15 @@ public class EnumConverterConfiguration {
             @Override
             public ControlTypeModel convert(String source) {
                 return ControlTypeModel.fromValue(source);
+            }
+        };
+    }
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.credentialStatusConverter")
+    Converter<String, CredentialStatusModel> credentialStatusConverter() {
+        return new Converter<String, CredentialStatusModel>() {
+            @Override
+            public CredentialStatusModel convert(String source) {
+                return CredentialStatusModel.fromValue(source);
             }
         };
     }
