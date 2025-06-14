@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/AiProviderApi.ts
 apis/GitConfigurationApi.ts
 apis/index.ts

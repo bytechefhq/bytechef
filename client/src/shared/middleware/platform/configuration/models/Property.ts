@@ -200,7 +200,7 @@ export function PropertyToJSONTyped(value?: Property | null, ignoreDiscriminator
             case 'TIME':
                 return TimePropertyToJSONTyped(value as TimeProperty, ignoreDiscriminator);
             default:
-                throw new Error(`No variant of Property exists with 'type=${value['type']}'`);
+                return value;
         }
     }
 

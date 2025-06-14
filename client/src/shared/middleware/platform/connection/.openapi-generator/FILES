@@ -1,8 +1,0 @@
-index.ts
-models/CredentialStatus.ts
-models/Environment.ts
-models/Tag.ts
-models/UpdateConnectionRequest.ts
-models/UpdateTagsRequest.ts
-models/index.ts
-runtime.ts

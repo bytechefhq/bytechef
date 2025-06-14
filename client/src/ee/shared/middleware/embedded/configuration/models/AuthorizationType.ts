@@ -14,7 +14,7 @@
 
 
 /**
- * Authorization type.
+ * The authorization type.
  * @export
  */
 export const AuthorizationType = {

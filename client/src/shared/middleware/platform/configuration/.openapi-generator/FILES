@@ -40,6 +40,7 @@ models/DateTimeProperty.ts
 models/DeleteWorkflowNodeParameter200Response.ts
 models/DeleteWorkflowNodeParameterRequest.ts
 models/DynamicPropertiesProperty.ts
+models/Environment.ts
 models/ExecutionError.ts
 models/FileEntryProperty.ts
 models/GetOAuth2AuthorizationParametersRequest.ts
@@ -65,6 +66,7 @@ models/SaveWorkflowTestConfigurationInputsRequest.ts
 models/ScriptTestExecution.ts
 models/StartWebhookTriggerTest200Response.ts
 models/StringProperty.ts
+models/Tag.ts
 models/TaskDispatcherDefinition.ts
 models/TaskDispatcherDefinitionBasic.ts
 models/TaskDispatcherOperationRequest.ts

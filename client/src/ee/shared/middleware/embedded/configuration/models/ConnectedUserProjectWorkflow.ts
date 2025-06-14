@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Workflow1 } from './Workflow1';
+import type { Workflow } from './Workflow';
 import {
-    Workflow1FromJSON,
-    Workflow1FromJSONTyped,
-    Workflow1ToJSON,
-    Workflow1ToJSONTyped,
-} from './Workflow1';
+    WorkflowFromJSON,
+    WorkflowFromJSONTyped,
+    WorkflowToJSON,
+    WorkflowToJSONTyped,
+} from './Workflow';
 
 /**
  * 
@@ -47,10 +47,10 @@ export interface ConnectedUserProjectWorkflow {
     workflowVersion?: number;
     /**
      * 
-     * @type {Workflow1}
+     * @type {Workflow}
      * @memberof ConnectedUserProjectWorkflow
      */
-    workflow?: Workflow1;
+    workflow?: Workflow;
 }
 
 /**
@@ -73,7 +73,7 @@ export function ConnectedUserProjectWorkflowFromJSONTyped(json: any, ignoreDiscr
         'connectedUserId': json['connectedUserId'] == null ? undefined : json['connectedUserId'],
         'projectId': json['projectId'] == null ? undefined : json['projectId'],
         'workflowVersion': json['workflowVersion'] == null ? undefined : json['workflowVersion'],
-        'workflow': json['workflow'] == null ? undefined : Workflow1FromJSON(json['workflow']),
+        'workflow': json['workflow'] == null ? undefined : WorkflowFromJSON(json['workflow']),
     };
 }
 
@@ -91,7 +91,7 @@ export function ConnectedUserProjectWorkflowToJSONTyped(value?: ConnectedUserPro
         'connectedUserId': value['connectedUserId'],
         'projectId': value['projectId'],
         'workflowVersion': value['workflowVersion'],
-        'workflow': Workflow1ToJSON(value['workflow']),
+        'workflow': WorkflowToJSON(value['workflow']),
     };
 }
 
