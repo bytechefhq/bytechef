@@ -12,7 +12,7 @@ tags:
     description: "The Embedded Integration Instance Public API"
   - name: "integration-instance-workflow"
     description: "The Embedded Integration Instance Workflow Public API"
-  - name: "automation-workflow"
+  - name: "connected-user-project-workflow"
     description: "The Embedded Automation Workflow Public API"
 paths:
   /automation/workflows:
@@ -20,7 +20,7 @@ paths:
       description: "Get automation workflows for particular external user."
       summary: "Get automation workflows for particular external user"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "getFrontendProjectWorkflows"
       parameters:
         - name: "X-Environment"
@@ -37,12 +37,12 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/AutomationWorkflow"
+                  $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
     post:
       description: "Create new workflow and adds it to an existing integration."
       summary: "Create new workflow and adds it to an existing integration"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "createFrontendProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -75,7 +75,7 @@ paths:
       description: "Delete a workflow."
       summary: "Delete a workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "deleteFrontendProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -97,7 +97,7 @@ paths:
       description: "Get a workflow by workflow reference code."
       summary: "Get a workflow by workflow reference code"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "getFrontendProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -118,12 +118,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AutomationWorkflow"
+                $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
     put:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "updateFrontendProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -158,7 +158,7 @@ paths:
       description: "Enable a workflow."
       summary: "Enable a workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "enableFrontendProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -188,7 +188,7 @@ paths:
       description: "Disable a workflow."
       summary: "Disable a workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "disableFrontendProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -219,7 +219,7 @@ paths:
       description: "Publishes existing workflow."
       summary: "Publishes existing workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "publishFrontendProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -466,7 +466,7 @@ paths:
       description: "Get automation workflows for particular external user."
       summary: "Get automation workflows for particular external user"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "getProjectWorkflows"
       parameters:
         - name: "X-Environment"
@@ -489,12 +489,12 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/AutomationWorkflow"
+                  $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
     post:
       description: "Create new workflow and adds it to an existing integration."
       summary: "Create new workflow and adds it to an existing integration"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "createProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -533,7 +533,7 @@ paths:
       description: "Delete a workflow."
       summary: "Delete a workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "deleteProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -561,7 +561,7 @@ paths:
       description: "Get a workflow by workflow reference code."
       summary: "Get a workflow by workflow reference code"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "getProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -588,12 +588,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AutomationWorkflow"
+                $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
     put:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "updateProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -634,7 +634,7 @@ paths:
       description: "Enable a workflow."
       summary: "Enable a workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "enableProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -670,7 +670,7 @@ paths:
       description: "Disable a workflow."
       summary: "Disable a workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "disableProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -707,7 +707,7 @@ paths:
       description: "Publishes existing workflow."
       summary: "Publishes existing workflow"
       tags:
-        - "automation-workflow"
+        - "connected-user-project-workflow"
       operationId: "publishProjectWorkflow"
       parameters:
         - name: "X-Environment"
@@ -999,7 +999,7 @@ paths:
         - bearerAuth: [ ]
 components:
   schemas:
-    AutomationWorkflow:
+    ConnectedUserProjectWorkflow:
       description: "A group of tasks that make one logical workflow."
       allOf:
         - $ref: "#/components/schemas/Workflow"
