@@ -43,7 +43,7 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
     public ConnectedUserAuthenticationFilter(
         AuthenticationManager authenticationManager, SigningKeyService signingKeyService) {
 
-        super("^/api/embedded/v[0-9]+/.+", authenticationManager);
+        super("^/api/embedded/v[0-9]+/.+|^/api/(?:automation|embedded|platform)/internal/.+", authenticationManager);
 
         this.signingKeyService = signingKeyService;
     }
@@ -51,6 +51,10 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
     @Override
     protected Authentication getAuthentication(HttpServletRequest request) {
         String token = getAuthToken(request);
+
+        if (token == null) {
+            return null;
+        }
 
         Matcher jwtTokenMatcher = JWT_TOKEN_PATTERN.matcher(token);
 
@@ -70,7 +74,6 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
         } else {
             String externalUserId;
             Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
-            TenantKey tenantKey = TenantKey.parse(token);
 
             if (matcher.matches()) {
                 externalUserId = matcher.group(1);
@@ -78,9 +81,22 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
                 throw new IllegalArgumentException("externalUserId parameter is required");
             }
 
+            TenantKey tenantKey = TenantKey.parse(token);
+
             return new ConnectedUserAuthenticationToken(
                 externalUserId, getEnvironment(request), tenantKey.getTenantId());
         }
+    }
+
+    @Override
+    protected String getAuthToken(HttpServletRequest request) {
+        String token = request.getHeader(AUTH_TOKEN_HEADER_NAME);
+
+        if (token == null) {
+            return null;
+        }
+
+        return token.replace("Bearer ", "");
     }
 
     private Jws<Claims> getJws(String secretKey) {

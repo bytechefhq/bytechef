@@ -155,7 +155,8 @@ public class SecurityConfiguration {
                 .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
                 .ignoringRequestMatchers("/api/o/**")
                 .ignoringRequestMatchers("/sse")
-                .ignoringRequestMatchers(request -> request.getHeader("X-JWT-TOKEN") != null));
+                // For internal calls from the embedded workflow builder
+                .ignoringRequestMatchers(request -> request.getHeader("Authorization") != null));
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
             http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
