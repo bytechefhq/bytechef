@@ -20,10 +20,10 @@ import jakarta.annotation.Generated;
  * A group of tasks that make one logical workflow.
  */
 
-@Schema(name = "AutomationWorkflow", description = "A group of tasks that make one logical workflow.")
-@JsonTypeName("AutomationWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:31:59.759754+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class AutomationWorkflowModel {
+@Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
+@JsonTypeName("ConnectedUserProjectWorkflow")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T20:42:01.793515+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable String description;
 
@@ -35,7 +35,7 @@ public class AutomationWorkflowModel {
 
   private @Nullable Integer workflowVersion;
 
-  public AutomationWorkflowModel description(String description) {
+  public ConnectedUserProjectWorkflowModel description(String description) {
     this.description = description;
     return this;
   }
@@ -55,7 +55,7 @@ public class AutomationWorkflowModel {
     this.description = description;
   }
 
-  public AutomationWorkflowModel definition(String definition) {
+  public ConnectedUserProjectWorkflowModel definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -75,7 +75,7 @@ public class AutomationWorkflowModel {
     this.definition = definition;
   }
 
-  public AutomationWorkflowModel label(String label) {
+  public ConnectedUserProjectWorkflowModel label(String label) {
     this.label = label;
     return this;
   }
@@ -95,7 +95,7 @@ public class AutomationWorkflowModel {
     this.label = label;
   }
 
-  public AutomationWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+  public ConnectedUserProjectWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -115,7 +115,7 @@ public class AutomationWorkflowModel {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 
-  public AutomationWorkflowModel workflowVersion(Integer workflowVersion) {
+  public ConnectedUserProjectWorkflowModel workflowVersion(Integer workflowVersion) {
     this.workflowVersion = workflowVersion;
     return this;
   }
@@ -143,12 +143,12 @@ public class AutomationWorkflowModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AutomationWorkflowModel automationWorkflow = (AutomationWorkflowModel) o;
-    return Objects.equals(this.description, automationWorkflow.description) &&
-        Objects.equals(this.definition, automationWorkflow.definition) &&
-        Objects.equals(this.label, automationWorkflow.label) &&
-        Objects.equals(this.workflowReferenceCode, automationWorkflow.workflowReferenceCode) &&
-        Objects.equals(this.workflowVersion, automationWorkflow.workflowVersion);
+    ConnectedUserProjectWorkflowModel connectedUserProjectWorkflow = (ConnectedUserProjectWorkflowModel) o;
+    return Objects.equals(this.description, connectedUserProjectWorkflow.description) &&
+        Objects.equals(this.definition, connectedUserProjectWorkflow.definition) &&
+        Objects.equals(this.label, connectedUserProjectWorkflow.label) &&
+        Objects.equals(this.workflowReferenceCode, connectedUserProjectWorkflow.workflowReferenceCode) &&
+        Objects.equals(this.workflowVersion, connectedUserProjectWorkflow.workflowVersion);
   }
 
   @Override
@@ -159,7 +159,7 @@ public class AutomationWorkflowModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AutomationWorkflowModel {\n");
+    sb.append("class ConnectedUserProjectWorkflowModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");

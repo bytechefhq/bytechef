@@ -5,7 +5,7 @@
  */
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
@@ -35,10 +35,10 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T15:31:59.759754+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-11T20:42:01.793515+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
-@Tag(name = "automation-workflow", description = "The Embedded Automation Workflow Public API")
-public interface AutomationWorkflowApi {
+@Tag(name = "connected-user-project-workflow", description = "The Embedded Automation Workflow Public API")
+public interface ConnectedUserProjectWorkflowApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
@@ -56,7 +56,7 @@ public interface AutomationWorkflowApi {
         operationId = "createFrontendProjectWorkflow",
         summary = "Create new workflow and adds it to an existing integration",
         description = "Create new workflow and adds it to an existing integration.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow reference code.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
@@ -95,7 +95,7 @@ public interface AutomationWorkflowApi {
         operationId = "createProjectWorkflow",
         summary = "Create new workflow and adds it to an existing integration",
         description = "Create new workflow and adds it to an existing integration.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow reference code.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
@@ -134,7 +134,7 @@ public interface AutomationWorkflowApi {
         operationId = "deleteFrontendProjectWorkflow",
         summary = "Delete a workflow",
         description = "Delete a workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
@@ -166,7 +166,7 @@ public interface AutomationWorkflowApi {
         operationId = "deleteProjectWorkflow",
         summary = "Delete a workflow",
         description = "Delete a workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
@@ -199,7 +199,7 @@ public interface AutomationWorkflowApi {
         operationId = "disableFrontendProjectWorkflow",
         summary = "Disable a workflow",
         description = "Disable a workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -236,7 +236,7 @@ public interface AutomationWorkflowApi {
         operationId = "disableProjectWorkflow",
         summary = "Disable a workflow",
         description = "Disable a workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -273,7 +273,7 @@ public interface AutomationWorkflowApi {
         operationId = "enableFrontendProjectWorkflow",
         summary = "Enable a workflow",
         description = "Enable a workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -310,7 +310,7 @@ public interface AutomationWorkflowApi {
         operationId = "enableProjectWorkflow",
         summary = "Enable a workflow",
         description = "Enable a workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -346,10 +346,10 @@ public interface AutomationWorkflowApi {
         operationId = "getFrontendProjectWorkflow",
         summary = "Get a workflow by workflow reference code",
         description = "Get a workflow by workflow reference code.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = AutomationWorkflowModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectedUserProjectWorkflowModel.class))
             })
         }
     )
@@ -359,7 +359,7 @@ public interface AutomationWorkflowApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<AutomationWorkflowModel> getFrontendProjectWorkflow(
+    default ResponseEntity<ConnectedUserProjectWorkflowModel> getFrontendProjectWorkflow(
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
@@ -388,10 +388,10 @@ public interface AutomationWorkflowApi {
         operationId = "getFrontendProjectWorkflows",
         summary = "Get automation workflows for particular external user",
         description = "Get automation workflows for particular external user.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = AutomationWorkflowModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectedUserProjectWorkflowModel.class)))
             })
         }
     )
@@ -401,7 +401,7 @@ public interface AutomationWorkflowApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<AutomationWorkflowModel>> getFrontendProjectWorkflows(
+    default ResponseEntity<List<ConnectedUserProjectWorkflowModel>> getFrontendProjectWorkflows(
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
@@ -431,10 +431,10 @@ public interface AutomationWorkflowApi {
         operationId = "getProjectWorkflow",
         summary = "Get a workflow by workflow reference code",
         description = "Get a workflow by workflow reference code.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = AutomationWorkflowModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectedUserProjectWorkflowModel.class))
             })
         }
     )
@@ -444,7 +444,7 @@ public interface AutomationWorkflowApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<AutomationWorkflowModel> getProjectWorkflow(
+    default ResponseEntity<ConnectedUserProjectWorkflowModel> getProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
@@ -475,10 +475,10 @@ public interface AutomationWorkflowApi {
         operationId = "getProjectWorkflows",
         summary = "Get automation workflows for particular external user",
         description = "Get automation workflows for particular external user.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = AutomationWorkflowModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectedUserProjectWorkflowModel.class)))
             })
         }
     )
@@ -488,7 +488,7 @@ public interface AutomationWorkflowApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<AutomationWorkflowModel>> getProjectWorkflows(
+    default ResponseEntity<List<ConnectedUserProjectWorkflowModel>> getProjectWorkflows(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
@@ -519,7 +519,7 @@ public interface AutomationWorkflowApi {
         operationId = "publishFrontendProjectWorkflow",
         summary = "Publishes existing workflow",
         description = "Publishes existing workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -557,7 +557,7 @@ public interface AutomationWorkflowApi {
         operationId = "publishProjectWorkflow",
         summary = "Publishes existing workflow",
         description = "Publishes existing workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -595,7 +595,7 @@ public interface AutomationWorkflowApi {
         operationId = "updateFrontendProjectWorkflow",
         summary = "Update an existing workflow",
         description = "Update an existing workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
@@ -633,7 +633,7 @@ public interface AutomationWorkflowApi {
         operationId = "updateProjectWorkflow",
         summary = "Update an existing workflow",
         description = "Update an existing workflow.",
-        tags = { "automation-workflow" },
+        tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         },

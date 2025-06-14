@@ -1,12 +1,13 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/ApiUtil.java
-src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/AutomationWorkflowApi.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/ConnectedUserApi.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/ConnectedUserProjectWorkflowApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/IntegrationApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/IntegrationInstanceApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/IntegrationInstanceWorkflowApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AuthorizationTypeModel.java
-src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AutomationWorkflowModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ConnectedUserProjectWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ConnectionConfigModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendIntegrationInstanceRequestConnectionModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendIntegrationInstanceRequestModel.java
