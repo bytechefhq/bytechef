@@ -32,10 +32,10 @@ interface ConnectionDialogHookReturnType {
     openDialog: () => void;
 }
 
-function createApiClient(baseUrl: string, jwtToken: string) {
+function createApiClient(baseUrl: string, environment: string, jwtToken: string) {console.log(jwtToken)
     const defaultHeaders = {
         Authorization: `Bearer ${jwtToken}`,
-        'x-environment': 'development',
+        'X-Environment': environment,
         'Content-Type': 'application/json',
     };
 
@@ -95,12 +95,14 @@ function debounce<T extends (...args: unknown[]) => unknown>(fn: T, delay: numbe
 
 interface UseConnectDialogProps {
     baseUrl?: string;
+    environment?: string;
     integrationId: string;
     jwtToken: string;
 }
 
 export default function useConnectDialog({
-    baseUrl = 'http://localhost:9555',
+    baseUrl = 'https://app.bytechef.io',
+    environment = 'PRODUCTION',
     integrationId,
     jwtToken,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
@@ -117,7 +119,7 @@ export default function useConnectDialog({
     const rootRef = useRef<ReturnType<typeof createRoot> | null>(null);
     const formSubmitRef = useRef<FormSubmitHandler | null>(null);
 
-    const {fetch} = useMemo(() => createApiClient(baseUrl, jwtToken), [baseUrl, jwtToken]);
+    const {fetch} = useMemo(() => createApiClient(baseUrl, environment, jwtToken), [baseUrl, environment, jwtToken]);
 
     const registerFormSubmit = useCallback<RegisterFormSubmitFunction>((submitFn) => {
         formSubmitRef.current = submitFn;

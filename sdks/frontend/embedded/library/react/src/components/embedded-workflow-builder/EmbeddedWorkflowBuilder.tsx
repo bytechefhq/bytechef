@@ -68,7 +68,7 @@ interface EmbeddedWorkflowBuilderProps {
  */
 
 const EmbeddedWorkflowBuilder = ({
-    baseUrl = 'http://127.0.0.1:5173',
+    baseUrl = 'https://app.bytechef.io',
     connectionDialogAllowed,
     environment = 'PRODUCTION',
     includeComponents,
