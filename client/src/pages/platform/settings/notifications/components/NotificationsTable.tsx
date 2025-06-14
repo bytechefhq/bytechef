@@ -11,7 +11,7 @@ const NotificationsTable = ({columns, notifications}: {columns: []; notification
     });
 
     return (
-        <div className="px-4">
+        <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (

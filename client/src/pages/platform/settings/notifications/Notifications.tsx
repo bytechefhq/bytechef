@@ -4,6 +4,7 @@ import {Button} from '@/components/ui/button';
 import NotificationDialog from '@/pages/platform/settings/notifications/components/NotificationDialog';
 import NotificationsTable from '@/pages/platform/settings/notifications/components/NotificationsTable';
 import Header from '@/shared/layout/Header';
+import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Link2Icon, PlusIcon} from 'lucide-react';
 import {UseFormReturn} from 'react-hook-form';
 
@@ -28,23 +29,28 @@ const Notifications = () => {
     } = useNotifications();
 
     return (
-        <>
-            <Header
-                centerTitle
-                position="main"
-                right={
-                    <Button
-                        className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover"
-                        onClick={() => openEditDialog()}
-                    >
-                        <PlusIcon /> New Notification
-                    </Button>
-                }
-                title="Notifications"
-            />
-
+        <LayoutContainer
+            header={
+                <Header
+                    centerTitle
+                    position="main"
+                    right={
+                        <Button
+                            className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover"
+                            onClick={() => openEditDialog()}
+                        >
+                            <PlusIcon /> New Notification
+                        </Button>
+                    }
+                    title="Notifications"
+                />
+            }
+            leftSidebarOpen={false}
+        >
             <PageLoader errors={[notificationsError]} loading={isNotificationsLoading}>
-                {!notificationsData?.length && (
+                {notificationsData && notificationsData?.length > 0 ? (
+                    <NotificationsTable columns={columns as []} notifications={notificationsData!} />
+                ) : (
                     <EmptyList
                         button={
                             <Button
@@ -59,8 +65,6 @@ const Notifications = () => {
                         title="No Notifications"
                     />
                 )}
-
-                <NotificationsTable columns={columns as []} notifications={notificationsData!} />
             </PageLoader>
 
             {isEditDialogOpen && (
@@ -87,7 +91,7 @@ const Notifications = () => {
                     selectedNotification={selectedNotification}
                 />
             )}
-        </>
+        </LayoutContainer>
     );
 };
 
