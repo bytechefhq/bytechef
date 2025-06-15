@@ -8,7 +8,7 @@
 package com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper;
 
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiClient;
-import com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config.EeAutomationApiPlatformConfigurationMapperSpringConfig;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config.ApiPlatformConfigurationMapperSpringConfig;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiClientModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -20,7 +20,7 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Ivica Cardic
  */
-@Mapper(config = EeAutomationApiPlatformConfigurationMapperSpringConfig.class)
+@Mapper(config = ApiPlatformConfigurationMapperSpringConfig.class)
 public interface ApiClientMapper extends Converter<ApiClient, ApiClientModel> {
 
     @Override
