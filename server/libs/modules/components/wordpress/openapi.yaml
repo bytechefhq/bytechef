@@ -1,0 +1,1335 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Wordpress"
+  description: "WordPress is a web content management system."
+  version: "v1"
+servers:
+  - url: "{domain}/wp-json"
+paths:
+  /wp/v2/posts/{postId}:
+    put:
+      summary: "Update Post"
+      description: "Update a post."
+      operationId: "updatePost"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "postId"
+          description: "ID of the post that will be fetched."
+          in: "path"
+          required: true
+          schema:
+            title: "Post ID"
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Post"
+              type: "object"
+              properties:
+                title:
+                  type: "string"
+                  title: "Title"
+                  description: "Title of the post."
+                content:
+                  type: "string"
+                  title: "Content"
+                  description: "Content of the post, uses the WordPress Text Editor which supports HTML."
+                status:
+                  type: "string"
+                  title: "Status"
+                  description: "Status of the post."
+                  enum:
+                    - "publish"
+                    - "future"
+                    - "draft"
+                    - "pending"
+                    - "private"
+                slug:
+                  type: "string"
+                  title: "Slug"
+                  description: "Slug of the post identifier."
+                categories:
+                  type: "array"
+                  title: "Categories"
+                  description: "Categories of the post."
+                  x-dynamic-options: true
+                  items:
+                    type: "integer"
+                comment_status:
+                  type: "string"
+                  title: "Enable Comments"
+                  description: "Enable comments on the post."
+                  enum:
+                    - "open"
+                    - "closed"
+                ping_status:
+                  type: "string"
+                  title: "Open to Pinging"
+                  description: "Enable pinging on the post."
+                  enum:
+                    - "open"
+                    - "closed"
+      responses:
+        200:
+          description: "Post fetched."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "Unique identifier for the post."
+                  date:
+                    type: "string"
+                    description: "The date the post was published, in the site's timezone."
+                  date_gmt:
+                    type: "string"
+                    description: "The date the post was published, in GMT."
+                  guid:
+                    type: "object"
+                    description: "The globally unique identifier for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "GUID for the post, as rendered in HTML."
+                      raw:
+                        type: "string"
+                        description: "GUID for the post, raw."
+                  modified:
+                    type: "string"
+                    description: "The date the post was last modified, in the site's timezone."
+                  modified_gmt:
+                    type: "string"
+                    description: "The date the post was last modified, in GMT."
+                  password:
+                    type: "string"
+                    description: "Password for accessing the post."
+                  slug:
+                    type: "string"
+                    description: "An alphanumeric identifier for the post unique to its type."
+                  status:
+                    type: "string"
+                    enum: [ "publish", "future", "draft", "pending", "private" ]
+                    description: "The publication status of the post."
+                  type:
+                    type: "string"
+                    description: "Type of the object (post)."
+                  link:
+                    type: "string"
+                    format: "uri"
+                    description: "URL to the post."
+                  title:
+                    type: "object"
+                    description: "The title for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered title of the post."
+                      raw:
+                        type: "string"
+                        description: "Raw title of the post."
+                  content:
+                    type: "object"
+                    description: "The content for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered content of the post."
+                      raw:
+                        type: "string"
+                        description: "Raw content of the post."
+                      protected:
+                        type: "boolean"
+                        description: "Whether the content is protected with a password."
+                      block_version:
+                        type: "integer"
+                        description: "Block version of the post content."
+                  excerpt:
+                    type: "object"
+                    description: "The excerpt for the post."
+                    properties:
+                      raw:
+                        type: "string"
+                        description: "Raw excerpt of the post."
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered excerpt of the post."
+                      protected:
+                        type: "boolean"
+                        description: "Whether the excerpt is protected with a password."
+                  author:
+                    type: "integer"
+                    description: "The ID for the author of the post."
+                  "featured_media":
+                    type: "integer"
+                    description: "The ID of the featured media for the post."
+                  "comment_status":
+                    type: "string"
+                    enum: [ "open", "closed" ]
+                    description: "Whether comments are allowed for the post."
+                  "ping_status":
+                    type: "string"
+                    enum: [ "open", "closed" ]
+                    description: "Whether pingbacks or trackbacks are allowed."
+                  sticky:
+                    type: "boolean"
+                    description: "Weather the post is pinned to the top of the page."
+                  template:
+                    type: "string"
+                    description: "The theme file used to display the post."
+                  format:
+                    type: "string"
+                    description: "The format of the post."
+                  meta:
+                    type: "object"
+                    description: "Meta fields associated with the post."
+                    properties:
+                      footnotes:
+                        type: "string"
+                        description: "Footnotes of the post."
+                  categories:
+                    type: "array"
+                    description: "Categories of the post."
+                    items:
+                      type: "integer"
+                  tags:
+                    type: "array"
+                    description: "Tags of the post."
+                    items:
+                      type: "string"
+                  permalink_template:
+                    type: "string"
+                    description: "Permalink template of the post."
+                  generated_slug:
+                    type: "string"
+                    description: "Generated slug of the post."
+                  class_list:
+                    type: "array"
+                    description: "Class list of the post."
+                    items:
+                      type: "string"
+                  _links:
+                    type: "object"
+                    description: "Links to other related resources."
+                    properties:
+                      self:
+                        type: "array"
+                        description: "Link to the current post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            targetHints:
+                              type: "object"
+                              description: "Target hints of the post."
+                              properties:
+                                allow:
+                                  type: "array"
+                                  items:
+                                    type: "string"
+                      collection:
+                        type: "array"
+                        description: "Link to the collection this post belongs to."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      about:
+                        type: "array"
+                        description: "Link to the schema definition."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      author:
+                        type: "array"
+                        description: "Link to the author of the post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      replies:
+                        type: "array"
+                        description: "Link to comments or replies for this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      version-history:
+                        type: "array"
+                        description: "Link to the version history of this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            count:
+                              type: "integer"
+                              description: "Count of the versions."
+                      predecessor-version:
+                        type: "array"
+                        description: "Predecessor version of this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            id:
+                              type: "integer"
+                              description: "id of the predecessor version."
+                      wp:attachment:
+                        type: "array"
+                        description: "Link to media items attached to this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:term:
+                        type: "array"
+                        description: "Terms of this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            taxonomy:
+                              type: "string"
+                              description: "Taxonomy of the term."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      wp:action-publish:
+                        type: "array"
+                        description: "Action link to publish this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-unfiltered-html:
+                        type: "array"
+                        description: "Action link for unfiltered HTML editing."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-sticky:
+                        type: "array"
+                        description: "Link to top of this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-assign-author:
+                        type: "array"
+                        description: "Action link to assign a new author to this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-create-categories:
+                        type: "array"
+                        description: "Action link to create a new category for this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-assign-categories:
+                        type: "array"
+                        description: "Action link to assign a new category to this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-assign-tags:
+                        type: "array"
+                        description: "Action link to assign a new tag to this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-create-tags:
+                        type: "array"
+                        description: "Action link to create a new tag for this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      curies:
+                        type: "array"
+                        description: "Compact URIs to identify WordPress REST namespaces."
+                        items:
+                          type: "object"
+                          properties:
+                            name:
+                              type: "string"
+                              description: "Namespace prefix."
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "Templated URI to the namespace documentation."
+                            templated:
+                              type: "boolean"
+                              description: "Whether the link is templated."
+    get:
+      summary: "Get Post"
+      description: "Get a post by post ID."
+      operationId: "getPost"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "postId"
+          description: "ID of the post that will be fetched."
+          in: "path"
+          required: true
+          schema:
+            title: "Post ID"
+            type: "string"
+      responses:
+        200:
+          description: "Post fetched."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "Unique identifier for the post."
+                  date:
+                    type: "string"
+                    description: "The date the post was published, in the site's timezone."
+                  date_gmt:
+                    type: "string"
+                    description: "The date the post was published, in GMT."
+                  guid:
+                    type: "object"
+                    description: "The globally unique identifier for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "GUID for the post, as rendered in HTML."
+                  modified:
+                    type: "string"
+                    description: "The date the post was last modified, in the site's timezone."
+                  modified_gmt:
+                    type: "string"
+                    description: "The date the post was last modified, in GMT."
+                  slug:
+                    type: "string"
+                    description: "An alphanumeric identifier for the post unique to its type."
+                  status:
+                    type: "string"
+                    enum: [ "publish", "future", "draft", "pending", "private" ]
+                    description: "The publication status of the post."
+                  type:
+                    type: "string"
+                    description: "Type of the object (post)."
+                  link:
+                    type: "string"
+                    description: "URL to the post."
+                  title:
+                    type: "object"
+                    description: "The title for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered title of the post."
+                      raw:
+                        type: "string"
+                        description: "Raw title of the post."
+                  content:
+                    type: "object"
+                    description: "The content for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered content of the post."
+                      protected:
+                        type: "boolean"
+                        description: "Whether the content is protected with a password."
+                  excerpt:
+                    type: "object"
+                    description: "The excerpt for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered excerpt of the post."
+                      protected:
+                        type: "boolean"
+                        description: "Whether the excerpt is protected with a password."
+                  author:
+                    type: "integer"
+                    description: "The ID for the author of the post."
+                  featured_media:
+                    type: "integer"
+                    description: "The ID of the featured media for the post."
+                  comment_status:
+                    type: "string"
+                    enum: [ "open", "closed" ]
+                    description: "Whether comments are allowed for the post."
+                  ping_status:
+                    type: "string"
+                    enum: [ "open", "closed" ]
+                    description: "Whether pingbacks or trackbacks are allowed."
+                  sticky:
+                    type: "boolean"
+                    description: "Weather the post is pinned to the top of the page."
+                  template:
+                    type: "string"
+                    description: "The theme file used to display the post."
+                  format:
+                    type: "string"
+                    description: "The format of the post."
+                  meta:
+                    type: "object"
+                    description: "Meta fields associated with the post."
+                    properties:
+                      footnotes:
+                        type: "string"
+                        description: "Footnotes of the post."
+                  categories:
+                    type: "array"
+                    description: "Categories of the post."
+                    items:
+                      type: "integer"
+                  tags:
+                    type: "array"
+                    description: "Tags of the post."
+                    items:
+                      type: "string"
+                  class_list:
+                    type: "array"
+                    description: "Class list of the post."
+                    items:
+                      type: "string"
+                  _links:
+                    type: "object"
+                    description: "Links to other related resources."
+                    properties:
+                      self:
+                        type: "array"
+                        description: "Link to the current post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                            targetHints:
+                              type: "object"
+                              description: "Target hints of the post."
+                              properties:
+                                allow:
+                                  type: "array"
+                                  items:
+                                    type: "string"
+                      collection:
+                        type: "array"
+                        description: "Link to the collection this post belongs to."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                      about:
+                        type: "array"
+                        description: "Link to the schema definition."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                      author:
+                        type: "array"
+                        description: "Link to the author of the post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      replies:
+                        type: "array"
+                        description: "Link to comments or replies for this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      version-history:
+                        type: "array"
+                        description: "Link to the version history of this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                            count:
+                              type: "integer"
+                              description: "Count of the versions."
+                      predecessor-version:
+                        type: "array"
+                        description: "Link to the predecessor version of this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                            id:
+                              type: "integer"
+                              description: "Id of the predecessor version."
+                      wp:attachment:
+                        type: "array"
+                        description: "Link to media items attached to this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                      wp:term:
+                        type: "array"
+                        description: "Terms of this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            taxonomy:
+                              type: "string"
+                              description: "Taxonomy of the term."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      curies:
+                        type: "array"
+                        description: "Compact URIs to identify WordPress REST namespaces."
+                        items:
+                          type: "object"
+                          properties:
+                            name:
+                              type: "string"
+                              description: "Namespace prefix."
+                            href:
+                              type: "string"
+                              description: "Templated URI to the namespace documentation."
+                            templated:
+                              type: "boolean"
+                              description: "Whether the link is templated."
+  /wp/v2/posts:
+    post:
+      summary: "Create Post"
+      description: "Creates a new post."
+      operationId: "createPost"
+      x-ai-agent-tool: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Post"
+              type: "object"
+              required:
+                - "title"
+                - "content"
+              properties:
+                title:
+                  type: "string"
+                  title: "Title"
+                  description: "Title of the post about to be created."
+                content:
+                  type: "string"
+                  title: "Content"
+                  description: "Content of the post about to be created. Uses the WordPress Text Editor which supports HTML."
+                status:
+                  type: "string"
+                  title: "Status"
+                  description: "Status of the post about to be added."
+                  enum:
+                    - "publish"
+                    - "future"
+                    - "draft"
+                    - "pending"
+                    - "private"
+                slug:
+                  type: "string"
+                  title: "Slug"
+                  description: "Slug of the post identifier."
+                categories:
+                  type: "array"
+                  title: "Categories"
+                  description: "Categories of the post."
+                  x-dynamic-options: true
+                  items:
+                    type: "integer"
+                comment_status:
+                  type: "string"
+                  title: "Enable Comments"
+                  description: "Enable comments on the post."
+                  enum:
+                    - "open"
+                    - "closed"
+                ping_status:
+                  type: "string"
+                  title: "Open to Pinging"
+                  description: "Enable pinging on the post."
+                  enum:
+                    - "open"
+                    - "closed"
+      responses:
+        200:
+          description: "Post created."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "Unique identifier for the post."
+                  date:
+                    type: "string"
+                    description: "The date the post was published, in the site's timezone."
+                  date_gmt:
+                    type: "string"
+                    description: "The date the post was published, in GMT."
+                  guid:
+                    type: "object"
+                    description: "The globally unique identifier for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "GUID for the post, as rendered in HTML."
+                      raw:
+                        type: "string"
+                        description: "GUID for the post, raw."
+                  modified:
+                    type: "string"
+                    description: "The date the post was last modified, in the site's timezone."
+                  modified_gmt:
+                    type: "string"
+                    description: "The date the post was last modified, in GMT."
+                  password:
+                    type: "string"
+                    description: "Password for accessing the post."
+                  slug:
+                    type: "string"
+                    description: "An alphanumeric identifier for the post unique to its type."
+                  status:
+                    type: "string"
+                    enum: [ "publish", "future", "draft", "pending", "private" ]
+                    description: "The publication status of the post."
+                  type:
+                    type: "string"
+                    description: "Type of the object (post)."
+                  link:
+                    type: "string"
+                    description: "URL to the post."
+                  title:
+                    type: "object"
+                    description: "The title for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered title of the post."
+                      raw:
+                        type: "string"
+                        description: "Raw title of the post."
+                  content:
+                    type: "object"
+                    description: "The content for the post."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered content of the post."
+                      raw:
+                        type: "string"
+                        description: "Raw content of the post."
+                      protected:
+                        type: "boolean"
+                        description: "Whether the content is protected with a password."
+                      block_version:
+                        type: "integer"
+                        description: "Block version of the post content."
+                  excerpt:
+                    type: "object"
+                    description: "The excerpt for the post."
+                    properties:
+                      raw:
+                        type: "string"
+                        description: "Raw excerpt of the post."
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered excerpt of the post."
+                      protected:
+                        type: "boolean"
+                        description: "Whether the excerpt is protected with a password."
+                  author:
+                    type: "integer"
+                    description: "The ID for the author of the post."
+                  featured_media:
+                    type: "integer"
+                    description: "The ID of the featured media for the post."
+                  comment_status:
+                    type: "string"
+                    enum: [ "open", "closed" ]
+                    description: "Whether comments are allowed for the post."
+                  ping_status:
+                    type: "string"
+                    enum: [ "open", "closed" ]
+                    description: "Whether pingbacks or trackbacks are allowed."
+                  sticky:
+                    type: "boolean"
+                    description: "Weather the post is pinned to the top of the page."
+                  template:
+                    type: "string"
+                    description: "The theme file used to display the post."
+                  format:
+                    type: "string"
+                    description: "The format of the post."
+                  meta:
+                    type: "object"
+                    description: "Meta fields associated with the post."
+                    properties:
+                      footnotes:
+                        type: "string"
+                        description: "Footnotes of the post."
+                  categories:
+                    type: "array"
+                    description: "Categories of the post."
+                    items:
+                      type: "integer"
+                  tags:
+                    type: "array"
+                    description: "Tags of the post."
+                    items:
+                      type: "string"
+                  permalink_template:
+                    type: "string"
+                    description: "Permalink template of the post."
+                  generated_slug:
+                    type: "string"
+                    description: "Generated slug of the post."
+                  class_list:
+                    type: "array"
+                    description: "Class list of the post."
+                    items:
+                      type: "string"
+                  _links:
+                    type: "object"
+                    description: "Links to other related resources."
+                    properties:
+                      self:
+                        type: "array"
+                        description: "Link to the current post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                            targetHints:
+                              type: "object"
+                              description: "Target hints of the post."
+                              properties:
+                                allow:
+                                  type: "array"
+                                  items:
+                                    type: "string"
+                      collection:
+                        type: "array"
+                        description: "Link to the collection this post belongs to."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                      about:
+                        type: "array"
+                        description: "Link to the schema definition."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                      author:
+                        type: "array"
+                        description: "Link to the author of the post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      replies:
+                        type: "array"
+                        description: "Link to comments or replies for this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      version-history:
+                        type: "array"
+                        description: "Link to the version history of this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                            count:
+                              type: "integer"
+                              description: "Count of the versions."
+                      wp:attachment:
+                        type: "array"
+                        description: "Link to media items attached to this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                      wp:action-publish:
+                        type: "array"
+                        description: "Action link to publish this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                      wp:action-unfiltered-html:
+                        type: "array"
+                        description: "Action link for unfiltered HTML editing."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                      wp:action-assign-author:
+                        type: "array"
+                        description: "Action link to assign a new author to this post."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              description: "URL to the linked resource."
+                      curies:
+                        type: "array"
+                        description: "Compact URIs to identify WordPress REST namespaces."
+                        items:
+                          type: "object"
+                          properties:
+                            name:
+                              type: "string"
+                              description: "Namespace prefix."
+                            href:
+                              type: "string"
+                              description: "Templated URI to the namespace documentation."
+                            templated:
+                              type: "boolean"
+                              description: "Whether the link is templated."
+  /wp/v2/pages:
+    post:
+      summary: "Create Page"
+      description: "Creates a new page."
+      operationId: "createPage"
+      x-ai-agent-tool: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Page"
+              type: "object"
+              required:
+                - "title"
+                - "content"
+              properties:
+                title:
+                  type: "string"
+                  title: "Title"
+                  description: "Title of the page about to be added."
+                content:
+                  type: "string"
+                  title: "Content"
+                  description: "Content of the page about to be added. Uses the WordPress Text Editor which supports HTML."
+                status:
+                  type: "string"
+                  title: "Status"
+                  description: "Status of the page about to be added."
+                  enum:
+                    - "publish"
+                    - "future"
+                    - "draft"
+                    - "pending"
+                    - "private"
+                slug:
+                  type: "string"
+                  title: "Slug"
+                  description: "Slug of the page identifier."
+                comment_status:
+                  type: "string"
+                  title: "Enable Comments"
+                  description: "Enable comments on the page."
+                  enum:
+                    - "open"
+                    - "closed"
+                ping_status:
+                  type: "string"
+                  title: "Open to Pinging"
+                  description: "Enable pinging on the page."
+                  enum:
+                    - "open"
+                    - "closed"
+      responses:
+        200:
+          description: "Page created."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "Unique identifier for the page."
+                  date:
+                    type: "string"
+                    description: "The date the page was published, in the site's timezone."
+                  date_gmt:
+                    type: "string"
+                    description: "The date the page was published, in GMT."
+                  guid:
+                    type: "object"
+                    description: "The globally unique identifier for the page."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "GUID for the page, as rendered in HTML."
+                      raw:
+                        type: "string"
+                        description: "GUID for the page, raw."
+                  modified:
+                    type: "string"
+                    description: "The date the page was last modified, in the site's timezone."
+                  modified_gmt:
+                    type: "string"
+                    description: "The date the page was last modified, in GMT."
+                  password:
+                    type: "string"
+                    description: "Password for accessing the page."
+                  slug:
+                    type: "string"
+                    description: "An alphanumeric identifier for the page unique to its type."
+                  status:
+                    type: "string"
+                    enum: [ "publish", "future", "draft", "pending", "private" ]
+                    description: "The publication status of the page."
+                  type:
+                    type: "string"
+                    description: "Type of the object (page)."
+                  link:
+                    type: "string"
+                    format: "uri"
+                    description: "URL to the page."
+                  title:
+                    type: "object"
+                    description: "The title for the page."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered title of the page."
+                      raw:
+                        type: "string"
+                        description: "Raw title of the page."
+                  content:
+                    type: "object"
+                    description: "The content for the page."
+                    properties:
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered content of the page."
+                      raw:
+                        type: "string"
+                        description: "Raw content of the page."
+                      protected:
+                        type: "boolean"
+                        description: "Whether the content is protected with a password."
+                      block_version:
+                        type: "integer"
+                        description: "Block version of the page content."
+                  excerpt:
+                    type: "object"
+                    description: "The excerpt for the page."
+                    properties:
+                      raw:
+                        type: "string"
+                        description: "Raw excerpt of the page."
+                      rendered:
+                        type: "string"
+                        description: "HTML-rendered excerpt of the page."
+                      protected:
+                        type: "boolean"
+                        description: "Whether the excerpt is protected with a password."
+                  author:
+                    type: "integer"
+                    description: "The ID for the author of the page."
+                  featured_media:
+                    type: "integer"
+                    description: "The ID of the featured media for the page."
+                  parent:
+                    type: "integer"
+                    description: "The ID of the parent page, if any."
+                  menu_order:
+                    type: "integer"
+                    description: "The order of the page in menus."
+                  comment_status:
+                    type: "string"
+                    enum: [ "open", "closed" ]
+                    description: "Whether comments are allowed for the page."
+                  ping_status:
+                    type: "string"
+                    enum: [ "open", "closed" ]
+                    description: "Whether pingbacks or trackbacks are allowed."
+                  template:
+                    type: "string"
+                    description: "The theme file used to display the page."
+                  meta:
+                    type: "object"
+                    description: "Meta fields associated with the page."
+                    properties:
+                      footnotes:
+                        type: "string"
+                        description: "Footnotes of the page."
+                  permalink_template:
+                    type: "string"
+                    description: "Permalink template of the page."
+                  generated_slug:
+                    type: "string"
+                    description: "Generated slug of the page."
+                  class_list:
+                    type: "array"
+                    description: "Class list of the page."
+                    items:
+                      type: "string"
+                  _links:
+                    type: "object"
+                    description: "Links to other related resources."
+                    properties:
+                      self:
+                        type: "array"
+                        description: "Link to the current page."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            targetHints:
+                              type: "object"
+                              description: "Target hints of the page."
+                              properties:
+                                allow:
+                                  type: "array"
+                                  items:
+                                    type: "string"
+                      collection:
+                        type: "array"
+                        description: "Link to the collection this page belongs to."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      about:
+                        type: "array"
+                        description: "Link to the schema definition."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      author:
+                        type: "array"
+                        description: "Link to the author of the page."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      replies:
+                        type: "array"
+                        description: "Link to comments or replies for this page."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            embeddable:
+                              type: "boolean"
+                              description: "Indicates whether the resource can be embedded."
+                      version-history:
+                        type: "array"
+                        description: "Link to the version history of this page."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                            count:
+                              type: "integer"
+                              description: "Count of the versions."
+                      wp:attachment:
+                        type: "array"
+                        description: "Link to media items attached to this page."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-publish:
+                        type: "array"
+                        description: "Action link to publish this page."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-unfiltered-html:
+                        type: "array"
+                        description: "Action link for unfiltered HTML editing."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      wp:action-assign-author:
+                        type: "array"
+                        description: "Action link to assign a new author to this page."
+                        items:
+                          type: "object"
+                          properties:
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "URL to the linked resource."
+                      curies:
+                        type: "array"
+                        description: "Compact URIs to identify WordPress REST namespaces."
+                        items:
+                          type: "object"
+                          properties:
+                            name:
+                              type: "string"
+                              description: "Namespace prefix."
+                            href:
+                              type: "string"
+                              format: "uri"
+                              description: "Templated URI to the namespace documentation."
+                            templated:
+                              type: "boolean"
+                              description: "Whether the link is templated."
+components:
+  securitySchemes:
+    basicAuth:
+      type: "http"
+      scheme: "basic"
