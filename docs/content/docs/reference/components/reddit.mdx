@@ -1,0 +1,114 @@
+---
+title: "Reddit"
+description: "Reddit is a social news aggregation, discussion, and content-sharing platform where users post and vote on content organized into communities called subreddits."
+---
+
+Reddit is a social news aggregation, discussion, and content-sharing platform where users post and vote on content organized into communities called subreddits.
+
+
+Categories: Social Media
+
+
+Type: reddit/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Comment
+Name: createComment
+
+`Creates a new comment on a Reddit post or comment.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| thing_id | Parent ID | STRING | `Fullname of parent (post ID or comment ID to reply to).` | true |
+| text | Comment Text | STRING | `Comment text.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Comment",
+  "name" : "createComment",
+  "parameters" : {
+    "thing_id" : "",
+    "text" : ""
+  },
+  "type" : "reddit/v1/createComment"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Create Post
+Name: createPost
+
+`Creates new reddit post.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sr | Subreddit Name | STRING | `Subreddit name.` | true |
+| title | Title | STRING | `Post title.` | true |
+| kind | Kind | STRING <details> <summary> Options </summary> link, self </details> | `Type of post.` | true |
+| url | URL | STRING | `Link URL.` | true |
+| text | Text | STRING | `Post text.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Post",
+  "name" : "createPost",
+  "parameters" : {
+    "sr" : "",
+    "title" : "",
+    "kind" : "",
+    "url" : "",
+    "text" : ""
+  },
+  "type" : "reddit/v1/createPost"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
