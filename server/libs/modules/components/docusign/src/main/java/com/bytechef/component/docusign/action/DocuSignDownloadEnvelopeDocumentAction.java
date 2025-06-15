@@ -57,13 +57,13 @@ public class DocuSignDownloadEnvelopeDocumentAction {
                 .description("The ID of the envelope.")
                 .required(true)
                 .optionsLookupDependsOn(FROM_DATE)
-                .options((ActionOptionsFunction<String>) DocuSignUtils::getEnvelopeId),
+                .options((ActionOptionsFunction<String>) DocuSignUtils::getEnvelopeIdOptions),
             string(DOCUMENT_ID)
                 .label("Document ID")
                 .description("ID of the document that will be downloaded from the envelope.")
                 .required(true)
                 .optionsLookupDependsOn(ENVELOPE_ID)
-                .options((ActionOptionsFunction<String>) DocuSignUtils::getDocumentId))
+                .options((ActionOptionsFunction<String>) DocuSignUtils::getDocumentIdOptions))
         .output(
             outputSchema(
                 object()
@@ -87,8 +87,9 @@ public class DocuSignDownloadEnvelopeDocumentAction {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return context.file(file -> file.storeContent(
-            inputParameters.getRequiredString(DOCUMENT_ID),
-            new ByteArrayInputStream(fileByteArray.getBytes(StandardCharsets.UTF_8))));
+        return context.file(
+            file -> file.storeContent(
+                inputParameters.getRequiredString(DOCUMENT_ID),
+                new ByteArrayInputStream(fileByteArray.getBytes(StandardCharsets.UTF_8))));
     }
 }

@@ -47,6 +47,32 @@ public class DocuSignUtils {
             .formatted(environment.equals("demo") ? "account-d.docusign.com" : "account.docusign.com");
     }
 
+    public static List<Option<String>> getDocumentIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        Map<String, Object> response = context.http(
+            http -> http.get(
+                "/restapi/v2.1/accounts/%s/envelopes/%s/documents".formatted(
+                    connectionParameters.getRequiredString(ACCOUNT_ID),
+                    inputParameters.getRequiredString(ENVELOPE_ID))))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (response.get("envelopeDocuments") instanceof List<?> envelopeDocuments) {
+            for (Object documentObject : envelopeDocuments) {
+                if (documentObject instanceof Map<?, ?> document) {
+                    options.add(option((String) document.get("name"), (String) document.get(DOCUMENT_ID)));
+                }
+            }
+        }
+
+        return options;
+    }
+
     public static List<Map<String, Object>> getDocumentsList(List<DocumentRecord> documentRecords, Context context) {
         List<Map<String, Object>> documentsList = new ArrayList<>();
 
@@ -64,63 +90,34 @@ public class DocuSignUtils {
     }
 
     private static String encodeFileEntry(FileEntry fileEntry, Context context) {
-        byte[] fileContent =
-            context.file(file -> file.readAllBytes(fileEntry));
+        byte[] fileContent = context.file(file -> file.readAllBytes(fileEntry));
 
         return EncodingUtils.base64EncodeToString(fileContent);
     }
 
-    public static List<Option<String>> getEnvelopeId(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+    public static List<Option<String>> getEnvelopeIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        List<Option<String>> envelopeIdList = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-        Map<String, Object> response = context.http(http -> http.get(
-            "/restapi/v2.1/accounts/%s/envelopes".formatted(connectionParameters.getRequiredString(ACCOUNT_ID))))
-            .queryParameter("from_date", inputParameters.getRequiredLocalDate(FROM_DATE)
-                .toString())
+        Map<String, Object> response = context.http(
+            http -> http.get(
+                "/restapi/v2.1/accounts/%s/envelopes".formatted(connectionParameters.getRequiredString(ACCOUNT_ID))))
+            .queryParameter("from_date", inputParameters.getRequiredString(FROM_DATE))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (response.get("envelopes") instanceof List envelopes) {
+        if (response.get("envelopes") instanceof List<?> envelopes) {
             for (Object envelopeObject : envelopes) {
-                if (envelopeObject instanceof Map envelope &&
-                    envelope.get(ENVELOPE_ID) instanceof String envelopeId &&
-                    envelope.get(EMAIL_SUBJECT) instanceof String envelopeEmailSubject) {
-                    envelopeIdList.add(option(envelopeEmailSubject, envelopeId));
+                if (envelopeObject instanceof Map<?, ?> envelope) {
+                    options.add(
+                        option((String) envelope.get(EMAIL_SUBJECT), (String) envelope.get(ENVELOPE_ID)));
                 }
             }
         }
 
-        return envelopeIdList;
-    }
-
-    public static List<Option<String>> getDocumentId(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
-
-        List<Option<String>> documentIdList = new ArrayList<>();
-
-        Map<String, Object> response = context.http(http -> http.get(
-            "/restapi/v2.1/accounts/%s/envelopes/%s/documents".formatted(
-                connectionParameters.getRequiredString(ACCOUNT_ID),
-                inputParameters.getRequiredString(ENVELOPE_ID))))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        if (response.get("envelopeDocuments") instanceof List envelopeDocuments) {
-            for (Object documentObject : envelopeDocuments) {
-                if (documentObject instanceof Map document &&
-                    document.get(DOCUMENT_ID) instanceof String documentId &&
-                    document.get("name") instanceof String documentName) {
-                    documentIdList.add(option(documentName, documentId));
-                }
-            }
-        }
-
-        return documentIdList;
+        return options;
     }
 }

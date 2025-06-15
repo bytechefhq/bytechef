@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.Authorization.EXPIRES_IN;
 import static com.bytechef.component.definition.Authorization.REFRESH_TOKEN;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -78,9 +79,9 @@ public class DocuSignConnection {
                 .authorizationUrl((connectionParameters, context) -> getAuthorizationUrl(
                     connectionParameters.getRequiredString(ENVIRONMENT)) + "auth")
                 .tokenUrl((connectionParameters, context) -> getAuthorizationUrl(
-                    connectionParameters.getRequiredString(ENVIRONMENT)) + "token")
+                    connectionParameters.getRequiredString(ENVIRONMENT)) + TOKEN)
                 .refreshUrl((connectionParameters, context) -> getAuthorizationUrl(
-                    connectionParameters.getRequiredString(ENVIRONMENT)) + "token")
+                    connectionParameters.getRequiredString(ENVIRONMENT)) + TOKEN)
                 .authorizationCallback((connectionParameters, code, redirectUri, codeVerifier, context) -> {
                     String clientId = connectionParameters.getString(CLIENT_ID);
                     String clientSecret = connectionParameters.getString(CLIENT_SECRET);

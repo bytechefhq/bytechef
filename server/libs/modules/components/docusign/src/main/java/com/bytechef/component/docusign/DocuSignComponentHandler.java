@@ -36,7 +36,8 @@ public class DocuSignComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("docusign")
         .title("DocuSign")
         .description(
-            "DocuSign is a cloud-based e-signature platform that enables secure digital document signing and workflow automation.")
+            "DocuSign is a cloud-based e-signature platform that enables secure digital document signing and " +
+                "workflow automation.")
         .icon("path:assets/docusign.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(DocuSignConnection.CONNECTION_DEFINITION)

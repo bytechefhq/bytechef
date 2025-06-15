@@ -46,23 +46,26 @@ import org.mockito.ArgumentCaptor;
  * @author Nikolina Spehar
  */
 class DocuSignUtilsTest {
+
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         ACCOUNT_ID, List.of(), FROM_DATE, LocalDate.of(2025, 6, 4), ENVELOPE_ID, "1"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<String> keyArgumentCapture = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> valueArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testGetAuthorizationUrl() {
-        String demoExpected = DocuSignUtils.getAuthorizationUrl("demo");
+    void testGetAuthorizationUrlForDemoEnvironment() {
+        String actualUrl = DocuSignUtils.getAuthorizationUrl("demo");
 
-        assertEquals("https://account-d.docusign.com/oauth/", demoExpected);
+        assertEquals("https://account-d.docusign.com/oauth/", actualUrl);
+    }
 
-        String otherExpected = DocuSignUtils.getAuthorizationUrl("other");
+    @Test
+    void testGetAuthorizationUrlForOtherEnvironment() {
+        String actualUrl = DocuSignUtils.getAuthorizationUrl("production");
 
-        assertEquals("https://account.docusign.com/oauth/", otherExpected);
+        assertEquals("https://account.docusign.com/oauth/", actualUrl);
     }
 
     @Test
@@ -89,49 +92,39 @@ class DocuSignUtilsTest {
     }
 
     @Test
-    void testGetEnvelopeId() {
-        Map<String, Object> responseMap =
-            Map.of("envelopes", List.of(Map.of(ENVELOPE_ID, "1", EMAIL_SUBJECT, "emailSubject")));
-
+    void testGetEnvelopeIdOptions() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(keyArgumentCapture.capture(), valueArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(Map.of("envelopes", List.of(Map.of(ENVELOPE_ID, "1", EMAIL_SUBJECT, "emailSubject"))));
 
-        List<Option<String>> result = DocuSignUtils.getEnvelopeId(
+        List<Option<String>> result = DocuSignUtils.getEnvelopeIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expected = List.of(option("emailSubject", "1"));
 
         assertEquals(expected, result);
-
-        assertEquals("from_date", keyArgumentCapture.getValue());
-        assertEquals("2025-06-04", valueArgumentCaptor.getValue());
+        assertEquals(List.of("from_date", "2025-06-04"), stringArgumentCaptor.getAllValues());
     }
 
     @Test
-    void testGetDocumentId() {
-        Map<String, Object> responseMap =
-            Map.of("envelopeDocuments", List.of(Map.of(DOCUMENT_ID, "1", "name", "name")));
-
+    void testGetDocumentIdOptions() {
         when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(keyArgumentCapture.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(Map.of("envelopeDocuments", List.of(Map.of(DOCUMENT_ID, "1", "name", "name"))));
 
-        List<Option<String>> result = DocuSignUtils.getDocumentId(
+        List<Option<String>> result = DocuSignUtils.getDocumentIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expected = List.of(option("name", "1"));
