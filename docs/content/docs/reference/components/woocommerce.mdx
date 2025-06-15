@@ -9,7 +9,7 @@ WooCommerce is a e-commerce plugin for WordPress that allows you to turn a stand
 Categories: E-commerce
 
 
-Type: wooCommerce/v1
+Type: woocommerce/v1
 
 <hr />
 
@@ -78,7 +78,7 @@ Name: createCoupon
     "minimum_amount" : "",
     "maximum_amount" : ""
   },
-  "type" : "wooCommerce/v1/createCoupon"
+  "type" : "woocommerce/v1/createCoupon"
 }
 ```
 
@@ -223,7 +223,7 @@ Name: createCustomer
       "phone" : ""
     }
   },
-  "type" : "wooCommerce/v1/createCustomer"
+  "type" : "woocommerce/v1/createCustomer"
 }
 ```
 
@@ -324,7 +324,13 @@ Name: createOrder
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | customer_id | Customer Id | STRING | `User ID who owns the order. 0 for guests.` | true |
-| line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(product_id), INTEGER\(quantity)&#125;, STRING\($status), STRING\($customer_note), &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125;\($billing), &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(phone)&#125;\($shipping), STRING\($payment_method), BOOLEAN\($set_paid)] </details> | `Line items data.` | true |
+| line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(product_id), INTEGER\(quantity)&#125;] </details> | `Line items data.` | true |
+| status | Status | STRING <details> <summary> Options </summary> pending, processing, on-hold, completed, cancelled, refunded, failed </details> | `Order status.` | false |
+| customer_note | Customer Note | STRING | `Note left by customer during checkout.` | false |
+| billing | Billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | `List of billing address data.` | false |
+| shipping | Shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(phone)&#125; </details> | `List of shipping address data.` | false |
+| payment_method | Payment Method | STRING | `Payment method ID.` | false |
+| set_paid | Set Paid | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Define if the order is paid. It will set the status to processing and reduce stock items.` | false |
 
 #### Example JSON Structure
 ```json
@@ -336,7 +342,10 @@ Name: createOrder
     "line_items" : [ {
       "product_id" : "",
       "quantity" : 1
-    }, "", "", {
+    } ],
+    "status" : "",
+    "customer_note" : "",
+    "billing" : {
       "first_name" : "",
       "last_name" : "",
       "company" : "",
@@ -348,7 +357,8 @@ Name: createOrder
       "country" : "",
       "email" : "",
       "phone" : ""
-    }, {
+    },
+    "shipping" : {
       "first_name" : "",
       "last_name" : "",
       "company" : "",
@@ -359,9 +369,11 @@ Name: createOrder
       "postcode" : "",
       "country" : "",
       "phone" : ""
-    }, "", false ]
+    },
+    "payment_method" : "",
+    "set_paid" : false
   },
-  "type" : "wooCommerce/v1/createOrder"
+  "type" : "woocommerce/v1/createOrder"
 }
 ```
 
@@ -573,7 +585,9 @@ Name: createProduct
 | stock_status | Stock Status | STRING <details> <summary> Options </summary> instock, outofstock, onbackorder </details> | `Controls the stock status of the product.` | false |
 | weight | Weight | STRING | `Product weight (kg).` | false |
 | dimensions | Dimensions | OBJECT <details> <summary> Properties </summary> &#123;STRING\(length), STRING\(width), STRING\(height)&#125; </details> | `Product dimensions.` | false |
-| categories | Categories | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id)&#125;, [&#123;INTEGER\(id)&#125;, [&#123;STRING\(src), STRING\(name)&#125;]\($images)]\($tags)] </details> | `List of categories.` | false |
+| categories | Categories | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of categories.` | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of tags.` | false |
+| images | Images | ARRAY <details> <summary> Items </summary> [&#123;STRING\(src), STRING\(name)&#125;] </details> | `List of images.` | false |
 
 #### Example JSON Structure
 ```json
@@ -594,16 +608,14 @@ Name: createProduct
       "width" : "",
       "height" : ""
     },
-    "categories" : [ {
-      "id" : 1
-    }, [ {
-      "id" : 1
-    }, [ {
+    "categories" : [ "" ],
+    "tags" : [ "" ],
+    "images" : [ {
       "src" : "",
       "name" : ""
-    } ] ] ]
+    } ]
   },
-  "type" : "wooCommerce/v1/createProduct"
+  "type" : "woocommerce/v1/createProduct"
 }
 ```
 
@@ -823,14 +835,38 @@ Type: DYNAMIC_WEBHOOK
 
 #### Output
 
-This trigger does not produce any output.
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the resource. |
+| name | STRING | A friendly name for the webhook. |
+| status | STRING | Webhook status. |
+| topic | STRING | Webhook topic. |
+| resource | STRING | Webhook resource. |
+| event | STRING | Webhook event. |
+| hooks | ARRAY <details> <summary> Items </summary> [STRING] </details> | WooCommerce action names associated with the webhook. |
+| delivery_url | STRING | The URL where the webhook payload is delivered. |
+| date_created | STRING | The date the webhook was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the webhook was created, as GMT. |
+| date_modified | STRING | The date the webhook was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the webhook was last modified, as GMT. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
 
 #### JSON Example
 ```json
 {
   "label" : "New Order",
   "name" : "newOrder",
-  "type" : "wooCommerce/v1/newOrder"
+  "type" : "woocommerce/v1/newOrder"
 }
 ```
 
@@ -845,14 +881,38 @@ Type: DYNAMIC_WEBHOOK
 
 #### Output
 
-This trigger does not produce any output.
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the resource. |
+| name | STRING | A friendly name for the webhook. |
+| status | STRING | Webhook status. |
+| topic | STRING | Webhook topic. |
+| resource | STRING | Webhook resource. |
+| event | STRING | Webhook event. |
+| hooks | ARRAY <details> <summary> Items </summary> [STRING] </details> | WooCommerce action names associated with the webhook. |
+| delivery_url | STRING | The URL where the webhook payload is delivered. |
+| date_created | STRING | The date the webhook was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the webhook was created, as GMT. |
+| date_modified | STRING | The date the webhook was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the webhook was last modified, as GMT. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
 
 #### JSON Example
 ```json
 {
   "label" : "New Coupon",
   "name" : "newCoupon",
-  "type" : "wooCommerce/v1/newCoupon"
+  "type" : "woocommerce/v1/newCoupon"
 }
 ```
 
