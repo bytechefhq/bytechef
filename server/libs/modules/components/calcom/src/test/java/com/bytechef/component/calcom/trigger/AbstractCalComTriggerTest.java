@@ -35,7 +35,8 @@ import org.mockito.MockedStatic;
 /**
  * @author Nikolina Spehar
  */
-public class AbstractCalComTriggerTest {
+class AbstractCalComTriggerTest {
+
     protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
@@ -45,8 +46,8 @@ public class AbstractCalComTriggerTest {
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected MockedStatic<CalComUtils> calComUtilsMockedStatic;
     protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor = ArgumentCaptor.forClass(
-        TriggerContext.class);
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
+        ArgumentCaptor.forClass(TriggerContext.class);
     protected ArgumentCaptor<WebhookBody> webhookBodyArgumentCaptor = ArgumentCaptor.forClass(WebhookBody.class);
     protected String webhookUrl = "testWebhookUrl";
     protected String workflowExecutionId = "testWorkflowExecutionId";

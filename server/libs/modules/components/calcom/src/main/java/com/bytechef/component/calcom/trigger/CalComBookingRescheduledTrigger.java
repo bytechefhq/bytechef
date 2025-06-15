@@ -50,7 +50,6 @@ public class CalComBookingRescheduledTrigger {
         .title("Booking Rescheduled")
         .description("Triggers when a booking is rescheduled.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties()
         .output(
             outputSchema(
                 object()
@@ -242,11 +241,11 @@ public class CalComBookingRescheduledTrigger {
     }
 
     protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
 
-        return new WebhookEnableOutput(Map.of(WEBHOOK_ID, subscribeWebhook("BOOKING_RESCHEDULED", context, webhookUrl)),
-            null);
+        return new WebhookEnableOutput(
+            Map.of(WEBHOOK_ID, subscribeWebhook("BOOKING_RESCHEDULED", context, webhookUrl)), null);
     }
 
     protected static void webhookDisable(

@@ -46,9 +46,8 @@ public class CalComUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (body.get(DATA) instanceof Map dataMap &&
-            dataMap.get(ID) instanceof String webhookId) {
-            return webhookId;
+        if (body.get(DATA) instanceof Map<?, ?> dataMap) {
+            return (String) dataMap.get(ID);
         }
 
         throw new ProviderException("Failed to subscribe to webhook");

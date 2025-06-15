@@ -34,8 +34,7 @@ public class CalComConnection {
         .authorizations(
             authorization(AuthorizationType.BEARER_TOKEN)
                 .title("API Key Authorization")
-                .description(
-                    "API key authorization.")
+                .description("API key authorization.")
                 .properties(
                     string(TOKEN)
                         .label("Api Key")

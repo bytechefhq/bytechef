@@ -47,7 +47,6 @@ public class CalComBookingEndedTrigger {
         .title("Booking Ended")
         .description("Triggers when a booking ends.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties()
         .output(
             outputSchema(
                 object()
@@ -79,8 +78,8 @@ public class CalComBookingEndedTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new WebhookEnableOutput(Map.of(WEBHOOK_ID, subscribeWebhook("MEETING_ENDED", context, webhookUrl)),
-            null);
+        return new WebhookEnableOutput(
+            Map.of(WEBHOOK_ID, subscribeWebhook("MEETING_ENDED", context, webhookUrl)), null);
     }
 
     protected static void webhookDisable(

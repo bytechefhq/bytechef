@@ -50,7 +50,6 @@ public class CalComBookingCreatedTrigger {
         .title("Booking Created")
         .description("Triggers when a booking is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties()
         .output(
             outputSchema(
                 object()
@@ -221,11 +220,11 @@ public class CalComBookingCreatedTrigger {
     }
 
     protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
 
-        return new WebhookEnableOutput(Map.of(WEBHOOK_ID, subscribeWebhook("BOOKING_CREATED", context, webhookUrl)),
-            null);
+        return new WebhookEnableOutput(
+            Map.of(WEBHOOK_ID, subscribeWebhook("BOOKING_CREATED", context, webhookUrl)), null);
     }
 
     protected static void webhookDisable(

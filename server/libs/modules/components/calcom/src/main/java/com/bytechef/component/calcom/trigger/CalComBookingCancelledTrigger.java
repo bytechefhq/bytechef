@@ -50,7 +50,6 @@ public class CalComBookingCancelledTrigger {
         .title("Booking Canceled")
         .description("Triggers when a booking is canceled.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties()
         .output(
             outputSchema(
                 object()
@@ -186,11 +185,11 @@ public class CalComBookingCancelledTrigger {
     }
 
     protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
 
-        return new WebhookEnableOutput(Map.of(WEBHOOK_ID, subscribeWebhook("BOOKING_CANCELLED", context, webhookUrl)),
-            null);
+        return new WebhookEnableOutput(
+            Map.of(WEBHOOK_ID, subscribeWebhook("BOOKING_CANCELLED", context, webhookUrl)), null);
     }
 
     protected static void webhookDisable(
@@ -206,5 +205,4 @@ public class CalComBookingCancelledTrigger {
 
         return getContent(body);
     }
-
 }
