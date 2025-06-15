@@ -102,12 +102,14 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     @Override
     @CrossOrigin
-    public ResponseEntity<List<ConnectedUserProjectWorkflowModel>>
-        getFrontendProjectWorkflows(EnvironmentModel xEnvironment) {
+    public ResponseEntity<List<ConnectedUserProjectWorkflowModel>> getFrontendProjectWorkflows(
+        EnvironmentModel xEnvironment) {
+
         return ResponseEntity.ok(
-            connectUserProjectFacade.getProjectWorkflows(
-                OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
-                getEnvironment(xEnvironment))
+            connectUserProjectFacade
+                .getProjectWorkflows(
+                    OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
+                    getEnvironment(xEnvironment))
                 .stream()
                 .map(workflow -> conversionService.convert(workflow, ConnectedUserProjectWorkflowModel.class))
                 .toList());
