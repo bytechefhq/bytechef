@@ -75,9 +75,8 @@ class DocuSignCreateEnvelopeActionTest {
 
         try (MockedStatic<DocuSignUtils> mockedDocuSignUtils = Mockito.mockStatic(DocuSignUtils.class)) {
 
-            mockedDocuSignUtils
-                .when(
-                    () -> DocuSignUtils.getDocumentsList(listArgumentCaptor.capture(), contextArgumentCaptor.capture()))
+            mockedDocuSignUtils.when(
+                () -> DocuSignUtils.getDocumentsList(listArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(List.of());
 
             Map<String, Object> result = DocuSignCreateEnvelopeAction.perform(

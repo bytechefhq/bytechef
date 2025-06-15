@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
  * @author Nikolina Spehar
  */
 class DocuSignDownloadEnvelopeDocumentActionTest {
+
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
