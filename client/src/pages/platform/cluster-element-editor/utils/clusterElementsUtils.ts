@@ -2,8 +2,8 @@ import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {ClusterElementItemType, ClusterElementsType} from '@/shared/types';
 
 export function initializeClusterElementsObject(
-    rootClusterElementDefinition: ComponentDefinition,
-    clusterElementsData: ClusterElementsType
+    clusterElementsData: ClusterElementsType,
+    rootClusterElementDefinition: ComponentDefinition
 ) {
     const clusterElements: ClusterElementsType = {};
 
@@ -26,9 +26,9 @@ export function initializeClusterElementsObject(
                     clusterElementsData[clusterElementType] as ClusterElementItemType[]
                 ).map((element) => ({
                     label: element.label,
-                    metadata: element.metadata || {},
+                    metadata: element.metadata,
                     name: element.name,
-                    parameters: element.parameters || {},
+                    parameters: element.parameters,
                     type: element.type,
                 }));
             } else {
@@ -37,7 +37,7 @@ export function initializeClusterElementsObject(
                 if (element && !Array.isArray(element)) {
                     clusterElements[clusterElementType] = {
                         label: element.label,
-                        metadata: element.metadata || {},
+                        metadata: element.metadata,
                         name: element.name,
                         parameters: element.parameters || {},
                         type: element.type,
@@ -68,4 +68,10 @@ export function convertNameToCamelCase(typeName: string): string {
 
 export function convertNameToSnakeCase(type: string): string {
     return type.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`).toUpperCase();
+}
+
+export function getClusterElementsLabel(clusterElementType: string) {
+    clusterElementType = clusterElementType.replace(/([a-z])([A-Z])/g, '$1 $2');
+
+    return clusterElementType.charAt(0).toUpperCase() + clusterElementType.slice(1);
 }
