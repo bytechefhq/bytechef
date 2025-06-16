@@ -39,14 +39,23 @@ const useClusterElementsLayout = () => {
         !!rootClusterElementNodeData && currentNode?.rootClusterElement
     );
 
-    const {setEdges, setNodes} = useClusterElementsDataStore(
+    const {nodes, setEdges, setNodes} = useClusterElementsDataStore(
         useShallow((state) => ({
+            nodes: state.nodes,
             setEdges: state.setEdges,
             setNodes: state.setNodes,
         }))
     );
 
-    const canvasWidth = window.innerWidth - 80 - 460;
+    const nodePositions = nodes.reduce<Record<string, {x: number; y: number}>>((accumulator, node) => {
+        accumulator[node.id] = {
+            x: node.position.x,
+            y: node.position.y,
+        };
+        return accumulator;
+    }, {});
+
+    const canvasWidth = window.innerWidth - 80;
 
     const {allNodes, taskEdges} = useMemo(() => {
         const nodes: Array<Node> = [];
@@ -58,9 +67,12 @@ const useClusterElementsLayout = () => {
 
         if (rootClusterElementNodeData) {
             const rootClusterElementNode = {
-                data: rootClusterElementNodeData,
+                data: {...rootClusterElementNodeData},
                 id: rootClusterElementNodeData.workflowNodeName,
-                position: DEFAULT_NODE_POSITION,
+                position:
+                    rootClusterElementNodeData.metadata?.ui?.nodePosition ||
+                    nodePositions[rootClusterElementNodeData.workflowNodeName] ||
+                    DEFAULT_NODE_POSITION,
                 type: 'workflow',
             };
 
@@ -83,12 +95,14 @@ const useClusterElementsLayout = () => {
                 const isMultipleElementsNode = clusterElementType.multipleElements;
                 const currentRootClusterElementNodeName = rootClusterElementNodeData.workflowNodeName;
                 const clusterElementData = clusterElements[elementType as keyof typeof clusterElements];
-                const placeholderPositions = rootClusterElementNodeData?.metadata?.ui?.placeholderPositions || {};
+                const rootPlaceholderPositions = rootClusterElementNodeData.metadata?.ui?.placeholderPositions || {};
 
                 if (isMultipleElementsNode) {
                     if (Array.isArray(clusterElementData) && clusterElementData.length) {
                         clusterElementData.forEach((element) => {
-                            nodes.push(createMultipleElementsNode(element, elementType, isMultipleElementsNode));
+                            nodes.push(
+                                createMultipleElementsNode(element, elementType, isMultipleElementsNode, nodePositions)
+                            );
                         });
                     }
 
@@ -97,19 +111,23 @@ const useClusterElementsLayout = () => {
                             currentRootClusterElementNodeName,
                             elementLabel,
                             elementType,
-                            placeholderPositions
+                            rootPlaceholderPositions,
+                            nodePositions
                         )
                     );
                 } else {
                     if (clusterElementData) {
-                        nodes.push(createSingleElementsNode(clusterElementData, elementLabel, elementType));
+                        nodes.push(
+                            createSingleElementsNode(clusterElementData, elementLabel, elementType, nodePositions)
+                        );
                     } else {
                         nodes.push(
                             createPlaceholderNode(
                                 currentRootClusterElementNodeName,
                                 elementLabel,
                                 elementType,
-                                placeholderPositions
+                                nodePositions,
+                                rootPlaceholderPositions
                             )
                         );
                     }
@@ -163,6 +181,8 @@ const useClusterElementsLayout = () => {
         });
 
         return {allNodes: nodes, taskEdges: edges};
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [rootClusterElementNodeData, rootClusterElementDefinition, workflow]);
 
     useEffect(() => {
@@ -173,6 +193,7 @@ const useClusterElementsLayout = () => {
 
         setNodes(elements.nodes);
         setEdges(elements.edges);
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canvasWidth, rootClusterElementNodeData, allNodes]);
 };
