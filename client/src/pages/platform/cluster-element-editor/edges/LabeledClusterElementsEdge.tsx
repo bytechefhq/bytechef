@@ -46,10 +46,6 @@ export default function LabeledClusterElementsEdge({
     function getEdgeLabelPosition() {
         const defaultPosition = `translate(-50%, 0%) translate(${sourceX}px,${sourceY}px)`;
 
-        if (node?.data.multipleClusterElementsNode) {
-            return `translate(-50%, 0%) translate(${sourceX}px,${sourceY}px)`;
-        }
-
         return defaultPosition;
     }
 
@@ -59,7 +55,7 @@ export default function LabeledClusterElementsEdge({
 
             <EdgeLabelRenderer key={id}>
                 <div
-                    className="flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white p-1 text-xs font-medium"
+                    className="w-14 items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white p-1 text-center text-xs font-medium"
                     style={{
                         position: 'absolute',
                         transform: getEdgeLabelPosition(),
