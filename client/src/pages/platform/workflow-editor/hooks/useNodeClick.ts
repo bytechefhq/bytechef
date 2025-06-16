@@ -44,8 +44,12 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         setActiveTab(activeTab ?? 'description');
         setCurrentNode({...data, description: ''});
 
-        if (data.rootClusterElement) {
+        if (data.rootClusterElement && !clusterElementsCanvasOpen) {
             setClusterElementsCanvasOpen(true);
+
+            setCurrentComponent(undefined);
+
+            return;
         }
 
         setWorkflowNodeDetailsPanelOpen(true);

@@ -19,7 +19,7 @@ export default function handleComponentAddedSuccess({
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore.getState();
 
-    const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(nodeData.componentName as string);
+    const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(nodeData.type?.split('/')[0] || '');
 
     if (isRootClusterElement) {
         return;
@@ -37,7 +37,7 @@ export default function handleComponentAddedSuccess({
             setCurrentNode({...currentNode, ...nodeData});
             setCurrentComponent({...currentComponent, ...nodeData});
         }
-    } else {
+    } else if (!isRootClusterElement) {
         setCurrentNode({...nodeData, description: ''});
         setCurrentComponent({...nodeData, description: ''});
         setWorkflowNodeDetailsPanelOpen(true);
