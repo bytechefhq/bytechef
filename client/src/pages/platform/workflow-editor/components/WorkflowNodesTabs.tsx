@@ -1,10 +1,6 @@
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {
-    ClusterElementDefinitionBasic,
-    ComponentDefinitionBasic,
-    TaskDispatcherDefinition,
-} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
 import {useEffect, useMemo, useState} from 'react';
@@ -20,7 +16,7 @@ type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
 
 interface WorkflowNodesTabsProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasic>;
-    clusterElementComponentDefinitions?: Array<ClusterElementDefinitionBasic>;
+    clusterElementComponentDefinitions?: Array<ComponentDefinitionBasic>;
     hideActionComponents?: boolean;
     hideClusterElementComponents?: boolean;
     hideTaskDispatchers?: boolean;
@@ -148,7 +144,7 @@ const WorkflowNodesTabs = ({
 
                     {!hideClusterElementComponents && (
                         <TabsTrigger className="w-full data-[state=active]:shadow-none" value="clusterElements">
-                            Cluster elements
+                            Cluster Elements
                         </TabsTrigger>
                     )}
                 </TabsList>
