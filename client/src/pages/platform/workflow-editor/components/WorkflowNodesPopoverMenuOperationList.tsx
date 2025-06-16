@@ -19,8 +19,10 @@ import {useCallback, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useShallow} from 'zustand/react/shallow';
 
+import useClusterElementsDataStore from '../../cluster-element-editor/stores/useClusterElementsDataStore';
 import {
     convertNameToCamelCase,
+    getClusterElementsLabel,
     initializeClusterElementsObject,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
@@ -65,6 +67,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
         }))
     );
 
+    const {nodes: clusterElementNodes} = useClusterElementsDataStore();
+
     const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
         useWorkflowEditorStore();
 
@@ -76,9 +80,12 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
     const queryClient = useQueryClient();
 
-    const {actions, icon, name, title, triggers, version} = componentDefinition;
+    const {actions, clusterElement, clusterElements, icon, name, title, triggers, version} = componentDefinition;
 
-    const operations = useMemo(() => (trigger ? triggers : actions), [trigger, triggers, actions]);
+    const operations = useMemo(
+        () => (trigger ? triggers : clusterElementsCanvasOpen && clusterElement ? clusterElements : actions),
+        [trigger, triggers, clusterElementsCanvasOpen, clusterElement, clusterElements, actions]
+    );
 
     const getNodeData = useCallback(
         (operation: ClickedOperationType, definition: ActionDefinition | TriggerDefinition) => {
@@ -145,9 +152,23 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
             );
 
+            if (!currentClusterRootTask) return;
+
+            const nodePositions = clusterElementNodes.reduce<Record<string, {x: number; y: number}>>(
+                (accumulator, node) => {
+                    accumulator[node.id] = {
+                        x: node.position.x,
+                        y: node.position.y,
+                    };
+
+                    return accumulator;
+                },
+                {}
+            );
+
             const clusterElements = initializeClusterElementsObject(
-                rootClusterElementDefinition,
-                currentClusterRootTask?.clusterElements || {}
+                currentClusterRootTask?.clusterElements || {},
+                rootClusterElementDefinition
             );
 
             if (isMultipleElements) {
@@ -159,9 +180,76 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 clusterElements[clusterElementType] = clusterElementData;
             }
 
+            Object.entries(clusterElements).forEach(([elementKey, elementValue]) => {
+                if (elementKey !== clusterElementType || isMultipleElements) {
+                    if (Array.isArray(elementValue)) {
+                        clusterElements[elementKey] = elementValue.map((element) => {
+                            const elementNodeId = element.name;
+
+                            const elementPosition = nodePositions[elementNodeId];
+
+                            if (elementPosition) {
+                                return {
+                                    ...element,
+                                    metadata: {
+                                        ...element?.metadata,
+                                        ui: {
+                                            ...element?.metadata?.ui,
+                                            nodePosition: elementPosition,
+                                        },
+                                    },
+                                };
+                            }
+
+                            return element;
+                        });
+                    } else if (elementValue != null && 'name' in elementValue) {
+                        const elementNodeId = elementValue.name;
+                        const elementPosition = nodePositions[elementNodeId];
+
+                        if (elementPosition) {
+                            clusterElements[elementKey] = {
+                                ...elementValue,
+                                metadata: {
+                                    ...elementValue?.metadata,
+                                    ui: {
+                                        ...elementValue?.metadata?.ui,
+                                        nodePosition: elementPosition,
+                                    },
+                                },
+                            } as ClusterElementItemType;
+                        }
+                    }
+                }
+            });
+
+            const placeholderPositions = Object.entries(nodePositions).reduce<Record<string, {x: number; y: number}>>(
+                (accumulator, [nodeId, position]) => {
+                    if (nodeId.includes('placeholder')) {
+                        accumulator[nodeId] = position;
+                    }
+                    return accumulator;
+                },
+                {}
+            );
+
+            const rootNodePosition = rootClusterElementNodeData?.workflowNodeName
+                ? nodePositions[rootClusterElementNodeData.workflowNodeName]
+                : undefined;
+
+            const metadata = {
+                ...currentClusterRootTask.metadata,
+                ui: {
+                    ...currentClusterRootTask.metadata?.ui,
+                    nodePosition: rootNodePosition,
+                    placeholderPositions: placeholderPositions || {},
+                },
+            };
+
             const updatedNodeData = {
                 ...currentClusterRootTask,
                 clusterElements,
+                metadata,
             };
 
             setRootClusterElementNodeData({
@@ -188,19 +276,17 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 },
                 updateWorkflowMutation: updateWorkflowMutation!,
             });
-
-            setPopoverOpen(false);
         },
         [
             workflow,
             rootClusterElementDefinition,
-            setRootClusterElementNodeData,
+            clusterElementNodes,
             rootClusterElementNodeData,
+            setRootClusterElementNodeData,
             currentNode,
             invalidateWorkflowQueries,
             queryClient,
             updateWorkflowMutation,
-            setPopoverOpen,
             setCurrentNode,
         ]
     );
@@ -256,7 +342,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 const isMultipleElements = !!currentClusterElementDefinition.multipleElements;
 
                 const getClusterElementDefinitionRequest = {
-                    clusterElementName: isMultipleElements ? operationName : clusterElementType,
+                    clusterElementName: operationName,
                     componentName: componentName,
                     componentVersion: version,
                 };
@@ -271,6 +357,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 const clusterElementData = {
                     label: clickedOperation.componentLabel,
+                    metadata: {},
                     name: getFormattedName(componentName),
                     parameters:
                         getParametersWithDefaultValues({
@@ -414,7 +501,13 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 <div className="flex w-full flex-col">
                     <h2 className="text-lg font-semibold">{title}</h2>
 
-                    <h3 className="text-sm text-muted-foreground">{trigger ? 'Triggers' : 'Actions'}</h3>
+                    <h3 className="text-sm text-muted-foreground">
+                        {trigger
+                            ? 'Triggers'
+                            : clusterElementsCanvasOpen
+                              ? getClusterElementsLabel(clusterElementType as string)
+                              : 'Actions'}
+                    </h3>
                 </div>
             </header>
 

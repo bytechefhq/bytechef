@@ -3,11 +3,7 @@ import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/Workf
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
-import {
-    ClusterElementDefinitionBasic,
-    ComponentDefinitionBasic,
-    TaskDispatcherDefinition,
-} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
@@ -15,8 +11,11 @@ import {memo, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+import {convertNameToSnakeCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
+
 interface WorkflowNodesListProps {
     actionPanelOpen: boolean;
+    clusterElementType?: string;
     edgeId?: string;
     handleComponentClick?: (clickedItem: ClickedDefinitionType) => void;
     hideActionComponents?: boolean;
@@ -24,13 +23,13 @@ interface WorkflowNodesListProps {
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     selectedComponentName?: string;
-    sourceData?: ClusterElementDefinitionBasic[];
     sourceNodeId?: string;
 }
 
 const WorkflowNodesPopoverMenuComponentList = memo(
     ({
         actionPanelOpen,
+        clusterElementType,
         edgeId,
         handleComponentClick,
         hideActionComponents = false,
@@ -38,7 +37,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         hideTaskDispatchers = false,
         hideTriggerComponents = false,
         selectedComponentName,
-        sourceData,
         sourceNodeId,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
@@ -55,7 +53,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         >([]);
 
         const [filteredClusterElementComponentDefinitions, setFilteredClusterElementComponentDefinitions] = useState<
-            Array<ClusterElementDefinitionBasic>
+            Array<ComponentDefinitionBasic>
         >([]);
 
         const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();
@@ -73,34 +71,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         );
 
         useEffect(() => {
-            if (sourceData) {
-                const clusterElementNames = new Set(
-                    sourceData.map((element) => (element.componentName || element.name)?.toLowerCase()).filter(Boolean)
-                );
-
-                const matchingComponents = componentDefinitions
-                    .filter(({name}) => name && clusterElementNames.has(name.toLowerCase()))
-                    .filter(
-                        (comp) =>
-                            comp.name?.toLowerCase().includes(filter.toLowerCase()) ||
-                            comp.title?.toLowerCase().includes(filter.toLowerCase())
-                    );
-
-                if (matchingComponents.length > 0) {
-                    setFilteredClusterElementComponentDefinitions(
-                        matchingComponents as unknown as Array<ClusterElementDefinitionBasic>
-                    );
-                } else {
-                    setFilteredClusterElementComponentDefinitions(
-                        sourceData.filter(
-                            (element) =>
-                                element.name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                element.title?.toLowerCase().includes(filter.toLowerCase()) ||
-                                element.componentName?.toLowerCase().includes(filter.toLowerCase())
-                        )
-                    );
-                }
-            } else if (!sourceData && componentDefinitions) {
+            if (componentDefinitions) {
                 setFilteredActionComponentDefinitions(
                     componentDefinitions
                         .filter(
@@ -120,8 +91,19 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                                 title?.toLowerCase().includes(filter.toLowerCase()))
                     )
                 );
+
+                if (clusterElementType) {
+                    setFilteredClusterElementComponentDefinitions(
+                        componentDefinitions.filter(
+                            ({clusterElementsCount, name, title}) =>
+                                clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)] &&
+                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
+                                    title?.toLowerCase().includes(filter.toLowerCase()))
+                        )
+                    );
+                }
             }
-        }, [componentDefinitions, filter, ff_797, sourceData]);
+        }, [componentDefinitions, filter, ff_797, clusterElementType]);
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>

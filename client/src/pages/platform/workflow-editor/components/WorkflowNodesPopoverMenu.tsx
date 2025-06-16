@@ -1,11 +1,5 @@
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {
-    ClusterElementDefinitionApi,
-    ClusterElementDefinitionBasic,
-    ComponentDefinition,
-    ComponentDefinitionApi,
-} from '@/shared/middleware/platform/configuration';
-import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
+import {ComponentDefinition, ComponentDefinitionApi} from '@/shared/middleware/platform/configuration';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionQuery,
@@ -16,12 +10,10 @@ import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'reac
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import {convertNameToCamelCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
-import handleClusterElementClick from '../utils/handleClusterElementClick';
 import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
@@ -34,7 +26,6 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     nodeIndex?: number;
-    sourceData?: ClusterElementDefinitionBasic[];
     sourceNodeId: string;
 }
 
@@ -47,7 +38,6 @@ const WorkflowNodesPopoverMenu = ({
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
     nodeIndex,
-    sourceData,
     sourceNodeId,
 }: WorkflowNodesPopoverMenuProps) => {
     const [actionPanelOpen, setActionPanelOpen] = useState(false);
@@ -95,7 +85,7 @@ const WorkflowNodesPopoverMenu = ({
 
     const handleComponentClick = useCallback(
         async (clickedItem: ClickedDefinitionType) => {
-            const {clusterElement, componentVersion, name, taskDispatcher, trigger, version} = clickedItem;
+            const {componentVersion, name, taskDispatcher, trigger, version} = clickedItem;
 
             if (taskDispatcher) {
                 const edge = edges.find((edge) => edge.id === edgeId);
@@ -127,48 +117,6 @@ const WorkflowNodesPopoverMenu = ({
                 setTrigger(true);
             }
 
-            if (
-                clusterElement &&
-                (!('actionsCount' in clickedItem) || !clickedItem.actionsCount) &&
-                rootClusterElementDefinition
-            ) {
-                if (clickedItem) {
-                    const getClusterElementDefinitionRequest = {
-                        clusterElementName: convertNameToCamelCase(clickedItem.type),
-                        componentName: clickedItem.componentName || '',
-                        componentVersion: clickedItem.componentVersion || 1,
-                    };
-
-                    const clickedClusterElementDefinition = await queryClient.fetchQuery({
-                        queryFn: () =>
-                            new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
-                                getClusterElementDefinitionRequest
-                            ),
-                        queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(
-                            getClusterElementDefinitionRequest
-                        ),
-                    });
-                    const clusterData = {
-                        ...clickedItem,
-                        componentName: clickedItem.componentName,
-                    } as ClusterElementDefinitionBasic;
-
-                    handleClusterElementClick({
-                        clickedClusterElementDefinition,
-                        data: clusterData,
-                        invalidateWorkflowQueries: invalidateWorkflowQueries!,
-                        queryClient,
-                        rootClusterElementDefinition,
-                        setPopoverOpen,
-                        updateWorkflowMutation: updateWorkflowMutation!,
-                    });
-                }
-
-                setPopoverOpen(false);
-
-                return;
-            }
-
             const clickedComponentDefinition = await queryClient.fetchQuery({
                 queryFn: () =>
                     new ComponentDefinitionApi().getComponentDefinition({
@@ -192,6 +140,8 @@ const WorkflowNodesPopoverMenu = ({
     useEffect(() => {
         if (componentDefinitionToBeAdded?.name) {
             setActionPanelOpen(true);
+        } else {
+            setActionPanelOpen(false);
         }
     }, [componentDefinitionToBeAdded?.name]);
 
@@ -234,6 +184,7 @@ const WorkflowNodesPopoverMenu = ({
                 <div className="nowheel flex w-full rounded-lg bg-surface-neutral-secondary">
                     <WorkflowNodesPopoverMenuComponentList
                         actionPanelOpen={actionPanelOpen}
+                        clusterElementType={clusterElementType}
                         edgeId={edgeId}
                         handleComponentClick={handleComponentClick}
                         hideActionComponents={hideActionComponents}
@@ -241,7 +192,6 @@ const WorkflowNodesPopoverMenu = ({
                         hideTaskDispatchers={hideTaskDispatchers}
                         hideTriggerComponents={hideTriggerComponents}
                         selectedComponentName={componentDefinitionToBeAdded?.name}
-                        sourceData={sourceData}
                         sourceNodeId={sourceNodeId}
                     />
 
