@@ -20,6 +20,7 @@ import {
     IntegrationInstanceConfigurationWorkflow,
     IntegrationInstanceConfigurationWorkflowConnection,
 } from '@/ee/shared/middleware/embedded/configuration';
+import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {AuthorizationType} from '@/shared/middleware/platform/configuration';
@@ -376,16 +377,18 @@ const IntegrationInstanceConfigurationDialog = ({
                         <DialogCloseButton />
                     </DialogHeader>
 
-                    <div
-                        className={twMerge(
-                            ((activeStepIndex === 1 && !oAuth2Authorization) ||
-                                (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
-                                (activeStepIndex === 2 && oAuth2Authorization)) &&
-                                'max-h-integration-instance-configuration-dialog-height overflow-y-auto'
-                        )}
-                    >
-                        {integrationInstanceConfigurationDialogSteps[activeStepIndex].content}
-                    </div>
+                    <WorkflowMockProvider>
+                        <div
+                            className={twMerge(
+                                ((activeStepIndex === 1 && !oAuth2Authorization) ||
+                                    (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
+                                    (activeStepIndex === 2 && oAuth2Authorization)) &&
+                                    'max-h-integration-instance-configuration-dialog-height overflow-y-auto'
+                            )}
+                        >
+                            {integrationInstanceConfigurationDialogSteps[activeStepIndex].content}
+                        </div>
+                    </WorkflowMockProvider>
 
                     {integrationInstanceConfiguration?.id && connectionDefinition && !updateIntegrationVersion && (
                         <div className="py-4">

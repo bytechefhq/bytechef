@@ -13,6 +13,7 @@ import {
 import {Form} from '@/components/ui/form';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ComponentConnection,
@@ -315,9 +316,13 @@ const ProjectDeploymentDialog = ({
                         <DialogCloseButton />
                     </DialogHeader>
 
-                    <div className={twMerge('px-6', activeStepIndex === 1 && 'max-h-dialog-height overflow-y-auto')}>
-                        {projectDeploymentDialogSteps[activeStepIndex].content}
-                    </div>
+                    <WorkflowMockProvider>
+                        <div
+                            className={twMerge('px-6', activeStepIndex === 1 && 'max-h-dialog-height overflow-y-auto')}
+                        >
+                            {projectDeploymentDialogSteps[activeStepIndex].content}
+                        </div>
+                    </WorkflowMockProvider>
 
                     <DialogFooter className="p-6">
                         {activeStepIndex === 0 && (

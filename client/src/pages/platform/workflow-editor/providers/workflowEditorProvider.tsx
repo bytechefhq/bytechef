@@ -106,9 +106,8 @@ export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     webhookTriggerTestApi: WebhookTriggerTestApiI;
 }
 
-export interface WorkflowEditorProviderProps {
+export interface WorkflowMockProviderProps {
     children: React.ReactNode;
-    value: WorkflowEditorStateI;
 }
 
 export interface WorkflowReadOnlyProviderProps {
@@ -116,27 +115,39 @@ export interface WorkflowReadOnlyProviderProps {
     value: WorkflowReadOnlyStateI;
 }
 
+export interface WorkflowEditorProviderProps {
+    children: React.ReactNode;
+    value: WorkflowEditorStateI;
+}
+
+const WorkflowMockProviderContext = createContext<unknown | undefined>(undefined);
+
+const WorkflowReadOnlyProviderContext = createContext<WorkflowReadOnlyStateI | undefined>(undefined);
+
 const WorkflowEditorProviderContext = createContext<WorkflowEditorStateI | undefined>(undefined);
 
-const WorkflowReadoOnlyProviderContext = createContext<WorkflowReadOnlyStateI | undefined>(undefined);
+export const WorkflowMockProvider = ({children}: WorkflowMockProviderProps) => (
+    <WorkflowMockProviderContext.Provider value={{}}>{children}</WorkflowMockProviderContext.Provider>
+);
+
+export const WorkflowReadOnlyProvider = ({children, value}: WorkflowReadOnlyProviderProps) => (
+    <WorkflowReadOnlyProviderContext.Provider value={value}>{children}</WorkflowReadOnlyProviderContext.Provider>
+);
 
 export const WorkflowEditorProvider = ({children, value}: WorkflowEditorProviderProps) => (
     <WorkflowEditorProviderContext.Provider value={value}>{children}</WorkflowEditorProviderContext.Provider>
 );
 
-export const WorkflowReadOnlyProvider = ({children, value}: WorkflowReadOnlyProviderProps) => (
-    <WorkflowReadoOnlyProviderContext.Provider value={value}>{children}</WorkflowReadoOnlyProviderContext.Provider>
-);
-
 export const useWorkflowEditor = (): WorkflowEditorStateI => {
+    const mockContext = useContext(WorkflowMockProviderContext);
     const editorContext = useContext(WorkflowEditorProviderContext);
-    const readOnlyContext = useContext(WorkflowReadoOnlyProviderContext);
+    const readOnlyContext = useContext(WorkflowReadOnlyProviderContext);
 
-    const context = editorContext ? editorContext : readOnlyContext;
+    const context = mockContext || editorContext || readOnlyContext;
 
     if (context === undefined) {
         throw new Error(
-            'useWorkflowEditor must be used within a WorkflowEditorProvider/WorkflowReadoOnlyProviderContext'
+            'useWorkflowEditor must be used within a WorkflowEditorProvider/WorkflowReadOnlyProviderContext'
         );
     }
 

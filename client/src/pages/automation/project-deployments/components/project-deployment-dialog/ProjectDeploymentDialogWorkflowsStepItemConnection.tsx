@@ -3,10 +3,10 @@ import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
@@ -40,8 +40,6 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
         componentName: componentConnection.componentName,
         componentVersion: componentConnection.componentVersion,
     });
-
-    const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
