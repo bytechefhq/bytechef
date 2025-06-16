@@ -1,58 +1,90 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import ConnectedUserFilterTitle from '@/ee/pages/embedded/automation-workflows/components/ConnectedUserFilterTitle';
+import EnvironmentLeftSidebarNav from '@/ee/pages/embedded/automation-workflows/components/EnvironmentLeftSidebarNav';
+import ConnectedUserProjectList from '@/ee/pages/embedded/automation-workflows/components/connected-user-project-list/ConnectedUserProjectList';
+import {ConnectedUser, ConnectedUserFromJSON} from '@/ee/shared/middleware/embedded/connected-user';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {Settings2Icon} from 'lucide-react';
+import {Environment, InputMaybe, useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
+import {useGetConnectedUsersQuery} from '@/shared/queries/embedded/connectedUsers.queries';
+import {Workflow} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
 import ConnectedUsersLeftSidebarNav from './components/ConnectedUsersLeftSidebarNav';
 
+function getEnvironment(environment: number | undefined): Environment | undefined {
+    return environment === undefined
+        ? undefined
+        : environment === 1
+          ? Environment.Development
+          : environment === 2
+            ? Environment.Staging
+            : Environment.Production;
+}
+
 const AutomationWorkflows = () => {
     const [searchParams] = useSearchParams();
 
-    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
+    const connectedUserId = searchParams.get('connectedUserId')
+        ? parseInt(searchParams.get('connectedUserId')!)
+        : undefined;
+    const environment = getEnvironment(
+        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined
+    );
+
+    const {data: connectedUsersPage, isLoading: isConnectedUsersPageLoading} = useGetConnectedUsersQuery({
+        pageNumber: 0,
+    });
+
+    const {data, isLoading: isConnectedUserProjectsLoading} = useConnectedUserProjectsQuery({
+        connectedUserId: connectedUserId?.toString(),
+        environment: environment as InputMaybe<Environment> | undefined,
+    });
+
+    const connectedUsers =
+        connectedUsersPage?.content?.map((connectedUser: object) => ConnectedUserFromJSON(connectedUser)) || [];
 
     return (
         <LayoutContainer
-            header={<Header centerTitle={true} position="main" title="" />}
+            header={
+                connectedUsers &&
+                connectedUsers?.length > 0 && (
+                    <Header
+                        centerTitle={true}
+                        position="main"
+                        title={
+                            <ConnectedUserFilterTitle
+                                connectedUsers={connectedUsers as ConnectedUser[]}
+                                environment={environment}
+                                filterData={{id: connectedUserId}}
+                            />
+                        }
+                    />
+                )
+            }
             leftSidebarBody={
                 <>
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                {[
-                                    {label: 'All Environments'},
-                                    {label: 'Development', value: 1},
-                                    {label: 'Staging', value: 2},
-                                    {label: 'Production', value: 3},
-                                ]?.map((item) => (
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current: environment === item.value,
-                                            id: item.value,
-                                            name: item.label,
-                                        }}
-                                        key={item.value ?? ''}
-                                        toLink={`?environment=${item.value ?? ''}`}
-                                    />
-                                ))}
-                            </>
-                        }
-                        title="Environments"
+                    <EnvironmentLeftSidebarNav connectedUserId={connectedUserId} environment={environment} />
+
+                    <ConnectedUsersLeftSidebarNav
+                        connectedUserId={connectedUserId}
+                        connectedUsers={connectedUsers}
+                        environment={environment}
                     />
-                    <ConnectedUsersLeftSidebarNav />
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Automation Workflows" />}
             leftSidebarWidth="64"
         >
-            <PageLoader errors={[]} loading={false}>
-                <EmptyList
-                    icon={<Settings2Icon className="size-24 text-gray-300" />}
-                    message="Get started by embedding the Workflow Builder."
-                    title="No Automation Workflows"
-                />
+            <PageLoader loading={isConnectedUsersPageLoading || isConnectedUserProjectsLoading}>
+                {data?.connectedUserProjects && data?.connectedUserProjects?.length > 0 ? (
+                    <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
+                        <ConnectedUserProjectList connectedUserProjects={data.connectedUserProjects} />
+                    </div>
+                ) : (
+                    <EmptyList icon={<Workflow className="size-24 text-gray-300" />} title="No Automation Workflows" />
+                )}
             </PageLoader>
         </LayoutContainer>
     );
