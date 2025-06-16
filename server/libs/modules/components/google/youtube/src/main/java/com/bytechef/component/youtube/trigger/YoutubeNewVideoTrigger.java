@@ -21,11 +21,10 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.ID;
 import static com.bytechef.component.youtube.constant.YoutubeConstants.IDENTIFIER;
 import static com.bytechef.component.youtube.constant.YoutubeConstants.ITEMS;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.LAST_TIME_CHECKED;
 import static com.bytechef.component.youtube.constant.YoutubeConstants.SNIPPET;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.VIDEO;
 import static com.bytechef.component.youtube.util.YoutubeUtils.getChannelId;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -36,6 +35,10 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -111,10 +114,14 @@ public class YoutubeNewVideoTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        List<String> allVideos = closureParameters.getList(VIDEO, String.class, List.of());
-        List<String> allVideosUpdated = new ArrayList<>();
-
         String channelId = getChannelId(inputParameters.getRequiredString(IDENTIFIER), triggerContext);
+
+        ZoneId zoneId = ZoneId.systemDefault();
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+        ZonedDateTime startZonedDate = startDate.atZone(zoneId);
 
         Map<String, Object> response =
             triggerContext.http(http -> http.get("https://www.googleapis.com/youtube/v3/search"))
@@ -122,7 +129,8 @@ public class YoutubeNewVideoTrigger {
                     "part", SNIPPET,
                     "channelId", channelId,
                     "type", "video",
-                    "order", "date")
+                    "order", "date",
+                    "publishedAfter", startZonedDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
                 .configuration(Http.responseType(ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
@@ -132,19 +140,13 @@ public class YoutubeNewVideoTrigger {
         if (response.get(ITEMS) instanceof List<?> items) {
             for (Object item : items) {
                 if (item instanceof Map<?, ?> itemMap &&
-                    itemMap.get(ID) instanceof Map<?, ?> idMap &&
-                    idMap.get("videoId") instanceof String videoId &&
                     itemMap.get(SNIPPET) instanceof Map<?, ?> snippet) {
 
-                    allVideosUpdated.add(videoId);
-
-                    if (!allVideos.contains(videoId)) {
-                        newVideos.add(snippet);
-                    }
+                    newVideos.add(snippet);
                 }
             }
         }
 
-        return new PollOutput(newVideos, Map.of(VIDEO, allVideosUpdated), false);
+        return new PollOutput(newVideos, Map.of(LAST_TIME_CHECKED, now), false);
     }
 }

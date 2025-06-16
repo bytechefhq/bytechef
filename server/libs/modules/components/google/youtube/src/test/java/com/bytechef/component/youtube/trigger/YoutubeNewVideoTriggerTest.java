@@ -17,9 +17,10 @@
 package com.bytechef.component.youtube.trigger;
 
 import static com.bytechef.component.youtube.constant.YoutubeConstants.IDENTIFIER;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.VIDEO;
+import static com.bytechef.component.youtube.constant.YoutubeConstants.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -32,6 +33,10 @@ import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.youtube.util.YoutubeUtils;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -44,15 +49,17 @@ import org.mockito.MockedStatic;
 class YoutubeNewVideoTriggerTest {
 
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(IDENTIFIER, "testIdentifier"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final LocalDateTime mockLocalDate = LocalDateTime.of(2025, 6, 16, 15, 5);
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
     private final Map<String, Object> responseMap = Map.of("items", List.of(
         Map.of("id", Map.of("videoId", "1"), "snippet", Map.of())));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
         ArgumentCaptor.forClass(TriggerContext.class);
+    private final Parameters mockedParameters =
+        MockParametersFactory.create(Map.of(IDENTIFIER, "testIdentifier", LAST_TIME_CHECKED, mockLocalDate));
 
     @Test
     void testPoll() {
@@ -75,20 +82,22 @@ class YoutubeNewVideoTriggerTest {
             PollOutput pollOutput = YoutubeNewVideoTrigger.poll(
                 mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
 
-            PollOutput expectedPollOutput = new PollOutput(
-                List.of(Map.of()), Map.of(VIDEO, List.of("1")), false);
-
-            assertEquals(expectedPollOutput, pollOutput);
+            assertEquals(List.of(Map.of()), pollOutput.records());
+            assertFalse(pollOutput.pollImmediately());
 
             assertEquals("testIdentifier", stringArgumentCaptor.getValue());
             assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
+
+            ZoneId zoneId = ZoneId.systemDefault();
+            ZonedDateTime startZonedDate = mockLocalDate.atZone(zoneId);
 
             Object[] queryArguments = queryArgumentCaptor.getValue();
             Object[] expectedQueryArguments = {
                 "part", "snippet",
                 "channelId", "channelId",
                 "type", "video",
-                "order", "date"
+                "order", "date",
+                "publishedAfter", startZonedDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
             };
 
             assertArrayEquals(expectedQueryArguments, queryArguments);
