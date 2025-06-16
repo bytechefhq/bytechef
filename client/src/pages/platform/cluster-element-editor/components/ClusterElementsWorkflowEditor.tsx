@@ -7,7 +7,6 @@ import PlaceholderNode from '../../workflow-editor/nodes/PlaceholderNode';
 import WorkflowNode from '../../workflow-editor/nodes/WorkflowNode';
 import LabeledClusterElementsEdge from '../edges/LabeledClusterElementsEdge';
 import useClusterElementsLayout from '../hooks/useClusterElementsLayout';
-import MultipleClusterElementsGhostNode from '../nodes/MultipleClusterElementsGhostNode';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
 const ClusterElementsWorkflowEditor = () => {
@@ -25,7 +24,6 @@ const ClusterElementsWorkflowEditor = () => {
     };
 
     const clusterElementsNodeTypes = {
-        multipleClusterElementsGhostNode: MultipleClusterElementsGhostNode,
         placeholder: PlaceholderNode,
         workflow: WorkflowNode,
     };
