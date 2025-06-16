@@ -1,21 +1,27 @@
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ActionDefinitionBasic, TriggerDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {
+    ActionDefinitionBasic,
+    ClusterElementDefinitionBasic,
+    TriggerDefinitionBasic,
+} from '@/shared/middleware/platform/configuration';
 import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {twMerge} from 'tailwind-merge';
 
 interface CurrentOperationSelectProps {
+    clusterElementLabel?: string;
     description?: string;
     handleValueChange: (value: string) => void;
-    operations: Array<ActionDefinitionBasic | TriggerDefinitionBasic>;
+    operations: Array<ActionDefinitionBasic | TriggerDefinitionBasic | ClusterElementDefinitionBasic>;
     triggerSelect?: boolean;
     value: string;
 }
 
 const OperationSelect = ({
+    clusterElementLabel,
     description,
     handleValueChange,
     operations,
@@ -24,7 +30,9 @@ const OperationSelect = ({
 }: CurrentOperationSelectProps) => (
     <div className="flex w-full flex-col">
         <Label className="flex items-center space-x-1">
-            <span className="text-sm font-medium leading-6">{triggerSelect ? 'Triggers' : 'Actions'}</span>
+            <span className="text-sm font-medium leading-6">
+                {clusterElementLabel ?? (triggerSelect ? 'Triggers' : 'Actions')}
+            </span>
 
             {description && (
                 <Tooltip>
@@ -79,6 +87,7 @@ const OperationSelect = ({
 );
 
 const CurrentOperationSelect = ({
+    clusterElementLabel,
     description,
     handleValueChange,
     operations,
@@ -89,7 +98,9 @@ const CurrentOperationSelect = ({
         {operations?.length === 1 && !!operations[0] ? (
             <div className="flex w-full flex-col">
                 <div className="flex items-center space-x-1">
-                    <span className="text-sm font-medium leading-6">{triggerSelect ? 'Triggers' : 'Actions'}</span>
+                    <span className="text-sm font-medium leading-6">
+                        {clusterElementLabel ?? (triggerSelect ? 'Triggers' : 'Actions')}
+                    </span>
 
                     {description && (
                         <Tooltip>
@@ -108,6 +119,7 @@ const CurrentOperationSelect = ({
             </div>
         ) : (
             <OperationSelect
+                clusterElementLabel={clusterElementLabel}
                 description={description}
                 handleValueChange={handleValueChange}
                 operations={operations}
