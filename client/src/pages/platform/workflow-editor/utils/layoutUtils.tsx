@@ -8,6 +8,7 @@ import {
     NODE_WIDTH,
     PLACEHOLDER_NODE_HEIGHT,
     ROOT_CLUSTER_ELEMENT_NAMES,
+    ROOT_CLUSTER_WIDTH,
     TASK_DISPATCHER_NAMES,
 } from '@/shared/constants';
 import {
@@ -18,6 +19,7 @@ import {
 import {
     BranchCaseType,
     BranchChildTasksType,
+    ClusterElementsType,
     ConditionChildTasksType,
     EachChildTasksType,
     LoopChildTasksType,
@@ -56,16 +58,6 @@ export const calculateNodeHeight = (node: Node) => {
     }
 
     return height;
-};
-
-export const calculateClusterElementsNodeHeight = (node: Node) => {
-    let clusterElementNodeHeight = NODE_HEIGHT;
-
-    if (node.id.includes('placeholder')) {
-        clusterElementNodeHeight = 150;
-    }
-
-    return clusterElementNodeHeight;
 };
 
 export const convertTaskToNode = (
@@ -116,20 +108,44 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
     dagreGraph.setGraph({rankdir: DIRECTION});
 
     nodes.forEach((node) => {
-        let height;
+        let height = NODE_HEIGHT;
+        let width = NODE_WIDTH;
 
         if (isClusterElementsCanvas) {
-            height = calculateClusterElementsNodeHeight(node);
+            width = 72;
+
+            if (node.id.includes('placeholder')) {
+                width = 15;
+            }
+
+            if (node.data.rootClusterElement) {
+                width = ROOT_CLUSTER_WIDTH;
+            }
         } else {
             height = calculateNodeHeight(node);
         }
 
-        dagreGraph.setNode(node.id, {height, width: NODE_WIDTH});
+        dagreGraph.setNode(node.id, {height, width});
     });
 
     edges.forEach((edge) => {
         if (edge.target.includes('bottom-ghost')) {
             dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
+        } else if (ROOT_CLUSTER_ELEMENT_NAMES.includes(edge.source.split('_')[0])) {
+            const sourceNode = nodes.find((node) => node.id === edge.source);
+
+            const hasValidClusterElements =
+                sourceNode?.data.clusterElements &&
+                Object.entries(sourceNode.data.clusterElements).some(
+                    ([, value]) =>
+                        value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+                );
+
+            if (hasValidClusterElements) {
+                dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
+            } else {
+                dagreGraph.setEdge(edge.source, edge.target);
+            }
         } else {
             dagreGraph.setEdge(edge.source, edge.target);
         }
@@ -143,18 +159,30 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
     }
 
     if (isClusterElementsCanvas) {
-        const nodesWithPositions = nodes.filter(
-            (node) => containsNodePosition(node.data.metadata) || (node.position.x !== 0 && node.position.y !== 0)
-        );
+        const rootNode = nodes.find((node) => node.data.clusterElements);
 
-        const nodesNeedingLayout = nodes.filter(
-            (node) => !containsNodePosition(node.data.metadata) && node.position.x === 0 && node.position.y === 0
-        );
+        const hasValidClusterElements =
+            rootNode &&
+            Object.entries(rootNode.data.clusterElements as ClusterElementsType).some(
+                ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+            );
+
+        const nodesWithPositions = hasValidClusterElements
+            ? nodes.filter(
+                  (node) => containsNodePosition(node.data.metadata) || (node.position.x !== 0 && node.position.y !== 0)
+              )
+            : [];
+
+        const nodesToLayout = hasValidClusterElements
+            ? nodes.filter(
+                  (node) => !containsNodePosition(node.data.metadata) && node.position.x === 0 && node.position.y === 0
+              )
+            : nodes;
 
         let centeringOffsetX = 0;
 
-        if (nodesNeedingLayout.length > 0) {
-            const dagrePositions = nodesNeedingLayout.map((node) => dagreGraph.node(node.id).x);
+        if (nodesToLayout.length > 0) {
+            const dagrePositions = nodesToLayout.map((node) => dagreGraph.node(node.id).x);
 
             const minX = Math.min(...dagrePositions);
             const maxX = Math.max(...dagrePositions);
@@ -166,20 +194,33 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
             centeringOffsetX = canvasWidth / 2 - graphCenter;
         }
 
-        const positionedNodes = [
-            ...nodesWithPositions.map((node) => ({
-                ...node,
-                position: containsNodePosition(node.data.metadata) ? node.data.metadata.ui.nodePosition : node.position,
-            })),
+        let positionedNodes;
 
-            ...nodesNeedingLayout.map((node) => ({
+        if (hasValidClusterElements && nodesWithPositions.length > 0) {
+            positionedNodes = [
+                ...nodesWithPositions.map((node) => ({
+                    ...node,
+                    position: containsNodePosition(node.data.metadata)
+                        ? node.data.metadata.ui.nodePosition
+                        : node.position,
+                })),
+                ...nodesToLayout.map((node) => ({
+                    ...node,
+                    position: {
+                        x: dagreGraph.node(node.id).x + centeringOffsetX,
+                        y: dagreGraph.node(node.id).y + NODE_HEIGHT,
+                    },
+                })),
+            ];
+        } else {
+            positionedNodes = nodesToLayout.map((node) => ({
                 ...node,
                 position: {
                     x: dagreGraph.node(node.id).x + centeringOffsetX,
-                    y: dagreGraph.node(node.id).y + 150,
+                    y: dagreGraph.node(node.id).y + NODE_HEIGHT,
                 },
-            })),
-        ];
+            }));
+        }
 
         return {edges, nodes: positionedNodes};
     }
