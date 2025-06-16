@@ -37,6 +37,9 @@ export default function saveClusterElementNodesPosition({
         return;
     }
 
+    const clusterElements: Record<string, ClusterElementItemType | ClusterElementItemType[]> =
+        currentClusterRootTask.clusterElements;
+
     const nodePositions = clusterElementNodes.reduce<Record<string, {x: number; y: number}>>((accumulator, node) => {
         accumulator[node.id] = {
             x: node.position.x,
@@ -45,20 +48,6 @@ export default function saveClusterElementNodesPosition({
 
         return accumulator;
     }, {});
-
-    const placeholderPositions = Object.entries(nodePositions).reduce<Record<string, {x: number; y: number}>>(
-        (accumulator, [nodeId, position]) => {
-            if (nodeId.includes('placeholder')) {
-                accumulator[nodeId] = position;
-            }
-
-            return accumulator;
-        },
-        {}
-    );
-
-    const clusterElements: Record<string, ClusterElementItemType | ClusterElementItemType[]> =
-        currentClusterRootTask.clusterElements;
 
     Object.entries(clusterElements).forEach(([elementKey, elementValue]) => {
         if (Array.isArray(elementValue)) {
@@ -71,9 +60,9 @@ export default function saveClusterElementNodesPosition({
                     return {
                         ...element,
                         metadata: {
-                            ...(element?.metadata || {}),
+                            ...element?.metadata,
                             ui: {
-                                ...(element?.metadata?.ui || {}),
+                                ...element?.metadata?.ui,
                                 nodePosition: elementPosition,
                             },
                         },
@@ -82,26 +71,17 @@ export default function saveClusterElementNodesPosition({
 
                 return element;
             });
-        } else {
-            let elementNodeId;
-
-            if (elementValue != null && 'name' in elementValue) {
-                elementNodeId = elementValue.name;
-            }
-
-            if (!elementNodeId) {
-                return;
-            }
-
+        } else if (elementValue != null && 'name' in elementValue) {
+            const elementNodeId = elementValue.name;
             const elementPosition = nodePositions[elementNodeId];
 
             if (elementPosition) {
                 clusterElements[elementKey] = {
-                    ...(clusterElements[elementKey] as ClusterElementItemType),
+                    ...elementValue,
                     metadata: {
-                        ...(elementValue?.metadata || {}),
+                        ...elementValue?.metadata,
                         ui: {
-                            ...(elementValue?.metadata?.ui || {}),
+                            ...elementValue?.metadata?.ui,
                             nodePosition: elementPosition,
                         },
                     },
@@ -110,13 +90,26 @@ export default function saveClusterElementNodesPosition({
         }
     });
 
-    const rootNodePosition = nodePositions[rootClusterElementNodeData.workflowNodeName];
+    const placeholderPositions = Object.entries(nodePositions).reduce<Record<string, {x: number; y: number}>>(
+        (accumulator, [nodeId, position]) => {
+            if (nodeId.includes('placeholder')) {
+                accumulator[nodeId] = position;
+            }
+
+            return accumulator;
+        },
+        {}
+    );
+
+    const rootNodePosition = rootClusterElementNodeData?.workflowNodeName
+        ? nodePositions[rootClusterElementNodeData.workflowNodeName]
+        : undefined;
 
     const metadata = {
-        ...(currentClusterRootTask.metadata || {}),
+        ...currentClusterRootTask.metadata,
         ui: {
-            ...(currentClusterRootTask.metadata?.ui || {}),
-            nodePosition: rootNodePosition || {x: 0, y: 0},
+            ...currentClusterRootTask.metadata?.ui,
+            nodePosition: rootNodePosition,
             placeholderPositions: placeholderPositions || {},
         },
     };
@@ -129,13 +122,13 @@ export default function saveClusterElementNodesPosition({
 
     setRootClusterElementNodeData({
         ...rootClusterElementNodeData,
-        clusterElements: clusterElements,
+        clusterElements,
     } as typeof rootClusterElementNodeData);
 
     if (currentNode?.rootClusterElement) {
         setCurrentNode({
             ...currentNode,
-            clusterElements: clusterElements,
+            clusterElements,
         });
     }
 

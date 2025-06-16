@@ -8,14 +8,19 @@ export function createPlaceholderNode(
     currentRootClusterElementNodeName: string,
     elementLabel: string,
     elementType: string,
-    placeholderPositions: Record<string, {x: number; y: number}> = {}
+    nodePositions: Record<string, {x: number; y: number}> = {},
+    rootPlaceholderPositions: Record<string, {x: number; y: number}> = {}
 ): Node {
+    const nodeId = `${currentRootClusterElementNodeName}-${elementType}-placeholder-0`;
+
     return {
-        data: {clusterElementLabel: elementLabel, clusterElementType: elementType, label: '+'},
-        id: `${currentRootClusterElementNodeName}-${elementType}-placeholder-0`,
-        position:
-            placeholderPositions[`${currentRootClusterElementNodeName}-${elementType}-placeholder-0`] ||
-            DEFAULT_NODE_POSITION,
+        data: {
+            clusterElementLabel: elementLabel,
+            clusterElementType: elementType,
+            label: '+',
+        },
+        id: nodeId,
+        position: rootPlaceholderPositions[nodeId] || nodePositions[nodeId] || DEFAULT_NODE_POSITION,
         type: 'placeholder',
     };
 }
@@ -23,10 +28,20 @@ export function createPlaceholderNode(
 export function createSingleElementsNode(
     clusterElementData: ClusterElementItemType,
     elementLabel: string,
-    elementType: string
+    elementType: string,
+    nodePositions: Record<string, {x: number; y: number}> = {}
 ): Node {
     const {label, metadata, name, parameters, type} = clusterElementData;
     const typeSegments = type.split('/');
+    const nodePosition = metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION;
+
+    const enhancedMetadata = {
+        ...(metadata || {}),
+        ui: {
+            ...(metadata?.ui || {}),
+            nodePosition: nodePositions[name] || metadata?.ui?.nodePosition,
+        },
+    };
 
     const iconUrl = `/icons/${typeSegments[0]}.svg`;
 
@@ -45,7 +60,7 @@ export function createSingleElementsNode(
                 />
             ),
             label,
-            metadata: metadata || {},
+            metadata: enhancedMetadata || {},
             name,
             operationName: typeSegments[2],
             parameters,
@@ -54,7 +69,7 @@ export function createSingleElementsNode(
             workflowNodeName: name,
         },
         id: name,
-        position: clusterElementData.metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION,
+        position: nodePositions[name] || nodePosition,
         type: 'workflow',
     };
 }
@@ -62,10 +77,20 @@ export function createSingleElementsNode(
 export function createMultipleElementsNode(
     element: ClusterElementItemType,
     elementType: string,
-    isMultipleElementsNode: boolean
+    isMultipleElementsNode: boolean,
+    nodePositions: Record<string, {x: number; y: number}> = {}
 ) {
     const {label, metadata, name, parameters, type} = element;
     const typeSegments = type.split('/');
+    const nodePosition = metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION;
+
+    const enhancedMetadata = {
+        ...(metadata || {}),
+        ui: {
+            ...(metadata?.ui || {}),
+            nodePosition: nodePositions[name] || metadata?.ui?.nodePosition,
+        },
+    };
 
     const iconUrl = `/icons/${typeSegments[0]}.svg`;
 
@@ -83,7 +108,7 @@ export function createMultipleElementsNode(
                 />
             ),
             label,
-            metadata: metadata || {},
+            metadata: enhancedMetadata || {},
             multipleClusterElementsNode: isMultipleElementsNode,
             name,
             operationName: typeSegments[2],
@@ -93,7 +118,7 @@ export function createMultipleElementsNode(
             workflowNodeName: name,
         },
         id: name,
-        position: element.metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION,
+        position: nodePositions[name] || nodePosition,
         type: 'workflow',
     };
 }
