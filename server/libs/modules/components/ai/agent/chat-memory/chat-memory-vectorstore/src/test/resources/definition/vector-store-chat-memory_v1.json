@@ -37,7 +37,7 @@
     "title" : "Vector Store Chat Memory",
     "type" : {
       "key" : "chatMemory",
-      "label" : "Chat Memory",
+      "label" : "Memory",
       "multipleElements" : false,
       "name" : "CHAT_MEMORY",
       "required" : false

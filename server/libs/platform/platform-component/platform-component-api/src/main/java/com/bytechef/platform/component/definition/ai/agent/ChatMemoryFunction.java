@@ -31,7 +31,7 @@ public interface ChatMemoryFunction {
     /**
      *
      */
-    ClusterElementType CHAT_MEMORY = new ClusterElementType("CHAT_MEMORY", "chatMemory", "Chat Memory");
+    ClusterElementType CHAT_MEMORY = new ClusterElementType("CHAT_MEMORY", "chatMemory", "Memory");
 
     /**
      * @param inputParameters
