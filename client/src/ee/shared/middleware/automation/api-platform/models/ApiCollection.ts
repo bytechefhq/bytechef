@@ -20,6 +20,13 @@ import {
     ApiCollectionEndpointToJSON,
     ApiCollectionEndpointToJSONTyped,
 } from './ApiCollectionEndpoint';
+import type { Environment } from './Environment';
+import {
+    EnvironmentFromJSON,
+    EnvironmentFromJSONTyped,
+    EnvironmentToJSON,
+    EnvironmentToJSONTyped,
+} from './Environment';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
@@ -90,6 +97,12 @@ export interface ApiCollection {
      * @memberof ApiCollection
      */
     endpoints?: Array<ApiCollectionEndpoint>;
+    /**
+     * 
+     * @type {Environment}
+     * @memberof ApiCollection
+     */
+    environment: Environment;
     /**
      * The id of an API collection.
      * @type {number}
@@ -164,12 +177,15 @@ export interface ApiCollection {
     version?: number;
 }
 
+
+
 /**
  * Check if a given object implements the ApiCollection interface.
  */
 export function instanceOfApiCollection(value: object): value is ApiCollection {
     if (!('contextPath' in value) || value['contextPath'] === undefined) return false;
     if (!('enabled' in value) || value['enabled'] === undefined) return false;
+    if (!('environment' in value) || value['environment'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('projectId' in value) || value['projectId'] === undefined) return false;
     if (!('projectVersion' in value) || value['projectVersion'] === undefined) return false;
@@ -194,6 +210,7 @@ export function ApiCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'],
         'endpoints': json['endpoints'] == null ? undefined : ((json['endpoints'] as Array<any>).map(ApiCollectionEndpointFromJSON)),
+        'environment': EnvironmentFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -225,6 +242,7 @@ export function ApiCollectionToJSONTyped(value?: Omit<ApiCollection, 'createdBy'
         'description': value['description'],
         'enabled': value['enabled'],
         'endpoints': value['endpoints'] == null ? undefined : ((value['endpoints'] as Array<any>).map(ApiCollectionEndpointToJSON)),
+        'environment': EnvironmentToJSON(value['environment']),
         'name': value['name'],
         'projectId': value['projectId'],
         'project': ProjectBasicToJSON(value['project']),
