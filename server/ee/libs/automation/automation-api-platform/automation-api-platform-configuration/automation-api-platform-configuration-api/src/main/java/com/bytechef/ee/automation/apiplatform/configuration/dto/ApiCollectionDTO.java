@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.dto;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -23,9 +24,9 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record ApiCollectionDTO(
     int collectionVersion, String contextPath, String createdBy, Instant createdDate, String description,
-    boolean enabled, List<ApiCollectionEndpointDTO> endpoints, Long id, String lastModifiedBy, Instant lastModifiedDate,
-    String name, Project project, long projectId, ProjectDeployment projectDeployment, long projectDeploymentId,
-    int projectVersion, List<Tag> tags, int version) {
+    boolean enabled, List<ApiCollectionEndpointDTO> endpoints, Environment environment, Long id, String lastModifiedBy,
+    Instant lastModifiedDate, String name, Project project, long projectId, ProjectDeployment projectDeployment,
+    long projectDeploymentId, int projectVersion, List<Tag> tags, int version) {
 
     public ApiCollectionDTO(
         ApiCollection apiCollection, List<ApiCollectionEndpointDTO> endpoints, Project project,
@@ -34,9 +35,9 @@ public record ApiCollectionDTO(
         this(
             apiCollection.getCollectionVersion(), apiCollection.getContextPath(), apiCollection.getCreatedBy(),
             apiCollection.getCreatedDate(), apiCollection.getDescription(), projectDeployment.isEnabled(), endpoints,
-            apiCollection.getId(), apiCollection.getLastModifiedBy(), apiCollection.getLastModifiedDate(),
-            apiCollection.getName(), project, projectDeployment.getProjectId(), projectDeployment,
-            apiCollection.getProjectDeploymentId(), projectDeployment.getProjectVersion(), tags,
+            projectDeployment.getEnvironment(), apiCollection.getId(), apiCollection.getLastModifiedBy(),
+            apiCollection.getLastModifiedDate(), apiCollection.getName(), project, projectDeployment.getProjectId(),
+            projectDeployment, apiCollection.getProjectDeploymentId(), projectDeployment.getProjectVersion(), tags,
             apiCollection.getVersion());
     }
 
