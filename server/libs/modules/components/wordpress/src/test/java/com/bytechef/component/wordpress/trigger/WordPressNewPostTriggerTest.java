@@ -16,9 +16,10 @@
 
 package com.bytechef.component.wordpress.trigger;
 
-import static com.bytechef.component.wordpress.constant.WordpressConstants.ALL_POSTS;
+import static com.bytechef.component.wordpress.constant.WordpressConstants.LAST_TIME_CHECKED;
 import static com.bytechef.component.wordpress.constant.WordpressConstants.WEBSITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,9 +30,12 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
@@ -39,15 +43,20 @@ import org.junit.jupiter.api.Test;
 class WordPressNewPostTriggerTest {
 
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(WEBSITE, "mockWebsite"));
+    private final LocalDateTime mockedLocalDateTime = LocalDateTime.of(2025, 6, 17, 9, 0);
+    private final Parameters mockedParameters =
+        MockParametersFactory.create(Map.of(WEBSITE, "mockWebsite", LAST_TIME_CHECKED, mockedLocalDateTime));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPoll() {
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -57,9 +66,12 @@ class WordPressNewPostTriggerTest {
         PollOutput pollOutput = WordPressNewPostTrigger.poll(
             mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
 
-        PollOutput expectedPollOutput = new PollOutput(
-            List.of(Map.of("id", "1")), Map.of(ALL_POSTS, List.of("1")), false);
+        assertEquals(List.of(Map.of("id", "1")), pollOutput.records());
+        assertFalse(pollOutput.pollImmediately());
 
-        assertEquals(expectedPollOutput, pollOutput);
+        List<String> expectedQueryArguments = List.of(
+            "after", mockedLocalDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+
+        assertEquals(expectedQueryArguments, stringArgumentCaptor.getAllValues());
     }
 }
