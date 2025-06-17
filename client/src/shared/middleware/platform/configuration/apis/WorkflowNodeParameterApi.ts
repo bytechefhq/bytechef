@@ -184,8 +184,8 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an action or trigger property options shown in the editor.
-     * Get an action or trigger property options shown in the editor
+     * Get cluster element options shown in the editor.
+     * Get cluster element property options shown in the editor
      */
     async getClusterElementParameterDisplayConditionsRaw(requestParameters: GetClusterElementParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeParameterDisplayConditions200Response>> {
         if (requestParameters['id'] == null) {
@@ -231,8 +231,8 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an action or trigger property options shown in the editor.
-     * Get an action or trigger property options shown in the editor
+     * Get cluster element options shown in the editor.
+     * Get cluster element property options shown in the editor
      */
     async getClusterElementParameterDisplayConditions(requestParameters: GetClusterElementParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetWorkflowNodeParameterDisplayConditions200Response> {
         const response = await this.getClusterElementParameterDisplayConditionsRaw(requestParameters, initOverrides);
@@ -240,8 +240,8 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an action or trigger property options shown in the editor.
-     * Get an action or trigger property options shown in the editor
+     * Get action or trigger property options shown in the editor.
+     * Get action or trigger property options shown in the editor
      */
     async getWorkflowNodeParameterDisplayConditionsRaw(requestParameters: GetWorkflowNodeParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeParameterDisplayConditions200Response>> {
         if (requestParameters['id'] == null) {
@@ -273,8 +273,8 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an action or trigger property options shown in the editor.
-     * Get an action or trigger property options shown in the editor
+     * Get action or trigger property options shown in the editor.
+     * Get action or trigger property options shown in the editor
      */
     async getWorkflowNodeParameterDisplayConditions(requestParameters: GetWorkflowNodeParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetWorkflowNodeParameterDisplayConditions200Response> {
         const response = await this.getWorkflowNodeParameterDisplayConditionsRaw(requestParameters, initOverrides);
