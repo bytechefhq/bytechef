@@ -17,7 +17,6 @@ import {
     GetComponentActionDefinitionRequest,
     GetComponentClusterElementDefinitionRequest,
     GetComponentTriggerDefinitionRequest,
-    TaskDispatcherDefinition,
     TriggerDefinitionApi,
     WorkflowNodeOutput,
     WorkflowTask,
@@ -255,12 +254,7 @@ const WorkflowNodeDetailsPanel = ({
         [previousComponentDefinitions, workflowNodeOutputs]
     );
 
-    const hasOutputData = useMemo(
-        () =>
-            currentNodeDefinition?.outputDefined ||
-            (currentNodeDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined,
-        [currentNodeDefinition]
-    );
+    const hasOutputData = useMemo(() => currentNodeDefinition?.outputDefined, [currentNodeDefinition?.outputDefined]);
 
     const currentWorkflowTrigger = useMemo(
         () => workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName),
@@ -1071,16 +1065,11 @@ const WorkflowNodeDetailsPanel = ({
                                         }
                                         currentNode={currentNode}
                                         key={`${currentNode?.componentName}-${currentNode?.type}_output`}
-                                        outputDefined={
-                                            (currentActionDefinition?.outputDefined ||
-                                                currentClusterElementDefinition?.outputDefined ||
-                                                currentTriggerDefinition?.outputDefined ||
-                                                currentTaskDispatcherDefinition?.outputDefined) ??
-                                            false
-                                        }
-                                        outputFunctionDefined={
-                                            ((currentActionDefinition as ActionDefinition)?.outputFunctionDefined ||
-                                                currentTriggerDefinition?.outputFunctionDefined) ??
+                                        outputSchemaDefined={
+                                            (currentActionDefinition?.outputSchemaDefined ||
+                                                currentClusterElementDefinition?.outputSchemaDefined ||
+                                                currentTriggerDefinition?.outputSchemaDefined ||
+                                                currentTaskDispatcherDefinition?.outputSchemaDefined) ??
                                             false
                                         }
                                         workflowId={workflow.id!}
