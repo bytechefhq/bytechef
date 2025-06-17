@@ -1728,18 +1728,24 @@ components:
         name:
           description: "The cluster element name."
           type: "string"
+        icon:
+          description: "The component icon."
+          type: "string"
+        outputDefined:
+          description: "Does action defines output."
+          type: "boolean"
+        outputFunctionDefined:
+          description: "Does action defines output function."
+          type: "boolean"
+        outputSchemaDefined:
+          description: "Does action defines output schema."
+          type: "boolean"
         title:
           description: "The cluster element title."
           type: "string"
         type:
           description: "The cluster element type."
           type: "string"
-        icon:
-          description: "The component icon."
-          type: "string"
-        outputDefined:
-          description: "Does action define output schema."
-          type: "boolean"
     ClusterElementType:
       description: "A type of a cluster element."
       type: "object"
