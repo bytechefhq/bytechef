@@ -102,6 +102,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
         WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
+        // Fix, cluster element tools are not necessarily the same as actions
         return actionDefinitionFacade.executeOptions(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation(), propertyName,

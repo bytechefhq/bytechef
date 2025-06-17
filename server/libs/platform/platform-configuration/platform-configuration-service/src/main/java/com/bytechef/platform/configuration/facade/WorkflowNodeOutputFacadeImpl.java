@@ -210,18 +210,6 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .collect(Collectors.toMap(WorkflowNodeOutputDTO::workflowNodeName, WorkflowNodeOutputDTO::sampleOutput));
     }
 
-    private OutputResponse checkOutputSchemaIsFileEntryProperty(OutputResponse outputResponse) {
-        if (outputResponse != null) {
-            // Force UI to test component to get the real fileEntry instance
-
-            if (outputResponse.outputSchema() instanceof FileEntryProperty) {
-                return null;
-            }
-        }
-
-        return outputResponse;
-    }
-
     @Override
     public void checkWorkflowCache(String workflowId, String lastWorkflowNodeName) {
         boolean dynamicOutputDefined = false;
@@ -265,6 +253,16 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName);
             }
         }
+    }
+
+    private OutputResponse checkOutputSchemaIsFileEntryProperty(OutputResponse outputResponse) {
+        if (outputResponse != null && outputResponse.outputSchema() instanceof FileEntryProperty) {
+            // Force UI to test component to get the real fileEntry instance
+
+            return null;
+        }
+
+        return outputResponse;
     }
 
     private OutputResponse checkTriggerOutput(OutputResponse outputResponse, TriggerDefinition triggerDefinition) {
@@ -312,7 +310,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
         ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService.getClusterElementDefinition(
-            workflowNodeType.name(), workflowNodeType.version(), clusterElementWorkflowNodeType.operation());
+            clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
+            clusterElementWorkflowNodeType.operation());
 
         OutputResponse outputResponse = clusterElementDefinition.getOutputResponse();
 
@@ -326,25 +325,39 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         outputResponse = workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, clusterElementName)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
-            .or(() -> getClusterElementDynamicOutputResponse(workflowId, clusterElement))
+            .or(() -> getClusterElementDynamicOutputResponse(workflowId, workflowTask, clusterElement))
             .map(this::checkOutputSchemaIsFileEntryProperty)
             .orElse(null);
 
         return new ClusterElementOutputDTO(clusterElementDefinition, outputResponse, clusterElementName);
     }
 
+    @SuppressWarnings("unchecked")
     private Optional<OutputResponse> getClusterElementDynamicOutputResponse(
-        String workflowId, ClusterElement clusterElement) {
+        String workflowId, WorkflowTask workflowTask, ClusterElement clusterElement) {
 
+        OutputResponse outputResponse;
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
 
-        // TODO ClusterElement
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
-        if (clusterElement != null && inputs != null) {
-            System.out.println(clusterElement);
-        }
+        Map<String, ?> outputs = getPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
 
-        return Optional.empty();
+        Map<String, ?> inputParameters = workflowTask.evaluateParameters(
+            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
+
+        Map<String, Long> connectionIds = MapUtils.toMap(
+            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                workflowId, clusterElement.getName()),
+            WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+            WorkflowTestConfigurationConnection::getConnectionId);
+
+        // Fix, cluster element tools are not necessarily the same as actions
+        outputResponse = actionDefinitionFacade.executeOutput(
+            clusterElement.getComponentName(), workflowNodeType.version(), workflowNodeType.operation(),
+            inputParameters, connectionIds);
+
+        return Optional.ofNullable(outputResponse);
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
@@ -434,8 +447,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 return Optional.empty();
             }
         } else {
-            if ((!actionDefinitionService.isDynamicOutputDefined(
-                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation()))) {
+            if (!actionDefinitionService.isDynamicOutputDefined(
+                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation())) {
 
                 return Optional.empty();
             }

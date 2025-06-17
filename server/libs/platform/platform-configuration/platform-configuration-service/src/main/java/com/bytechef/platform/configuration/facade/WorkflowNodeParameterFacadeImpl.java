@@ -910,7 +910,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 operationType = WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT;
 
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
-                    (String) taskMap.get(WorkflowConstants.TYPE));
+                    (String) clusterElementMap.get(WorkflowConstants.TYPE));
 
                 ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService
                     .getClusterElementDefinition(
