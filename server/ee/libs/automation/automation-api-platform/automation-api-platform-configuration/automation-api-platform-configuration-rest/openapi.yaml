@@ -481,6 +481,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ApiCollectionEndpoint"
+        environment:
+          $ref: "#/components/schemas/Environment"
         id:
           description: "The id of an API collection."
           type: "integer"
