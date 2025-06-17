@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinitionBasic", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T16:32:17.357738+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-15T09:08:32.976582+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ActionDefinitionBasicModel {
 
   private String componentName;
@@ -39,6 +39,8 @@ public class ActionDefinitionBasicModel {
   private Boolean outputDefined;
 
   private Boolean outputFunctionDefined;
+
+  private @Nullable Boolean outputSchemaDefined;
 
   private @Nullable String title;
 
@@ -163,11 +165,11 @@ public class ActionDefinitionBasicModel {
   }
 
   /**
-   * Does action define output schema.
+   * Does action defines output.
    * @return outputDefined
    */
   @NotNull 
-  @Schema(name = "outputDefined", description = "Does action define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "outputDefined", description = "Does action defines output.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputDefined")
   public Boolean getOutputDefined() {
     return outputDefined;
@@ -183,11 +185,11 @@ public class ActionDefinitionBasicModel {
   }
 
   /**
-   * Does action define output function.
+   * Does action defines output function.
    * @return outputFunctionDefined
    */
   @NotNull 
-  @Schema(name = "outputFunctionDefined", description = "Does action define output function.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "outputFunctionDefined", description = "Does action defines output function.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputFunctionDefined")
   public Boolean getOutputFunctionDefined() {
     return outputFunctionDefined;
@@ -195,6 +197,26 @@ public class ActionDefinitionBasicModel {
 
   public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
+  }
+
+  public ActionDefinitionBasicModel outputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
+    return this;
+  }
+
+  /**
+   * Does action defines output schema.
+   * @return outputSchemaDefined
+   */
+  
+  @Schema(name = "outputSchemaDefined", description = "Does action defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputSchemaDefined")
+  public Boolean getOutputSchemaDefined() {
+    return outputSchemaDefined;
+  }
+
+  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
   }
 
   public ActionDefinitionBasicModel title(String title) {
@@ -233,12 +255,13 @@ public class ActionDefinitionBasicModel {
         Objects.equals(this.name, actionDefinitionBasic.name) &&
         Objects.equals(this.outputDefined, actionDefinitionBasic.outputDefined) &&
         Objects.equals(this.outputFunctionDefined, actionDefinitionBasic.outputFunctionDefined) &&
+        Objects.equals(this.outputSchemaDefined, actionDefinitionBasic.outputSchemaDefined) &&
         Objects.equals(this.title, actionDefinitionBasic.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, title);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, title);
   }
 
   @Override
@@ -252,6 +275,7 @@ public class ActionDefinitionBasicModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
+    sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T16:32:17.357738+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-15T09:08:32.976582+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ActionDefinitionModel {
 
   private String componentName;
@@ -43,6 +43,8 @@ public class ActionDefinitionModel {
   private Boolean outputDefined;
 
   private Boolean outputFunctionDefined;
+
+  private @Nullable Boolean outputSchemaDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
@@ -172,11 +174,11 @@ public class ActionDefinitionModel {
   }
 
   /**
-   * Does action define output schema.
+   * Does action defines output.
    * @return outputDefined
    */
   @NotNull 
-  @Schema(name = "outputDefined", description = "Does action define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "outputDefined", description = "Does action defines output.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputDefined")
   public Boolean getOutputDefined() {
     return outputDefined;
@@ -192,11 +194,11 @@ public class ActionDefinitionModel {
   }
 
   /**
-   * Does action define output function.
+   * Does action defines output function.
    * @return outputFunctionDefined
    */
   @NotNull 
-  @Schema(name = "outputFunctionDefined", description = "Does action define output function.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "outputFunctionDefined", description = "Does action defines output function.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputFunctionDefined")
   public Boolean getOutputFunctionDefined() {
     return outputFunctionDefined;
@@ -204,6 +206,26 @@ public class ActionDefinitionModel {
 
   public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
+  }
+
+  public ActionDefinitionModel outputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
+    return this;
+  }
+
+  /**
+   * Does action defines output schema.
+   * @return outputSchemaDefined
+   */
+  
+  @Schema(name = "outputSchemaDefined", description = "Does action defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputSchemaDefined")
+  public Boolean getOutputSchemaDefined() {
+    return outputSchemaDefined;
+  }
+
+  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
   }
 
   public ActionDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -290,6 +312,7 @@ public class ActionDefinitionModel {
         Objects.equals(this.name, actionDefinition.name) &&
         Objects.equals(this.outputDefined, actionDefinition.outputDefined) &&
         Objects.equals(this.outputFunctionDefined, actionDefinition.outputFunctionDefined) &&
+        Objects.equals(this.outputSchemaDefined, actionDefinition.outputSchemaDefined) &&
         Objects.equals(this.properties, actionDefinition.properties) &&
         Objects.equals(this.title, actionDefinition.title) &&
         Objects.equals(this.workflowNodeDescriptionDefined, actionDefinition.workflowNodeDescriptionDefined);
@@ -297,7 +320,7 @@ public class ActionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, properties, title, workflowNodeDescriptionDefined);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, properties, title, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -311,6 +334,7 @@ public class ActionDefinitionModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
+    sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    workflowNodeDescriptionDefined: ").append(toIndentedString(workflowNodeDescriptionDefined)).append("\n");

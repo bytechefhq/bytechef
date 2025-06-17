@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T16:32:17.357738+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-15T09:08:32.976582+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class TaskDispatcherDefinitionModel {
 
   private @Nullable String description;
@@ -37,6 +37,10 @@ public class TaskDispatcherDefinitionModel {
   private String name;
 
   private Boolean outputDefined;
+
+  private @Nullable Boolean outputFunctionDefined;
+
+  private @Nullable Boolean outputSchemaDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
@@ -131,11 +135,11 @@ public class TaskDispatcherDefinitionModel {
   }
 
   /**
-   * Does task dispatcher define output schema.
+   * Does task dispatcher defines output.
    * @return outputDefined
    */
   @NotNull 
-  @Schema(name = "outputDefined", description = "Does task dispatcher define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "outputDefined", description = "Does task dispatcher defines output.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputDefined")
   public Boolean getOutputDefined() {
     return outputDefined;
@@ -143,6 +147,46 @@ public class TaskDispatcherDefinitionModel {
 
   public void setOutputDefined(Boolean outputDefined) {
     this.outputDefined = outputDefined;
+  }
+
+  public TaskDispatcherDefinitionModel outputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does task dispatcher defines output function.
+   * @return outputFunctionDefined
+   */
+  
+  @Schema(name = "outputFunctionDefined", description = "Does task dispatcher defines output function.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputFunctionDefined")
+  public Boolean getOutputFunctionDefined() {
+    return outputFunctionDefined;
+  }
+
+  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+  }
+
+  public TaskDispatcherDefinitionModel outputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
+    return this;
+  }
+
+  /**
+   * Does task dispatcher defines output schema.
+   * @return outputSchemaDefined
+   */
+  
+  @Schema(name = "outputSchemaDefined", description = "Does task dispatcher defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputSchemaDefined")
+  public Boolean getOutputSchemaDefined() {
+    return outputSchemaDefined;
+  }
+
+  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
   }
 
   public TaskDispatcherDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -294,6 +338,8 @@ public class TaskDispatcherDefinitionModel {
         Objects.equals(this.icon, taskDispatcherDefinition.icon) &&
         Objects.equals(this.name, taskDispatcherDefinition.name) &&
         Objects.equals(this.outputDefined, taskDispatcherDefinition.outputDefined) &&
+        Objects.equals(this.outputFunctionDefined, taskDispatcherDefinition.outputFunctionDefined) &&
+        Objects.equals(this.outputSchemaDefined, taskDispatcherDefinition.outputSchemaDefined) &&
         Objects.equals(this.properties, taskDispatcherDefinition.properties) &&
         Objects.equals(this.resources, taskDispatcherDefinition.resources) &&
         Objects.equals(this.taskProperties, taskDispatcherDefinition.taskProperties) &&
@@ -304,7 +350,7 @@ public class TaskDispatcherDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, icon, name, outputDefined, properties, resources, taskProperties, title, variablePropertiesDefined, version);
+    return Objects.hash(description, icon, name, outputDefined, outputFunctionDefined, outputSchemaDefined, properties, resources, taskProperties, title, variablePropertiesDefined, version);
   }
 
   @Override
@@ -315,6 +361,8 @@ public class TaskDispatcherDefinitionModel {
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
+    sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
+    sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    taskProperties: ").append(toIndentedString(taskProperties)).append("\n");

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T16:32:17.357738+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-15T09:08:32.976582+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class TriggerDefinitionModel {
 
   private @Nullable String componentName;
@@ -45,6 +45,8 @@ public class TriggerDefinitionModel {
   private Boolean outputDefined;
 
   private Boolean outputFunctionDefined;
+
+  private @Nullable Boolean outputSchemaDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
@@ -175,11 +177,11 @@ public class TriggerDefinitionModel {
   }
 
   /**
-   * Does trigger define output schema.
+   * Does trigger defines output.
    * @return outputDefined
    */
   @NotNull 
-  @Schema(name = "outputDefined", description = "Does trigger define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "outputDefined", description = "Does trigger defines output.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputDefined")
   public Boolean getOutputDefined() {
     return outputDefined;
@@ -195,11 +197,11 @@ public class TriggerDefinitionModel {
   }
 
   /**
-   * Does trigger define output function.
+   * Does trigger defines output function.
    * @return outputFunctionDefined
    */
   @NotNull 
-  @Schema(name = "outputFunctionDefined", description = "Does trigger define output function.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "outputFunctionDefined", description = "Does trigger defines output function.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputFunctionDefined")
   public Boolean getOutputFunctionDefined() {
     return outputFunctionDefined;
@@ -207,6 +209,26 @@ public class TriggerDefinitionModel {
 
   public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
+  }
+
+  public TriggerDefinitionModel outputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
+    return this;
+  }
+
+  /**
+   * Does trigger defines output schema.
+   * @return outputSchemaDefined
+   */
+  
+  @Schema(name = "outputSchemaDefined", description = "Does trigger defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputSchemaDefined")
+  public Boolean getOutputSchemaDefined() {
+    return outputSchemaDefined;
+  }
+
+  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
   }
 
   public TriggerDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -313,6 +335,7 @@ public class TriggerDefinitionModel {
         Objects.equals(this.name, triggerDefinition.name) &&
         Objects.equals(this.outputDefined, triggerDefinition.outputDefined) &&
         Objects.equals(this.outputFunctionDefined, triggerDefinition.outputFunctionDefined) &&
+        Objects.equals(this.outputSchemaDefined, triggerDefinition.outputSchemaDefined) &&
         Objects.equals(this.properties, triggerDefinition.properties) &&
         Objects.equals(this.title, triggerDefinition.title) &&
         Objects.equals(this.type, triggerDefinition.type) &&
@@ -321,7 +344,7 @@ public class TriggerDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, properties, title, type, workflowNodeDescriptionDefined);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, properties, title, type, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -335,6 +358,7 @@ public class TriggerDefinitionModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
+    sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
