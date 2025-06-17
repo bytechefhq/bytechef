@@ -21,7 +21,7 @@ package com.bytechef.component.wordpress.constant;
  */
 public class WordpressConstants {
 
-    public static final String ALL_POSTS = "allPosts";
+    public static final String LAST_TIME_CHECKED = "lastTimeChecked";
     public static final String WEBSITE = "website";
 
     private WordpressConstants() {

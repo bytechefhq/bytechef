@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.wordpress.constant.WordpressConstants.ALL_POSTS;
+import static com.bytechef.component.wordpress.constant.WordpressConstants.LAST_TIME_CHECKED;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
@@ -32,7 +32,8 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -229,27 +230,16 @@ public class WordPressNewPostTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        List<String> allPosts = closureParameters.getList(ALL_POSTS, String.class, List.of());
-        List<String> allPostsUpdated = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
 
-        List<Map<String, Object>> posts = triggerContext.http(http -> http.get("/wp/v2/posts"))
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+
+        List<Map<String, Object>> newPosts = triggerContext.http(http -> http.get("/wp/v2/posts"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
+            .queryParameter("after", startDate.format(DateTimeFormatter.ISO_DATE_TIME))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Map<String, Object>> newPosts = new ArrayList<>();
-
-        for (Map<String, Object> post : posts) {
-            String postId = post.get("id")
-                .toString();
-
-            allPostsUpdated.add(postId);
-
-            if (!allPosts.contains(postId)) {
-                newPosts.add(post);
-            }
-        }
-
-        return new PollOutput(newPosts, Map.of(ALL_POSTS, allPostsUpdated), false);
+        return new PollOutput(newPosts, Map.of(LAST_TIME_CHECKED, now), false);
     }
 }
