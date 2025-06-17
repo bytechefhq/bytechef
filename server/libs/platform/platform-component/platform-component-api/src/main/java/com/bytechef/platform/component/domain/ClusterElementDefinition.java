@@ -42,6 +42,7 @@ public class ClusterElementDefinition {
     private boolean outputDefined;
     private boolean outputFunctionDefined;
     private OutputResponse outputResponse;
+    private boolean outputSchemaDefined;
     private List<? extends Property> properties;
     private String title;
     private ClusterElementType type;
@@ -66,6 +67,7 @@ public class ClusterElementDefinition {
             outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             clusterElementDefinition.getOutputDefinition(), ClusterElementDefinition::toOutputResponse, null);
+        this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(clusterElementDefinition.getProperties(), List.of()), Property::toProperty);
         this.title = OptionalUtils.orElse(clusterElementDefinition.getTitle(), null);
@@ -82,15 +84,16 @@ public class ClusterElementDefinition {
             Objects.equals(description, that.description) && Objects.equals(help, that.help) &&
             Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
             outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
-            Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
-            Objects.equals(title, that.title) && Objects.equals(type, that.type);
+            Objects.equals(outputResponse, that.outputResponse) && outputSchemaDefined == that.outputSchemaDefined &&
+            Objects.equals(properties, that.properties) && Objects.equals(title, that.title) &&
+            Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
             componentName, componentVersion, description, icon, name, outputDefined, outputFunctionDefined,
-            outputResponse, properties, title, type);
+            outputResponse, outputSchemaDefined, properties, title, type);
     }
 
     public String getComponentName() {
@@ -140,6 +143,14 @@ public class ClusterElementDefinition {
         return outputDefined;
     }
 
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
+    }
+
+    public boolean isOutputSchemaDefined() {
+        return outputSchemaDefined;
+    }
+
     @Override
     public String toString() {
         return "ClusterElementDefinition{" +
@@ -152,6 +163,7 @@ public class ClusterElementDefinition {
             ", properties=" + properties +
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +
+            ", outputSchemaDefined=" + outputSchemaDefined +
             ", outputResponse=" + outputResponse +
             '}';
     }
