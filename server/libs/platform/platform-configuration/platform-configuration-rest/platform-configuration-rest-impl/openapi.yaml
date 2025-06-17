@@ -1226,8 +1226,8 @@ paths:
                       type: "string"
   /workflows/{id}/parameters/{workflowNodeName}/display-conditions:
     get:
-      description: "Get an action or trigger property options shown in the editor."
-      summary: "Get an action or trigger property options shown in the editor"
+      description: "Get action or trigger property options shown in the editor."
+      summary: "Get action or trigger property options shown in the editor"
       tags:
         - "workflow-node-parameter"
       operationId: "getWorkflowNodeParameterDisplayConditions"
@@ -1262,8 +1262,8 @@ paths:
                       type: "string"
   /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}/display-conditions:
     get:
-      description: "Get an action or trigger property options shown in the editor."
-      summary: "Get an action or trigger property options shown in the editor"
+      description: "Get cluster element options shown in the editor."
+      summary: "Get cluster element property options shown in the editor"
       tags:
         - "workflow-node-parameter"
       operationId: "getClusterElementParameterDisplayConditions"
