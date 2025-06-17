@@ -30,6 +30,7 @@ import McpServers from '@/pages/automation/mcp-servers/McpServers';
 import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
 import Project from '@/pages/automation/project/Project';
 import Projects from '@/pages/automation/projects/Projects';
+import AiAgentEditor from '@/pages/automation/projects/ai-agent-editor/AiAgentEditor';
 import Tasks from '@/pages/automation/tasks/tasks';
 import WorkflowChat from '@/pages/automation/workflow-chat/WorkflowChat';
 import {WorkflowExecutions as AutomationWorkflowExecutions} from '@/pages/automation/workflow-executions/WorkflowExecutions';
@@ -311,6 +312,22 @@ export const getRouter = (queryClient: QueryClient) =>
                                             queryKey: ProjectKeys.project(parseInt(params.projectId!)),
                                         }),
                                     path: 'projects/:projectId/project-workflows/:projectWorkflowId',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <AiAgentEditor />
+                                        </PrivateRoute>
+                                    ),
+                                    loader: async ({params}) =>
+                                        queryClient.ensureQueryData({
+                                            queryFn: () =>
+                                                new ProjectApi().getProject({
+                                                    id: parseInt(params.projectId!),
+                                                }),
+                                            queryKey: ProjectKeys.project(parseInt(params.projectId!)),
+                                        }),
+                                    path: 'projects/:projectId/project-workflows/:projectWorkflowId/ai-agent',
                                 },
                                 {
                                     element: (
