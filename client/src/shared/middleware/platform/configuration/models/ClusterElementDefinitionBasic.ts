@@ -58,6 +58,30 @@ export interface ClusterElementDefinitionBasic {
      */
     name: string;
     /**
+     * The component icon.
+     * @type {string}
+     * @memberof ClusterElementDefinitionBasic
+     */
+    icon?: string;
+    /**
+     * Does action defines output.
+     * @type {boolean}
+     * @memberof ClusterElementDefinitionBasic
+     */
+    outputDefined: boolean;
+    /**
+     * Does action defines output function.
+     * @type {boolean}
+     * @memberof ClusterElementDefinitionBasic
+     */
+    outputFunctionDefined?: boolean;
+    /**
+     * Does action defines output schema.
+     * @type {boolean}
+     * @memberof ClusterElementDefinitionBasic
+     */
+    outputSchemaDefined?: boolean;
+    /**
      * The cluster element title.
      * @type {string}
      * @memberof ClusterElementDefinitionBasic
@@ -69,18 +93,6 @@ export interface ClusterElementDefinitionBasic {
      * @memberof ClusterElementDefinitionBasic
      */
     type: string;
-    /**
-     * The component icon.
-     * @type {string}
-     * @memberof ClusterElementDefinitionBasic
-     */
-    icon?: string;
-    /**
-     * Does action define output schema.
-     * @type {boolean}
-     * @memberof ClusterElementDefinitionBasic
-     */
-    outputDefined: boolean;
 }
 
 /**
@@ -90,8 +102,8 @@ export function instanceOfClusterElementDefinitionBasic(value: object): value is
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
     if (!('componentVersion' in value) || value['componentVersion'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
-    if (!('type' in value) || value['type'] === undefined) return false;
     if (!('outputDefined' in value) || value['outputDefined'] === undefined) return false;
+    if (!('type' in value) || value['type'] === undefined) return false;
     return true;
 }
 
@@ -110,10 +122,12 @@ export function ClusterElementDefinitionBasicFromJSONTyped(json: any, ignoreDisc
         'description': json['description'] == null ? undefined : json['description'],
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
-        'title': json['title'] == null ? undefined : json['title'],
-        'type': json['type'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'] == null ? undefined : json['outputFunctionDefined'],
+        'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
+        'title': json['title'] == null ? undefined : json['title'],
+        'type': json['type'],
     };
 }
 
@@ -133,10 +147,12 @@ export function ClusterElementDefinitionBasicToJSONTyped(value?: ClusterElementD
         'description': value['description'],
         'help': HelpToJSON(value['help']),
         'name': value['name'],
-        'title': value['title'],
-        'type': value['type'],
         'icon': value['icon'],
         'outputDefined': value['outputDefined'],
+        'outputFunctionDefined': value['outputFunctionDefined'],
+        'outputSchemaDefined': value['outputSchemaDefined'],
+        'title': value['title'],
+        'type': value['type'],
     };
 }
 
