@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-17T12:31:37.320488+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-17T13:04:06.604414+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "notification-event", description = "The platform Notification Event Internal API")
 public interface NotificationEventApi {

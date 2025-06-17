@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementDefinition", description = "A cluster element definition.")
 @JsonTypeName("ClusterElementDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-17T12:31:37.320488+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-17T13:04:06.604414+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ClusterElementDefinitionModel {
 
   private String componentName;
@@ -40,13 +40,17 @@ public class ClusterElementDefinitionModel {
 
   private String name;
 
-  private @Nullable String title;
-
-  private String type;
-
   private @Nullable String icon;
 
   private Boolean outputDefined;
+
+  private @Nullable Boolean outputFunctionDefined;
+
+  private @Nullable Boolean outputSchemaDefined;
+
+  private @Nullable String title;
+
+  private String type;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
@@ -58,12 +62,12 @@ public class ClusterElementDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public ClusterElementDefinitionModel(String componentName, Integer componentVersion, String name, String type, Boolean outputDefined) {
+  public ClusterElementDefinitionModel(String componentName, Integer componentVersion, String name, Boolean outputDefined, String type) {
     this.componentName = componentName;
     this.componentVersion = componentVersion;
     this.name = name;
-    this.type = type;
     this.outputDefined = outputDefined;
+    this.type = type;
   }
 
   public ClusterElementDefinitionModel componentName(String componentName) {
@@ -166,6 +170,86 @@ public class ClusterElementDefinitionModel {
     this.name = name;
   }
 
+  public ClusterElementDefinitionModel icon(String icon) {
+    this.icon = icon;
+    return this;
+  }
+
+  /**
+   * The component icon.
+   * @return icon
+   */
+  
+  @Schema(name = "icon", description = "The component icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
+  }
+
+  public ClusterElementDefinitionModel outputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
+    return this;
+  }
+
+  /**
+   * Does action defines output.
+   * @return outputDefined
+   */
+  @NotNull 
+  @Schema(name = "outputDefined", description = "Does action defines output.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("outputDefined")
+  public Boolean getOutputDefined() {
+    return outputDefined;
+  }
+
+  public void setOutputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
+  }
+
+  public ClusterElementDefinitionModel outputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does action defines output function.
+   * @return outputFunctionDefined
+   */
+  
+  @Schema(name = "outputFunctionDefined", description = "Does action defines output function.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputFunctionDefined")
+  public Boolean getOutputFunctionDefined() {
+    return outputFunctionDefined;
+  }
+
+  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+  }
+
+  public ClusterElementDefinitionModel outputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
+    return this;
+  }
+
+  /**
+   * Does action defines output schema.
+   * @return outputSchemaDefined
+   */
+  
+  @Schema(name = "outputSchemaDefined", description = "Does action defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputSchemaDefined")
+  public Boolean getOutputSchemaDefined() {
+    return outputSchemaDefined;
+  }
+
+  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+    this.outputSchemaDefined = outputSchemaDefined;
+  }
+
   public ClusterElementDefinitionModel title(String title) {
     this.title = title;
     return this;
@@ -204,46 +288,6 @@ public class ClusterElementDefinitionModel {
 
   public void setType(String type) {
     this.type = type;
-  }
-
-  public ClusterElementDefinitionModel icon(String icon) {
-    this.icon = icon;
-    return this;
-  }
-
-  /**
-   * The component icon.
-   * @return icon
-   */
-  
-  @Schema(name = "icon", description = "The component icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("icon")
-  public String getIcon() {
-    return icon;
-  }
-
-  public void setIcon(String icon) {
-    this.icon = icon;
-  }
-
-  public ClusterElementDefinitionModel outputDefined(Boolean outputDefined) {
-    this.outputDefined = outputDefined;
-    return this;
-  }
-
-  /**
-   * Does action define output schema.
-   * @return outputDefined
-   */
-  @NotNull 
-  @Schema(name = "outputDefined", description = "Does action define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("outputDefined")
-  public Boolean getOutputDefined() {
-    return outputDefined;
-  }
-
-  public void setOutputDefined(Boolean outputDefined) {
-    this.outputDefined = outputDefined;
   }
 
   public ClusterElementDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -288,16 +332,18 @@ public class ClusterElementDefinitionModel {
         Objects.equals(this.description, clusterElementDefinition.description) &&
         Objects.equals(this.help, clusterElementDefinition.help) &&
         Objects.equals(this.name, clusterElementDefinition.name) &&
-        Objects.equals(this.title, clusterElementDefinition.title) &&
-        Objects.equals(this.type, clusterElementDefinition.type) &&
         Objects.equals(this.icon, clusterElementDefinition.icon) &&
         Objects.equals(this.outputDefined, clusterElementDefinition.outputDefined) &&
+        Objects.equals(this.outputFunctionDefined, clusterElementDefinition.outputFunctionDefined) &&
+        Objects.equals(this.outputSchemaDefined, clusterElementDefinition.outputSchemaDefined) &&
+        Objects.equals(this.title, clusterElementDefinition.title) &&
+        Objects.equals(this.type, clusterElementDefinition.type) &&
         Objects.equals(this.properties, clusterElementDefinition.properties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, title, type, icon, outputDefined, properties);
+    return Objects.hash(componentName, componentVersion, description, help, name, icon, outputDefined, outputFunctionDefined, outputSchemaDefined, title, type, properties);
   }
 
   @Override
@@ -309,10 +355,12 @@ public class ClusterElementDefinitionModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    title: ").append(toIndentedString(title)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
+    sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
+    sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("}");
     return sb.toString();
