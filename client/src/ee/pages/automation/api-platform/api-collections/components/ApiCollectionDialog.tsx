@@ -12,12 +12,13 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
 import {useCreateApiCollectionMutation, useUpdateApiCollectionMutation} from '@/ee/mutations/apiCollections.mutations';
 import ApiCollectionDialogTagsSelect from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialogTagsSelect';
 import {ApiCollectionTagKeys} from '@/ee/queries/apiCollectionTags.queries';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
-import {ApiCollection, Tag} from '@/ee/shared/middleware/automation/api-platform';
+import {ApiCollection, Environment, Tag} from '@/ee/shared/middleware/automation/api-platform';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -31,6 +32,7 @@ const formSchema = z.object({
     contextPath: z.coerce.string().min(1),
     description: z.string(),
     enabled: z.boolean(),
+    environment: z.string().min(1),
     name: z.string().min(2, {
         message: 'Name must be at least 2 characters.',
     }),
@@ -63,6 +65,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
             contextPath: apiCollection?.contextPath || '',
             description: apiCollection?.description || '',
             enabled: apiCollection?.enabled || false,
+            environment: (apiCollection?.environment || Environment.Development) as string,
             name: apiCollection?.name || '',
             projectId: apiCollection?.projectId,
             projectVersion: apiCollection?.projectVersion,
@@ -111,11 +114,13 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
             updateOpenApiCollectionMutation.mutate({
                 ...apiCollection,
                 ...getValues(),
+                environment: getValues().environment as Environment,
             });
         } else {
             createOpenApiCollectionMutation.mutate({
                 ...apiCollection,
                 ...getValues(),
+                environment: getValues().environment as Environment,
             });
         }
     }
@@ -205,6 +210,41 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                                         <FormMessage />
                                     </FormItem>
                                 )}
+                                shouldUnregister={false}
+                            />
+                        )}
+
+                        {!apiCollection?.id && (
+                            <FormField
+                                control={control}
+                                name="environment"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Environment</FormLabel>
+
+                                        <FormControl>
+                                            <Select
+                                                defaultValue={field.value}
+                                                onValueChange={(value) => field.onChange(value)}
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select environment" />
+                                                </SelectTrigger>
+
+                                                <SelectContent>
+                                                    <SelectItem value="DEVELOPMENT">Development</SelectItem>
+
+                                                    <SelectItem value="STAGING">Staging</SelectItem>
+
+                                                    <SelectItem value="PRODUCTION">Production</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                rules={{required: true}}
                                 shouldUnregister={false}
                             />
                         )}
