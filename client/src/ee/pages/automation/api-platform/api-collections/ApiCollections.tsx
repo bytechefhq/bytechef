@@ -110,13 +110,13 @@ const ApiCollections = () => {
             >
                 {apiCollections && apiCollections?.length > 0 ? (
                     <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
-                        <ApiCollectionList apiCollections={apiCollections} tags={tags} />
-
                         <WorkflowReadOnlyProvider
                             value={{
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
                             }}
                         >
+                            <ApiCollectionList apiCollections={apiCollections} tags={tags} />
+
                             <ReadOnlyWorkflowSheet />
                         </WorkflowReadOnlyProvider>
                     </div>
