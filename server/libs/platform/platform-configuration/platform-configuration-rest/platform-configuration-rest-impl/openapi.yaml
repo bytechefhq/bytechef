@@ -1535,10 +1535,13 @@ components:
           description: "The action name."
           type: "string"
         outputDefined:
-          description: "Does action define output schema."
+          description: "Does action defines output."
           type: "boolean"
         outputFunctionDefined:
-          description: "Does action define output function."
+          description: "Does action defines output function."
+          type: "boolean"
+        outputSchemaDefined:
+          description: "Does action defines output schema."
           type: "boolean"
         properties:
           description: "The list of action properties."
@@ -1580,10 +1583,13 @@ components:
           description: "The action name."
           type: "string"
         outputDefined:
-          description: "Does action define output schema."
+          description: "Does action defines output."
           type: "boolean"
         outputFunctionDefined:
-          description: "Does action define output function."
+          description: "Does action defines output function."
+          type: "boolean"
+        outputSchemaDefined:
+          description: "Does action defines output schema."
           type: "boolean"
         title:
           description: "The title"
@@ -2437,7 +2443,13 @@ components:
           description: "The task dispatcher name.."
           type: "string"
         outputDefined:
-          description: "Does task dispatcher define output schema."
+          description: "Does task dispatcher defines output."
+          type: "boolean"
+        outputFunctionDefined:
+          description: "Does task dispatcher defines output function."
+          type: "boolean"
+        outputSchemaDefined:
+          description: "Does task dispatcher defines output schema."
           type: "boolean"
         properties:
           description: "The list of task dispatcher properties."
@@ -2476,10 +2488,16 @@ components:
           description: "The icon."
           type: "string"
         name:
-          description: "The task dispatcher name.."
+          description: "The task dispatcher name."
           type: "string"
         outputDefined:
-          description: "Does task dispatcher define output schema."
+          description: "Does task dispatcher defines output."
+          type: "boolean"
+        outputFunctionDefined:
+          description: "Does task dispatcher defines output function."
+          type: "boolean"
+        outputSchemaDefined:
+          description: "Does task dispatcher defines output schema."
           type: "boolean"
         resources:
           $ref: "#/components/schemas/Resources"
@@ -2558,10 +2576,13 @@ components:
           description: "The action name."
           type: "string"
         outputDefined:
-          description: "Does trigger define output schema."
+          description: "Does trigger defines output."
           type: "boolean"
         outputFunctionDefined:
-          description: "Does trigger define output function."
+          description: "Does trigger defines output function."
+          type: "boolean"
+        outputSchemaDefined:
+          description: "Does trigger defines output schema."
           type: "boolean"
         properties:
           description: "The list of action properties."
@@ -2603,10 +2624,13 @@ components:
           description: "The action name."
           type: "string"
         outputDefined:
-          description: "Does trigger define output schema."
+          description: "Does trigger defines output."
           type: "boolean"
         outputFunctionDefined:
-          description: "Does trigger define output function."
+          description: "Does trigger defines output function."
+          type: "boolean"
+        outputSchemaDefined:
+          description: "Does trigger defines output schema."
           type: "boolean"
         title:
           description: "The title"
