@@ -8,10 +8,10 @@ interface ConnectedUserSheetPanelProps {
 
 const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) => {
     return (
-        <div className="flex w-full flex-col gap-4 px-2 pb-4">
+        <div className="flex w-full flex-col gap-4 pt-4">
             <div className="flex w-full flex-col space-x-4">
                 <div className="w-full space-y-10">
-                    <div className="w-full space-y-2 px-2">
+                    <div className="w-full space-y-2">
                         <div className="text-base font-semibold">Profile</div>
 
                         <ConnectedUserSheetPanelProfile connectedUser={connectedUser} />
