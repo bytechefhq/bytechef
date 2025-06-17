@@ -78,11 +78,11 @@ const ProjectHeader = ({
             </div>
 
             <div className="flex items-center space-x-2">
-                <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
-
                 <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
 
                 <SettingsMenu project={project} updateWorkflowMutation={updateWorkflowMutation} workflow={workflow} />
+
+                <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
                 <PublishPopover
                     isPending={publishProjectMutationIsPending}
