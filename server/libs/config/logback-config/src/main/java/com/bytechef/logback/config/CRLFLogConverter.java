@@ -67,9 +67,12 @@ public class CRLFLogConverter extends CompositeConverter<ILoggingEvent> {
 
         List<Marker> markers = event.getMarkerList();
 
-        if ((markers != null && !markers.isEmpty() && markers.get(0)
-            .contains(CRLF_SAFE_MARKER)) || isLoggerSafe(event)) {
-            return in;
+        if (markers != null && !markers.isEmpty()) {
+            Marker marker = markers.getFirst();
+
+            if (marker.contains(CRLF_SAFE_MARKER) || isLoggerSafe(event)) {
+                return in;
+            }
         }
 
         String replacement = element == null ? "_" : toAnsiString("_", element);
@@ -79,8 +82,9 @@ public class CRLFLogConverter extends CompositeConverter<ILoggingEvent> {
 
     protected boolean isLoggerSafe(ILoggingEvent event) {
         for (String safeLogger : SAFE_LOGGERS) {
-            if (event.getLoggerName()
-                .startsWith(safeLogger)) {
+            String loggerName = event.getLoggerName();
+
+            if (loggerName.startsWith(safeLogger)) {
                 return true;
             }
         }

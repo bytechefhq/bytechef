@@ -199,8 +199,9 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .collect(Collectors.toMap(WorkflowNodeOutputDTO::workflowNodeName, WorkflowNodeOutputDTO::sampleOutput));
     }
 
-    private OutputResponse
-        checkOutput(String workflowId, OutputResponse outputResponse, WorkflowTrigger workflowTrigger) {
+    private OutputResponse checkOutput(
+        String workflowId, OutputResponse outputResponse, WorkflowTrigger workflowTrigger) {
+
         if (outputResponse != null) {
             // Force UI to test component to get the real fileEntry instance
 
@@ -223,8 +224,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 .orElse(null);
 
             outputResponse = triggerDefinitionFacade.executeOutput(
-                workflowNodeType.name(), workflowNodeType.version(),
-                workflowNodeType.operation(), inputParameters, connectionId);
+                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
+                connectionId);
         }
 
         return outputResponse;
@@ -305,8 +306,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             outputResponse = taskDispatcherDefinition.getOutputResponse();
         } else {
             actionDefinition = actionDefinitionService.getActionDefinition(
-                workflowNodeType.name(), workflowNodeType.version(),
-                workflowNodeType.operation());
+                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
 
             outputResponse = actionDefinition.getOutputResponse();
         }

@@ -234,8 +234,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         throw (ProviderException) e;
                     }
 
-                    throw new ConfigurationException(
-                        e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+                    throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
                 }
             })
             .orElseGet(() -> {

@@ -20,8 +20,6 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.definition.BaseOutputDefinition;
-import com.bytechef.definition.BaseProperty;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.NullProperty;

@@ -76,18 +76,18 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
             });
 
         taskDispatcherDefinition.getVariableProperties()
-            .map(VariablePropertiesFunction -> {
+            .map(variablePropertiesFunction -> {
                 try {
-                    return VariablePropertiesFunction.apply(inputParameters);
+                    return variablePropertiesFunction.apply(inputParameters);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             })
-            .ifPresent(outputOutputResponse -> {
+            .ifPresent(outputResponse -> {
                 properties.add(
-                    ((ModifiableValueProperty<?, ?>) outputOutputResponse.getOutputSchema())
+                    ((ModifiableValueProperty<?, ?>) outputResponse.getOutputSchema())
                         .setName("variableProperties"));
-                sampleOutput.put("variableProperties", outputOutputResponse.getSampleOutput());
+                sampleOutput.put("variableProperties", outputResponse.getSampleOutput());
             });
 
         return SchemaUtils.toOutput(

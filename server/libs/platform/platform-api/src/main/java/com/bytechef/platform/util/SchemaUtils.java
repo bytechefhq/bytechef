@@ -131,8 +131,8 @@ public class SchemaUtils {
         Object value, OutputFactoryFunction outputFactoryFunction, SchemaPropertyFactory propertyFactoryFunction) {
 
         return toOutput(
-            BaseOutputDefinition.OutputResponse.of((BaseProperty.BaseValueProperty<?>) getOutputSchema(
-                value, propertyFactoryFunction), value),
+            BaseOutputDefinition.OutputResponse.of(
+                (BaseProperty.BaseValueProperty<?>) getOutputSchema(value, propertyFactoryFunction), value),
             outputFactoryFunction, propertyFactoryFunction);
     }
 
