@@ -7,6 +7,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.TagMo
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T09:35:00.400192+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-17T21:20:19.988350+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ApiCollectionModel {
 
   private @Nullable Integer collectionVersion;
@@ -47,6 +48,8 @@ public class ApiCollectionModel {
 
   @Valid
   private List<@Valid ApiCollectionEndpointModel> endpoints = new ArrayList<>();
+
+  private com.bytechef.automation.configuration.web.rest.model.EnvironmentModel environment;
 
   private @Nullable Long id;
 
@@ -81,9 +84,10 @@ public class ApiCollectionModel {
   /**
    * Constructor with only required parameters
    */
-  public ApiCollectionModel(String contextPath, Boolean enabled, String name, Long projectId, Integer projectVersion, Long workspaceId) {
+  public ApiCollectionModel(String contextPath, Boolean enabled, com.bytechef.automation.configuration.web.rest.model.EnvironmentModel environment, String name, Long projectId, Integer projectVersion, Long workspaceId) {
     this.contextPath = contextPath;
     this.enabled = enabled;
+    this.environment = environment;
     this.name = name;
     this.projectId = projectId;
     this.projectVersion = projectVersion;
@@ -236,6 +240,26 @@ public class ApiCollectionModel {
 
   public void setEndpoints(List<@Valid ApiCollectionEndpointModel> endpoints) {
     this.endpoints = endpoints;
+  }
+
+  public ApiCollectionModel environment(com.bytechef.automation.configuration.web.rest.model.EnvironmentModel environment) {
+    this.environment = environment;
+    return this;
+  }
+
+  /**
+   * Get environment
+   * @return environment
+   */
+  @NotNull @Valid 
+  @Schema(name = "environment", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("environment")
+  public com.bytechef.automation.configuration.web.rest.model.EnvironmentModel getEnvironment() {
+    return environment;
+  }
+
+  public void setEnvironment(com.bytechef.automation.configuration.web.rest.model.EnvironmentModel environment) {
+    this.environment = environment;
   }
 
   public ApiCollectionModel id(Long id) {
@@ -502,6 +526,7 @@ public class ApiCollectionModel {
         Objects.equals(this.description, apiCollection.description) &&
         Objects.equals(this.enabled, apiCollection.enabled) &&
         Objects.equals(this.endpoints, apiCollection.endpoints) &&
+        Objects.equals(this.environment, apiCollection.environment) &&
         Objects.equals(this.id, apiCollection.id) &&
         Objects.equals(this.name, apiCollection.name) &&
         Objects.equals(this.lastModifiedBy, apiCollection.lastModifiedBy) &&
@@ -518,7 +543,7 @@ public class ApiCollectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(collectionVersion, contextPath, createdBy, createdDate, description, enabled, endpoints, id, name, lastModifiedBy, lastModifiedDate, projectId, project, projectDeploymentId, projectDeployment, projectVersion, tags, workspaceId, version);
+    return Objects.hash(collectionVersion, contextPath, createdBy, createdDate, description, enabled, endpoints, environment, id, name, lastModifiedBy, lastModifiedDate, projectId, project, projectDeploymentId, projectDeployment, projectVersion, tags, workspaceId, version);
   }
 
   @Override
@@ -532,6 +557,7 @@ public class ApiCollectionModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    endpoints: ").append(toIndentedString(endpoints)).append("\n");
+    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
