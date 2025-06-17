@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-15T09:08:32.976582+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-17T12:31:37.320488+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "workflow-node-parameter", description = "The Platform Workflow Node Parameter Internal API")
 public interface WorkflowNodeParameterApi {
@@ -143,8 +143,8 @@ public interface WorkflowNodeParameterApi {
 
 
     /**
-     * GET /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}/display-conditions : Get an action or trigger property options shown in the editor
-     * Get an action or trigger property options shown in the editor.
+     * GET /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}/display-conditions : Get cluster element property options shown in the editor
+     * Get cluster element options shown in the editor.
      *
      * @param id The workflow id (required)
      * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
@@ -154,8 +154,8 @@ public interface WorkflowNodeParameterApi {
      */
     @Operation(
         operationId = "getClusterElementParameterDisplayConditions",
-        summary = "Get an action or trigger property options shown in the editor",
-        description = "Get an action or trigger property options shown in the editor.",
+        summary = "Get cluster element property options shown in the editor",
+        description = "Get cluster element options shown in the editor.",
         tags = { "workflow-node-parameter" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow node parameter display conditions.", content = {
@@ -190,8 +190,8 @@ public interface WorkflowNodeParameterApi {
 
 
     /**
-     * GET /workflows/{id}/parameters/{workflowNodeName}/display-conditions : Get an action or trigger property options shown in the editor
-     * Get an action or trigger property options shown in the editor.
+     * GET /workflows/{id}/parameters/{workflowNodeName}/display-conditions : Get action or trigger property options shown in the editor
+     * Get action or trigger property options shown in the editor.
      *
      * @param id The workflow id (required)
      * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
@@ -199,8 +199,8 @@ public interface WorkflowNodeParameterApi {
      */
     @Operation(
         operationId = "getWorkflowNodeParameterDisplayConditions",
-        summary = "Get an action or trigger property options shown in the editor",
-        description = "Get an action or trigger property options shown in the editor.",
+        summary = "Get action or trigger property options shown in the editor",
+        description = "Get action or trigger property options shown in the editor.",
         tags = { "workflow-node-parameter" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow node parameter display conditions.", content = {
