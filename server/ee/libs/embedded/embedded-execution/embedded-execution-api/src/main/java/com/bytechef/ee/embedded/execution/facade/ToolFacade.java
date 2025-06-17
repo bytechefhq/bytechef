@@ -22,11 +22,11 @@ public interface ToolFacade {
 
     List<ToolDTO> getTools();
 
-    Map<String, List<ToolDTO>> getTools(
-        String externalUserId, List<String> categoryNames, List<String> componentNames,
-        List<String> clusterElementNames, Environment environment);
-
     Object executeTool(
         String externalUserId, String toolName, Map<String, Object> inputParameters, @Nullable Long instanceId,
         Environment environment);
+
+    Map<String, List<ToolDTO>> getTools(
+        String externalUserId, List<String> categoryNames, List<String> componentNames,
+        List<String> clusterElementNames, Environment environment);
 }

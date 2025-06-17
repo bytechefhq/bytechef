@@ -285,8 +285,8 @@ paths:
             type: "array"
             items:
               type: "string"
-        - name: "actions"
-          description: "Filter by specific actions, depending on the integrations the user has connected."
+        - name: "tools"
+          description: "Filter by specific tools, depending on the integrations the user has connected."
           in: "query"
           required: false
           schema:

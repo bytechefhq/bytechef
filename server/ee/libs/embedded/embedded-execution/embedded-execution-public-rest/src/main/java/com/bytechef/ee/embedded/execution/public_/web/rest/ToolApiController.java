@@ -56,7 +56,7 @@ public class ToolApiController implements ToolApi {
     @Override
     public ResponseEntity<Map<String, List<ToolModel>>> getTools(
         String externalUserId, EnvironmentModel xEnvironment, List<String> categories, List<String> components,
-        List<String> actions) {
+        List<String> tools) {
 
         Environment environment = xEnvironment == null
             ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
@@ -65,7 +65,7 @@ public class ToolApiController implements ToolApi {
             toolFacade
                 .getTools(
                     externalUserId, categories == null ? List.of() : categories,
-                    components == null ? List.of() : components, actions == null ? List.of() : actions, environment)
+                    components == null ? List.of() : components, tools == null ? List.of() : tools, environment)
                 .entrySet()
                 .stream()
                 .collect(

@@ -109,7 +109,7 @@ public interface ToolApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    
+
     default ResponseEntity<Object> executeTool(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
@@ -178,7 +178,7 @@ public interface ToolApi {
      * @param xEnvironment The environment. (optional)
      * @param categories Filter by specific integration categories, depending on the integrations the user has connected. (optional)
      * @param components Filter by specific components, depending on the integrations the user has connected. (optional)
-     * @param actions Filter by specific actions, depending on the integrations the user has connected. (optional)
+     * @param tools Filter by specific tools, depending on the integrations the user has connected. (optional)
      * @return The list of tool objects. (status code 200)
      *         or Bad request (status code 400)
      *         or Unauthorized (status code 401)
@@ -233,13 +233,13 @@ public interface ToolApi {
         value = "/{externalUserId}/tools",
         produces = { "application/json" }
     )
-    
+
     default ResponseEntity<Map<String, List<ToolModel>>> getTools(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
         @Parameter(name = "categories", description = "Filter by specific integration categories, depending on the integrations the user has connected.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categories", required = false) List<String> categories,
         @Parameter(name = "components", description = "Filter by specific components, depending on the integrations the user has connected.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "components", required = false) List<String> components,
-        @Parameter(name = "actions", description = "Filter by specific actions, depending on the integrations the user has connected.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "actions", required = false) List<String> actions
+        @Parameter(name = "tools", description = "Filter by specific tools, depending on the integrations the user has connected.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tools", required = false) List<String> tools
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
