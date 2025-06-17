@@ -40,17 +40,29 @@ export interface TaskDispatcherDefinitionBasic {
      */
     icon?: string;
     /**
-     * The task dispatcher name..
+     * The task dispatcher name.
      * @type {string}
      * @memberof TaskDispatcherDefinitionBasic
      */
     name: string;
     /**
-     * Does task dispatcher define output schema.
+     * Does task dispatcher defines output.
      * @type {boolean}
      * @memberof TaskDispatcherDefinitionBasic
      */
     outputDefined: boolean;
+    /**
+     * Does task dispatcher defines output function.
+     * @type {boolean}
+     * @memberof TaskDispatcherDefinitionBasic
+     */
+    outputFunctionDefined?: boolean;
+    /**
+     * Does task dispatcher defines output schema.
+     * @type {boolean}
+     * @memberof TaskDispatcherDefinitionBasic
+     */
+    outputSchemaDefined?: boolean;
     /**
      * 
      * @type {Resources}
@@ -101,6 +113,8 @@ export function TaskDispatcherDefinitionBasicFromJSONTyped(json: any, ignoreDisc
         'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
         'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'] == null ? undefined : json['outputFunctionDefined'],
+        'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
         'resources': json['resources'] == null ? undefined : ResourcesFromJSON(json['resources']),
         'title': json['title'] == null ? undefined : json['title'],
         'variablePropertiesDefined': json['variablePropertiesDefined'] == null ? undefined : json['variablePropertiesDefined'],
@@ -123,6 +137,8 @@ export function TaskDispatcherDefinitionBasicToJSONTyped(value?: TaskDispatcherD
         'icon': value['icon'],
         'name': value['name'],
         'outputDefined': value['outputDefined'],
+        'outputFunctionDefined': value['outputFunctionDefined'],
+        'outputSchemaDefined': value['outputSchemaDefined'],
         'resources': ResourcesToJSON(value['resources']),
         'title': value['title'],
         'variablePropertiesDefined': value['variablePropertiesDefined'],

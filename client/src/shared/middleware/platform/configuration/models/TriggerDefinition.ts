@@ -72,17 +72,23 @@ export interface TriggerDefinition {
      */
     name: string;
     /**
-     * Does trigger define output schema.
+     * Does trigger defines output.
      * @type {boolean}
      * @memberof TriggerDefinition
      */
     outputDefined: boolean;
     /**
-     * Does trigger define output function.
+     * Does trigger defines output function.
      * @type {boolean}
      * @memberof TriggerDefinition
      */
     outputFunctionDefined: boolean;
+    /**
+     * Does trigger defines output schema.
+     * @type {boolean}
+     * @memberof TriggerDefinition
+     */
+    outputSchemaDefined?: boolean;
     /**
      * The list of action properties.
      * @type {Array<Property>}
@@ -139,6 +145,7 @@ export function TriggerDefinitionFromJSONTyped(json: any, ignoreDiscriminator: b
         'name': json['name'],
         'outputDefined': json['outputDefined'],
         'outputFunctionDefined': json['outputFunctionDefined'],
+        'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'title': json['title'] == null ? undefined : json['title'],
         'type': TriggerTypeFromJSON(json['type']),
@@ -164,6 +171,7 @@ export function TriggerDefinitionToJSONTyped(value?: TriggerDefinition | null, i
         'name': value['name'],
         'outputDefined': value['outputDefined'],
         'outputFunctionDefined': value['outputFunctionDefined'],
+        'outputSchemaDefined': value['outputSchemaDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
         'title': value['title'],
         'type': TriggerTypeToJSON(value['type']),

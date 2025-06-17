@@ -65,17 +65,23 @@ export interface TriggerDefinitionBasic {
      */
     name: string;
     /**
-     * Does trigger define output schema.
+     * Does trigger defines output.
      * @type {boolean}
      * @memberof TriggerDefinitionBasic
      */
     outputDefined: boolean;
     /**
-     * Does trigger define output function.
+     * Does trigger defines output function.
      * @type {boolean}
      * @memberof TriggerDefinitionBasic
      */
     outputFunctionDefined: boolean;
+    /**
+     * Does trigger defines output schema.
+     * @type {boolean}
+     * @memberof TriggerDefinitionBasic
+     */
+    outputSchemaDefined?: boolean;
     /**
      * The title
      * @type {string}
@@ -122,6 +128,7 @@ export function TriggerDefinitionBasicFromJSONTyped(json: any, ignoreDiscriminat
         'name': json['name'],
         'outputDefined': json['outputDefined'],
         'outputFunctionDefined': json['outputFunctionDefined'],
+        'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
         'title': json['title'] == null ? undefined : json['title'],
         'type': TriggerTypeFromJSON(json['type']),
     };
@@ -145,6 +152,7 @@ export function TriggerDefinitionBasicToJSONTyped(value?: TriggerDefinitionBasic
         'name': value['name'],
         'outputDefined': value['outputDefined'],
         'outputFunctionDefined': value['outputFunctionDefined'],
+        'outputSchemaDefined': value['outputSchemaDefined'],
         'title': value['title'],
         'type': TriggerTypeToJSON(value['type']),
     };

@@ -58,17 +58,23 @@ export interface ActionDefinitionBasic {
      */
     name: string;
     /**
-     * Does action define output schema.
+     * Does action defines output.
      * @type {boolean}
      * @memberof ActionDefinitionBasic
      */
     outputDefined: boolean;
     /**
-     * Does action define output function.
+     * Does action defines output function.
      * @type {boolean}
      * @memberof ActionDefinitionBasic
      */
     outputFunctionDefined: boolean;
+    /**
+     * Does action defines output schema.
+     * @type {boolean}
+     * @memberof ActionDefinitionBasic
+     */
+    outputSchemaDefined?: boolean;
     /**
      * The title
      * @type {string}
@@ -106,6 +112,7 @@ export function ActionDefinitionBasicFromJSONTyped(json: any, ignoreDiscriminato
         'name': json['name'],
         'outputDefined': json['outputDefined'],
         'outputFunctionDefined': json['outputFunctionDefined'],
+        'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
         'title': json['title'] == null ? undefined : json['title'],
     };
 }
@@ -128,6 +135,7 @@ export function ActionDefinitionBasicToJSONTyped(value?: ActionDefinitionBasic |
         'name': value['name'],
         'outputDefined': value['outputDefined'],
         'outputFunctionDefined': value['outputFunctionDefined'],
+        'outputSchemaDefined': value['outputSchemaDefined'],
         'title': value['title'],
     };
 }

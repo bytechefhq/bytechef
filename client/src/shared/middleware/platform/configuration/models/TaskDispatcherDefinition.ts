@@ -53,11 +53,23 @@ export interface TaskDispatcherDefinition {
      */
     name: string;
     /**
-     * Does task dispatcher define output schema.
+     * Does task dispatcher defines output.
      * @type {boolean}
      * @memberof TaskDispatcherDefinition
      */
     outputDefined: boolean;
+    /**
+     * Does task dispatcher defines output function.
+     * @type {boolean}
+     * @memberof TaskDispatcherDefinition
+     */
+    outputFunctionDefined?: boolean;
+    /**
+     * Does task dispatcher defines output schema.
+     * @type {boolean}
+     * @memberof TaskDispatcherDefinition
+     */
+    outputSchemaDefined?: boolean;
     /**
      * The list of task dispatcher properties.
      * @type {Array<Property>}
@@ -120,6 +132,8 @@ export function TaskDispatcherDefinitionFromJSONTyped(json: any, ignoreDiscrimin
         'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
         'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'] == null ? undefined : json['outputFunctionDefined'],
+        'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'resources': json['resources'] == null ? undefined : ResourcesFromJSON(json['resources']),
         'taskProperties': json['taskProperties'] == null ? undefined : ((json['taskProperties'] as Array<any>).map(PropertyFromJSON)),
@@ -144,6 +158,8 @@ export function TaskDispatcherDefinitionToJSONTyped(value?: TaskDispatcherDefini
         'icon': value['icon'],
         'name': value['name'],
         'outputDefined': value['outputDefined'],
+        'outputFunctionDefined': value['outputFunctionDefined'],
+        'outputSchemaDefined': value['outputSchemaDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
         'resources': ResourcesToJSON(value['resources']),
         'taskProperties': value['taskProperties'] == null ? undefined : ((value['taskProperties'] as Array<any>).map(PropertyToJSON)),
