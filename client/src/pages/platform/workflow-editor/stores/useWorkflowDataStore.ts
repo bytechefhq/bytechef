@@ -3,18 +3,18 @@ import defaultNodes from '@/shared/defaultNodes';
 
 /* eslint-disable sort-keys */
 import {ComponentDefinitionBasic, TaskDispatcherDefinition, Workflow} from '@/shared/middleware/platform/configuration';
-import {ComponentOperationType, DataPillType} from '@/shared/types';
+import {DataPillType, WorkflowNodeType} from '@/shared/types';
 import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeChanges} from '@xyflow/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-export type WorkflowTaskDataType = {
+export type WorkflowDataType = {
     actionNames?: Array<string>;
     nodeNames: Array<string>;
 };
 
 interface WorkflowDataStateI {
-    componentActions: Array<ComponentOperationType>;
+    workflowNodes: Array<WorkflowNodeType>;
 
     componentDefinitions: Array<ComponentDefinitionBasic>;
     setComponentDefinitions: (componentDefinitions: Array<ComponentDefinitionBasic>) => void;
@@ -38,7 +38,7 @@ interface WorkflowDataStateI {
     taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinition>) => void;
 
-    workflow: Workflow & WorkflowTaskDataType;
+    workflow: Workflow & WorkflowDataType;
     setWorkflow: (workflow: Workflow) => void;
 }
 
@@ -79,7 +79,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
 
             reset: () =>
                 set(() => ({
-                    componentActions: [],
+                    workflowNodes: [],
                     dataPills: [],
                     workflow: {
                         actionNames: [],
@@ -96,26 +96,28 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             },
             setWorkflow: (workflow) =>
                 set((state) => {
-                    const workflowComponents: Array<{name: string; type: string}> = [
+                    const workflowNodes: Array<{name: string; type: string}> = [
                         workflow.triggers?.[0] || (defaultNodes[0].data as {name: string; type: string}),
                         ...(workflow?.tasks || []),
                     ];
 
                     return {
                         ...state,
-                        componentActions: workflowComponents.map((component) => {
-                            const componentName = component.type!.split('/')[0];
-                            const operationName = component.type!.split('/')[2];
+                        workflowNodes: workflowNodes.map((workflowNode) => {
+                            const name = workflowNode.type!.split('/')[0];
+                            const version = +workflowNode.type!.split('/')[1].replace('v', '');
+                            const operationName = workflowNode.type!.split('/')[2];
 
                             return {
-                                componentName,
+                                name,
                                 operationName,
-                                workflowNodeName: component.name,
+                                version,
+                                workflowNodeName: workflowNode.name,
                             };
                         }),
                         workflow: {
                             ...workflow,
-                            nodeNames: workflowComponents.map((component) => component.name),
+                            nodeNames: workflowNodes.map((workflowNode) => workflowNode.name),
                         },
                     };
                 }),

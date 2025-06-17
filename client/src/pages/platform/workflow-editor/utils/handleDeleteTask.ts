@@ -5,7 +5,7 @@ import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutp
 import {BranchCaseType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
-import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
+import {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
@@ -19,7 +19,7 @@ interface HandleDeleteTaskProps {
     setRootClusterElementNodeData?: (node: NodeDataType) => void;
     setCurrentNode?: (node: NodeDataType) => void;
     updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
-    workflow: Workflow & WorkflowTaskDataType;
+    workflow: Workflow & WorkflowDataType;
 }
 
 export default function handleDeleteTask({

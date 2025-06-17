@@ -38,8 +38,9 @@ export type DataPillType = {
     value: string;
 };
 
-export type ComponentOperationType = {
-    componentName: string;
+export type WorkflowNodeType = {
+    name: string;
+    version: number;
     operationName: string;
     workflowNodeName?: string;
 };
@@ -50,21 +51,6 @@ export type ComponentPropertiesType =
           properties?: Array<Property>;
       }
     | undefined;
-
-export type ConditionTaskDispatcherType = {
-    parameters: {
-        caseFalse: Array<WorkflowTaskType>;
-        caseTrue: Array<WorkflowTaskType>;
-        [key: string]: unknown;
-    };
-} & WorkflowTaskType;
-
-export type TaskDispatcherType = {
-    componentName: string;
-    icon: ReactNode;
-    label: string;
-    name: string;
-};
 
 export type ComponentType = {
     componentName: string;

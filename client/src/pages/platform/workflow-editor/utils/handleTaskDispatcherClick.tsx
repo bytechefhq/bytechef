@@ -11,7 +11,7 @@ import {Edge} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
-import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
+import {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import calculateNodeInsertIndex from './calculateNodeInsertIndex';
 import getFormattedName from './getFormattedName';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
@@ -29,7 +29,7 @@ interface HandleTaskDispatcherClickProps {
     taskDispatcherDefinition: ClickedDefinitionType;
     taskDispatcherName: keyof typeof TASK_DISPATCHER_CONFIG;
     updateWorkflowMutation: UpdateWorkflowMutationType;
-    workflow: Workflow & WorkflowTaskDataType;
+    workflow: Workflow & WorkflowDataType;
 }
 
 export default async function handleTaskDispatcherClick({

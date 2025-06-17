@@ -14,7 +14,7 @@ import {useEffect, useMemo} from 'react';
 export const useWorkflowLayout = (includeComponents?: string[]) => {
     const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
-    const {componentActions, setComponentDefinitions, setTaskDispatcherDefinitions, workflow} = useWorkflowDataStore();
+    const {setComponentDefinitions, setTaskDispatcherDefinitions, workflow, workflowNodes} = useWorkflowDataStore();
     const {
         clusterElementsCanvasOpen,
         setShowWorkflowCodeEditorSheet,
@@ -66,7 +66,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
             id: workflow.id!,
             lastWorkflowNodeName: currentNode?.name,
         },
-        !!componentActions?.length && !!currentNode && !!currentNode?.name && !currentNode?.trigger
+        !!workflowNodes?.length && !!currentNode && !!currentNode?.name && !currentNode?.trigger
     );
 
     let previousComponentDefinitions: ComponentDefinitionBasic[] = [];

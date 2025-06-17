@@ -10,7 +10,7 @@ import {QueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
-import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
+import {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
@@ -25,7 +25,7 @@ interface HandleTaskDispatcherSubtaskOperationClickProps {
     queryClient: QueryClient;
     taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
-    workflow: Workflow & WorkflowTaskDataType;
+    workflow: Workflow & WorkflowDataType;
 }
 
 export default function handleTaskDispatcherSubtaskOperationClick({

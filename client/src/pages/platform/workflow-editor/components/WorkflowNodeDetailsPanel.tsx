@@ -39,12 +39,12 @@ import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/querie
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
     BranchCaseType,
-    ComponentOperationType,
     ComponentPropertiesType,
     NodeDataType,
     PropertyAllType,
     TabNameType,
     UpdateWorkflowMutationType,
+    WorkflowNodeType,
 } from '@/shared/types';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
@@ -111,9 +111,9 @@ const WorkflowNodeDetailsPanel = ({
     >();
     const [currentActionFetched, setCurrentActionFetched] = useState(false);
     const [currentClusterElementName, setCurrentClusterElementName] = useState<string | undefined>();
-    const [clusterElementComponentOperations, setClusterElementComponentOperations] = useState<
-        Array<ComponentOperationType>
-    >([]);
+    const [clusterElementComponentOperations, setClusterElementComponentOperations] = useState<Array<WorkflowNodeType>>(
+        []
+    );
 
     const {
         activeTab,
@@ -125,7 +125,7 @@ const WorkflowNodeDetailsPanel = ({
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
 
-    const {componentActions, setDataPills, workflow} = useWorkflowDataStore();
+    const {setDataPills, workflow, workflowNodes} = useWorkflowDataStore();
 
     const {clusterElementsCanvasOpen, rootClusterElementNodeData} = useWorkflowEditorStore();
 
@@ -736,62 +736,67 @@ const WorkflowNodeDetailsPanel = ({
         const currentRootClusterTaskClusterElements = currentRootClusterTask?.clusterElements;
 
         if (currentRootClusterTaskClusterElements) {
-            let clusterElementsOperationData: ComponentOperationType[] = [];
+            let clusterElementsWorkflowNodeTypes: WorkflowNodeType[] = [];
 
             Object.entries(currentRootClusterTaskClusterElements).forEach(([, value]) => {
                 if (Array.isArray(value)) {
-                    const multipleElementsData = value.map((element) => ({
-                        componentName: element.componentName || '',
+                    const multipleClusterElements = value.map((element) => ({
+                        name: element.componentName || '',
                         operationName: element.type ? element.type.split('/')[2] : '',
+                        version: +element.type!.split('/')[1].replace('v', ''),
                         workflowNodeName: element.name || '',
                     }));
 
-                    clusterElementsOperationData = [...clusterElementsOperationData, ...multipleElementsData];
+                    clusterElementsWorkflowNodeTypes = [
+                        ...clusterElementsWorkflowNodeTypes,
+                        ...multipleClusterElements,
+                    ];
                 } else {
-                    clusterElementsOperationData.push({
-                        componentName: value.componentName || '',
+                    clusterElementsWorkflowNodeTypes.push({
+                        name: value.componentName || '',
                         operationName: value.type ? value.type.split('/')[2] : '',
+                        version: +value.type!.split('/')[1].replace('v', ''),
                         workflowNodeName: value.name || '',
                     });
                 }
             });
 
-            if (clusterElementsOperationData.length > 0) {
-                setClusterElementComponentOperations(clusterElementsOperationData);
+            if (clusterElementsWorkflowNodeTypes.length > 0) {
+                setClusterElementComponentOperations(clusterElementsWorkflowNodeTypes);
             }
         }
     }, [clusterElementsCanvasOpen, rootClusterElementNodeData, workflow]);
 
     // Set currentOperationName depending on the currentComponentAction.operationName
     useEffect(() => {
-        if (!componentActions?.length) {
+        if (!workflowNodes?.length) {
             return;
         }
 
-        let currentComponentAction;
+        let curWorkflowNode;
 
-        if (componentActions.length && !clusterElementsCanvasOpen && !isClusterElement) {
-            currentComponentAction = componentActions.find(
-                (action) => action.workflowNodeName === currentNode?.workflowNodeName
+        if (workflowNodes.length && !clusterElementsCanvasOpen && !isClusterElement) {
+            curWorkflowNode = workflowNodes.find(
+                (workflowNode) => workflowNode.workflowNodeName === currentNode?.workflowNodeName
             );
         } else if (clusterElementsCanvasOpen) {
             if (currentNode?.rootClusterElement) {
-                currentComponentAction = componentActions.find(
+                curWorkflowNode = workflowNodes.find(
                     (action) => action.workflowNodeName === currentNode?.workflowNodeName
                 );
             } else if (clusterElementComponentOperations) {
-                currentComponentAction = clusterElementComponentOperations.find(
+                curWorkflowNode = clusterElementComponentOperations.find(
                     (action) => action.workflowNodeName === currentNode?.workflowNodeName
                 );
             }
         }
 
-        if (currentComponentAction?.operationName && currentComponentAction.operationName !== currentOperationName) {
-            setCurrentOperationName(currentComponentAction.operationName);
+        if (curWorkflowNode?.operationName && curWorkflowNode.operationName !== currentOperationName) {
+            setCurrentOperationName(curWorkflowNode.operationName);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [clusterElementComponentOperations, componentActions, currentNode?.workflowNodeName, currentOperationName]);
+    }, [clusterElementComponentOperations, currentNode?.workflowNodeName, currentOperationName, workflowNodes]);
 
     // Update display conditions when currentNode changes
     useEffect(() => {
