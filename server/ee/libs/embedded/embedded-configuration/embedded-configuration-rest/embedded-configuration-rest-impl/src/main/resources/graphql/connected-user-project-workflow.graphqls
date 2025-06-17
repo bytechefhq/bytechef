@@ -1,22 +1,25 @@
 extend type Query {
-    connectedUserProjectWorkflow(id: ID): ConnectedUserProjectWorkflow
+    connectedUserProjectWorkflow(id: Long): ConnectedUserProjectWorkflow
     connectedUserProjectWorkflowsByConnectedUserProjectId(connectedUserProjectId: ID): [ConnectedUserProjectWorkflow]
-    isConnectionUsed(connectionId: ID): Boolean
+    isConnectionUsed(connectionId: Long): Boolean
 }
 
 type ConnectedUserProjectWorkflow {
-    id: ID!
-    connectedUserProjectId: ID!
-    projectWorkflowId: ID!
+    id: Long!
+    connectedUserProjectId: Long!
+    label: String
+    projectId: Long!
+    projectWorkflowId: Long!
+    workflowReferenceCode: ID!
+    workflowVersion: Int
+    connections: [ConnectedUserProjectWorkflowConnection]
     createdBy: String
     createdDate: String
     lastModifiedBy: String
     lastModifiedDate: String
     version: Int
-    workflowVersion: Int
-    connections: [ConnectedUserProjectWorkflowConnection]
 }
 
 type ConnectedUserProjectWorkflowConnection {
-    connectionId: ID!
+    connectionId: Long!
 }

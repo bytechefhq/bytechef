@@ -1,11 +1,12 @@
 extend type Query {
-    connectedUserProject(id: ID): ConnectedUserProject
+    connectedUserProject(id: Long): ConnectedUserProject
 }
 
 type ConnectedUserProject {
-    id: ID!
-    connectedUserId: ID!
-    projectId: ID!
+    id: Long!
+    connectedUserId: Long!
+    projectId: Long!
+    name: String
     createdBy: String
     createdDate: String
     lastModifiedBy: String
