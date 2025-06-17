@@ -48,10 +48,10 @@ public class WorkflowCacheManager {
     /**
      * Clears cache entries for a specific workflow.
      *
-     * @param cacheName  the name of the cache
      * @param workflowId the ID of the workflow
+     * @param cacheName  the name of the cache
      */
-    public void clearCacheForWorkflow(String cacheName, String workflowId) {
+    public void clearCacheForWorkflow(String workflowId, String cacheName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         List<String> workflowNodeNames = new ArrayList<>();

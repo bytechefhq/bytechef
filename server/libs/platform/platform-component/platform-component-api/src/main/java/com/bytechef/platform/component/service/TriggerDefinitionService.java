@@ -101,4 +101,6 @@ public interface TriggerDefinitionService {
     List<TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion);
 
     WebhookTriggerFlags getWebhookTriggerFlags(String componentName, int componentVersion, String triggerName);
+
+    boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName);
 }

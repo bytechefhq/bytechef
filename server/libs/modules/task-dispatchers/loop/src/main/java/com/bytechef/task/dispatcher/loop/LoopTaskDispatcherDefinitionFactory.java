@@ -74,7 +74,7 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         }
 
         OutputResponse outputResponse;
-        List<?> list = MapUtils.getRequiredList(inputParameters, ITEMS);
+        List<?> list = MapUtils.getList(inputParameters, ITEMS, List.of());
 
         if (list.isEmpty()) {
             outputResponse = OutputResponse.of(object());

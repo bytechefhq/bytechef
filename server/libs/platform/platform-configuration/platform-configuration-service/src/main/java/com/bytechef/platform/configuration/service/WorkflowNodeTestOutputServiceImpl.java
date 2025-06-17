@@ -22,6 +22,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
@@ -61,8 +62,8 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     @Override
     @CacheEvict(value = WORKFLOW_TEST_NODE_OUTPUT_CACHE)
     @WorkflowCacheEvict(cacheNames = {
-        "WorkflowNodeOutputFacade.previousWorkflowNodeOutputs",
-        "WorkflowNodeOutputFacade.previousWorkflowNodeSampleOutputs"
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
     public void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
         workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName)
@@ -140,8 +141,8 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     @WorkflowCacheEvict(cacheNames = {
-        "WorkflowNodeOutputFacade.previousWorkflowNodeOutputs",
-        "WorkflowNodeOutputFacade.previousWorkflowNodeSampleOutputs"
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
     public WorkflowNodeTestOutput save(
         String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, OutputResponse outputResponse) {

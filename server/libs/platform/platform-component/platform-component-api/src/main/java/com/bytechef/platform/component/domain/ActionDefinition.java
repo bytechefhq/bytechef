@@ -42,6 +42,7 @@ public class ActionDefinition {
     private boolean outputDefined;
     private boolean outputFunctionDefined;
     private OutputResponse outputResponse;
+    private boolean outputSchemaDefined;
     private List<? extends Property> properties;
     boolean singleConnection;
     private String title;
@@ -67,6 +68,7 @@ public class ActionDefinition {
             outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             actionDefinition.getOutputDefinition(), ActionDefinition::toOutputResponse, null);
+        this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
         this.singleConnection = OptionalUtils.mapOrElse(
@@ -88,7 +90,9 @@ public class ActionDefinition {
             outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
             Objects.equals(componentName, that.componentName) && Objects.equals(description, that.description) &&
             Objects.equals(help, that.help) && Objects.equals(name, that.name) &&
-            Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
+            Objects.equals(outputResponse, that.outputResponse) &&
+            Objects.equals(outputSchemaDefined, that.outputSchemaDefined) &&
+            Objects.equals(properties, that.properties) &&
             Objects.equals(title, that.title) && workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined;
     }
 
@@ -96,7 +100,7 @@ public class ActionDefinition {
     public int hashCode() {
         return Objects.hash(
             batch, componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined,
-            outputResponse, properties, title, workflowNodeDescriptionDefined);
+            outputResponse, outputSchemaDefined, properties, title, workflowNodeDescriptionDefined);
     }
 
     public String getComponentName() {
@@ -144,6 +148,10 @@ public class ActionDefinition {
         return outputFunctionDefined;
     }
 
+    public boolean isOutputSchemaDefined() {
+        return outputSchemaDefined;
+    }
+
     public boolean isSingleConnection() {
         return singleConnection;
     }
@@ -166,6 +174,7 @@ public class ActionDefinition {
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +
             ", outputResponse=" + outputResponse +
+            ", outputResponseDefined=" + outputSchemaDefined +
             ", help=" + help +
             ", workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
             '}';

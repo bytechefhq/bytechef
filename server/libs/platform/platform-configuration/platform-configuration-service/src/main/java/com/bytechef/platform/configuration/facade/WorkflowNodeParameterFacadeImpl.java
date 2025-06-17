@@ -807,18 +807,20 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     curList.getFirst() instanceof Map<?, ?>) {
 
                     for (Object item : curList) {
-                        Map<String, ?> curTask = (Map<String, ?>) item;
+                        if (item instanceof Map<?, ?> curTask) {
+                            if (!curTask.containsKey(WorkflowConstants.NAME) &&
+                                !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
 
-                        if (curTask == null || !curTask.containsKey(WorkflowConstants.NAME) &&
-                            !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
+                                continue;
+                            }
 
-                            continue;
-                        }
+                            Map<String, ?> curTaskMap = getTask(workflowNodeName, List.of((Map<String, ?>) curTask));
 
-                        Map<String, ?> curTaskMap = getTask(workflowNodeName, List.of(curTask));
-
-                        if (curTaskMap != null) {
-                            return curTaskMap;
+                            if (curTaskMap != null) {
+                                return curTaskMap;
+                            }
+                        } else {
+                            System.out.println(item);
                         }
                     }
                 }
@@ -1021,7 +1023,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 for (String key : new HashSet<>(dynamicPropertyTypesMap.keySet())) {
                     List<Integer> keyIndexes = extractIndexes(key);
 
-                    if (key.startsWith(pathPrefix) && pathIndexes.getLast() < keyIndexes.getLast()) {
+                    if (key.startsWith(pathPrefix) && !keyIndexes.isEmpty() &&
+                        pathIndexes.getLast() < keyIndexes.getLast()) {
+
                         dynamicPropertyTypesMap.put(
                             pathPrefix + "[" + (keyIndexes.getLast() - 1) +
                                 path.substring(path.lastIndexOf("[") + 2, path.lastIndexOf("]") + 1),

@@ -184,9 +184,15 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
+    public boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String triggerName, int statusCode, Object body,
         Context triggerContext) {
+
         throw new UnsupportedOperationException();
     }
 }

@@ -52,6 +52,11 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     }
 
     @Override
+    public OutputResponse executeVariableProperties(String name, int version, Map<String, ?> inputParameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String executeWorkflowNodeDescription(String name, int version, Map<String, ?> inputParameters) {
         throw new UnsupportedOperationException();
     }
@@ -90,6 +95,11 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
                 .path(TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definition-versions/{name}")
                 .build(name),
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public boolean isDynamicOutputDefined(String componentName, int componentVersion) {
+        throw new UnsupportedOperationException();
     }
 
     private record OutputRequest(String name, int version, Map<String, ?> taskDispatcherParameters) {

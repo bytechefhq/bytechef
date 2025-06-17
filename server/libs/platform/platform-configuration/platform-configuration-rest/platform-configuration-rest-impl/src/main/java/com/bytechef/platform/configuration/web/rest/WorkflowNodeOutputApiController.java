@@ -67,6 +67,8 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
     public ResponseEntity<List<WorkflowNodeOutputModel>> getPreviousWorkflowNodeOutputs(
         String workflowId, String lastWorkflowNodeName) {
 
+        workflowNodeOutputFacade.checkWorkflowCache(workflowId, lastWorkflowNodeName);
+
         return ResponseEntity.ok(
             CollectionUtils.map(
                 workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName),

@@ -30,6 +30,8 @@ public interface TaskDispatcherDefinitionService {
 
     OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters);
 
+    OutputResponse executeVariableProperties(String name, int version, Map<String, ?> inputParameters);
+
     String executeWorkflowNodeDescription(String name, int version, Map<String, ?> inputParameters);
 
     Optional<TaskDispatcherDefinition> fetchTaskDispatcherDefinition(String name, @Nullable Integer version);
@@ -39,4 +41,6 @@ public interface TaskDispatcherDefinitionService {
     List<TaskDispatcherDefinition> getTaskDispatcherDefinitions();
 
     List<TaskDispatcherDefinition> getTaskDispatcherDefinitionVersions(String name);
+
+    boolean isDynamicOutputDefined(String componentName, int componentVersion);
 }

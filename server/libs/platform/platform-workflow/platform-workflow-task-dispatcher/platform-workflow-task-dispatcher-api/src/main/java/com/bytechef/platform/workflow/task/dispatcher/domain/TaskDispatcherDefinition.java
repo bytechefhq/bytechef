@@ -36,7 +36,9 @@ public class TaskDispatcherDefinition {
     private String icon;
     private String name;
     private boolean outputDefined;
+    private boolean outputFunctionDefined;
     private OutputResponse outputResponse;
+    private boolean outputSchemaDefined;
     private List<? extends Property> properties;
     private Resources resources;
     private List<? extends Property> taskProperties;
@@ -56,14 +58,18 @@ public class TaskDispatcherDefinition {
     public TaskDispatcherDefinition(
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition) {
 
-        this.outputDefined = OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutputDefinition(), outputDefinition -> true, false);
-        this.outputResponse = OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutputDefinition(), TaskDispatcherDefinition::toOutputResponse, null);
         this.description = OptionalUtils.orElse(taskDispatcherDefinition.getDescription(), null);
         this.help = OptionalUtils.mapOrElse(taskDispatcherDefinition.getHelp(), Help::new, null);
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = taskDispatcherDefinition.getName();
+        this.outputDefined = OptionalUtils.mapOrElse(
+            taskDispatcherDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            taskDispatcherDefinition.getOutputDefinition(),
+            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
+        this.outputResponse = OptionalUtils.mapOrElse(
+            taskDispatcherDefinition.getOutputDefinition(), TaskDispatcherDefinition::toOutputResponse, null);
+        this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), Property::toProperty);
         this.resources = OptionalUtils.mapOrElse(taskDispatcherDefinition.getResources(), Resources::new, null);
@@ -91,7 +97,8 @@ public class TaskDispatcherDefinition {
 
         return Objects.equals(description, that.description) &&
             Objects.equals(help, that.help) && Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
-            outputDefined == that.outputDefined && Objects.equals(outputResponse, that.outputResponse) &&
+            outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
+            Objects.equals(outputResponse, that.outputResponse) && outputSchemaDefined == that.outputSchemaDefined &&
             Objects.equals(properties, that.properties) && Objects.equals(resources, that.resources) &&
             Objects.equals(taskProperties, that.taskProperties) && Objects.equals(title, that.title) &&
             Objects.equals(variablePropertiesDefined, that.variablePropertiesDefined) && version == that.version;
@@ -100,12 +107,20 @@ public class TaskDispatcherDefinition {
     @Override
     public int hashCode() {
         return Objects.hash(
-            description, help, icon, name, outputDefined, outputResponse, properties, resources, taskProperties, title,
-            variablePropertiesDefined, version);
+            description, help, icon, name, outputDefined, outputFunctionDefined, outputResponse, outputSchemaDefined,
+            properties, resources, taskProperties, title, variablePropertiesDefined, version);
     }
 
     public boolean isOutputDefined() {
         return outputDefined;
+    }
+
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
+    }
+
+    public boolean isOutputSchemaDefined() {
+        return outputSchemaDefined;
     }
 
     public boolean isVariablePropertiesDefined() {
@@ -165,7 +180,10 @@ public class TaskDispatcherDefinition {
             ", icon='" + icon + '\'' +
             ", name='" + name + '\'' +
             ", properties=" + properties +
+            ", outputDefined=" + outputDefined +
+            ", outputFunctionDefined=" + outputFunctionDefined +
             ", outputResponse=" + outputResponse +
+            ", outputSchemaDefined=" + outputSchemaDefined +
             ", resources=" + resources +
             ", taskProperties=" + taskProperties +
             ", title='" + title + '\'' +

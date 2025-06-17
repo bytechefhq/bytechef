@@ -26,6 +26,9 @@ import java.util.Map;
  */
 public interface WorkflowNodeOutputFacade {
 
+    String PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE = "WorkflowNodeOutputFacade.previousWorkflowNodeOutputs";
+    String PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE = "WorkflowNodeOutputFacade.previousWorkflowNodeSampleOutputs";
+
     ClusterElementOutputDTO getClusterElementOutput(
         String workflowId, String workflowNodeName, String clusterElementType, String clusterElementName);
 
@@ -34,4 +37,6 @@ public interface WorkflowNodeOutputFacade {
     List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName);
 
     Map<String, ?> getPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName);
+
+    void checkWorkflowCache(String workflowId, String lastWorkflowNodeName);
 }

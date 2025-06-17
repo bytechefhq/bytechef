@@ -419,6 +419,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
     }
 
+    @Override
+    public boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName) {
+        TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, actionName);
+
+        return triggerDefinition.isOutputFunctionDefined();
+    }
+
     private static TriggerOutput executePollingTrigger(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition,
         Map<String, ?> inputParameters, ComponentConnection connection, Map<String, ?> closureParameters,

@@ -43,6 +43,7 @@ public class TriggerDefinition {
     protected boolean outputFunctionDefined;
     protected boolean outputDefined;
     private OutputResponse outputResponse;
+    private boolean outputSchemaDefined;
     private List<? extends Property> properties;
     protected String title;
     protected TriggerType type;
@@ -72,6 +73,7 @@ public class TriggerDefinition {
             outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             triggerDefinition.getOutputDefinition(), TriggerDefinition::toOutputResponse, null);
+        this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
         this.title = Validate.notNull(getTitle(triggerDefinition), "title");
@@ -100,16 +102,18 @@ public class TriggerDefinition {
             workflowSyncOnEnableValidation == that.workflowSyncOnEnableValidation &&
             Objects.equals(description, that.description) && Objects.equals(componentName, that.componentName) &&
             Objects.equals(help, that.help) && Objects.equals(name, that.name) &&
-            Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
-            Objects.equals(title, that.title) && type == that.type;
+            Objects.equals(outputResponse, that.outputResponse) &&
+            Objects.equals(outputSchemaDefined, that.outputSchemaDefined) &&
+            Objects.equals(properties, that.properties) && Objects.equals(title, that.title) && type == that.type;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
             batch, description, componentName, componentVersion, help, name, outputFunctionDefined, outputDefined,
-            outputResponse, properties, title, type, webhookRawBody, workflowNodeDescriptionDefined,
-            workflowSyncExecution, workflowSyncValidation, workflowSyncOnEnableValidation);
+            outputResponse, outputSchemaDefined, properties, title, type, webhookRawBody,
+            workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation,
+            workflowSyncOnEnableValidation);
     }
 
     public String getComponentName() {
@@ -161,6 +165,10 @@ public class TriggerDefinition {
         return outputFunctionDefined;
     }
 
+    public boolean isOutputSchemaDefined() {
+        return outputSchemaDefined;
+    }
+
     public boolean isWebhookRawBody() {
         return webhookRawBody;
     }
@@ -195,6 +203,7 @@ public class TriggerDefinition {
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +
             ", outputResponse=" + outputResponse +
+            ", outputResponseDefined=" + outputSchemaDefined +
             ", webhookRawBody=" + webhookRawBody +
             ", workflowSyncExecution=" + workflowSyncExecution +
             ", workflowSyncValidation=" + workflowSyncValidation +

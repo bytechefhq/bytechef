@@ -134,6 +134,11 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
+    public boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isSingleConnectionPerform(String componentName, int componentVersion, String actionName) {
         throw new UnsupportedOperationException();
     }

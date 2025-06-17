@@ -34,7 +34,6 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
-import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
@@ -124,18 +123,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
                 }
             })
-            .orElseGet(() -> {
-                Object result = executeMultipleConnectionsPerform(
-                    componentName, componentVersion, actionName, inputParameters, connections, extensions, context);
-
-                BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
-                    (BaseValueProperty<?>) SchemaUtils.getOutputSchema(result, PropertyFactory.PROPERTY_FACTORY),
-                    result);
-
-                return SchemaUtils.toOutput(
-                    definitionOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
-                    PropertyFactory.PROPERTY_FACTORY);
-            });
+            .orElse(null);
     }
 
     @Override
@@ -237,18 +225,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
                 }
             })
-            .orElseGet(() -> {
-                Object result = executeSingleConnectionPerform(
-                    componentName, componentVersion, actionName, inputParameters, connection, context);
-
-                BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
-                    (BaseValueProperty<?>) SchemaUtils.getOutputSchema(result, PropertyFactory.PROPERTY_FACTORY),
-                    result);
-
-                return SchemaUtils.toOutput(
-                    definitionOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
-                    PropertyFactory.PROPERTY_FACTORY);
-            });
+            .orElse(null);
     }
 
     @Override
@@ -312,6 +289,13 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             .stream()
             .map(actionDefinition -> new ActionDefinition(actionDefinition, componentName, componentVersion))
             .toList();
+    }
+
+    @Override
+    public boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName) {
+        ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
+
+        return actionDefinition.isOutputFunctionDefined();
     }
 
     @Override

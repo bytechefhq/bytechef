@@ -56,7 +56,7 @@ public class WorkflowCacheEvictAspect {
 
         if (workflowId != null) {
             for (String cacheName : workflowCacheEvict.cacheNames()) {
-                workflowCacheManager.clearCacheForWorkflow(cacheName, workflowId);
+                workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName);
             }
         }
     }

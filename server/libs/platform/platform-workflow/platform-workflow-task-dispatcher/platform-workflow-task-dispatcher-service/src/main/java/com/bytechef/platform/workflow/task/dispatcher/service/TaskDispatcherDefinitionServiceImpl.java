@@ -16,10 +16,7 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.service;
 
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
-
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
@@ -27,11 +24,8 @@ import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionRe
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,10 +50,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 
-        List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
-        Map<String, Object> sampleOutput = new HashMap<>();
-
-        taskDispatcherDefinition.getOutputDefinition()
+        return taskDispatcherDefinition.getOutputDefinition()
             .flatMap(OutputDefinition::getOutput)
             .map(f -> (OutputFunction) f)
             .map(outputFunction -> {
@@ -69,13 +60,17 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
                     throw new RuntimeException(e);
                 }
             })
-            .ifPresent(outputOutputResponse -> {
-                properties.add(
-                    ((ModifiableValueProperty<?, ?>) outputOutputResponse.getOutputSchema()).setName("output"));
-                sampleOutput.put("output", outputOutputResponse.getSampleOutput());
-            });
+            .map(curOutputResponse -> SchemaUtils.toOutput(
+                curOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY))
+            .orElse(null);
+    }
 
-        taskDispatcherDefinition.getVariableProperties()
+    @Override
+    public OutputResponse executeVariableProperties(String name, int version, Map<String, ?> inputParameters) {
+        com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
+            taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
+
+        return taskDispatcherDefinition.getVariableProperties()
             .map(variablePropertiesFunction -> {
                 try {
                     return variablePropertiesFunction.apply(inputParameters);
@@ -83,16 +78,9 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
                     throw new RuntimeException(e);
                 }
             })
-            .ifPresent(outputResponse -> {
-                properties.add(
-                    ((ModifiableValueProperty<?, ?>) outputResponse.getOutputSchema())
-                        .setName("variableProperties"));
-                sampleOutput.put("variableProperties", outputResponse.getSampleOutput());
-            });
-
-        return SchemaUtils.toOutput(
-            BaseOutputDefinition.OutputResponse.of(object().properties(properties), sampleOutput),
-            PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+            .map(curOutputResponse -> SchemaUtils.toOutput(
+                curOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY))
+            .orElse(null);
     }
 
     @Override
@@ -131,5 +119,14 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
             .stream()
             .map(TaskDispatcherDefinition::new)
             .toList();
+    }
+
+    @Override
+    public boolean isDynamicOutputDefined(String componentName, int componentVersion) {
+        TaskDispatcherDefinition taskDispatcherDefinition = getTaskDispatcherDefinition(
+            componentName, componentVersion);
+
+        return taskDispatcherDefinition.isOutputFunctionDefined() ||
+            taskDispatcherDefinition.isVariablePropertiesDefined();
     }
 }

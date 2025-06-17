@@ -22,7 +22,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.definition.PropertyFactory;
-import com.bytechef.platform.component.domain.NullProperty;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -40,7 +39,6 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
-import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,7 +57,6 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final Evaluator evaluator;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
-    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
@@ -71,7 +68,6 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     public WorkflowNodeTestOutputFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WebhookTriggerTestFacade webhookTriggerTestFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
@@ -79,7 +75,6 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.evaluator = evaluator;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
-        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
@@ -90,7 +85,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @Override
     @WorkflowCacheEvict(cacheNames = {
-        "previousWorkflowNodeOutputs", "previousWorkflowNodeSampleOutputs"
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -104,28 +100,20 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                     .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
                     .orElse(null));
         } else {
-            WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
-
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-            if (workflowNodeType.operation() == null) {
-                return saveTaskDispatcherWorkflowNodeTestOutput(workflowNodeName, workflow);
-            } else {
-                return saveActionWorkflowNodeTestOutput(
-                    workflowNodeName, workflow,
-                    MapUtils.toMap(
-                        workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                            workflowId, workflowNodeName),
-                        WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
-                        WorkflowTestConfigurationConnection::getConnectionId));
-            }
+            return saveActionWorkflowNodeTestOutput(
+                workflowNodeName, workflow,
+                MapUtils.toMap(
+                    workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                        workflowId, workflowNodeName),
+                    WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+                    WorkflowTestConfigurationConnection::getConnectionId));
         }
     }
 
     @Override
     @WorkflowCacheEvict(cacheNames = {
-        "WorkflowNodeOutputFacade.previousWorkflowNodeOutputs",
-        "WorkflowNodeOutputFacade.previousWorkflowNodeSampleOutputs"
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Object sampleOutput) {
@@ -195,32 +183,6 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     @SuppressWarnings("unchecked")
-    private WorkflowNodeTestOutput saveTaskDispatcherWorkflowNodeTestOutput(
-        String workflowNodeName, Workflow workflow) {
-
-        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
-        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflow.getId(), workflowTask.getName());
-
-        Map<String, ?> inputParameters = workflowTask.evaluateParameters(
-            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
-
-        OutputResponse outputResponse = taskDispatcherDefinitionService.executeOutput(
-            workflowNodeType.name(), workflowNodeType.version(), inputParameters);
-
-        if (outputResponse == null || outputResponse.outputSchema() instanceof NullProperty) {
-            return null;
-        }
-
-        return workflowNodeTestOutputService.save(
-            Validate.notNull(workflow.getId(), "id"), workflowNodeName, workflowNodeType, outputResponse);
-    }
-
-    @SuppressWarnings("unchecked")
     private WorkflowNodeTestOutput saveActionWorkflowNodeTestOutput(
         String workflowNodeName, Workflow workflow, Map<String, Long> connectionIds) {
 
@@ -235,11 +197,18 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
 
-        OutputResponse outputResponse = actionDefinitionFacade.executeOutput(
-            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
-            inputParameters, connectionIds);
+        Object value = actionDefinitionFacade.executePerform(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null, null,
+            null, inputParameters, connectionIds, Map.of(), true);
 
-        if (outputResponse == null || outputResponse.outputSchema() instanceof NullProperty) {
+        if (value == null) {
+            return null;
+        }
+
+        OutputResponse outputResponse = SchemaUtils.toOutput(
+            value, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+
+        if (outputResponse == null) {
             return null;
         }
 
@@ -270,12 +239,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             }
         }
 
-        BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
-            (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(value, PropertyFactory.PROPERTY_FACTORY),
-            value);
-
         OutputResponse outputResponse = SchemaUtils.toOutput(
-            definitionOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+            value, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null) {
             return null;

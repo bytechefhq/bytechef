@@ -128,5 +128,7 @@ public interface ActionDefinitionService {
 
     List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion);
 
+    boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName);
+
     boolean isSingleConnectionPerform(String componentName, int componentVersion, String actionName);
 }
