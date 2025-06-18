@@ -1,4 +1,4 @@
-query integrationById($id: Long!) {
+query integrationById($id: ID!) {
     integration(id: $id) {
         id
         name
