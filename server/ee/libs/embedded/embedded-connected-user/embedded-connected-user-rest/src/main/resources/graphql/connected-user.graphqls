@@ -12,7 +12,7 @@ extend type Query {
 type ConnectedUser {
     id: ID!
     externalId: String!
-    environment: Int!
+    environment: Environment!
     createdBy: String
     createdDate: String
     lastModifiedBy: String

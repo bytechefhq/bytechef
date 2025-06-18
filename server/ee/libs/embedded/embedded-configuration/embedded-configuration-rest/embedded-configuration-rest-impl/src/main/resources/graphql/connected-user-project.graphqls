@@ -1,15 +1,35 @@
 extend type Query {
-    connectedUserProject(id: Long): ConnectedUserProject
+    connectedUserProjects(connectedUserId: ID, environment: Environment): [ConnectedUserProject!]!
 }
 
 type ConnectedUserProject {
-    id: Long!
-    connectedUserId: Long!
-    projectId: Long!
-    name: String
+    id: ID!
+    connectedUser: ConnectedUser!
+    environment: Environment
+    lastExecutionDate: String
+    projectId: ID!
+    connectedUserProjectWorkflows: [ConnectedUserProjectWorkflow!]!
+    projectVersion: Int
     createdBy: String
     createdDate: String
     lastModifiedBy: String
     lastModifiedDate: String
     version: Int
 }
+
+type ConnectedUserProjectWorkflow {
+    id: ID!
+    connectedUserId: ID!
+    enabled: Boolean!
+    lastExecutionDate: String
+    projectId: ID!
+    workflow: Workflow!
+    workflowReferenceCode: ID!
+    workflowVersion: Int!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int
+}
+

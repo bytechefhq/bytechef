@@ -1,0 +1,27 @@
+query connectedUserProjects($connectedUserId: ID, $environment: Environment) {
+    connectedUserProjects(connectedUserId: $connectedUserId, environment: $environment) {
+        id
+        connectedUser {
+            id,
+            environment
+            externalId
+        }
+        connectedUserProjectWorkflows {
+            id,
+            connectedUserId
+            enabled
+            lastExecutionDate
+            projectId
+            workflowReferenceCode
+            workflowVersion
+            workflow {
+                id
+                label
+            }
+        }
+        environment
+        lastExecutionDate
+        projectId
+        projectVersion
+    }
+}

@@ -1,0 +1,9 @@
+type Workflow {
+    id: ID!
+    label: String!
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}

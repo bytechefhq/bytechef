@@ -1,8 +1,8 @@
 extend type Query {
-    integration(id: Long): Integration
+    integration(id: ID): Integration
 }
 
 type Integration {
-    id: Long!
+    id: ID!
     name: String!
 }
