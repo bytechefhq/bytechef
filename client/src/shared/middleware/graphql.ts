@@ -1,3 +1,4 @@
+import { endpointUrl, fetchParams } from './config';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -9,9 +10,9 @@ export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' |
 
 function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
   return async (): Promise<TData> => {
-    const res = await fetch("http://localhost:9555/graphql", {
+    const res = await fetch(endpointUrl as string, {
     method: "POST",
-    ...({"headers":{"Content-Type":"application/json"}}),
+    ...(fetchParams),
       body: JSON.stringify({ query, variables }),
     });
 
@@ -47,7 +48,7 @@ export type ConnectedUser = {
   __typename?: 'ConnectedUser';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
-  environment: Scalars['Int']['output'];
+  environment: Environment;
   externalId: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
@@ -66,37 +67,35 @@ export type ConnectedUserPage = {
 
 export type ConnectedUserProject = {
   __typename?: 'ConnectedUserProject';
-  connectedUserId: Scalars['Long']['output'];
+  connectedUser: ConnectedUser;
+  connectedUserProjectWorkflows: Array<ConnectedUserProjectWorkflow>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
-  id: Scalars['Long']['output'];
+  environment?: Maybe<Environment>;
+  id: Scalars['ID']['output'];
+  lastExecutionDate?: Maybe<Scalars['String']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  projectId: Scalars['Long']['output'];
+  projectId: Scalars['ID']['output'];
+  projectVersion?: Maybe<Scalars['Int']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
 };
 
 export type ConnectedUserProjectWorkflow = {
   __typename?: 'ConnectedUserProjectWorkflow';
-  connectedUserProjectId: Scalars['Long']['output'];
-  connections?: Maybe<Array<Maybe<ConnectedUserProjectWorkflowConnection>>>;
+  connectedUserId: Scalars['ID']['output'];
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
-  id: Scalars['Long']['output'];
-  label?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  lastExecutionDate?: Maybe<Scalars['String']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  projectId: Scalars['Long']['output'];
-  projectWorkflowId: Scalars['Long']['output'];
+  projectId: Scalars['ID']['output'];
   version?: Maybe<Scalars['Int']['output']>;
+  workflow: Workflow;
   workflowReferenceCode: Scalars['ID']['output'];
-  workflowVersion?: Maybe<Scalars['Int']['output']>;
-};
-
-export type ConnectedUserProjectWorkflowConnection = {
-  __typename?: 'ConnectedUserProjectWorkflowConnection';
-  connectionId: Scalars['Long']['output'];
+  workflowVersion: Scalars['Int']['output'];
 };
 
 export enum Environment {
@@ -107,7 +106,7 @@ export enum Environment {
 
 export type Integration = {
   __typename?: 'Integration';
-  id: Scalars['Long']['output'];
+  id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
 };
 
@@ -216,12 +215,9 @@ export type Query = {
   __typename?: 'Query';
   _empty?: Maybe<Scalars['String']['output']>;
   connectedUser?: Maybe<ConnectedUser>;
-  connectedUserProject?: Maybe<ConnectedUserProject>;
-  connectedUserProjectWorkflow?: Maybe<ConnectedUserProjectWorkflow>;
-  connectedUserProjectWorkflowsByConnectedUserProjectId?: Maybe<Array<Maybe<ConnectedUserProjectWorkflow>>>;
+  connectedUserProjects: Array<ConnectedUserProject>;
   connectedUsers?: Maybe<ConnectedUserPage>;
   integration?: Maybe<Integration>;
-  isConnectionUsed?: Maybe<Scalars['Boolean']['output']>;
   mcpAction?: Maybe<McpAction>;
   mcpActions?: Maybe<Array<Maybe<McpAction>>>;
   mcpActionsByComponentId?: Maybe<Array<Maybe<McpAction>>>;
@@ -244,18 +240,9 @@ export type QueryConnectedUserArgs = {
 };
 
 
-export type QueryConnectedUserProjectArgs = {
-  id?: InputMaybe<Scalars['Long']['input']>;
-};
-
-
-export type QueryConnectedUserProjectWorkflowArgs = {
-  id?: InputMaybe<Scalars['Long']['input']>;
-};
-
-
-export type QueryConnectedUserProjectWorkflowsByConnectedUserProjectIdArgs = {
-  connectedUserProjectId?: InputMaybe<Scalars['ID']['input']>;
+export type QueryConnectedUserProjectsArgs = {
+  connectedUserId?: InputMaybe<Scalars['ID']['input']>;
+  environment?: InputMaybe<Environment>;
 };
 
 
@@ -270,12 +257,7 @@ export type QueryConnectedUsersArgs = {
 
 
 export type QueryIntegrationArgs = {
-  id?: InputMaybe<Scalars['Long']['input']>;
-};
-
-
-export type QueryIsConnectionUsedArgs = {
-  connectionId?: InputMaybe<Scalars['Long']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -329,6 +311,17 @@ export type Tag = {
   name: Scalars['String']['output'];
 };
 
+export type Workflow = {
+  __typename?: 'Workflow';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  label: Scalars['String']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
 export type ProjectByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -336,12 +329,20 @@ export type ProjectByIdQueryVariables = Exact<{
 
 export type ProjectByIdQuery = { __typename?: 'Query', project?: { __typename?: 'Project', id: string, name: string } | null };
 
-export type IntegrationByIdQueryVariables = Exact<{
-  id: Scalars['Long']['input'];
+export type ConnectedUserProjectsQueryVariables = Exact<{
+  connectedUserId?: InputMaybe<Scalars['ID']['input']>;
+  environment?: InputMaybe<Environment>;
 }>;
 
 
-export type IntegrationByIdQuery = { __typename?: 'Query', integration?: { __typename?: 'Integration', id: any, name: string } | null };
+export type ConnectedUserProjectsQuery = { __typename?: 'Query', connectedUserProjects: Array<{ __typename?: 'ConnectedUserProject', id: string, environment?: Environment | null, lastExecutionDate?: string | null, projectId: string, projectVersion?: number | null, connectedUser: { __typename?: 'ConnectedUser', id: string, environment: Environment, externalId: string }, connectedUserProjectWorkflows: Array<{ __typename?: 'ConnectedUserProjectWorkflow', id: string, connectedUserId: string, enabled: boolean, lastExecutionDate?: string | null, projectId: string, workflowReferenceCode: string, workflowVersion: number, workflow: { __typename?: 'Workflow', id: string, label: string } }> }> };
+
+export type IntegrationByIdQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type IntegrationByIdQuery = { __typename?: 'Query', integration?: { __typename?: 'Integration', id: string, name: string } | null };
 
 
 
@@ -370,8 +371,57 @@ export const useProjectByIdQuery = <
   }
     )};
 
+export const ConnectedUserProjectsDocument = `
+    query connectedUserProjects($connectedUserId: ID, $environment: Environment) {
+  connectedUserProjects(
+    connectedUserId: $connectedUserId
+    environment: $environment
+  ) {
+    id
+    connectedUser {
+      id
+      environment
+      externalId
+    }
+    connectedUserProjectWorkflows {
+      id
+      connectedUserId
+      enabled
+      lastExecutionDate
+      projectId
+      workflowReferenceCode
+      workflowVersion
+      workflow {
+        id
+        label
+      }
+    }
+    environment
+    lastExecutionDate
+    projectId
+    projectVersion
+  }
+}
+    `;
+
+export const useConnectedUserProjectsQuery = <
+      TData = ConnectedUserProjectsQuery,
+      TError = unknown
+    >(
+      variables?: ConnectedUserProjectsQueryVariables,
+      options?: Omit<UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ConnectedUserProjectsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['connectedUserProjects'] : ['connectedUserProjects', variables],
+    queryFn: fetcher<ConnectedUserProjectsQuery, ConnectedUserProjectsQueryVariables>(ConnectedUserProjectsDocument, variables),
+    ...options
+  }
+    )};
+
 export const IntegrationByIdDocument = `
-    query integrationById($id: Long!) {
+    query integrationById($id: ID!) {
   integration(id: $id) {
     id
     name
