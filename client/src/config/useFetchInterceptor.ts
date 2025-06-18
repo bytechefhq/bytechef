@@ -15,7 +15,7 @@ export default function useFetchInterceptor() {
     const unregister = fetchIntercept.register({
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         request(url: string, config: any): Promise<any[]> | any[] {
-            if (url.includes('/internal/')) {
+            if (url.includes('/internal/') || url.includes('graphql')) {
                 return [
                     url,
                     {
