@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.ee.embedded.configuration.facade.ConnectUserProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.PublishConnectedUserProjectWorkflowRequestModel;
@@ -32,14 +32,14 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class ConnectedUserProjectWorkflowApiController implements ConnectedUserProjectWorkflowApi {
 
-    private final ConnectUserProjectFacade connectUserProjectFacade;
+    private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowApiController(
-        ConnectUserProjectFacade connectUserProjectFacade, ConversionService conversionService) {
+        ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService) {
 
-        this.connectUserProjectFacade = connectUserProjectFacade;
+        this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.conversionService = conversionService;
     }
 
@@ -47,7 +47,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<Void> enableConnectedUserProjectWorkflow(
         String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
 
-        connectUserProjectFacade.enableProjectWorkflow(
+        connectedUserProjectFacade.enableProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, enable,
             getEnvironment(xEnvironment));
 
@@ -61,7 +61,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         return ResponseEntity.ok(
             conversionService.convert(
-                connectUserProjectFacade.getProjectWorkflow(
+                connectedUserProjectFacade.getConnectedUserProjectWorkflow(
                     OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
                     getEnvironment(xEnvironment)),
                 ConnectedUserProjectWorkflowModel.class));
@@ -72,7 +72,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         String workflowReferenceCode, EnvironmentModel xEnvironment,
         PublishConnectedUserProjectWorkflowRequestModel publishConnectedUserProjectWorkflowRequestModel) {
 
-        connectUserProjectFacade.publishProjectWorkflow(
+        connectedUserProjectFacade.publishProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
             publishConnectedUserProjectWorkflowRequestModel.getDescription(), getEnvironment(xEnvironment));
 

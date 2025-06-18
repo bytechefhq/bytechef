@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -29,9 +30,11 @@ public interface ProjectDeploymentService {
 
     void delete(long id);
 
-    boolean isProjectDeploymentEnabled(long projectDeploymentId);
+    Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment);
 
     ProjectDeployment getProjectDeployment(long id);
+
+    ProjectDeployment getProjectDeployment(long projectId, Environment environment);
 
     long getProjectDeploymentId(long projectId, Environment environment);
 
@@ -43,6 +46,8 @@ public interface ProjectDeploymentService {
 
     List<ProjectDeployment> getProjectDeployments(
         Long workspaceId, Environment environment, Long projectId, Long tagId, List<Long> excludeProjectDeploymentIds);
+
+    boolean isProjectDeploymentEnabled(long projectDeploymentId);
 
     ProjectDeployment update(long id, List<Long> tagIds);
 

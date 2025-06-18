@@ -7,7 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
-import com.bytechef.ee.embedded.configuration.dto.ConnectUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
-public interface ConnectUserProjectFacade {
+public interface ConnectedUserProjectFacade {
 
     String createProjectWorkflow(
         String externalUserId, String definition, Environment environment);
@@ -26,10 +27,13 @@ public interface ConnectUserProjectFacade {
     void enableProjectWorkflow(
         String externalUserId, String workflowReferenceCode, boolean enable, Environment environment);
 
-    ConnectUserProjectWorkflowDTO
-        getProjectWorkflow(String externalUserId, String workflowReferenceCode, Environment environment);
+    ConnectedUserProjectWorkflowDTO getConnectedUserProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, Environment environment);
 
-    List<ConnectUserProjectWorkflowDTO> getProjectWorkflows(String externalUserId, Environment environment);
+    List<ConnectedUserProjectWorkflowDTO> getConnectedUserProjectWorkflows(
+        String externalUserId, Environment environment);
+
+    List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment);
 
     void publishProjectWorkflow(
         String externalUserId, String workflowReferenceCode, String description, Environment environment);

@@ -29,8 +29,7 @@ public interface ConnectedUserProjectWorkflowService {
 
     ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(long id);
 
-    ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(
-        long connectedUserProjectId, long projectWorkflowId);
+    ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(long connectedUserProjectId, long projectWorkflowId);
 
     List<ConnectedUserProjectWorkflow> getConnectedUserProjectWorkflows(long connectedUserProjectId);
 

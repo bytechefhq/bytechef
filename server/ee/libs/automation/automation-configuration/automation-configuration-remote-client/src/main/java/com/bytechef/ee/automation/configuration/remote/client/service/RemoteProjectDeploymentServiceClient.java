@@ -13,6 +13,7 @@ import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,6 +45,11 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     }
 
     @Override
+    public Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isProjectDeploymentEnabled(long projectDeploymentId) {
         throw new UnsupportedOperationException();
     }
@@ -56,6 +62,11 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
                 .path(PROJECT_DEPLOYMENT_SERVICE + "/get-project/deployment/{id}")
                 .build(id),
             ProjectDeployment.class);
+    }
+
+    @Override
+    public ProjectDeployment getProjectDeployment(long projectId, Environment environment) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

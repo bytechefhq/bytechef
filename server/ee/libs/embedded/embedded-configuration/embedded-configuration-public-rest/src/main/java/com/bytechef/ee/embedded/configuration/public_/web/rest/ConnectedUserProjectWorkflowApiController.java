@@ -11,7 +11,7 @@ import static com.bytechef.ee.embedded.configuration.public_.web.rest.util.Envir
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.ee.embedded.configuration.facade.ConnectUserProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
@@ -38,14 +38,14 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class ConnectedUserProjectWorkflowApiController implements ConnectedUserProjectWorkflowApi {
 
-    private final ConnectUserProjectFacade connectUserProjectFacade;
+    private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowApiController(
-        ConnectUserProjectFacade connectUserProjectFacade, ConversionService conversionService) {
+        ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService) {
 
-        this.connectUserProjectFacade = connectUserProjectFacade;
+        this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.conversionService = conversionService;
     }
 
@@ -56,7 +56,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
-            connectUserProjectFacade.createProjectWorkflow(
+            connectedUserProjectFacade.createProjectWorkflow(
                 OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
                 createFrontendProjectWorkflowRequestModel.getDefinition(), getEnvironment(xEnvironment)));
     }
@@ -66,7 +66,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<Void> deleteFrontendProjectWorkflow(
         String workflowReferenceCode, EnvironmentModel xEnvironment) {
 
-        connectUserProjectFacade.deleteProjectWorkflow(
+        connectedUserProjectFacade.deleteProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
             getEnvironment(xEnvironment));
 
@@ -81,7 +81,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         return ResponseEntity.ok(
             conversionService.convert(
-                connectUserProjectFacade.getProjectWorkflow(
+                connectedUserProjectFacade.getConnectedUserProjectWorkflow(
                     OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
                     getEnvironment(xEnvironment)),
                 ConnectedUserProjectWorkflowModel.class));
@@ -92,7 +92,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<Void> enableFrontendProjectWorkflow(
         String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
 
-        connectUserProjectFacade.enableProjectWorkflow(
+        connectedUserProjectFacade.enableProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, enable,
             getEnvironment(xEnvironment));
 
@@ -106,8 +106,8 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
-            connectUserProjectFacade
-                .getProjectWorkflows(
+            connectedUserProjectFacade
+                .getConnectedUserProjectWorkflows(
                     OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
                     getEnvironment(xEnvironment))
                 .stream()
@@ -122,7 +122,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
         EnvironmentModel xEnvironment) {
 
-        connectUserProjectFacade.updateProjectWorkflow(
+        connectedUserProjectFacade.updateProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
             createFrontendProjectWorkflowRequestModel.getDefinition(), getEnvironment(xEnvironment));
 
@@ -136,7 +136,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         String workflowReferenceCode, EnvironmentModel xEnvironment,
         PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel) {
 
-        connectUserProjectFacade.publishProjectWorkflow(
+        connectedUserProjectFacade.publishProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
             publishFrontendProjectWorkflowRequestModel.getDescription(), getEnvironment(xEnvironment));
 
@@ -150,7 +150,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
-            connectUserProjectFacade.createProjectWorkflow(
+            connectedUserProjectFacade.createProjectWorkflow(
                 externalUserId,
                 createFrontendProjectWorkflowRequestModel.getDefinition(), getEnvironment(xEnvironment)));
     }
@@ -159,7 +159,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<Void> deleteProjectWorkflow(
         String externalUserId, String workflowReferenceCode, EnvironmentModel xEnvironment) {
 
-        connectUserProjectFacade.deleteProjectWorkflow(
+        connectedUserProjectFacade.deleteProjectWorkflow(
             externalUserId, workflowReferenceCode, getEnvironment(xEnvironment));
 
         return ResponseEntity.noContent()
@@ -170,7 +170,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<Void> enableProjectWorkflow(
         String externalUserId, String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
 
-        connectUserProjectFacade.enableProjectWorkflow(
+        connectedUserProjectFacade.enableProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, enable,
             getEnvironment(xEnvironment));
 
@@ -184,7 +184,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         return ResponseEntity.ok(
             conversionService.convert(
-                connectUserProjectFacade.getProjectWorkflow(
+                connectedUserProjectFacade.getConnectedUserProjectWorkflow(
                     externalUserId, workflowReferenceCode, getEnvironment(xEnvironment)),
                 ConnectedUserProjectWorkflowModel.class));
     }
@@ -194,7 +194,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         String externalUserId, EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
-            connectUserProjectFacade.getProjectWorkflows(externalUserId, getEnvironment(xEnvironment))
+            connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, getEnvironment(xEnvironment))
                 .stream()
                 .map(workflow -> conversionService.convert(workflow, ConnectedUserProjectWorkflowModel.class))
                 .toList());
@@ -205,7 +205,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         String externalUserId, String workflowReferenceCode, EnvironmentModel xEnvironment,
         PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel) {
 
-        connectUserProjectFacade.publishProjectWorkflow(
+        connectedUserProjectFacade.publishProjectWorkflow(
             externalUserId, workflowReferenceCode,
             publishFrontendProjectWorkflowRequestModel.getDescription(), getEnvironment(xEnvironment));
 
@@ -219,7 +219,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
         EnvironmentModel xEnvironment) {
 
-        connectUserProjectFacade.updateProjectWorkflow(
+        connectedUserProjectFacade.updateProjectWorkflow(
             externalUserId, workflowReferenceCode,
             createFrontendProjectWorkflowRequestModel.getDefinition(), getEnvironment(xEnvironment));
 

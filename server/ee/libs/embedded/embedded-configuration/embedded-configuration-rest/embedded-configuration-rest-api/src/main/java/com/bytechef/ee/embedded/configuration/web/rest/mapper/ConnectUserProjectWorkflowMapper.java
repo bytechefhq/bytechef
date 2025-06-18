@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.web.rest.mapper;
 
-import com.bytechef.ee.embedded.configuration.dto.ConnectUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.WorkflowModel;
@@ -26,10 +26,10 @@ import org.springframework.core.convert.converter.Converter;
  */
 @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
 public interface ConnectUserProjectWorkflowMapper
-    extends Converter<ConnectUserProjectWorkflowDTO, ConnectedUserProjectWorkflowModel> {
+    extends Converter<ConnectedUserProjectWorkflowDTO, ConnectedUserProjectWorkflowModel> {
 
     @Override
-    ConnectedUserProjectWorkflowModel convert(ConnectUserProjectWorkflowDTO connectUserProjectWorkflowDTO);
+    ConnectedUserProjectWorkflowModel convert(ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO);
 
     @Mapping(target = "connectionsCount", ignore = true)
     @Mapping(target = "inputsCount", ignore = true)

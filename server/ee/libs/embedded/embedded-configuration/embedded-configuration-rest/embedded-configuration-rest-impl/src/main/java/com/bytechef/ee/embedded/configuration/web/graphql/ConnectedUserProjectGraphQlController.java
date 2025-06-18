@@ -8,9 +8,11 @@
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
-import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -24,15 +26,17 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class ConnectedUserProjectGraphQlController {
 
-    private final ConnectedUserProjectService connectedUserProjectService;
+    private final ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @SuppressFBWarnings("EI")
-    public ConnectedUserProjectGraphQlController(ConnectedUserProjectService connectedUserProjectService) {
-        this.connectedUserProjectService = connectedUserProjectService;
+    public ConnectedUserProjectGraphQlController(ConnectedUserProjectFacade connectedUserProjectFacade) {
+        this.connectedUserProjectFacade = connectedUserProjectFacade;
     }
 
     @QueryMapping
-    public ConnectedUserProject connectedUserProject(@Argument long id) {
-        return connectedUserProjectService.getConnectedUserProject(id);
+    public List<ConnectedUserProjectDTO> connectedUserProjects(
+        @Argument Long connectedUserId, @Argument Environment environment) {
+
+        return connectedUserProjectFacade.getConnectedUserProjects(connectedUserId, environment);
     }
 }

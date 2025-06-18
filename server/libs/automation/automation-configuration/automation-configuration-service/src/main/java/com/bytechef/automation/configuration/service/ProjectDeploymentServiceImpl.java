@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentReposit
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,14 +59,25 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     }
 
     @Override
+    public Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment) {
+        return projectDeploymentRepository.findByProjectIdAndEnvironment(projectId, environment.ordinal());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProjectDeployment getProjectDeployment(long id) {
         return OptionalUtils.get(projectDeploymentRepository.findById(id));
     }
 
     @Override
+    public ProjectDeployment getProjectDeployment(long projectId, Environment environment) {
+        return OptionalUtils.get(
+            projectDeploymentRepository.findByProjectIdAndEnvironment(projectId, environment.ordinal()));
+    }
+
+    @Override
     public long getProjectDeploymentId(long projectId, Environment environment) {
-        return projectDeploymentRepository.findByProjectIdAndEnvironment(projectId, environment.ordinal())
+        return getProjectDeployment(projectId, environment)
             .getId();
     }
 

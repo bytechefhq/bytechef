@@ -10,6 +10,8 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.exception.WorkflowErrorType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
@@ -23,10 +25,12 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflowConnection;
-import com.bytechef.ee.embedded.configuration.dto.ConnectUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -42,8 +46,10 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +66,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
+public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacade {
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -76,6 +82,8 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
+    private final JobService jobService;
+    private final PrincipalJobService principalJobService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -88,11 +96,12 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
-    public ConnectUserProjectFacadeImpl(
+    public ConnectedUserProjectFacadeImpl(
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
-        ConnectedUserService connectedUserService, ConnectionService connectionService,
-        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
+        ConnectedUserService connectedUserService, ConnectionService connectionService, JobService jobService,
+        PrincipalJobService principalJobService, ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectFacade projectFacade,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService, WorkflowFacade workflowFacade,
         WorkflowService workflowService, WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
@@ -102,6 +111,8 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
         this.connectedUserService = connectedUserService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectionService = connectionService;
+        this.jobService = jobService;
+        this.principalJobService = principalJobService;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
@@ -182,7 +193,7 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
     }
 
     @Override
-    public ConnectUserProjectWorkflowDTO getProjectWorkflow(
+    public ConnectedUserProjectWorkflowDTO getConnectedUserProjectWorkflow(
         String externalUserId, String workflowReferenceCode, Environment environment) {
 
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
@@ -193,41 +204,56 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
         ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
             .getConnectedUserProjectWorkflow(connectedUserProject.getId(), projectWorkflow.getId());
 
-        return new ConnectUserProjectWorkflowDTO(
-            connectedUserProject.getConnectedUserId(),
-            isProjectDeploymentWorkflowEnabled(projectWorkflow, environment), projectWorkflow,
-            workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()),
-            connectedUserProjectWorkflow.getWorkflowVersion());
+        return new ConnectedUserProjectWorkflowDTO(
+            connectedUserProject.getConnectedUserId(), connectedUserProjectWorkflow,
+            isProjectDeploymentWorkflowEnabled(projectWorkflow, environment),
+            getWorkflowLastExecutionDate(projectWorkflow.getWorkflowId()), projectWorkflow,
+            workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()));
     }
 
     @Override
-    public List<ConnectUserProjectWorkflowDTO> getProjectWorkflows(String externalUserId, Environment environment) {
+    public List<ConnectedUserProjectWorkflowDTO> getConnectedUserProjectWorkflows(
+        String externalUserId, Environment environment) {
+
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
-        Project project = projectService.getProject(connectedUserProject.getProjectId());
+        return getConnectedUserProjectWorkflows(connectedUserProject, environment);
+    }
 
-        List<ProjectWorkflow> latestProjectWorkflows = projectWorkflowService.getProjectWorkflows(
-            project.getId(), project.getLastVersion());
-
-        List<String> latestWorkflowIds = latestProjectWorkflows.stream()
-            .map(ProjectWorkflow::getWorkflowId)
-            .toList();
-
-        return workflowService.getWorkflows(latestWorkflowIds)
+    @Override
+    public List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment) {
+        return connectUserProjectService.getConnectedUserProjects(connectedUserId, environment)
             .stream()
-            .map(workflow -> {
-                ProjectWorkflow latestProjectWorkflow = latestProjectWorkflows.stream()
-                    .filter(curProjectWorkflow -> Objects.equals(curProjectWorkflow.getWorkflowId(), workflow.getId()))
-                    .findFirst()
-                    .orElseThrow();
+            .filter(connectedUserProject -> {
+                if (connectedUserId != null) {
+                    return Objects.equals(connectedUserProject.getConnectedUserId(), connectedUserId);
+                }
 
-                ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
-                    .getConnectedUserProjectWorkflow(connectedUserProject.getId(), latestProjectWorkflow.getId());
+                return true;
+            })
+            .filter(connectedUserProject -> {
+                if (environment != null) {
+                    return projectDeploymentService
+                        .fetchProjectDeployment(connectedUserProject.getProjectId(), environment)
+                        .map(projectDeployment -> projectDeployment.getEnvironment() == environment)
+                        .orElse(false);
+                }
 
-                return new ConnectUserProjectWorkflowDTO(
-                    connectedUserProject.getConnectedUserId(),
-                    isProjectDeploymentWorkflowEnabled(latestProjectWorkflow, environment), latestProjectWorkflow,
-                    new WorkflowDTO(workflow, List.of(), List.of()), connectedUserProjectWorkflow.getWorkflowVersion());
+                return true;
+            })
+            .map(connectedUserProject -> {
+                ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                    connectedUserProject.getConnectedUserId());
+
+                List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflows =
+                    getConnectedUserProjectWorkflows(connectedUserProject, connectedUser.getEnvironment());
+
+                ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
+                    connectedUserProject.getProjectId(), connectedUser.getEnvironment());
+
+                return new ConnectedUserProjectDTO(
+                    connectedUserProject, connectedUser, connectedUserProjectWorkflows,
+                    getProjectDeploymentLastExecutionDate(projectDeployment.getId()), projectDeployment);
             })
             .toList();
     }
@@ -344,6 +370,53 @@ public class ConnectUserProjectFacadeImpl implements ConnectUserProjectFacade {
             checkWorkflowNodeConnection(
                 MapUtils.getString(taskMap, "type"), connections, projectWorkflow, MapUtils.getString(taskMap, "name"));
         }
+    }
+
+    private List<ConnectedUserProjectWorkflowDTO> getConnectedUserProjectWorkflows(
+        ConnectedUserProject connectedUserProject, Environment environment) {
+
+        Project project = projectService.getProject(connectedUserProject.getProjectId());
+
+        List<ProjectWorkflow> latestProjectWorkflows = projectWorkflowService.getProjectWorkflows(
+            project.getId(), project.getLastVersion());
+
+        List<String> latestWorkflowIds = latestProjectWorkflows.stream()
+            .map(ProjectWorkflow::getWorkflowId)
+            .toList();
+
+        return workflowService.getWorkflows(latestWorkflowIds)
+            .stream()
+            .map(workflow -> {
+                ProjectWorkflow latestProjectWorkflow = latestProjectWorkflows.stream()
+                    .filter(curProjectWorkflow -> Objects.equals(curProjectWorkflow.getWorkflowId(), workflow.getId()))
+                    .findFirst()
+                    .orElseThrow();
+
+                ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
+                    .getConnectedUserProjectWorkflow(connectedUserProject.getId(), latestProjectWorkflow.getId());
+
+                return new ConnectedUserProjectWorkflowDTO(
+                    connectedUserProject.getConnectedUserId(), connectedUserProjectWorkflow,
+                    isProjectDeploymentWorkflowEnabled(latestProjectWorkflow, environment),
+                    getWorkflowLastExecutionDate(latestProjectWorkflow.getWorkflowId()), latestProjectWorkflow,
+                    new WorkflowDTO(workflow, List.of(), List.of()));
+            })
+            .toList();
+    }
+
+    private Instant getJobEndDate(Long jobId) {
+        Job job = jobService.getJob(jobId);
+
+        return job.getEndDate();
+    }
+
+    private Instant getProjectDeploymentLastExecutionDate(long projectDeploymentId) {
+        return OptionalUtils.mapOrElse(
+            principalJobService.fetchLastJobId(projectDeploymentId, ModeType.AUTOMATION), this::getJobEndDate, null);
+    }
+
+    private Instant getWorkflowLastExecutionDate(String workflowId) {
+        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowId), Job::getEndDate, null);
     }
 
     private boolean isProjectDeploymentWorkflowEnabled(ProjectWorkflow projectWorkflow, Environment environment) {

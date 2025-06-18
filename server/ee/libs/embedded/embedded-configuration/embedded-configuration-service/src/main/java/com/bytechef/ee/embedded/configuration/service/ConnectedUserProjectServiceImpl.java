@@ -84,7 +84,8 @@ public class ConnectedUserProjectServiceImpl implements ConnectedUserProjectServ
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectedUserProject> getConnectedUserProjects() {
+    public List<ConnectedUserProject> getConnectedUserProjects(Long connectedUserId, Environment environment) {
+        // TODO Add query
         return CollectionUtils.toList(connectUserProjectRepository.findAll());
     }
 }

@@ -31,9 +31,9 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record ProjectDeploymentDTO(
     String createdBy, Instant createdDate, String description, boolean enabled, Environment environment, Long id,
-    String name, Instant lastExecutionDate, String lastModifiedBy, Instant lastModifiedDate,
-    Project project, long projectId, int projectVersion, List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows,
-    List<Tag> tags, int version) {
+    String name, Instant lastExecutionDate, String lastModifiedBy, Instant lastModifiedDate, Project project,
+    long projectId, int projectVersion, List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows, List<Tag> tags,
+    int version) {
 
     public ProjectDeploymentDTO(ProjectDeployment projectDeployment) {
         this(

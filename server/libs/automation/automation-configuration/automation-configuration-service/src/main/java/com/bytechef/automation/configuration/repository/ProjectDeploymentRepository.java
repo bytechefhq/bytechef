@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -37,5 +38,5 @@ public interface ProjectDeploymentRepository
         AND project_deployment.project_id NOT IN (SELECT project.id FROM project JOIN connected_user_project ON connected_user_project.project_id = project.id)""")
     List<Long> findAllProjectDeploymentProjectIds();
 
-    ProjectDeployment findByProjectIdAndEnvironment(long projectId, int environment);
+    Optional<ProjectDeployment> findByProjectIdAndEnvironment(long projectId, int environment);
 }
