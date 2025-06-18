@@ -1,4 +1,5 @@
 import type {CodegenConfig} from '@graphql-codegen/cli';
+import {getCookie} from './src/shared/util/cookie-utils';
 
 const config: CodegenConfig = {
     schema: [
@@ -14,15 +15,20 @@ const config: CodegenConfig = {
     documents: ['src/graphql/**/*.graphql'],
     generates: {
         'src/shared/middleware/graphql.ts': {
-            plugins: ['typescript', 'typescript-operations', 'typescript-react-query'],
+            plugins: [
+                {
+                    add: {
+                        content: "import { endpointUrl, fetchParams } from './config';",
+                    },
+                },
+                'typescript',
+                'typescript-operations',
+                'typescript-react-query',
+            ],
             config: {
                 fetcher: {
-                    endpoint: 'http://localhost:9555/graphql',
-                    fetchParams: {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    },
+                    endpoint: 'endpointUrl',
+                    fetchParams: 'fetchParams',
                 },
                 reactQueryVersion: 5,
             },
