@@ -45,12 +45,11 @@ export const Connections = () => {
         isLoading: allConnectionsIsLoading,
     } = useGetWorkspaceConnectionsQuery({id: currentWorkspaceId!});
 
-    const allComponentNames = allConnections?.map((connection) => connection.componentName);
+    const allComponentNames = Array.from(new Set(allConnections?.map((connection) => connection.componentName)));
 
-    const {data: componentDefinitions, isLoading: componentsLoading} = useGetComponentDefinitionsQuery(
-        {include: allComponentNames},
-        allComponentNames !== undefined
-    );
+    const {data: componentDefinitions, isLoading: componentsLoading} = useGetComponentDefinitionsQuery({
+        connectionDefinitions: true,
+    });
 
     const {
         data: connections,
@@ -152,18 +151,23 @@ export const Connections = () => {
                                 />
 
                                 {!componentsLoading &&
-                                    componentDefinitions?.map((item) => (
-                                        <LeftSidebarNavItem
-                                            item={{
-                                                current:
-                                                    filterData?.id === item.name && filterData.type === Type.Component,
-                                                id: item.name!,
-                                                name: item.title!,
-                                            }}
-                                            key={item.name}
-                                            toLink={`?componentName=${item.name}&environment=${environment ?? ''}`}
-                                        />
-                                    ))}
+                                    componentDefinitions
+                                        ?.filter((componentDefinition) =>
+                                            allComponentNames.includes(componentDefinition.name)
+                                        )
+                                        ?.map((item) => (
+                                            <LeftSidebarNavItem
+                                                item={{
+                                                    current:
+                                                        filterData?.id === item.name &&
+                                                        filterData.type === Type.Component,
+                                                    id: item.name!,
+                                                    name: item.title!,
+                                                }}
+                                                key={item.name}
+                                                toLink={`?componentName=${item.name}&environment=${environment ?? ''}`}
+                                            />
+                                        ))}
                             </>
                         }
                         title="Components"
