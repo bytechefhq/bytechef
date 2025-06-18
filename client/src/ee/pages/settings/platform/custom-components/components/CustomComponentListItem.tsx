@@ -12,7 +12,6 @@ import {CustomComponentKeys} from '@/ee/pages/settings/platform/custom-component
 import {CustomComponent} from '@/ee/shared/middleware/platform/custom-component';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface CustomComponentItemProps {
@@ -107,16 +106,9 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                 {customComponent.lastModifiedDate ? (
-                                    <>
-                                        <CalendarIcon
-                                            aria-hidden="true"
-                                            className="mr-0.5 size-3.5 shrink-0 text-gray-400"
-                                        />
-
-                                        <span className="text-xs">
-                                            {`Updated at ${customComponent.lastModifiedDate?.toLocaleDateString()} ${customComponent.lastModifiedDate?.toLocaleTimeString()}`}
-                                        </span>
-                                    </>
+                                    <span className="text-xs">
+                                        {`Updated at ${customComponent.lastModifiedDate?.toLocaleDateString()} ${customComponent.lastModifiedDate?.toLocaleTimeString()}`}
+                                    </span>
                                 ) : (
                                     '-'
                                 )}

@@ -16,7 +16,6 @@ import {ApiConnectorKeys} from '@/ee/queries/apiConnectors.queries';
 import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface ApiConnectorItemProps {
@@ -114,16 +113,9 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                 {apiConnector.lastModifiedDate ? (
-                                    <>
-                                        <CalendarIcon
-                                            aria-hidden="true"
-                                            className="mr-0.5 size-3.5 shrink-0 text-gray-400"
-                                        />
-
-                                        <span className="text-xs">
-                                            {`Updated at ${apiConnector.lastModifiedDate?.toLocaleDateString()} ${apiConnector.lastModifiedDate?.toLocaleTimeString()}`}
-                                        </span>
-                                    </>
+                                    <span className="text-xs">
+                                        {`Updated at ${apiConnector.lastModifiedDate?.toLocaleDateString()} ${apiConnector.lastModifiedDate?.toLocaleTimeString()}`}
+                                    </span>
                                 ) : (
                                     '-'
                                 )}

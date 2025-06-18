@@ -18,7 +18,6 @@ import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface ApiCollectionListItemProps {
@@ -174,16 +173,9 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                     {apiCollection.lastModifiedDate ? (
-                                        <>
-                                            <CalendarIcon
-                                                aria-hidden="true"
-                                                className="mr-0.5 size-3.5 shrink-0 text-gray-400"
-                                            />
-
-                                            <span className="text-xs">
-                                                {`Updated at ${apiCollection.lastModifiedDate?.toLocaleDateString()} ${apiCollection.lastModifiedDate?.toLocaleTimeString()}`}
-                                            </span>
-                                        </>
+                                        <span className="text-xs">
+                                            {`Updated at ${apiCollection.lastModifiedDate?.toLocaleDateString()} ${apiCollection.lastModifiedDate?.toLocaleTimeString()}`}
+                                        </span>
                                     ) : (
                                         '-'
                                     )}
