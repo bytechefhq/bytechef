@@ -35,8 +35,8 @@ public interface ConnectedUserProjectWorkflowRepository extends ListCrudReposito
         @Param("connectedUserProjectId") Long connectedUserProjectId);
 
     @Query("""
-            SELECT connected_user_project_workflow_connection.connection_id FROM connected_user_project_workflow_connection
-            WHERE connection_id = :connectionId
+        SELECT connected_user_project_workflow_connection.connection_id FROM connected_user_project_workflow_connection
+        WHERE connection_id = :connectionId
         """)
     List<Long> findConnectedUserProjectWorkflowConnectionIdsByConnectionId(@Param("connectionId") long connectionId);
 }
