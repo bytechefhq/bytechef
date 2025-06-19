@@ -53,11 +53,12 @@ export interface GetProjectVersionsRequest {
 
 export interface GetWorkspaceProjectsRequest {
     id: number;
-    projectDeployments?: boolean;
+    apiCollections?: boolean;
     categoryId?: number;
-    tagId?: number;
-    status?: ProjectStatus;
     includeAllFields?: boolean;
+    projectDeployments?: boolean;
+    status?: ProjectStatus;
+    tagId?: number;
 }
 
 export interface PublishProjectOperationRequest {
@@ -270,24 +271,28 @@ export class ProjectApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
-        if (requestParameters['projectDeployments'] != null) {
-            queryParameters['projectDeployments'] = requestParameters['projectDeployments'];
+        if (requestParameters['apiCollections'] != null) {
+            queryParameters['apiCollections'] = requestParameters['apiCollections'];
         }
 
         if (requestParameters['categoryId'] != null) {
             queryParameters['categoryId'] = requestParameters['categoryId'];
         }
 
-        if (requestParameters['tagId'] != null) {
-            queryParameters['tagId'] = requestParameters['tagId'];
+        if (requestParameters['includeAllFields'] != null) {
+            queryParameters['includeAllFields'] = requestParameters['includeAllFields'];
+        }
+
+        if (requestParameters['projectDeployments'] != null) {
+            queryParameters['projectDeployments'] = requestParameters['projectDeployments'];
         }
 
         if (requestParameters['status'] != null) {
             queryParameters['status'] = requestParameters['status'];
         }
 
-        if (requestParameters['includeAllFields'] != null) {
-            queryParameters['includeAllFields'] = requestParameters['includeAllFields'];
+        if (requestParameters['tagId'] != null) {
+            queryParameters['tagId'] = requestParameters['tagId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
