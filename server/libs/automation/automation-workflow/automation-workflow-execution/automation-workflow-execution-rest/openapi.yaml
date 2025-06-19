@@ -17,6 +17,12 @@ paths:
       - "workflow-execution"
       operationId: "getWorkflowExecutionsPage"
       parameters:
+      - name: "embedded"
+        description: "If embedded automation workflows executions should be filtered."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
       - name: "environment"
         description: "The environment."
         in: "query"
