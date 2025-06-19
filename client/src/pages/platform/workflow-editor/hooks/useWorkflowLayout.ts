@@ -1,4 +1,5 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -13,6 +14,7 @@ import {useEffect, useMemo} from 'react';
 
 export const useWorkflowLayout = (includeComponents?: string[]) => {
     const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore();
+    const {dataPillPanelOpen} = useDataPillPanelStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {setComponentDefinitions, setTaskDispatcherDefinitions, workflow, workflowNodes} = useWorkflowDataStore();
     const {
@@ -66,12 +68,11 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
             id: workflow.id!,
             lastWorkflowNodeName: currentNode?.name,
         },
-        !!workflowNodes?.length && !!currentNode && !!currentNode?.name && !currentNode?.trigger
+        dataPillPanelOpen && !!workflowNodes?.length && !!currentNode && !!currentNode?.name && !currentNode?.trigger
     );
 
-    let previousComponentDefinitions: ComponentDefinitionBasic[] = [];
-
     let filteredWorkflowNodeOutputs;
+    let previousComponentDefinitions: ComponentDefinitionBasic[] = [];
 
     if (!currentNode?.trigger && workflowNodeOutputs && componentDefinitions) {
         const definitionsMap = new Map(
@@ -109,8 +110,8 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
             {definitions: [] as ComponentDefinitionBasic[], outputs: [] as WorkflowNodeOutput[]}
         );
 
-        previousComponentDefinitions = result.definitions;
         filteredWorkflowNodeOutputs = result.outputs;
+        previousComponentDefinitions = result.definitions;
     }
 
     const handleComponentsAndFlowControlsClick = () => {
