@@ -18,7 +18,7 @@ import org.springframework.data.domain.Page;
  *
  * @author Ivica Cardic
  */
-public interface WorkflowExecutionFacade {
+public interface IntegrationWorkflowExecutionFacade {
 
     WorkflowExecutionDTO getWorkflowExecution(long id);
 

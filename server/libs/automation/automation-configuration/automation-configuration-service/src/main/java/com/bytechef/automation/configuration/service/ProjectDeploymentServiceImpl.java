@@ -84,23 +84,23 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDeployment> getProjectDeployments() {
-        return getProjectDeployments(null, null, null, null, List.of());
+        return getProjectDeployments(null, null, null, null, null);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDeployment> getProjectDeployments(long projectId) {
-        return getProjectDeployments(null, null, projectId, null, List.of());
+        return getProjectDeployments(null, null, projectId, null, null);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDeployment> getProjectDeployments(
-        Long workspaceId, Environment environment, Long projectId, Long tagId, List<Long> excludeProjectDeploymentIds) {
+        Boolean embedded, Environment environment, Long projectId, Long tagId, Long workspaceId) {
 
         return projectDeploymentRepository.findAllProjectDeployments(
-            workspaceId, environment == null ? null : environment.ordinal(), projectId, tagId,
-            excludeProjectDeploymentIds);
+            embedded, environment == null ? null : environment.ordinal(), projectId, tagId,
+            workspaceId);
     }
 
     @Override

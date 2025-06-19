@@ -69,7 +69,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
-public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
+public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecutionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
@@ -89,7 +89,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowExecutionFacadeImpl(
+    public ProjectProjectWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
         JobService jobService, PrincipalJobService principalJobService, ProjectFacade projectFacade,
         ProjectDeploymentService projectDeploymentService,
@@ -146,8 +146,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
-        Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long projectId,
-        Long projectDeploymentId, String workflowId, int pageNumber) {
+        Boolean embedded, Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId, Long projectDeploymentId, String workflowId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();
 
@@ -156,8 +156,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
         } else if (projectId != null) {
             workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
         } else {
-            workflowIds.addAll(
-                CollectionUtils.map(projectFacade.getProjectWorkflows(), ProjectWorkflowDTO::getId));
+            workflowIds.addAll(CollectionUtils.map(projectFacade.getProjectWorkflows(), ProjectWorkflowDTO::getId));
         }
 
         Page<WorkflowExecutionDTO> workflowExecutionPage;
@@ -171,7 +170,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                 projectDeploymentIds.add(projectDeploymentId);
             } else {
                 projectDeploymentIds.addAll(
-                    projectDeploymentService.getProjectDeployments(null, environment, null, null, List.of())
+                    projectDeploymentService.getProjectDeployments(embedded, environment, null, null, null)
                         .stream()
                         .map(ProjectDeployment::getId)
                         .toList());

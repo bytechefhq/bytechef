@@ -87,8 +87,7 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     @Override
     public List<ProjectDeployment>
         getProjectDeployments(
-            Long workspaceId, Environment environment, Long projectId, Long tagId,
-            List<Long> excludeProjectDeploymentIds) {
+            Boolean embedded, Environment environment, Long projectId, Long tagId, Long workspaceId) {
         throw new UnsupportedOperationException();
     }
 

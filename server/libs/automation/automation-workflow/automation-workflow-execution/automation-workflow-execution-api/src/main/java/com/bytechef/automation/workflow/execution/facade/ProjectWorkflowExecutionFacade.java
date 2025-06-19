@@ -16,23 +16,21 @@
 
 package com.bytechef.automation.workflow.execution.facade;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.atlas.execution.domain.Job.Status;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.platform.constant.Environment;
+import java.time.Instant;
+import org.springframework.data.domain.Page;
 
 /**
  * @author Ivica Cardic
  */
-public class WorkflowExecutionFacadeTest {
+public interface ProjectWorkflowExecutionFacade {
 
-    @Disabled
-    @Test
-    public void testGetExecution() {
-        // TODO
-    }
+    WorkflowExecutionDTO getWorkflowExecution(long id);
 
-    @Disabled
-    @Test
-    public void testGetExecutions() {
-        // TODO
-    }
+    Page<WorkflowExecutionDTO> getWorkflowExecutions(
+        Boolean embedded, Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId,
+        Long projectDeploymentId, String workflowId, int pageNumber);
 }

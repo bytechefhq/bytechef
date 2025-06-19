@@ -25,5 +25,5 @@ import java.util.List;
 public interface CustomProjectDeploymentRepository {
 
     List<ProjectDeployment> findAllProjectDeployments(
-        Long workspaceId, Integer environment, Long projectId, Long tagId, List<Long> excludeProjectDeploymentIds);
+        Boolean embedded, Integer environment, Long projectId, Long tagId, Long workspaceId);
 }

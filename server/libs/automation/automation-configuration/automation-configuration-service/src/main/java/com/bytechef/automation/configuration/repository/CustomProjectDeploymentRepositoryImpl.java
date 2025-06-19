@@ -36,23 +36,36 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
 
     @Override
     public List<ProjectDeployment> findAllProjectDeployments(
-        Long workspaceId, Integer environment, Long projectId, Long tagId, List<Long> excludeProjectDeploymentIds) {
+        Boolean embedded, Integer environment, Long projectId, Long tagId, Long workspaceId) {
 
         List<Object> arguments = new ArrayList<>();
 
-        String query = "SELECT project_deployment.* FROM project_deployment ";
-
-        if (workspaceId != null) {
-            query += "JOIN project ON project_deployment.project_id = project.id ";
-        }
+        String query = """
+            SELECT project_deployment.* FROM project_deployment
+            JOIN project ON project_deployment.project_id = project.id
+            """;
 
         if (tagId != null) {
             query +=
                 "JOIN project_deployment_tag ON project_deployment.id = project_deployment_tag.project_deployment_id ";
         }
 
-        if (workspaceId != null || environment != null || projectId != null || tagId != null) {
+        if (embedded != null) {
             query += "WHERE ";
+
+            if (embedded) {
+                query += "project.name LIKE '__EMBEDDED__%' ";
+            } else {
+                query += "project.name NOT LIKE '__EMBEDDED__%' ";
+            }
+        }
+
+        if (environment != null || projectId != null || tagId != null || workspaceId != null) {
+            if (embedded == null) {
+                query += "WHERE ";
+            } else {
+                query += "AND ";
+            }
         }
 
         if (workspaceId != null) {
@@ -89,28 +102,6 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
             }
 
             query += "tag_id = ? ";
-        }
-
-        if (!excludeProjectDeploymentIds.isEmpty()) {
-            arguments.addAll(excludeProjectDeploymentIds);
-
-            if (query.contains("WHERE")) {
-                query += "AND ";
-            } else {
-                query += "WHERE ";
-            }
-
-            StringBuilder idsString = new StringBuilder();
-
-            for (int i = 0; i < excludeProjectDeploymentIds.size(); i++) {
-                idsString.append("?");
-
-                if (i < excludeProjectDeploymentIds.size() - 1) {
-                    idsString.append(",");
-                }
-            }
-
-            query += "project_deployment.id NOT IN (%s) ".formatted(idsString);
         }
 
         query += "ORDER BY LOWER(project_deployment.name) ASC, project_deployment.project_version ASC, " +
