@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollectionEndpoint", description = "An API collection endpoint.")
 @JsonTypeName("ApiCollectionEndpoint")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-17T21:20:19.988350+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-20T06:52:18.920258+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ApiCollectionEndpointModel {
 
   private @Nullable Long apiCollectionId;

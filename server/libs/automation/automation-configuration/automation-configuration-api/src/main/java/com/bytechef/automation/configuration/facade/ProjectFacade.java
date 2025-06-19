@@ -63,7 +63,7 @@ public interface ProjectFacade {
 
     List<ProjectDTO> getWorkspaceProjects(
         long workspaceId, boolean projectDeployments, @Nullable Long categoryId, @Nullable Long tagId,
-        @Nullable Status status, List<Long> projectIds, boolean includeAllFields);
+        @Nullable Status status, List<Long> projectIds, boolean includeAllFields, Boolean includeApiCollections);
 
     int publishProject(long id, @Nullable String description, boolean syncWithGit);
 
