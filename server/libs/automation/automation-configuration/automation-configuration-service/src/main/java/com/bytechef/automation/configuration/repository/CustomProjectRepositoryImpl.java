@@ -36,8 +36,9 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
     }
 
     @Override
-    public List<Project>
-        findAllProjects(Long workspaceId, Long categoryId, List<Long> ids, Long tagId, Integer status) {
+    public List<Project> findAllProjects(
+        Long workspaceId, Long categoryId, List<Long> ids, Long tagId, Integer status) {
+
         List<Object> arguments = new ArrayList<>();
         String query = "SELECT DISTINCT project.*, LOWER(name) AS lower_name FROM project ";
 
