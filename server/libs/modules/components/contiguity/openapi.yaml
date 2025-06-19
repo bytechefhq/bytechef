@@ -1,0 +1,152 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Contiguity"
+  description: "Contiguity is an SMS service for your needs - quick and simple."
+  version: "v1"
+servers:
+  - url: "https://api.contiguity.co"
+paths:
+  /send/text:
+    post:
+      summary: "Send SMS"
+      description: "Send SMS."
+      operationId: "sendSms"
+      x-ai-agent-tool: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "SMS"
+              required:
+                - "to"
+                - "message"
+              properties:
+                to:
+                  type: "string"
+                  description: "Recipient's phone number in E.164 format (e.g. +1234567890)."
+                  title: "To"
+                message:
+                  type: "string"
+                  description: "Content of the message."
+                  title: "Message"
+      responses:
+        201:
+          description: "Successfully sent"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "Status code of response."
+                  message:
+                    type: "string"
+                    description: "Response message."
+                  crumbs:
+                    type: "object"
+                    description: "Crumbs of the message that was sent."
+                    properties:
+                      plan:
+                        type: "string"
+                        description: "Subscription plan of the sender."
+                      quota:
+                        type: "integer"
+                        description: "How many messages of same type were already sent."
+                      remaining:
+                        type: "integer"
+                        description: "How many messages can sender still send."
+                      type:
+                        type: "string"
+                        description: "Type of message that was sent; SMS or email."
+                      ad:
+                        type: "boolean"
+                        description: "Whether the message was an ad or not."
+  /send/email:
+    post:
+      summary: "Send Email"
+      description: "Send email."
+      operationId: "sendEmail"
+      x-ai-agent-tool: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Email"
+              required:
+                - "to"
+                - "from"
+                - "subject"
+                - "body"
+                - "contentType"
+              properties:
+                to:
+                  type: "string"
+                  description: "Recipient's email address."
+                  title: "To"
+                from:
+                  type: "string"
+                  description: "Sender's name."
+                  title: "From"
+                subject:
+                  type: "string"
+                  description: "Email subject."
+                  title: "Subject"
+                body:
+                  type: "string"
+                  description: "Email content."
+                  title: "Body"
+                contentType:
+                  type: "string"
+                  description: "Content type of the email."
+                  title: "Content Type"
+                  enum:
+                    - "html"
+                    - "text"
+                cc:
+                  type: "string"
+                  description: "CC email address (only 1 is supported as of now)."
+                  title: "CC"
+                replyTo:
+                  type: "string"
+                  description: "Reply-to email address."
+                  title: "Reply To"
+      responses:
+        201:
+          description: "Successfully sent"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "Status code of response."
+                  message:
+                    type: "string"
+                    description: "Response message."
+                  crumbs:
+                    type: "object"
+                    description: "Crumbs of the message that was sent."
+                    properties:
+                      plan:
+                        type: "string"
+                        description: "Subscription plan of the sender."
+                      quota:
+                        type: "integer"
+                        description: "How many messages of same type were already sent."
+                      type:
+                        type: "string"
+                        description: "Type of message that was sent; SMS or email."
+                      ad:
+                        type: "boolean"
+                        description: "Whether the message was an ad or not."
+components:
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"
+      description: "Token can be created in Contiguity.co account dashboard."
