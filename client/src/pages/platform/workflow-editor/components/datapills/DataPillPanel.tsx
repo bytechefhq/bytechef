@@ -95,8 +95,12 @@ const DataPillPanel = ({
         return {
             ...actionDefinition,
             componentDefinition,
-            outputSchema: workflowNodeOutput.outputSchema,
-            sampleOutput: workflowNodeOutput.sampleOutput,
+            outputSchema:
+                workflowNodeOutput.outputResponse?.outputSchema ||
+                workflowNodeOutput.variableOutputResponse?.outputSchema,
+            sampleOutput:
+                workflowNodeOutput.outputResponse?.sampleOutput ||
+                workflowNodeOutput.variableOutputResponse?.sampleOutput,
             taskDispatcherDefinition: workflowNodeOutput.taskDispatcherDefinition,
             workflowNodeName: workflowNodeOutput.workflowNodeName,
         } as OperationType;

@@ -33,10 +33,17 @@ interface OutputTabProps {
     connectionMissing: boolean;
     currentNode: NodeDataType;
     outputSchemaDefined: boolean;
+    variablePropertiesDefined?: boolean;
     workflowId: string;
 }
 
-const OutputTab = ({connectionMissing, currentNode, outputSchemaDefined, workflowId}: OutputTabProps) => {
+const OutputTab = ({
+    connectionMissing,
+    currentNode,
+    outputSchemaDefined,
+    variablePropertiesDefined,
+    workflowId,
+}: OutputTabProps) => {
     const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
@@ -59,7 +66,8 @@ const OutputTab = ({connectionMissing, currentNode, outputSchemaDefined, workflo
         workflowNodeName: currentNode?.name as string,
     });
 
-    const {outputSchema, placeholder, sampleOutput} = workflowNodeOutput || {};
+    const {outputSchema, placeholder, sampleOutput} =
+        workflowNodeOutput?.outputResponse || workflowNodeOutput?.variableOutputResponse || {};
 
     const {refetch: workflowNodeTestOutputExistsRefetch} = useCheckWorkflowNodeTestOutputExistsQuery({
         createdDate: startWebhookTestDate,
@@ -226,13 +234,15 @@ const OutputTab = ({connectionMissing, currentNode, outputSchemaDefined, workflo
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="end" className="w-60 cursor-pointer">
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            disabled={connectionMissing}
-                                            onClick={handleTestOperationClick}
-                                        >
-                                            {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
-                                        </DropdownMenuItem>
+                                        {!variablePropertiesDefined && (
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                disabled={connectionMissing}
+                                                onClick={handleTestOperationClick}
+                                            >
+                                                {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
+                                            </DropdownMenuItem>
+                                        )}
 
                                         <DropdownMenuItem
                                             className="cursor-pointer"
@@ -241,7 +251,7 @@ const OutputTab = ({connectionMissing, currentNode, outputSchemaDefined, workflo
                                             Upload Sample Output Data
                                         </DropdownMenuItem>
 
-                                        {outputSchemaDefined && (
+                                        {(outputSchemaDefined || variablePropertiesDefined) && (
                                             <DropdownMenuItem
                                                 className="cursor-pointer"
                                                 onClick={handlePredefinedOutputSchemaClick}
@@ -299,17 +309,19 @@ const OutputTab = ({connectionMissing, currentNode, outputSchemaDefined, workflo
                                 </div>
 
                                 <div className="flex flex-col gap-4">
-                                    <div className="flex w-full flex-col gap-3">
-                                        <Button
-                                            disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                            onClick={handleTestOperationClick}
-                                            type="button"
-                                        >
-                                            {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
-                                        </Button>
+                                    {!variablePropertiesDefined && (
+                                        <div className="flex w-full flex-col gap-3">
+                                            <Button
+                                                disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                                onClick={handleTestOperationClick}
+                                                type="button"
+                                            >
+                                                {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
+                                            </Button>
 
-                                        <span className="text-center">or</span>
-                                    </div>
+                                            <span className="text-center">or</span>
+                                        </div>
+                                    )}
 
                                     <Button
                                         disabled={uploadSampleOutputRequestMutation.isPending}
