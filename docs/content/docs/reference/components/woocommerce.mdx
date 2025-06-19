@@ -1,0 +1,921 @@
+---
+title: "WooCommerce"
+description: "WooCommerce is a e-commerce plugin for WordPress that allows you to turn a standard WordPress website into a fully functional online store."
+---
+
+WooCommerce is a e-commerce plugin for WordPress that allows you to turn a standard WordPress website into a fully functional online store.
+
+
+Categories: E-commerce
+
+
+Type: woocommerce/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Basic Auth
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| domain | Domain | STRING | `The domain of your app.` | true |
+| username | Consumer Key | STRING | `The consumer key generated from your app.` | true |
+| password | Consumer Secret | STRING | `The consumer secret generated from your app.` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Coupon
+Name: createCoupon
+
+`Create a new coupon.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| code | Code | STRING | `Coupon code.` | true |
+| amount | Amount | STRING | `The amount of discount. Should always be numeric, even if setting a percentage.` | true |
+| discount_type | Discount Type | STRING <details> <summary> Options </summary> percent, fixed_cart, fixed_product </details> | `Determines the type of discount that will be applied.` | true |
+| description | Description | STRING | `Coupon description.` | false |
+| date_expires | Date Expires | DATE_TIME | `The date the coupon expires, in the site's timezone.` | false |
+| individual_use | Individual Use | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, the coupon can only be used individually. Other applied coupons will be removed from the cart.` | false |
+| product_ids | Product Ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | `List of product IDs the coupon can be used on.` | false |
+| exclude_sale_items | Exclude Sale Items | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, this coupon will not be applied to items that have sale prices.` | false |
+| minimum_amount | Minimum Amount | STRING | `Minimum order amount that needs to be in the cart before coupon applies.` | false |
+| maximum_amount | Maximum Amount | STRING | `Maximum order amount allowed when using the coupon.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Coupon",
+  "name" : "createCoupon",
+  "parameters" : {
+    "code" : "",
+    "amount" : "",
+    "discount_type" : "",
+    "description" : "",
+    "date_expires" : "2021-01-01T00:00:00",
+    "individual_use" : false,
+    "product_ids" : [ 1 ],
+    "exclude_sale_items" : false,
+    "minimum_amount" : "",
+    "maximum_amount" : ""
+  },
+  "type" : "woocommerce/v1/createCoupon"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the object. |
+| code | STRING | Coupon code. |
+| amount | STRING | The amount of discount. |
+| date_created | STRING | The date the coupon was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the coupon was created, as GMT. |
+| date_modified | STRING | The date the coupon was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the coupon was last modified, as GMT. |
+| discount_type | STRING | Determines the type of discount that will be applied. |
+| description | STRING | Coupon description. |
+| date_expires | STRING | The date the coupon expires, in the site's timezone. |
+| date_expires_gmt | STRING | The date the coupon expires, as GMT. |
+| usage_count | INTEGER | Number of times the coupon has been used already. |
+| individual_use | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, the coupon can only be used individually. |
+| product_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of product IDs the coupon can be used on. |
+| excluded_product_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of product IDs the coupon cannot be used on. |
+| usage_limit | INTEGER | How many times the coupon can be used in total. |
+| usage_limit_per_user | INTEGER | How many times the coupon can be used per customer. |
+| limit_usage_to_x_items | INTEGER | Max number of items in the cart the coupon can be applied to. |
+| free_shipping | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true and if the free shipping method requires a coupon, this coupon will enable free shipping. |
+| product_categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of category IDs the coupon applies to. |
+| excluded_product_categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of category IDs the coupon does not apply to. |
+| exclude_sale_items | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, this coupon will not be applied to items that have sale prices. |
+| minimum_amount | STRING | Minimum order amount that needs to be in the cart before coupon applies. |
+| maximum_amount | STRING | Maximum order amount allowed when using the coupon. |
+| email_restrictions | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of email addresses that can use this coupon. |
+| used_by | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of user IDs (or guest email addresses) that have used the coupon. |
+| meta_data | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(key), STRING\(value)&#125;] </details> | Meta data. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "code" : "",
+  "amount" : "",
+  "date_created" : "",
+  "date_created_gmt" : "",
+  "date_modified" : "",
+  "date_modified_gmt" : "",
+  "discount_type" : "",
+  "description" : "",
+  "date_expires" : "",
+  "date_expires_gmt" : "",
+  "usage_count" : 1,
+  "individual_use" : false,
+  "product_ids" : [ 1 ],
+  "excluded_product_ids" : [ 1 ],
+  "usage_limit" : 1,
+  "usage_limit_per_user" : 1,
+  "limit_usage_to_x_items" : 1,
+  "free_shipping" : false,
+  "product_categories" : [ 1 ],
+  "excluded_product_categories" : [ 1 ],
+  "exclude_sale_items" : false,
+  "minimum_amount" : "",
+  "maximum_amount" : "",
+  "email_restrictions" : [ "" ],
+  "used_by" : [ "" ],
+  "meta_data" : [ {
+    "id" : 1,
+    "key" : "",
+    "value" : ""
+  } ],
+  "_links" : {
+    "self" : [ {
+      "href" : ""
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ]
+  }
+}
+```
+
+
+### Create Customer
+Name: createCustomer
+
+`Create a new customer.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| email | Email | STRING | `The email address for the customer.` | true |
+| first_name | First Name | STRING | `Customer first name.` | true |
+| last_name | Last Name | STRING | `Customer last name.` | true |
+| username | Username | STRING | `Customer login name.` | true |
+| billing | Billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | `List of billing address data.` | false |
+| shipping | Shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(phone)&#125; </details> | `List of shipping address data.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Customer",
+  "name" : "createCustomer",
+  "parameters" : {
+    "email" : "",
+    "first_name" : "",
+    "last_name" : "",
+    "username" : "",
+    "billing" : {
+      "first_name" : "",
+      "last_name" : "",
+      "company" : "",
+      "address_1" : "",
+      "address_2" : "",
+      "city" : "",
+      "state" : "",
+      "postcode" : "",
+      "country" : "",
+      "email" : "",
+      "phone" : ""
+    },
+    "shipping" : {
+      "first_name" : "",
+      "last_name" : "",
+      "company" : "",
+      "address_1" : "",
+      "address_2" : "",
+      "city" : "",
+      "state" : "",
+      "postcode" : "",
+      "country" : "",
+      "phone" : ""
+    }
+  },
+  "type" : "woocommerce/v1/createCustomer"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the resource. |
+| date_created | STRING | The date the customer was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the customer was created, as GMT. |
+| date_modified | STRING | The date the customer was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the customer was last modified, as GMT. |
+| email | STRING | The email address for the customer. |
+| first_name | STRING | Customer first name. |
+| last_name | STRING | Customer last name. |
+| role | STRING | Customer role. |
+| username | STRING | Customer login name. |
+| billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | List of billing address data. |
+| shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country)&#125; </details> | List of shipping address data. |
+| is_paying_customer | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is the customer a paying customer? |
+| avatar_url | STRING | Avatar URL. |
+| meta_data | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(key), STRING\(value)&#125;] </details> | Meta data. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "date_created" : "",
+  "date_created_gmt" : "",
+  "date_modified" : "",
+  "date_modified_gmt" : "",
+  "email" : "",
+  "first_name" : "",
+  "last_name" : "",
+  "role" : "",
+  "username" : "",
+  "billing" : {
+    "first_name" : "",
+    "last_name" : "",
+    "company" : "",
+    "address_1" : "",
+    "address_2" : "",
+    "city" : "",
+    "state" : "",
+    "postcode" : "",
+    "country" : "",
+    "email" : "",
+    "phone" : ""
+  },
+  "shipping" : {
+    "first_name" : "",
+    "last_name" : "",
+    "company" : "",
+    "address_1" : "",
+    "address_2" : "",
+    "city" : "",
+    "state" : "",
+    "postcode" : "",
+    "country" : ""
+  },
+  "is_paying_customer" : false,
+  "avatar_url" : "",
+  "meta_data" : [ {
+    "id" : 1,
+    "key" : "",
+    "value" : ""
+  } ],
+  "_links" : {
+    "self" : [ {
+      "href" : ""
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ]
+  }
+}
+```
+
+
+### Create Order
+Name: createOrder
+
+`Create a new order.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| customer_id | Customer Id | STRING | `User ID who owns the order. 0 for guests.` | true |
+| line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(product_id), INTEGER\(quantity)&#125;] </details> | `Line items data.` | true |
+| status | Status | STRING <details> <summary> Options </summary> pending, processing, on-hold, completed, cancelled, refunded, failed </details> | `Order status.` | false |
+| customer_note | Customer Note | STRING | `Note left by customer during checkout.` | false |
+| billing | Billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | `List of billing address data.` | false |
+| shipping | Shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(phone)&#125; </details> | `List of shipping address data.` | false |
+| payment_method | Payment Method | STRING | `Payment method ID.` | false |
+| set_paid | Set Paid | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Define if the order is paid. It will set the status to processing and reduce stock items.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Order",
+  "name" : "createOrder",
+  "parameters" : {
+    "customer_id" : "",
+    "line_items" : [ {
+      "product_id" : "",
+      "quantity" : 1
+    } ],
+    "status" : "",
+    "customer_note" : "",
+    "billing" : {
+      "first_name" : "",
+      "last_name" : "",
+      "company" : "",
+      "address_1" : "",
+      "address_2" : "",
+      "city" : "",
+      "state" : "",
+      "postcode" : "",
+      "country" : "",
+      "email" : "",
+      "phone" : ""
+    },
+    "shipping" : {
+      "first_name" : "",
+      "last_name" : "",
+      "company" : "",
+      "address_1" : "",
+      "address_2" : "",
+      "city" : "",
+      "state" : "",
+      "postcode" : "",
+      "country" : "",
+      "phone" : ""
+    },
+    "payment_method" : "",
+    "set_paid" : false
+  },
+  "type" : "woocommerce/v1/createOrder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the resource. |
+| parent_id | STRING | Parent order ID. |
+| number | STRING | Order number. |
+| order_key | STRING | Order key. |
+| created_via | STRING | Shows where the order was created. |
+| version | STRING | Version of WooCommerce which last updated the order. |
+| status | STRING | Order status. |
+| currency | STRING | Currency the order was created with, in ISO format. |
+| date_created | STRING | The date the order was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the order was created, as GMT. |
+| date_modified | STRING | The date the order was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the order was last modified, as GMT. |
+| discount_total | STRING | Total discount amount for the order. |
+| discount_tax | STRING | Total discount tax amount for the order. |
+| shipping_total | STRING | Total shipping amount for the order. |
+| shipping_tax | STRING | Total shipping tax amount for the order. |
+| cart_tax | STRING | Sum of line item taxes only. |
+| total | STRING | Grand total. |
+| total_tax | STRING | Sum of all taxes. |
+| prices_include_tax | BOOLEAN <details> <summary> Options </summary> true, false </details> | True the prices included tax during checkout. |
+| customer_id | INTEGER | User ID who owns the order. 0 for guests. Default is 0. |
+| customer_ip_address | STRING | Customer's IP address. |
+| customer_user_agent | STRING | User agent of the customer. |
+| customer_note | STRING | Note left by customer during checkout. |
+| billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | Billing address. |
+| shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country)&#125; </details> | Shipping address. |
+| payment_methods | STRING | Payment method ID. |
+| payment_method_title | STRING | Payment method title. |
+| transaction_id | STRING | Unique transaction ID. |
+| date_paid | STRING | The date the order was paid, in the site's timezone. |
+| date_paid_gmt | STRING | The date the order was paid, as GMT. |
+| date_completed | STRING | The date the order was completed, in the site's timezone. |
+| date_completed_gmt | STRING | The date the order was completed, as GMT. |
+| cart_hash | STRING | Sum of line item taxes only. |
+| meta_data | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(key), STRING\(value)&#125;] </details> | Meta data. |
+| line_items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), INTEGER\(product_id), INTEGER\(variation_id), INTEGER\(quantity), STRING\(tax_class), STRING\(subtotal), STRING\(subtotal_tax), STRING\(total), STRING\(total_tax), []\(taxes), []\(meta_data), STRING\(sku), STRING\(price)&#125;] </details> | Line items data. |
+| tax_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(rate_code), INTEGER\(rate_id), STRING\(label), BOOLEAN\(compound), STRING\(tax_total), STRING\(shipping_tax_total), []\(mata_data)&#125;] </details> | Tax lines data. |
+| shipping_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(method_title), STRING\(method_id), STRING\(total), STRING\(total_tax), []\(taxes), []\(meta_data)&#125;] </details> | Shipping lines data. |
+| fee_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(tax_class), STRING\(tax_status), STRING\(total), STRING\(total_tax), []\(taxes), []\(mata_data)&#125;] </details> | Fee lines data. |
+| coupon_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(code), STRING\(discount), STRING\(discount_tax), []\(meta_data)&#125;] </details> | Coupons line data. |
+| refunds | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(reason), STRING\(total)&#125;] </details> | List of refunds. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "parent_id" : "",
+  "number" : "",
+  "order_key" : "",
+  "created_via" : "",
+  "version" : "",
+  "status" : "",
+  "currency" : "",
+  "date_created" : "",
+  "date_created_gmt" : "",
+  "date_modified" : "",
+  "date_modified_gmt" : "",
+  "discount_total" : "",
+  "discount_tax" : "",
+  "shipping_total" : "",
+  "shipping_tax" : "",
+  "cart_tax" : "",
+  "total" : "",
+  "total_tax" : "",
+  "prices_include_tax" : false,
+  "customer_id" : 1,
+  "customer_ip_address" : "",
+  "customer_user_agent" : "",
+  "customer_note" : "",
+  "billing" : {
+    "first_name" : "",
+    "last_name" : "",
+    "company" : "",
+    "address_1" : "",
+    "address_2" : "",
+    "city" : "",
+    "state" : "",
+    "postcode" : "",
+    "country" : "",
+    "email" : "",
+    "phone" : ""
+  },
+  "shipping" : {
+    "first_name" : "",
+    "last_name" : "",
+    "company" : "",
+    "address_1" : "",
+    "address_2" : "",
+    "city" : "",
+    "state" : "",
+    "postcode" : "",
+    "country" : ""
+  },
+  "payment_methods" : "",
+  "payment_method_title" : "",
+  "transaction_id" : "",
+  "date_paid" : "",
+  "date_paid_gmt" : "",
+  "date_completed" : "",
+  "date_completed_gmt" : "",
+  "cart_hash" : "",
+  "meta_data" : [ {
+    "id" : 1,
+    "key" : "",
+    "value" : ""
+  } ],
+  "line_items" : [ {
+    "id" : 1,
+    "name" : "",
+    "product_id" : 1,
+    "variation_id" : 1,
+    "quantity" : 1,
+    "tax_class" : "",
+    "subtotal" : "",
+    "subtotal_tax" : "",
+    "total" : "",
+    "total_tax" : "",
+    "taxes" : [ ],
+    "meta_data" : [ ],
+    "sku" : "",
+    "price" : ""
+  } ],
+  "tax_lines" : [ {
+    "id" : 1,
+    "rate_code" : "",
+    "rate_id" : 1,
+    "label" : "",
+    "compound" : false,
+    "tax_total" : "",
+    "shipping_tax_total" : "",
+    "mata_data" : [ ]
+  } ],
+  "shipping_lines" : [ {
+    "id" : 1,
+    "method_title" : "",
+    "method_id" : "",
+    "total" : "",
+    "total_tax" : "",
+    "taxes" : [ ],
+    "meta_data" : [ ]
+  } ],
+  "fee_lines" : [ {
+    "id" : 1,
+    "name" : "",
+    "tax_class" : "",
+    "tax_status" : "",
+    "total" : "",
+    "total_tax" : "",
+    "taxes" : [ ],
+    "mata_data" : [ ]
+  } ],
+  "coupon_lines" : [ {
+    "id" : 1,
+    "code" : "",
+    "discount" : "",
+    "discount_tax" : "",
+    "meta_data" : [ ]
+  } ],
+  "refunds" : [ {
+    "id" : 1,
+    "reason" : "",
+    "total" : ""
+  } ],
+  "_links" : {
+    "self" : [ {
+      "href" : ""
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ]
+  }
+}
+```
+
+
+### Create Product
+Name: createProduct
+
+`Create a new product.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | `Product name.` | true |
+| regular_price | Regular Price | STRING | `Product regular price.` | true |
+| type | Type | STRING <details> <summary> Options </summary> simple, grouped, external, variable </details> | `Product type.` | false |
+| description | Description | STRING | `Product description.` | false |
+| manage_stock | Manage Stock | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Stock management at product level.` | false |
+| stock_quantity | Stock Quantity | INTEGER | `Stock quantity.` | false |
+| stock_status | Stock Status | STRING <details> <summary> Options </summary> instock, outofstock, onbackorder </details> | `Controls the stock status of the product.` | false |
+| weight | Weight | STRING | `Product weight (kg).` | false |
+| dimensions | Dimensions | OBJECT <details> <summary> Properties </summary> &#123;STRING\(length), STRING\(width), STRING\(height)&#125; </details> | `Product dimensions.` | false |
+| categories | Categories | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of categories.` | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of tags.` | false |
+| images | Images | ARRAY <details> <summary> Items </summary> [&#123;STRING\(src), STRING\(name)&#125;] </details> | `List of images.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Product",
+  "name" : "createProduct",
+  "parameters" : {
+    "name" : "",
+    "regular_price" : "",
+    "type" : "",
+    "description" : "",
+    "manage_stock" : false,
+    "stock_quantity" : 1,
+    "stock_status" : "",
+    "weight" : "",
+    "dimensions" : {
+      "length" : "",
+      "width" : "",
+      "height" : ""
+    },
+    "categories" : [ "" ],
+    "tags" : [ "" ],
+    "images" : [ {
+      "src" : "",
+      "name" : ""
+    } ]
+  },
+  "type" : "woocommerce/v1/createProduct"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the resource. |
+| name | STRING | Product name. |
+| slug | STRING | Product slug. |
+| permalink | STRING | Product URL. |
+| date_created | STRING | The date the product was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the product was created, as GMT. |
+| date_modified | STRING | The date the product was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the product was last modified, as GMT. |
+| type | STRING | Product type. |
+| status | STRING | Product status. |
+| featured | BOOLEAN <details> <summary> Options </summary> true, false </details> | Featured product. |
+| catalog_visibility | STRING | Catalog visibility. |
+| description | STRING | Product description. |
+| short_description | STRING | Product short description. |
+| sku | STRING | Unique identifier. |
+| price | STRING | Current product price. |
+| regular_price | STRING | Product regular price. |
+| sale_price | STRING | Product sale price. |
+| date_on_sale_from | STRING | Start date of sale price, in the site's timezone. |
+| date_on_sale_from_gmt | STRING | Start date of sale price, as GMT. |
+| date_on_sale_to | STRING | End date of sale price, in the site's timezone. |
+| date_on_sale_to_gmt | STRING | End date of sale price, as GMT. |
+| price_html | STRING | Price formatted in HTML. |
+| on_sale | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if the product is on sale. |
+| purchasable | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if the product can be bought. |
+| total_sales | INTEGER | Amount of sales. |
+| virtual | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the product is virtual. Default is false. |
+| downloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the product is downloadable. Default is false. |
+| downloads | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(name), STRING\(file)&#125;] </details> | List of downloadable files. |
+| download_limit | INTEGER | Number of times downloadable files can be downloaded after purchase. |
+| download_expiry | INTEGER | Number of days until access to downloadable files expires. |
+| external_url | STRING | Product external URL. Only for external products. |
+| button_text | STRING | Product external button text. Only for external products. |
+| tax_status | STRING | Tax status |
+| tax_class | STRING | Tax class. |
+| manage_stock | BOOLEAN <details> <summary> Options </summary> true, false </details> | Stock management at product level. |
+| stock_quantity | INTEGER | Stock quantity. |
+| stock_status | STRING | Controls the stock status of the product. |
+| backorders | STRING | If managing stock, this controls if backorders are allowed. |
+| backorders_allowed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if backorders are allowed. |
+| backordered | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if the product is on backordered. |
+| sold_individually | BOOLEAN <details> <summary> Options </summary> true, false </details> | Allow one item to be bought in a single order. |
+| weight | STRING | Product weight. |
+| dimensions | OBJECT <details> <summary> Properties </summary> &#123;STRING\(length), STRING\(width), STRING\(height)&#125; </details> | Product dimensions. |
+| shipping_required | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if the product need to be shipped. |
+| shipping_taxable | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows whether or not the product shipping is taxable. |
+| shipping_class | STRING | Shipping class slug. |
+| shipping_class_id | INTEGER | Shipping class ID. |
+| reviews_allowed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Allow reviews. |
+| average_rating | STRING | Reviews average rating. |
+| rating_count | INTEGER | Amount of reviews that the product have. |
+| related_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of related products IDs. |
+| upsell_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of up-sell products IDs. |
+| cross_sell_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of cross-sell products IDs. |
+| parent_id | INTEGER | Product parent ID. |
+| purchase_note | STRING | Optional note to send the customer after purchase. |
+| categories | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(slug)&#125;] </details> | List of categories. |
+| tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(slug)&#125;] </details> | List of tags. |
+| images | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(date_created), STRING\(date_created_gmt), STRING\(date_modified), STRING\(date_modified_gmt), STRING\(src), STRING\(name), STRING\(alt)&#125;] </details> | List of images. |
+| attributes | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), INTEGER\(position), BOOLEAN\(visible), BOOLEAN\(variation), []\(options)&#125;] </details> | List of attributes. |
+| default_attributes | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(option)&#125;] </details> | Defaults variation attributes. |
+| variations | ARRAY <details> <summary> Items </summary> [] </details> | List of variations IDs. |
+| grouped_products | ARRAY <details> <summary> Items </summary> [] </details> | List of grouped products ID. |
+| menu_order | INTEGER | Menu order, used to custom sort products. |
+| meta_data | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(key), STRING\(value)&#125;] </details> | Meta data. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "slug" : "",
+  "permalink" : "",
+  "date_created" : "",
+  "date_created_gmt" : "",
+  "date_modified" : "",
+  "date_modified_gmt" : "",
+  "type" : "",
+  "status" : "",
+  "featured" : false,
+  "catalog_visibility" : "",
+  "description" : "",
+  "short_description" : "",
+  "sku" : "",
+  "price" : "",
+  "regular_price" : "",
+  "sale_price" : "",
+  "date_on_sale_from" : "",
+  "date_on_sale_from_gmt" : "",
+  "date_on_sale_to" : "",
+  "date_on_sale_to_gmt" : "",
+  "price_html" : "",
+  "on_sale" : false,
+  "purchasable" : false,
+  "total_sales" : 1,
+  "virtual" : false,
+  "downloadable" : false,
+  "downloads" : [ {
+    "id" : "",
+    "name" : "",
+    "file" : ""
+  } ],
+  "download_limit" : 1,
+  "download_expiry" : 1,
+  "external_url" : "",
+  "button_text" : "",
+  "tax_status" : "",
+  "tax_class" : "",
+  "manage_stock" : false,
+  "stock_quantity" : 1,
+  "stock_status" : "",
+  "backorders" : "",
+  "backorders_allowed" : false,
+  "backordered" : false,
+  "sold_individually" : false,
+  "weight" : "",
+  "dimensions" : {
+    "length" : "",
+    "width" : "",
+    "height" : ""
+  },
+  "shipping_required" : false,
+  "shipping_taxable" : false,
+  "shipping_class" : "",
+  "shipping_class_id" : 1,
+  "reviews_allowed" : false,
+  "average_rating" : "",
+  "rating_count" : 1,
+  "related_ids" : [ 1 ],
+  "upsell_ids" : [ 1 ],
+  "cross_sell_ids" : [ 1 ],
+  "parent_id" : 1,
+  "purchase_note" : "",
+  "categories" : [ {
+    "id" : 1,
+    "name" : "",
+    "slug" : ""
+  } ],
+  "tags" : [ {
+    "id" : 1,
+    "name" : "",
+    "slug" : ""
+  } ],
+  "images" : [ {
+    "id" : 1,
+    "date_created" : "",
+    "date_created_gmt" : "",
+    "date_modified" : "",
+    "date_modified_gmt" : "",
+    "src" : "",
+    "name" : "",
+    "alt" : ""
+  } ],
+  "attributes" : [ {
+    "id" : 1,
+    "name" : "",
+    "position" : 1,
+    "visible" : false,
+    "variation" : false,
+    "options" : [ ]
+  } ],
+  "default_attributes" : [ {
+    "id" : 1,
+    "name" : "",
+    "option" : ""
+  } ],
+  "variations" : [ ],
+  "grouped_products" : [ ],
+  "menu_order" : 1,
+  "meta_data" : [ {
+    "id" : 1,
+    "key" : "",
+    "value" : ""
+  } ],
+  "_links" : {
+    "self" : [ {
+      "href" : ""
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ]
+  }
+}
+```
+
+
+
+
+## Triggers
+
+
+### New Order
+Name: newOrder
+
+`Triggers when any order is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the resource. |
+| name | STRING | A friendly name for the webhook. |
+| status | STRING | Webhook status. |
+| topic | STRING | Webhook topic. |
+| resource | STRING | Webhook resource. |
+| event | STRING | Webhook event. |
+| hooks | ARRAY <details> <summary> Items </summary> [STRING] </details> | WooCommerce action names associated with the webhook. |
+| delivery_url | STRING | The URL where the webhook payload is delivered. |
+| date_created | STRING | The date the webhook was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the webhook was created, as GMT. |
+| date_modified | STRING | The date the webhook was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the webhook was last modified, as GMT. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Order",
+  "name" : "newOrder",
+  "type" : "woocommerce/v1/newOrder"
+}
+```
+
+
+### New Coupon
+Name: newCoupon
+
+`Triggers when any coupon is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the resource. |
+| name | STRING | A friendly name for the webhook. |
+| status | STRING | Webhook status. |
+| topic | STRING | Webhook topic. |
+| resource | STRING | Webhook resource. |
+| event | STRING | Webhook event. |
+| hooks | ARRAY <details> <summary> Items </summary> [STRING] </details> | WooCommerce action names associated with the webhook. |
+| delivery_url | STRING | The URL where the webhook payload is delivered. |
+| date_created | STRING | The date the webhook was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the webhook was created, as GMT. |
+| date_modified | STRING | The date the webhook was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the webhook was last modified, as GMT. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Coupon",
+  "name" : "newCoupon",
+  "type" : "woocommerce/v1/newCoupon"
+}
+```
+
+
+<hr />
+

@@ -279,6 +279,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:webflow"))
     implementation(project(":server:libs:modules:components:webhook"))
     implementation(project(":server:libs:modules:components:whatsapp"))
+    implementation(project(":server:libs:modules:components:woocommerce"))
     implementation(project(":server:libs:modules:components:xero"))
     implementation(project(":server:libs:modules:components:xlsx-file"))
     implementation(project(":server:libs:modules:components:xml-file"))
