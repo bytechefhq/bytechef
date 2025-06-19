@@ -26,6 +26,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -109,8 +111,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public List<Project> getProjects(Long workspaceId, List<Long> ids, Long categoryId, Long tagId, Status status) {
-        return projectRepository.findAllProjects(
-            workspaceId, categoryId, ids, tagId, status == null ? null : status.ordinal());
+        return projectRepository
+            .findAllProjects(workspaceId, categoryId, ids, tagId, status == null ? null : status.ordinal())
+            .stream()
+            .filter(project -> !StringUtils.startsWith(project.getName(), "EMBEDDED_"))
+            .toList();
     }
 
     @Override
