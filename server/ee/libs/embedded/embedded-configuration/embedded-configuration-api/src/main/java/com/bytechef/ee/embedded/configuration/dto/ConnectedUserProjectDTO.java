@@ -36,7 +36,6 @@ public record ConnectedUserProjectDTO(
             projectDeployment.getEnvironment(), lastExecutionDate, connectedUserProject.getProjectId(),
             projectDeployment.getProjectVersion(), connectedUserProject.getCreatedBy(),
             connectedUserProject.getCreatedDate(), connectedUserProject.getLastModifiedBy(),
-            connectedUserProject.getLastModifiedDate(),
-            connectedUserProject.getVersion());
+            connectedUserProject.getLastModifiedDate(), connectedUserProject.getVersion());
     }
 }
