@@ -38,6 +38,7 @@ import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherD
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,6 +46,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
+
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(LoopTaskDispatcherDefinitionFactory.class);
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP)
         .title("Loop")
@@ -74,7 +77,16 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         }
 
         OutputResponse outputResponse;
-        List<?> list = MapUtils.getList(inputParameters, ITEMS, List.of());
+        List<?> list = List.of();
+
+        // TODO Remove ince UI suppress executing outputs if previous nodes don't have defined output
+        try {
+            list = MapUtils.getList(inputParameters, ITEMS, List.of());
+        } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage());
+            }
+        }
 
         if (list.isEmpty()) {
             outputResponse = OutputResponse.of(object());
