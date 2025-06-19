@@ -467,8 +467,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         if (workflowNodeType.operation() == null) {
             if (taskDispatcherExecuteOutput) {
-                outputResponse = taskDispatcherDefinitionService.executeOutput(
-                    workflowNodeType.name(), workflowNodeType.version(), inputParameters);
+                if (Objects.equals(workflowNodeType.name(), "loop")) {
+                    outputResponse = taskDispatcherDefinitionService.executeVariableProperties(
+                        workflowNodeType.name(), workflowNodeType.version(), inputParameters);
+                } else {
+                    outputResponse = taskDispatcherDefinitionService.executeOutput(
+                        workflowNodeType.name(), workflowNodeType.version(), inputParameters);
+                }
             } else {
                 outputResponse = taskDispatcherDefinitionService.executeVariableProperties(
                     workflowNodeType.name(), workflowNodeType.version(), inputParameters);

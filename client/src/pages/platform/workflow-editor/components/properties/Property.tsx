@@ -1,5 +1,5 @@
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
-import {MultiSelectOptionType} from '@/components/MultiSelect';
+import {MultiSelectOptionType} from '@/components/MultiSelect/MultiSelect';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';

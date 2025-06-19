@@ -18,7 +18,7 @@ import {CheckIcon, ChevronDown, CircleXIcon, XIcon} from 'lucide-react';
 import {ButtonHTMLAttributes, ComponentType, ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {ScrollArea} from './ui/scroll-area';
+import {ScrollArea} from '../ui/scroll-area';
 
 export type MultiSelectOptionType = {
     label: string;

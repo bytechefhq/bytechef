@@ -1,4 +1,4 @@
-import {MultiSelect, MultiSelectOptionType} from '@/components/MultiSelect';
+import {MultiSelect, MultiSelectOptionType} from '@/components/MultiSelect/MultiSelect';
 import {fireEvent, mockScrollIntoView, render, screen, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';

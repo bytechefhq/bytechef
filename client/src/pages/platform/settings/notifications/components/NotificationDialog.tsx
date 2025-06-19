@@ -1,4 +1,4 @@
-import {MultiSelect} from '@/components/MultiSelect';
+import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import {Button} from '@/components/ui/button';
 import {
     Dialog,

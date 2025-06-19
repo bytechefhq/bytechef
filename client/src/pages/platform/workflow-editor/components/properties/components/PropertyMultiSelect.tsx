@@ -1,4 +1,4 @@
-import {MultiSelect, MultiSelectOptionType} from '@/components/MultiSelect';
+import {MultiSelect, MultiSelectOptionType} from '@/components/MultiSelect/MultiSelect';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
