@@ -1047,8 +1047,8 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "projectDeployments"
-          description: "Use for filtering projects for which project deployments exist."
+        - name: "apiCollections"
+          description: "Use for filtering API Collection based projects."
           in: "query"
           required: false
           schema:
@@ -1060,19 +1060,6 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "tagId"
-          description: "The tag id of used for filtering projects."
-          in: "query"
-          required: false
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "status"
-          description: "Use for filtering projects per status."
-          in: "query"
-          required: false
-          schema:
-            $ref: '#/components/schemas/ProjectStatus'
         - name: "includeAllFields"
           description: "Use for including all fields or just basic ones."
           in: "query"
@@ -1080,6 +1067,25 @@ paths:
           schema:
             type: "boolean"
             default: true
+        - name: "projectDeployments"
+          description: "Use for filtering projects for which project deployments exist."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "status"
+          description: "Use for filtering projects per status."
+          in: "query"
+          required: false
+          schema:
+            $ref: '#/components/schemas/ProjectStatus'
+        - name: "tagId"
+          description: "The tag id of used for filtering projects."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of projects."
