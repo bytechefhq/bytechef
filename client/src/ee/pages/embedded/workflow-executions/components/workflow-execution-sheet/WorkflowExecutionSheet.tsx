@@ -2,7 +2,7 @@ import {Sheet, SheetContent} from '@/components/ui/sheet';
 import WorkflowExecutionSheetWorkflowPanel from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheetWorkflowPanel';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
-import {useGetWorkflowExecutionQuery} from '@/shared/queries/embedded/workflowExecutions.queries';
+import {useGetIntegrationWorkflowExecutionQuery} from '@/shared/queries/embedded/workflowExecutions.queries';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionSheetAccordion from './WorkflowExecutionSheetAccordion';
@@ -11,7 +11,7 @@ const WorkflowExecutionSheet = () => {
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
         useWorkflowExecutionSheetStore();
 
-    const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetWorkflowExecutionQuery(
+    const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetIntegrationWorkflowExecutionQuery(
         {
             id: workflowExecutionId,
         },

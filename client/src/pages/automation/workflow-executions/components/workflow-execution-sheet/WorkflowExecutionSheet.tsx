@@ -1,7 +1,7 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
-import {useGetWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
+import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionSheetAccordion from './WorkflowExecutionSheetAccordion';
@@ -11,7 +11,7 @@ const WorkflowExecutionSheet = () => {
     const {setWorkflowExecutionDetailsSheetOpen, workflowExecutionDetailsSheetOpen, workflowExecutionId} =
         useWorkflowExecutionSheetStore();
 
-    const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetWorkflowExecutionQuery(
+    const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetProjectWorkflowExecutionQuery(
         {
             id: workflowExecutionId,
         },

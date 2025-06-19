@@ -18,13 +18,13 @@ export const WorkflowExecutionKeys = {
     workflowExecutions: ['integrationWorkflowExecutions'] as const,
 };
 
-export const useGetWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
+export const useGetIntegrationWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
     useQuery<Page, Error>({
         queryKey: WorkflowExecutionKeys.filteredWorkflowExecutions(request),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecutionsPage(request),
     });
 
-export const useGetWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, isEnabled: boolean) =>
+export const useGetIntegrationWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, isEnabled: boolean) =>
     useQuery<WorkflowExecution, Error>({
         queryKey: WorkflowExecutionKeys.workflowExecution(request.id),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecution(request),

@@ -18,13 +18,17 @@ export const WorkflowExecutionKeys = {
     workflowExecutions: ['automation_workflowExecutions'] as const,
 };
 
-export const useGetWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
+export const useGetProjectWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
     useQuery<Page, Error>({
         queryKey: WorkflowExecutionKeys.filteredWorkflowExecutions(request),
-        queryFn: () => new WorkflowExecutionApi().getWorkflowExecutionsPage(request),
+        queryFn: () =>
+            new WorkflowExecutionApi().getWorkflowExecutionsPage({
+                ...request,
+                embedded: false,
+            }),
     });
 
-export const useGetWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, enabled?: boolean) =>
+export const useGetProjectWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, enabled?: boolean) =>
     useQuery<WorkflowExecution, Error>({
         queryKey: WorkflowExecutionKeys.workflowExecution(request.id),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecution(request),
