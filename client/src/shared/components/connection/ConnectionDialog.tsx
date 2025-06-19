@@ -19,7 +19,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
-import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {
@@ -542,11 +542,13 @@ const ConnectionDialog = ({
                                 )}
 
                                 {!connection?.id && showConnectionProperties && !!connectionDefinition.properties && (
-                                    <Properties
-                                        control={control}
-                                        formState={formState}
-                                        properties={connectionDefinition?.properties}
-                                    />
+                                    <WorkflowMockProvider>
+                                        <Properties
+                                            control={control}
+                                            formState={formState}
+                                            properties={connectionDefinition?.properties}
+                                        />
+                                    </WorkflowMockProvider>
                                 )}
 
                                 {!connection?.id && showAuthorizations && (
@@ -601,11 +603,13 @@ const ConnectionDialog = ({
                                     showAuthorizationProperties &&
                                     !!authorizations?.length &&
                                     authorizations[0]?.properties && (
-                                        <Properties
-                                            control={control}
-                                            formState={formState}
-                                            properties={authorizations[0]?.properties}
-                                        />
+                                        <WorkflowMockProvider>
+                                            <Properties
+                                                control={control}
+                                                formState={formState}
+                                                properties={authorizations[0]?.properties}
+                                            />
+                                        </WorkflowMockProvider>
                                     )}
 
                                 {showOAuth2AppPredefined && (
