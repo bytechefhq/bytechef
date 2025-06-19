@@ -58,6 +58,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/OAuth2Propertie
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ObjectPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/OptionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/OptionsDataSourceModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/OutputResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertiesDataSourceModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertyTypeModel.java

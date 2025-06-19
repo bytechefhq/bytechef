@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T10:18:08.917524+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-19T09:51:17.689349+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "tool", description = "The Embedded AI Tool Public API")
 public interface ToolApi {
@@ -109,7 +109,7 @@ public interface ToolApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Object> executeTool(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
@@ -233,7 +233,7 @@ public interface ToolApi {
         value = "/{externalUserId}/tools",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<Map<String, List<ToolModel>>> getTools(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
