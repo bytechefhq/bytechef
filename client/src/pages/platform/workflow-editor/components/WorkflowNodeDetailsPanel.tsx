@@ -17,6 +17,7 @@ import {
     GetComponentActionDefinitionRequest,
     GetComponentClusterElementDefinitionRequest,
     GetComponentTriggerDefinitionRequest,
+    TaskDispatcherDefinition,
     TriggerDefinitionApi,
     WorkflowNodeOutput,
     WorkflowTask,
@@ -240,7 +241,8 @@ const WorkflowNodeDetailsPanel = ({
     const previousComponentProperties: Array<ComponentPropertiesType> = useMemo(
         () =>
             previousComponentDefinitions?.map((componentDefinition, index) => {
-                const outputSchemaDefinition: PropertyAllType | undefined = workflowNodeOutputs[index]?.outputSchema;
+                const outputSchemaDefinition: PropertyAllType | undefined =
+                    workflowNodeOutputs[index]?.outputResponse?.outputSchema;
 
                 const properties = outputSchemaDefinition?.properties?.length
                     ? outputSchemaDefinition.properties
@@ -254,7 +256,12 @@ const WorkflowNodeDetailsPanel = ({
         [previousComponentDefinitions, workflowNodeOutputs]
     );
 
-    const hasOutputData = useMemo(() => currentNodeDefinition?.outputDefined, [currentNodeDefinition?.outputDefined]);
+    const hasOutputData = useMemo(
+        () =>
+            currentNodeDefinition?.outputDefined ||
+            (currentNodeDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined,
+        [currentNodeDefinition]
+    );
 
     const currentWorkflowTrigger = useMemo(
         () => workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName),
@@ -1071,6 +1078,9 @@ const WorkflowNodeDetailsPanel = ({
                                                 currentTriggerDefinition?.outputSchemaDefined ||
                                                 currentTaskDispatcherDefinition?.outputSchemaDefined) ??
                                             false
+                                        }
+                                        variablePropertiesDefined={
+                                            currentTaskDispatcherDefinition?.variablePropertiesDefined
                                         }
                                         workflowId={workflow.id!}
                                     />
