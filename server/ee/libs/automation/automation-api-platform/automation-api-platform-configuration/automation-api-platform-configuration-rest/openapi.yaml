@@ -375,30 +375,6 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ApiCollection"
-  /workspaces/{id}/api/collections/projects:
-    get:
-      description: "Get workspace API collection projects by workspace id."
-      summary: "Get workspace API collection projects by workspace id"
-      tags:
-        - "project"
-      operationId: "getWorkspaceApiCollectionProjects"
-      parameters:
-        - name: "id"
-          description: "The id of a workspace."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "The list of projects."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "../../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
 components:
   schemas:
     ApiClient:
