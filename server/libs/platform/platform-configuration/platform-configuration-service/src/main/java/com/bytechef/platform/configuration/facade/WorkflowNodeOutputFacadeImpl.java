@@ -146,7 +146,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
             for (WorkflowTask workflowTask : workflowTasks) {
                 if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
-                    workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTask, true);
+                    workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTask, null);
 
                     break;
                 }
@@ -206,8 +206,18 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
         return getPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
             .stream()
-            .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.sampleOutput() != null)
-            .collect(Collectors.toMap(WorkflowNodeOutputDTO::workflowNodeName, WorkflowNodeOutputDTO::sampleOutput));
+            .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.getSampleOutput() != null ||
+                workflowNodeOutputDTO.getVariableSampleOutput() != null)
+            .collect(
+                Collectors.toMap(
+                    WorkflowNodeOutputDTO::workflowNodeName,
+                    workflowNodeOutputDTO -> {
+                        if (workflowNodeOutputDTO.getSampleOutput() != null) {
+                            return workflowNodeOutputDTO.getSampleOutput();
+                        }
+
+                        return workflowNodeOutputDTO.getVariableSampleOutput();
+                    }));
     }
 
     @Override
@@ -313,23 +323,21 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation());
 
-        OutputResponse outputResponse = clusterElementDefinition.getOutputResponse();
-
-        if (outputResponse != null) {
-            return new ClusterElementOutputDTO(
-                clusterElementDefinition, checkOutputSchemaIsFileEntryProperty(outputResponse), clusterElementName);
-        }
-
         Class<? extends BaseProperty> type = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
 
-        outputResponse = workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, clusterElementName)
+        OutputResponse outputResponse = workflowNodeTestOutputService
+            .fetchWorkflowTestNodeOutput(workflowId, clusterElementName)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
             .or(() -> getClusterElementDynamicOutputResponse(workflowId, workflowTask, clusterElement))
-            .map(this::checkOutputSchemaIsFileEntryProperty)
             .orElse(null);
 
-        return new ClusterElementOutputDTO(clusterElementDefinition, outputResponse, clusterElementName);
+        if (outputResponse == null) {
+            outputResponse = clusterElementDefinition.getOutputResponse();
+        }
+
+        return new ClusterElementOutputDTO(
+            clusterElementDefinition, checkOutputSchemaIsFileEntryProperty(outputResponse), clusterElementName);
     }
 
     @SuppressWarnings("unchecked")
@@ -361,43 +369,60 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
-        String workflowId, WorkflowTask workflowTask, boolean taskDispatcherExecuteOutput) {
+        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         ActionDefinition actionDefinition = null;
         TaskDispatcherDefinition taskDispatcherDefinition = null;
-        OutputResponse outputResponse;
+        OutputResponse variableOutputResponse = null;
 
         if (workflowNodeType.operation() == null) {
             taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
                 workflowNodeType.name(), workflowNodeType.version());
-
-            outputResponse = taskDispatcherDefinition.getOutputResponse();
         } else {
             actionDefinition = actionDefinitionService.getActionDefinition(
                 workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
-
-            outputResponse = actionDefinition.getOutputResponse();
-        }
-
-        if (outputResponse != null) {
-            return new WorkflowNodeOutputDTO(
-                actionDefinition, null, checkOutputSchemaIsFileEntryProperty(outputResponse), taskDispatcherDefinition,
-                null, workflowTask.getName());
         }
 
         Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
 
-        outputResponse = workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
+        OutputResponse outputResponse = workflowNodeTestOutputService
+            .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
-            .or(() -> getWorkflowTaskDynamicOutputResponse(workflowId, workflowTask, taskDispatcherExecuteOutput))
-            .map(this::checkOutputSchemaIsFileEntryProperty)
             .orElse(null);
 
+        if (outputResponse == null) {
+            if (workflowNodeType.operation() == null) {
+                WorkflowTaskDispatcherDynamicOutputResponse workflowTaskDispatcherDynamicOutputResponse =
+                    getWorkflowTaskDispatcherDynamicOutputResponse(workflowId, workflowTask, taskDispatcherOutput);
+
+                if (workflowTaskDispatcherDynamicOutputResponse == null) {
+                    outputResponse = taskDispatcherDefinition.getOutputResponse();
+                } else {
+                    outputResponse = workflowTaskDispatcherDynamicOutputResponse.outputResponse;
+                    variableOutputResponse = workflowTaskDispatcherDynamicOutputResponse.variableOutputResponse;
+                }
+            } else {
+                outputResponse = actionDefinition.getOutputResponse();
+
+                if (outputResponse == null) {
+                    outputResponse = getWorkflowTaskDynamicOutputResponse(workflowId, workflowTask);
+                }
+            }
+        } else {
+            // Currently, variable output samples are stored as the output response in db
+            if (taskDispatcherOutput == null || !taskDispatcherOutput) {
+                variableOutputResponse = outputResponse;
+
+                outputResponse = null;
+            }
+        }
+
         return new WorkflowNodeOutputDTO(
-            actionDefinition, null, outputResponse, taskDispatcherDefinition, null, workflowTask.getName());
+            actionDefinition, null, checkOutputSchemaIsFileEntryProperty(outputResponse), taskDispatcherDefinition,
+            null, variableOutputResponse, workflowTask.getName());
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTrigger workflowTrigger) {
@@ -407,51 +432,37 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             workflowNodeType.name(), workflowNodeType.version(),
             workflowNodeType.operation());
 
-        OutputResponse outputResponse = triggerDefinition.getOutputResponse();
-
-        if (outputResponse != null) {
-            return new WorkflowNodeOutputDTO(
-                null, null, checkOutputSchemaIsFileEntryProperty(outputResponse), null, triggerDefinition,
-                workflowTrigger.getName());
-        }
-
         Class<? extends BaseProperty> type = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
 
-        outputResponse = workflowNodeTestOutputService
+        OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
             .or(() -> getWorkflowTriggerDynamicOutputResponse(workflowId, workflowTrigger))
-            .map(this::checkOutputSchemaIsFileEntryProperty)
             .orElse(null);
+
+        if (outputResponse == null) {
+            outputResponse = triggerDefinition.getOutputResponse();
+        }
 
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
 
         return new WorkflowNodeOutputDTO(
-            null, null, outputResponse, null, triggerDefinition, workflowTrigger.getName());
+            null, null, checkOutputSchemaIsFileEntryProperty(outputResponse), null, triggerDefinition,
+            workflowTrigger.getName());
     }
 
     @SuppressWarnings("unchecked")
-    private Optional<OutputResponse> getWorkflowTaskDynamicOutputResponse(
-        String workflowId, WorkflowTask workflowTask, boolean taskDispatcherExecuteOutput) {
-
-        OutputResponse outputResponse;
+    private OutputResponse getWorkflowTaskDynamicOutputResponse(String workflowId, WorkflowTask workflowTask) {
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        OutputResponse outputResponse;
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-        if (workflowNodeType.operation() == null) {
-            if (!taskDispatcherDefinitionService.isDynamicOutputDefined(
-                workflowNodeType.name(), workflowNodeType.version())) {
+        if (!actionDefinitionService.isDynamicOutputDefined(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation())) {
 
-                return Optional.empty();
-            }
-        } else {
-            if (!actionDefinitionService.isDynamicOutputDefined(
-                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation())) {
-
-                return Optional.empty();
-            }
+            return null;
         }
 
         Map<String, ?> outputs = getPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
@@ -465,19 +476,37 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
             WorkflowTestConfigurationConnection::getConnectionId);
 
-        if (workflowNodeType.operation() == null) {
-            if (taskDispatcherExecuteOutput) {
-                if (Objects.equals(workflowNodeType.name(), "loop")) {
-                    outputResponse = taskDispatcherDefinitionService.executeVariableProperties(
-                        workflowNodeType.name(), workflowNodeType.version(), inputParameters);
-                } else {
-                    outputResponse = taskDispatcherDefinitionService.executeOutput(
-                        workflowNodeType.name(), workflowNodeType.version(), inputParameters);
-                }
-            } else {
-                outputResponse = taskDispatcherDefinitionService.executeVariableProperties(
-                    workflowNodeType.name(), workflowNodeType.version(), inputParameters);
-            }
+        outputResponse = actionDefinitionFacade.executeOutput(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
+            connectionIds);
+
+        return outputResponse;
+    }
+
+    @SuppressWarnings("unchecked")
+    private WorkflowTaskDispatcherDynamicOutputResponse getWorkflowTaskDispatcherDynamicOutputResponse(
+        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput) {
+
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        OutputResponse outputResponse = null;
+        OutputResponse variableOutputResponse = null;
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        if (!taskDispatcherDefinitionService.isDynamicOutputDefined(
+            workflowNodeType.name(), workflowNodeType.version())) {
+
+            return null;
+        }
+
+        Map<String, ?> outputs = getPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
+
+        Map<String, ?> inputParameters = workflowTask.evaluateParameters(
+            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
+
+        if (taskDispatcherOutput == null || taskDispatcherOutput) {
+            outputResponse = taskDispatcherDefinitionService.executeOutput(
+                workflowNodeType.name(), workflowNodeType.version(), inputParameters);
 
             if (outputResponse != null && outputResponse.outputSchema() instanceof ObjectProperty objectProperty) {
                 List<? extends Property> properties = objectProperty.getProperties();
@@ -486,13 +515,24 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     outputResponse = null;
                 }
             }
-        } else {
-            outputResponse = actionDefinitionFacade.executeOutput(
-                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
-                inputParameters, connectionIds);
         }
 
-        return Optional.ofNullable(outputResponse);
+        if (taskDispatcherOutput == null || !taskDispatcherOutput) {
+            variableOutputResponse = taskDispatcherDefinitionService.executeVariableProperties(
+                workflowNodeType.name(), workflowNodeType.version(), inputParameters);
+
+            if (variableOutputResponse != null &&
+                variableOutputResponse.outputSchema() instanceof ObjectProperty objectProperty) {
+
+                List<? extends Property> properties = objectProperty.getProperties();
+
+                if (properties.isEmpty()) {
+                    variableOutputResponse = null;
+                }
+            }
+        }
+
+        return new WorkflowTaskDispatcherDynamicOutputResponse(outputResponse, variableOutputResponse);
     }
 
     private Optional<OutputResponse> getWorkflowTriggerDynamicOutputResponse(
@@ -511,5 +551,9 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             triggerDefinitionFacade.executeOutput(
                 workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
                 connectionId));
+    }
+
+    private record WorkflowTaskDispatcherDynamicOutputResponse(
+        OutputResponse outputResponse, OutputResponse variableOutputResponse) {
     }
 }

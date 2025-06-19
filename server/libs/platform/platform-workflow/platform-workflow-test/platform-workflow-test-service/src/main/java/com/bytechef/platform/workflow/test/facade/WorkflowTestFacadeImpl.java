@@ -110,7 +110,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
                 workflowId, workflowTrigger.getName());
 
-            Object sampleOutput = workflowNodeOutputDTO.sampleOutput();
+            Object sampleOutput = workflowNodeOutputDTO.getSampleOutput();
 
             if (inputs.isEmpty() && sampleOutput != null) {
                 TriggerExecution triggerExecution = TriggerExecution.builder()

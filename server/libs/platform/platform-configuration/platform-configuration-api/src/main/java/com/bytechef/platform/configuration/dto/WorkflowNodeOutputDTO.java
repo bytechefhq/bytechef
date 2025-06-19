@@ -19,17 +19,17 @@ package com.bytechef.platform.configuration.dto;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
-import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public record WorkflowNodeOutputDTO(
-    ActionDefinition actionDefinition, ClusterElementDefinition clusterElementDefinition, BaseProperty outputSchema,
-    Object placeholder, Object sampleOutput, TaskDispatcherDefinition taskDispatcherDefinition,
-    TriggerDefinition triggerDefinition, String workflowNodeName) {
+    ActionDefinition actionDefinition, ClusterElementDefinition clusterElementDefinition,
+    @Nullable OutputResponse outputResponse, TaskDispatcherDefinition taskDispatcherDefinition,
+    TriggerDefinition triggerDefinition, @Nullable OutputResponse variableOutputResponse, String workflowNodeName) {
 
     public WorkflowNodeOutputDTO(
         ActionDefinition actionDefinition, ClusterElementDefinition clusterElementDefinition,
@@ -37,9 +37,23 @@ public record WorkflowNodeOutputDTO(
         TriggerDefinition triggerDefinition, String workflowNodeName) {
 
         this(
-            actionDefinition, clusterElementDefinition, outputResponse == null ? null : outputResponse.outputSchema(),
-            outputResponse == null ? null : outputResponse.placeholder(),
-            outputResponse == null ? null : outputResponse.sampleOutput(), taskDispatcherDefinition, triggerDefinition,
-            workflowNodeName);
+            actionDefinition, clusterElementDefinition, outputResponse, taskDispatcherDefinition, triggerDefinition,
+            null, workflowNodeName);
+    }
+
+    public Object getSampleOutput() {
+        if (outputResponse != null) {
+            return outputResponse.sampleOutput();
+        }
+
+        return null;
+    }
+
+    public Object getVariableSampleOutput() {
+        if (variableOutputResponse != null) {
+            return variableOutputResponse.sampleOutput();
+        }
+
+        return null;
     }
 }
