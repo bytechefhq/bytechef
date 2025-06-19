@@ -60,17 +60,6 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     }
 
     @Override
-    @CacheEvict(value = WORKFLOW_TEST_NODE_OUTPUT_CACHE)
-    @WorkflowCacheEvict(cacheNames = {
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
-    })
-    public void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
-        workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName)
-            .ifPresent(workflowNodeTestOutputRepository::delete);
-    }
-
-    @Override
     public boolean checkWorkflowNodeTestOutputExists(
         String workflowId, String workflowNodeName, @Nullable Instant createdDate) {
 
@@ -83,11 +72,20 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     }
 
     @Override
+    @CacheEvict(value = WORKFLOW_TEST_NODE_OUTPUT_CACHE)
+    @WorkflowCacheEvict(cacheNames = {
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
+    })
+    public void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
+        workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName)
+            .ifPresent(workflowNodeTestOutputRepository::delete);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     @Cacheable(value = WORKFLOW_TEST_NODE_OUTPUT_CACHE)
-    public Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(
-        String workflowId, String workflowNodeName) {
-
+    public Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(String workflowId, String workflowNodeName) {
         return workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName);
     }
 
