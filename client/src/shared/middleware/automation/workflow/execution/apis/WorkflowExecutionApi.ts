@@ -33,6 +33,7 @@ export interface GetWorkflowExecutionRequest {
 }
 
 export interface GetWorkflowExecutionsPageRequest {
+    embedded?: boolean;
     environment?: Environment;
     jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
     jobStartDate?: Date;
@@ -89,6 +90,10 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      */
     async getWorkflowExecutionsPageRaw(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
         const queryParameters: any = {};
+
+        if (requestParameters['embedded'] != null) {
+            queryParameters['embedded'] = requestParameters['embedded'];
+        }
 
         if (requestParameters['environment'] != null) {
             queryParameters['environment'] = requestParameters['environment'];
