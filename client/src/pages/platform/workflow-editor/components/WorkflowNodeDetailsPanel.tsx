@@ -22,6 +22,7 @@ import {
     WorkflowNodeOutput,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
+import {useDeleteWorkflowNodeTestOutputMutation} from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {
     ClusterElementDefinitionKeys,
@@ -35,6 +36,7 @@ import {
 } from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
@@ -157,6 +159,14 @@ const WorkflowNodeDetailsPanel = ({
         },
         isClusterElement
     );
+
+    const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflow.id],
+            });
+        },
+    });
 
     const {nodeNames} = workflow;
 
@@ -367,6 +377,11 @@ const WorkflowNodeDetailsPanel = ({
                 return;
             }
 
+            await deleteWorkflowNodeTestOutputMutation.mutateAsync({
+                id: workflow.id!,
+                workflowNodeName: currentNode!.name,
+            });
+
             queryClient.invalidateQueries({
                 queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
             });
@@ -507,6 +522,7 @@ const WorkflowNodeDetailsPanel = ({
             currentComponent,
             queryClient,
             currentNode,
+            deleteWorkflowNodeTestOutputMutation,
             invalidateWorkflowQueries,
             clusterElementsCanvasOpen,
             isClusterElement,
@@ -515,6 +531,7 @@ const WorkflowNodeDetailsPanel = ({
             currentOperationProperties,
             setCurrentComponent,
             setCurrentNode,
+            workflow.id,
         ]
     );
 
