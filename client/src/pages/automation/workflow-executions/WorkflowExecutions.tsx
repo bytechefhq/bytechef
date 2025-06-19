@@ -21,13 +21,23 @@ import {
 } from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
-import {useGetWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
+import {useGetProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
 import WorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
+
+function getEnvironment(filterEnvironment: number) {
+    return filterEnvironment === 0
+        ? undefined
+        : filterEnvironment === 1
+          ? Environment.Development
+          : filterEnvironment === 2
+            ? Environment.Development
+            : Environment.Production;
+}
 
 const jobStatusOptions = [
     {
@@ -96,14 +106,7 @@ export const WorkflowExecutions = () => {
     );
 
     const {data: projectDeployments} = useGetWorkspaceProjectDeploymentsQuery({
-        environment:
-            filterEnvironment === 0
-                ? undefined
-                : filterEnvironment === 1
-                  ? Environment.Development
-                  : filterEnvironment === 2
-                    ? Environment.Development
-                    : Environment.Production,
+        environment: getEnvironment(filterEnvironment),
         id: currentWorkspaceId!,
         includeAllFields: false,
         projectId: filterProjectId,
@@ -115,15 +118,8 @@ export const WorkflowExecutions = () => {
         data: workflowExecutionPage,
         error: workflowExecutionsError,
         isLoading: workflowExecutionsIsLoading,
-    } = useGetWorkflowExecutionsQuery({
-        environment:
-            filterEnvironment === 0
-                ? undefined
-                : filterEnvironment === 1
-                  ? Environment.Development
-                  : filterEnvironment === 2
-                    ? Environment.Development
-                    : Environment.Production,
+    } = useGetProjectWorkflowExecutionsQuery({
+        environment: getEnvironment(filterEnvironment),
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
