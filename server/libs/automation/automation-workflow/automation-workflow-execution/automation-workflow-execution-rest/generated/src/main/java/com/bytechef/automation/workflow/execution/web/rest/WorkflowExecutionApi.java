@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T06:40:04.975862+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-20T09:14:25.665741+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "workflow-execution", description = "The Automation Workflow Execution Internal API")
 public interface WorkflowExecutionApi {
@@ -89,6 +89,7 @@ public interface WorkflowExecutionApi {
      * GET /workflow-executions : Get project workflow executions
      * Get project workflow executions.
      *
+     * @param embedded If embedded automation workflows executions should be filtered. (optional)
      * @param environment The environment. (optional)
      * @param jobStatus The status of an executed job (optional)
      * @param jobStartDate The start date of a job. (optional)
@@ -117,6 +118,7 @@ public interface WorkflowExecutionApi {
     )
     
     default ResponseEntity<org.springframework.data.domain.Page> getWorkflowExecutionsPage(
+        @Parameter(name = "embedded", description = "If embedded automation workflows executions should be filtered.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "embedded", required = false) Boolean embedded,
         @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) com.bytechef.automation.configuration.web.rest.model.EnvironmentModel environment,
         @Parameter(name = "jobStatus", description = "The status of an executed job", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStatus", required = false) String jobStatus,
         @Parameter(name = "jobStartDate", description = "The start date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStartDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime jobStartDate,
