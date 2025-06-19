@@ -1,3 +1,4 @@
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -29,7 +30,6 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 import {Link, useSearchParams} from 'react-router-dom';
 
 const IntegrationWorkflowListItem = ({
@@ -99,7 +99,7 @@ const IntegrationWorkflowListItem = ({
                             <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <InlineSVG
+                                        <LazyLoadSVG
                                             className="size-5 flex-none"
                                             key={name}
                                             src={

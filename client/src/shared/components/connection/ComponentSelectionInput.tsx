@@ -1,9 +1,9 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {FormControl, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {ComponentDefinition, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ControllerRenderProps} from 'react-hook-form';
-import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 import {ConnectionDialogFormProps} from './ConnectionDialog';
@@ -40,7 +40,7 @@ const ComponentSelectionInput = ({
                     {selectedComponentDefinition?.icon ? (
                         <div className="relative">
                             <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md px-3">
-                                <InlineSVG className="size-4" src={selectedComponentDefinition.icon} />
+                                <LazyLoadSVG className="size-4" src={selectedComponentDefinition.icon} />
                             </span>
 
                             <Input

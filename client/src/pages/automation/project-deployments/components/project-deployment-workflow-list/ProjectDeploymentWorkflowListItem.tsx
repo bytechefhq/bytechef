@@ -1,3 +1,4 @@
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
@@ -20,7 +21,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
 import {useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 const projectDeploymentApi = new ProjectDeploymentApi();
@@ -128,10 +128,10 @@ const ProjectDeploymentWorkflowListItem = ({
                             <div className="flex items-center justify-center rounded-full border-2 p-1" key={name}>
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <InlineSVG
+                                        <LazyLoadSVG
                                             className="size-5"
                                             key={name}
-                                            loader={<Component1Icon className="size-5 flex-none text-gray-900" />}
+                                            preloader={<Component1Icon className="size-5 flex-none text-gray-900" />}
                                             src={
                                                 componentDefinition?.icon
                                                     ? componentDefinition?.icon

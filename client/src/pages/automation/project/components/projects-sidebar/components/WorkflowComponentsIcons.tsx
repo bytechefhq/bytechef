@@ -1,7 +1,7 @@
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import InlineSVG from 'react-inlinesvg';
 
 interface WorkflowComponentsIconsProps {
     workflowComponentDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
@@ -26,7 +26,7 @@ const WorkflowComponentsIcons = ({
             <Tooltip>
                 <TooltipTrigger asChild>
                     {componentDefinition?.icon || taskDispatcherDefinition?.icon ? (
-                        <InlineSVG
+                        <LazyLoadSVG
                             className="size-5 flex-none"
                             src={componentDefinition?.icon || taskDispatcherDefinition?.icon || ''}
                         />

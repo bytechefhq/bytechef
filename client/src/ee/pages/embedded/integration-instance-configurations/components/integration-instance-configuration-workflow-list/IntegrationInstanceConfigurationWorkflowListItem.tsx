@@ -1,3 +1,4 @@
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -10,7 +11,6 @@ import {useEnableIntegrationInstanceConfigurationWorkflowMutation} from '@/share
 import {IntegrationInstanceConfigurationKeys} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 const IntegrationInstanceConfigurationWorkflowListItem = ({
@@ -92,7 +92,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                             <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <InlineSVG
+                                        <LazyLoadSVG
                                             className="size-5 flex-none"
                                             key={name}
                                             src={

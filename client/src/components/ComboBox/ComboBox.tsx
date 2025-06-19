@@ -1,3 +1,4 @@
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Button} from '@/components/ui/button';
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {Popover, PopoverTrigger} from '@/components/ui/popover';
@@ -5,7 +6,6 @@ import {cn} from '@/shared/util/cn-utils';
 import {CaretSortIcon, CheckIcon} from '@radix-ui/react-icons';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import {FocusEventHandler, ReactNode, useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 
 export type ComboBoxItemType = {
     icon?: string;
@@ -50,7 +50,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
             }}
             value={comboBoxItem.value}
         >
-            {comboBoxItem.icon && <InlineSVG className="mr-2 size-6 flex-none" src={comboBoxItem.icon} />}
+            {comboBoxItem.icon && <LazyLoadSVG className="mr-2 size-6 flex-none" src={comboBoxItem.icon} />}
 
             {comboBoxItem.label}
 
@@ -73,7 +73,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                 >
                     {value ? (
                         <span className="flex w-full items-center">
-                            {item?.icon && <InlineSVG className="mr-2 size-6 flex-none" src={item?.icon} />}
+                            {item?.icon && <LazyLoadSVG className="mr-2 size-6 flex-none" src={item?.icon} />}
 
                             {item?.label}
                         </span>

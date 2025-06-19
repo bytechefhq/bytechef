@@ -1,3 +1,4 @@
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -35,7 +36,6 @@ import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 
 import TagList from '../../../../../components/TagList';
 
@@ -89,6 +89,10 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
         }
     };
 
+    if (!componentDefinition) {
+        return <></>;
+    }
+
     return (
         <li key={connection.id}>
             <>
@@ -97,11 +101,11 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                         <div className="flex-1">
                             <div className="flex items-center justify-between">
                                 <div className="relative flex items-center gap-2">
-                                    {componentDefinition?.icon && (
-                                        <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
-                                    )}
-
-                                    {!componentDefinition?.icon && <Component1Icon className="mr-1 size-5 flex-none" />}
+                                    <LazyLoadSVG
+                                        className="size-5 flex-none"
+                                        preloader={<Component1Icon />}
+                                        src={componentDefinition.icon!}
+                                    />
 
                                     <span className="text-base font-semibold">{connection.name}</span>
                                 </div>

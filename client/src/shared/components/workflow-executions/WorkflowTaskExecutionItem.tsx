@@ -1,6 +1,6 @@
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {TaskExecution} from '@/shared/middleware/platform/workflow/execution';
-import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 const WorkflowTaskExecutionItem = ({
@@ -28,7 +28,7 @@ const WorkflowTaskExecutionItem = ({
                 <WorkflowExecutionBadge status={taskExecution.status} />
 
                 <div className="flex items-center gap-x-1">
-                    {icon && <InlineSVG className="size-4" src={icon} />}
+                    {icon && <LazyLoadSVG className="size-4" src={icon} />}
 
                     <div className="flex flex-col">
                         <span>{title}</span>
