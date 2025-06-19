@@ -16,7 +16,7 @@
 
 @NonNullApi
 @NonNullFields
-package com.bytechef.platform.ai.facade;
+package com.bytechef.platform.ai;
 
 import org.springframework.lang.NonNullApi;
 import org.springframework.lang.NonNullFields;
