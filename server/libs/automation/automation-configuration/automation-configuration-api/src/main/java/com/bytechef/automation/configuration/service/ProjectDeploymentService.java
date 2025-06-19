@@ -38,8 +38,6 @@ public interface ProjectDeploymentService {
 
     long getProjectDeploymentId(long projectId, Environment environment);
 
-    List<Long> getProjectDeploymentProjectIds();
-
     List<ProjectDeployment> getProjectDeployments();
 
     List<ProjectDeployment> getProjectDeployments(long projectId);

@@ -97,7 +97,10 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public List<Project> getProjects(Long workspaceId, List<Long> ids, Long categoryId, Long tagId, Status status) {
+    public List<Project> getProjects(
+        Boolean apiCollections, Long categoryId, Boolean projectDeployments, Long tagId,
+        Status status, Long workspaceId) {
+
         throw new UnsupportedOperationException();
     }
 

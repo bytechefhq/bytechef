@@ -37,19 +37,44 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
 
     @Override
     public List<Project> findAllProjects(
-        Long workspaceId, Long categoryId, List<Long> ids, Long tagId, Integer status) {
+        Boolean apiCollections, Long categoryId, Boolean projectDeployments, Long tagId, Integer status,
+        Long workspaceId) {
 
         List<Object> arguments = new ArrayList<>();
-        String query = "SELECT DISTINCT project.*, LOWER(name) AS lower_name FROM project ";
+        String query = "SELECT DISTINCT project.*, LOWER(project.name) AS lower_name FROM project ";
 
-        query += "JOIN project_version ON project.id = project_version.project_id ";
+        if (apiCollections != null) {
+            query += """
+                JOIN project_version ON project.id = project_version.project_id
+                JOIN project_workflow ON project.id = project_workflow.project_id
+                JOIN workflow ON project_workflow.workflow_id = workflow.id
+                """;
+        }
+
+        if (projectDeployments != null && projectDeployments) {
+            query += "JOIN project_deployment ON project.id = project_deployment.project_id ";
+        }
 
         if (tagId != null) {
             query += "JOIN project_tag ON project.id = project_tag.project_id ";
         }
 
-        if (workspaceId != null || categoryId != null || !ids.isEmpty() || tagId != null || status != null) {
-            query += "WHERE ";
+        query += "WHERE project.name NOT LIKE '__EMBEDDED__%' ";
+
+        if (apiCollections != null) {
+            if (apiCollections) {
+                query += "AND workflow.definition LIKE '%newApiRequest%' ";
+            } else {
+                query += "AND workflow.definition NOT LIKE '%newApiRequest%' ";
+            }
+        }
+
+        if (projectDeployments != null && !projectDeployments) {
+            query += "AND project.id NOT IN (SELECT project_deployment.project_id FROM project_deployment) ";
+        }
+
+        if (workspaceId != null || categoryId != null || tagId != null || status != null) {
+            query += "AND ";
         }
 
         if (workspaceId != null) {
@@ -68,30 +93,10 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
             query += "category_id = ? ";
         }
 
-        if (!ids.isEmpty()) {
-            arguments.addAll(ids);
-
-            if (workspaceId != null || categoryId != null) {
-                query += "AND ";
-            }
-
-            StringBuilder idsString = new StringBuilder();
-
-            for (int i = 0; i < ids.size(); i++) {
-                idsString.append("?");
-
-                if (i < ids.size() - 1) {
-                    idsString.append(",");
-                }
-            }
-
-            query += "project.id in (%s) ".formatted(idsString.toString());
-        }
-
         if (tagId != null) {
             arguments.add(tagId);
 
-            if (workspaceId != null || categoryId != null || !ids.isEmpty()) {
+            if (workspaceId != null || categoryId != null) {
                 query += "AND ";
             }
 
@@ -101,7 +106,7 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
         if (status != null) {
             arguments.add(status);
 
-            if (workspaceId != null || categoryId != null || !ids.isEmpty() || tagId != null) {
+            if (workspaceId != null || categoryId != null || tagId != null) {
                 query += "AND ";
             }
 
@@ -142,8 +147,5 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
     }
 
     private record ProjectVersion(int version, int status, Instant publishedDate, String description) {
-    }
-
-    private record ProjectWorkflow(String workflow_id, int project_version) {
     }
 }

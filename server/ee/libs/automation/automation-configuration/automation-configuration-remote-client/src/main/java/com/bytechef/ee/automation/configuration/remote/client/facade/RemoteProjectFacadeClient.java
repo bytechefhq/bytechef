@@ -96,14 +96,14 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public List<ProjectDTO> getProjects(Long categoryId, boolean projectDeployments, Long tagId, Status status) {
+    public List<ProjectDTO> getProjects(Long categoryId, Boolean projectDeployments, Long tagId, Status status) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<ProjectDTO> getWorkspaceProjects(
-        long workspaceId, boolean projectDeployments, Long categoryId, Long tagId,
-        Status status, List<Long> projectIds, boolean includeAllFields) {
+        Boolean apiCollections, Long categoryId, boolean includeAllFields, Boolean projectDeployments, Status status,
+        Long tagId, long workspaceId) {
 
         throw new UnsupportedOperationException();
     }

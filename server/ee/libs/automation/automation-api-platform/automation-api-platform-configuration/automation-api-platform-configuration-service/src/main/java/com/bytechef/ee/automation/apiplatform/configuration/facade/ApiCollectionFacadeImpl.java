@@ -246,6 +246,11 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    public List<Project> getWorkspaceProjects(long workspaceId) {
+        return projectService.getProjects(apiCollectionService.getApiCollectionProjectIds(workspaceId));
+    }
+
+    @Override
     public ApiCollectionDTO updateApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
 

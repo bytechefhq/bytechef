@@ -216,7 +216,7 @@ public class ProjectFacadeIntTest {
         testProjectDTOs.add(projectFacadeInstanceHelper.createProject(workspace.getId()));
         testProjectDTOs.add(projectFacadeInstanceHelper.createProject(workspace.getId()));
 
-        List<ProjectDTO> projectsDTOs = projectFacade.getProjects(null, false, null, null);
+        List<ProjectDTO> projectsDTOs = projectFacade.getProjects(null, null, null, null);
 
         assertThat(projectsDTOs).hasSize(testProjectDTOs.size());
 
@@ -226,7 +226,7 @@ public class ProjectFacadeIntTest {
 
         Category category = projectDTO.category();
 
-        projectsDTOs = projectFacade.getProjects(category.getId(), false, null, null);
+        projectsDTOs = projectFacade.getProjects(category.getId(), null, null, null);
 
         assertThat(projectsDTOs).hasSize(1);
 
