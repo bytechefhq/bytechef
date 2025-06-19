@@ -304,7 +304,9 @@ const OutputTab = ({
                                     <div className="self-center">Define Output Schema</div>
 
                                     <p className="text-sm text-muted-foreground">
-                                        Define the expected output schema with one of the methods
+                                        {!variablePropertiesDefined
+                                            ? 'Define the expected output schema with one of the methods'
+                                            : 'Define the expected output schema by uploading sample data'}
                                     </p>
                                 </div>
 
