@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.ai.facade;
+package com.bytechef.platform.ai.workflow;
 
 import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
@@ -44,27 +44,27 @@ import org.springframework.util.Assert;
  * <p>
  * This implementation allows for dynamic routing based on content classification, with each route having its own
  * specialized prompt optimized for specific types of input.
- *
  * <p/>
+ *
  * Implementation uses the
  * <a href= "https://docs.spring.io/spring-ai/reference/1.0/api/structured-output-converter.html">Spring AI Structure
  * Output</a> to convert the chat client response into a structured {@link RoutingResponse} object.
  *
- * @author Christian Tzolov
  * @see org.springframework.ai.chat.client.ChatClient
  * @see <a href= "https://docs.spring.io/spring-ai/reference/1.0/api/chatclient.html">Spring AI ChatClient</a>
  * @see <a href= "https://www.anthropic.com/research/building-effective-agents">Building Effective Agents</a>
  * @see <a href= "https://docs.spring.io/spring-ai/reference/1.0/api/structured-output-converter.html">Spring AI
  *      Structure Output</a>
  *
+ * @author Christian Tzolov
+ * @author Marko Kriskovic
  */
 public class RoutingWorkflow {
 
-    private final ChatClient chatClient;
-
-    public static final String DEFAULT_ROUTER_PROMPT =
+    private static final String DEFAULT_ROUTER_PROMPT =
         """
-            Analyze the input content and determine the most appropriate route based on content classification. The classification process considers key terms, context and patterns in the input to select the optimal route.
+            Analyze the input content and determine the most appropriate route based on content classification.
+            The classification process considers key terms, context and patterns in the input to select the optimal route.
 
             Input:
             {input}
@@ -77,29 +77,12 @@ public class RoutingWorkflow {
                 "reasoning": "The reasoning behind the route selection, explaining why this particular route was chosen based on the input analysis.",
                 "selection": "The chosen category"
             \\}
-
             """;
+
+    private final ChatClient chatClient;
 
     public RoutingWorkflow(ChatClient chatClient) {
         this.chatClient = chatClient;
-    }
-
-    /**
-     * Record representing the response from the routing classification process.
-     *
-     * <p>
-     * This record is used by the {@link RoutingWorkflow} to capture and communicate routing decisions made by the LLM
-     * classifier.
-     *
-     * @param reasoning A detailed explanation of why a particular route was chosen, considering factors like key terms,
-     *                  user intent, and urgency level
-     * @param selection The name of the selected route that will handle the input
-     *
-     *
-     * @author Christian Tzolov
-     * @see RoutingWorkflow
-     */
-    record RoutingResponse(String reasoning, String selection) {
     }
 
     /**
@@ -163,5 +146,19 @@ public class RoutingWorkflow {
         Assert.notNull(routingResponse, "Router response must not be null");
 
         return routingResponse.selection();
+    }
+
+    /**
+     * Record representing the response from the routing classification process.
+     *
+     * <p>
+     * This record is used by the {@link RoutingWorkflow} to capture and communicate routing decisions made by the LLM
+     * classifier.
+     *
+     * @param reasoning A detailed explanation of why a particular route was chosen, considering factors like key terms,
+     *                  user intent, and urgency level
+     * @param selection The name of the selected route that will handle the input
+     */
+    private record RoutingResponse(String reasoning, String selection) {
     }
 }

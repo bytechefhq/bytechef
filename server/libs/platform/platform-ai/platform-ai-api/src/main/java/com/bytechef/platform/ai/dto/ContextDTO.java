@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.ai.facade;
+package com.bytechef.platform.ai.dto;
 
-import com.bytechef.platform.ai.facade.dto.ContextDTO;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import reactor.core.publisher.Flux;
 
 /**
  * @author Ivica Cardic
  */
-public interface AiCopilotFacade {
+@SuppressFBWarnings("EI")
+public record ContextDTO(Source source, Map<String, ?> parameters, String workflowId) {
 
-    Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId);
+    public enum Source {
+        WORKFLOW_EDITOR,
+        WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU,
+        CODE_EDITOR
+    }
 }
