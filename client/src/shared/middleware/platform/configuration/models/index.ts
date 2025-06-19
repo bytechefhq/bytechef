@@ -40,6 +40,7 @@ export * from './OAuth2Properties';
 export * from './ObjectProperty';
 export * from './Option';
 export * from './OptionsDataSource';
+export * from './OutputResponse';
 export * from './PropertiesDataSource';
 export * from './Property';
 export * from './PropertyType';
