@@ -59,11 +59,11 @@ public interface ProjectFacade {
     List<ProjectWorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion, boolean includeAllFields);
 
     List<ProjectDTO> getProjects(
-        @Nullable Long categoryId, boolean projectDeployments, @Nullable Long tagId, @Nullable Status status);
+        @Nullable Long categoryId, @Nullable Boolean projectDeployments, @Nullable Long tagId, @Nullable Status status);
 
     List<ProjectDTO> getWorkspaceProjects(
-        long workspaceId, boolean projectDeployments, @Nullable Long categoryId, @Nullable Long tagId,
-        @Nullable Status status, List<Long> projectIds, boolean includeAllFields, Boolean includeApiCollections);
+        Boolean apiCollections, @Nullable Long categoryId, boolean includeAllFields, Boolean projectDeployments,
+        @Nullable Status status, @Nullable Long tagId, long workspaceId);
 
     int publishProject(long id, @Nullable String description, boolean syncWithGit);
 

@@ -293,7 +293,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             ConnectedUser connectedUser = connectedUserService.getConnectedUser(
                 connectedUserProject.getConnectedUserId());
 
-            projectDeployment.setName("EMBEDDED_" + connectedUser.getExternalId());
+            projectDeployment.setName("__EMBEDDED__" + connectedUser.getExternalId());
 
             projectDeployment.setProjectId(connectedUserProject.getProjectId());
             projectDeployment.setProjectVersion(1);
@@ -329,7 +329,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .orElseGet(() -> {
                 Project project = new Project();
 
-                project.setName("EMBEDDED_" + externalUserId);
+                project.setName("__EMBEDDED__" + externalUserId);
                 project.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
 
                 project = projectService.create(project);

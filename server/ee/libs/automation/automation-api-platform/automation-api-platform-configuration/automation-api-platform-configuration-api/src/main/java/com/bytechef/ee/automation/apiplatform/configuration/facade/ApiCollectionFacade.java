@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.facade;
 
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
 import com.bytechef.platform.constant.Environment;
@@ -34,9 +35,12 @@ public interface ApiCollectionFacade {
 
     String getOpenApiSpecification(long id);
 
+    List<Project> getWorkspaceProjects(long workspaceId);
+
     ApiCollectionDTO updateApiCollection(ApiCollectionDTO apiCollectionDTO);
 
     void updateApiCollectionTags(long id, List<Tag> tags);
 
     ApiCollectionEndpointDTO updateApiCollectionEndpoint(ApiCollectionEndpointDTO apiCollectionEndpointDTO);
+
 }

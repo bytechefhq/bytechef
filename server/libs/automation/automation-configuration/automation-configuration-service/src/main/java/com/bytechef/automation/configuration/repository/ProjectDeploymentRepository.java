@@ -32,12 +32,5 @@ public interface ProjectDeploymentRepository
     extends ListPagingAndSortingRepository<ProjectDeployment, Long>, CrudRepository<ProjectDeployment, Long>,
     CustomProjectDeploymentRepository {
 
-    // TODO get rid of api_collection and connected_user_project in this query, find another way to filter out records
-    @Query("""
-        SELECT project_deployment.project_id FROM project_deployment
-        WHERE project_deployment.id NOT IN (SELECT api_collection.project_deployment_id FROM api_collection)
-        AND project_deployment.project_id NOT IN (SELECT project.id FROM project JOIN connected_user_project ON connected_user_project.project_id = project.id)""")
-    List<Long> findAllProjectDeploymentProjectIds();
-
     Optional<ProjectDeployment> findByProjectIdAndEnvironment(long projectId, int environment);
 }

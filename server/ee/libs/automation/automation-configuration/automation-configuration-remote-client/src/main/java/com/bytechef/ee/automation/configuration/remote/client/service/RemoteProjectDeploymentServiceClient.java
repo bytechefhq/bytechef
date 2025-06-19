@@ -75,11 +75,6 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     }
 
     @Override
-    public List<Long> getProjectDeploymentProjectIds() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<ProjectDeployment> getProjectDeployments() {
         throw new UnsupportedOperationException();
     }

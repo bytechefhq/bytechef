@@ -47,8 +47,8 @@ public interface ProjectService {
     List<Project> getProjects(List<Long> ids);
 
     List<Project> getProjects(
-        @Nullable Long workspaceId, List<Long> ids, @Nullable Long categoryId, @Nullable Long tagId,
-        @Nullable Status status);
+        @Nullable Boolean apiCollections, @Nullable Long categoryId, Boolean projectDeployments,
+        @Nullable Long tagId, @Nullable Status status, @Nullable Long workspaceId);
 
     Project getWorkflowProject(String workflowId);
 

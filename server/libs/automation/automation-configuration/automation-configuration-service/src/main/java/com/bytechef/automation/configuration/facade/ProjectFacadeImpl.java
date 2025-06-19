@@ -326,17 +326,18 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectDTO> getProjects(Long categoryId, boolean projectDeployments, Long tagId, Status status) {
-        return getProjects(null, projectDeployments, categoryId, tagId, status, List.of(), true);
+    public List<ProjectDTO> getProjects(Long categoryId, Boolean projectDeployments, Long tagId, Status status) {
+        return getProjects(null, categoryId, tagId, projectDeployments, status, true, null);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDTO> getWorkspaceProjects(
-        long workspaceId, boolean projectDeployments, Long categoryId, Long tagId,
-        Status status, List<Long> projectIds, boolean includeAllFields) {
+        Boolean apiCollections, Long categoryId, boolean includeAllFields, Boolean projectDeployments, Status status,
+        Long tagId, long workspaceId) {
 
-        return getProjects(workspaceId, projectDeployments, categoryId, tagId, status, projectIds, includeAllFields);
+        return getProjects(
+            apiCollections, categoryId, tagId, projectDeployments, status, includeAllFields, workspaceId);
     }
 
     @Override
@@ -443,16 +444,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private List<ProjectDTO> getProjects(
-        Long workspaceId, boolean projectDeployments, Long categoryId, Long tagId, Status status, List<Long> projectIds,
-        boolean includeAllFields) {
+        Boolean apiCollections, Long categoryId, Long tagId, Boolean projectDeployments, Status status,
+        boolean includeAllFields, Long workspaceId) {
 
-        projectIds = new ArrayList<>(projectIds);
-
-        if (projectDeployments) {
-            projectIds.addAll(projectDeploymentService.getProjectDeploymentProjectIds());
-        }
-
-        List<Project> projects = projectService.getProjects(workspaceId, projectIds, categoryId, tagId, status);
+        List<Project> projects = projectService.getProjects(
+            apiCollections, categoryId, projectDeployments, tagId, status, workspaceId);
 
         if (includeAllFields) {
             return CollectionUtils.map(
