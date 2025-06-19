@@ -2,7 +2,7 @@ import {Input} from '@/components/ui/input';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import DataPillPanelBody, {
-    ComponentOperationType,
+    OperationType,
 } from '@/pages/platform/workflow-editor/components/datapills/DataPillPanelBody';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
@@ -83,7 +83,7 @@ const DataPillPanel = ({
         );
     });
 
-    const componentOperations = validWorkflowNodeOutputs.map((workflowNodeOutput) => {
+    const operations = validWorkflowNodeOutputs.map((workflowNodeOutput) => {
         const {actionDefinition, triggerDefinition} = workflowNodeOutput;
 
         const componentDefinition = previousComponentDefinitions?.find(
@@ -99,7 +99,7 @@ const DataPillPanel = ({
             sampleOutput: workflowNodeOutput.sampleOutput,
             taskDispatcherDefinition: workflowNodeOutput.taskDispatcherDefinition,
             workflowNodeName: workflowNodeOutput.workflowNodeName,
-        } as ComponentOperationType;
+        } as OperationType;
     });
 
     useEffect(() => {
@@ -114,7 +114,7 @@ const DataPillPanel = ({
     }
 
     const hasAvailableDataPills =
-        (componentOperations && componentOperations.length > 0) || (workflow.inputs && workflow.inputs.length > 0);
+        (operations && operations.length > 0) || (workflow.inputs && workflow.inputs.length > 0);
 
     return (
         <div
@@ -164,8 +164,8 @@ const DataPillPanel = ({
                     {!currentNode?.trigger && isLoading && <LoadingSkeleton />}
 
                     <DataPillPanelBody
-                        componentOperations={componentOperations}
                         dataPillFilterQuery={dataPillFilterQuery}
+                        operations={operations}
                         workflowInputs={workflow.inputs}
                     />
                 </main>
