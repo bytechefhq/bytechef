@@ -2310,6 +2310,18 @@ components:
           type: "array"
           items:
             type: "string"
+    OutputResponse:
+      description: "The output response"
+      type: "object"
+      properties:
+        outputSchema:
+          $ref: "#/components/schemas/Property"
+        placeholder:
+          description: "The placeholder of an output."
+          type: "object"
+        sampleOutput:
+          description: "The sample value of an output."
+          type: "object"
     PropertiesDataSource:
       description: "Defines function that should load properties."
       type: "object"
@@ -2881,20 +2893,16 @@ components:
         - outputSchema
         - workflowNodeName
       properties:
-        outputSchema:
-          $ref: "#/components/schemas/Property"
-        sampleOutput:
-          description: "The sample value of an output."
-          type: "object"
-        placeholder:
-          description: "The placeholder of an output."
-          type: "object"
         actionDefinition:
           $ref: '#/components/schemas/ActionDefinitionBasic'
+        outputResponse:
+          $ref: "#/components/schemas/OutputResponse"
         taskDispatcherDefinition:
           $ref: '#/components/schemas/TaskDispatcherDefinitionBasic'
         triggerDefinition:
           $ref: '#/components/schemas/TriggerDefinitionBasic'
+        variableOutputResponse:
+          $ref: "#/components/schemas/OutputResponse"
         workflowNodeName:
           description: The workflow node name
           type: "string"
