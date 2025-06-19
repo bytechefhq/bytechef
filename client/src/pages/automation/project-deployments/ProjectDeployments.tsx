@@ -43,6 +43,7 @@ const ProjectDeployments = () => {
         error: projectsError,
         isLoading: projectsIsLoading,
     } = useGetWorkspaceProjectsQuery({
+        apiCollections: false,
         id: currentWorkspaceId!,
         includeAllFields: false,
         projectDeployments: true,

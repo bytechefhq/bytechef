@@ -4,7 +4,6 @@ import {Button} from '@/components/ui/button';
 import ApiPlatformLeftSidebarNav from '@/ee/pages/automation/api-platform/ApiPlatformLeftSidebarNav';
 import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialog';
 import ApiCollectionsFilterTitle from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionsFilterTitle';
-import {useGetWorkspaceApiCollectionProjectsQuery} from '@/ee/queries/apiCollectionProjects.queries';
 import {useGetApiCollectionTagsQuery} from '@/ee/queries/apiCollectionTags.queries';
 import {useGetApiCollectionsQuery} from '@/ee/queries/apiCollections.queries';
 import {Environment} from '@/ee/shared/middleware/automation/api-platform';
@@ -14,6 +13,7 @@ import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {Link2Icon} from 'lucide-react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 
@@ -49,8 +49,11 @@ const ApiCollections = () => {
         data: projects,
         error: projectsError,
         isLoading: projectsIsLoading,
-    } = useGetWorkspaceApiCollectionProjectsQuery({
+    } = useGetWorkspaceProjectsQuery({
+        apiCollections: true,
         id: currentWorkspaceId!,
+        includeAllFields: false,
+        projectDeployments: true,
     });
 
     const {

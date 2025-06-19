@@ -43,6 +43,7 @@ const ProjectDeploymentDialogBasicStep = ({
 
                             <FormControl>
                                 <ProjectDeploymentDialogBasicStepProjectsComboBox
+                                    apiCollections={false}
                                     onBlur={field.onBlur}
                                     onChange={(item) => {
                                         if (item) {
