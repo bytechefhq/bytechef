@@ -27,7 +27,6 @@ import {
 import {ProjectGitConfigurationKeys} from '@/ee/queries/projectGit.queries';
 import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import {useToast} from '@/hooks/use-toast';
-import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
@@ -42,7 +41,7 @@ import {ProjectTagKeys} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {ChevronDownIcon, RocketIcon} from '@radix-ui/react-icons';
+import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     CopyIcon,
@@ -270,21 +269,21 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             <span>PUBLISHED</span>
                                         </Badge>
 
-                                        <ProjectDeploymentDialog
-                                            projectDeployment={{
-                                                name: project.name,
-                                                projectId: project.id,
-                                            }}
-                                            triggerNode={
-                                                <Button
-                                                    className="hover:bg-surface-neutral-primary-hover"
-                                                    size="sm"
-                                                    variant="ghost"
-                                                >
-                                                    <RocketIcon /> Deploy
-                                                </Button>
-                                            }
-                                        />
+                                        {/*<ProjectDeploymentDialog*/}
+                                        {/*    projectDeployment={{*/}
+                                        {/*        name: project.name,*/}
+                                        {/*        projectId: project.id,*/}
+                                        {/*    }}*/}
+                                        {/*    triggerNode={*/}
+                                        {/*        <Button*/}
+                                        {/*            className="hover:bg-surface-neutral-primary-hover"*/}
+                                        {/*            size="sm"*/}
+                                        {/*            variant="ghost"*/}
+                                        {/*        >*/}
+                                        {/*            <RocketIcon /> Deploy*/}
+                                        {/*        </Button>*/}
+                                        {/*    }*/}
+                                        {/*/>*/}
                                     </>
                                 ) : (
                                     <Badge className="flex space-x-1" variant="secondary">
