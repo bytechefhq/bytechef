@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.workflow.execution.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
-import com.bytechef.ee.embedded.workflow.execution.facade.WorkflowExecutionFacade;
+import com.bytechef.ee.embedded.workflow.execution.facade.IntegrationWorkflowExecutionFacade;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import com.bytechef.platform.constant.Environment;
@@ -33,21 +33,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkflowExecutionApiController implements WorkflowExecutionApi {
 
     private final ConversionService conversionService;
-    private final WorkflowExecutionFacade workflowExecutionFacade;
+    private final IntegrationWorkflowExecutionFacade integrationWorkflowExecutionFacade;
 
     @SuppressFBWarnings("EI")
     public WorkflowExecutionApiController(
-        ConversionService conversionService, WorkflowExecutionFacade workflowExecutionFacade) {
+        ConversionService conversionService, IntegrationWorkflowExecutionFacade integrationWorkflowExecutionFacade) {
 
         this.conversionService = conversionService;
-        this.workflowExecutionFacade = workflowExecutionFacade;
+        this.integrationWorkflowExecutionFacade = integrationWorkflowExecutionFacade;
     }
 
     @Override
     public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowExecutionFacade.getWorkflowExecution(id), WorkflowExecutionModel.class));
+                integrationWorkflowExecutionFacade.getWorkflowExecution(id), WorkflowExecutionModel.class));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
         Long projectId, Long integrationInstanceConfigurationId, String workflowId, Integer pageNumber) {
 
         return ResponseEntity.ok(
-            workflowExecutionFacade
+            integrationWorkflowExecutionFacade
                 .getWorkflowExecutions(
                     environment == null ? null : Environment.valueOf(environment.name()),
                     jobStatus == null ? null : Status.valueOf(jobStatus),

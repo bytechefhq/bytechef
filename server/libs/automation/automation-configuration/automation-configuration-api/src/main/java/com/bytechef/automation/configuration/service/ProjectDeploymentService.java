@@ -43,7 +43,7 @@ public interface ProjectDeploymentService {
     List<ProjectDeployment> getProjectDeployments(long projectId);
 
     List<ProjectDeployment> getProjectDeployments(
-        Long workspaceId, Environment environment, Long projectId, Long tagId, List<Long> excludeProjectDeploymentIds);
+        Boolean embedded, Environment environment, Long projectId, Long tagId, Long workspaceId);
 
     boolean isProjectDeploymentEnabled(long projectDeploymentId);
 
