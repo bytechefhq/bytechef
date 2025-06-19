@@ -1,0 +1,123 @@
+---
+title: "Gotify"
+description: "A simple server for sending and receiving messages."
+---
+
+A simple server for sending and receiving messages.
+
+
+Categories: Communication
+
+
+Type: gotify/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING | `Application token of the app you created for receiving and sending messages.` | true |
+| baseUri | Base URI | STRING | `Base URI of your Gotify server (e.g. http://localhost:1024).` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Send Message
+Name: sendMessage
+
+`Sends a message to the server.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Message Title | STRING | `The title of the message that will be sent.` | false |
+| message | Message Content | STRING | `The content message that will be sent.` | true |
+| priority | Priority | INTEGER | `The priority of the message. If unset, then the default priority of the application will be used.` | false |
+| extras | Extras | ARRAY <details> <summary> Items </summary> [&#123;STRING\(topNamespace), STRING\(subNamespace), STRING\(extraInfoKey), STRING\(extraInfoValue)&#125;\($extra)] </details> | `The extra data sent along the message.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Message",
+  "name" : "sendMessage",
+  "parameters" : {
+    "title" : "",
+    "message" : "",
+    "priority" : 1,
+    "extras" : [ {
+      "topNamespace" : "",
+      "subNamespace" : "",
+      "extraInfoKey" : "",
+      "extraInfoValue" : ""
+    } ]
+  },
+  "type" : "gotify/v1/sendMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | ID of the message that was sent. |
+| appid | INTEGER | ID of the app that sent the message. |
+| message | STRING | Content of the message that was sent. |
+| title | STRING | Title of the message that was sent. |
+| date | STRING | Date when the message was sent. |
+| extras | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#123;STRING\(extra_info)&#125;\(sub_namespace)&#125;\(top_namespace)&#125; </details> | Extras of the message that was sent. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "appid" : 1,
+  "message" : "",
+  "title" : "",
+  "date" : "",
+  "extras" : {
+    "top_namespace" : {
+      "sub_namespace" : {
+        "extra_info" : ""
+      }
+    }
+  }
+}
+```
+
+
+
+
+<hr />
+
+# Additional instructions
+<hr />
+
