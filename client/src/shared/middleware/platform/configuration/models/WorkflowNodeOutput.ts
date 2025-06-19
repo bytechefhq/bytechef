@@ -20,6 +20,13 @@ import {
     TaskDispatcherDefinitionBasicToJSON,
     TaskDispatcherDefinitionBasicToJSONTyped,
 } from './TaskDispatcherDefinitionBasic';
+import type { OutputResponse } from './OutputResponse';
+import {
+    OutputResponseFromJSON,
+    OutputResponseFromJSONTyped,
+    OutputResponseToJSON,
+    OutputResponseToJSONTyped,
+} from './OutputResponse';
 import type { ActionDefinitionBasic } from './ActionDefinitionBasic';
 import {
     ActionDefinitionBasicFromJSON,
@@ -27,13 +34,6 @@ import {
     ActionDefinitionBasicToJSON,
     ActionDefinitionBasicToJSONTyped,
 } from './ActionDefinitionBasic';
-import type { Property } from './Property';
-import {
-    PropertyFromJSON,
-    PropertyFromJSONTyped,
-    PropertyToJSON,
-    PropertyToJSONTyped,
-} from './Property';
 import type { TriggerDefinitionBasic } from './TriggerDefinitionBasic';
 import {
     TriggerDefinitionBasicFromJSON,
@@ -50,28 +50,16 @@ import {
 export interface WorkflowNodeOutput {
     /**
      * 
-     * @type {Property}
-     * @memberof WorkflowNodeOutput
-     */
-    outputSchema: Property;
-    /**
-     * The sample value of an output.
-     * @type {object}
-     * @memberof WorkflowNodeOutput
-     */
-    sampleOutput?: object;
-    /**
-     * The placeholder of an output.
-     * @type {object}
-     * @memberof WorkflowNodeOutput
-     */
-    placeholder?: object;
-    /**
-     * 
      * @type {ActionDefinitionBasic}
      * @memberof WorkflowNodeOutput
      */
     actionDefinition?: ActionDefinitionBasic;
+    /**
+     * 
+     * @type {OutputResponse}
+     * @memberof WorkflowNodeOutput
+     */
+    outputResponse?: OutputResponse;
     /**
      * 
      * @type {TaskDispatcherDefinitionBasic}
@@ -85,6 +73,12 @@ export interface WorkflowNodeOutput {
      */
     triggerDefinition?: TriggerDefinitionBasic;
     /**
+     * 
+     * @type {OutputResponse}
+     * @memberof WorkflowNodeOutput
+     */
+    variableOutputResponse?: OutputResponse;
+    /**
      * The workflow node name
      * @type {string}
      * @memberof WorkflowNodeOutput
@@ -96,7 +90,6 @@ export interface WorkflowNodeOutput {
  * Check if a given object implements the WorkflowNodeOutput interface.
  */
 export function instanceOfWorkflowNodeOutput(value: object): value is WorkflowNodeOutput {
-    if (!('outputSchema' in value) || value['outputSchema'] === undefined) return false;
     if (!('workflowNodeName' in value) || value['workflowNodeName'] === undefined) return false;
     return true;
 }
@@ -111,12 +104,11 @@ export function WorkflowNodeOutputFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'outputSchema': PropertyFromJSON(json['outputSchema']),
-        'sampleOutput': json['sampleOutput'] == null ? undefined : json['sampleOutput'],
-        'placeholder': json['placeholder'] == null ? undefined : json['placeholder'],
         'actionDefinition': json['actionDefinition'] == null ? undefined : ActionDefinitionBasicFromJSON(json['actionDefinition']),
+        'outputResponse': json['outputResponse'] == null ? undefined : OutputResponseFromJSON(json['outputResponse']),
         'taskDispatcherDefinition': json['taskDispatcherDefinition'] == null ? undefined : TaskDispatcherDefinitionBasicFromJSON(json['taskDispatcherDefinition']),
         'triggerDefinition': json['triggerDefinition'] == null ? undefined : TriggerDefinitionBasicFromJSON(json['triggerDefinition']),
+        'variableOutputResponse': json['variableOutputResponse'] == null ? undefined : OutputResponseFromJSON(json['variableOutputResponse']),
         'workflowNodeName': json['workflowNodeName'],
     };
 }
@@ -132,12 +124,11 @@ export function WorkflowNodeOutputToJSONTyped(value?: WorkflowNodeOutput | null,
 
     return {
         
-        'outputSchema': PropertyToJSON(value['outputSchema']),
-        'sampleOutput': value['sampleOutput'],
-        'placeholder': value['placeholder'],
         'actionDefinition': ActionDefinitionBasicToJSON(value['actionDefinition']),
+        'outputResponse': OutputResponseToJSON(value['outputResponse']),
         'taskDispatcherDefinition': TaskDispatcherDefinitionBasicToJSON(value['taskDispatcherDefinition']),
         'triggerDefinition': TriggerDefinitionBasicToJSON(value['triggerDefinition']),
+        'variableOutputResponse': OutputResponseToJSON(value['variableOutputResponse']),
         'workflowNodeName': value['workflowNodeName'],
     };
 }
