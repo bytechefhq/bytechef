@@ -1,5 +1,6 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
+import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -120,8 +121,8 @@ function App() {
         reset: resetAuthentication,
         sessionHasBeenFetched,
     } = useAuthenticationStore();
-
     const {copilotPanelOpen} = useCopilotStore();
+    const {currentType, setCurrentType} = useModeTypeStore();
 
     const analytics = useAnalytics();
 
@@ -206,6 +207,20 @@ function App() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authenticated]);
+
+    useEffect(() => {
+        let type;
+
+        if (location.pathname.includes('/automation/')) {
+            type = ModeType.AUTOMATION;
+        } else {
+            type = ModeType.EMBEDDED;
+        }
+
+        if (type !== currentType) {
+            setCurrentType(type);
+        }
+    }, [currentType, location, setCurrentType]);
 
     if (loading || !sessionHasBeenFetched) {
         return <></>;
