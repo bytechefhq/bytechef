@@ -341,7 +341,7 @@ const WorkflowNodeDetailsPanel = ({
         ]
     );
 
-    const currentTaskDataOperations = useMemo(() => {
+    const currentWorkflowNodeOperations = useMemo(() => {
         if (clusterElementsCanvasOpen && isClusterElement) {
             return (currentWorkflowNode as ComponentDefinition)?.clusterElements;
         }
@@ -937,7 +937,7 @@ const WorkflowNodeDetailsPanel = ({
                     </header>
 
                     <main className="flex h-full flex-col overflow-hidden">
-                        {!!currentTaskDataOperations?.length && operationDataMissing && (
+                        {!!currentWorkflowNodeOperations?.length && operationDataMissing && (
                             <div className="flex flex-col border-b border-muted p-4">
                                 <span className="text-sm leading-6">Actions</span>
 
@@ -945,7 +945,7 @@ const WorkflowNodeDetailsPanel = ({
                             </div>
                         )}
 
-                        {currentTaskDataOperations && !operationDataMissing && (
+                        {currentWorkflowNodeOperations && !operationDataMissing && (
                             <CurrentOperationSelect
                                 clusterElementLabel={
                                     currentNode.clusterElementType &&

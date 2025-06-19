@@ -35,15 +35,15 @@ interface TaskDispatcherOperationI extends BaseComponentOperationI {
     taskDispatcherDefinition: TaskDispatcherDefinitionBasic;
 }
 
-export type ComponentOperationType = ComponentActionOperationI | ComponentTriggerOperationI | TaskDispatcherOperationI;
+export type OperationType = ComponentActionOperationI | ComponentTriggerOperationI | TaskDispatcherOperationI;
 
 interface DataPillPanelBodyProps {
-    componentOperations: Array<ComponentOperationType>;
+    operations: Array<OperationType>;
     dataPillFilterQuery: string;
     workflowInputs?: WorkflowInput[];
 }
 
-const DataPillPanelBody = ({componentOperations, dataPillFilterQuery, workflowInputs}: DataPillPanelBodyProps) => (
+const DataPillPanelBody = ({dataPillFilterQuery, operations, workflowInputs}: DataPillPanelBodyProps) => (
     <ScrollArea>
         <Accordion className="size-full max-w-data-pill-panel-width" collapsible type="single">
             {!!workflowInputs?.length && (
@@ -52,15 +52,15 @@ const DataPillPanelBody = ({componentOperations, dataPillFilterQuery, workflowIn
                 </AccordionItem>
             )}
 
-            {componentOperations.map((operation) => (
+            {operations.map((operation) => (
                 <AccordionItem
                     className="group"
                     key={`accordion-item-${operation.workflowNodeName}`}
                     value={operation.workflowNodeName}
                 >
                     <DataPillPanelBodyPropertiesItem
-                        componentOperation={operation}
                         dataPillFilterQuery={dataPillFilterQuery}
+                        operation={operation}
                         sampleOutput={operation.sampleOutput}
                     />
                 </AccordionItem>

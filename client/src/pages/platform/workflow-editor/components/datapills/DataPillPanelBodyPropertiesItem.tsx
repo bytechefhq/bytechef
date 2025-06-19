@@ -10,7 +10,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import useNodeClickHandler from '../../hooks/useNodeClick';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
-import {ComponentOperationType} from './DataPillPanelBody';
+import {OperationType} from './DataPillPanelBody';
 
 function getFilteredProperties({filterQuery, properties}: {filterQuery: string; properties?: Array<PropertyAllType>}) {
     if (!properties || !properties.length) {
@@ -32,14 +32,14 @@ function getFilteredProperties({filterQuery, properties}: {filterQuery: string; 
 }
 
 interface DataPillPanelBodyPropertiesItemProps {
-    componentOperation: ComponentOperationType;
+    operation: OperationType;
     dataPillFilterQuery: string;
     sampleOutput: string | number | boolean | object;
 }
 
 const DataPillPanelBodyPropertiesItem = ({
-    componentOperation,
     dataPillFilterQuery,
+    operation,
     sampleOutput,
 }: DataPillPanelBodyPropertiesItemProps) => {
     const {componentDefinitions, workflowNodes} = useWorkflowDataStore();
@@ -50,9 +50,9 @@ const DataPillPanelBodyPropertiesItem = ({
         }))
     );
 
-    const {workflowNodeName} = componentOperation;
+    const {workflowNodeName} = operation;
 
-    const outputSchema: PropertyAllType | undefined = componentOperation?.outputSchema;
+    const outputSchema: PropertyAllType | undefined = operation?.outputSchema;
 
     const properties: Array<PropertyAllType> | undefined = outputSchema?.properties || outputSchema?.items;
 
@@ -63,14 +63,14 @@ const DataPillPanelBodyPropertiesItem = ({
 
     let icon: string | undefined, title: string | undefined;
 
-    if (componentOperation.componentDefinition) {
-        icon = componentOperation.componentDefinition.icon;
-        title = componentOperation.componentDefinition.title;
+    if (operation.componentDefinition) {
+        icon = operation.componentDefinition.icon;
+        title = operation.componentDefinition.title;
     }
 
-    if (componentOperation.taskDispatcherDefinition) {
-        icon = componentOperation.taskDispatcherDefinition.icon;
-        title = componentOperation.taskDispatcherDefinition.title;
+    if (operation.taskDispatcherDefinition) {
+        icon = operation.taskDispatcherDefinition.icon;
+        title = operation.taskDispatcherDefinition.title;
     }
 
     const curWorkflowNode = workflowNodes.find((workflowNode) => workflowNode.workflowNodeName === workflowNodeName);
