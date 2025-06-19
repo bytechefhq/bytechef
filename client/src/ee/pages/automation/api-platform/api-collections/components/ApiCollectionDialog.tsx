@@ -163,6 +163,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
 
                                         <FormControl>
                                             <ProjectDeploymentDialogBasicStepProjectsComboBox
+                                                apiCollections={true}
                                                 onBlur={field.onBlur}
                                                 onChange={(item) => {
                                                     if (item) {

@@ -13,10 +13,12 @@ const ProjectLabel = ({project}: {project: Project}) => (
 );
 
 const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
+    apiCollections,
     onBlur,
     onChange,
     value,
 }: {
+    apiCollections: boolean;
     onBlur: FocusEventHandler;
     onChange: (item?: ComboBoxItemType) => void;
     value?: number;
@@ -24,6 +26,7 @@ const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
     const {currentWorkspaceId} = useWorkspaceStore();
 
     const {data: projects} = useGetWorkspaceProjectsQuery({
+        apiCollections,
         id: currentWorkspaceId!,
         includeAllFields: false,
         status: ProjectStatus.Published,
