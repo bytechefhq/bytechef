@@ -117,7 +117,11 @@ export default function useConnectDialog({
         async (payload: CodePayloadI | TokenPayloadI) => {
             await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
                 method: 'POST',
-                body: payload,
+                body: {
+                    connection: {
+                        parameters: payload
+                    }
+                },
             });
 
             closeDialog();
