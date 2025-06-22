@@ -3,36 +3,25 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import useOAuth2 from './useOAuth2';
 import {
+    CodePayloadI,
     FormSubmitHandler,
     FormType,
     IntegrationType,
     PropertyType,
     RegisterFormSubmitFunction,
+    TokenPayloadI,
     WorkflowInputType,
     WorkflowType,
 } from './types';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
 
-export const DIALOG_STEPS = {
-    initial: 'Description',
-    workflows: 'Workflows',
-    form: 'Custom Data',
-} as const;
-
-export type DialogStepKeyType = keyof typeof DIALOG_STEPS;
-
-export interface DialogStepType {
-    key: DialogStepKeyType;
-    label: string;
-}
-
 interface ConnectionDialogHookReturnType {
     closeDialog: () => void;
     openDialog: () => void;
 }
 
-function createApiClient(baseUrl: string, environment: string, jwtToken: string) {console.log(jwtToken)
+function createApiClient(baseUrl: string, environment: string, jwtToken: string) {
     const defaultHeaders = {
         Authorization: `Bearer ${jwtToken}`,
         'X-Environment': environment,
@@ -106,7 +95,6 @@ export default function useConnectDialog({
     integrationId,
     jwtToken,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
-    const [dialogStep, setDialogStep] = useState<DialogStepKeyType>('initial');
     const [integration, setIntegration] = useState<IntegrationType | undefined>(undefined);
     const [isOAuth2, setIsOAuth2] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -125,22 +113,39 @@ export default function useConnectDialog({
         formSubmitRef.current = submitFn;
     }, []);
 
-    const saveConnection = useCallback(async () => {
-        await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
-            method: 'POST',
-            body: formValues,
-        });
+    const saveOAuth2Connection = useCallback(
+        async (payload: CodePayloadI | TokenPayloadI) => {
+            await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
+                method: 'POST',
+                body: payload,
+            });
 
-        closeDialog();
-    }, [fetch, integrationId, formValues]);
+            closeDialog();
+        },
+        [fetch, integrationId]
+    );
+
+    const saveNonOAuth2Connection = useCallback(
+        async (formData: Record<string, string>) => {
+            console.log('saveNonOAuth2Connection called with payload: ', formData);
+
+            await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            closeDialog();
+        },
+        [fetch, integrationId]
+    );
 
     const handleSubmit = useCallback(() => {
         if (formSubmitRef.current) {
-            const submitFunction = formSubmitRef.current(() => saveConnection());
+            const submitFunction = formSubmitRef.current(() => saveNonOAuth2Connection(formValues));
 
             submitFunction();
         }
-    }, [saveConnection]);
+    }, [formValues, saveNonOAuth2Connection]);
 
     const handleWorkflowToggle = useCallback(
         (workflowId: string, isSelected: boolean) => {
@@ -167,14 +172,32 @@ export default function useConnectDialog({
         [integration]
     );
 
+    const handleOnCodeSuccess = useCallback(
+        (payload: CodePayloadI) => {
+            if (payload.code) {
+                saveOAuth2Connection(payload);
+            }
+        },
+        [saveOAuth2Connection]
+    );
+
+    const handleOnTokenSuccess = useCallback(
+        (payload: TokenPayloadI) => {
+            if (payload.access_token) {
+                saveOAuth2Connection(payload);
+            }
+        },
+        [saveOAuth2Connection]
+    );
+
     const {getAuth} = useOAuth2({
         ...integration?.connectionConfig?.oauth2,
         authorizationUrl: integration?.connectionConfig?.oauth2?.authorizationUrl || '',
         clientId: integration?.connectionConfig?.oauth2?.clientId || '',
         redirectUri: integration?.connectionConfig?.oauth2?.redirectUri || '',
-        onCodeSuccess: (payload) => console.log('onCodeSuccess called: ', payload),
+        onCodeSuccess: handleOnCodeSuccess,
         onError: (error: string) => console.error(error),
-        onTokenSuccess: (payload) => console.log('onTokenSuccess called: ', payload),
+        onTokenSuccess: handleOnTokenSuccess,
         responseType: isOAuth2AuthorizationType ? 'code' : 'token',
         scope: integration?.connectionConfig?.oauth2?.scopes?.join(' ') || '',
     });
@@ -227,7 +250,7 @@ export default function useConnectDialog({
         return {
             register: (name: string) => ({
                 name,
-                defaultValue: formValues[name] || '',
+                defaultValue: formValues?.[name] || '',
                 ref: (element: HTMLInputElement) => {
                     if (element) {
                         inputRefs.current[name] = element;
@@ -236,7 +259,7 @@ export default function useConnectDialog({
                 onInput: (event: React.FormEvent<HTMLInputElement>) => {
                     const value = event.currentTarget.value;
 
-                    setFormValues((prev) => ({...prev, [name]: value}));
+                    setFormValues((prev: CodePayloadI) => ({...prev, [name]: value}));
                 },
             }),
             handleSubmit: (callback: (data: {[key: string]: unknown}) => void) => (event?: React.FormEvent) => {
@@ -287,39 +310,23 @@ export default function useConnectDialog({
     };
 
     const closeDialog = () => {
-        setDialogStep('initial');
-
         setIsOpen(false);
     };
 
-    const getCurrentStep = useCallback((): DialogStepType => {
-        return {
-            key: dialogStep,
-            label: DIALOG_STEPS[dialogStep],
-        };
-    }, [dialogStep]);
-
     const handleClick = useCallback(
         (event: React.MouseEvent<HTMLButtonElement>) => {
-            if ((event.target as HTMLButtonElement).name === 'backButton') {
-                setDialogStep('workflows');
-
+            if ((event.target as HTMLButtonElement).name === 'disconnectButton') {
                 return;
             }
 
-            if (dialogStep === 'initial') {
-                setDialogStep('workflows');
-            } else if (dialogStep === 'workflows') {
-                if (isOAuth2) {
-                    getAuth();
-                } else {
-                    setDialogStep('form');
-                }
-            } else if (dialogStep === 'form') {
+            if (isOAuth2) {
+                console.log('invoking getAuth for OAuth2 flow');
+                getAuth();
+            } else {
                 handleSubmit();
             }
         },
-        [dialogStep, isOAuth2, getAuth, handleSubmit]
+        [isOAuth2, getAuth, handleSubmit]
     );
 
     const debouncedFetchesRef = useRef<Record<string, (...args: unknown[]) => void>>({});
@@ -406,12 +413,10 @@ export default function useConnectDialog({
 
         // Always render with current state
         if (rootRef.current) {
-            const currentStep = getCurrentStep();
-
             rootRef.current.render(
                 <ConnectDialog
                     closeDialog={closeDialog}
-                    dialogStep={currentStep}
+                    edit={false}
                     form={form}
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
@@ -427,7 +432,6 @@ export default function useConnectDialog({
         }
     }, [
         isOpen,
-        dialogStep,
         form,
         formValues,
         handleClick,
@@ -436,7 +440,6 @@ export default function useConnectDialog({
         registerFormSubmit,
         handleWorkflowToggle,
         selectedWorkflows,
-        getCurrentStep,
         handleWorkflowInputChange,
     ]);
 

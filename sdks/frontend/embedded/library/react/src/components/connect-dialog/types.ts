@@ -12,6 +12,7 @@ export interface IntegrationType {
     };
     icon?: string;
     id?: number;
+    name?: string;
     workflows?: WorkflowType[];
 }
 
@@ -56,3 +57,16 @@ export type FormSubmitHandler = (
 ) => (event?: React.FormEvent) => boolean;
 
 export type RegisterFormSubmitFunction = (submitFn: FormSubmitHandler | null) => void;
+
+export interface TokenPayloadI {
+    token_type: string;
+    expires_in: number;
+    access_token: string;
+    scope: string;
+    refresh_token: string;
+}
+
+export interface CodePayloadI {
+    code: string;
+    [key: string]: string;
+}

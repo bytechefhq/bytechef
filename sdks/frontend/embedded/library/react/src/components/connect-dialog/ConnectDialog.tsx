@@ -2,7 +2,6 @@ import {useEffect} from 'react';
 import Logo from './assets/logo.svg';
 import XIcon from './assets/x.svg';
 import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
-import {DialogStepKeyType, DialogStepType} from '.';
 import styles from './styles.module.css';
 import {
     FormType,
@@ -43,7 +42,7 @@ const Toggle = ({id, pressed, onPressedChange}: ToggleProps) => (
 
 interface DialogProps {
     closeDialog: () => void;
-    dialogStep: DialogStepType;
+    edit?: boolean;
     form?: FormType;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
@@ -58,7 +57,7 @@ interface DialogProps {
 
 const ConnectDialog = ({
     closeDialog,
-    dialogStep,
+    edit = false,
     form,
     handleClick,
     handleWorkflowToggle,
@@ -93,12 +92,12 @@ const ConnectDialog = ({
     return (
         <div className={styles.dialogOverlay} data-testid="dialog-overlay" onClick={closeDialog}>
             <div className={styles.dialogContainer} onClick={(event) => event.stopPropagation()}>
-                <DialogHeader closeDialog={closeDialog} dialogStep={dialogStep} integration={integration} />
+                <DialogHeader closeDialog={closeDialog} edit={edit} integration={integration} />
 
                 {integration ? (
                     <DialogContent
                         closeDialog={closeDialog}
-                        dialogStepKey={dialogStep.key}
+                        edit={false}
                         form={form}
                         handleWorkflowToggle={handleWorkflowToggle}
                         handleWorkflowInputChange={handleWorkflowInputChange}
@@ -119,14 +118,7 @@ const ConnectDialog = ({
                     </main>
                 )}
 
-                {integration && (
-                    <DialogFooter
-                        closeDialog={closeDialog}
-                        dialogStepKey={dialogStep.key}
-                        handleClick={handleClick}
-                        isOAuth2={isOAuth2}
-                    />
-                )}
+                {integration && <DialogFooter edit={false} handleClick={handleClick} isOAuth2={isOAuth2} />}
 
                 <DialogPoweredBy />
             </div>
@@ -136,25 +128,22 @@ const ConnectDialog = ({
 
 interface DialogHeaderProps {
     closeDialog: () => void;
-    dialogStep: DialogStepType;
     integration?: IntegrationType;
 }
 
-const DialogHeader = ({closeDialog, dialogStep, integration}: DialogHeaderProps) => (
+const DialogHeader = ({closeDialog, integration}: DialogHeaderProps) => (
     <header className={styles.dialogHeader}>
         <div>
             {integration && integration.icon && (
                 <div className={styles.integrationIcon} dangerouslySetInnerHTML={{__html: integration.icon}} />
             )}
 
-            <h2>Create Connection | {integration ? dialogStep.label : 'Error'}</h2>
+            <h2>{integration?.name}</h2>
         </div>
 
-        <div>
-            <button aria-label="Close Dialog" className={styles.closeButton} onClick={closeDialog}>
-                <img src={XIcon} />
-            </button>
-        </div>
+        <button aria-label="Close Dialog" className={styles.closeButton} onClick={closeDialog}>
+            <img src={XIcon} />
+        </button>
     </header>
 );
 
@@ -230,7 +219,7 @@ const DialogWorkflowsContainer = ({
 
 interface DialogContentProps {
     closeDialog: () => void;
-    dialogStepKey: DialogStepKeyType;
+    edit?: boolean;
     form?: FormType;
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
@@ -241,7 +230,7 @@ interface DialogContentProps {
 }
 
 const DialogContent = ({
-    dialogStepKey = 'initial',
+    edit = false,
     form,
     handleWorkflowToggle,
     handleWorkflowInputChange,
@@ -259,18 +248,9 @@ const DialogContent = ({
 
     return (
         <main className={styles.dialogContent}>
-            {dialogStepKey === 'initial' && <p>{integration.description}</p>}
+            <p>{integration.description}</p>
 
-            {dialogStepKey === 'workflows' && !!integration.workflows?.length && (
-                <DialogWorkflowsContainer
-                    handleWorkflowToggle={handleWorkflowToggle}
-                    handleWorkflowInputChange={handleWorkflowInputChange}
-                    selectedWorkflows={selectedWorkflows}
-                    workflows={integration.workflows}
-                />
-            )}
-
-            {dialogStepKey === 'form' && !!form && (
+            {!edit && form && (
                 <form id="form" onSubmit={form.handleSubmit}>
                     {properties?.map((property) => {
                         const field = form.register(property.name);
@@ -292,48 +272,44 @@ const DialogContent = ({
                     })}
                 </form>
             )}
+
+            {edit && !!integration.workflows?.length && (
+                <DialogWorkflowsContainer
+                    handleWorkflowToggle={handleWorkflowToggle}
+                    handleWorkflowInputChange={handleWorkflowInputChange}
+                    selectedWorkflows={selectedWorkflows}
+                    workflows={integration.workflows}
+                />
+            )}
         </main>
     );
 };
 
 interface DialogFooterProps {
-    closeDialog: () => void;
-    dialogStepKey: DialogStepKeyType;
+    edit?: boolean;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     isOAuth2?: boolean;
 }
 
-const DialogFooter = ({closeDialog, handleClick, dialogStepKey = 'initial', isOAuth2 = false}: DialogFooterProps) => (
+const DialogFooter = ({edit = false, handleClick, isOAuth2 = false}: DialogFooterProps) => (
     <footer className={styles.dialogFooter}>
-        {dialogStepKey === 'form' && (
-            <button name="backButton" onClick={handleClick} className={styles.backButton}>
-                Back
+        {edit && (
+            <button name="disconnectButton" onClick={handleClick} className={styles.destructiveButton} type="button">
+                Disconnect
             </button>
         )}
 
-        <button type="button" className={styles.buttonSecondary} onClick={closeDialog}>
-            Cancel
-        </button>
-
-        <button
-            autoFocus
-            onClick={handleClick}
-            className={styles.buttonPrimary}
-            type={dialogStepKey === 'form' ? 'submit' : 'button'}
-            form="form"
-        >
-            {dialogStepKey === 'workflows' && isOAuth2 && (
+        <button autoFocus onClick={handleClick} className={styles.buttonPrimary} type="button" form="form">
+            {!edit && isOAuth2 && (
                 <span>
                     Authorize
                     <img data-testid="authorize-icon" src={SquareArrowOutUpRightIcon} />
                 </span>
             )}
 
-            {dialogStepKey === 'initial' && 'Continue'}
+            {!edit && !isOAuth2 && 'Connect'}
 
-            {dialogStepKey === 'form' && !isOAuth2 && 'Connect'}
-
-            {dialogStepKey === 'workflows' && !isOAuth2 && 'Continue'}
+            {edit && 'Update'}
         </button>
     </footer>
 );

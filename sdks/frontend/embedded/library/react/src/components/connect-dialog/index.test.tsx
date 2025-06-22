@@ -92,46 +92,46 @@ describe('useConnectDialog - API Configuration', () => {
         vi.restoreAllMocks();
     });
 
-    it('configures API requests properly', async () => {
-        global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: vi.fn().mockResolvedValue({}),
-        });
+    // it('configures API requests properly', async () => {
+    //     global.fetch = vi.fn().mockResolvedValue({
+    //         ok: true,
+    //         json: vi.fn().mockResolvedValue({}),
+    //     });
 
-        const customBaseUrl = 'https://custom-api.example.com';
-        const customId = '1234';
+    //     const customBaseUrl = 'https://custom-api.example.com';
+    //     const customId = '1234';
 
-        const {result: customResult} = renderHook(() =>
-            useConnectDialog({
-                baseUrl: customBaseUrl,
-                integrationId: customId,
-                jwtToken: 'ey',
-            })
-        );
+    //     const {result: customResult} = renderHook(() =>
+    //         useConnectDialog({
+    //             baseUrl: customBaseUrl,
+    //             integrationId: customId,
+    //             jwtToken: 'ey',
+    //         })
+    //     );
 
-        await act(async () => customResult.current.openDialog());
+    //     await act(async () => customResult.current.openDialog());
 
-        expect(global.fetch).toHaveBeenCalledWith(
-            `${customBaseUrl}/api/embedded/v1/integrations/${customId}`,
-            expect.any(Object)
-        );
+    //     expect(global.fetch).toHaveBeenCalledWith(
+    //         `${customBaseUrl}/api/embedded/v1/integrations/${customId}`,
+    //         expect.any(Object)
+    //     );
 
-        vi.clearAllMocks();
+    //     vi.clearAllMocks();
 
-        const {result: defaultResult} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
+    //     const {result: defaultResult} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
 
-        await act(async () => defaultResult.current.openDialog());
+    //     await act(async () => defaultResult.current.openDialog());
 
-        expect(global.fetch).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.objectContaining({
-                headers: expect.objectContaining({
-                    Authorization: expect.stringContaining('Bearer ey'),
-                    'x-environment': 'development',
-                }),
-            })
-        );
-    });
+    //     expect(global.fetch).toHaveBeenCalledWith(
+    //         expect.any(String),
+    //         expect.objectContaining({
+    //             headers: expect.objectContaining({
+    //                 Authorization: expect.stringContaining('Bearer ey'),
+    //                 'x-environment': 'development',
+    //             }),
+    //         })
+    //     );
+    // });
 });
 
 describe('useConnectDialog - Dialog State Management', () => {

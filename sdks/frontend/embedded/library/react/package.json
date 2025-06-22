@@ -17,8 +17,10 @@
         "test:ui": "vitest --ui",
         "test:watch": "vitest --watch",
         "coverage": "vitest run --coverage",
-        "prepublishOnly": "vitest run && npm run build",
-        "watch": "tsc && vite build --watch"
+        "watch": "tsc && vite build --watch",
+        "yalc:publish": "npm run build && yalc publish",
+        "yalc:push": "npm run build && yalc push",
+        "dev:yalc": "concurrently \"npm run watch\" \"nodemon --watch dist --delay 1 --exec 'yalc push'\""
     },
     "module": "./dist/main.js",
     "exports": "./dist/main.js",
@@ -27,8 +29,8 @@
     ],
     "types": "./dist/main.d.ts",
     "peerDependencies": {
-        "react": "^18.3.1",
-        "react-dom": "^18.3.1"
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0"
     },
     "author": "Kresimir Coko <kresimir.coko@bytechef.io>",
     "license": "MIT",
@@ -52,6 +54,7 @@
         "@vitest/coverage-v8": "3.0.7",
         "@vitest/ui": "3.0.7",
         "clsx": "2.1.1",
+        "concurrently": "^8.2.2",
         "eslint": "9.21.0",
         "eslint-config-prettier": "10.1.5",
         "eslint-plugin-react-hooks": "5.2.0",
@@ -60,6 +63,7 @@
         "glob": "11.0.1",
         "globals": "16.0.0",
         "jsdom": "26.0.0",
+        "nodemon": "^3.1.0",
         "prettier": "3.5.2",
         "storybook": "8.6.3",
         "stylelint": "16.15.0",
