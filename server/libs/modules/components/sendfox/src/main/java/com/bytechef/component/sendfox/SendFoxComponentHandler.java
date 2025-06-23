@@ -31,6 +31,7 @@ public class SendFoxComponentHandler extends AbstractSendFoxComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .categories(ComponentCategory.ADVERTISING)
-            .icon("path:assets/sendfox.svg");
+            .icon("path:assets/sendfox.svg")
+            .customAction(true);
     }
 }
