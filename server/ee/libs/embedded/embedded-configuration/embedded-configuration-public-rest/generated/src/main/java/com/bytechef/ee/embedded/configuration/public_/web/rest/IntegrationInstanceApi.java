@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T05:56:44.169926+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T11:56:40.624151+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "integration-instance", description = "The Embedded Integration Instance Public API")
 public interface IntegrationInstanceApi {
@@ -50,7 +50,7 @@ public interface IntegrationInstanceApi {
      * @param id The id of an integration. (required)
      * @param xEnvironment The environment. (optional)
      * @param createFrontendIntegrationInstanceRequestModel  (optional)
-     * @return Successful operation. (status code 204)
+     * @return The integration instance id. (status code 200)
      *         or Access token is missing or invalid (status code 401)
      */
     @Operation(
@@ -59,7 +59,9 @@ public interface IntegrationInstanceApi {
         description = "Creates and configures a new integration instance that connects to the specified integration, providing access to its functionality and enabling integration with external services and systems.",
         tags = { "integration-instance" },
         responses = {
-            @ApiResponse(responseCode = "204", description = "Successful operation."),
+            @ApiResponse(responseCode = "200", description = "The integration instance id.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))
+            }),
             @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
         },
         security = {
@@ -69,10 +71,11 @@ public interface IntegrationInstanceApi {
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/integrations/{id}/instances",
+        produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<Void> createFrontendIntegrationInstance(
+    default ResponseEntity<Long> createFrontendIntegrationInstance(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
         @Parameter(name = "CreateFrontendIntegrationInstanceRequestModel", description = "") @Valid @RequestBody(required = false) CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel
@@ -90,7 +93,7 @@ public interface IntegrationInstanceApi {
      * @param id The id of an integration. (required)
      * @param xEnvironment The environment. (optional)
      * @param createFrontendIntegrationInstanceRequestModel  (optional)
-     * @return Successful operation. (status code 204)
+     * @return The integration instance id. (status code 200)
      *         or Access token is missing or invalid (status code 401)
      */
     @Operation(
@@ -99,7 +102,9 @@ public interface IntegrationInstanceApi {
         description = "Connects an integration instance to an existing integration, allowing access to its functionality and resources.",
         tags = { "integration-instance" },
         responses = {
-            @ApiResponse(responseCode = "204", description = "Successful operation."),
+            @ApiResponse(responseCode = "200", description = "The integration instance id.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))
+            }),
             @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
         },
         security = {
@@ -109,10 +114,11 @@ public interface IntegrationInstanceApi {
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/{externalUserId}/integrations/{id}/instances",
+        produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<Void> createIntegrationInstance(
+    default ResponseEntity<Long> createIntegrationInstance(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,

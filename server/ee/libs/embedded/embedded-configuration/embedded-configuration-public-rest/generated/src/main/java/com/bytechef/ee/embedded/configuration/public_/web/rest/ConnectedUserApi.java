@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T05:56:44.169926+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T11:56:40.624151+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "connected-user", description = "the connected-user API")
 public interface ConnectedUserApi {
@@ -50,7 +50,7 @@ public interface ConnectedUserApi {
      * @param externalUserId The external user id. (required)
      * @param xEnvironment The environment. (optional)
      * @param requestBody  (optional)
-     * @return The workflow reference code. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateConnectedUser",
@@ -58,7 +58,7 @@ public interface ConnectedUserApi {
         description = "Update data of an external user.",
         tags = { "connected-user" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The workflow reference code.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
         security = {
             @SecurityRequirement(name = "bearerAuth")
@@ -86,7 +86,7 @@ public interface ConnectedUserApi {
      *
      * @param xEnvironment The environment. (optional)
      * @param requestBody  (optional)
-     * @return The workflow reference code. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateFrontendConnectedUser",
@@ -94,7 +94,7 @@ public interface ConnectedUserApi {
         description = "Update data of an external user.",
         tags = { "connected-user" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The workflow reference code.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         },
         security = {
             @SecurityRequirement(name = "jwtBearerAuth")

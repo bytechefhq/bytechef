@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-13T10:18:08.727521+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T11:56:41.561215+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ConnectedUserIntegrationInstanceModel {
 
   private @Nullable String componentName;

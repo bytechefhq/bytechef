@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("listAccounts_400_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-20T09:14:25.336178+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T11:57:20.437965+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ListAccounts400ResponseModel {
 
   @Valid
