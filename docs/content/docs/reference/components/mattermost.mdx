@@ -76,27 +76,27 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| create_at | INTEGER |  |
-| update_at | INTEGER |  |
-| edit_at | INTEGER |  |
-| delete_at | INTEGER |  |
-| is_pinned | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
-| user_id | STRING |  |
-| channel_id | STRING |  |
-| root_id | STRING |  |
+| id | STRING | ID of the message. |
+| create_at | INTEGER | The time in milliseconds a post was created. |
+| update_at | INTEGER | The time in milliseconds a post was last updated. |
+| edit_at | INTEGER | The time in milliseconds a post was last edited. |
+| delete_at | INTEGER | The time in milliseconds a post was deleted. |
+| is_pinned | BOOLEAN <details> <summary> Options </summary> true, false </details> | True if post is pinned to the channel it is in. |
+| user_id | STRING | ID of the user. |
+| channel_id | STRING | ID of the channel. |
+| root_id | STRING | Post ID if post is created as a comment on another post. |
 | parent_id | STRING |  |
 | original_id | STRING |  |
-| message | STRING |  |
+| message | STRING | The actual content of the message. |
 | type | STRING |  |
 | props | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
-| hashtags | STRING |  |
+| hashtags | STRING | Any hashtags included in the message content. |
 | pending_post_id | STRING |  |
-| reply_count | INTEGER |  |
-| last_reply_at | INTEGER |  |
+| reply_count | INTEGER | Number of replies to this message. |
+| last_reply_at | INTEGER | The time in milliseconds of the most recent reply. |
 | participants | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
 | is_following | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
-| metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(type), STRING\(url), &#123;&#125;\(data)&#125;]\(embeds), [&#123;STRING\(id), STRING\(creator_id), STRING\(name), INTEGER\(create_at), INTEGER\(update_at), INTEGER\(delete_at)&#125;]\(emojis), [&#123;STRING\(id), STRING\(user_id), STRING\(post_id), INTEGER\(create_at), INTEGER\(update_at), INTEGER\(delete_at), STRING\(name), STRING\(extension), INTEGER\(size), STRING\(mime_type), INTEGER\(width), INTEGER\(height), BOOLEAN\(has_preview_image)&#125;]\(files), [&#123;INTEGER\(height), INTEGER\(width)&#125;]\(images), [&#123;STRING\(user_id), STRING\(post_id), STRING\(emoji_name), INTEGER\(create_at)&#125;]\(reactions)&#125; </details> | Additional information used to display the post. |
 
 
 
@@ -124,7 +124,46 @@ Type: OBJECT
   "last_reply_at" : 1,
   "participants" : { },
   "is_following" : false,
-  "metadata" : { }
+  "metadata" : {
+    "embeds" : [ {
+      "type" : "",
+      "url" : "",
+      "data" : { }
+    } ],
+    "emojis" : [ {
+      "id" : "",
+      "creator_id" : "",
+      "name" : "",
+      "create_at" : 1,
+      "update_at" : 1,
+      "delete_at" : 1
+    } ],
+    "files" : [ {
+      "id" : "",
+      "user_id" : "",
+      "post_id" : "",
+      "create_at" : 1,
+      "update_at" : 1,
+      "delete_at" : 1,
+      "name" : "",
+      "extension" : "",
+      "size" : 1,
+      "mime_type" : "",
+      "width" : 1,
+      "height" : 1,
+      "has_preview_image" : false
+    } ],
+    "images" : [ {
+      "height" : 1,
+      "width" : 1
+    } ],
+    "reactions" : [ {
+      "user_id" : "",
+      "post_id" : "",
+      "emoji_name" : "",
+      "create_at" : 1
+    } ]
+  }
 }
 ```
 
