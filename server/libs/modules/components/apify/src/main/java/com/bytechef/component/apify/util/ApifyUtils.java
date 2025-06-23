@@ -37,27 +37,25 @@ public class ApifyUtils extends AbstractApifyUtils {
 
     public static List<Option<String>> getActorIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText,
-        Context context) {
+        String searchText, Context context) {
 
-        Map<String, Map<String, Object>> response = context.http(http -> http.get("/acts"))
+        Map<String, Map<String, Object>> body = context.http(http -> http.get("/acts"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> actorIdOptions = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-        if (response.get("data")
-            .get("items") instanceof List<?> actors) {
+        Map<String, Object> data = body.get("data");
+
+        if (data.get("items") instanceof List<?> actors) {
             for (Object actor : actors) {
-                if (actor instanceof Map<?, ?> actorMap &&
-                    actorMap.get("name") instanceof String actorName &&
-                    actorMap.get("id") instanceof String actorId) {
-                    actorIdOptions.add(option(actorName, actorId));
+                if (actor instanceof Map<?, ?> actorMap) {
+                    options.add(option((String) actorMap.get("name"), (String) actorMap.get("id")));
                 }
             }
         }
 
-        return actorIdOptions;
+        return options;
     }
 }

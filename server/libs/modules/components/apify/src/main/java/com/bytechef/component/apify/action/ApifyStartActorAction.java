@@ -59,16 +59,15 @@ public class ApifyStartActorAction {
     private ApifyStartActorAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Map<String, Object> jsonBody = context.json(
+            json -> json.read(inputParameters.getRequiredString(BODY), new TypeReference<>() {}));
 
-        Object jsonBody = context.json(json -> json.read(inputParameters.getRequiredString(BODY)));
-
-        return context.http(http -> http.post("/acts/%s/runs"
-            .formatted(inputParameters.getRequiredString(ACTOR_ID))))
-            .body(Body.of((Map<String, ?>) jsonBody))
+        return context.http(
+            http -> http.post("/acts/%s/runs".formatted(inputParameters.getRequiredString(ACTOR_ID))))
+            .body(Body.of(jsonBody))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
