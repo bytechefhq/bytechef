@@ -81,7 +81,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     }
 
     @Override
-    public void createIntegrationInstance(
+    public IntegrationInstance createIntegrationInstance(
         String externalUserId, long integrationId, Map<String, Object> connectionParameters, Environment environment) {
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
@@ -101,7 +101,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             connectionDefinition.getVersion(), integrationInstanceConfiguration.getEnvironment(),
             integrationInstanceConfiguration.getName(), connectionParameters, ModeType.EMBEDDED);
 
-        integrationInstanceService.create(
+        return integrationInstanceService.create(
             connectedUser.getId(), connection.getId(), integrationInstanceConfiguration.getId());
     }
 

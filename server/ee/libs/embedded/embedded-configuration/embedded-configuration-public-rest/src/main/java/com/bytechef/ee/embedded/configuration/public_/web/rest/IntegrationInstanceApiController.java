@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 import static com.bytechef.ee.embedded.configuration.public_.web.rest.util.EnvironmentUtils.getEnvironment;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendIntegrationInstanceRequestConnectionModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendIntegrationInstanceRequestModel;
@@ -42,7 +43,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
 
     @Override
     @CrossOrigin
-    public ResponseEntity<Void> createFrontendIntegrationInstance(
+    public ResponseEntity<Long> createFrontendIntegrationInstance(
         Long id, EnvironmentModel xEnvironment,
         CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel) {
 
@@ -55,11 +56,10 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
         Map<String, Object> parameters = Objects.requireNonNull(connection)
             .getParameters();
 
-        connectedUserIntegrationFacade.createIntegrationInstance(
+        IntegrationInstance integrationInstance = connectedUserIntegrationFacade.createIntegrationInstance(
             externalUserId, id, parameters, getEnvironment(xEnvironment));
 
-        return ResponseEntity.noContent()
-            .build();
+        return ResponseEntity.ok(integrationInstance.getId());
     }
 
     @Override
@@ -75,20 +75,20 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
-    public ResponseEntity<Void> createIntegrationInstance(
+    public ResponseEntity<Long> createIntegrationInstance(
         String externalUserId, Long id, EnvironmentModel xEnvironment,
         CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel) {
 
         CreateFrontendIntegrationInstanceRequestConnectionModel connection =
             createFrontendIntegrationInstanceRequestModel.getConnection();
 
-        connectedUserIntegrationFacade.createIntegrationInstance(
-            externalUserId, id, Objects.requireNonNull(connection)
-                .getParameters(),
-            getEnvironment(xEnvironment));
+        Map<String, Object> parameters = Objects.requireNonNull(connection)
+            .getParameters();
 
-        return ResponseEntity.noContent()
-            .build();
+        IntegrationInstance integrationInstance = connectedUserIntegrationFacade.createIntegrationInstance(
+            externalUserId, id, parameters, getEnvironment(xEnvironment));
+
+        return ResponseEntity.ok(integrationInstance.getId());
     }
 
     @Override

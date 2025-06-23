@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Map;
  */
 public interface ConnectedUserIntegrationFacade {
 
-    void createIntegrationInstance(
+    IntegrationInstance createIntegrationInstance(
         String externalUserId, long integrationId, Map<String, Object> connectionParameters, Environment environment);
 
     void deleteIntegrationInstance(String externalUserId, long integrationInstanceId);
