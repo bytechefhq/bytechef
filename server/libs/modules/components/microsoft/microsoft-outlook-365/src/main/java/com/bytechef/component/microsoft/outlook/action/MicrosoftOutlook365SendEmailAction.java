@@ -36,7 +36,6 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -162,7 +161,7 @@ public class MicrosoftOutlook365SendEmailAction {
                     "@odata.type", "#microsoft.graph.fileAttachment",
                     NAME, attachment.getName(),
                     CONTENT_TYPE, attachment.getMimeType(),
-                    CONTENT_BYTES, EncodingUtils.base64EncodeToString(file1)));
+                    CONTENT_BYTES, context.encoder(encoder -> encoder.base64EncodeToString(file1))));
         }
 
         return encodedAttachments;

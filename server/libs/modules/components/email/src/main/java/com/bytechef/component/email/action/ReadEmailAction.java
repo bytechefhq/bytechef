@@ -30,7 +30,6 @@ import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
 import static com.bytechef.component.email.constant.EmailConstants.PROTOCOL;
 
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -163,10 +162,10 @@ public class ReadEmailAction {
 
             Map<String, Object> itemMap = new HashMap<>();
 
-            itemMap.put(FROM, JsonUtils.write(message.getFrom()));
-            itemMap.put(TO, JsonUtils.write(message.getRecipients(RecipientType.TO)));
-            itemMap.put(CC, JsonUtils.write(message.getRecipients(RecipientType.CC)));
-            itemMap.put(BCC, JsonUtils.write(message.getRecipients(RecipientType.BCC)));
+            itemMap.put(FROM, context.json(json -> json.write(message.getFrom())));
+            itemMap.put(TO, context.json(json -> json.write(message.getRecipients(RecipientType.TO))));
+            itemMap.put(CC, context.json(json -> json.write(message.getRecipients(RecipientType.CC))));
+            itemMap.put(BCC, context.json(json -> json.write(message.getRecipients(RecipientType.BCC))));
             itemMap.put(SUBJECT, message.getSubject());
             itemMap.put(CONTENT, getContent(message));
             itemMap.put(CONTENT_TYPE, message.getContentType());

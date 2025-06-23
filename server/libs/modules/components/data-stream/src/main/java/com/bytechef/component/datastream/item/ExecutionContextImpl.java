@@ -53,6 +53,11 @@ public class ExecutionContextImpl implements ExecutionContext {
     }
 
     @Override
+    public <R> R encoder(ContextFunction<Encoder, R> encoderFunction) {
+        return context.encoder(encoderFunction);
+    }
+
+    @Override
     public <R> R file(ContextFunction<File, R> fileFunction) {
         return context.file(fileFunction);
     }

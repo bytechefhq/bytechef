@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.XmlUtils;
@@ -53,6 +54,7 @@ import org.slf4j.LoggerFactory;
 class ContextImpl implements Context {
 
     private final Convert convert;
+    private final Encoder encoder;
     private final File file;
     private final Http http;
     private final Json json;
@@ -68,6 +70,7 @@ class ContextImpl implements Context {
         HttpClientExecutor httpClientExecutor) {
 
         this.convert = new ConvertImpl();
+        this.encoder = new EncoderImpl();
         this.file = new FileImpl(filesFileStorage);
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
@@ -82,6 +85,15 @@ class ContextImpl implements Context {
     public <R> R convert(ContextFunction<Convert, R> convertFunction) {
         try {
             return convertFunction.apply(convert);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <R> R encoder(ContextFunction<Encoder, R> encoderFunction) {
+        try {
+            return encoderFunction.apply(encoder);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -337,6 +349,19 @@ class ContextImpl implements Context {
         @Override
         public Object string(String str) {
             return ConvertUtils.convertString(str);
+        }
+    }
+
+    private record EncoderImpl() implements Encoder {
+
+        @Override
+        public byte[] base64Decode(String string) {
+            return EncodingUtils.base64Decode(string);
+        }
+
+        @Override
+        public String base64EncodeToString(byte[] bytes) {
+            return EncodingUtils.base64EncodeToString(bytes);
         }
     }
 

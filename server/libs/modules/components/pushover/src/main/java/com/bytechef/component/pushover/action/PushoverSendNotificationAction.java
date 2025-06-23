@@ -36,7 +36,6 @@ import static com.bytechef.component.pushover.constant.PushoverConstants.URL;
 import static com.bytechef.component.pushover.constant.PushoverConstants.URL_TITLE;
 import static com.bytechef.component.pushover.constant.PushoverConstants.USER;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -115,7 +114,7 @@ public class PushoverSendNotificationAction {
             byte[] fileContent =
                 actionContext.file(file -> file.readAllBytes(fileEntry));
 
-            attachmentBase64 = EncodingUtils.base64EncodeToString(fileContent);
+            attachmentBase64 = actionContext.encoder(encoder -> encoder.base64EncodeToString(fileContent));
         }
 
         return actionContext

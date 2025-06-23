@@ -43,6 +43,14 @@ public interface Context {
     <R> R convert(ContextFunction<Convert, R> convertFunction);
 
     /**
+     *
+     * @param encoderFunction
+     * @return
+     * @param <R>
+     */
+    <R> R encoder(ContextFunction<Encoder, R> encoderFunction);
+
+    /**
      * @param fileFunction
      * @param <R>
      * @return
@@ -161,6 +169,26 @@ public interface Context {
          */
         Object string(String str);
 
+    }
+
+    /**
+     *
+     */
+    interface Encoder {
+
+        /**
+         *
+         * @param string
+         * @return
+         */
+        byte[] base64Decode(String string);
+
+        /**
+         *
+         * @param bytes
+         * @return
+         */
+        String base64EncodeToString(byte[] bytes);
     }
 
     /**

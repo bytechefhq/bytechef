@@ -31,7 +31,6 @@ import static com.bytechef.component.docusign.constant.DocuSignConstants.BASE_UR
 import static com.bytechef.component.docusign.constant.DocuSignConstants.ENVIRONMENT;
 import static com.bytechef.component.docusign.util.DocuSignUtils.getAuthorizationUrl;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
@@ -86,7 +85,8 @@ public class DocuSignConnection {
                     String clientId = connectionParameters.getString(CLIENT_ID);
                     String clientSecret = connectionParameters.getString(CLIENT_SECRET);
                     String valueToEncode = clientId + ":" + clientSecret;
-                    String encode = EncodingUtils.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8));
+                    String encode = context.encoder(
+                        encoder -> encoder.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)));
 
                     Http.Response httpResponse =
                         context.http(http -> http.post(getAuthorizationUrl(
@@ -116,7 +116,8 @@ public class DocuSignConnection {
                     String clientId = connectionParameters.getString(CLIENT_ID);
                     String clientSecret = connectionParameters.getString(CLIENT_SECRET);
                     String valueToEncode = clientId + ":" + clientSecret;
-                    String encode = EncodingUtils.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8));
+                    String encode = context.encoder(
+                        encoder -> encoder.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)));
 
                     Http.Response httpResponse =
                         context.http(http -> http.post("https://account-d.docusign.com/oauth/token"))

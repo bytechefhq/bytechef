@@ -31,7 +31,6 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
@@ -123,7 +122,7 @@ public class MicrosoftOutlook365Utils {
                 for (Object attachment : attachments) {
                     if (attachment instanceof Map<?, ?> map) {
                         String contentBytes = (String) map.get(CONTENT_BYTES);
-                        byte[] decodedBytes = EncodingUtils.base64Decode(contentBytes);
+                        byte[] decodedBytes = context.encoder(encoder -> encoder.base64Decode(contentBytes));
 
                         FileEntry fileEntry = context.file(
                             file -> file.storeContent((String) map.get(NAME),

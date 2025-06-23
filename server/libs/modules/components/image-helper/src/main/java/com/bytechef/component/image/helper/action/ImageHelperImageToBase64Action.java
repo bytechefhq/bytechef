@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.image.helper.constant.ImageHelperConstants.IMAGE;
 import static com.bytechef.component.image.helper.constant.ImageHelperConstants.IMAGE_PROPERTY;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -47,6 +46,6 @@ public class ImageHelperImageToBase64Action {
 
         byte[] fileContent = actionContext.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(IMAGE)));
 
-        return EncodingUtils.base64EncodeToString(fileContent);
+        return actionContext.encoder(encoder -> encoder.base64EncodeToString(fileContent));
     }
 }

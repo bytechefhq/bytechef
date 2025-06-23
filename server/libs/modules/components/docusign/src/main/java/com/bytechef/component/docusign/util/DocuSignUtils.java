@@ -24,7 +24,6 @@ import static com.bytechef.component.docusign.constant.DocuSignConstants.EMAIL_S
 import static com.bytechef.component.docusign.constant.DocuSignConstants.ENVELOPE_ID;
 import static com.bytechef.component.docusign.constant.DocuSignConstants.FROM_DATE;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
@@ -92,7 +91,7 @@ public class DocuSignUtils {
     private static String encodeFileEntry(FileEntry fileEntry, Context context) {
         byte[] fileContent = context.file(file -> file.readAllBytes(fileEntry));
 
-        return EncodingUtils.base64EncodeToString(fileContent);
+        return context.encoder(encoder -> encoder.base64EncodeToString(fileContent));
     }
 
     public static List<Option<String>> getEnvelopeIdOptions(

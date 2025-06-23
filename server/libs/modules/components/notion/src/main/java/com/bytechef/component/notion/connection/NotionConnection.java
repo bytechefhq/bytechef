@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -59,7 +58,8 @@ public class NotionConnection {
                 String clientId = connectionParameters.getString(CLIENT_ID);
                 String clientSecret = connectionParameters.getString(CLIENT_SECRET);
                 String valueToEncode = clientId + ":" + clientSecret;
-                String encode = EncodingUtils.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8));
+                String encode = context.encoder(encoder -> encoder.base64EncodeToString(
+                    valueToEncode.getBytes(StandardCharsets.UTF_8)));
 
                 Http.Response response = context.http(http -> http.post("https://api.notion.com/v1/oauth/token"))
                     .headers(
