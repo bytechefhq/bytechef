@@ -47,6 +47,7 @@ public class ApifyComponentHandler extends AbstractApifyComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .icon("path:assets/apify.svg")
-            .categories(ComponentCategory.MARKETING_AUTOMATION);
+            .categories(ComponentCategory.MARKETING_AUTOMATION)
+            .customAction(true);
     }
 }
