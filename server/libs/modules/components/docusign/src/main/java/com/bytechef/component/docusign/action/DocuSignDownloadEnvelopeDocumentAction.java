@@ -87,9 +87,8 @@ public class DocuSignDownloadEnvelopeDocumentAction {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return context.file(
-            file -> file.storeContent(
-                inputParameters.getRequiredString(DOCUMENT_ID),
-                new ByteArrayInputStream(fileByteArray.getBytes(StandardCharsets.UTF_8))));
+        return context.file(file -> file.storeContent(
+            inputParameters.getRequiredString(DOCUMENT_ID),
+            new ByteArrayInputStream(fileByteArray.getBytes(StandardCharsets.UTF_8))));
     }
 }

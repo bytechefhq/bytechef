@@ -74,7 +74,7 @@ public class DocuSignUtils {
     }
 
     public static List<Map<String, Object>> getDocumentsList(List<DocumentRecord> documentRecords, Context context) {
-        List<Map<String, Object>> documentsList = new ArrayList<>();
+        List<Map<String, Object>> documents = new ArrayList<>();
 
         for (DocumentRecord documentRecord : documentRecords) {
             Map<String, Object> document = new HashMap<>();
@@ -83,10 +83,10 @@ public class DocuSignUtils {
             document.put("name", documentRecord.name());
             document.put("documentId", documentRecord.documentId());
 
-            documentsList.add(document);
+            documents.add(document);
         }
 
-        return documentsList;
+        return documents;
     }
 
     private static String encodeFileEntry(FileEntry fileEntry, Context context) {
@@ -101,8 +101,8 @@ public class DocuSignUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        Map<String, Object> response = context.http(
-            http -> http.get(
+        Map<String, Object> response = context
+            .http(http -> http.get(
                 "/restapi/v2.1/accounts/%s/envelopes".formatted(connectionParameters.getRequiredString(ACCOUNT_ID))))
             .queryParameter("from_date", inputParameters.getRequiredString(FROM_DATE))
             .configuration(responseType(ResponseType.JSON))
@@ -112,8 +112,7 @@ public class DocuSignUtils {
         if (response.get("envelopes") instanceof List<?> envelopes) {
             for (Object envelopeObject : envelopes) {
                 if (envelopeObject instanceof Map<?, ?> envelope) {
-                    options.add(
-                        option((String) envelope.get(EMAIL_SUBJECT), (String) envelope.get(ENVELOPE_ID)));
+                    options.add(option((String) envelope.get(EMAIL_SUBJECT), (String) envelope.get(ENVELOPE_ID)));
                 }
             }
         }
