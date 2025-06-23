@@ -32,6 +32,6 @@ public interface IntegrationInstanceConfigurationRepository
 
     List<IntegrationInstanceConfiguration> findAllByIdIn(List<Long> ids);
 
-    Optional<IntegrationInstanceConfiguration> findByIdAndEnvironmentAndEnabled(
+    Optional<IntegrationInstanceConfiguration> findByIntegrationIdAndEnvironmentAndEnabled(
         long id, int environment, boolean enabled);
 }

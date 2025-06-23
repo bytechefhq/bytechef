@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFront
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -51,10 +52,11 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
         String externalUserId = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
+        Map<String, Object> parameters = Objects.requireNonNull(connection)
+            .getParameters();
+
         connectedUserIntegrationFacade.createIntegrationInstance(
-            externalUserId, id, Objects.requireNonNull(connection)
-                .getParameters(),
-            getEnvironment(xEnvironment));
+            externalUserId, id, parameters, getEnvironment(xEnvironment));
 
         return ResponseEntity.noContent()
             .build();

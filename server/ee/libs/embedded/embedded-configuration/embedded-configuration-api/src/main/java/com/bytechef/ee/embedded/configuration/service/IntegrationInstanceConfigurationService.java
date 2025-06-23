@@ -26,7 +26,7 @@ public interface IntegrationInstanceConfigurationService {
 
     IntegrationInstanceConfiguration getIntegrationInstanceConfiguration(long id);
 
-    IntegrationInstanceConfiguration getIntegrationInstanceConfiguration(
+    IntegrationInstanceConfiguration getIntegrationIntegrationInstanceConfiguration(
         long id, Environment environment, boolean enabled);
 
     List<Long> getIntegrationIds();

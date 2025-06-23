@@ -20,9 +20,9 @@ import java.util.Map;
 public interface ConnectedUserIntegrationFacade {
 
     void createIntegrationInstance(
-        String externalUserId, long id, Map<String, Object> connectionParameters, Environment environment);
+        String externalUserId, long integrationId, Map<String, Object> connectionParameters, Environment environment);
 
-    void deleteIntegrationInstance(String externalUserId, long instanceId);
+    void deleteIntegrationInstance(String externalUserId, long integrationInstanceId);
 
     ConnectedUserIntegrationDTO getConnectedUserIntegration(
         String externalUserId, long integrationId, boolean enabled, Environment environment);

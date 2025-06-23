@@ -66,7 +66,7 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
     }
 
     @Override
-    public IntegrationInstanceConfiguration getIntegrationInstanceConfiguration(
+    public IntegrationInstanceConfiguration getIntegrationIntegrationInstanceConfiguration(
         long id, Environment environment, boolean enabled) {
 
         throw new UnsupportedOperationException();

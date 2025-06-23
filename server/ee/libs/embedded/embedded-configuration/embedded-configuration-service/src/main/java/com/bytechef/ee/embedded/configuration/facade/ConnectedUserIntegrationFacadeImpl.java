@@ -82,15 +82,14 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     @Override
     public void createIntegrationInstance(
-        String externalUserId, long id, Map<String, Object> connectionParameters, Environment environment) {
+        String externalUserId, long integrationId, Map<String, Object> connectionParameters, Environment environment) {
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
-            .getIntegrationInstanceConfiguration(id, environment, true);
+            .getIntegrationIntegrationInstanceConfiguration(integrationId, environment, true);
 
-        Integration integration = integrationService.getIntegration(
-            integrationInstanceConfiguration.getIntegrationId());
+        Integration integration = integrationService.getIntegration(integrationId);
 
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             integration.getComponentName(), integration.getComponentVersion());
@@ -107,8 +106,9 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     }
 
     @Override
-    public void deleteIntegrationInstance(String externalUserId, long instanceId) {
-        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(instanceId);
+    public void deleteIntegrationInstance(String externalUserId, long integrationInstanceId) {
+        IntegrationInstance integrationInstance =
+            integrationInstanceService.getIntegrationInstance(integrationInstanceId);
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
@@ -116,7 +116,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         connectedUserService.fetchConnectedUser(externalUserId, integrationInstanceConfiguration.getEnvironment())
             .ifPresent(connectedUser -> {
                 if (Objects.equals(connectedUser.getExternalId(), externalUserId)) {
-                    integrationInstanceService.delete(instanceId);
+                    integrationInstanceService.delete(integrationInstanceId);
                 }
             });
     }
