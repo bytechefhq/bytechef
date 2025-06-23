@@ -269,8 +269,8 @@ paths:
               type: "object"
               additionalProperties: true
       responses:
-        "200":
-          description: "The workflow reference code."
+        "204":
+          description: "Successful operation."
       security:
         - jwtBearerAuth: [ ]
   /integration-instances/{id}:
@@ -480,8 +480,13 @@ paths:
                       type: "object"
                       additionalProperties: true
       responses:
-        "204":
-          description: "Successful operation."
+        "200":
+          description: "The integration instance id."
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
@@ -513,8 +518,8 @@ paths:
               type: "object"
               additionalProperties: true
       responses:
-        "200":
-          description: "The workflow reference code."
+        "204":
+          description: "Successful operation."
       security:
         - bearerAuth: [ ]
   /{externalUserId}/automation/workflows:
@@ -1047,8 +1052,13 @@ paths:
                       type: "object"
                       additionalProperties: true
       responses:
-        "204":
-          description: "Successful operation."
+        "200":
+          description: "The integration instance id."
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
