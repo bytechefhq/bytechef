@@ -12,6 +12,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -255,6 +256,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
     }
 
+    @SuppressWarnings("unchecked")
     private void disableWorkflowTriggers(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
@@ -278,13 +280,18 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.evaluateParameters(integrationInstanceConfigurationWorkflow.getInputs(), evaluator),
+                workflowTrigger.evaluateParameters(
+                    MapUtils.concat(
+                        (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(),
+                        (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
+                    evaluator),
                 getConnectionId(
                     integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfiguration.getId(),
                     integrationInstanceWorkflow.getIntegrationInstanceId(), workflow.getId(), workflowTrigger));
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void enableWorkflowTriggers(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
@@ -308,7 +315,11 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.evaluateParameters(integrationInstanceConfigurationWorkflow.getInputs(), evaluator),
+                workflowTrigger.evaluateParameters(
+                    MapUtils.concat(
+                        (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(),
+                        (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
+                    evaluator),
                 getConnectionId(integrationInstanceConfiguration.getIntegrationId(),
                     integrationInstanceConfiguration.getId(), integrationInstanceWorkflow.getIntegrationInstanceId(),
                     workflow.getId(), workflowTrigger),
