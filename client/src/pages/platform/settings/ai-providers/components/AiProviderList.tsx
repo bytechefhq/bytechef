@@ -2,7 +2,7 @@ import {Accordion, AccordionContent, AccordionItem} from '@/components/ui/accord
 import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
 import {useEnableAiProviderMutation} from '@/ee/mutations/aiProvider.mutations';
-import {AiProviderKeys} from '@/ee/queries/aiProviderrs.queries';
+import {AiProviderKeys} from '@/ee/queries/aiProviders.queries';
 import {AiProvider} from '@/ee/shared/middleware/platform/configuration';
 import AiProviderForm from '@/pages/platform/settings/ai-providers/components/AiProviderForm';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';

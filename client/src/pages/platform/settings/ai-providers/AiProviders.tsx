@@ -1,5 +1,5 @@
 import PageLoader from '@/components/PageLoader';
-import {useGetAiProvidersQuery} from '@/ee/queries/aiProviderrs.queries';
+import {useGetAiProvidersQuery} from '@/ee/queries/aiProviders.queries';
 import AiProviderList from '@/pages/platform/settings/ai-providers/components/AiProviderList';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
