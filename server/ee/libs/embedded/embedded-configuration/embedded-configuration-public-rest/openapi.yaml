@@ -295,7 +295,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - jwtBearerAuth: [ ]
-  /integration-instances{id}/workflows/${workflowReferenceCode}:
+  /integration-instances/{id}/workflows/{workflowReferenceCode}:
     put:
       description: "Update a workflow for a specific integration instance."
       summary: "Update integration instance workflow"
@@ -332,7 +332,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - jwtBearerAuth: [ ]
-  /integration-instances{id}/workflows/${workflowReferenceCode}/enable:
+  /integration-instances/{id}/workflows/{workflowReferenceCode}/enable:
     post:
       description: "Enable a workflow."
       summary: "Enable a workflow"
@@ -831,7 +831,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}:
+  /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}:
     put:
       description: "Update a workflow for a specific integration instance."
       summary: "Update integration instance workflow"
@@ -874,7 +874,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable:
+  /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable:
     post:
       description: "Enable a workflow."
       summary: "Enable a workflow"
