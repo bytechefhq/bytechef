@@ -15,19 +15,19 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {Category, Integration, Tag} from '@/ee/shared/middleware/embedded/configuration';
-import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     useCreateIntegrationMutation,
     useUpdateIntegrationMutation,
-} from '@/shared/mutations/embedded/integrations.mutations';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
+} from '@/ee/shared/mutations/embedded/integrations.mutations';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {
     IntegrationCategoryKeys,
     useGetIntegrationCategoriesQuery,
-} from '@/shared/queries/embedded/integrationCategories.queries';
-import {IntegrationTagKeys, useGetIntegrationTagsQuery} from '@/shared/queries/embedded/integrationTags.quries';
-import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
+} from '@/ee/shared/queries/embedded/integrationCategories.queries';
+import {IntegrationTagKeys, useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import React, {ReactNode, useState} from 'react';

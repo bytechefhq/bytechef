@@ -14,22 +14,22 @@ import IntegrationHeaderWorkflowDropDownMenu from '@/ee/pages/embedded/integrati
 import IntegrationHeaderWorkflowSelect from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeaderWorkflowSelect';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import {useDeleteIntegrationMutation} from '@/ee/shared/mutations/embedded/integrations.mutations';
+import {
+    useCreateIntegrationWorkflowMutation,
+    useDeleteWorkflowMutation,
+} from '@/ee/shared/mutations/embedded/workflows.mutations';
+import {IntegrationCategoryKeys} from '@/ee/shared/queries/embedded/integrationCategories.queries';
+import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.quries';
+import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
-import {useDeleteIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
-import {
-    useCreateIntegrationWorkflowMutation,
-    useDeleteWorkflowMutation,
-} from '@/shared/mutations/embedded/workflows.mutations';
-import {IntegrationCategoryKeys} from '@/shared/queries/embedded/integrationCategories.queries';
-import {IntegrationTagKeys} from '@/shared/queries/embedded/integrationTags.quries';
-import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
-import {IntegrationKeys, useGetIntegrationQuery} from '@/shared/queries/embedded/integrations.queries';
-import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/embedded/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';

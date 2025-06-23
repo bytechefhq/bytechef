@@ -5,11 +5,11 @@ import IntegrationDialog from '@/ee/pages/embedded/integrations/components/Integ
 import IntegrationsFilterTitle from '@/ee/pages/embedded/integrations/components/IntegrationsFilterTitle';
 import IntegrationsLeftSidebarNav from '@/ee/pages/embedded/integrations/components/IntegrationsLeftSidebarNav';
 import IntegrationList from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationList';
+import {useGetIntegrationCategoriesQuery} from '@/ee/shared/queries/embedded/integrationCategories.queries';
+import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
+import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useGetIntegrationCategoriesQuery} from '@/shared/queries/embedded/integrationCategories.queries';
-import {useGetIntegrationTagsQuery} from '@/shared/queries/embedded/integrationTags.quries';
-import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {SquareIcon} from 'lucide-react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 

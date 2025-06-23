@@ -10,10 +10,10 @@ import {
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
+import {usePublishIntegrationMutation} from '@/ee/shared/mutations/embedded/integrations.mutations';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useToast} from '@/hooks/use-toast';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {usePublishIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
-import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import React, {useState} from 'react';
 

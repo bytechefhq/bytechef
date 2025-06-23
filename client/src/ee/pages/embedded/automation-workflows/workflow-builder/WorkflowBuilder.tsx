@@ -1,6 +1,12 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import WorkflowBuilderHeader from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/WorkflowBuilderHeader';
 import {useWorkflowBuilder} from '@/ee/pages/embedded/automation-workflows/workflow-builder/hooks/useWorkflowBuilder';
+import {getCreateConnectedUserProjectWorkflowConnection} from '@/ee/shared/mutations/embedded/connections.mutations';
+import {
+    ConnectionKeys,
+    getConnectedUserConnectionsQuery,
+    useGetConnectionTagsQuery,
+} from '@/ee/shared/queries/embedded/connections.queries';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
@@ -8,14 +14,8 @@ import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
-import {getCreateConnectedUserProjectWorkflowConnection} from '@/shared/mutations/embedded/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {
-    ConnectionKeys,
-    getConnectedUserConnectionsQuery,
-    useGetConnectionTagsQuery,
-} from '@/shared/queries/embedded/connections.queries';
 import {useQueryClient} from '@tanstack/react-query';
 
 const WorkflowBuilder = () => {

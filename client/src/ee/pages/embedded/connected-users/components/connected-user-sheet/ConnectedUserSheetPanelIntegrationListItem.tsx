@@ -8,15 +8,15 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import CredentialsStatus from '@/ee/pages/embedded/connected-users/components/CredentialsStatus';
 import ConnectedUserSheetPanelIntegrationWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowList';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useEnableIntegrationInstanceMutation} from '@/shared/mutations/embedded/integrationInstances.mutations';
-import {ConnectedUserKeys} from '@/shared/queries/embedded/connectedUsers.queries';
-import {useGetIntegrationInstanceConfigurationQuery} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {useEnableIntegrationInstanceMutation} from '@/ee/shared/mutations/embedded/integrationInstances.mutations';
+import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {useGetIntegrationInstanceConfigurationQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {
     IntegrationInstanceKeys,
     useGetIntegrationInstanceQuery,
-} from '@/shared/queries/embedded/integrationInstances.queries';
-import {useGetIntegrationVersionWorkflowsQuery} from '@/shared/queries/embedded/integrationWorkflows.queries';
+} from '@/ee/shared/queries/embedded/integrationInstances.queries';
+import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';

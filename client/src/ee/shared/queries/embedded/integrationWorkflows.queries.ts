@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys */
 import {Workflow, WorkflowApi} from '@/ee/shared/middleware/embedded/configuration';
-import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useQuery} from '@tanstack/react-query';
 
 export const IntegrationWorkflowKeys = {

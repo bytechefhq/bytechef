@@ -1,9 +1,9 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationInstanceConfigurationWorkflowListItem from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItem';
 import {IntegrationInstanceConfigurationWorkflow} from '@/ee/shared/middleware/embedded/configuration';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
+import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
-import {useGetIntegrationVersionWorkflowsQuery} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 
 const IntegrationInstanceConfigurationWorkflowList = ({

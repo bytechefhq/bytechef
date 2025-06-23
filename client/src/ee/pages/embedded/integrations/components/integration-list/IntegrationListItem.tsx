@@ -23,18 +23,18 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationPublishDialog from '@/ee/pages/embedded/integrations/components/IntegrationPublishDialog';
 import {Integration, Tag} from '@/ee/shared/middleware/embedded/configuration';
-import {useToast} from '@/hooks/use-toast';
-import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
-import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     useDeleteIntegrationMutation,
     useUpdateIntegrationTagsMutation,
-} from '@/shared/mutations/embedded/integrations.mutations';
-import {useCreateIntegrationWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
+} from '@/ee/shared/mutations/embedded/integrations.mutations';
+import {useCreateIntegrationWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
+import {IntegrationCategoryKeys} from '@/ee/shared/queries/embedded/integrationCategories.queries';
+import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.quries';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import {useToast} from '@/hooks/use-toast';
+import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {IntegrationCategoryKeys} from '@/shared/queries/embedded/integrationCategories.queries';
-import {IntegrationTagKeys} from '@/shared/queries/embedded/integrationTags.quries';
-import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';

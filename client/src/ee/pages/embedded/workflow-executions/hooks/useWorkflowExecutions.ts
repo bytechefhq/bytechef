@@ -2,12 +2,12 @@ import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionApi as EmbeddedWorkflowExecutionApi,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
+import {WorkflowExecutionKeys as EmbeddedWorkflowExecutionKeys} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import {WorkflowExecutionApi as AutomationWorkflowExecutionApi} from '@/shared/middleware/automation/workflow/execution';
 import {useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {Environment} from '@/shared/middleware/platform/configuration';
 import {Page} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowExecutionKeys as AutomationWorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
-import {WorkflowExecutionKeys as EmbeddedWorkflowExecutionKeys} from '@/shared/queries/embedded/workflowExecutions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 

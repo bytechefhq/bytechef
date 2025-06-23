@@ -16,9 +16,9 @@ import {
     IntegrationInstanceConfigurationWorkflow,
     IntegrationInstanceConfigurationWorkflowConnection,
 } from '@/ee/shared/middleware/embedded/configuration';
+import {useUpdateIntegrationInstanceConfigurationWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
+import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {useUpdateIntegrationInstanceConfigurationWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
-import {IntegrationInstanceConfigurationKeys} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';

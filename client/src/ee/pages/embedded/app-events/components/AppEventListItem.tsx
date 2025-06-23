@@ -19,8 +19,8 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AppEventDialog from '@/ee/pages/embedded/app-events/components/AppEventDialog';
 import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
-import {useDeleteAppEventMutation} from '@/shared/mutations/embedded/appEvents.mutations';
-import {AppEventKeys} from '@/shared/queries/embedded/appEvents.queries';
+import {useDeleteAppEventMutation} from '@/ee/shared/mutations/embedded/appEvents.mutations';
+import {AppEventKeys} from '@/ee/shared/queries/embedded/appEvents.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';

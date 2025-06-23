@@ -1,19 +1,19 @@
+import {useUpdateWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
+import {
+    IntegrationWorkflowKeys,
+    useGetIntegrationWorkflowQuery,
+} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import {WorkflowKeys} from '@/ee/shared/queries/embedded/workflows.queries';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {useUpdateWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
 import {
     useDeleteWorkflowNodeParameterMutation,
     useUpdateWorkflowNodeParameterMutation,
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
-import {
-    IntegrationWorkflowKeys,
-    useGetIntegrationWorkflowQuery,
-} from '@/shared/queries/embedded/integrationWorkflows.queries';
-import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
-import {WorkflowKeys} from '@/shared/queries/embedded/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';

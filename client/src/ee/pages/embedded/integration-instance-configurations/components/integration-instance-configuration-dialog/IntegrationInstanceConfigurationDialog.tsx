@@ -20,18 +20,18 @@ import {
     IntegrationInstanceConfigurationWorkflow,
     IntegrationInstanceConfigurationWorkflowConnection,
 } from '@/ee/shared/middleware/embedded/configuration';
+import {
+    useCreateIntegrationInstanceConfigurationMutation,
+    useUpdateIntegrationInstanceConfigurationMutation,
+} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
+import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
+import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {AuthorizationType} from '@/shared/middleware/platform/configuration';
-import {
-    useCreateIntegrationInstanceConfigurationMutation,
-    useUpdateIntegrationInstanceConfigurationMutation,
-} from '@/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
-import {IntegrationInstanceConfigurationTagKeys} from '@/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
-import {IntegrationInstanceConfigurationKeys} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
-import {useGetIntegrationVersionWorkflowsQuery} from '@/shared/queries/embedded/integrationWorkflows.queries';
-import {IntegrationKeys, useGetIntegrationQuery} from '@/shared/queries/embedded/integrations.queries';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import React, {ReactNode, useEffect, useState} from 'react';

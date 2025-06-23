@@ -2,8 +2,8 @@ import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/co
 import {Badge} from '@/components/ui/badge';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
+import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {ProjectStatus} from '@/shared/middleware/automation/configuration';
-import {useGetIntegrationVersionsQuery} from '@/shared/queries/embedded/integrationVersions.queries';
 
 interface IntegrationVersionHistorySheetProps {
     onClose: () => void;

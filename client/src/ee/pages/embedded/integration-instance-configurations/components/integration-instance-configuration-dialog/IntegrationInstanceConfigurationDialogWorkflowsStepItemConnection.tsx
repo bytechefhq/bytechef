@@ -3,15 +3,15 @@ import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
-import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
-import {ComponentConnection} from '@/shared/middleware/platform/configuration';
-import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
+import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
-} from '@/shared/queries/embedded/connections.queries';
+} from '@/ee/shared/queries/embedded/connections.queries';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {PlusIcon} from '@radix-ui/react-icons';
 import * as Portal from '@radix-ui/react-portal';

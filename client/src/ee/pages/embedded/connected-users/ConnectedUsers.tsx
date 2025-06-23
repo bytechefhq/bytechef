@@ -13,12 +13,12 @@ import ConnectedUsersFilterTitle from '@/ee/pages/embedded/connected-users/compo
 import ConnectedUserSheet from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheet';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserFromJSON, type CredentialStatus} from '@/ee/shared/middleware/embedded/connected-user';
+import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Environment} from '@/shared/middleware/automation/configuration';
-import {useGetConnectedUsersQuery} from '@/shared/queries/embedded/connectedUsers.queries';
-import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {cn} from '@/shared/util/cn-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {format} from 'date-fns';

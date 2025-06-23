@@ -1,6 +1,6 @@
 import ConnectedUserSheetPanelIntegrationListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationListItem';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
 
 import type {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 

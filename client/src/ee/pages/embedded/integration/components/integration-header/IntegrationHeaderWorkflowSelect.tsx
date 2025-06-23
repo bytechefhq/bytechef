@@ -7,7 +7,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import {useGetIntegrationWorkflowsQuery} from '@/shared/queries/embedded/integrationWorkflows.queries';
+import {useGetIntegrationWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 
 const IntegrationHeaderWorkflowSelect = ({
     integrationId,

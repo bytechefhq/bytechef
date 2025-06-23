@@ -4,10 +4,10 @@ import ConnectedUserFilterTitle from '@/ee/pages/embedded/automation-workflows/c
 import EnvironmentLeftSidebarNav from '@/ee/pages/embedded/automation-workflows/components/EnvironmentLeftSidebarNav';
 import ConnectedUserProjectList from '@/ee/pages/embedded/automation-workflows/components/connected-user-project-list/ConnectedUserProjectList';
 import {ConnectedUser, ConnectedUserFromJSON} from '@/ee/shared/middleware/embedded/connected-user';
+import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Environment, InputMaybe, useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
-import {useGetConnectedUsersQuery} from '@/shared/queries/embedded/connectedUsers.queries';
 import {Workflow} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 

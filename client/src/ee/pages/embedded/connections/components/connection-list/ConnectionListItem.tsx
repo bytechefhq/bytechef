@@ -21,14 +21,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Connection, Tag} from '@/ee/shared/middleware/embedded/configuration';
-import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useUpdateConnectionTagsMutation} from '@/shared/mutations/embedded/connectionTags.mutations';
+import {useUpdateConnectionTagsMutation} from '@/ee/shared/mutations/embedded/connectionTags.mutations';
 import {
     useDeleteConnectionMutation,
     useUpdateConnectionMutation,
-} from '@/shared/mutations/embedded/connections.mutations';
-import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/embedded/connections.queries';
+} from '@/ee/shared/mutations/embedded/connections.mutations';
+import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     ComponentDefinitionKeys,
     useGetConnectionComponentDefinitionQuery,

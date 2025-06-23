@@ -8,8 +8,8 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {useDeleteConnectedUserMutation} from '@/shared/mutations/embedded/connectedUsers.mutations';
-import {ConnectedUserKeys} from '@/shared/queries/embedded/connectedUsers.queries';
+import {useDeleteConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
+import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useQueryClient} from '@tanstack/react-query';
 
 const ConnectedUserDeleteDialog = ({connectedUserId, onClose}: {connectedUserId: number; onClose: () => void}) => {

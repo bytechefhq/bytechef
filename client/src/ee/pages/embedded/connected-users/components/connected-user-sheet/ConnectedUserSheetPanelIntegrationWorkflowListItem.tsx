@@ -8,10 +8,10 @@ import {
     IntegrationInstanceWorkflow,
     Workflow,
 } from '@/ee/shared/middleware/embedded/configuration';
+import {useEnableIntegrationInstanceWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
+import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {IntegrationInstanceKeys} from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useEnableIntegrationInstanceWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
-import {ConnectedUserKeys} from '@/shared/queries/embedded/connectedUsers.queries';
-import {IntegrationInstanceKeys} from '@/shared/queries/embedded/integrationInstances.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';

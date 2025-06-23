@@ -12,18 +12,18 @@ import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionFromJSON,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
+import {
+    useGetIntegrationInstanceConfigurationQuery,
+    useGetIntegrationInstanceConfigurationsQuery,
+} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import AutomationWorkflowExecutionsTable from '@/pages/automation/workflow-executions/components/WorkflowExecutionsTable';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {ConnectedUserProject} from '@/shared/middleware/graphql';
-import {
-    useGetIntegrationInstanceConfigurationQuery,
-    useGetIntegrationInstanceConfigurationsQuery,
-} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
-import {useGetIntegrationVersionWorkflowsQuery} from '@/shared/queries/embedded/integrationWorkflows.queries';
-import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';

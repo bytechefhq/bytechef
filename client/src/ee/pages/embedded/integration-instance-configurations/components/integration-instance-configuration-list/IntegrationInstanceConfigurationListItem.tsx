@@ -8,14 +8,14 @@ import IntegrationInstanceConfigurationListItemAlertDialog from '@/ee/pages/embe
 import IntegrationInstanceConfigurationListItemDropdownMenu from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItemDropdownMenu';
 import {useIntegrationInstanceConfigurationsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
 import {IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
-import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     useDeleteIntegrationInstanceConfigurationMutation,
     useEnableIntegrationInstanceConfigurationMutation,
     useUpdateIntegrationInstanceConfigurationTagsMutation,
-} from '@/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
-import {IntegrationInstanceConfigurationTagKeys} from '@/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
-import {IntegrationInstanceConfigurationKeys} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
+} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
+import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
+import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';

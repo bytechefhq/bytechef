@@ -1,8 +1,8 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
 import WorkflowExecutionSheetWorkflowPanel from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheetWorkflowPanel';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
+import {useGetIntegrationWorkflowExecutionQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
-import {useGetIntegrationWorkflowExecutionQuery} from '@/shared/queries/embedded/workflowExecutions.queries';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionSheetAccordion from './WorkflowExecutionSheetAccordion';

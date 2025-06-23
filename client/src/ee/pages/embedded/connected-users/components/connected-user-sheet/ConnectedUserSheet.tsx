@@ -2,7 +2,7 @@ import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/
 import ConnectedUserSheetPanel from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanel';
 import ConnectedUserSheetTitle from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetTitle';
 import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
-import {useGetConnectedUserQuery} from '@/shared/queries/embedded/connectedUsers.queries';
+import {useGetConnectedUserQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 
 const ConnectedUserSheet = () => {
     const {connectedUserId, connectedUserSheetOpen, setConnectedUserSheetOpen} = useConnectedUserSheetStore();

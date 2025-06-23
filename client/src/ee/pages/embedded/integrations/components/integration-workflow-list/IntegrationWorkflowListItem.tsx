@@ -19,13 +19,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
+import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import {WorkflowKeys} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
-import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
-import {WorkflowKeys} from '@/shared/queries/embedded/workflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';

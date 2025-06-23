@@ -13,12 +13,12 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {SigningKey} from '@/ee/shared/middleware/embedded/user';
-import {useToast} from '@/hooks/use-toast';
 import {
     useCreateSigningKeyMutation,
     useUpdateSigningKeyMutation,
-} from '@/shared/mutations/embedded/signingKeys.mutations';
-import {SigningKeyKeys} from '@/shared/queries/embedded/signingKeys.queries';
+} from '@/ee/shared/mutations/embedded/signingKeys.mutations';
+import {SigningKeyKeys} from '@/ee/shared/queries/embedded/signingKeys.queries';
+import {useToast} from '@/hooks/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';

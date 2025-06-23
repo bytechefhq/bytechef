@@ -1,11 +1,11 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
-import SigningKeyDialog from '@/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
-import SigningKeyTable from '@/pages/settings/embedded/signing-keys/components/SigningKeyTable';
+import SigningKeyDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
+import SigningKeyTable from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyTable';
+import {useGeSigningKeysQuery} from '@/ee/shared/queries/embedded/signingKeys.queries';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useGeSigningKeysQuery} from '@/shared/queries/embedded/signingKeys.queries';
 import {ClipboardSignatureIcon} from 'lucide-react';
 import {useState} from 'react';
 

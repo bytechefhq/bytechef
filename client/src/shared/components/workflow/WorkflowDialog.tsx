@@ -14,9 +14,9 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
+import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';

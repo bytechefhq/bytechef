@@ -4,6 +4,14 @@ import IntegrationsSidebar from '@/ee/pages/embedded/integration/components/inte
 import IntegrationsSidebarHeader from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebarHeader';
 import {useIntegration} from '@/ee/pages/embedded/integration/hooks/useIntegration';
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
+import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
+import {
+    ConnectionKeys,
+    useGetConnectionTagsQuery,
+    useGetConnectionsQuery,
+} from '@/ee/shared/queries/embedded/connections.queries';
+import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
@@ -12,14 +20,6 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
-import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
-import {
-    ConnectionKeys,
-    useGetConnectionTagsQuery,
-    useGetConnectionsQuery,
-} from '@/shared/queries/embedded/connections.queries';
-import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useParams} from 'react-router-dom';
 

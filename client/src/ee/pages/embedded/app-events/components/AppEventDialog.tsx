@@ -13,8 +13,8 @@ import {
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
-import {useCreateAppEventMutation, useUpdateAppEventMutation} from '@/shared/mutations/embedded/appEvents.mutations';
-import {AppEventKeys} from '@/shared/queries/embedded/appEvents.queries';
+import {useCreateAppEventMutation, useUpdateAppEventMutation} from '@/ee/shared/mutations/embedded/appEvents.mutations';
+import {AppEventKeys} from '@/ee/shared/queries/embedded/appEvents.queries';
 import Editor from '@monaco-editor/react';
 import {useQueryClient} from '@tanstack/react-query';
 import React, {ReactNode, useState} from 'react';

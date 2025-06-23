@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import ConnectedUserDeleteDialog from '@/ee/pages/embedded/connected-users/components/ConnectedUserDeleteDialog';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
-import {useEnableConnectedUserMutation} from '@/shared/mutations/embedded/connectedUsers.mutations';
-import {ConnectedUserKeys} from '@/shared/queries/embedded/connectedUsers.queries';
+import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
+import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';

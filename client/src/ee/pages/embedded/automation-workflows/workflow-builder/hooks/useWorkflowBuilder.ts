@@ -1,3 +1,7 @@
+import {
+    ConnectedUserProjectWorkflowKeys,
+    useGetConnectedUserProjectWorkflowQuery,
+} from '@/ee/shared/queries/embedded/connectedUserProjectWorkflows.queries';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
@@ -11,10 +15,6 @@ import {
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
-import {
-    ConnectedUserProjectWorkflowKeys,
-    useGetConnectedUserProjectWorkflowQuery,
-} from '@/shared/queries/embedded/connectedUserProjectWorkflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';

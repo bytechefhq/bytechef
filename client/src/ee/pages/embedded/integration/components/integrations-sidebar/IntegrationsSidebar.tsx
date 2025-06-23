@@ -1,6 +1,6 @@
 import {Badge} from '@/components/ui/badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
+import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import * as React from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';

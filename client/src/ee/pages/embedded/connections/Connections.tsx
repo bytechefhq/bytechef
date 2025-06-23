@@ -3,17 +3,17 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ConnectionsFilterTitle from '@/ee/pages/embedded/connections/components/ConnectionsFilterTitle';
 import {Connection, Environment} from '@/ee/shared/middleware/embedded/configuration';
-import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
-import Header from '@/shared/layout/Header';
-import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/embedded/componentDefinitions.queries';
+import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
-} from '@/shared/queries/embedded/connections.queries';
+} from '@/ee/shared/queries/embedded/connections.queries';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import Header from '@/shared/layout/Header';
+import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {Link2Icon, TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 

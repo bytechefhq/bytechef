@@ -9,9 +9,11 @@ import IntegrationInstanceConfigurations from '@/ee/pages/embedded/integration-i
 import Integration from '@/ee/pages/embedded/integration/Integration';
 import Integrations from '@/ee/pages/embedded/integrations/Integrations';
 import {WorkflowExecutions as EmbeddedIntegrationWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/WorkflowExecutions';
+import SigningKeys from '@/ee/pages/settings/embedded/signing-keys/SigningKeys';
 import ApiConnectors from '@/ee/pages/settings/platform/api-connectors/ApiConnectors';
 import CustomComponents from '@/ee/pages/settings/platform/custom-components/CustomComponents';
 import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
 import PasswordResetEmailSent from '@/pages/account/public/PasswordResetEmailSent';
@@ -36,7 +38,6 @@ import ApiKeys from '@/pages/platform/settings/api-keys/ApiKeys';
 import GitConfiguration from '@/pages/platform/settings/git-configuration/GitConfiguration';
 import Notifications from '@/pages/platform/settings/notifications/Notifications';
 import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
-import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
@@ -46,7 +47,6 @@ import PageNotFound from '@/shared/error/PageNotFound';
 import Settings from '@/shared/layout/Settings';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
-import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter, redirect} from 'react-router-dom';
 
