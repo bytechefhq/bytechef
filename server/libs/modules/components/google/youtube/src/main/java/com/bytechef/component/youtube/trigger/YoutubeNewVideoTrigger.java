@@ -115,12 +115,12 @@ public class YoutubeNewVideoTrigger {
         TriggerContext triggerContext) {
 
         String channelId = getChannelId(inputParameters.getRequiredString(IDENTIFIER), triggerContext);
-
         ZoneId zoneId = ZoneId.systemDefault();
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+
         ZonedDateTime startZonedDate = startDate.atZone(zoneId);
 
         Map<String, Object> response =
