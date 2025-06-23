@@ -135,7 +135,11 @@ export default function useConnectDialog({
 
             await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
                 method: 'POST',
-                body: formData,
+                body: {
+                    connection: {
+                        parameters: formData
+                    }
+                },
             });
 
             closeDialog();
