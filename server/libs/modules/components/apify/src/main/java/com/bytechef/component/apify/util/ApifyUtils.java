@@ -39,12 +39,12 @@ public class ApifyUtils extends AbstractApifyUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        List<Option<String>> options = new ArrayList<>();
+
         Map<String, Map<String, Object>> body = context.http(http -> http.get("/acts"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         Map<String, Object> data = body.get("data");
 
