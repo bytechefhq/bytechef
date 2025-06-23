@@ -37,50 +37,47 @@ public class SendFoxUtils extends AbstractSendFoxUtils {
 
     public static List<Option<String>> getEmailOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText,
-        Context context) {
+        String searchText, Context context) {
 
-        Map<String, Object> response = context.http(http -> http.get("/contacts"))
+        Map<String, Object> body = context.http(http -> http.get("/contacts"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> emailOptions = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-        if (response.get("data") instanceof List<?> contacts) {
+        if (body.get("data") instanceof List<?> contacts) {
             for (Object contactObject : contacts) {
-                if (contactObject instanceof Map<?, ?> contact &&
-                    contact.get("email") instanceof String contactEmail) {
-                    emailOptions.add(option(contactEmail, contactEmail));
+                if (contactObject instanceof Map<?, ?> contact) {
+                    String email = (String) contact.get("email");
+
+                    options.add(option(email, email));
                 }
             }
         }
 
-        return emailOptions;
+        return options;
     }
 
     public static List<Option<Long>> getListsOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText,
-        Context context) {
+        String searchText, Context context) {
 
-        Map<String, Object> response = context.http(http -> http.get("/lists"))
+        Map<String, Object> body = context.http(http -> http.get("/lists"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<Long>> listIdOptions = new ArrayList<>();
+        List<Option<Long>> options = new ArrayList<>();
 
-        if (response.get("data") instanceof List<?> lists) {
+        if (body.get("data") instanceof List<?> lists) {
             for (Object listObject : lists) {
-                if (listObject instanceof Map<?, ?> list &&
-                    list.get("id") instanceof Integer listId &&
-                    list.get("name") instanceof String listName) {
-                    listIdOptions.add(option(listName, (long) listId));
+                if (listObject instanceof Map<?, ?> list) {
+                    options.add(option((String) list.get("name"), ((Integer) list.get("id")).intValue()));
                 }
             }
         }
 
-        return listIdOptions;
+        return options;
     }
 }
