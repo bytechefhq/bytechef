@@ -132,12 +132,12 @@ public class WorkflowNodeTestOutput {
         return lastModifiedDate;
     }
 
-    public OutputResponse getOutput(Class<? extends BaseProperty> type) {
-        return new OutputResponse(getOutputSchema(type), getSampleOutput());
+    public OutputResponse getOutput(Class<? extends BaseProperty> typeClass) {
+        return new OutputResponse(getOutputSchema(typeClass), getSampleOutput());
     }
 
-    public BaseProperty getOutputSchema(Class<? extends BaseProperty> type) {
-        return MapUtils.get(outputSchema.getMap(), "outputSchema", type);
+    public BaseProperty getOutputSchema(Class<? extends BaseProperty> typeClass) {
+        return MapUtils.get(outputSchema.getMap(), "outputSchema", typeClass);
     }
 
     public Object getSampleOutput() {
