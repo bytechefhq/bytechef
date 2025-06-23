@@ -25,7 +25,6 @@ import static org.mockito.Mockito.mock;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -40,21 +39,19 @@ class JwtHelperSignActionTest {
 
     @Test
     void testPerform() {
-        Context mockedContext = mock(Context.class);
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(SECRET, "testSecret",
-            PAYLOAD, List.of(Map.of(KEY, "key1", VALUE, "value1"), Map.of(KEY, "key2", VALUE, "value2"))));
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(
+                SECRET, "testSecret", PAYLOAD, List.of(Map.of(KEY, "key1", VALUE, "value1"),
+                    Map.of(KEY, "key2", VALUE, "value2"))));
 
-        String jwtToken = JwtHelperSignAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        String jwtToken = JwtHelperSignAction.perform(mockedParameters, mockedParameters, mock(Context.class));
 
         Algorithm algorithm = Algorithm.HMAC256("testSecret");
-        DecodedJWT decodedJWT = JWT.require(algorithm)
-            .build()
-            .verify(jwtToken);
 
-        Map<String, Object> expectedPayload = Map.of("key1", "value1", "key2", "value2");
+        String expectedToken = JWT.create()
+            .withClaim(PAYLOAD, Map.of("key1", "value1", "key2", "value2"))
+            .sign(algorithm);
 
-        assertEquals(expectedPayload, decodedJWT.getClaim(PAYLOAD)
-            .asMap());
+        assertEquals(expectedToken, jwtToken);
     }
 }

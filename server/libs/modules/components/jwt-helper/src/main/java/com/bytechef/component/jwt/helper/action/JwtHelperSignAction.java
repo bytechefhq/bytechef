@@ -31,6 +31,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,19 +78,17 @@ public class JwtHelperSignAction {
         Algorithm algorithm = Algorithm.HMAC256(inputParameters.getRequiredString(SECRET));
 
         return JWT.create()
-            .withClaim(PAYLOAD, getPayload(inputParameters.getList(PAYLOAD)))
+            .withClaim(PAYLOAD, getPayload(inputParameters.getList(PAYLOAD, new TypeReference<>() {})))
             .sign(algorithm);
     }
 
-    private static HashMap<String, String> getPayload(List<?> payloadList) {
-        HashMap<String, String> payload = new HashMap<>();
+    private static Map<String, String> getPayload(List<Map<String, String>> payloads) {
+        Map<String, String> payloadMap = new HashMap<>();
 
-        for (Object payloadObject : payloadList) {
-            if (payloadObject instanceof Map<?, ?> payloadMap) {
-                payload.put((String) payloadMap.get(KEY), (String) payloadMap.get(VALUE));
-            }
+        for (Map<String, String> payloadObject : payloads) {
+            payloadMap.put(payloadObject.get(KEY), payloadObject.get(VALUE));
         }
 
-        return payload;
+        return payloadMap;
     }
 }
