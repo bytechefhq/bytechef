@@ -71,8 +71,8 @@ public record ConnectedUserIntegrationDTO(
             .map(integrationInstance -> new ConnectedUserIntegrationInstance(
                 getConnection(connections, integrationInstance), integrationInstance,
                 toIntegrationInstanceWorkflows(
-                    integrationInstanceConfigurationWorkflowDTOs,
-                    integrationInstance.getId(), integrationInstanceWorkflows)))
+                    integrationInstanceConfigurationWorkflowDTOs, integrationInstance.getId(),
+                    integrationInstanceWorkflows)))
             .toList();
     }
 
