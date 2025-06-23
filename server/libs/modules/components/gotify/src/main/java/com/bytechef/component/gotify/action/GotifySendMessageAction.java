@@ -127,32 +127,26 @@ public class GotifySendMessageAction {
                     MESSAGE, inputParameters.getRequiredString(MESSAGE),
                     PRIORITY, inputParameters.getInteger(PRIORITY),
                     TITLE, inputParameters.getString(TITLE),
-                    EXTRAS, getExtras(inputParameters.getList(EXTRAS))))
+                    EXTRAS, getExtras(inputParameters.getList(EXTRAS, new TypeReference<>() {}))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }
 
-    private static Object getExtras(List<?> extrasList) {
-        if (extrasList == null) {
+    private static Object getExtras(List<Map<String, String>> extrasList) {
+        if (extrasList == null || extrasList.isEmpty()) {
             return null;
         }
 
         Map<String, Map<String, Map<String, String>>> extras = new HashMap<>();
 
-        for (Object extraObject : extrasList) {
-            if (extraObject instanceof Map extra) {
-                String topNamespace = extra.get(TOP_NAMESPACE)
-                    .toString();
-                String subNamespace = extra.get(SUB_NAMESPACE)
-                    .toString();
-                String extraInfoKey = extra.get(EXTRA_INFO_KEY)
-                    .toString();
-                String extraInfoValue = extra.get(EXTRA_INFO_VALUE)
-                    .toString();
+        for (Map<String, String> extra : extrasList) {
+            String topNamespace = extra.get(TOP_NAMESPACE);
+            String subNamespace = extra.get(SUB_NAMESPACE);
+            String extraInfoKey = extra.get(EXTRA_INFO_KEY);
+            String extraInfoValue = extra.get(EXTRA_INFO_VALUE);
 
-                extras.put(topNamespace, Map.of(subNamespace, Map.of(extraInfoKey, extraInfoValue)));
-            }
+            extras.put(topNamespace, Map.of(subNamespace, Map.of(extraInfoKey, extraInfoValue)));
         }
 
         return extras;
