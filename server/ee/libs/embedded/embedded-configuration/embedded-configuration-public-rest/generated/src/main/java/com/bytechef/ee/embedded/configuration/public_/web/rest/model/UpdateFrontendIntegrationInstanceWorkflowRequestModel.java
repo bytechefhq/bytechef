@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateFrontendIntegrationInstanceWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T11:56:40.624151+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T14:57:57.448877+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class UpdateFrontendIntegrationInstanceWorkflowRequestModel {
 
   @Valid

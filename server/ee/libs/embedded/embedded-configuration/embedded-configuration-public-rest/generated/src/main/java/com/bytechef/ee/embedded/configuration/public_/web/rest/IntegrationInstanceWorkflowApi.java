@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T11:56:40.624151+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T14:57:57.448877+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "integration-instance-workflow", description = "The Embedded Integration Instance Workflow Public API")
 public interface IntegrationInstanceWorkflowApi {
@@ -43,7 +43,7 @@ public interface IntegrationInstanceWorkflowApi {
     }
 
     /**
-     * DELETE /integration-instances{id}/workflows/${workflowReferenceCode}/enable : Disable a workflow
+     * DELETE /integration-instances/{id}/workflows/{workflowReferenceCode}/enable : Disable a workflow
      * Disable a workflow.
      *
      * @param id The id of an integration instance. (required)
@@ -66,7 +66,7 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/integration-instances{id}/workflows/${workflowReferenceCode}/enable"
+        value = "/integration-instances/{id}/workflows/{workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> disableFrontendIntegrationInstanceWorkflow(
@@ -79,7 +79,7 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * DELETE /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable : Disable a workflow
+     * DELETE /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable : Disable a workflow
      * Disable a workflow.
      *
      * @param externalUserId The external user id. (required)
@@ -103,7 +103,7 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable"
+        value = "/{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> disableIntegrationInstanceWorkflow(
@@ -117,7 +117,7 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * POST /integration-instances{id}/workflows/${workflowReferenceCode}/enable : Enable a workflow
+     * POST /integration-instances/{id}/workflows/{workflowReferenceCode}/enable : Enable a workflow
      * Enable a workflow.
      *
      * @param id The id of an integration instance. (required)
@@ -140,7 +140,7 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/integration-instances{id}/workflows/${workflowReferenceCode}/enable"
+        value = "/integration-instances/{id}/workflows/{workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> enableFrontendIntegrationInstanceWorkflow(
@@ -153,7 +153,7 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * POST /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable : Enable a workflow
+     * POST /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable : Enable a workflow
      * Enable a workflow.
      *
      * @param externalUserId The external user id. (required)
@@ -177,7 +177,7 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}/enable"
+        value = "/{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable"
     )
     
     default ResponseEntity<Void> enableIntegrationInstanceWorkflow(
@@ -191,7 +191,7 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * PUT /integration-instances{id}/workflows/${workflowReferenceCode} : Update integration instance workflow
+     * PUT /integration-instances/{id}/workflows/{workflowReferenceCode} : Update integration instance workflow
      * Update a workflow for a specific integration instance.
      *
      * @param id The id of an integration instance. (required)
@@ -215,7 +215,7 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/integration-instances{id}/workflows/${workflowReferenceCode}",
+        value = "/integration-instances/{id}/workflows/{workflowReferenceCode}",
         consumes = { "application/json" }
     )
     
@@ -230,7 +230,7 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * PUT /{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode} : Update integration instance workflow
+     * PUT /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode} : Update integration instance workflow
      * Update a workflow for a specific integration instance.
      *
      * @param externalUserId The external user id. (required)
@@ -255,7 +255,7 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/{externalUserId}/integration-instances{id}/workflows/${workflowReferenceCode}",
+        value = "/{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}",
         consumes = { "application/json" }
     )
     
