@@ -39,12 +39,12 @@ public class SendFoxUtils extends AbstractSendFoxUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        List<Option<String>> options = new ArrayList<>();
+
         Map<String, Object> body = context.http(http -> http.get("/contacts"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         if (body.get("data") instanceof List<?> contacts) {
             for (Object contactObject : contacts) {
@@ -63,12 +63,12 @@ public class SendFoxUtils extends AbstractSendFoxUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        List<Option<Long>> options = new ArrayList<>();
+
         Map<String, Object> body = context.http(http -> http.get("/lists"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<Long>> options = new ArrayList<>();
 
         if (body.get("data") instanceof List<?> lists) {
             for (Object listObject : lists) {
