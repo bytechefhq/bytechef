@@ -49,6 +49,7 @@
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
+            "regex" : null,
             "required" : false,
             "type" : "STRING"
           }, {
@@ -69,6 +70,7 @@
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
+            "regex" : null,
             "required" : false,
             "type" : "STRING"
           } ],
@@ -115,6 +117,7 @@
           "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : false,
           "type" : "STRING"
         }, {
@@ -135,6 +138,7 @@
           "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : false,
           "type" : "STRING"
         } ],
@@ -168,6 +172,7 @@
         "optionsLookupDependsOn" : null
       },
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     } ],
@@ -209,6 +214,7 @@
         "optionsLookupDependsOn" : null
       },
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -229,6 +235,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     } ],
@@ -280,6 +287,7 @@
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
+            "regex" : null,
             "required" : false,
             "type" : "STRING"
           }, {
@@ -300,6 +308,7 @@
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
+            "regex" : null,
             "required" : false,
             "type" : "STRING"
           } ],
@@ -346,6 +355,7 @@
           "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : false,
           "type" : "STRING"
         }, {
@@ -366,6 +376,7 @@
           "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
+          "regex" : null,
           "required" : false,
           "type" : "STRING"
         } ],
@@ -397,6 +408,7 @@
         "optionsLookupDependsOn" : null
       },
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     } ],
@@ -440,6 +452,7 @@
         "optionsLookupDependsOn" : null
       },
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     }, {
@@ -460,6 +473,7 @@
       "options" : null,
       "optionsDataSource" : null,
       "placeholder" : null,
+      "regex" : null,
       "required" : true,
       "type" : "STRING"
     } ],
@@ -508,6 +522,7 @@
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
+        "regex" : null,
         "required" : true,
         "type" : "STRING"
       } ],
@@ -525,7 +540,7 @@
     "test" : null,
     "version" : 1
   },
-  "customAction" : null,
+  "customAction" : true,
   "customActionHelp" : null,
   "description" : "Apify is the largest ecosystem where developers build, deploy, and publish data extraction and web automation tools.",
   "icon" : "path:assets/apify.svg",
