@@ -37,12 +37,12 @@ public class WordpressUtils extends AbstractWordpressUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        List<Option<Long>> options = new ArrayList<>();
+
         List<Map<String, Object>> categories = context.http(http -> http.get("/wp/v2/categories"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<Long>> options = new ArrayList<>();
 
         for (Map<String, Object> category : categories) {
             if (category.get("id") instanceof Integer categoryId) {
