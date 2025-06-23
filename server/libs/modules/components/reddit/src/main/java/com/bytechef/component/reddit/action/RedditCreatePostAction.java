@@ -31,7 +31,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Marija Horvat
@@ -72,16 +71,16 @@ public class RedditCreatePostAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         return context.http(http -> http.post("/submit"))
-            .body(Body.of(
-                SUBREDDIT_NAME, inputParameters.getRequiredString(SUBREDDIT_NAME),
-                TITLE, inputParameters.getRequiredString(TITLE),
-                KIND, inputParameters.getRequiredString(KIND),
-                URL, inputParameters.getString(URL),
-                TEXT, inputParameters.getString(TEXT)))
+            .body(
+                Body.of(
+                    SUBREDDIT_NAME, inputParameters.getRequiredString(SUBREDDIT_NAME),
+                    TITLE, inputParameters.getRequiredString(TITLE),
+                    KIND, inputParameters.getRequiredString(KIND),
+                    URL, inputParameters.getString(URL),
+                    TEXT, inputParameters.getString(TEXT)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

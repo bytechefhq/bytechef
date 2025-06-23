@@ -27,7 +27,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Marija Horvat
@@ -53,13 +52,13 @@ public class RedditCreateCommentAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         return context.http(http -> http.post("/comment"))
-            .body(Body.of(
-                THING_ID, inputParameters.getRequiredString(THING_ID),
-                TEXT, inputParameters.getRequiredString(TEXT)))
+            .body(
+                Body.of(
+                    THING_ID, inputParameters.getRequiredString(THING_ID),
+                    TEXT, inputParameters.getRequiredString(TEXT)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

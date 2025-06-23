@@ -28,7 +28,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -42,8 +41,8 @@ class RedditCreateCommentActionTest {
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        THING_ID, "test", TEXT, "This is a comment."));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(THING_ID, "test", TEXT, "This is a comment."));
     private final Response mockedResponse = mock(Response.class);
     private final Map<String, Object> responseMap = Map.of("success", true, "id", "abc123");
 
@@ -57,15 +56,15 @@ class RedditCreateCommentActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
-        Map<String, Object> expectedResponse = Map.of("success", true, "id", "abc123");
         Object result = RedditCreateCommentAction.perform(mockedParameters, mockedParameters, mockedContext);
-        assertEquals(expectedResponse, result);
 
-        Map<String, Object> expectedBodyMap = Map.of(THING_ID, "test", TEXT, "This is a comment.");
+        assertEquals(responseMap, result);
+
         Body body = bodyArgumentCaptor.getValue();
-        assertEquals(expectedBodyMap, body.getContent());
+
+        assertEquals(Map.of(THING_ID, "test", TEXT, "This is a comment."), body.getContent());
     }
 }

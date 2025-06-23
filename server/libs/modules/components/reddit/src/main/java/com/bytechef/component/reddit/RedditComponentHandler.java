@@ -36,7 +36,8 @@ public class RedditComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("reddit")
         .title("Reddit")
         .description(
-            "Reddit is a social news aggregation, discussion, and content-sharing platform where users post and vote on content organized into communities called subreddits.")
+            "Reddit is a social news aggregation, discussion, and content-sharing platform where users post and " +
+                "vote on content organized into communities called subreddits.")
         .icon("path:assets/reddit.svg")
         .customAction(true)
         .categories(ComponentCategory.SOCIAL_MEDIA)

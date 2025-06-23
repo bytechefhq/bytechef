@@ -26,10 +26,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class RedditCreatePostActionTest {
     private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", TEXT, "This is a test."));
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of("success", true, "id", "abc123");
 
     @Test
@@ -58,16 +58,17 @@ class RedditCreatePostActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
-        Map<String, Object> expectedResponse = Map.of("success", true, "id", "abc123");
         Object result = RedditCreatePostAction.perform(mockedParameters, mockedParameters, mockedContext);
-        assertEquals(expectedResponse, result);
 
-        Map<String, Object> expectedBodyMap = Map.of(
-            SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", TEXT, "This is a test.");
+        assertEquals(responseMap, result);
+
         Body body = bodyArgumentCaptor.getValue();
-        assertEquals(expectedBodyMap, body.getContent());
+
+        assertEquals(
+            Map.of(SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", TEXT, "This is a test."),
+            body.getContent());
     }
 }
