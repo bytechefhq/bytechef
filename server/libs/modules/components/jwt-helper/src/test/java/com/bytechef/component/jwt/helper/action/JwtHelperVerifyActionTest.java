@@ -42,15 +42,11 @@ class JwtHelperVerifyActionTest {
             .withClaim(PAYLOAD, Map.of("key", "value"))
             .sign(algorithm);
 
-        Context mockedContext = mock(Context.class);
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(SECRET, "testSecret",
-            JWT_TOKEN, token));
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(SECRET, "testSecret", JWT_TOKEN, token));
 
-        Object result = JwtHelperVerifyAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Object result = JwtHelperVerifyAction.perform(mockedParameters, mockedParameters, mock(Context.class));
 
-        Map<String, String> expected = Map.of("key", "value");
-
-        assertEquals(expected, result);
+        assertEquals(Map.of("key", "value"), result);
     }
 }
