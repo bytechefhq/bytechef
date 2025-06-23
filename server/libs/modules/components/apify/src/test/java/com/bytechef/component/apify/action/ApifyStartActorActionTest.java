@@ -27,7 +27,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -37,16 +36,17 @@ import org.mockito.ArgumentCaptor;
  * @author Nikolina Spehar
  */
 class ApifyStartActorActionTest {
+
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responseMap = Map.of();
+    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(ACTOR_ID, "actorId", BODY, "testBody"));
 
     @Test
-    void perform() {
+    void testPerform() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -55,16 +55,15 @@ class ApifyStartActorActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
 
         when(mockedContext.json(any()))
             .thenReturn(Map.of());
 
-        Map<String, Object> result = ApifyStartActorAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Object result = ApifyStartActorAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(Map.of(), result);
+        assertEquals(mockedObject, result);
 
         Body body = bodyArgumentCaptor.getValue();
 

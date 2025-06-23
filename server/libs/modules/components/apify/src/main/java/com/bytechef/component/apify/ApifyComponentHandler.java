@@ -34,13 +34,6 @@ import java.util.List;
 public class ApifyComponentHandler extends AbstractApifyComponentHandler {
 
     @Override
-    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
-        return modifiableComponentDefinition
-            .icon("path:assets/apify.svg")
-            .categories(ComponentCategory.MARKETING_AUTOMATION);
-    }
-
-    @Override
     public List<? extends ModifiableActionDefinition> getCustomActions() {
         return List.of(ApifyStartActorAction.ACTION_DEFINITION);
     }
@@ -48,5 +41,12 @@ public class ApifyComponentHandler extends AbstractApifyComponentHandler {
     @Override
     public List<ClusterElementDefinition<?>> getCustomClusterElements() {
         return List.of(tool(ApifyStartActorAction.ACTION_DEFINITION));
+    }
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .icon("path:assets/apify.svg")
+            .categories(ComponentCategory.MARKETING_AUTOMATION);
     }
 }
