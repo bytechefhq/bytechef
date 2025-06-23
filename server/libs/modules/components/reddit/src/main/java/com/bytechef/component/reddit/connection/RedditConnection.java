@@ -24,14 +24,12 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.TypeReference;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +37,7 @@ import javax.naming.ConfigurationException;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class RedditConnection {
 
@@ -64,29 +63,27 @@ public class RedditConnection {
                     String valueToEncode = clientId + ":" + clientSecret;
                     String encoded = EncodingUtils.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8));
 
-                    StringBuilder formBody = new StringBuilder();
-                    formBody.append("grant_type=authorization_code");
-                    formBody.append("&code=")
-                        .append(URLEncoder.encode(code, StandardCharsets.UTF_8));
-                    formBody.append("&redirect_uri=")
-                        .append(URLEncoder.encode(redirectUri, StandardCharsets.UTF_8));
-
-                    Context.Http.Response response =
+                    Http.Response response =
                         context.http(http -> http.post("https://www.reddit.com/api/v1/access_token")
-                            .headers(Map.of(
-                                "Accept", List.of("application/json"),
-                                "Content-Type", List.of("application/x-www-form-urlencoded"),
-                                "Authorization", List.of("Basic " + encoded)))
-                            .body(Body.of(formBody.toString()))
+                            .queryParameters(
+                                "grant_type", "authorization_code",
+                                "code", code,
+                                "redirect_uri", redirectUri)
+                            .headers(
+                                Map.of(
+                                    "Accept", List.of("application/json"),
+                                    "Content-Type", List.of("application/x-www-form-urlencoded"),
+                                    "Authorization", List.of("Basic " + encoded)))
                             .configuration(responseType(ResponseType.JSON))
                             .execute());
 
                     if (response.getStatusCode() < 200 || response.getStatusCode() > 299
                         || response.getBody() == null) {
+
                         throw new ConfigurationException("Invalid claim");
                     }
 
-                    return new Authorization.AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
+                    return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
                 }));
 
     private RedditConnection() {
