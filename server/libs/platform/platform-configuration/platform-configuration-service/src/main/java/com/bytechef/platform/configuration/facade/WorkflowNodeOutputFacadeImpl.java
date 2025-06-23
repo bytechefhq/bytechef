@@ -323,12 +323,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation());
 
-        Class<? extends BaseProperty> type = workflowNodeType.operation() == null
+        Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
 
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, clusterElementName)
-            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
+            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .or(() -> getClusterElementDynamicOutputResponse(workflowId, workflowTask, clusterElement))
             .orElse(null);
 
@@ -432,7 +432,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         boolean testoutputResponse = false;
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-        Class<? extends BaseProperty> type = workflowNodeType.operation() == null
+        Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
             workflowNodeType.name(), workflowNodeType.version(),
@@ -440,7 +440,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
-            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
+            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .or(() -> getWorkflowTriggerDynamicOutputResponse(workflowId, workflowTrigger))
             .orElse(null);
 
