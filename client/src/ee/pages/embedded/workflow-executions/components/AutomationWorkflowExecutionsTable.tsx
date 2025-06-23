@@ -1,9 +1,8 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {JobBasic, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
-
-import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
 const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>) => {
     const infoValue = info.getValue();
@@ -28,17 +27,10 @@ const columns = [
         header: 'Workflow',
     }),
     columnHelper.accessor('project', {
-        cell: (info) => info.getValue()?.name,
-        header: 'Project',
+        cell: (info) => info.getValue()?.name.replace('__EMBEDDED__', ''),
+        header: 'Connected user',
     }),
-    columnHelper.accessor('projectDeployment', {
-        cell: (info) => `${info.getValue()?.name}`,
-        header: 'Deployment',
-    }),
-    columnHelper.accessor('projectDeployment', {
-        cell: (info) => `V${info.getValue()?.projectVersion}`,
-        header: 'Version',
-    }),
+
     columnHelper.accessor('projectDeployment', {
         cell: (info) => info.getValue()?.environment,
         header: 'Environment',
@@ -60,7 +52,8 @@ const columns = [
     }),
 ];
 
-const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
+const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
+    console.log(data);
     const reactTable = useReactTable<WorkflowExecution>({
         columns,
         data,
@@ -116,4 +109,4 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
     );
 };
 
-export default WorkflowExecutionsTable;
+export default AutomationWorkflowExecutionsTable;

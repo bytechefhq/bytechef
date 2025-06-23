@@ -51,7 +51,6 @@ export const useWorkflowExecutions = (
                     }),
                 })
                 .then((response) => {
-                    console.log(response);
                     setWorkflowExecutionsIsLoading(false);
                     setWorkflowExecutionPage(response);
                 })

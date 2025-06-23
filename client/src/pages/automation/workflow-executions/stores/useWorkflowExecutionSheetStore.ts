@@ -2,8 +2,8 @@
 import {create} from 'zustand';
 
 interface WorkflowExecutionSheetStateI {
-    workflowExecutionDetailsSheetOpen: boolean;
-    setWorkflowExecutionDetailsSheetOpen: (workflowExecutionDetailsSheetOpen: boolean) => void;
+    workflowExecutionSheetOpen: boolean;
+    setWorkflowExecutionSheetOpen: (workflowExecutionDetailsSheetOpen: boolean) => void;
 
     workflowExecutionId: number;
     setWorkflowExecutionId: (workflowExecutionId: number) => void;
@@ -17,11 +17,11 @@ export const useWorkflowExecutionSheetStore = create<WorkflowExecutionSheetState
             workflowExecutionId: workflowExecutionId,
         })),
 
-    workflowExecutionDetailsSheetOpen: false,
-    setWorkflowExecutionDetailsSheetOpen: (workflowExecutionDetailsSheetOpen) =>
+    workflowExecutionSheetOpen: false,
+    setWorkflowExecutionSheetOpen: (workflowExecutionSheetOpen) =>
         set((state) => ({
             ...state,
-            workflowExecutionDetailsSheetOpen: workflowExecutionDetailsSheetOpen,
+            workflowExecutionSheetOpen: workflowExecutionSheetOpen,
         })),
 }));
 

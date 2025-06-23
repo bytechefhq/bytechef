@@ -60,7 +60,7 @@ const columns = [
     }),
 ];
 
-const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
+const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
     const reactTable = useReactTable<WorkflowExecution>({
         columns,
         data,
@@ -119,4 +119,4 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
     );
 };
 
-export default WorkflowExecutionsTable;
+export default EmbeddedWorkflowExecutionsTable;

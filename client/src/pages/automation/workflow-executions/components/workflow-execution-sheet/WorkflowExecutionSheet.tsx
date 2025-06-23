@@ -8,20 +8,20 @@ import WorkflowExecutionSheetAccordion from './WorkflowExecutionSheetAccordion';
 import WorkflowExecutionSheetWorkflowPanel from './WorkflowExecutionSheetWorkflowPanel';
 
 const WorkflowExecutionSheet = () => {
-    const {setWorkflowExecutionDetailsSheetOpen, workflowExecutionDetailsSheetOpen, workflowExecutionId} =
+    const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
         useWorkflowExecutionSheetStore();
 
     const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetProjectWorkflowExecutionQuery(
         {
             id: workflowExecutionId,
         },
-        workflowExecutionDetailsSheetOpen
+        workflowExecutionSheetOpen
     );
 
     return (
         <Sheet
-            onOpenChange={() => setWorkflowExecutionDetailsSheetOpen(!workflowExecutionDetailsSheetOpen)}
-            open={workflowExecutionDetailsSheetOpen}
+            onOpenChange={() => setWorkflowExecutionSheetOpen(!workflowExecutionSheetOpen)}
+            open={workflowExecutionSheetOpen}
         >
             <SheetContent className="flex w-11/12 gap-0 p-0 sm:max-w-screen-xl">
                 {workflowExecutionLoading && <span>Loading...</span>}

@@ -5,12 +5,13 @@ import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
 import WorkflowExecutionsFilterTitle from '@/ee/pages/embedded/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
 import {Environment, Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
-    WorkflowExecutionFromJSON,
+    WorkflowExecutionFromJSON as EmbeddedWorkflowExecutionFromJSON,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
 import {
     useGetIntegrationInstanceConfigurationQuery,
@@ -18,17 +19,17 @@ import {
 } from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
-import AutomationWorkflowExecutionsTable from '@/pages/automation/workflow-executions/components/WorkflowExecutionsTable';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {WorkflowExecutionFromJSON as AutomationWorkflowExecutionFromJSON} from '@/shared/middleware/automation/workflow/execution';
 import {ConnectedUserProject} from '@/shared/middleware/graphql';
 import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
-import EmbeddedWorkflowExecutionsTable from './components/WorkflowExecutionsTable';
+import EmbeddedWorkflowExecutionsTable from './components/EmbeddedWorkflowExecutionsTable';
 import EmbeddedWorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
 
 function getEnvironment(filterEnvironment: number) {
@@ -162,7 +163,9 @@ export const WorkflowExecutions = () => {
             : 'There is no executed workflows for the current criteria.';
 
     const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecution: object) =>
-        WorkflowExecutionFromJSON(workflowExecution)
+        filterAutomations
+            ? AutomationWorkflowExecutionFromJSON(workflowExecution)
+            : EmbeddedWorkflowExecutionFromJSON(workflowExecution)
     );
 
     function filter(
