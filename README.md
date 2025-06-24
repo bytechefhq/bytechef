@@ -134,6 +134,13 @@ For help, you can use one of these channels to ask a question:
 ## Roadmap
 Check out our [roadmap](https://github.com/orgs/bytechefhq/projects/3) to get informed of the latest features released and the upcoming ones.
 
+## Mock Server
+
+You can instantly try out the ByteChef API using a hosted mock server built from the OpenAPI spec—no backend, auth, or config needed. This helps when you're building or testing integrations, exploring request/response formats, or validating client behavior early in development. The mock server generates dynamic, realistic data using schema details and examples.
+
+<a href="https://beeceptor.com/openapi-mock-server/?utm_source=github&utm_campaign=bytechef&url=https://raw.githubusercontent.com/bytechefhq/bytechef/8d989faf6f15f58707b4b13089c03bf9d4724575/server/ee/libs/embedded/embedded-unified/embedded-unified-rest/openapi/v1/crm/openapi.yaml" target="_blank"><img src="https://cdn.beeceptor.com/assets/images/buttons/mock-openapi-with-beeceptor.png" alt="Mock These APIs Instantly" style="height: 60px;"></a>
+
+
 ### Contributing
 
 If you'd like to contribute, kindly read our [Contributing Guide](CONTRIBUTING.md) to learn and understand about our development process, how to propose bug fixes and improvements, and how to build and test your changes to ByteChef.
