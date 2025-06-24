@@ -5,7 +5,6 @@ import './DesktopSidebar.css';
 
 import reactLogo from '@/assets/logo.svg';
 import DesktopSidebarBottomMenu from '@/shared/layout/desktop-sidebar/DesktopSidebarBottomMenu';
-import {useConnectDialog} from '@bytechef/embedded-react';
 import React from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -21,14 +20,6 @@ export function DesktopSidebar({
     }[];
 }) {
     const {pathname} = useLocation();
-    const {openDialog} = useConnectDialog({
-        baseUrl: 'http://localhost:9555',
-        environment: 'development',
-        integrationId: '1052',
-        // integrationInstanceId: '',
-        jwtToken:
-            'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNIVmliR2xqT2tWeE9HNW5Sa3BUUW1kTmJsaE1iVkZpTWtkcGRUWkVVRXg0TlcxS1dGbHAifQ.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.IOUDS8b5jp7OxLn-Wcw3e5X6S_zZ7KdHTII3CZ-_OK46JjMEmERKfE_86ZIW0RckConFh6O_V_4tXj1GXJgNH0Zj6VdEjpwNBRXzsh_G_qtFt1cNdvAJbhi1LupOeM9F8aRTyvHci7OD5b5VzYNig7M8FZLx14e5V4AIUscwyi0XOSvud9LaOHU_-sb-K0jLUGEproLYkzXRjkxrP4dxbJGNOK92-9g7ap8AWnrLhYuivTpimkQstf5dWp1lBn-M4t_evu9KyAWYkVCVLVLBmo5mMHc694-OaGv8-zbVxaCXd0BMO68t7FdtA_zZGD1aeFZTVmIqJmVrDthHvAokZw',
-    });
 
     return (
         <aside className={twMerge('hidden bg-muted lg:flex lg:shrink-0', className)}>
@@ -67,8 +58,6 @@ export function DesktopSidebar({
                     </div>
 
                     <div className="flex shrink-0 flex-col items-center justify-center gap-4 py-4">
-                        <button onClick={openDialog}>open dialog</button>
-
                         <DesktopSidebarBottomMenu />
                     </div>
                 </div>
