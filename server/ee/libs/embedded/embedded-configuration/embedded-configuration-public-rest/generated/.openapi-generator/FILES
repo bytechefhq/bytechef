@@ -17,9 +17,9 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Envi
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputTypeModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationBasicModel.java
-src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceAllOfWorkflowsModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceBasicModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/OAuth2Model.java

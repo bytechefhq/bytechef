@@ -3,7 +3,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceAllOfWorkflowsModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceWorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstance", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T21:06:35.139368+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T21:36:46.689421+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class IntegrationInstanceModel {
 
   private @Nullable Long id;
@@ -38,7 +38,7 @@ public class IntegrationInstanceModel {
   private @Nullable Boolean enabled;
 
   @Valid
-  private List<@Valid IntegrationInstanceAllOfWorkflowsModel> workflows = new ArrayList<>();
+  private List<@Valid IntegrationInstanceWorkflowModel> workflows = new ArrayList<>();
 
   public IntegrationInstanceModel id(Long id) {
     this.id = id;
@@ -100,12 +100,12 @@ public class IntegrationInstanceModel {
     this.enabled = enabled;
   }
 
-  public IntegrationInstanceModel workflows(List<@Valid IntegrationInstanceAllOfWorkflowsModel> workflows) {
+  public IntegrationInstanceModel workflows(List<@Valid IntegrationInstanceWorkflowModel> workflows) {
     this.workflows = workflows;
     return this;
   }
 
-  public IntegrationInstanceModel addWorkflowsItem(IntegrationInstanceAllOfWorkflowsModel workflowsItem) {
+  public IntegrationInstanceModel addWorkflowsItem(IntegrationInstanceWorkflowModel workflowsItem) {
     if (this.workflows == null) {
       this.workflows = new ArrayList<>();
     }
@@ -120,11 +120,11 @@ public class IntegrationInstanceModel {
   @Valid 
   @Schema(name = "workflows", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflows")
-  public List<@Valid IntegrationInstanceAllOfWorkflowsModel> getWorkflows() {
+  public List<@Valid IntegrationInstanceWorkflowModel> getWorkflows() {
     return workflows;
   }
 
-  public void setWorkflows(List<@Valid IntegrationInstanceAllOfWorkflowsModel> workflows) {
+  public void setWorkflows(List<@Valid IntegrationInstanceWorkflowModel> workflows) {
     this.workflows = workflows;
   }
 

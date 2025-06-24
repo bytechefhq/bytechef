@@ -2,13 +2,11 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -21,53 +19,51 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A group of tasks that make one logical workflow.
+ * A workflow data for particular integration instance.
  */
 
-@Schema(name = "IntegrationWorkflow", description = "A group of tasks that make one logical workflow.")
-@JsonTypeName("IntegrationWorkflow")
+@Schema(name = "IntegrationInstanceWorkflow", description = "A workflow data for particular integration instance.")
+@JsonTypeName("IntegrationInstanceWorkflow")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T21:36:46.689421+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
-public class IntegrationWorkflowModel {
+public class IntegrationInstanceWorkflowModel {
 
-  private @Nullable String description;
+  private @Nullable Boolean enabled;
 
   @Valid
-  private List<@Valid InputModel> inputs = new ArrayList<>();
-
-  private @Nullable String label;
+  private Map<String, Object> inputs = new HashMap<>();
 
   private @Nullable String workflowReferenceCode;
 
-  public IntegrationWorkflowModel description(String description) {
-    this.description = description;
+  public IntegrationInstanceWorkflowModel enabled(Boolean enabled) {
+    this.enabled = enabled;
     return this;
   }
 
   /**
-   * The description of a workflow.
-   * @return description
+   * If a workflow is enabled or not.
+   * @return enabled
    */
   
-  @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
+  @Schema(name = "enabled", description = "If a workflow is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("enabled")
+  public Boolean getEnabled() {
+    return enabled;
   }
 
-  public void setDescription(String description) {
-    this.description = description;
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
   }
 
-  public IntegrationWorkflowModel inputs(List<@Valid InputModel> inputs) {
+  public IntegrationInstanceWorkflowModel inputs(Map<String, Object> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public IntegrationWorkflowModel addInputsItem(InputModel inputsItem) {
+  public IntegrationInstanceWorkflowModel putInputsItem(String key, Object inputsItem) {
     if (this.inputs == null) {
-      this.inputs = new ArrayList<>();
+      this.inputs = new HashMap<>();
     }
-    this.inputs.add(inputsItem);
+    this.inputs.put(key, inputsItem);
     return this;
   }
 
@@ -75,38 +71,18 @@ public class IntegrationWorkflowModel {
    * Get inputs
    * @return inputs
    */
-  @Valid 
+  
   @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
-  public List<@Valid InputModel> getInputs() {
+  public Map<String, Object> getInputs() {
     return inputs;
   }
 
-  public void setInputs(List<@Valid InputModel> inputs) {
+  public void setInputs(Map<String, Object> inputs) {
     this.inputs = inputs;
   }
 
-  public IntegrationWorkflowModel label(String label) {
-    this.label = label;
-    return this;
-  }
-
-  /**
-   * The label of a workflow.
-   * @return label
-   */
-  
-  @Schema(name = "label", description = "The label of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("label")
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public IntegrationWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+  public IntegrationInstanceWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -134,25 +110,23 @@ public class IntegrationWorkflowModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    IntegrationWorkflowModel integrationWorkflow = (IntegrationWorkflowModel) o;
-    return Objects.equals(this.description, integrationWorkflow.description) &&
-        Objects.equals(this.inputs, integrationWorkflow.inputs) &&
-        Objects.equals(this.label, integrationWorkflow.label) &&
-        Objects.equals(this.workflowReferenceCode, integrationWorkflow.workflowReferenceCode);
+    IntegrationInstanceWorkflowModel integrationInstanceWorkflow = (IntegrationInstanceWorkflowModel) o;
+    return Objects.equals(this.enabled, integrationInstanceWorkflow.enabled) &&
+        Objects.equals(this.inputs, integrationInstanceWorkflow.inputs) &&
+        Objects.equals(this.workflowReferenceCode, integrationInstanceWorkflow.workflowReferenceCode);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, inputs, label, workflowReferenceCode);
+    return Objects.hash(enabled, inputs, workflowReferenceCode);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IntegrationWorkflowModel {\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("class IntegrationInstanceWorkflowModel {\n");
+    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
     sb.append("}");
     return sb.toString();

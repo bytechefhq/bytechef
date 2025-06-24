@@ -22,12 +22,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T21:06:35.139368+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T21:36:46.689421+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable String description;
 
   private @Nullable String definition;
+
+  private @Nullable Boolean enabled;
 
   private @Nullable String label;
 
@@ -73,6 +75,26 @@ public class ConnectedUserProjectWorkflowModel {
 
   public void setDefinition(String definition) {
     this.definition = definition;
+  }
+
+  public ConnectedUserProjectWorkflowModel enabled(Boolean enabled) {
+    this.enabled = enabled;
+    return this;
+  }
+
+  /**
+   * If a workflow is enabled or not.
+   * @return enabled
+   */
+  
+  @Schema(name = "enabled", description = "If a workflow is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("enabled")
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
   }
 
   public ConnectedUserProjectWorkflowModel label(String label) {
@@ -146,6 +168,7 @@ public class ConnectedUserProjectWorkflowModel {
     ConnectedUserProjectWorkflowModel connectedUserProjectWorkflow = (ConnectedUserProjectWorkflowModel) o;
     return Objects.equals(this.description, connectedUserProjectWorkflow.description) &&
         Objects.equals(this.definition, connectedUserProjectWorkflow.definition) &&
+        Objects.equals(this.enabled, connectedUserProjectWorkflow.enabled) &&
         Objects.equals(this.label, connectedUserProjectWorkflow.label) &&
         Objects.equals(this.workflowReferenceCode, connectedUserProjectWorkflow.workflowReferenceCode) &&
         Objects.equals(this.workflowVersion, connectedUserProjectWorkflow.workflowVersion);
@@ -153,7 +176,7 @@ public class ConnectedUserProjectWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, definition, label, workflowReferenceCode, workflowVersion);
+    return Objects.hash(description, definition, enabled, label, workflowReferenceCode, workflowVersion);
   }
 
   @Override
@@ -162,6 +185,7 @@ public class ConnectedUserProjectWorkflowModel {
     sb.append("class ConnectedUserProjectWorkflowModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
     sb.append("    workflowVersion: ").append(toIndentedString(workflowVersion)).append("\n");
