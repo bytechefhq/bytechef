@@ -808,6 +808,15 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                     for (Object item : curList) {
                         if (item instanceof Map<?, ?> curTask) {
+                            if (curTask.containsKey(WorkflowConstants.TASKS)) {
+                                Map<String, ?> curTaskMap = getTask(
+                                    workflowNodeName, (List<Map<String, ?>>) curTask.get(WorkflowConstants.TASKS));
+
+                                if (curTaskMap != null) {
+                                    return curTaskMap;
+                                }
+                            }
+
                             if (!curTask.containsKey(WorkflowConstants.NAME) &&
                                 !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
 
@@ -820,7 +829,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                                 return curTaskMap;
                             }
                         } else {
-                            System.out.println(item);
+                            throw new IllegalStateException(
+                                String.format("Unexpected list item type: %s", item.getClass()
+                                    .getName()));
                         }
                     }
                 }
