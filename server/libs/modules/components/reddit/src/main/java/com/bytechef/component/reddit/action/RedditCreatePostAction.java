@@ -17,7 +17,11 @@
 package com.bytechef.component.reddit.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.reddit.constant.RedditConstants.KIND;
@@ -28,7 +32,6 @@ import static com.bytechef.component.reddit.constant.RedditConstants.URL;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 
@@ -39,7 +42,7 @@ public class RedditCreatePostAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPost")
         .title("Create Post")
-        .description("Creates new reddit post.")
+        .description("Creates a new reddit post.")
         .properties(
             string(SUBREDDIT_NAME)
                 .label("Subreddit Name")
@@ -52,7 +55,7 @@ public class RedditCreatePostAction {
             string(KIND)
                 .label("Kind")
                 .description("Type of post.")
-                .options(option("Link", "link"), option("Self", "self"))
+                .options(option("Link", "link"), option("Text", "self"))
                 .required(true),
             string(URL)
                 .label("URL")
@@ -64,21 +67,27 @@ public class RedditCreatePostAction {
                 .description("Post text.")
                 .required(true)
                 .displayCondition("%s == '%s'".formatted(KIND, "self")))
-        .output()
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        array("jquery")
+                            .description("An array with response data."),
+                        bool("success")
+                            .description("Boolean value that indicates the success or failure of the request."))))
         .perform(RedditCreatePostAction::perform);
 
     private RedditCreatePostAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(http -> http.post("/submit"))
-            .body(
-                Body.of(
-                    SUBREDDIT_NAME, inputParameters.getRequiredString(SUBREDDIT_NAME),
-                    TITLE, inputParameters.getRequiredString(TITLE),
-                    KIND, inputParameters.getRequiredString(KIND),
-                    URL, inputParameters.getString(URL),
-                    TEXT, inputParameters.getString(TEXT)))
+        return context.http(http -> http.post("/api/submit"))
+            .queryParameters(
+                SUBREDDIT_NAME, inputParameters.getRequiredString(SUBREDDIT_NAME),
+                TITLE, inputParameters.getRequiredString(TITLE),
+                KIND, inputParameters.getRequiredString(KIND),
+                URL, inputParameters.getString(URL),
+                TEXT, inputParameters.getString(TEXT))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();

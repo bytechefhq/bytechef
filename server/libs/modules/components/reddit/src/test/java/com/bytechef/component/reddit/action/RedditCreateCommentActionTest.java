@@ -24,11 +24,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -38,7 +39,7 @@ import org.mockito.ArgumentCaptor;
  */
 class RedditCreateCommentActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
@@ -52,7 +53,7 @@ class RedditCreateCommentActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -63,8 +64,10 @@ class RedditCreateCommentActionTest {
 
         assertEquals(responseMap, result);
 
-        Body body = bodyArgumentCaptor.getValue();
+        Object[] query = queryArgumentCaptor.getValue();
 
-        assertEquals(Map.of(THING_ID, "test", TEXT, "This is a comment."), body.getContent());
+        assertEquals(
+            List.of(THING_ID, "test", TEXT, "This is a comment."),
+            Arrays.asList(query));
     }
 }

@@ -20,6 +20,7 @@ import static com.bytechef.component.reddit.constant.RedditConstants.KIND;
 import static com.bytechef.component.reddit.constant.RedditConstants.SUBREDDIT_NAME;
 import static com.bytechef.component.reddit.constant.RedditConstants.TEXT;
 import static com.bytechef.component.reddit.constant.RedditConstants.TITLE;
+import static com.bytechef.component.reddit.constant.RedditConstants.URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -27,10 +28,11 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -40,11 +42,11 @@ import org.mockito.ArgumentCaptor;
  */
 class RedditCreatePostActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", TEXT, "This is a test."));
+        SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", URL, "This is URL.", TEXT, "This is a test."));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of("success", true, "id", "abc123");
 
@@ -54,7 +56,7 @@ class RedditCreatePostActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -65,10 +67,11 @@ class RedditCreatePostActionTest {
 
         assertEquals(responseMap, result);
 
-        Body body = bodyArgumentCaptor.getValue();
+        Object[] query = queryArgumentCaptor.getValue();
 
         assertEquals(
-            Map.of(SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", TEXT, "This is a test."),
-            body.getContent());
+            List.of(SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", URL, "This is URL.", TEXT, "This is a test."),
+            Arrays.asList(query));
+
     }
 }
