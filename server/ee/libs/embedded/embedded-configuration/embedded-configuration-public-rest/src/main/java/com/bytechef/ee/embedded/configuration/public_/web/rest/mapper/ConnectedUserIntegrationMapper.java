@@ -84,7 +84,6 @@ public interface ConnectedUserIntegrationMapper {
         @Mapping(target = "scopes", source = "oAuth2.oAuth2AuthorizationParameters.scopes")
         OAuth2Model map(OAuth2 oAuth2);
 
-        @Mapping(target = "definition", source = "workflow.definition")
         @Mapping(target = "description", source = "workflow.description")
         @Mapping(target = "inputs", source = "workflow.inputs")
         @Mapping(target = "label", source = "workflow.label")

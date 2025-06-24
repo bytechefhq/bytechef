@@ -323,6 +323,7 @@ paths:
               type: "object"
               properties:
                 inputs:
+                  description: The workflow inputs
                   type: "object"
                   additionalProperties: true
       responses:
@@ -865,6 +866,7 @@ paths:
               type: "object"
               properties:
                 inputs:
+                  description: The workflow inputs
                   type: "object"
                   additionalProperties: true
       responses:
@@ -1067,13 +1069,26 @@ components:
   schemas:
     ConnectedUserProjectWorkflow:
       description: "A group of tasks that make one logical workflow."
-      allOf:
-        - $ref: "#/components/schemas/Workflow"
-        - type: "object"
-          properties:
-            workflowVersion:
-              type: "integer"
-              description: "The workflow version, if null a workflow is not yet published"
+      type: "object"
+      required:
+        - "name"
+        - "tasks"
+      properties:
+        description:
+          description: "The description of a workflow."
+          type: "string"
+        definition:
+          description: "The definition of a workflow."
+          type: "string"
+        label:
+          description: "The label of a workflow."
+          type: "string"
+        workflowReferenceCode:
+          description: "The reference code of a workflow."
+          type: "string"
+        workflowVersion:
+          type: "integer"
+          description: "The workflow version, if null a workflow is not yet published"
     ConnectionConfig:
       description: "Contains all required information to open a connection to a service defined by componentName parameter."
       type: "object"
@@ -1175,14 +1190,24 @@ components:
                     type: "string"
     IntegrationWorkflow:
       description: "A group of tasks that make one logical workflow."
-      allOf:
-        - $ref: "#/components/schemas/Workflow"
-        - type: "object"
-          properties:
-            inputs:
-              type: array
-              items:
-                $ref: "#/components/schemas/Input"
+      type: "object"
+      required:
+        - "name"
+        - "tasks"
+      properties:
+        description:
+          description: "The description of a workflow."
+          type: "string"
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Input"
+        label:
+          description: "The label of a workflow."
+          type: "string"
+        workflowReferenceCode:
+          description: "The reference code of a workflow."
+          type: "string"
     Input:
       type: "object"
       required:
