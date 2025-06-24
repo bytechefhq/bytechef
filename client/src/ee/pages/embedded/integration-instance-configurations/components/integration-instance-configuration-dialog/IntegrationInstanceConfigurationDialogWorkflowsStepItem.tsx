@@ -1,7 +1,6 @@
 import {Label} from '@/components/ui/label';
 import {Switch} from '@/components/ui/switch';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections';
-import IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {ComponentConnection, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {Workflow} from '@/shared/middleware/automation/configuration';
@@ -25,6 +24,7 @@ export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
 const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
     componentName,
     control,
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     formState,
     label,
     setValue,
@@ -81,14 +81,21 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
             {(workflowEnabledMap.get(workflow.id!) || switchHidden) && (
                 <div className="mt-2 space-y-6">
                     {/*<div className="flex flex-col gap-3">*/}
+
                     {/*    <Label className="font-semibold">Inputs</Label>*/}
 
                     {/*    <IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs*/}
+
                     {/*        control={control}*/}
+
                     {/*        formState={formState}*/}
+
                     {/*        workflow={workflow}*/}
+
                     {/*        workflowIndex={workflowIndex}*/}
+
                     {/*    />*/}
+
                     {/*</div>*/}
 
                     <div className="flex flex-col gap-3">
