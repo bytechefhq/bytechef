@@ -28,7 +28,6 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -41,6 +40,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -78,7 +79,6 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
     private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
     private final ProjectDeploymentService projectDeploymentService;
-    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -107,7 +107,6 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
         this.principalJobService = principalJobService;
         this.projectFacade = projectFacade;
         this.projectDeploymentService = projectDeploymentService;
-        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
@@ -265,15 +264,23 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
         TriggerExecutionDTO triggerExecutionDTO = null;
 
         if (projectDeploymentId != null && triggerExecution != null) {
-            ProjectDeploymentWorkflow projectDeploymentWorkflow =
-                projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
-                    projectDeploymentId.longValue(), job.getWorkflowId());
             DefinitionResult definitionResult = getDefinition(triggerExecution.getType());
+
+            WorkflowTrigger workflowTrigger = triggerExecution.getWorkflowTrigger();
+
+            Map<String, ?> workflowTriggerParameters = workflowTrigger.getParameters();
+
+            Map<String, Object> inputs = job.getInputs()
+                .entrySet()
+                .stream()
+                .filter(input -> !workflowTriggerParameters.containsKey(input.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
             triggerExecutionDTO = new TriggerExecutionDTO(
                 triggerExecution, definitionResult.title(), definitionResult.icon(),
-                projectDeploymentWorkflow.getInputs(),
-                triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput()));
+                workflowTrigger.evaluateParameters(inputs, evaluator),
+                triggerExecution.getOutput() == null ? null
+                    : triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput()));
         }
 
         return triggerExecutionDTO;
