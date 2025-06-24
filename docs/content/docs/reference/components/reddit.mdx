@@ -43,13 +43,13 @@ Version: 1
 ### Create Comment
 Name: createComment
 
-`Creates a new comment on a Reddit post or comment.`
+`Creates comment on a Reddit post or replies to a comment.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| thing_id | Parent ID | STRING | `Fullname of parent (post ID or comment ID to reply to).` | true |
+| thing_id | Parent ID | STRING | `Post ID (t3_*) or comment ID (t1_*) to reply to.` | true |
 | text | Comment Text | STRING | `Comment text.` | true |
 
 #### Example JSON Structure
@@ -67,15 +67,34 @@ Name: createComment
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| jquery | ARRAY <details> <summary> Items </summary> [] </details> | An array with response data. |
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | Boolean value that indicates the success or failure of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "jquery" : [ ],
+  "success" : false
+}
+```
 
 
 ### Create Post
 Name: createPost
 
-`Creates new reddit post.`
+`Creates a new reddit post.`
 
 #### Properties
 
@@ -105,9 +124,28 @@ Name: createPost
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| jquery | ARRAY <details> <summary> Items </summary> [] </details> | An array with response data. |
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | Boolean value that indicates the success or failure of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "jquery" : [ ],
+  "success" : false
+}
+```
 
 
 
