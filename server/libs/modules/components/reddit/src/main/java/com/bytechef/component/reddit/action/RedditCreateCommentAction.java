@@ -17,6 +17,10 @@
 package com.bytechef.component.reddit.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.reddit.constant.RedditConstants.TEXT;
@@ -24,7 +28,6 @@ import static com.bytechef.component.reddit.constant.RedditConstants.THING_ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 
@@ -35,28 +38,34 @@ public class RedditCreateCommentAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createComment")
         .title("Create Comment")
-        .description("Creates a new comment on a Reddit post or comment.")
+        .description("Creates comment on a Reddit post or replies to a comment.")
         .properties(
             string(THING_ID)
                 .label("Parent ID")
-                .description("Fullname of parent (post ID or comment ID to reply to).")
+                .description("Post ID (t3_*) or comment ID (t1_*) to reply to.")
                 .required(true),
             string(TEXT)
                 .label("Comment Text")
                 .description("Comment text.")
                 .required(true))
-        .output()
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        array("jquery")
+                            .description("An array with response data."),
+                        bool("success")
+                            .description("Boolean value that indicates the success or failure of the request."))))
         .perform(RedditCreateCommentAction::perform);
 
     private RedditCreateCommentAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(http -> http.post("/comment"))
-            .body(
-                Body.of(
-                    THING_ID, inputParameters.getRequiredString(THING_ID),
-                    TEXT, inputParameters.getRequiredString(TEXT)))
+        return context.http(http -> http.post("/api/comment"))
+            .queryParameters(
+                THING_ID, inputParameters.getRequiredString(THING_ID),
+                TEXT, inputParameters.getRequiredString(TEXT))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();
