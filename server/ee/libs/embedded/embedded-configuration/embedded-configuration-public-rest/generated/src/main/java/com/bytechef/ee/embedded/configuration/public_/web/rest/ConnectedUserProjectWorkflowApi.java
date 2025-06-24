@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T18:39:29.529101+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T21:06:35.139368+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Automation Workflow Public API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -192,7 +192,6 @@ public interface ConnectedUserProjectWorkflowApi {
      * Disable a workflow.
      *
      * @param workflowReferenceCode The workflow reference code. (required)
-     * @param enable Enable/disable the project deployment. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -215,7 +214,6 @@ public interface ConnectedUserProjectWorkflowApi {
     
     default ResponseEntity<Void> disableFrontendProjectWorkflow(
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "enable", description = "Enable/disable the project deployment.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -229,7 +227,6 @@ public interface ConnectedUserProjectWorkflowApi {
      *
      * @param externalUserId The external user id. (required)
      * @param workflowReferenceCode The workflow reference code. (required)
-     * @param enable Enable/disable the project deployment. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -253,7 +250,6 @@ public interface ConnectedUserProjectWorkflowApi {
     default ResponseEntity<Void> disableProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "enable", description = "Enable/disable the project deployment.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -266,7 +262,6 @@ public interface ConnectedUserProjectWorkflowApi {
      * Enable a workflow.
      *
      * @param workflowReferenceCode The workflow reference code. (required)
-     * @param enable Enable/disable the project deployment. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -289,7 +284,6 @@ public interface ConnectedUserProjectWorkflowApi {
     
     default ResponseEntity<Void> enableFrontendProjectWorkflow(
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "enable", description = "Enable/disable the project deployment.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -303,7 +297,6 @@ public interface ConnectedUserProjectWorkflowApi {
      *
      * @param externalUserId The external user id. (required)
      * @param workflowReferenceCode The workflow reference code. (required)
-     * @param enable Enable/disable the project deployment. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -327,7 +320,6 @@ public interface ConnectedUserProjectWorkflowApi {
     default ResponseEntity<Void> enableProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "enable", description = "Enable/disable the project deployment.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
