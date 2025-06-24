@@ -61,6 +61,8 @@ class PushoverSendNotificationActionTest {
 
     @Test
     void testPerform() {
+        String encodedToString = EncodingUtils.base64EncodeToString(fileContent);
+
         when(mockedParameters.getString(TITLE))
             .thenReturn("testTitle");
         when(mockedParameters.getRequiredString(MESSAGE))
@@ -81,6 +83,8 @@ class PushoverSendNotificationActionTest {
             .thenReturn("testUrlTitle");
         when(mockedParameters.getFileEntry(ATTACHMENT_BASE_64))
             .thenReturn(mockedFileEntry);
+        when(mockedActionContext.encoder(any()))
+            .thenReturn(encodedToString);
 
         when(mockedActionContext.file(any()))
             .thenReturn(fileContent);
@@ -104,7 +108,7 @@ class PushoverSendNotificationActionTest {
         Map<String, Object> expectedBody = Map.of(
             TITLE, "testTitle", MESSAGE, "This is a test message", TOKEN, "testToken", USER, "testUserKey",
             PRIORITY, "2", RETRY, 30, EXPIRE, 1800, URL, "testUrl", URL_TITLE, "testUrlTitle",
-            ATTACHMENT_BASE_64, EncodingUtils.base64EncodeToString(fileContent));
+            ATTACHMENT_BASE_64, encodedToString);
 
         assertEquals(expectedBody, body.getContent());
     }

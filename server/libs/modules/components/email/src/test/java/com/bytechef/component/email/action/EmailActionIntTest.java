@@ -16,7 +16,9 @@
 
 package com.bytechef.component.email.action;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -30,8 +32,8 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.server.AbstractServer;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -56,6 +58,8 @@ public class EmailActionIntTest {
     @Test
     public void testEmailActions() throws Exception {
         ActionContext actionContext = mock(ActionContext.class);
+        when(actionContext.json(any()))
+            .thenReturn(JsonUtils.write("test.from@test.com"));
 
         AbstractServer server = greenMail.getSmtp();
 
@@ -110,10 +114,10 @@ public class EmailActionIntTest {
 
         parameterMap.put(EmailConstants.PORT, String.valueOf(port));
         parameterMap.put("from", "test.from@test.com");
-        parameterMap.put("to", Arrays.asList("bytecheftest@bytechef.io"));
-        parameterMap.put("cc", Arrays.asList("test.cc@test.com"));
-        parameterMap.put("bcc", Arrays.asList("test.bcc@test.com"));
-        parameterMap.put("replyTo", Arrays.asList("test.replyto@test.com"));
+        parameterMap.put("to", List.of("bytecheftest@bytechef.io"));
+        parameterMap.put("cc", List.of("test.cc@test.com"));
+        parameterMap.put("bcc", List.of("test.bcc@test.com"));
+        parameterMap.put("replyTo", List.of("test.replyto@test.com"));
         parameterMap.put("subject", "Do Test Until Success");
         parameterMap.put("content", "Magic appears always");
 
