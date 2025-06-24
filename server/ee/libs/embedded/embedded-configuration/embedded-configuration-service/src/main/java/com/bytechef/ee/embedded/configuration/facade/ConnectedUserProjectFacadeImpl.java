@@ -169,7 +169,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                     connectedUserProjectWorkflowService.delete(connectedUserProjectWorkflow.getId());
                 });
 
-            projectFacade.deleteWorkflow(projectWorkflow.getWorkflowId(), true);
+            projectFacade.deleteWorkflow(projectWorkflow.getWorkflowId());
         }
 
         for (Long connectionId : connectionIds) {

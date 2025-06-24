@@ -64,7 +64,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
 
     @Override
     public ResponseEntity<Void> deleteWorkflow(String workflowId) {
-        projectFacade.deleteWorkflow(workflowId, false);
+        projectFacade.deleteWorkflow(workflowId);
 
         return ResponseEntity.noContent()
             .build();

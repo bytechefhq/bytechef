@@ -115,7 +115,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public void delete(long projectId, int projectVersion, String workflowId, boolean deleteLastWorkflow) {
+    public void delete(long projectId, int projectVersion, String workflowId) {
         throw new UnsupportedOperationException();
     }
 

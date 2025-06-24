@@ -17,10 +17,8 @@
 package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.exception.ConfigurationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -161,15 +159,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public void delete(long projectId, int projectVersion, String workflowId, boolean deleteLastWorkflow) {
-        if (projectWorkflowRepository.countByProjectIdAndProjectVersion(projectId, projectVersion) == 1 &&
-            !deleteLastWorkflow) {
-
-            throw new ConfigurationException(
-                "The last workflow id=%s cannot be deleted".formatted(workflowId),
-                ProjectErrorType.DELETE_LAST_WORKFLOW);
-        }
-
+    public void delete(long projectId, int projectVersion, String workflowId) {
         projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowId(projectId, projectVersion, workflowId)
             .ifPresent(projectWorkflow -> projectWorkflowRepository.deleteById(projectWorkflow.getId()));
     }

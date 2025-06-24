@@ -161,7 +161,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void deleteWorkflow(String workflowId, boolean deleteLastWorkflow) {
+    public void deleteWorkflow(String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(project.getId());
@@ -186,7 +186,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         for (ProjectVersion projectVersion : project.getProjectVersions()) {
-            projectWorkflowService.delete(project.getId(), projectVersion.getVersion(), workflowId, deleteLastWorkflow);
+            projectWorkflowService.delete(project.getId(), projectVersion.getVersion(), workflowId);
         }
 
         workflowTestConfigurationService.delete(workflowId);
