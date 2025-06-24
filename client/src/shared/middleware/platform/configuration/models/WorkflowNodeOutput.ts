@@ -67,6 +67,12 @@ export interface WorkflowNodeOutput {
      */
     taskDispatcherDefinition?: TaskDispatcherDefinitionBasic;
     /**
+     * If the output response is a sample or the real one
+     * @type {boolean}
+     * @memberof WorkflowNodeOutput
+     */
+    testOutputResponse?: boolean;
+    /**
      * 
      * @type {TriggerDefinitionBasic}
      * @memberof WorkflowNodeOutput
@@ -107,6 +113,7 @@ export function WorkflowNodeOutputFromJSONTyped(json: any, ignoreDiscriminator: 
         'actionDefinition': json['actionDefinition'] == null ? undefined : ActionDefinitionBasicFromJSON(json['actionDefinition']),
         'outputResponse': json['outputResponse'] == null ? undefined : OutputResponseFromJSON(json['outputResponse']),
         'taskDispatcherDefinition': json['taskDispatcherDefinition'] == null ? undefined : TaskDispatcherDefinitionBasicFromJSON(json['taskDispatcherDefinition']),
+        'testOutputResponse': json['testOutputResponse'] == null ? undefined : json['testOutputResponse'],
         'triggerDefinition': json['triggerDefinition'] == null ? undefined : TriggerDefinitionBasicFromJSON(json['triggerDefinition']),
         'variableOutputResponse': json['variableOutputResponse'] == null ? undefined : OutputResponseFromJSON(json['variableOutputResponse']),
         'workflowNodeName': json['workflowNodeName'],
@@ -127,6 +134,7 @@ export function WorkflowNodeOutputToJSONTyped(value?: WorkflowNodeOutput | null,
         'actionDefinition': ActionDefinitionBasicToJSON(value['actionDefinition']),
         'outputResponse': OutputResponseToJSON(value['outputResponse']),
         'taskDispatcherDefinition': TaskDispatcherDefinitionBasicToJSON(value['taskDispatcherDefinition']),
+        'testOutputResponse': value['testOutputResponse'],
         'triggerDefinition': TriggerDefinitionBasicToJSON(value['triggerDefinition']),
         'variableOutputResponse': OutputResponseToJSON(value['variableOutputResponse']),
         'workflowNodeName': value['workflowNodeName'],
