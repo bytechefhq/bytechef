@@ -1,0 +1,402 @@
+---
+title: "Wrike"
+description: "Wrike's Powerful Project Management Software Provides Users with Enterprise-Level Security."
+---
+
+Wrike's Powerful Project Management Software Provides Users with Enterprise-Level Security.
+
+
+Categories: Project Management
+
+
+Type: wrike/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### oauth2_authorization_code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client ID | STRING | `Client ID of your Wrike app.` | true |
+| clientSecret | Client Secret | STRING | `Client Secret of your Wrike app.` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Comment
+Name: createComment
+
+`Create a comment in a folder or in a task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| parent | Parent | STRING <details> <summary> Options </summary> folders, tasks </details> | `Choose whether the comment will be added to a task or to a folder.` | true |
+| parentId | Parent ID | STRING <details> <summary> Depends On </summary> parent </details> | `ID of the parent folder or the parent task.` | true |
+| text | Text | STRING | `Comment text.` | true |
+| plainText | Plain Text | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether the comment will be treated as plain text or as HTML.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Comment",
+  "name" : "createComment",
+  "parameters" : {
+    "parent" : "",
+    "parentId" : "",
+    "text" : "",
+    "plainText" : false
+  },
+  "type" : "wrike/v1/createComment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| kind | STRING | Kind of the object that was created. |
+| data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(authorId), STRING\(text), STRING\(updatedDate), STRING\(createdDate), STRING\(parentId), []\(attachmentIds)&#125;] </details> | Data of the object that was created. |
+
+
+
+
+#### Output Example
+```json
+{
+  "kind" : "",
+  "data" : [ {
+    "id" : "",
+    "authorId" : "",
+    "text" : "",
+    "updatedDate" : "",
+    "createdDate" : "",
+    "parentId" : "",
+    "attachmentIds" : [ ]
+  } ]
+}
+```
+
+
+### Create Folder
+Name: createFolder
+
+`Create a folder.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| parentId | Parent ID | STRING | `ID of the parent folder.` | true |
+| title | Title | STRING | `The title of the folder.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Folder",
+  "name" : "createFolder",
+  "parameters" : {
+    "parentId" : "",
+    "title" : ""
+  },
+  "type" : "wrike/v1/createFolder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| kind | STRING | Kind of the object that was created. |
+| data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(accountId), STRING\(title), STRING\(createdDate), STRING\(updatedDate), STRING\(description), [STRING\($sharedId)]\(sharedIds), [STRING\($parentId)]\(parentIds), [STRING\($childId)]\(childIds), [STRING\($superParentId)]\(superParentIds), STRING\(scope), BOOLEAN\(hasAttachments), STRING\(permalink), STRING\(workflowId), []\(metadata), []\(customFields)&#125;] </details> | Data of the object that was created. |
+
+
+
+
+#### Output Example
+```json
+{
+  "kind" : "",
+  "data" : [ {
+    "id" : "",
+    "accountId" : "",
+    "title" : "",
+    "createdDate" : "",
+    "updatedDate" : "",
+    "description" : "",
+    "sharedIds" : [ "" ],
+    "parentIds" : [ "" ],
+    "childIds" : [ "" ],
+    "superParentIds" : [ "" ],
+    "scope" : "",
+    "hasAttachments" : false,
+    "permalink" : "",
+    "workflowId" : "",
+    "metadata" : [ ],
+    "customFields" : [ ]
+  } ]
+}
+```
+
+
+### Create Project
+Name: createProject
+
+`Create a project.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| parentId | Parent ID | STRING | `ID of the parent folder.` | true |
+| title | Title | STRING | `The title of the project.` | true |
+| description | Description | STRING | `The description of the project.` | false |
+| startDate | Start Date | DATE | `The start date of the project.` | true |
+| endDate | End Date | DATE | `The end date of the project.` | true |
+| contractType | Contract Type | STRING <details> <summary> Options </summary> Billable, NonBillable </details> | `The contract type of the project.` | false |
+| ownerIds | Owner IDs | ARRAY <details> <summary> Items </summary> [STRING\($ContactId)] </details> | `List of project owner IDs.` | false |
+| budget | Budget | INTEGER | `The budget of the project.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Project",
+  "name" : "createProject",
+  "parameters" : {
+    "parentId" : "",
+    "title" : "",
+    "description" : "",
+    "startDate" : "2021-01-01",
+    "endDate" : "2021-01-01",
+    "contractType" : "",
+    "ownerIds" : [ "" ],
+    "budget" : 1
+  },
+  "type" : "wrike/v1/createProject"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| kind | STRING | Kind of the object that was created. |
+| data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(accountId), STRING\(title), STRING\(createdDate), STRING\(updatedDate), STRING\(description), [STRING\($sharedId)]\(sharedIds), [STRING\($parentId)]\(parentIds), [STRING\($childId)]\(childIds), [STRING\($superParentId)]\(superParentIds), STRING\(scope), BOOLEAN\(hasAttachments), STRING\(permalink), STRING\(workflowId), []\(metadata), []\(customFields), &#123;STRING\(authorId), [STRING\($ownerId)]\(ownerIds), STRING\(customStatusId), STRING\(startDate), STRING\(endDate), STRING\(createdDate)&#125;\(project)&#125;] </details> | Data of the object that was created. |
+
+
+
+
+#### Output Example
+```json
+{
+  "kind" : "",
+  "data" : [ {
+    "id" : "",
+    "accountId" : "",
+    "title" : "",
+    "createdDate" : "",
+    "updatedDate" : "",
+    "description" : "",
+    "sharedIds" : [ "" ],
+    "parentIds" : [ "" ],
+    "childIds" : [ "" ],
+    "superParentIds" : [ "" ],
+    "scope" : "",
+    "hasAttachments" : false,
+    "permalink" : "",
+    "workflowId" : "",
+    "metadata" : [ ],
+    "customFields" : [ ],
+    "project" : {
+      "authorId" : "",
+      "ownerIds" : [ "" ],
+      "customStatusId" : "",
+      "startDate" : "",
+      "endDate" : "",
+      "createdDate" : ""
+    }
+  } ]
+}
+```
+
+
+### Create Task
+Name: createTask
+
+`Create a task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| parentId | Parent ID | STRING | `ID of the parent folder.` | true |
+| title | Title | STRING | `The title of the task.` | true |
+| description | Description | STRING | `Description of task, will be left blank, if not set.` | false |
+| status | Status | STRING <details> <summary> Options </summary> Active, Completed, Deferred, Cancelled </details> | `The status of the task.` | false |
+| importance | Importance | STRING <details> <summary> Options </summary> High, Normal, Low </details> | `The importance of the task.` | false |
+| responsibles | Assignees | ARRAY <details> <summary> Items </summary> [STRING\($assigneeId)] </details> | `Choose assignees for the task.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "parentId" : "",
+    "title" : "",
+    "description" : "",
+    "status" : "",
+    "importance" : "",
+    "responsibles" : [ "" ]
+  },
+  "type" : "wrike/v1/createTask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| kind | STRING | Kind of the object that was created. |
+| data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(accountId), STRING\(title), STRING\(description), STRING\(briefDescription), [STRING\($parentId)]\(parentIds), [STRING\($superParentId)]\(superParentIds), [STRING\($sharedId)]\(sharedIds), [STRING\($responsibleId)]\(responsibleIds), STRING\(status), STRING\(importance), STRING\(createdDate), STRING\(updatedDate), STRING\(completedDate), &#123;STRING\(type)&#125;\(dates), STRING\(scope), [STRING\($authorId)]\(authorIds), STRING\(customStatusId), BOOLEAN\(hasAttachments), INTEGER\(attachmentCount), STRING\(permalink), STRING\(priority), BOOLEAN\(followedByMe), [STRING\($followerId)]\(followerIds), []\(superTaskIds), []\(subTaskIds), []\(dependencyIds), []\(metadata), []\(customFields)&#125;] </details> | Data of the object that was created. |
+
+
+
+
+#### Output Example
+```json
+{
+  "kind" : "",
+  "data" : [ {
+    "id" : "",
+    "accountId" : "",
+    "title" : "",
+    "description" : "",
+    "briefDescription" : "",
+    "parentIds" : [ "" ],
+    "superParentIds" : [ "" ],
+    "sharedIds" : [ "" ],
+    "responsibleIds" : [ "" ],
+    "status" : "",
+    "importance" : "",
+    "createdDate" : "",
+    "updatedDate" : "",
+    "completedDate" : "",
+    "dates" : {
+      "type" : ""
+    },
+    "scope" : "",
+    "authorIds" : [ "" ],
+    "customStatusId" : "",
+    "hasAttachments" : false,
+    "attachmentCount" : 1,
+    "permalink" : "",
+    "priority" : "",
+    "followedByMe" : false,
+    "followerIds" : [ "" ],
+    "superTaskIds" : [ ],
+    "subTaskIds" : [ ],
+    "dependencyIds" : [ ],
+    "metadata" : [ ],
+    "customFields" : [ ]
+  } ]
+}
+```
+
+
+
+
+## Triggers
+
+
+### New Task
+Name: newTask
+
+`Triggers when a new task is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| taskId | STRING | The task ID. |
+| webhookId | STRING | The webhook ID. |
+| eventAuthorId | STRING | The ID of the author of the task. |
+| eventType | STRING | Event type that happened. |
+| lastUpdatedDate | STRING | Date of the last update. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Task",
+  "name" : "newTask",
+  "type" : "wrike/v1/newTask"
+}
+```
+
+
+<hr />
+
+<hr />
+
+# Additional instructions
+<hr />
+
