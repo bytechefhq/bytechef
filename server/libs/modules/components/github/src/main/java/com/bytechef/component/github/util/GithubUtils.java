@@ -32,7 +32,6 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,7 +67,7 @@ public class GithubUtils {
             return content;
         }
 
-        return Collections.emptyMap();
+        return null;
     }
 
     public static List<Option<String>> getIssueOptions(
@@ -133,9 +132,9 @@ public class GithubUtils {
         return options;
     }
 
-    public static Integer subscribeWebhook(String repositry, String event, String webhookUrl, TriggerContext context) {
+    public static Integer subscribeWebhook(String repository, String event, String webhookUrl, TriggerContext context) {
         Map<String, Object> body = context
-            .http(http -> http.post("/repos/" + getOwnerName(context) + "/" + repositry + "/hooks"))
+            .http(http -> http.post("/repos/" + getOwnerName(context) + "/" + repository + "/hooks"))
             .body(
                 Http.Body.of(
                     "events", List.of(event),
