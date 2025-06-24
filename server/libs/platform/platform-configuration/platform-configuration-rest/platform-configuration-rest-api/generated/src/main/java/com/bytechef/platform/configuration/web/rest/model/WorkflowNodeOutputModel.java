@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeOutput", description = "The workflow node output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T11:56:44.083740+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T23:18:46.779804+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class WorkflowNodeOutputModel {
 
   private @Nullable ActionDefinitionBasicModel actionDefinition;
@@ -34,6 +34,8 @@ public class WorkflowNodeOutputModel {
   private @Nullable OutputResponseModel outputResponse;
 
   private @Nullable TaskDispatcherDefinitionBasicModel taskDispatcherDefinition;
+
+  private Boolean testOutputResponse = false;
 
   private @Nullable TriggerDefinitionBasicModel triggerDefinition;
 
@@ -112,6 +114,26 @@ public class WorkflowNodeOutputModel {
     this.taskDispatcherDefinition = taskDispatcherDefinition;
   }
 
+  public WorkflowNodeOutputModel testOutputResponse(Boolean testOutputResponse) {
+    this.testOutputResponse = testOutputResponse;
+    return this;
+  }
+
+  /**
+   * If the output response is a sample or the real one
+   * @return testOutputResponse
+   */
+  
+  @Schema(name = "testOutputResponse", description = "If the output response is a sample or the real one", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("testOutputResponse")
+  public Boolean getTestOutputResponse() {
+    return testOutputResponse;
+  }
+
+  public void setTestOutputResponse(Boolean testOutputResponse) {
+    this.testOutputResponse = testOutputResponse;
+  }
+
   public WorkflowNodeOutputModel triggerDefinition(TriggerDefinitionBasicModel triggerDefinition) {
     this.triggerDefinition = triggerDefinition;
     return this;
@@ -184,6 +206,7 @@ public class WorkflowNodeOutputModel {
     return Objects.equals(this.actionDefinition, workflowNodeOutput.actionDefinition) &&
         Objects.equals(this.outputResponse, workflowNodeOutput.outputResponse) &&
         Objects.equals(this.taskDispatcherDefinition, workflowNodeOutput.taskDispatcherDefinition) &&
+        Objects.equals(this.testOutputResponse, workflowNodeOutput.testOutputResponse) &&
         Objects.equals(this.triggerDefinition, workflowNodeOutput.triggerDefinition) &&
         Objects.equals(this.variableOutputResponse, workflowNodeOutput.variableOutputResponse) &&
         Objects.equals(this.workflowNodeName, workflowNodeOutput.workflowNodeName);
@@ -191,7 +214,7 @@ public class WorkflowNodeOutputModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionDefinition, outputResponse, taskDispatcherDefinition, triggerDefinition, variableOutputResponse, workflowNodeName);
+    return Objects.hash(actionDefinition, outputResponse, taskDispatcherDefinition, testOutputResponse, triggerDefinition, variableOutputResponse, workflowNodeName);
   }
 
   @Override
@@ -201,6 +224,7 @@ public class WorkflowNodeOutputModel {
     sb.append("    actionDefinition: ").append(toIndentedString(actionDefinition)).append("\n");
     sb.append("    outputResponse: ").append(toIndentedString(outputResponse)).append("\n");
     sb.append("    taskDispatcherDefinition: ").append(toIndentedString(taskDispatcherDefinition)).append("\n");
+    sb.append("    testOutputResponse: ").append(toIndentedString(testOutputResponse)).append("\n");
     sb.append("    triggerDefinition: ").append(toIndentedString(triggerDefinition)).append("\n");
     sb.append("    variableOutputResponse: ").append(toIndentedString(variableOutputResponse)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
