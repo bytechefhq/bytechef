@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateFrontendIntegrationInstanceWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T14:57:57.448877+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T18:39:29.529101+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class UpdateFrontendIntegrationInstanceWorkflowRequestModel {
 
   @Valid
@@ -43,11 +43,11 @@ public class UpdateFrontendIntegrationInstanceWorkflowRequestModel {
   }
 
   /**
-   * Get inputs
+   * The workflow inputs
    * @return inputs
    */
   
-  @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "inputs", description = "The workflow inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public Map<String, Object> getInputs() {
     return inputs;

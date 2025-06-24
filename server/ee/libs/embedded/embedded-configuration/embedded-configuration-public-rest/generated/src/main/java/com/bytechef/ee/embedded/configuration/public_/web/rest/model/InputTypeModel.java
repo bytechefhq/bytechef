@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The type of an input, for example \\\"STRING\\\"
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T14:57:57.448877+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T18:39:29.529101+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public enum InputTypeModel {
   
   BOOLEAN("BOOLEAN"),

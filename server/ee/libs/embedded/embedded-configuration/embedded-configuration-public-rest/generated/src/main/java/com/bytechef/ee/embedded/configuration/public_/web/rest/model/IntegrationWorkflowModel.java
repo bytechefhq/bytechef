@@ -26,19 +26,17 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("IntegrationWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T14:57:57.448877+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T18:39:29.529101+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class IntegrationWorkflowModel {
 
   private @Nullable String description;
 
-  private @Nullable String definition;
+  @Valid
+  private List<@Valid InputModel> inputs = new ArrayList<>();
 
   private @Nullable String label;
 
   private @Nullable String workflowReferenceCode;
-
-  @Valid
-  private List<@Valid InputModel> inputs = new ArrayList<>();
 
   public IntegrationWorkflowModel description(String description) {
     this.description = description;
@@ -60,24 +58,32 @@ public class IntegrationWorkflowModel {
     this.description = description;
   }
 
-  public IntegrationWorkflowModel definition(String definition) {
-    this.definition = definition;
+  public IntegrationWorkflowModel inputs(List<@Valid InputModel> inputs) {
+    this.inputs = inputs;
+    return this;
+  }
+
+  public IntegrationWorkflowModel addInputsItem(InputModel inputsItem) {
+    if (this.inputs == null) {
+      this.inputs = new ArrayList<>();
+    }
+    this.inputs.add(inputsItem);
     return this;
   }
 
   /**
-   * The definition of a workflow.
-   * @return definition
+   * Get inputs
+   * @return inputs
    */
-  
-  @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("definition")
-  public String getDefinition() {
-    return definition;
+  @Valid 
+  @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
+  public List<@Valid InputModel> getInputs() {
+    return inputs;
   }
 
-  public void setDefinition(String definition) {
-    this.definition = definition;
+  public void setInputs(List<@Valid InputModel> inputs) {
+    this.inputs = inputs;
   }
 
   public IntegrationWorkflowModel label(String label) {
@@ -120,34 +126,6 @@ public class IntegrationWorkflowModel {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 
-  public IntegrationWorkflowModel inputs(List<@Valid InputModel> inputs) {
-    this.inputs = inputs;
-    return this;
-  }
-
-  public IntegrationWorkflowModel addInputsItem(InputModel inputsItem) {
-    if (this.inputs == null) {
-      this.inputs = new ArrayList<>();
-    }
-    this.inputs.add(inputsItem);
-    return this;
-  }
-
-  /**
-   * Get inputs
-   * @return inputs
-   */
-  @Valid 
-  @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("inputs")
-  public List<@Valid InputModel> getInputs() {
-    return inputs;
-  }
-
-  public void setInputs(List<@Valid InputModel> inputs) {
-    this.inputs = inputs;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -158,15 +136,14 @@ public class IntegrationWorkflowModel {
     }
     IntegrationWorkflowModel integrationWorkflow = (IntegrationWorkflowModel) o;
     return Objects.equals(this.description, integrationWorkflow.description) &&
-        Objects.equals(this.definition, integrationWorkflow.definition) &&
+        Objects.equals(this.inputs, integrationWorkflow.inputs) &&
         Objects.equals(this.label, integrationWorkflow.label) &&
-        Objects.equals(this.workflowReferenceCode, integrationWorkflow.workflowReferenceCode) &&
-        Objects.equals(this.inputs, integrationWorkflow.inputs);
+        Objects.equals(this.workflowReferenceCode, integrationWorkflow.workflowReferenceCode);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, definition, label, workflowReferenceCode, inputs);
+    return Objects.hash(description, inputs, label, workflowReferenceCode);
   }
 
   @Override
@@ -174,10 +151,9 @@ public class IntegrationWorkflowModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationWorkflowModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
-    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("}");
     return sb.toString();
   }
