@@ -53,7 +53,6 @@ const columns = [
 ];
 
 const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
-    console.log(data);
     const reactTable = useReactTable<WorkflowExecution>({
         columns,
         data,
