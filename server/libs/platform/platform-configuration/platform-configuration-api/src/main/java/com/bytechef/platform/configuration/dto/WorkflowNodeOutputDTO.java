@@ -29,17 +29,17 @@ import org.springframework.lang.Nullable;
 public record WorkflowNodeOutputDTO(
     @Nullable ActionDefinition actionDefinition, @Nullable ClusterElementDefinition clusterElementDefinition,
     @Nullable OutputResponse outputResponse, @Nullable TaskDispatcherDefinition taskDispatcherDefinition,
-    @Nullable TriggerDefinition triggerDefinition, @Nullable OutputResponse variableOutputResponse,
-    String workflowNodeName) {
+    boolean testOutputResponse, @Nullable TriggerDefinition triggerDefinition,
+    @Nullable OutputResponse variableOutputResponse, String workflowNodeName) {
 
     public WorkflowNodeOutputDTO(
         @Nullable ActionDefinition actionDefinition, @Nullable ClusterElementDefinition clusterElementDefinition,
         @Nullable OutputResponse outputResponse, @Nullable TaskDispatcherDefinition taskDispatcherDefinition,
-        @Nullable TriggerDefinition triggerDefinition, String workflowNodeName) {
+        boolean testOutputResponse, @Nullable TriggerDefinition triggerDefinition, String workflowNodeName) {
 
         this(
-            actionDefinition, clusterElementDefinition, outputResponse, taskDispatcherDefinition, triggerDefinition,
-            null, workflowNodeName);
+            actionDefinition, clusterElementDefinition, outputResponse, taskDispatcherDefinition,
+            testOutputResponse, triggerDefinition, null, workflowNodeName);
     }
 
     public Object getSampleOutput() {

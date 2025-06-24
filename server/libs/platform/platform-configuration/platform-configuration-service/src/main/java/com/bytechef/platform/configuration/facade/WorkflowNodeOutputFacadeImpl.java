@@ -376,14 +376,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         ActionDefinition actionDefinition = null;
         TaskDispatcherDefinition taskDispatcherDefinition = null;
         OutputResponse variableOutputResponse = null;
-
-        if (workflowNodeType.operation() == null) {
-            taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
-                workflowNodeType.name(), workflowNodeType.version());
-        } else {
-            actionDefinition = actionDefinitionService.getActionDefinition(
-                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
-        }
+        boolean testoutputResponse = false;
 
         Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
@@ -392,6 +385,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .orElse(null);
+
+        if (workflowNodeType.operation() == null) {
+            taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+                workflowNodeType.name(), workflowNodeType.version());
+        } else {
+            actionDefinition = actionDefinitionService.getActionDefinition(
+                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
+        }
 
         if (outputResponse == null) {
             if (workflowNodeType.operation() == null) {
@@ -418,22 +419,24 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
                 outputResponse = null;
             }
+
+            testoutputResponse = true;
         }
 
         return new WorkflowNodeOutputDTO(
             actionDefinition, null, checkOutputSchemaIsFileEntryProperty(outputResponse), taskDispatcherDefinition,
-            null, variableOutputResponse, workflowTask.getName());
+            testoutputResponse, null, variableOutputResponse, workflowTask.getName());
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTrigger workflowTrigger) {
+        boolean testoutputResponse = false;
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowNodeType.name(), workflowNodeType.version(),
-            workflowNodeType.operation());
 
         Class<? extends BaseProperty> type = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
+        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+            workflowNodeType.name(), workflowNodeType.version(),
+            workflowNodeType.operation());
 
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
@@ -443,13 +446,15 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         if (outputResponse == null) {
             outputResponse = triggerDefinition.getOutputResponse();
+        } else {
+            testoutputResponse = true;
         }
 
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
 
         return new WorkflowNodeOutputDTO(
-            null, null, checkOutputSchemaIsFileEntryProperty(outputResponse), null, triggerDefinition,
-            workflowTrigger.getName());
+            null, null, checkOutputSchemaIsFileEntryProperty(outputResponse), null, testoutputResponse,
+            triggerDefinition, workflowTrigger.getName());
     }
 
     @SuppressWarnings("unchecked")
