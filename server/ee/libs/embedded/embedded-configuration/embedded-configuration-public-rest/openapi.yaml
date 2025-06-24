@@ -173,12 +173,6 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "enable"
-          description: "Enable/disable the project deployment."
-          in: "path"
-          required: true
-          schema:
-            type: "boolean"
       responses:
         "204":
           description: "Successful operation."
@@ -203,12 +197,6 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "enable"
-          description: "Enable/disable the project deployment."
-          in: "path"
-          required: true
-          schema:
-            type: "boolean"
       responses:
         "204":
           description: "Successful operation."
@@ -717,12 +705,6 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "enable"
-          description: "Enable/disable the project deployment."
-          in: "path"
-          required: true
-          schema:
-            type: "boolean"
       responses:
         "204":
           description: "Successful operation."
@@ -753,12 +735,6 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "enable"
-          description: "Enable/disable the project deployment."
-          in: "path"
-          required: true
-          schema:
-            type: "boolean"
       responses:
         "204":
           description: "Successful operation."
