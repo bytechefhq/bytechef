@@ -75,6 +75,31 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     }
 
     @Override
+    public ResponseEntity<Void> disableFrontendProjectWorkflow(
+        String workflowReferenceCode, EnvironmentModel xEnvironment) {
+
+        connectedUserProjectFacade.enableProjectWorkflow(
+            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, false,
+            getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    @CrossOrigin
+    public ResponseEntity<Void> enableFrontendProjectWorkflow(
+        String workflowReferenceCode, EnvironmentModel xEnvironment) {
+
+        connectedUserProjectFacade.enableProjectWorkflow(
+            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, true,
+            getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     @CrossOrigin
     public ResponseEntity<ConnectedUserProjectWorkflowModel> getFrontendProjectWorkflow(
         String workflowReferenceCode, EnvironmentModel xEnvironment) {
@@ -85,19 +110,6 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
                     OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
                     getEnvironment(xEnvironment)),
                 ConnectedUserProjectWorkflowModel.class));
-    }
-
-    @Override
-    @CrossOrigin
-    public ResponseEntity<Void> enableFrontendProjectWorkflow(
-        String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
-
-        connectedUserProjectFacade.enableProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, enable,
-            getEnvironment(xEnvironment));
-
-        return ResponseEntity.noContent()
-            .build();
     }
 
     @Override
@@ -167,11 +179,23 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     }
 
     @Override
-    public ResponseEntity<Void> enableProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
+    public ResponseEntity<Void> disableProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.enableProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, enable,
+            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, false,
+            getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> enableProjectWorkflow(
+        String externalUserId, String workflowReferenceCode, EnvironmentModel xEnvironment) {
+
+        connectedUserProjectFacade.enableProjectWorkflow(
+            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, true,
             getEnvironment(xEnvironment));
 
         return ResponseEntity.noContent()
