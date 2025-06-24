@@ -75,16 +75,20 @@ class DocuSignUtilsTest {
             1, 1, 1
         };
 
+        String encodeToString = EncodingUtils.base64EncodeToString(mockedByteArray);
+
         List<DocumentRecord> documentRecordList = List.of(new DocumentRecord(mockFileEntry, "name", 1));
 
         when(mockedContext.file(any()))
             .thenReturn(mockedByteArray);
+        when(mockedContext.encoder(any()))
+            .thenReturn(encodeToString);
 
         List<Map<String, Object>> result = DocuSignUtils.getDocumentsList(documentRecordList, mockedContext);
 
         List<Map<String, Object>> expected = List.of(
             Map.of(
-                "documentBase64", EncodingUtils.base64EncodeToString(mockedByteArray),
+                "documentBase64", encodeToString,
                 "name", "name",
                 "documentId", 1));
 

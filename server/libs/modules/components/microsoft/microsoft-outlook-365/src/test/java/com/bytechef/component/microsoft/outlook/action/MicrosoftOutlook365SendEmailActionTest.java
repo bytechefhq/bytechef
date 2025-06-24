@@ -78,12 +78,16 @@ class MicrosoftOutlook365SendEmailActionTest {
             1, 2, 3
         };
 
+        String encodedToString = EncodingUtils.base64EncodeToString(fileContent);
+
         when(mockedFileEntry.getName())
             .thenReturn("file.txt");
         when(mockedFileEntry.getMimeType())
             .thenReturn("text/plain");
         when(mockedContext.file(any()))
             .thenReturn(fileContent);
+        when(mockedContext.encoder(any()))
+            .thenReturn(encodedToString);
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -113,7 +117,7 @@ class MicrosoftOutlook365SendEmailActionTest {
                         "@odata.type", "#microsoft.graph.fileAttachment",
                         NAME, "file.txt",
                         CONTENT_TYPE, "text/plain",
-                        CONTENT_BYTES, EncodingUtils.base64EncodeToString(fileContent)))));
+                        CONTENT_BYTES, encodedToString))));
 
         assertEquals(expectedBody, body.getContent());
     }

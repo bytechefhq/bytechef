@@ -42,13 +42,15 @@ class ImageHelperImageToBase64ActionTest {
             1, 2, 3
         };
 
+        String encodeToString = EncodingUtils.base64EncodeToString(fileContent);
+
         when(mockedActionContext.file(any()))
             .thenReturn(fileContent);
+        when(mockedActionContext.encoder(any()))
+            .thenReturn(encodeToString);
 
         String result = ImageHelperImageToBase64Action.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        String expected = EncodingUtils.base64EncodeToString(fileContent);
-
-        assertEquals(expected, result);
+        assertEquals(encodeToString, result);
     }
 }
