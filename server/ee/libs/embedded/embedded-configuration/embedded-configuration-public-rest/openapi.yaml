@@ -1056,6 +1056,9 @@ components:
         definition:
           description: "The definition of a workflow."
           type: "string"
+        enabled:
+          type: "boolean"
+          description: "If a workflow is enabled or not."
         label:
           description: "The label of a workflow."
           type: "string"
