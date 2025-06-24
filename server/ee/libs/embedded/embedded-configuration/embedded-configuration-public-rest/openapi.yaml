@@ -1156,17 +1156,20 @@ components:
             workflows:
               type: "array"
               items:
-                type: "object"
-                properties:
-                  enabled:
-                    type: "boolean"
-                    description: "If a workflow is enabled or not."
-                  inputs:
-                    type: "object"
-                    additionalProperties: true
-                  workflowReferenceCode:
-                    description: "The reference code of a workflow."
-                    type: "string"
+                $ref: '#/components/schemas/IntegrationInstanceWorkflow'
+    IntegrationInstanceWorkflow:
+      description: "A workflow data for particular integration instance."
+      type: "object"
+      properties:
+        enabled:
+          type: "boolean"
+          description: "If a workflow is enabled or not."
+        inputs:
+          type: "object"
+          additionalProperties: true
+        workflowReferenceCode:
+          description: "The reference code of a workflow."
+          type: "string"
     IntegrationWorkflow:
       description: "A group of tasks that make one logical workflow."
       type: "object"
