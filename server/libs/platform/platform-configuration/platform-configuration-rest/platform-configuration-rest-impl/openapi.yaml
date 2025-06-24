@@ -2899,6 +2899,10 @@ components:
           $ref: "#/components/schemas/OutputResponse"
         taskDispatcherDefinition:
           $ref: '#/components/schemas/TaskDispatcherDefinitionBasic'
+        testOutputResponse:
+          description: "If the output response is a sample or the real one"
+          type: "boolean"
+          default: false
         triggerDefinition:
           $ref: '#/components/schemas/TriggerDefinitionBasic'
         variableOutputResponse:
