@@ -28,5 +28,5 @@ public interface ConnectUserProjectWorkflowMapper
     @Mapping(target = "definition", source = "workflow.definition")
     @Mapping(target = "description", source = "workflow.description")
     @Mapping(target = "label", source = "workflow.label")
-    ConnectedUserProjectWorkflowModel convert(ConnectedUserProjectWorkflowDTO workflow);
+    ConnectedUserProjectWorkflowModel convert(ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO);
 }
