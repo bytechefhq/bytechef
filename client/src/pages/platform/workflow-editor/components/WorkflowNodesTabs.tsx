@@ -75,7 +75,10 @@ const WorkflowNodesTabs = ({
             availableTaskDispatchers = taskDispatcherDefinitions;
         } else {
             availableTaskDispatchers = taskDispatcherDefinitions.filter(
-                (taskDispatcherDefinition) => taskDispatcherDefinition.name === 'condition'
+                (taskDispatcherDefinition) =>
+                    taskDispatcherDefinition.name === 'branch' ||
+                    taskDispatcherDefinition.name === 'condition' ||
+                    taskDispatcherDefinition.name === 'loop'
             );
         }
 
