@@ -42,6 +42,7 @@ import org.junit.jupiter.api.Test;
  * @author Nikolina Spehar
  */
 class WrikeUtilsTest {
+
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(PARENT, "parent"));

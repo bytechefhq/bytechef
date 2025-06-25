@@ -75,10 +75,12 @@ public class WrikeUtils {
 
         if (response.get(DATA) instanceof List<?> parents) {
             for (Object parent : parents) {
-                if (parent instanceof Map<?, ?> parentMap &&
-                    !parentMap.get("scope")
-                        .equals("RbFolder")) {
-                    options.add(option((String) parentMap.get(TITLE), (String) parentMap.get(ID)));
+                if (parent instanceof Map<?, ?> parentMap) {
+                    Object scope = parentMap.get("scope");
+
+                    if (!scope.equals("RbFolder")) {
+                        options.add(option((String) parentMap.get(TITLE), (String) parentMap.get(ID)));
+                    }
                 }
             }
         }

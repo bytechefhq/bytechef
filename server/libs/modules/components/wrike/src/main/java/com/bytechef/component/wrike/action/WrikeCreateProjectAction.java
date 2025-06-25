@@ -42,10 +42,7 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.wrike.util.WrikeUtils;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,11 +70,11 @@ public class WrikeCreateProjectAction {
             date(START_DATE)
                 .label("Start Date")
                 .description("The start date of the project.")
-                .required(true),
+                .required(false),
             date(END_DATE)
                 .label("End Date")
                 .description("The end date of the project.")
-                .required(true),
+                .required(false),
             string(CONTRACT_TYPE)
                 .label("Contract Type")
                 .description("The contract type of the project.")
@@ -90,11 +87,7 @@ public class WrikeCreateProjectAction {
                 .description("List of project owner IDs.")
                 .required(false)
                 .options((ActionOptionsFunction<String>) WrikeUtils::getContactIdOptions)
-                .items(
-                    string("ContactId")
-                        .label("Contact ID")
-                        .description("Contact ID.")
-                        .required(false)),
+                .items(string()),
             integer(BUDGET)
                 .label("Budget")
                 .description("The budget of the project.")
@@ -177,9 +170,7 @@ public class WrikeCreateProjectAction {
     private WrikeCreateProjectAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Map<String, Object> project = getProject(inputParameters);
 
         return context.http(
@@ -196,33 +187,18 @@ public class WrikeCreateProjectAction {
     private static Map<String, Object> getProject(Parameters inputParameters) {
         Map<String, Object> project = new HashMap<>();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        LocalDate startDate = inputParameters.getLocalDate(START_DATE);
-        if (startDate != null) {
-            project.put(START_DATE, startDate.format(formatter));
-        }
-
-        LocalDate endDate = inputParameters.getLocalDate(END_DATE);
-        if (endDate != null) {
-            project.put(END_DATE, endDate.format(formatter));
-        }
-
-        String contractType = inputParameters.getString(CONTRACT_TYPE);
-        if (contractType != null) {
-            project.put(CONTRACT_TYPE, contractType);
-        }
-
-        List<?> ownerIds = inputParameters.getList(OWNER_IDS);
-        if (ownerIds != null) {
-            project.put(OWNER_IDS, ownerIds);
-        }
-
-        Integer budget = inputParameters.getInteger(BUDGET);
-        if (budget != null) {
-            project.put(BUDGET, budget);
-        }
+        addIfNotNull(inputParameters.getLocalDate(START_DATE), START_DATE, project);
+        addIfNotNull(inputParameters.getLocalDate(END_DATE), END_DATE, project);
+        addIfNotNull(inputParameters.getString(CONTRACT_TYPE), CONTRACT_TYPE, project);
+        addIfNotNull(inputParameters.getList(OWNER_IDS, String.class), OWNER_IDS, project);
+        addIfNotNull(inputParameters.getInteger(BUDGET), BUDGET, project);
 
         return project;
+    }
+
+    private static <T> void addIfNotNull(T value, String key, Map<String, Object> project) {
+        if (value != null) {
+            project.put(key, value);
+        }
     }
 }

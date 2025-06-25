@@ -54,7 +54,8 @@ class WrikeCreateProjectActionTest {
     private final LocalDate mockStartDate = LocalDate.of(2025, 6, 18);
     private final LocalDate mockEndDate = LocalDate.of(2025, 6, 19);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(PARENT_ID, "parentId",
+        Map.of(
+            PARENT_ID, "parentId",
             TITLE, "title",
             DESCRIPTION, "description",
             START_DATE, mockStartDate,
@@ -84,8 +85,8 @@ class WrikeCreateProjectActionTest {
         Object[] queryParameters = queryArgumentCaptor.getValue();
 
         Map<String, Object> expectedProject = Map.of(
-            START_DATE, "2025-06-18",
-            END_DATE, "2025-06-19",
+            START_DATE, LocalDate.of(2025, 6, 18),
+            END_DATE, LocalDate.of(2025, 6, 19),
             CONTRACT_TYPE, "Billable",
             OWNER_IDS, List.of("id"),
             BUDGET, 100);

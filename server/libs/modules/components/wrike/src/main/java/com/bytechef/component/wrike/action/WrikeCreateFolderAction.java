@@ -105,7 +105,7 @@ public class WrikeCreateFolderAction {
                                         array("metadata")
                                             .description("Metadata of the object."),
                                         array("customFields")
-                                            .placeholder("Custom fields of the object."))))))
+                                            .description("Custom fields of the object."))))))
         .perform(WrikeCreateFolderAction::perform);
 
     private WrikeCreateFolderAction() {
@@ -114,7 +114,7 @@ public class WrikeCreateFolderAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(
             http -> http.post("/folders/%s/folders".formatted(inputParameters.getRequiredString(PARENT_ID))))
-            .queryParameters(TITLE, inputParameters.getRequiredString(TITLE))
+            .queryParameter(TITLE, inputParameters.getRequiredString(TITLE))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();
