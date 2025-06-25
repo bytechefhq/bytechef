@@ -61,7 +61,7 @@ public class RedditCreateCommentAction {
     private RedditCreateCommentAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("/api/comment"))
             .queryParameters(
                 THING_ID, inputParameters.getRequiredString(THING_ID),

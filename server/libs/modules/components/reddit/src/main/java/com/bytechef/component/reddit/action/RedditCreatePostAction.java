@@ -82,7 +82,7 @@ public class RedditCreatePostAction {
     private RedditCreatePostAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("/api/submit"))
             .queryParameters(
                 SUBREDDIT_NAME, inputParameters.getRequiredString(SUBREDDIT_NAME),
