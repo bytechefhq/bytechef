@@ -111,7 +111,7 @@ public class WrikeCreateFolderAction {
     private WrikeCreateFolderAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(
             http -> http.post("/folders/%s/folders".formatted(inputParameters.getRequiredString(PARENT_ID))))
             .queryParameter(TITLE, inputParameters.getRequiredString(TITLE))
