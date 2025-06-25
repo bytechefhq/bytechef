@@ -267,11 +267,52 @@ public interface Context {
         /**
          *
          */
-        enum ResponseType {
-            BINARY,
-            JSON,
-            TEXT,
-            XML,
+        class ResponseType {
+
+            public enum Type {
+                BINARY,
+                JSON,
+                TEXT,
+                XML
+            }
+
+            public static final ResponseType BINARY = new ResponseType("application/octet-stream", Type.BINARY);
+            public static final ResponseType JSON = new ResponseType("application/json", Type.JSON);
+            public static final ResponseType TEXT = new ResponseType("ext/plain", Type.TEXT);
+            public static final ResponseType XML = new ResponseType("application/xml", Type.XML);
+
+            private String contentType;
+            private Type type;
+
+            private ResponseType() {
+            }
+
+            private ResponseType(String contentType, Type type) {
+                this.contentType = contentType;
+                this.type = type;
+            }
+
+            public static ResponseType binary(String contentType) {
+                return new ResponseType(contentType, Type.BINARY);
+            }
+
+            public static ResponseType valueOf(String string) {
+                return switch (string) {
+                    case "BINARY" -> BINARY;
+                    case "JSON" -> JSON;
+                    case "TEXT" -> TEXT;
+                    case "XML" -> XML;
+                    default -> throw new IllegalArgumentException("Unsupported response type: " + string);
+                };
+            }
+
+            public String getContentType() {
+                return contentType;
+            }
+
+            public Type getType() {
+                return type;
+            }
         }
 
         /**

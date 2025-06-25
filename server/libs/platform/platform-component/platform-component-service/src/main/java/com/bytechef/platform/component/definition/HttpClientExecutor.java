@@ -243,9 +243,7 @@ class HttpClientExecutor {
         ResponseType responseType = configuration.getResponseType();
         int statusCode = httpResponse.statusCode();
 
-        if (statusCode != 204 &&
-            ((responseType == null) || !matches(responseType, httpHeaders.firstValue("content-type")))) {
-
+        if (statusCode != 204 && ((responseType == null) || !matches(responseType, httpHeaders))) {
             logger.warn(
                 "Unexpected response body content-type type: {} can not be converted to {}",
                 httpHeaders.firstValue("content-type"), responseType);
@@ -259,12 +257,14 @@ class HttpClientExecutor {
             return new ResponseImpl(httpHeaders.map(), null, statusCode);
         }
 
-        return switch (responseType) {
-            case BINARY -> new ResponseImpl(
+        return switch (responseType.getType()) {
+            case ResponseType.Type.BINARY -> new ResponseImpl(
                 httpHeaders.map(),
                 storeBinaryResponseBody(configuration, httpHeaders.map(), (InputStream) httpResponseBody), statusCode);
-            case JSON -> new ResponseImpl(httpHeaders.map(), JsonUtils.read(httpResponseBody.toString()), statusCode);
-            case XML -> new ResponseImpl(httpHeaders.map(), XmlUtils.read(httpResponseBody.toString()), statusCode);
+            case ResponseType.Type.JSON -> new ResponseImpl(
+                httpHeaders.map(), JsonUtils.read(httpResponseBody.toString()), statusCode);
+            case ResponseType.Type.XML -> new ResponseImpl(
+                httpHeaders.map(), XmlUtils.read(httpResponseBody.toString()), statusCode);
             default -> new ResponseImpl(httpHeaders.map(), httpResponseBody.toString(), statusCode);
         };
     }
@@ -276,7 +276,7 @@ class HttpClientExecutor {
         if (responseType == null) {
             bodyHandler = HttpResponse.BodyHandlers.discarding();
         } else {
-            if (responseType == Http.ResponseType.BINARY) {
+            if (responseType.getType() == Http.ResponseType.BINARY.getType()) {
                 bodyHandler = HttpResponse.BodyHandlers.ofInputStream();
             } else {
                 bodyHandler = HttpResponse.BodyHandlers.ofString();
@@ -403,14 +403,14 @@ class HttpClientExecutor {
     /**
      * Gets interceptor that scans valid response bodyContent for information on token refresh errors.
      *
-     * @param componentName
-     * @param componentVersion
-     * @param componentOperationName
-     * @param connectionVersion
-     * @param authorizationType
-     * @param credentialsBeRefreshed
-     * @param isAction
-     * @return
+     * @param componentName          the name of the component
+     * @param componentVersion       the version of the component
+     * @param componentOperationName the name of the component operation
+     * @param connectionVersion      the version of the connection
+     * @param authorizationType      the type of authorization
+     * @param credentialsBeRefreshed whether credentials can be refreshed
+     * @param isAction               whether this is an action operation
+     * @return the Methanol interceptor
      */
     private Methanol.Interceptor getInterceptor(
         String componentName, int componentVersion, String componentOperationName, int connectionVersion,
@@ -500,9 +500,14 @@ class HttpClientExecutor {
         return false;
     }
 
-    private boolean matches(ResponseType responseType, Optional<String> contentTypeValueOptional) {
-        return contentTypeValueOptional.isPresent() &&
-            StringUtils.containsIgnoreCase(contentTypeValueOptional.get(), responseType.name());
+    private boolean matches(ResponseType responseType, HttpHeaders httpHeaders) {
+        Optional<String> contentTypeOptional = httpHeaders.firstValue("content-type");
+
+        return contentTypeOptional
+            .map(contentType -> StringUtils.equalsIgnoreCase(contentType, responseType.getContentType()) ||
+                StringUtils.containsIgnoreCase(contentType, String.valueOf(responseType.getType())))
+            .orElse(true);
+
     }
 
     private FileEntry storeBinaryResponseBody(
@@ -511,8 +516,8 @@ class HttpClientExecutor {
         String filename = configuration.getFilename();
 
         if (filename == null || filename.isEmpty()) {
-            if (headers.containsKey("Content-Type")) {
-                List<String> values = headers.get("Content-Type");
+            if (headers.containsKey("content-type")) {
+                List<String> values = headers.get("content-type");
 
                 filename = "file." + MimeTypeUtils.getDefaultExt(values.getFirst());
             } else {

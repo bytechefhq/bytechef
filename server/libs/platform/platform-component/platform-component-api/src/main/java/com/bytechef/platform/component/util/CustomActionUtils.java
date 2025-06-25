@@ -164,17 +164,23 @@ public class CustomActionUtils {
                     .description("The format in which the data gets returned from the URL.")
                     .options(
                         option(
-                            "JSON", ResponseType.JSON.name(),
+                            "JSON", String.valueOf(ResponseType.JSON.getType()),
                             "The response is automatically converted to object/array."),
                         option(
-                            "XML", ResponseType.XML.name(), "The response is automatically converted to object/array."),
-                        option("Text", ResponseType.TEXT.name(), "The response is returned as a text."),
-                        option("File", ResponseType.BINARY.name(), "The response is returned as a file object."))
-                    .defaultValue(ResponseType.JSON.name()),
+                            "XML", String.valueOf(ResponseType.XML.getType()),
+                            "The response is automatically converted to object/array."),
+                        option(
+                            "Text",
+                            String.valueOf(ResponseType.TEXT.getType()), "The response is returned as a text."),
+                        option(
+                            "File",
+                            String.valueOf(ResponseType.BINARY.getType()),
+                            "The response is returned as a file object."))
+                    .defaultValue(String.valueOf(ResponseType.JSON.getType())),
                 string(RESPONSE_FILENAME)
                     .label("Response Filename")
                     .description("The name of the file if the response is returned as a file object.")
-                    .displayCondition("%s == '%s'".formatted(RESPONSE_FORMAT, ResponseType.BINARY.name())))
+                    .displayCondition("%s == '%s'".formatted(RESPONSE_FORMAT, ResponseType.BINARY.getType())))
             .output()
             .perform(CustomActionUtils::perform);
 

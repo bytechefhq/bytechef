@@ -59,14 +59,15 @@ public class OpenApiClientUtils {
 
         BaseValueProperty<?> outputSchema = outputDefinition == null ? null : outputDefinition.getOutputSchema();
 
+        ResponseType responseType = outputSchema == null
+            ? null
+            : MapUtils.get(outputSchema.getMetadata(), "responseType", ResponseType.class);
+
         Response response = context
             .http(http -> http.exchange(
                 createUrl(inputParameters, metadata, properties),
                 MapUtils.get(metadata, "method", RequestMethod.class)))
-            .configuration(Http.responseType(
-                outputSchema == null
-                    ? null
-                    : MapUtils.get(outputSchema.getMetadata(), "responseType", ResponseType.class)))
+            .configuration(Http.responseType(responseType))
             .headers(getValuesMap(inputParameters, properties, PropertyType.HEADER))
             .body(
                 getBody(

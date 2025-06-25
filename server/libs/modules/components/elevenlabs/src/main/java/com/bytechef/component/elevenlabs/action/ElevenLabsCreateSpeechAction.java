@@ -57,9 +57,8 @@ public class ElevenLabsCreateSpeechAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("/text-to-speech/" + inputParameters.getRequiredString(VOICE_ID)))
-            .header("Content-Type", "audio/mpeg")
             .body(Body.of(Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
-            .configuration(responseType(ResponseType.BINARY))
+            .configuration(responseType(ResponseType.binary("audio/mpeg")))
             .execute();
     }
 }
