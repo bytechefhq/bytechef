@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -61,7 +60,8 @@ public class RedditConnection {
                     String clientId = connectionParameters.getString(CLIENT_ID);
                     String clientSecret = connectionParameters.getString(CLIENT_SECRET);
                     String valueToEncode = clientId + ":" + clientSecret;
-                    String encoded = EncodingUtils.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8));
+                    String encoded = context.encoder(
+                        encoder -> encoder.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)));
 
                     Http.Response response =
                         context.http(http -> http.post("https://www.reddit.com/api/v1/access_token")

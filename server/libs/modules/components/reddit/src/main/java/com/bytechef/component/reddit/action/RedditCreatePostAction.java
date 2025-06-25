@@ -55,7 +55,9 @@ public class RedditCreatePostAction {
             string(KIND)
                 .label("Kind")
                 .description("Type of post.")
-                .options(option("Link", "link"), option("Text", "self"))
+                .options(
+                    option("Link", "link"),
+                    option("Text", "self"))
                 .required(true),
             string(URL)
                 .label("URL")
