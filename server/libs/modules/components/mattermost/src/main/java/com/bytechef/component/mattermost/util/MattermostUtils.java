@@ -41,13 +41,12 @@ public class MattermostUtils extends AbstractMattermostUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        List<Map<String, Object>> body = context
-            .http(http -> http.get("/channels"))
+        List<Option<String>> options = new ArrayList<>();
+
+        List<Map<String, Object>> body = context.http(http -> http.get("/channels"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> map : body) {
             options.add(option((String) map.get(DISPLAY_NAME), (String) map.get(ID)));
