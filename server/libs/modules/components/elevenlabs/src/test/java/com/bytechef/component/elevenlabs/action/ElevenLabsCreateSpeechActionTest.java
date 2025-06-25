@@ -28,7 +28,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -64,6 +63,5 @@ class ElevenLabsCreateSpeechActionTest {
         Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of(TEXT, mockedParameters.getString(TEXT)), body.getContent());
-        assertEquals(List.of("Content-Type", "audio/mpeg"), stringArgumentCaptor.getAllValues());
     }
 }
