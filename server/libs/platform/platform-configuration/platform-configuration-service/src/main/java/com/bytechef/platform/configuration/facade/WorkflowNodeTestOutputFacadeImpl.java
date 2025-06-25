@@ -146,38 +146,38 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         String workflowId = jobPrincipalAccessor.getLatestWorkflowId(
             workflowExecutionId.getWorkflowReferenceCode());
 
-        try {
-            Workflow workflow = workflowService.getWorkflow(workflowId);
+        Workflow workflow = workflowService.getWorkflow(workflowId);
 
-            WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflow)
-                .getFirst();
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflow)
+            .getFirst();
 
-            WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+        WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-            Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
-                workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId), evaluator);
+        Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
+            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId), evaluator);
 
-            Long connectionId = null;
+        Long connectionId = null;
 
-            List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
-                workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                    workflowId, workflowTrigger.getName());
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
+            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                workflowId, workflowTrigger.getName());
 
-            if (!workflowTestConfigurationConnections.isEmpty()) {
-                WorkflowTestConfigurationConnection workflowTestConfigurationConnection =
-                    workflowTestConfigurationConnections.getFirst();
+        if (!workflowTestConfigurationConnections.isEmpty()) {
+            WorkflowTestConfigurationConnection workflowTestConfigurationConnection =
+                workflowTestConfigurationConnections.getFirst();
 
-                connectionId = workflowTestConfigurationConnection.getConnectionId();
-            }
+            connectionId = workflowTestConfigurationConnection.getConnectionId();
+        }
 
-            TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
-                triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
-                triggerWorkflowNodeType.operation(), workflowExecutionId.getType(), null,
-                workflowExecutionId.getWorkflowReferenceCode(), triggerParameters, Map.of(), webhookRequest,
-                connectionId, true);
+        TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
+            triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+            triggerWorkflowNodeType.operation(), workflowExecutionId.getType(), null,
+            workflowExecutionId.getWorkflowReferenceCode(), triggerParameters, Map.of(), webhookRequest,
+            connectionId, true);
 
+        if (triggerOutput != null && triggerOutput.value() != null) {
             saveWorkflowNodeTestOutput(workflowId, workflowTrigger.getName(), triggerOutput.value());
-        } finally {
+
             webhookTriggerTestFacade.disableTrigger(workflowId, workflowExecutionId.getType());
         }
     }
