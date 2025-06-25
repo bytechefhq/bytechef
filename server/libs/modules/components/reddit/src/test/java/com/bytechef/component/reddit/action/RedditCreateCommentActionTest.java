@@ -39,13 +39,13 @@ import org.mockito.ArgumentCaptor;
  */
 class RedditCreateCommentActionTest {
 
-    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
+    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(THING_ID, "test", TEXT, "This is a comment."));
     private final Response mockedResponse = mock(Response.class);
-    private final Map<String, Object> responseMap = Map.of("success", true, "id", "abc123");
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
     void testPerform() {
@@ -58,11 +58,11 @@ class RedditCreateCommentActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody())
-            .thenReturn(responseMap);
+            .thenReturn(mockedObject);
 
         Object result = RedditCreateCommentAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertEquals(mockedObject, result);
 
         Object[] query = queryArgumentCaptor.getValue();
 

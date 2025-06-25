@@ -42,13 +42,13 @@ import org.mockito.ArgumentCaptor;
  */
 class RedditCreatePostActionTest {
 
-    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
+    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", URL, "This is URL.", TEXT, "This is a test."));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responseMap = Map.of("success", true, "id", "abc123");
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
     void testPerform() {
@@ -61,11 +61,11 @@ class RedditCreatePostActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody())
-            .thenReturn(responseMap);
+            .thenReturn(mockedObject);
 
         Object result = RedditCreatePostAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertEquals(mockedObject, result);
 
         Object[] query = queryArgumentCaptor.getValue();
 
