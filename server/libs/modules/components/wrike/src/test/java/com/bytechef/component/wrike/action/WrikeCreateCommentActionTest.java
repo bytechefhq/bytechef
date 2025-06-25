@@ -60,16 +60,14 @@ class WrikeCreateCommentActionTest {
         when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
-        Object result = WrikeCreateCommentAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Object result = WrikeCreateCommentAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
 
-        Object[] queryParameters = queryArgumentCaptor.getValue();
         Object[] expectedQueryParameters = {
             TEXT, "text", PLAIN_TEXT, null
         };
 
-        assertArrayEquals(expectedQueryParameters, queryParameters);
+        assertArrayEquals(expectedQueryParameters, queryArgumentCaptor.getValue());
     }
 }

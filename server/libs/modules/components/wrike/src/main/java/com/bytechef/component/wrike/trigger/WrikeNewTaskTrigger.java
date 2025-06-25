@@ -34,6 +34,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.List;
 import java.util.Map;
 
@@ -71,8 +72,7 @@ public class WrikeNewTaskTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        context.http(
-            http -> http.delete("/webhooks/%s".formatted(outputParameters.getRequiredString(ID))))
+        context.http(http -> http.delete("/webhooks/%s".formatted(outputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
@@ -97,7 +97,7 @@ public class WrikeNewTaskTrigger {
             }
         }
 
-        return null;
+        throw new ProviderException("Failed to enable webhook for new task trigger.");
     }
 
     protected static Object webhookRequest(

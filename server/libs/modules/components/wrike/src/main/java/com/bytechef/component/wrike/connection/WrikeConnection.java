@@ -43,11 +43,9 @@ public class WrikeConnection {
                         .label("Client Secret")
                         .description("Client Secret of your Wrike app.")
                         .required(true))
-                .authorizationUrl(
-                    (connectionParameters, context) -> "https://login.wrike.com/oauth2/authorize/v4")
+                .authorizationUrl((connectionParameters, context) -> "https://login.wrike.com/oauth2/authorize/v4")
                 .tokenUrl((connectionParameters, context) -> "https://login.wrike.com/oauth2/token")
-                .refreshUrl(
-                    (connectionParameters, context) -> "https://login.wrike.com/oauth2/token"));
+                .refreshUrl((connectionParameters, context) -> "https://login.wrike.com/oauth2/token"));
 
     private WrikeConnection() {
     }

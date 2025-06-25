@@ -48,7 +48,8 @@ class WrikeCreateTaskActionTest {
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
     private final Map<String, Object> responseMap = Map.of();
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(PARENT_ID, "parentId",
+        Map.of(
+            PARENT_ID, "parentId",
             TITLE, "title",
             DESCRIPTION, "description",
             STATUS, "status",
