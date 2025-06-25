@@ -56,7 +56,7 @@ public class MattermostComponentHandler extends AbstractMattermostComponentHandl
                         string(TOKEN)
                             .label("Token")
                             .required(true)))
-            .baseUri((connectionParameters, context) -> "http://" + connectionParameters.getRequiredString(DOMAIN)
-                + "/api/v4");
+            .baseUri((connectionParameters, context) -> "http://" + connectionParameters.getRequiredString(DOMAIN) +
+                "/api/v4");
     }
 }
