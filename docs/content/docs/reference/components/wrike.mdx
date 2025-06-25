@@ -183,10 +183,10 @@ Name: createProject
 | parentId | Parent ID | STRING | `ID of the parent folder.` | true |
 | title | Title | STRING | `The title of the project.` | true |
 | description | Description | STRING | `The description of the project.` | false |
-| startDate | Start Date | DATE | `The start date of the project.` | true |
-| endDate | End Date | DATE | `The end date of the project.` | true |
+| startDate | Start Date | DATE | `The start date of the project.` | false |
+| endDate | End Date | DATE | `The end date of the project.` | false |
 | contractType | Contract Type | STRING <details> <summary> Options </summary> Billable, NonBillable </details> | `The contract type of the project.` | false |
-| ownerIds | Owner IDs | ARRAY <details> <summary> Items </summary> [STRING\($ContactId)] </details> | `List of project owner IDs.` | false |
+| ownerIds | Owner IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of project owner IDs.` | false |
 | budget | Budget | INTEGER | `The budget of the project.` | false |
 
 #### Example JSON Structure
