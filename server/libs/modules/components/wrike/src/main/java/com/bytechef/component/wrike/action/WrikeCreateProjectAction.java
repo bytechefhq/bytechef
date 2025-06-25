@@ -170,7 +170,7 @@ public class WrikeCreateProjectAction {
     private WrikeCreateProjectAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Map<String, Object> project = getProject(inputParameters);
 
         return context.http(

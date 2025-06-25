@@ -98,7 +98,7 @@ public class WrikeCreateCommentAction {
     private WrikeCreateCommentAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(
             http -> http.post("/%s/%s/comments".formatted(
                 inputParameters.getRequiredString(PARENT),

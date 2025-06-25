@@ -181,7 +181,7 @@ public class WrikeCreateTaskAction {
     private WrikeCreateTaskAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(
             http -> http.post("/folders/%s/tasks".formatted(inputParameters.getRequiredString(PARENT_ID))))
             .configuration(responseType(ResponseType.JSON))
