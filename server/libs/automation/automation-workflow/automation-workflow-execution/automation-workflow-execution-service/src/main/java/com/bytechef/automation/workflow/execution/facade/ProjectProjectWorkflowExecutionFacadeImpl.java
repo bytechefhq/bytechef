@@ -31,7 +31,6 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
-import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
@@ -93,7 +92,6 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
         ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
         JobService jobService, PrincipalJobService principalJobService, ProjectFacade projectFacade,
         ProjectDeploymentService projectDeploymentService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
