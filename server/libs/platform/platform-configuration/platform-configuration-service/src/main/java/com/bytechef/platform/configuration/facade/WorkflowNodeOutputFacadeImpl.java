@@ -333,11 +333,10 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .orElse(null);
 
         if (outputResponse == null) {
-            outputResponse = clusterElementDefinition.getOutputResponse();
+            outputResponse = checkOutputSchemaIsFileEntryProperty(clusterElementDefinition.getOutputResponse());
         }
 
-        return new ClusterElementOutputDTO(
-            clusterElementDefinition, checkOutputSchemaIsFileEntryProperty(outputResponse), clusterElementName);
+        return new ClusterElementOutputDTO(clusterElementDefinition, outputResponse, clusterElementName);
     }
 
     @SuppressWarnings("unchecked")
@@ -402,11 +401,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 if (workflowTaskDispatcherDynamicOutputResponse == null) {
                     outputResponse = taskDispatcherDefinition.getOutputResponse();
                 } else {
-                    outputResponse = workflowTaskDispatcherDynamicOutputResponse.outputResponse;
+                    outputResponse = checkOutputSchemaIsFileEntryProperty(
+                        workflowTaskDispatcherDynamicOutputResponse.outputResponse);
                     variableOutputResponse = workflowTaskDispatcherDynamicOutputResponse.variableOutputResponse;
                 }
             } else {
-                outputResponse = actionDefinition.getOutputResponse();
+                outputResponse = checkOutputSchemaIsFileEntryProperty(actionDefinition.getOutputResponse());
 
                 if (outputResponse == null) {
                     outputResponse = getWorkflowTaskDynamicOutputResponse(workflowId, workflowTask);
@@ -424,8 +424,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         return new WorkflowNodeOutputDTO(
-            actionDefinition, null, checkOutputSchemaIsFileEntryProperty(outputResponse), taskDispatcherDefinition,
-            testoutputResponse, null, variableOutputResponse, workflowTask.getName());
+            actionDefinition, null, outputResponse, taskDispatcherDefinition, testoutputResponse, null,
+            variableOutputResponse, workflowTask.getName());
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTrigger workflowTrigger) {
@@ -445,7 +445,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .orElse(null);
 
         if (outputResponse == null) {
-            outputResponse = triggerDefinition.getOutputResponse();
+            outputResponse = checkOutputSchemaIsFileEntryProperty(triggerDefinition.getOutputResponse());
         } else {
             testoutputResponse = true;
         }
@@ -453,8 +453,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
 
         return new WorkflowNodeOutputDTO(
-            null, null, checkOutputSchemaIsFileEntryProperty(outputResponse), null, testoutputResponse,
-            triggerDefinition, workflowTrigger.getName());
+            null, null, outputResponse, null, testoutputResponse, triggerDefinition, workflowTrigger.getName());
     }
 
     @SuppressWarnings("unchecked")
