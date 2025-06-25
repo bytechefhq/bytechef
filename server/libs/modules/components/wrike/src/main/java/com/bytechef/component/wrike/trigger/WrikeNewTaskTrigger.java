@@ -82,9 +82,7 @@ public class WrikeNewTaskTrigger {
         TriggerContext context) {
 
         Map<String, Object> body = context.http(http -> http.post("/webhooks"))
-            .queryParameters(
-                "hookUrl", webhookUrl,
-                "events", List.of("TaskCreated"))
+            .queryParameters("hookUrl", webhookUrl, "events", List.of("TaskCreated"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -107,5 +105,4 @@ public class WrikeNewTaskTrigger {
 
         return webhookBody.getContent(new TypeReference<>() {});
     }
-
 }

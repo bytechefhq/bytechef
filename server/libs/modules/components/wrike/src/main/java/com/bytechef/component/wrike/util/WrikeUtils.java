@@ -64,14 +64,13 @@ public class WrikeUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        List<Option<String>> options = new ArrayList<>();
         String uri = inputParameters.getString(PARENT) == null ? "folders" : inputParameters.getString(PARENT);
 
         Map<String, Object> response = context.http(http -> http.get("/%s".formatted(uri)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         if (response.get(DATA) instanceof List<?> parents) {
             for (Object parent : parents) {
