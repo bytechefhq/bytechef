@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20240604153111" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mcp_project"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="mcp_project">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_server_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_project_mcp_server_id" references="mcp_server(id)"/>
+            </column>
+            <column name="project_deployment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_mcp_project_project_deployment_server" tableName="mcp_project" columnNames="project_deployment_id,mcp_server_id" />
+    </changeSet>
+
+    <changeSet id="20240604153111-1" author="Ivica Cardic" contextFilter="mono">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_mcp_project_project_deployment"/>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_project"
+            baseColumnNames="project_deployment_id"
+            constraintName="fk_mcp_project_project_deployment"
+            referencedTableName="project_deployment"
+            referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
