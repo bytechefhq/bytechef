@@ -641,9 +641,17 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     workflowConnection.componentName(), integration.getComponentName()))
                 .toList();
 
-            int connectionsCount = integrationInstanceConfigurationWorkflow.getConnectionsCount();
+            List<String> workflowNodeNames = requiredComponentConnections.stream()
+                .map(ComponentConnection::workflowNodeName)
+                .toList();
 
-            if (!requiredComponentConnections.isEmpty() && requiredComponentConnections.size() != connectionsCount) {
+            List<IntegrationInstanceConfigurationWorkflowConnection> connections =
+                integrationInstanceConfigurationWorkflow.getConnections()
+                    .stream()
+                    .filter(connection -> workflowNodeNames.contains(connection.getWorkflowNodeName()))
+                    .toList();
+
+            if (!requiredComponentConnections.isEmpty() && requiredComponentConnections.size() != connections.size()) {
                 throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     IntegrationInstanceConfigurationErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
