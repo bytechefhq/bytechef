@@ -57,9 +57,6 @@ class DocuSignDownloadEnvelopeDocumentActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn("");
-
-        when(mockedContext.file(any()))
             .thenReturn(mockedFileEntry);
 
         FileEntry result = DocuSignDownloadEnvelopeDocumentAction.perform(
