@@ -35,6 +35,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SUMMARY;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getCalendarTimezone;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.updateEvent;
 
@@ -44,6 +45,8 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
+import com.bytechef.google.commons.GoogleServices;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import java.io.IOException;
@@ -117,7 +120,8 @@ public class GoogleCalendarUpdateEventAction {
     public static CustomEvent perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws IOException {
 
-        Event event = getEvent(inputParameters, connectionParameters);
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+        Event event = getEvent(inputParameters, calendar);
 
         List<String> attendees = inputParameters.getList(ATTENDEES, String.class, List.of());
 
@@ -148,12 +152,14 @@ public class GoogleCalendarUpdateEventAction {
             event.setSummary(summary);
         }
 
+        String calendarTimezone = getCalendarTimezone(calendar);
+
         if (inputParameters.getBoolean(ALL_DAY) != null) {
             event
-                .setEnd(createEventDateTime(inputParameters, END))
-                .setStart(createEventDateTime(inputParameters, START));
+                .setEnd(createEventDateTime(inputParameters, END, calendarTimezone))
+                .setStart(createEventDateTime(inputParameters, START, calendarTimezone));
         }
 
-        return createCustomEvent(updateEvent(inputParameters, connectionParameters, event));
+        return createCustomEvent(updateEvent(inputParameters, connectionParameters, event), calendarTimezone);
     }
 }

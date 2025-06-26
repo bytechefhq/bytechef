@@ -25,7 +25,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
-import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.convertToDateViaSqlTimestamp;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.convertLocalDateTimeToDateInTimezone;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
@@ -137,18 +137,20 @@ public class GoogleCalendarEventTrigger {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
+        String calendarTimezone = GoogleCalendarUtils.getCalendarTimezone(calendar);
+
         List<Event> events = calendar.events()
             .list(inputParameters.getRequiredString(CALENDAR_ID))
             .setOrderBy("updated")
             .setShowDeleted(true)
-            .setUpdatedMin(new DateTime(convertToDateViaSqlTimestamp(currentRowNum)))
+            .setUpdatedMin(new DateTime(convertLocalDateTimeToDateInTimezone(currentRowNum, calendarTimezone)))
             .execute()
             .getItems();
 
         context.data(data -> data.put(WORKFLOW, "lastTimeChecked", now));
 
         if (events != null && !events.isEmpty()) {
-            return createCustomEvent(events.getLast());
+            return createCustomEvent(events.getLast(), calendarTimezone);
         }
 
         return null;

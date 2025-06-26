@@ -26,6 +26,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TEXT;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getCalendarTimezone;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -67,6 +68,6 @@ public class GoogleCalendarCreateQuickEventAction {
             .setSendUpdates(inputParameters.getString(SEND_UPDATES))
             .execute();
 
-        return createCustomEvent(event);
+        return createCustomEvent(event, getCalendarTimezone(calendar));
     }
 }

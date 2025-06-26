@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.END;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
@@ -47,6 +48,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
@@ -62,16 +64,23 @@ public class GoogleCalendarUtils {
     private GoogleCalendarUtils() {
     }
 
-    public static Date convertToDateViaSqlTimestamp(LocalDateTime dateToConvert) {
-        return dateToConvert == null ? null : java.sql.Timestamp.valueOf(dateToConvert);
+    public static Date convertLocalDateTimeToDateInTimezone(LocalDateTime dateToConvert, String timezone) {
+        if (dateToConvert == null) {
+            return null;
+        } else {
+            ZoneId zoneId = ZoneId.of(timezone);
+            ZonedDateTime zonedDateTime = dateToConvert.atZone(zoneId);
+
+            return Date.from(zonedDateTime.toInstant());
+        }
     }
 
-    public static Temporal convertToTemporalFromEventDateTime(EventDateTime eventDateTime) {
+    public static Temporal convertToTemporalFromEventDateTime(EventDateTime eventDateTime, String timezone) {
         if (eventDateTime != null) {
             DateTime dateTime = eventDateTime.getDateTime();
 
             if (dateTime != null) {
-                return LocalDateTime.ofInstant(Instant.parse(dateTime.toString()), ZoneId.systemDefault());
+                return LocalDateTime.ofInstant(Instant.parse(dateTime.toString()), ZoneId.of(timezone));
             }
 
             DateTime allDayDate = eventDateTime.getDate();
@@ -82,27 +91,37 @@ public class GoogleCalendarUtils {
         }
     }
 
-    public static EventDateTime createEventDateTime(Parameters inputParameters, String time) {
+    public static EventDateTime createEventDateTime(Parameters inputParameters, String time, String timezone) {
         EventDateTime eventDateTime = new EventDateTime();
 
         if (inputParameters.getRequiredBoolean(ALL_DAY)) {
             Date date = inputParameters.getRequiredDate(time);
+
+            if (time.equals(END)) {
+                java.util.Calendar javaCalendar = java.util.Calendar.getInstance();
+                javaCalendar.setTime(date);
+                javaCalendar.add(java.util.Calendar.DAY_OF_MONTH, 1);
+
+                date = javaCalendar.getTime();
+            }
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             eventDateTime.setDate(new DateTime(simpleDateFormat.format(date)));
         } else {
             eventDateTime.setDateTime(
-                new DateTime(convertToDateViaSqlTimestamp(inputParameters.getRequiredLocalDateTime(time))));
+                new DateTime(
+                    convertLocalDateTimeToDateInTimezone(inputParameters.getRequiredLocalDateTime(time), timezone)));
         }
 
         return eventDateTime;
     }
 
-    public static CustomEvent createCustomEvent(Event event) {
+    public static CustomEvent createCustomEvent(Event event, String timezone) {
         return new CustomEvent(
             event.getICalUID(), event.getId(), event.getSummary(), event.getDescription(),
-            convertToTemporalFromEventDateTime(event.getStart()), convertToTemporalFromEventDateTime(event.getEnd()),
+            convertToTemporalFromEventDateTime(event.getStart(), timezone),
+            convertToTemporalFromEventDateTime(event.getEnd(), timezone),
             event.getEtag(), event.getEventType(), event.getHtmlLink(), event.getStatus(), event.getLocation(),
             event.getHangoutLink(), event.getAttendees(), event.getAttachments(), event.getReminders());
     }
@@ -141,54 +160,56 @@ public class GoogleCalendarUtils {
             .execute()
             .getItems();
 
+        String calendarTimezone = getCalendarTimezone(calendar);
+
         Map<String, LocalDateTime> timePeriod = inputParameters.getMap(DATE_RANGE, LocalDateTime.class, Map.of());
 
         LocalDateTime from = timePeriod.get(FROM);
         LocalDateTime to = timePeriod.get(TO);
 
-        return convertToCustomEvents(filterEvents(from, to, items));
+        return convertToCustomEvents(filterEvents(from, to, items, calendarTimezone), calendarTimezone);
     }
 
-    private static List<Event> filterEvents(LocalDateTime from, LocalDateTime to, List<Event> items) {
+    private static List<Event> filterEvents(LocalDateTime from, LocalDateTime to, List<Event> items, String timezone) {
         if (from == null && to == null) {
             return items;
         } else if (from != null && to == null) {
 
             return items.stream()
-                .filter(event -> isAfter(event.getEnd(), from))
+                .filter(event -> isAfter(event.getEnd(), from, timezone))
                 .toList();
 
         } else if (from == null) {
 
             return items.stream()
-                .filter(event -> isBefore(event.getStart(), to))
+                .filter(event -> isBefore(event.getStart(), to, timezone))
                 .toList();
         } else {
             return items.stream()
-                .filter(event -> isWithinRange(event, from, to))
+                .filter(event -> isWithinRange(event, from, to, timezone))
                 .toList();
         }
     }
 
-    private static boolean isAfter(EventDateTime eventDateTime, LocalDateTime from) {
-        Temporal temporal = convertToTemporalFromEventDateTime(eventDateTime);
+    private static boolean isAfter(EventDateTime eventDateTime, LocalDateTime from, String timezone) {
+        Temporal temporal = convertToTemporalFromEventDateTime(eventDateTime, timezone);
 
         return temporal instanceof LocalDateTime localDateTime ? localDateTime.isAfter(from)
             : LocalDateTime.of(((LocalDate) temporal).minusDays(1), LOCAL_TIME_MAX)
                 .isAfter(from);
     }
 
-    private static boolean isBefore(EventDateTime eventDateTime, LocalDateTime to) {
-        Temporal temporal = convertToTemporalFromEventDateTime(eventDateTime);
+    private static boolean isBefore(EventDateTime eventDateTime, LocalDateTime to, String timezone) {
+        Temporal temporal = convertToTemporalFromEventDateTime(eventDateTime, timezone);
 
         return temporal instanceof LocalDateTime localDateTime ? localDateTime.isBefore(to)
             : LocalDateTime.of((LocalDate) temporal, LOCAL_TIME_MIN)
                 .isBefore(to);
     }
 
-    private static boolean isWithinRange(Event event, LocalDateTime from, LocalDateTime to) {
-        Temporal start = convertToTemporalFromEventDateTime(event.getStart());
-        Temporal end = convertToTemporalFromEventDateTime(event.getEnd());
+    private static boolean isWithinRange(Event event, LocalDateTime from, LocalDateTime to, String timezone) {
+        Temporal start = convertToTemporalFromEventDateTime(event.getStart(), timezone);
+        Temporal end = convertToTemporalFromEventDateTime(event.getEnd(), timezone);
 
         if (start instanceof LocalDateTime startLDT && end instanceof LocalDateTime endLDT) {
 
@@ -208,15 +229,13 @@ public class GoogleCalendarUtils {
         return false;
     }
 
-    private static List<CustomEvent> convertToCustomEvents(List<Event> eventList) {
+    private static List<CustomEvent> convertToCustomEvents(List<Event> eventList, String timezone) {
         return eventList.stream()
-            .map(GoogleCalendarUtils::createCustomEvent)
+            .map(event -> createCustomEvent(event, timezone))
             .toList();
     }
 
-    public static Event getEvent(Parameters inputParameters, Parameters connectionParameters) throws IOException {
-        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
-
+    public static Event getEvent(Parameters inputParameters, Calendar calendar) throws IOException {
         return calendar
             .events()
             .get(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID))
@@ -255,6 +274,20 @@ public class GoogleCalendarUtils {
             .events()
             .update(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID), event)
             .execute();
+    }
+
+    public static String getCalendarTimezone(Calendar calendar) throws IOException {
+        return calendar
+            .settings()
+            .list()
+            .execute()
+            .getItems()
+            .stream()
+            .filter(setting -> setting.getId()
+                .equals("timezone"))
+            .findFirst()
+            .get()
+            .getValue();
     }
 
     @SuppressFBWarnings("EI")
