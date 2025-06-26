@@ -292,15 +292,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         <span>{project.lastStatus}</span>
                                     </Badge>
                                 )}
-
-                                <Button
-                                    className="hover:bg-surface-neutral-primary-hover"
-                                    onClick={() => setShowEditDialog(true)}
-                                    size="sm"
-                                    variant="ghost"
-                                >
-                                    <EditIcon />
-                                </Button>
                             </div>
 
                             <Tooltip>
