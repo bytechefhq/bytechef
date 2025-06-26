@@ -264,8 +264,7 @@ public class JobSyncExecutor {
             .orElse(job);
     }
 
-    private record JobServiceWrapper(JobFactoryFunction jobFactoryFunction)
-        implements JobService {
+    private record JobServiceWrapper(JobFactoryFunction jobFactoryFunction) implements JobService {
 
         @Override
         public Job getJob(long id) {
@@ -299,6 +298,11 @@ public class JobSyncExecutor {
 
         @Override
         public Optional<Job> fetchLastWorkflowJob(String workflowId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Optional<Job> fetchLastWorkflowJob(List<String> workflowIds) {
             throw new UnsupportedOperationException();
         }
 

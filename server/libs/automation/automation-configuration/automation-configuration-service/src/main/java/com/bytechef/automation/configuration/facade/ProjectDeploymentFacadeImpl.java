@@ -278,14 +278,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 CollectionUtils.filter(
                     projectDeploymentWorkflowService.getProjectDeploymentWorkflows(id),
                     projectDeploymentWorkflow -> workflowIds.contains(projectDeploymentWorkflow.getWorkflowId())),
-                projectDeploymentWorkflow -> new ProjectDeploymentWorkflowDTO(
-                    projectDeploymentWorkflow,
-                    getWorkflowLastExecutionDate(projectDeploymentWorkflow.getWorkflowId()),
-                    getStaticWebhookUrl(
-                        projectDeploymentWorkflow.getProjectDeploymentId(), projectDeploymentWorkflow.getWorkflowId()),
-                    getWorkflowReferenceCode(
-                        projectDeploymentWorkflow.getWorkflowId(), projectDeployment.getProjectVersion(),
-                        projectWorkflows))),
+                projectDeploymentWorkflow -> toProjectDeploymentWorkflowDTO(
+                    projectDeploymentWorkflow, projectDeployment, projectWorkflows)),
             projectService.getProject(projectDeployment.getProjectId()),
             getProjectDeploymentLastExecutionDate(Validate.notNull(projectDeployment.getId(), "id")),
             tagService.getTags(projectDeployment.getTagIds()));
@@ -336,15 +330,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                                 projectDeploymentWorkflow -> Objects.equals(
                                     projectDeploymentWorkflow.getProjectDeploymentId(), projectDeployment.getId()) &&
                                     workflowIds.contains(projectDeploymentWorkflow.getWorkflowId())),
-                            projectDeploymentWorkflow -> new ProjectDeploymentWorkflowDTO(
-                                projectDeploymentWorkflow,
-                                getWorkflowLastExecutionDate(projectDeploymentWorkflow.getWorkflowId()),
-                                getStaticWebhookUrl(
-                                    projectDeploymentWorkflow.getProjectDeploymentId(),
-                                    projectDeploymentWorkflow.getWorkflowId()),
-                                getWorkflowReferenceCode(
-                                    projectDeploymentWorkflow.getWorkflowId(), projectDeployment.getProjectVersion(),
-                                    projectWorkflows))),
+                            projectDeploymentWorkflow -> toProjectDeploymentWorkflowDTO(
+                                projectDeploymentWorkflow, projectDeployment, projectWorkflows)),
                         project,
                         getProjectDeploymentLastExecutionDate(Validate.notNull(projectDeployment.getId(), "id")),
                         filterTags(tags, projectDeployment));
@@ -762,8 +749,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return webhookUrl.replace("{id}", workflowExecutionId.toString());
     }
 
-    private Instant getWorkflowLastExecutionDate(String workflowId) {
-        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowId), Job::getEndDate, null);
+    private Instant getWorkflowLastExecutionDate(List<String> workflowIds) {
+        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowIds), Job::getEndDate, null);
     }
 
     private String getWorkflowReferenceCode(
@@ -775,6 +762,29 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             .findFirst()
             .map(ProjectWorkflow::getWorkflowReferenceCode)
             .orElseThrow();
+    }
+
+    private ProjectDeploymentWorkflowDTO toProjectDeploymentWorkflowDTO(
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, ProjectDeployment projectDeployment,
+        List<ProjectWorkflow> projectWorkflows) {
+
+        String workflowReferenceCode = getWorkflowReferenceCode(
+            projectDeploymentWorkflow.getWorkflowId(), projectDeployment.getProjectVersion(),
+            projectWorkflows);
+
+        List<String> workflowReferenceCodeWorkflowIds = projectWorkflows.stream()
+            .filter(projectWorkflow -> Objects.equals(
+                projectWorkflow.getWorkflowReferenceCode(), workflowReferenceCode))
+            .map(ProjectWorkflow::getWorkflowId)
+            .toList();
+
+        return new ProjectDeploymentWorkflowDTO(
+            projectDeploymentWorkflow,
+            getWorkflowLastExecutionDate(workflowReferenceCodeWorkflowIds),
+            getStaticWebhookUrl(
+                projectDeploymentWorkflow.getProjectDeploymentId(),
+                projectDeploymentWorkflow.getWorkflowId()),
+            workflowReferenceCode);
     }
 
     private void validateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {

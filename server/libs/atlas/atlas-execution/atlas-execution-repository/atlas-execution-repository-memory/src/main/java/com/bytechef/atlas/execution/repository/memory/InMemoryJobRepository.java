@@ -107,6 +107,11 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
+    public Optional<Job> findTop1ByWorkflowIdInOrderByIdDesc(List<String> workflowIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<Job> findByTaskExecutionId(Long taskExecutionId) {
         TaskExecution taskExecution = OptionalUtils.get(inMemoryTaskExecutionRepository.findById(taskExecutionId));
 

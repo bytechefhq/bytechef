@@ -54,5 +54,7 @@ public interface JobRepository {
 
     Optional<Job> findTop1ByWorkflowIdOrderByIdDesc(String workflowId);
 
+    Optional<Job> findTop1ByWorkflowIdInOrderByIdDesc(List<String> workflowIds);
+
     Job save(Job job);
 }

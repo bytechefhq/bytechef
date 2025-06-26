@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.repository.JobRepository;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -53,6 +54,9 @@ public interface JdbcJobRepository
 
     @Override
     Optional<Job> findTop1ByWorkflowIdOrderByIdDesc(String workflowId);
+
+    @Override
+    Optional<Job> findTop1ByWorkflowIdInOrderByIdDesc(List<String> workflowIds);
 
     @Override
     @Query("SELECT * FROM job j WHERE j.id = (SELECT job_id FROM task_execution te WHERE te.id=:taskExecutionId)")

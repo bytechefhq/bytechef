@@ -23,6 +23,7 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -77,6 +78,11 @@ public class JobServiceImpl implements JobService {
     @Transactional(readOnly = true)
     public Optional<Job> fetchLastWorkflowJob(String workflowId) {
         return jobRepository.findTop1ByWorkflowIdOrderByIdDesc(workflowId);
+    }
+
+    @Override
+    public Optional<Job> fetchLastWorkflowJob(List<String> workflowIds) {
+        return jobRepository.findTop1ByWorkflowIdInOrderByIdDesc(workflowIds);
     }
 
     @Override
