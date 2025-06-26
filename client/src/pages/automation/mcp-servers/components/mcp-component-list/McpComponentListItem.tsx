@@ -2,19 +2,12 @@ import '@/shared/styles/dropdownMenu.css';
 import {Badge} from '@/components/ui/badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
-import {McpComponentType} from '@/shared/queries/platform/mcpComponents.queries';
-import {McpServerType} from '@/shared/queries/platform/mcpServers.queries';
+import {McpComponent, McpServer} from '@/shared/middleware/graphql';
 import {ComponentIcon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const McpComponentListItem = ({
-    mcpComponent,
-    mcpServer,
-}: {
-    mcpComponent: McpComponentType;
-    mcpServer: McpServerType;
-}) => {
+const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpComponent; mcpServer: McpServer}) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, setIsHovered] = useState(false);
 

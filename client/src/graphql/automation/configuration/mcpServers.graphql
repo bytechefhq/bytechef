@@ -1,0 +1,9 @@
+query mcpServers($type: ModeType!) {
+    mcpServers(type: $type) {
+        id
+        name
+        type
+        environment
+        enabled
+    }
+}

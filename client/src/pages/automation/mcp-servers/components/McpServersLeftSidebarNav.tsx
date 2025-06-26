@@ -1,6 +1,6 @@
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {useGetMcpServerTagsQuery} from '@/shared/queries/platform/mcpServerTags.queries';
+import {ModeType, useMcpServerTagsQuery} from '@/shared/middleware/graphql';
 import {TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -12,11 +12,15 @@ const McpServersLeftSidebarNav = () => {
     const tagId = searchParams.get('tagId');
 
     const filterData = {
-        id: projectId ? parseInt(projectId) : tagId ? parseInt(tagId) : undefined,
+        id: projectId ? projectId : tagId ? tagId : undefined,
         type: tagId ? Type.Tag : Type.Project,
     };
 
-    const {data: tags, isLoading: tagsIsLoading} = useGetMcpServerTagsQuery('AUTOMATION');
+    const {data, isLoading: tagsIsLoading} = useMcpServerTagsQuery({type: ModeType.Automation});
+
+    if (!data || !data?.mcpServerTags) {
+        return <></>;
+    }
 
     return (
         <>
@@ -48,17 +52,17 @@ const McpServersLeftSidebarNav = () => {
                 body={
                     <>
                         {!tagsIsLoading &&
-                            (tags && !!tags.length ? (
-                                tags?.map((item) => (
+                            (data.mcpServerTags.length ? (
+                                data.mcpServerTags.map((item) => (
                                     <LeftSidebarNavItem
                                         icon={<TagIcon className="mr-1 size-4" />}
                                         item={{
-                                            current: filterData?.id === item.id && filterData.type === Type.Tag,
-                                            id: item.id!,
-                                            name: item.name,
+                                            current: filterData?.id === item!.id && filterData.type === Type.Tag,
+                                            id: item!.id,
+                                            name: item!.name,
                                         }}
-                                        key={item.id}
-                                        toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
+                                        key={item!.id}
+                                        toLink={`?tagId=${item!.id}&environment=${environment ?? ''}`}
                                     />
                                 ))
                             ) : (

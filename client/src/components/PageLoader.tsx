@@ -9,7 +9,7 @@ const PageLoader = ({
     className,
     errors = [],
     loading,
-}: PropsWithChildren<{errors?: Array<TErrorType>; className?: string; loading: boolean}>) => {
+}: PropsWithChildren<{errors?: Array<TErrorType | unknown>; className?: string; loading: boolean}>) => {
     let errorExists = false;
 
     errors.forEach((error) => {

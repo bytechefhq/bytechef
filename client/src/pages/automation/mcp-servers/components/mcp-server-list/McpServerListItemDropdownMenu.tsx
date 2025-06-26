@@ -7,11 +7,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServerDialog';
-import {McpServerType} from '@/shared/queries/platform/mcpServers.queries';
+import {McpServer} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
 interface McpServerListItemDropdownMenuProps {
-    mcpServer: McpServerType;
+    mcpServer: McpServer;
     onDeleteClick: () => void;
 }
 

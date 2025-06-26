@@ -1,0 +1,6 @@
+query mcpServerTags($type: ModeType!) {
+    mcpServerTags(type: $type) {
+        id
+        name
+    }
+}

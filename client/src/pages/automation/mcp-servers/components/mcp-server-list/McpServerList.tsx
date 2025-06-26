@@ -1,15 +1,15 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {McpServerType} from '@/shared/queries/platform/mcpServers.queries';
+import {McpServer} from '@/shared/middleware/graphql';
 import McpServerListItem from 'pages/automation/mcp-servers/components/mcp-server-list/McpServerListItem';
 
 import McpComponentList from '../mcp-component-list/McpComponentList';
 
-const McpServerList = ({mcpServers}: {mcpServers: McpServerType[]}) => {
+const McpServerList = ({mcpServers}: {mcpServers: McpServer[]}) => {
     return (
         <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
             {mcpServers.map((mcpServer) => {
                 return (
-                    <Collapsible className="group" defaultOpen={true} key={mcpServer.id}>
+                    <Collapsible className="group" key={mcpServer.id}>
                         <McpServerListItem key={mcpServer.id} mcpServer={mcpServer} />
 
                         <CollapsibleContent>
@@ -21,4 +21,5 @@ const McpServerList = ({mcpServers}: {mcpServers: McpServerType[]}) => {
         </div>
     );
 };
+
 export default McpServerList;

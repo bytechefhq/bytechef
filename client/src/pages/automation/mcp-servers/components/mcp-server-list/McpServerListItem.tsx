@@ -5,16 +5,16 @@ import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpServerListItemAlertDialog from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemAlertDialog';
 import McpServerListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
-import {McpServerType} from '@/shared/queries/platform/mcpServers.queries';
+import {McpServer} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDown, ServerIcon} from 'lucide-react';
 import {useState} from 'react';
 
-const McpServerListItem = ({mcpServer}: {mcpServer: McpServerType}) => {
+const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [isEnablePending, setIsEnablePending] = useState(false);
-    const [localMcpServer, setLocalMcpServer] = useState<McpServerType>(mcpServer);
+    const [localMcpServer, setLocalMcpServer] = useState<McpServer>(mcpServer);
 
     const queryClient = useQueryClient();
 
@@ -142,14 +142,6 @@ const McpServerListItem = ({mcpServer}: {mcpServer: McpServerType}) => {
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Badge variant="secondary">{localMcpServer.type}</Badge>
-                            </TooltipTrigger>
-
-                            <TooltipContent>The server type</TooltipContent>
-                        </Tooltip>
-
                         <div className="flex min-w-28 justify-end">
                             <Tooltip>
                                 <TooltipTrigger asChild>

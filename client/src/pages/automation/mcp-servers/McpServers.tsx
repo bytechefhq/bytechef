@@ -3,7 +3,7 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useGetMcpServersQuery} from '@/shared/queries/platform/mcpServers.queries';
+import {ModeType, useMcpServersQuery} from '@/shared/middleware/graphql';
 import {ServerIcon} from 'lucide-react';
 
 import McpServerDialog from './components/McpServerDialog';
@@ -11,13 +11,22 @@ import McpServersLeftSidebarNav from './components/McpServersLeftSidebarNav';
 import McpServerList from './components/mcp-server-list/McpServerList';
 
 const McpServers = () => {
-    const {data: mcpServers, error: mcpServersError, isLoading: mcpServersIsLoading} = useGetMcpServersQuery();
+    const {
+        data,
+        error: mcpServersError,
+        isLoading: mcpServersIsLoading,
+    } = useMcpServersQuery({type: ModeType.Automation});
+
+    if (!data || !data.mcpServers) {
+        return <></>;
+    }
+
+    const validMcpServers = data.mcpServers.filter((server) => server !== null);
 
     return (
         <LayoutContainer
             header={
-                mcpServers &&
-                mcpServers.length > 0 && (
+                validMcpServers.length > 0 && (
                     <Header
                         centerTitle={true}
                         position="main"
@@ -31,8 +40,8 @@ const McpServers = () => {
             leftSidebarWidth="64"
         >
             <PageLoader errors={[mcpServersError]} loading={mcpServersIsLoading}>
-                {mcpServers && mcpServers?.length > 0 ? (
-                    <McpServerList mcpServers={mcpServers} />
+                {validMcpServers.length > 0 ? (
+                    <McpServerList mcpServers={validMcpServers} />
                 ) : (
                     <EmptyList
                         button={

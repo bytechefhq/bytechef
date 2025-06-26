@@ -1,14 +1,13 @@
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {McpComponentType} from '@/shared/queries/platform/mcpComponents.queries';
-import {McpServerType} from '@/shared/queries/platform/mcpServers.queries';
+import {McpComponent, McpServer} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
 import McpComponentDialog from '../McpComponentDialog';
 
 interface McpComponentListItemDropDownProps {
-    mcpComponent: McpComponentType;
-    mcpServer: McpServerType;
+    mcpComponent: McpComponent;
+    mcpServer: McpServer;
 }
 
 const McpComponentListItemDropdownMenu = ({mcpComponent, mcpServer}: McpComponentListItemDropDownProps) => {

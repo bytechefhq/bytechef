@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {McpComponentType} from '@/shared/queries/platform/mcpComponents.queries';
+import {McpComponent} from '@/shared/middleware/graphql';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
@@ -30,8 +30,8 @@ const McpComponentDialog = ({
     mcpServerId,
     triggerNode,
 }: {
-    mcpComponent?: McpComponentType;
-    mcpServerId: number;
+    mcpComponent?: McpComponent;
+    mcpServerId: string;
     triggerNode: ReactNode;
 }) => {
     const [open, setOpen] = useState(false);
@@ -41,7 +41,7 @@ const McpComponentDialog = ({
         defaultValues: {
             componentName: mcpComponent?.componentName || '',
             componentVersion: mcpComponent?.componentVersion || 1,
-            connectionId: mcpComponent?.connectionId,
+            connectionId: mcpComponent?.connectionId ? +mcpComponent?.connectionId : undefined,
         },
         resolver: zodResolver(formSchema),
     });
@@ -58,7 +58,7 @@ const McpComponentDialog = ({
 
             // Invalidate queries to refresh the list
             queryClient.invalidateQueries({
-                queryKey: ['mcpComponents', 'byServerId', mcpServerId],
+                queryKey: ['mcpComponents'],
             });
             setOpen(false);
         } catch (error) {

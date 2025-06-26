@@ -2,17 +2,15 @@ import EmptyList from '@/components/EmptyList';
 import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import McpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItem';
-import {useGetMcpComponentsByServerIdQuery} from '@/shared/queries/platform/mcpComponents.queries';
-import {McpServerType} from '@/shared/queries/platform/mcpServers.queries';
+import {McpServer, useMcpComponentsByServerIdQuery} from '@/shared/middleware/graphql';
 import {ComponentIcon} from 'lucide-react';
 
 import McpComponentDialog from '../McpComponentDialog';
 
-const McpComponentList = ({mcpServer}: {mcpServer: McpServerType}) => {
-    const {data: mcpComponents, isLoading: isMcpComponentsLoading} = useGetMcpComponentsByServerIdQuery(
-        mcpServer.id!,
-        !!mcpServer.id
-    );
+const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
+    const {data, isLoading: isMcpComponentsLoading} = useMcpComponentsByServerIdQuery({
+        mcpServerId: mcpServer.id!,
+    });
 
     if (isMcpComponentsLoading) {
         return (
@@ -38,19 +36,23 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServerType}) => {
         );
     }
 
+    if (!data || !data.mcpComponentsByServerId) {
+        return <></>;
+    }
+
     return (
         <div className="border-b border-b-gray-100 py-3 pl-4">
-            {mcpComponents && mcpComponents.length > 0 ? (
+            {data.mcpComponentsByServerId.length > 0 ? (
                 <>
                     <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Components</h3>
 
                     <ul className="divide-y divide-gray-100">
-                        {mcpComponents
-                            .sort((a, b) => a.componentName.localeCompare(b.componentName))
+                        {data.mcpComponentsByServerId
+                            .sort((a, b) => a!.componentName.localeCompare(b!.componentName))
                             .map((mcpComponent) => (
                                 <McpComponentListItem
-                                    key={mcpComponent.id}
-                                    mcpComponent={mcpComponent}
+                                    key={mcpComponent?.id}
+                                    mcpComponent={mcpComponent!}
                                     mcpServer={mcpServer}
                                 />
                             ))}

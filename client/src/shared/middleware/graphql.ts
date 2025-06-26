@@ -1,5 +1,5 @@
 import { endpointUrl, fetchParams } from './config';
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useMutation, useQuery, UseMutationOptions, UseQueryOptions } from '@tanstack/react-query';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -145,9 +145,32 @@ export type McpProject = {
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  mcpProjectWorkflows?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
   mcpServerId: Scalars['ID']['output'];
   projectDeploymentId: Scalars['ID']['output'];
   version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type McpProjectWorkflow = {
+  __typename?: 'McpProjectWorkflow';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  mcpProjectId: Scalars['Long']['output'];
+  projectDeploymentWorkflowId: Scalars['Long']['output'];
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type McpProjectWorkflowInput = {
+  mcpProjectId: Scalars['Long']['input'];
+  projectDeploymentWorkflowId: Scalars['Long']['input'];
+};
+
+export type McpProjectWorkflowUpdateInput = {
+  mcpProjectId?: InputMaybe<Scalars['Long']['input']>;
+  projectDeploymentWorkflowId?: InputMaybe<Scalars['Long']['input']>;
 };
 
 export type McpServer = {
@@ -188,19 +211,44 @@ export enum ModeType {
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
+  createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpServer?: Maybe<McpServer>;
+  deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
+  updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   updateMcpServer?: Maybe<McpServer>;
 };
 
 
+export type MutationCreateMcpProjectWorkflowArgs = {
+  input: McpProjectWorkflowInput;
+};
+
+
 export type MutationCreateMcpServerArgs = {
-  input: McpServerInput;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  environment: Environment;
+  name: Scalars['String']['input'];
+  type: ModeType;
+};
+
+
+export type MutationDeleteMcpProjectWorkflowArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateMcpProjectWorkflowArgs = {
+  id: Scalars['ID']['input'];
+  input: McpProjectWorkflowUpdateInput;
 };
 
 
 export type MutationUpdateMcpServerArgs = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  environment?: InputMaybe<Environment>;
   id: Scalars['ID']['input'];
-  input: McpServerUpdateInput;
+  name?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<ModeType>;
 };
 
 export type Project = {
@@ -225,6 +273,10 @@ export type Query = {
   mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
   mcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
   mcpProject?: Maybe<McpProject>;
+  mcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
+  mcpProjectWorkflows?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
+  mcpProjectWorkflowsByMcpProjectId?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
+  mcpProjectWorkflowsByProjectDeploymentWorkflowId?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
   mcpProjects?: Maybe<Array<Maybe<McpProject>>>;
   mcpProjectsByServerId?: Maybe<Array<Maybe<McpProject>>>;
   mcpServer?: Maybe<McpServer>;
@@ -286,6 +338,21 @@ export type QueryMcpProjectArgs = {
 };
 
 
+export type QueryMcpProjectWorkflowArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryMcpProjectWorkflowsByMcpProjectIdArgs = {
+  mcpProjectId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryMcpProjectWorkflowsByProjectDeploymentWorkflowIdArgs = {
+  projectDeploymentWorkflowId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
 export type QueryMcpProjectsByServerIdArgs = {
   mcpServerId?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -297,7 +364,12 @@ export type QueryMcpServerArgs = {
 
 
 export type QueryMcpServerTagsArgs = {
-  type?: InputMaybe<Scalars['String']['input']>;
+  type: ModeType;
+};
+
+
+export type QueryMcpServersArgs = {
+  type: ModeType;
 };
 
 
@@ -322,12 +394,53 @@ export type Workflow = {
   version?: Maybe<Scalars['Int']['output']>;
 };
 
+export type CreateMcpServerMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  type: ModeType;
+  environment: Environment;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type CreateMcpServerMutation = { __typename?: 'Mutation', createMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: ModeType, environment: Environment, enabled: boolean } | null };
+
+export type McpComponentsByServerIdQueryVariables = Exact<{
+  mcpServerId: Scalars['ID']['input'];
+}>;
+
+
+export type McpComponentsByServerIdQuery = { __typename?: 'Query', mcpComponentsByServerId?: Array<{ __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, mcpServerId: string, connectionId?: string | null } | null> | null };
+
+export type McpServerTagsQueryVariables = Exact<{
+  type: ModeType;
+}>;
+
+
+export type McpServerTagsQuery = { __typename?: 'Query', mcpServerTags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null };
+
+export type McpServersQueryVariables = Exact<{
+  type: ModeType;
+}>;
+
+
+export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environment: Environment, enabled: boolean } | null> | null };
+
 export type ProjectByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
 export type ProjectByIdQuery = { __typename?: 'Query', project?: { __typename?: 'Project', id: string, name: string } | null };
+
+export type UpdateMcpServerMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  environment?: InputMaybe<Environment>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type UpdateMcpServerMutation = { __typename?: 'Mutation', updateMcpServer?: { __typename?: 'McpServer', id: string, name: string, environment: Environment, enabled: boolean } | null };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -345,6 +458,117 @@ export type IntegrationByIdQueryVariables = Exact<{
 export type IntegrationByIdQuery = { __typename?: 'Query', integration?: { __typename?: 'Integration', id: string, name: string } | null };
 
 
+
+export const CreateMcpServerDocument = `
+    mutation createMcpServer($name: String!, $type: ModeType!, $environment: Environment!, $enabled: Boolean) {
+  createMcpServer(
+    name: $name
+    type: $type
+    environment: $environment
+    enabled: $enabled
+  ) {
+    id
+    name
+    type
+    environment
+    enabled
+  }
+}
+    `;
+
+export const useCreateMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['createMcpServer'],
+    mutationFn: (variables?: CreateMcpServerMutationVariables) => fetcher<CreateMcpServerMutation, CreateMcpServerMutationVariables>(CreateMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const McpComponentsByServerIdDocument = `
+    query mcpComponentsByServerId($mcpServerId: ID!) {
+  mcpComponentsByServerId(mcpServerId: $mcpServerId) {
+    id
+    componentName
+    componentVersion
+    mcpServerId
+    connectionId
+  }
+}
+    `;
+
+export const useMcpComponentsByServerIdQuery = <
+      TData = McpComponentsByServerIdQuery,
+      TError = unknown
+    >(
+      variables: McpComponentsByServerIdQueryVariables,
+      options?: Omit<UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpComponentsByServerIdQuery, TError, TData>(
+      {
+    queryKey: ['mcpComponentsByServerId', variables],
+    queryFn: fetcher<McpComponentsByServerIdQuery, McpComponentsByServerIdQueryVariables>(McpComponentsByServerIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const McpServerTagsDocument = `
+    query mcpServerTags($type: ModeType!) {
+  mcpServerTags(type: $type) {
+    id
+    name
+  }
+}
+    `;
+
+export const useMcpServerTagsQuery = <
+      TData = McpServerTagsQuery,
+      TError = unknown
+    >(
+      variables: McpServerTagsQueryVariables,
+      options?: Omit<UseQueryOptions<McpServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServerTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpServerTagsQuery, TError, TData>(
+      {
+    queryKey: ['mcpServerTags', variables],
+    queryFn: fetcher<McpServerTagsQuery, McpServerTagsQueryVariables>(McpServerTagsDocument, variables),
+    ...options
+  }
+    )};
+
+export const McpServersDocument = `
+    query mcpServers($type: ModeType!) {
+  mcpServers(type: $type) {
+    id
+    name
+    type
+    environment
+    enabled
+  }
+}
+    `;
+
+export const useMcpServersQuery = <
+      TData = McpServersQuery,
+      TError = unknown
+    >(
+      variables: McpServersQueryVariables,
+      options?: Omit<UseQueryOptions<McpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpServersQuery, TError, TData>(
+      {
+    queryKey: ['mcpServers', variables],
+    queryFn: fetcher<McpServersQuery, McpServersQueryVariables>(McpServersDocument, variables),
+    ...options
+  }
+    )};
 
 export const ProjectByIdDocument = `
     query projectById($id: ID!) {
@@ -367,6 +591,35 @@ export const useProjectByIdQuery = <
       {
     queryKey: ['projectById', variables],
     queryFn: fetcher<ProjectByIdQuery, ProjectByIdQueryVariables>(ProjectByIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateMcpServerDocument = `
+    mutation updateMcpServer($id: ID!, $name: String, $environment: Environment, $enabled: Boolean) {
+  updateMcpServer(
+    id: $id
+    name: $name
+    environment: $environment
+    enabled: $enabled
+  ) {
+    id
+    name
+    environment
+    enabled
+  }
+}
+    `;
+
+export const useUpdateMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['updateMcpServer'],
+    mutationFn: (variables?: UpdateMcpServerMutationVariables) => fetcher<UpdateMcpServerMutation, UpdateMcpServerMutationVariables>(UpdateMcpServerDocument, variables)(),
     ...options
   }
     )};
