@@ -17,6 +17,8 @@
 package com.bytechef.component.elevenlabs.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.TEXT;
@@ -26,8 +28,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.elevenlabs.util.ElevenLabsUtils;
 import java.util.Map;
 
@@ -49,16 +53,20 @@ public class ElevenLabsCreateSpeechAction {
                 .label("Text")
                 .description("Text you want to convert into speech.")
                 .required(true))
-        .output()
+        .output(
+            outputSchema(
+                fileEntry()
+                    .description("Speech audio that was created.")))
         .perform(ElevenLabsCreateSpeechAction::perform);
 
     private ElevenLabsCreateSpeechAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("/text-to-speech/" + inputParameters.getRequiredString(VOICE_ID)))
             .body(Body.of(Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
             .configuration(responseType(ResponseType.binary("audio/mpeg")))
-            .execute();
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
