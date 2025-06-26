@@ -54,6 +54,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
@@ -193,11 +194,14 @@ public class GoogleCalendarCreateEventAction {
             .map(attendee -> new EventAttendee().setEmail(attendee))
             .toList();
 
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+        String timezone = GoogleCalendarUtils.getCalendarTimezone(calendar);
+
         Event event = new Event()
             .setAttachments(eventAttachments)
             .setAttendees(eventAttendees)
             .setDescription(inputParameters.getString(DESCRIPTION))
-            .setEnd(createEventDateTime(inputParameters, END))
+            .setEnd(createEventDateTime(inputParameters, END, timezone))
             .setGuestsCanInviteOthers(inputParameters.getBoolean(GUEST_CAN_INVITE_OTHERS))
             .setGuestsCanModify(inputParameters.getBoolean(GUEST_CAN_MODIFY))
             .setGuestsCanSeeOtherGuests(inputParameters.getBoolean(GUEST_CAN_SEE_OTHER_GUESTS))
@@ -206,16 +210,14 @@ public class GoogleCalendarCreateEventAction {
                 new Event.Reminders()
                     .setUseDefault(inputParameters.getRequiredBoolean(USE_DEFAULT))
                     .setOverrides(inputParameters.getList(REMINDERS, EventReminder.class, List.of())))
-            .setStart(createEventDateTime(inputParameters, START))
+            .setStart(createEventDateTime(inputParameters, START, timezone))
             .setSummary(inputParameters.getString(SUMMARY));
-
-        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         Event newEvent = calendar.events()
             .insert(inputParameters.getRequiredString(CALENDAR_ID), event)
             .setSendUpdates(inputParameters.getString(SEND_UPDATES))
             .execute();
 
-        return createCustomEvent(newEvent);
+        return createCustomEvent(newEvent, timezone);
     }
 }
