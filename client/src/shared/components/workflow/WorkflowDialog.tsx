@@ -153,17 +153,21 @@ const WorkflowDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle>{`${!workflow?.id ? 'Create' : 'Edit'}`} Workflow</DialogTitle>
+
+                        <DialogDescription>
+                            {workflow?.id
+                                ? 'Edit the details of the workflow.'
+                                : 'Create a new workflow by filling out the form below.'}
+                        </DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
+                </DialogHeader>
+
                 <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                        <div className="flex flex-col space-y-1">
-                            <DialogTitle>{`${!workflow?.id ? 'Create' : 'Edit'}`} Workflow</DialogTitle>
-
-                            <DialogDescription>Use this form to create a workflow.</DialogDescription>
-                        </div>
-
-                        <DialogCloseButton />
-                    </DialogHeader>
-
                     <FormField
                         control={control}
                         name="label"
