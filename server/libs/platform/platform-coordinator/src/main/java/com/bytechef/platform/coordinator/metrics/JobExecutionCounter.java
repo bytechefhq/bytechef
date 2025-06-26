@@ -37,8 +37,7 @@ public class JobExecutionCounter {
     }
 
     public void process(JobStatusApplicationEvent jobStatusApplicationEvent, Job job) {
-        Counter
-            .builder("bytechef_job_execution")
+        Counter.builder("bytechef_job_execution")
             .tag("job_name", job.getLabel())
             .tag("job_status", jobStatusApplicationEvent.getStatus()
                 .toString()
