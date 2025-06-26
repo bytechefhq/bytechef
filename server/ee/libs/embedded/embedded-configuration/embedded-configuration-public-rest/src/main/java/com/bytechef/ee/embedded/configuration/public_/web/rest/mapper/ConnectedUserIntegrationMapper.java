@@ -17,8 +17,8 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.Emb
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputTypeModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationBasicModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceAllOfWorkflowsModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OAuth2Model;
@@ -56,8 +56,8 @@ public interface ConnectedUserIntegrationMapper {
 
         @Mapping(target = "enabled", source = "integrationInstanceWorkflow.enabled")
         @Mapping(target = "inputs", source = "integrationInstanceWorkflow.inputs")
-        IntegrationInstanceAllOfWorkflowsModel
-            map(ConnectedUserIntegrationInstanceWorkflow integrationInstanceWorkflow);
+        IntegrationInstanceWorkflowModel map(
+            ConnectedUserIntegrationInstanceWorkflow integrationInstanceWorkflow);
     }
 
     @Mapper(
@@ -97,7 +97,7 @@ public interface ConnectedUserIntegrationMapper {
 
         @Mapping(target = "enabled", source = "integrationInstanceWorkflow.enabled")
         @Mapping(target = "inputs", source = "integrationInstanceWorkflow.inputs")
-        IntegrationInstanceAllOfWorkflowsModel map(
+        IntegrationInstanceWorkflowModel map(
             ConnectedUserIntegrationInstanceWorkflow integrationInstanceWorkflow);
 
         default InputModel map(Workflow.Input input) {
