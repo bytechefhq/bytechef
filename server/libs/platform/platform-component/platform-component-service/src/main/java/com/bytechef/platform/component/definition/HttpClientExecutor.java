@@ -122,9 +122,9 @@ class HttpClientExecutor {
             }
 
             httpResponse = httpClient.send(httpRequest, createResponseBodyHandler(configuration));
-        }
 
-        return handleResponse(httpResponse, configuration);
+            return handleResponse(httpResponse, configuration);
+        }
     }
 
     BodyPublisher createBodyPublisher(Body body) {
