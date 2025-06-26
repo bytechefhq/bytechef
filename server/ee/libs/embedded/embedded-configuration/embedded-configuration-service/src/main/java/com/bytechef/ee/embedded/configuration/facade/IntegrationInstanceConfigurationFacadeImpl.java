@@ -753,8 +753,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfiguration.getIntegrationVersion());
     }
 
-    private Instant getWorkflowLastExecutionDate(String workflowId) {
-        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowId), Job::getEndDate, null);
+    private Instant getWorkflowLastExecutionDate(List<String> workflowIds) {
+        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowIds), Job::getEndDate, null);
     }
 
     private String getWorkflowReferenceCode(
@@ -812,13 +812,23 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfiguration,
             CollectionUtils.map(
                 integrationInstanceWorkflows,
-                integrationInstanceConfigurationWorkflow -> new IntegrationInstanceConfigurationWorkflowDTO(
-                    integrationInstanceConfigurationWorkflow,
-                    getWorkflowLastExecutionDate(integrationInstanceConfigurationWorkflow.getWorkflowId()),
-                    workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId()),
-                    getWorkflowReferenceCode(
+                integrationInstanceConfigurationWorkflow -> {
+                    String workflowReferenceCode = getWorkflowReferenceCode(
                         integrationInstanceConfigurationWorkflow.getWorkflowId(),
-                        integrationInstanceConfiguration.getIntegrationVersion(), integrationWorkflows))),
+                        integrationInstanceConfiguration.getIntegrationVersion(), integrationWorkflows);
+
+                    List<String> workflowReferenceCodeWorkflowIds = integrationWorkflows.stream()
+                        .filter(projectWorkflow -> Objects.equals(
+                            projectWorkflow.getWorkflowReferenceCode(), workflowReferenceCode))
+                        .map(IntegrationWorkflow::getWorkflowId)
+                        .toList();
+
+                    return new IntegrationInstanceConfigurationWorkflowDTO(
+                        integrationInstanceConfigurationWorkflow,
+                        getWorkflowLastExecutionDate(workflowReferenceCodeWorkflowIds),
+                        workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId()),
+                        workflowReferenceCode);
+                }),
             integrationDTO,
             tags);
     }
