@@ -626,7 +626,16 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                     .filter(ComponentConnection::required)
                     .toList());
 
-            if (requiredComponentConnections.size() != projectDeploymentWorkflow.getConnectionsCount()) {
+            List<String> workflowNodeNames = requiredComponentConnections.stream()
+                .map(ComponentConnection::workflowNodeName)
+                .toList();
+
+            List<ProjectDeploymentWorkflowConnection> connections = projectDeploymentWorkflow.getConnections()
+                .stream()
+                .filter(connection -> workflowNodeNames.contains(connection.getWorkflowNodeName()))
+                .toList();
+
+            if (!requiredComponentConnections.isEmpty() && requiredComponentConnections.size() != connections.size()) {
                 throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     ProjectDeploymentErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
