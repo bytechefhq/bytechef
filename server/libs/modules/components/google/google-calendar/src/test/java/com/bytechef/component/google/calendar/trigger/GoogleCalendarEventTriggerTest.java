@@ -62,6 +62,7 @@ import org.mockito.MockedStatic;
 class GoogleCalendarEventTriggerTest {
 
     private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
     private final ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
     private final ArgumentCaptor<DateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(DateTime.class);
     private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
@@ -160,6 +161,7 @@ class GoogleCalendarEventTriggerTest {
     void testWebhookRequest() throws IOException {
         LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
         LocalDateTime minusedHours = localDateTime.minusHours(3);
+        String timezone = "Europe/Zagreb";
 
         Event event = new Event();
         java.util.List<Event> events = java.util.List.of(event);
@@ -170,10 +172,15 @@ class GoogleCalendarEventTriggerTest {
             MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class);
             MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(LocalDateTime.class)) {
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.createCustomEvent(eventArgumentCaptor.capture()))
+                .when(() -> GoogleCalendarUtils.createCustomEvent(
+                    eventArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedCustomEvent);
+            googleCalendarUtilsMockedStatic
+                .when(() -> GoogleCalendarUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
+                .thenReturn(timezone);
             googleServicesMockedStatic
-                .when(() -> GoogleCalendarUtils.convertToDateViaSqlTimestamp(localDateTimeArgumentCaptor.capture()))
+                .when(() -> GoogleCalendarUtils.convertLocalDateTimeToDateInTimezone(
+                    localDateTimeArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(java.sql.Timestamp.valueOf(minusedHours));
             googleServicesMockedStatic
                 .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
@@ -204,7 +211,8 @@ class GoogleCalendarEventTriggerTest {
 
             assertEquals(event, eventArgumentCaptor.getValue());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-            assertEquals(java.util.List.of("calendar_id", "updated"), stringArgumentCaptor.getAllValues());
+            assertEquals(java.util.List.of("calendar_id", "updated", timezone, timezone),
+                stringArgumentCaptor.getAllValues());
             assertEquals(true, booleanArgumentCaptor.getValue());
             assertEquals(new DateTime(java.sql.Timestamp.valueOf(minusedHours)), dateTimeArgumentCaptor.getValue());
             assertEquals(minusedHours, localDateTimeArgumentCaptor.getValue());
