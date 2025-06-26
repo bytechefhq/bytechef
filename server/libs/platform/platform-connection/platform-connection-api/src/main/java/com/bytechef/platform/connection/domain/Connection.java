@@ -39,6 +39,7 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -51,7 +52,7 @@ public final class Connection {
     }
 
     @Column("authorization_type")
-    private int authorizationType;
+    private Integer authorizationType;
 
     @Column
     private int environment;
@@ -134,8 +135,9 @@ public final class Connection {
     /**
      * Return the type of an authorization it is used with this connection.
      */
+    @Nullable
     public AuthorizationType getAuthorizationType() {
-        return AuthorizationType.values()[authorizationType];
+        return authorizationType == null ? null : AuthorizationType.values()[authorizationType];
     }
 
     /**
@@ -231,7 +233,7 @@ public final class Connection {
     }
 
     public void setAuthorizationType(AuthorizationType authorizationType) {
-        this.authorizationType = authorizationType.ordinal();
+        this.authorizationType = authorizationType == null ? null : authorizationType.ordinal();
     }
 
     public void setComponentName(String componentName) {

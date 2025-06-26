@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -60,10 +61,9 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection create(
-        AuthorizationType authorizationType, String componentName, int connectionVersion,
+        @Nullable AuthorizationType authorizationType, String componentName, int connectionVersion,
         Environment environment, String name, Map<String, Object> parameters, ModeType type) {
 
-        Assert.notNull(authorizationType, "'authorizationType' must not be null");
         Assert.hasText(componentName, "'componentName' must not be empty");
         Assert.hasText(name, "'name' must not be empty");
         Assert.notNull(environment, "'environment' must not be null");
@@ -71,6 +71,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         Assert.notNull(type, "'type' must not be null");
 
         Connection connection = new Connection();
+
         connection.setAuthorizationType(authorizationType);
         connection.setComponentName(componentName);
         connection.setConnectionVersion(connectionVersion);

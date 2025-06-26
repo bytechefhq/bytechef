@@ -22,6 +22,7 @@ import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -31,7 +32,7 @@ public interface ConnectionService {
     Connection create(Connection connection);
 
     Connection create(
-        AuthorizationType authorizationType, String componentName, int connectionVersion,
+        @Nullable AuthorizationType authorizationType, String componentName, int connectionVersion,
         Environment environment, String name, Map<String, Object> parameters, ModeType type);
 
     void delete(long id);

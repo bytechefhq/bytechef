@@ -25,15 +25,16 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
-    boolean active, AuthorizationType authorizationType, Map<String, ?> authorizationParameters, String componentName,
-    Map<String, ?> connectionParameters, int connectionVersion, String createdBy, Instant createdDate,
-    CredentialStatus credentialStatus, Environment environment, Long id, String lastModifiedBy,
+    boolean active, @Nullable AuthorizationType authorizationType, Map<String, ?> authorizationParameters,
+    String componentName, Map<String, ?> connectionParameters, int connectionVersion, String createdBy,
+    Instant createdDate, CredentialStatus credentialStatus, Environment environment, Long id, String lastModifiedBy,
     Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
 
     public ConnectionDTO(
