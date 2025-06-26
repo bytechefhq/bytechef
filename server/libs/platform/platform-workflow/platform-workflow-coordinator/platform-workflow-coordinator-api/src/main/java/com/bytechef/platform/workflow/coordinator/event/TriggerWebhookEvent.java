@@ -42,6 +42,14 @@ public class TriggerWebhookEvent extends AbstractEvent {
         return webhookParameters;
     }
 
+    public WebhookRequest getWebhookRequest() {
+        return webhookParameters.webhookRequest;
+    }
+
+    public WorkflowExecutionId getWorkflowExecutionId() {
+        return webhookParameters.workflowExecutionId;
+    }
+
     @Override
     public String toString() {
         return "TriggerWebhookEvent{" +

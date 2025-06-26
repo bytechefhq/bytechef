@@ -34,7 +34,6 @@ import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionErrorEve
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerPollEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
-import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;
 import com.bytechef.platform.workflow.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.platform.workflow.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.platform.workflow.coordinator.trigger.completion.TriggerCompletionHandler;
@@ -143,20 +142,24 @@ public class TriggerCoordinator {
             logger.trace("onTriggerListenerEvent: triggerListenerEvent={}", triggerListenerEvent);
         }
 
-        TriggerExecution triggerExecution = TriggerExecution.builder()
-            .startDate(triggerListenerEvent.getExecutionDate())
-            .endDate(triggerListenerEvent.getExecutionDate())
-            .workflowExecutionId(triggerListenerEvent.getWorkflowExecutionId())
-            .workflowTrigger(getWorkflowTrigger(triggerListenerEvent.getWorkflowExecutionId()))
-            .build();
+        WorkflowExecutionId workflowExecutionId = triggerListenerEvent.getWorkflowExecutionId();
 
-        triggerExecution = triggerExecutionService.create(triggerExecution);
+        TenantUtils.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+            TriggerExecution triggerExecution = TriggerExecution.builder()
+                .startDate(triggerListenerEvent.getExecutionDate())
+                .endDate(triggerListenerEvent.getExecutionDate())
+                .workflowExecutionId(workflowExecutionId)
+                .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
+                .build();
 
-        triggerExecution.setOutput(
-            triggerFileStorage.storeTriggerExecutionOutput(
-                Validate.notNull(triggerExecution.getId(), "id"), triggerListenerEvent.getOutput()));
+            triggerExecution = triggerExecutionService.create(triggerExecution);
 
-        handleTriggerExecutionCompletion(triggerExecution);
+            triggerExecution.setOutput(
+                triggerFileStorage.storeTriggerExecutionOutput(
+                    Validate.notNull(triggerExecution.getId(), "id"), triggerListenerEvent.getOutput()));
+
+            handleTriggerExecutionCompletion(triggerExecution);
+        });
     }
 
     /**
@@ -200,22 +203,24 @@ public class TriggerCoordinator {
             logger.trace("onTriggerWebhookEvent: triggerWebhookEvent={}", triggerWebhookEvent);
         }
 
-        WebhookParameters webhookParameters = triggerWebhookEvent.getWebhookParameters();
+        WorkflowExecutionId workflowExecutionId = triggerWebhookEvent.getWorkflowExecutionId();
 
-        TriggerExecution triggerExecution = TriggerExecution.builder()
-            .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookParameters.webhookRequest()))
-            .workflowExecutionId(webhookParameters.workflowExecutionId())
-            .workflowTrigger(getWorkflowTrigger(webhookParameters.workflowExecutionId()))
-            .build();
+        TenantUtils.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+            TriggerExecution triggerExecution = TriggerExecution.builder()
+                .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, triggerWebhookEvent.getWebhookRequest()))
+                .workflowExecutionId(workflowExecutionId)
+                .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
+                .build();
 
-        dispatch(triggerExecution);
+            dispatch(triggerExecution);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
-                "Webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
-                triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
-                triggerExecution.getWorkflowExecutionId());
-        }
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "Webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
+                    triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
+                    triggerExecution.getWorkflowExecutionId());
+            }
+        });
     }
 
     private void dispatch(TriggerExecution triggerExecution) {
