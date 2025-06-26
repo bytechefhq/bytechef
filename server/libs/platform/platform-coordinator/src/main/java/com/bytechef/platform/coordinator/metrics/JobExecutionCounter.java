@@ -18,6 +18,7 @@ package com.bytechef.platform.coordinator.metrics;
 
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.execution.domain.Job;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 
@@ -25,6 +26,10 @@ import io.micrometer.core.instrument.MeterRegistry;
  * @author Matija Petanjek
  */
 public class JobExecutionCounter {
+
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "MeterRegistry is intentionally shared as recommended by Micrometer/Spring.")
     private final MeterRegistry meterRegistry;
 
     public JobExecutionCounter(MeterRegistry meterRegistry) {
