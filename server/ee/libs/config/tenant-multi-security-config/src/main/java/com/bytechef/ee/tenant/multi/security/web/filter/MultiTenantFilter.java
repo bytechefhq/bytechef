@@ -39,7 +39,13 @@ public class MultiTenantFilter extends OncePerRequestFilter {
         String sessionCurrentTenantId = (String) session.getAttribute(TenantConstants.CURRENT_TENANT_ID);
 
         if (sessionCurrentTenantId == null) {
-            sessionCurrentTenantId = TenantContext.DEFAULT_TENANT_ID;
+            String requestedURI = request.getRequestURI();
+
+            if (requestedURI.contains("/api/account")) {
+                sessionCurrentTenantId = TenantContext.DEFAULT_TENANT_ID;
+            } else {
+                throw new IllegalStateException("Tenant ID is not set in the session");
+            }
         }
 
         TenantUtils.runWithTenantId(sessionCurrentTenantId, () -> filterChain.doFilter(request, response));
