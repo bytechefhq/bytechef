@@ -19,7 +19,6 @@ package com.bytechef.component.docusign.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -36,8 +35,6 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.docusign.util.DocuSignUtils;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author Nikolina Spehar
@@ -64,12 +61,7 @@ public class DocuSignDownloadEnvelopeDocumentAction {
                 .required(true)
                 .optionsLookupDependsOn(ENVELOPE_ID)
                 .options((ActionOptionsFunction<String>) DocuSignUtils::getDocumentIdOptions))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        fileEntry("document")
-                            .description("Downloaded document."))))
+        .output(outputSchema(fileEntry().description("Downloaded document.")))
         .perform(DocuSignDownloadEnvelopeDocumentAction::perform);
 
     private DocuSignDownloadEnvelopeDocumentAction() {
@@ -78,17 +70,13 @@ public class DocuSignDownloadEnvelopeDocumentAction {
     public static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        String fileByteArray = context
-            .http(http -> http.get("/restapi/v2.1/accounts/%s/envelopes/%s/documents/%s".formatted(
+        return context.http(
+            http -> http.get("/restapi/v2.1/accounts/%s/envelopes/%s/documents/%s".formatted(
                 connectionParameters.getRequiredString(ACCOUNT_ID),
                 inputParameters.getRequiredString(ENVELOPE_ID),
                 inputParameters.getRequiredString(DOCUMENT_ID))))
-            .configuration(responseType(ResponseType.BINARY))
+            .configuration(responseType(ResponseType.binary("application/pdf")))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        return context.file(file -> file.storeContent(
-            inputParameters.getRequiredString(DOCUMENT_ID),
-            new ByteArrayInputStream(fileByteArray.getBytes(StandardCharsets.UTF_8))));
     }
 }
