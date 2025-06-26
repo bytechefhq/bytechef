@@ -25,7 +25,9 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -43,6 +45,7 @@ class ElevenLabsCreateSoundEffectTest {
         Map.of(TEXT, "This is text that will be converted to speech."));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final FileEntry mockedFileEntry = mock(FileEntry.class);
 
     @Test
     void testPerform() {
@@ -56,8 +59,12 @@ class ElevenLabsCreateSoundEffectTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedFileEntry);
 
-        ElevenLabsCreateSoundEffectAction.perform(mockedParameters, mockedParameters, mockedContext);
+        FileEntry result = ElevenLabsCreateSoundEffectAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(mockedFileEntry, result);
 
         Body body = bodyArgumentCaptor.getValue();
 
