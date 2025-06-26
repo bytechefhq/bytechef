@@ -47,8 +47,7 @@ public class PlatformCoordinatorConfiguration {
     @SuppressFBWarnings("EI")
     public PlatformCoordinatorConfiguration(
         JobService jobService, NotificationHandlerRegistry notificationHandlerRegistry,
-        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService,
-        MeterRegistry meterRegistry) {
+        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
 
         this.jobService = jobService;
         this.notificationHandlerRegistry = notificationHandlerRegistry;
