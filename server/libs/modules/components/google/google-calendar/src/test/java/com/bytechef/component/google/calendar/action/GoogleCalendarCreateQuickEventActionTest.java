@@ -44,6 +44,7 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarCreateQuickEventActionTest {
 
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
     private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
@@ -57,13 +58,19 @@ class GoogleCalendarCreateQuickEventActionTest {
 
     @Test
     void testPerform() throws IOException {
+        String calendarTimezone = "Europe/Zagreb";
+
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class)) {
 
             googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedCalendar);
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.createCustomEvent(eventArgumentCaptor.capture()))
+                .when(() -> GoogleCalendarUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
+                .thenReturn(calendarTimezone);
+            googleCalendarUtilsMockedStatic
+                .when(() -> GoogleCalendarUtils.createCustomEvent(
+                    eventArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedCustomEvent);
 
             when(mockedCalendar.events())
@@ -81,8 +88,10 @@ class GoogleCalendarCreateQuickEventActionTest {
             assertEquals(mockedCustomEvent, result);
 
             assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedCalendar, calendarArgumentCaptor.getValue());
             assertEquals(mockedEvent, eventArgumentCaptor.getValue());
-            assertEquals(List.of("calendarId", "text", "sendUpdates"), stringArgumentCaptor.getAllValues());
+            assertEquals(
+                List.of("calendarId", "text", "sendUpdates", calendarTimezone), stringArgumentCaptor.getAllValues());
         }
     }
 }

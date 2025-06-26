@@ -27,7 +27,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.START;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
-import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.convertToDateViaSqlTimestamp;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.convertLocalDateTimeToDateInTimezone;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,11 +51,15 @@ import com.google.api.services.calendar.model.EventAttachment;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
+import com.google.api.services.calendar.model.Setting;
+import com.google.api.services.calendar.model.Settings;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.List;
@@ -83,48 +87,51 @@ class GoogleCalendarUtilsTest {
     private final Calendar.Events.Get mockedGet = mock(Calendar.Events.Get.class);
     private final Calendar.CalendarList.List mockedList = mock(Calendar.CalendarList.List.class);
     private Parameters mockedParameters = mock(Parameters.class);
+    private final Calendar.Settings mockedSettings = mock(Calendar.Settings.class);
+    private final Calendar.Settings.List mockedSettingsList = mock(Calendar.Settings.List.class);
     private final Calendar.Events.Update mockedUpdate = mock(Calendar.Events.Update.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
+    void testConvertLocalDateTimeToDateInTimezone() {
+        LocalDateTime dateToConvert = LocalDateTime.of(2010, 11, 10, 8, 20);
+        String timezone = "Europe/Zagreb";
+
+        Date date = convertLocalDateTimeToDateInTimezone(dateToConvert, timezone);
+
+        ZonedDateTime expectedZonedDateTime = dateToConvert.atZone(ZoneId.of(timezone));
+        Date expectedDate = Date.from(expectedZonedDateTime.toInstant());
+
+        assertEquals(expectedDate, date);
+    }
+
+    @Test
     void testConvertToTemporalFromEventDateTimeForLocalDateTime() {
         LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
+        String timezone = "Europe/Zagreb";
 
         EventDateTime eventDateTime =
-            new EventDateTime().setDateTime(new DateTime(convertToDateViaSqlTimestamp(localDateTime)));
+            new EventDateTime()
+                .setDateTime(new DateTime(convertLocalDateTimeToDateInTimezone(localDateTime, timezone)));
 
-        Temporal convertedDateTime = GoogleCalendarUtils.convertToTemporalFromEventDateTime(eventDateTime);
+        Temporal convertedDateTime = GoogleCalendarUtils.convertToTemporalFromEventDateTime(eventDateTime, timezone);
 
-        assertEquals(localDateTime, convertedDateTime);
+        assertEquals(localDateTime.atZone(ZoneId.of(timezone))
+            .toLocalDateTime(), convertedDateTime);
     }
 
     @Test
     void testConvertToTemporalFromEventDateTimeForLocalDate() {
         LocalDate localDate = LocalDate.of(2000, 1, 1);
+        String timezone = "Europe/Zagreb";
 
         EventDateTime eventDateTime =
             new EventDateTime().setDate(new DateTime("2000-01-01"));
 
-        Temporal convertedDateTime = GoogleCalendarUtils.convertToTemporalFromEventDateTime(eventDateTime);
+        Temporal convertedDateTime = GoogleCalendarUtils.convertToTemporalFromEventDateTime(eventDateTime, timezone);
 
         assertEquals(localDate, convertedDateTime);
-    }
-
-    @Test
-    void testConvertToDateViaSqlTimestamp() {
-        LocalDateTime dateToConvert = LocalDateTime.of(2010, 11, 10, 8, 20);
-
-        Date date = convertToDateViaSqlTimestamp(dateToConvert);
-        java.util.Calendar calendar = java.util.Calendar.getInstance();
-        calendar.setTime(date);
-
-        assertEquals(2010, calendar.get(java.util.Calendar.YEAR));
-        assertEquals(10, calendar.get(java.util.Calendar.MONTH));
-        assertEquals(10, calendar.get(java.util.Calendar.DAY_OF_MONTH));
-        assertEquals(8, calendar.get(java.util.Calendar.HOUR));
-        assertEquals(20, calendar.get(java.util.Calendar.MINUTE));
-        assertEquals(0, calendar.get(java.util.Calendar.SECOND));
     }
 
     @Test
@@ -133,7 +140,7 @@ class GoogleCalendarUtilsTest {
 
         mockedParameters = MockParametersFactory.create(Map.of(ALL_DAY, true, START, date));
 
-        EventDateTime eventDateTime = createEventDateTime(mockedParameters, START);
+        EventDateTime eventDateTime = createEventDateTime(mockedParameters, START, "Europe/Zagreb");
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -148,9 +155,9 @@ class GoogleCalendarUtilsTest {
 
         mockedParameters = MockParametersFactory.create(Map.of(ALL_DAY, false, START, localDateTime));
 
-        EventDateTime eventDateTime = createEventDateTime(mockedParameters, START);
+        EventDateTime eventDateTime = createEventDateTime(mockedParameters, START, "Europe/Zagreb");
 
-        assertEquals(new DateTime(convertToDateViaSqlTimestamp(localDateTime)),
+        assertEquals(new DateTime(convertLocalDateTimeToDateInTimezone(localDateTime, "Europe/Zagreb")),
             eventDateTime.getDateTime());
         assertNull(eventDateTime.getDate());
         assertNull(eventDateTime.getTimeZone());
@@ -160,14 +167,17 @@ class GoogleCalendarUtilsTest {
     void testCreateCustomEvent() {
         LocalDateTime startTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
         LocalDateTime endTime = LocalDateTime.of(2000, 2, 2, 2, 2, 2);
+        String timezone = "Europe/Zagreb";
 
         Event event = new Event()
             .setICalUID("icaluid")
             .setId("id")
             .setSummary("summary")
             .setDescription("description")
-            .setStart(new EventDateTime().setDateTime(new DateTime(convertToDateViaSqlTimestamp(startTime))))
-            .setEnd(new EventDateTime().setDateTime(new DateTime(convertToDateViaSqlTimestamp(endTime))))
+            .setStart(new EventDateTime()
+                .setDateTime(new DateTime(convertLocalDateTimeToDateInTimezone(startTime, timezone))))
+            .setEnd(
+                new EventDateTime().setDateTime(new DateTime(convertLocalDateTimeToDateInTimezone(endTime, timezone))))
             .setEtag("etag")
             .setEventType("eventType")
             .setHtmlLink("htmlLink")
@@ -177,7 +187,7 @@ class GoogleCalendarUtilsTest {
             .setAttendees(List.of(new EventAttendee()))
             .setReminders(new Event.Reminders().setUseDefault(false));
 
-        GoogleCalendarUtils.CustomEvent customEvent = createCustomEvent(event);
+        GoogleCalendarUtils.CustomEvent customEvent = createCustomEvent(event, timezone);
 
         assertEquals(event.getICalUID(), customEvent.iCalUID());
         assertEquals(event.getId(), customEvent.id());
@@ -229,47 +239,56 @@ class GoogleCalendarUtilsTest {
     @SuppressWarnings("unchecked")
     void testGetCustomEvents() throws IOException {
         List<String> eventTypes = List.of("default", "focusTime");
+        String timezone = "Europe/Zagreb";
 
         Event e1 = new Event()
             .setStart(new EventDateTime()
-                .setDateTime(new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 3, 11, 30)))))
+                .setDateTime(
+                    new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 3, 11, 30), timezone))))
             .setEnd(new EventDateTime()
-                .setDateTime(new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 3, 12, 30)))));
+                .setDateTime(new DateTime(
+                    convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 3, 12, 30), timezone))));
         Event e2 = new Event()
             .setStart(new EventDateTime()
-                .setDateTime(new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 3, 7, 0)))))
+                .setDateTime(
+                    new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 3, 7, 0), timezone))))
             .setEnd(new EventDateTime()
-                .setDateTime(new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 5, 9, 0)))));
+                .setDateTime(
+                    new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 5, 9, 0), timezone))));
         Event e3 = new Event()
             .setStart(new EventDateTime()
-                .setDateTime(new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 5, 8, 0)))))
+                .setDateTime(
+                    new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 5, 8, 0), timezone))))
             .setEnd(new EventDateTime()
-                .setDateTime(new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 5, 9, 0)))));
+                .setDateTime(
+                    new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 5, 9, 0), timezone))));
         Event e4 = new Event()
             .setStart(new EventDateTime()
-                .setDateTime(new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 5, 9, 30)))))
+                .setDateTime(
+                    new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 5, 9, 30), timezone))))
             .setEnd(new EventDateTime()
-                .setDateTime(new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 5, 10, 30)))));
+                .setDateTime(new DateTime(
+                    convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 5, 10, 30), timezone))));
         Event e5 = new Event()
             .setStart(new EventDateTime().setDateTime(
-                new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 7, 23, 6, 30)))))
+                new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 7, 23, 6, 30), timezone))))
             .setEnd(new EventDateTime().setDateTime(
-                new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 7, 23, 7, 30)))));
+                new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 7, 23, 7, 30), timezone))));
         Event e6 = new Event()
             .setStart(new EventDateTime().setDateTime(
-                new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 1, 9, 0)))))
+                new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 1, 9, 0), timezone))))
             .setEnd(new EventDateTime().setDateTime(
-                new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 1, 10, 0)))));
+                new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 1, 10, 0), timezone))));
         Event e7 = new Event()
             .setStart(new EventDateTime().setDateTime(
-                new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 2, 4, 30)))))
+                new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 2, 4, 30), timezone))))
             .setEnd(new EventDateTime().setDateTime(
-                new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 2, 5, 30)))));
+                new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 2, 5, 30), timezone))));
         Event e8 = new Event()
             .setStart(new EventDateTime().setDateTime(
-                new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 5, 11, 0)))))
+                new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 5, 11, 0), timezone))))
             .setEnd(new EventDateTime().setDateTime(
-                new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 5, 12, 0)))));
+                new DateTime(convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 5, 12, 0), timezone))));
         Event e9 = new Event()
             .setStart(new EventDateTime().setDate(new DateTime("2024-09-04")))
             .setEnd(new EventDateTime().setDate(new DateTime("2024-09-04")));
@@ -299,12 +318,22 @@ class GoogleCalendarUtilsTest {
             when(mockedEventsList.execute())
                 .thenReturn(new Events().setItems(List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9)));
 
-            List<GoogleCalendarUtils.CustomEvent> result =
-                GoogleCalendarUtils.getCustomEvents(mockedParameters, mockedParameters);
+            when(mockedCalendar.settings())
+                .thenReturn(mockedSettings);
+            when(mockedSettings.list())
+                .thenReturn(mockedSettingsList);
+            when(mockedSettingsList.execute())
+                .thenReturn(new Settings().setItems(List.of(
+                    new Setting().setId("timezone")
+                        .setValue(timezone))));
+
+            List<GoogleCalendarUtils.CustomEvent> result = GoogleCalendarUtils.getCustomEvents(
+                mockedParameters, mockedParameters);
 
             assertEquals(
-                List.of(createCustomEvent(e1), createCustomEvent(e2), createCustomEvent(e3), createCustomEvent(e4),
-                    createCustomEvent(e9)),
+                List.of(
+                    createCustomEvent(e1, timezone), createCustomEvent(e2, timezone), createCustomEvent(e3, timezone),
+                    createCustomEvent(e4, timezone), createCustomEvent(e9, timezone)),
                 result);
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(List.of("calendarId", "q"), stringArgumentCaptor.getAllValues());
@@ -317,24 +346,18 @@ class GoogleCalendarUtilsTest {
     void testGetEvent() throws IOException {
         mockedParameters = MockParametersFactory.create(Map.of(CALENDAR_ID, "calendarId", EVENT_ID, "eventId"));
 
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
-                .thenReturn(mockedCalendar);
+        when(mockedCalendar.events())
+            .thenReturn(mockedEvents);
+        when(mockedEvents.get(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedGet);
+        when(mockedGet.execute())
+            .thenReturn(mockedEvent);
 
-            when(mockedCalendar.events())
-                .thenReturn(mockedEvents);
-            when(mockedEvents.get(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(mockedGet);
-            when(mockedGet.execute())
-                .thenReturn(mockedEvent);
+        Event event = GoogleCalendarUtils.getEvent(mockedParameters, mockedCalendar);
 
-            Event event = GoogleCalendarUtils.getEvent(mockedParameters, mockedParameters);
+        assertEquals(mockedEvent, event);
+        assertEquals(List.of("calendarId", "eventId"), stringArgumentCaptor.getAllValues());
 
-            assertEquals(mockedEvent, event);
-            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of("calendarId", "eventId"), stringArgumentCaptor.getAllValues());
-        }
     }
 
     @Test

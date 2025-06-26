@@ -58,6 +58,7 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarCreateEventActionTest {
 
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
     private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
     private final EventDateTime eventDateTime = new EventDateTime();
     private final Calendar mockedCalendar = mock(Calendar.class);
@@ -70,6 +71,7 @@ class GoogleCalendarCreateEventActionTest {
 
     @Test
     void testPerform() throws IOException {
+        String calendarTimezone = "Europe/Zagreb";
         Parameters mockedParameters = getParameters();
 
         when(mockedCalendar.events())
@@ -87,11 +89,15 @@ class GoogleCalendarCreateEventActionTest {
             googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedCalendar);
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.createEventDateTime(parametersArgumentCaptor.capture(),
-                    stringArgumentCaptor.capture()))
+                .when(() -> GoogleCalendarUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
+                .thenReturn(calendarTimezone);
+            googleCalendarUtilsMockedStatic
+                .when(() -> GoogleCalendarUtils.createEventDateTime(
+                    parametersArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(eventDateTime);
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.createCustomEvent(eventArgumentCaptor.capture()))
+                .when(() -> GoogleCalendarUtils.createCustomEvent(
+                    eventArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedCustomEvent);
 
             CustomEvent result = GoogleCalendarCreateEventAction.perform(
@@ -100,7 +106,10 @@ class GoogleCalendarCreateEventActionTest {
             assertEquals(mockedCustomEvent, result);
             assertEquals(
                 List.of(mockedParameters, mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
-            assertEquals(List.of(END, START, "calendarId", "sendUpdates"), stringArgumentCaptor.getAllValues());
+            assertEquals(mockedCalendar, calendarArgumentCaptor.getValue());
+            assertEquals(
+                List.of(END, calendarTimezone, START, calendarTimezone, "calendarId", "sendUpdates", calendarTimezone),
+                stringArgumentCaptor.getAllValues());
 
             Event expectedEvent = new Event()
                 .setAttachments(List.of())
