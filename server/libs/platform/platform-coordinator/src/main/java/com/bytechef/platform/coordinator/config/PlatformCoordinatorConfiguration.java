@@ -24,7 +24,11 @@ import com.bytechef.platform.configuration.service.NotificationService;
 import com.bytechef.platform.coordinator.event.listener.JobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookTaskStartedApplicationEventListener;
+import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Optional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -43,12 +47,19 @@ public class PlatformCoordinatorConfiguration {
     @SuppressFBWarnings("EI")
     public PlatformCoordinatorConfiguration(
         JobService jobService, NotificationHandlerRegistry notificationHandlerRegistry,
-        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
+        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService,
+        MeterRegistry meterRegistry) {
 
         this.jobService = jobService;
         this.notificationHandlerRegistry = notificationHandlerRegistry;
         this.notificationSenderRegistry = notificationSenderRegistry;
         this.notificationService = notificationService;
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "bytechef.observability.enabled", havingValue = "true")
+    JobExecutionCounter jobExecutionCounter(MeterRegistry meterRegistry) {
+        return new JobExecutionCounter(meterRegistry);
     }
 
     @Bean
@@ -62,9 +73,12 @@ public class PlatformCoordinatorConfiguration {
     }
 
     @Bean
-    JobStatusApplicationEventListener jobStatusApplicationEventListener() {
+    JobStatusApplicationEventListener jobStatusApplicationEventListener(
+        Optional<JobExecutionCounter> jobExecutionCounter) {
+
         return new JobStatusApplicationEventListener(
-            jobService, notificationHandlerRegistry, notificationSenderRegistry, notificationService);
+            jobExecutionCounter, jobService, notificationHandlerRegistry, notificationSenderRegistry,
+            notificationService);
     }
 
 }

@@ -29,16 +29,17 @@ import com.bytechef.platform.configuration.notification.NotificationHandlerRegis
 import com.bytechef.platform.configuration.notification.NotificationSender;
 import com.bytechef.platform.configuration.notification.NotificationSenderRegistry;
 import com.bytechef.platform.configuration.service.NotificationService;
+import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.springframework.stereotype.Component;
+import java.util.Optional;
 
 /**
  * @author Matija Petanjek
  */
-@Component
 public class JobStatusApplicationEventListener implements ApplicationEventListener {
 
+    private final Optional<JobExecutionCounter> jobExecutionCounter;
     private final JobService jobService;
     private final NotificationHandlerRegistry notificationHandlerRegistry;
     private final NotificationSenderRegistry notificationSenderRegistry;
@@ -46,14 +47,15 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
 
     @SuppressFBWarnings("EI")
     public JobStatusApplicationEventListener(
-        JobService jobService, NotificationHandlerRegistry notificationHandlerRegistry,
+        Optional<JobExecutionCounter> jobExecutionCounter, JobService jobService,
+        NotificationHandlerRegistry notificationHandlerRegistry,
         NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
 
+        this.jobExecutionCounter = jobExecutionCounter;
         this.jobService = jobService;
         this.notificationHandlerRegistry = notificationHandlerRegistry;
         this.notificationService = notificationService;
         this.notificationSenderRegistry = notificationSenderRegistry;
-
     }
 
     @SuppressWarnings({
@@ -62,13 +64,18 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if (applicationEvent instanceof JobStatusApplicationEvent jobStatusApplicationEvent) {
 
+            Job job = jobService.getJob(jobStatusApplicationEvent.getJobId());
+
+            jobExecutionCounter.ifPresent(
+                jobExecutionCounter -> jobExecutionCounter.process(jobStatusApplicationEvent, job));
+
             Job.Status status = jobStatusApplicationEvent.getStatus();
 
             NotificationEvent.Type eventType =
                 NotificationEvent.Type.of(NotificationEvent.Source.JOB, status.toString());
 
             NotificationHandlerContext notificationHandlerContext = getNotificationHandlerContext(
-                eventType, jobService.getJob(jobStatusApplicationEvent.getJobId()));
+                eventType, job);
 
             List<Notification> notifications = notificationService.getNotifications(eventType);
 
