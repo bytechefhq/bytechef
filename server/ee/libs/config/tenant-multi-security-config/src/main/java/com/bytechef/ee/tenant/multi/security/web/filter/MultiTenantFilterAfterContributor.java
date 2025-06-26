@@ -10,7 +10,7 @@ package com.bytechef.ee.tenant.multi.security.web.filter;
 import com.bytechef.platform.security.web.filter.FilterAfterContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.Filter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 
 /**
  * @version ee
@@ -33,6 +33,6 @@ public class MultiTenantFilterAfterContributor implements FilterAfterContributor
 
     @Override
     public Class<? extends Filter> getAfterFilter() {
-        return BasicAuthenticationFilter.class;
+        return RememberMeAuthenticationFilter.class;
     }
 }
