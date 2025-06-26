@@ -47,7 +47,6 @@ public record ApiCollectionEndpointDTO(
         apiCollectionEndpoint.setId(id);
         apiCollectionEndpoint.setName(name);
         apiCollectionEndpoint.setPath(path);
-        apiCollectionEndpoint.setWorkflowReferenceCode(workflowReferenceCode);
 
         return apiCollectionEndpoint;
     }

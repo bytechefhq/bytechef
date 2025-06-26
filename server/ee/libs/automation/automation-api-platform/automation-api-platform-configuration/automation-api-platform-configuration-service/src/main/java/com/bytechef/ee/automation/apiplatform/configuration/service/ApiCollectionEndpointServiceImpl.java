@@ -37,7 +37,6 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
         Assert.notNull(apiCollectionEndpoint.getHttpMethod(), "'httpMethod' must not be null");
         Assert.isTrue(apiCollectionEndpoint.getId() == null, "'id' must be null");
         Assert.notNull(apiCollectionEndpoint.getPath(), "'path' must not be null");
-        Assert.notNull(apiCollectionEndpoint.getWorkflowReferenceCode(), "'workflowReferenceCode' must not be null");
 
         return apiEndpointRepository.save(apiCollectionEndpoint);
     }

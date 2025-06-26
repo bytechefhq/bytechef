@@ -66,9 +66,6 @@ public class ApiCollectionEndpoint {
     @Column("project_deployment_workflow_id")
     private AggregateReference<ProjectDeploymentWorkflow, Long> projectDeploymentWorkflowId;
 
-    @Column("workflow_reference_code")
-    private String workflowReferenceCode;
-
     @Version
     private int version;
 
@@ -134,10 +131,6 @@ public class ApiCollectionEndpoint {
         return version;
     }
 
-    public String getWorkflowReferenceCode() {
-        return workflowReferenceCode;
-    }
-
     public void setApiCollectionId(Long apiCollectionId) {
         this.apiCollectionId = AggregateReference.to(apiCollectionId);
     }
@@ -166,10 +159,6 @@ public class ApiCollectionEndpoint {
         this.version = version;
     }
 
-    public void setWorkflowReferenceCode(String workflowReferenceCode) {
-        this.workflowReferenceCode = workflowReferenceCode;
-    }
-
     @Override
     public String toString() {
         return "ApiCollectionEndpoint{" +
@@ -177,7 +166,6 @@ public class ApiCollectionEndpoint {
             ", name='" + name + '\'' +
             ", path='" + path + '\'' +
             ", httpMethod='" + httpMethod + '\'' +
-            ", workflowReferenceCode='" + workflowReferenceCode + '\'' +
             ", projectDeploymentWorkflowId=" + projectDeploymentWorkflowId +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
