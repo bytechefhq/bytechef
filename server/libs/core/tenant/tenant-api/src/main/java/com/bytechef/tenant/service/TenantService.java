@@ -31,8 +31,6 @@ public interface TenantService {
 
     List<String> getTenantIdsByUserEmail(String email);
 
-    List<String> getTenantIdsByUserId(long id);
-
     List<String> getTenantIdsByUserLogin(String login);
 
     String getTenantIdByUserResetKey(String key);

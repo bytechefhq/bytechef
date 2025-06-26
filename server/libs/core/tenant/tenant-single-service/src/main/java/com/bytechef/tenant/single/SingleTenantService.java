@@ -50,11 +50,6 @@ public class SingleTenantService implements TenantService {
     }
 
     @Override
-    public List<String> getTenantIdsByUserId(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<String> getTenantIdsByUserLogin(String login) {
         throw new UnsupportedOperationException();
     }
