@@ -23,7 +23,6 @@ import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -52,36 +51,21 @@ public class McpServerGraphQlController {
     }
 
     @QueryMapping
-    List<McpServer> mcpServers() {
-        return mcpServerService.getMcpServers();
+    List<McpServer> mcpServers(@Argument ModeType type) {
+        return mcpServerService.getMcpServers(type);
     }
 
     @MutationMapping
-    McpServer createMcpServer(@Argument("input") Map<String, Object> input) {
-        String name = (String) input.get("name");
-        ModeType type = ModeType.valueOf((String) input.get("type"));
-        Environment environment = Environment.valueOf((String) input.get("environment"));
-
-        return mcpServerService.createFromInput(name, type, environment);
+    McpServer createMcpServer(
+        @Argument String name, @Argument ModeType type, @Argument Environment environment, @Argument Boolean enabled) {
+        return mcpServerService.create(name, type, environment, enabled);
     }
 
     @MutationMapping
-    McpServer updateMcpServer(@Argument("id") long id, @Argument("input") Map<String, Object> input) {
-        String name = null;
-        if (input.containsKey("name")) {
-            name = (String) input.get("name");
-        }
+    McpServer updateMcpServer(
+        @Argument long id, @Argument String name, @Argument ModeType type, @Argument Environment environment,
+        @Argument Boolean enabled) {
 
-        ModeType type = null;
-        if (input.containsKey("type")) {
-            type = ModeType.valueOf((String) input.get("type"));
-        }
-
-        Environment environment = null;
-        if (input.containsKey("environment")) {
-            environment = Environment.valueOf((String) input.get("environment"));
-        }
-
-        return mcpServerService.updateFromInput(id, name, type, environment);
+        return mcpServerService.update(id, name, type, environment, enabled);
     }
 }

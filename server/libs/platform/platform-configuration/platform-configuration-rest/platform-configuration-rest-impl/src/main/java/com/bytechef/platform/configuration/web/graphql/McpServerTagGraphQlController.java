@@ -48,17 +48,15 @@ public class McpServerTagGraphQlController {
     }
 
     @QueryMapping
-    List<Tag> mcpServerTags(@Argument(name = "type") String type) {
+    List<Tag> mcpServerTags(@Argument(name = "type") ModeType type) {
         if (type == null) {
             return List.of();
         }
 
-        ModeType modeType = ModeType.valueOf(type);
-
-        List<McpServer> mcpServers = mcpServerService.getMcpServers();
+        List<McpServer> mcpServers = mcpServerService.getMcpServers(type);
 
         List<Long> tagIds = mcpServers.stream()
-            .filter(server -> server.getType() == modeType)
+            .filter(server -> server.getType() == type)
             .flatMap(server -> CollectionUtils.stream(server.getTagIds()))
             .distinct()
             .toList();

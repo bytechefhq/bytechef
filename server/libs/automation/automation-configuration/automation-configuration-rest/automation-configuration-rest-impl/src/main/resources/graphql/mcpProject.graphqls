@@ -8,6 +8,7 @@ type McpProject {
     id: ID!
     projectDeploymentId: ID!
     mcpServerId: ID!
+    mcpProjectWorkflows: [McpProjectWorkflow]
     createdBy: String
     createdDate: Long
     lastModifiedBy: String

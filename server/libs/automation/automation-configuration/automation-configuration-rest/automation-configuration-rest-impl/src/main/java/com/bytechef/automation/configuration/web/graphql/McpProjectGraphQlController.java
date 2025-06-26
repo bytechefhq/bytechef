@@ -19,10 +19,13 @@ package com.bytechef.automation.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.McpProject;
 import com.bytechef.automation.configuration.service.McpProjectService;
+import com.bytechef.automation.configuration.service.McpProjectWorkflowService;
+import com.bytechef.platform.configuration.domain.McpProjectWorkflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -35,10 +38,14 @@ import org.springframework.stereotype.Controller;
 public class McpProjectGraphQlController {
 
     private final McpProjectService mcpProjectService;
+    private final McpProjectWorkflowService mcpProjectWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public McpProjectGraphQlController(McpProjectService mcpProjectService) {
+    public McpProjectGraphQlController(
+        McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService) {
+
         this.mcpProjectService = mcpProjectService;
+        this.mcpProjectWorkflowService = mcpProjectWorkflowService;
     }
 
     @QueryMapping
@@ -55,5 +62,10 @@ public class McpProjectGraphQlController {
     @QueryMapping
     public List<McpProject> mcpProjectsByServerId(@Argument long mcpServerId) {
         return mcpProjectService.getMcpProjectsByServerId(mcpServerId);
+    }
+
+    @SchemaMapping
+    public List<McpProjectWorkflow> mcpProjectWorkflows(McpProject mcpProject) {
+        return mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProject.getId());
     }
 }

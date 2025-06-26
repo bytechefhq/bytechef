@@ -1,24 +1,24 @@
 extend type Query {
     mcpServer(id: ID): McpServer
-    mcpServers: [McpServer]
+    mcpServers(type: ModeType!): [McpServer]
 }
 
 extend type Mutation {
-    createMcpServer(input: McpServerInput!): McpServer
-    updateMcpServer(id: ID!, input: McpServerUpdateInput!): McpServer
+    createMcpServer(name: String!, type: ModeType!, environment: Environment!, enabled: Boolean): McpServer
+    updateMcpServer(id: ID!, name: String, type: ModeType, environment: Environment, enabled: Boolean): McpServer
 }
 
 scalar Long
-
-enum ModeType {
-    AUTOMATION
-    EMBEDDED
-}
 
 enum Environment {
     DEVELOPMENT
     STAGING
     PRODUCTION
+}
+
+enum ModeType {
+    AUTOMATION
+    EMBEDDED
 }
 
 type McpServer {

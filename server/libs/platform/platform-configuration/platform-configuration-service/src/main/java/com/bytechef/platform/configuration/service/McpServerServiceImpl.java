@@ -47,16 +47,16 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
-    public McpServer update(McpServer mcpServer) {
-        McpServer currentMcpServer = OptionalUtils.get(mcpServerRepository.findById(mcpServer.getId()));
+    public McpServer create(String name, Environment environment, Boolean enabled) {
+        McpServer mcpServer;
 
-        currentMcpServer.setName(mcpServer.getName());
-        currentMcpServer.setType(mcpServer.getType());
-        currentMcpServer.setEnvironment(mcpServer.getEnvironment());
-        currentMcpServer.setTagIds(mcpServer.getTagIds());
-        currentMcpServer.setVersion(mcpServer.getVersion());
+        if (enabled != null) {
+            mcpServer = new McpServer(name, ModeType.AUTOMATION, environment, enabled);
+        } else {
+            mcpServer = new McpServer(name, ModeType.AUTOMATION, environment);
+        }
 
-        return mcpServerRepository.save(currentMcpServer);
+        return create(mcpServer);
     }
 
     @Override
@@ -71,24 +71,72 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<McpServer> getMcpServers() {
-        return mcpServerRepository.findAll();
-    }
+    public McpServer create(String name, ModeType type, Environment environment, Boolean enabled) {
+        McpServer mcpServer;
 
-    @Override
-    public McpServer createFromInput(String name, ModeType type, Environment environment) {
-        McpServer mcpServer = new McpServer(name, type, environment);
+        if (enabled != null) {
+            mcpServer = new McpServer(name, type, environment, enabled);
+        } else {
+            mcpServer = new McpServer(name, type, environment);
+        }
 
         return create(mcpServer);
     }
 
     @Override
-    public McpServer updateFromInput(long id, String name, ModeType type, Environment environment) {
+    @Transactional(readOnly = true)
+    public List<McpServer> getMcpServers(Long tagId) {
+        return mcpServerRepository.findAllByTagId(tagId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<McpServer> getMcpServers(ModeType type) {
+        return mcpServerRepository.findAll()
+            .stream()
+            .filter(server -> server.getType() == type)
+            .toList();
+    }
+
+    @Override
+    public McpServer update(McpServer mcpServer) {
+        McpServer currentMcpServer = OptionalUtils.get(mcpServerRepository.findById(mcpServer.getId()));
+
+        currentMcpServer.setName(mcpServer.getName());
+        currentMcpServer.setType(mcpServer.getType());
+        currentMcpServer.setEnvironment(mcpServer.getEnvironment());
+        currentMcpServer.setEnabled(mcpServer.isEnabled());
+        currentMcpServer.setTagIds(mcpServer.getTagIds());
+        currentMcpServer.setVersion(mcpServer.getVersion());
+
+        return mcpServerRepository.save(currentMcpServer);
+    }
+
+    @Override
+    public McpServer update(long id, String name, Environment environment, Boolean enabled) {
         McpServer existingMcpServer = fetchMcpServer(id)
             .orElseThrow(() -> new IllegalArgumentException("McpServer not found with id: " + id));
 
-        // Only update the non-auditing fields
+        if (name != null) {
+            existingMcpServer.setName(name);
+        }
+
+        if (environment != null) {
+            existingMcpServer.setEnvironment(environment);
+        }
+
+        if (enabled != null) {
+            existingMcpServer.setEnabled(enabled);
+        }
+
+        return update(existingMcpServer);
+    }
+
+    @Override
+    public McpServer update(long id, String name, ModeType type, Environment environment, Boolean enabled) {
+        McpServer existingMcpServer = fetchMcpServer(id)
+            .orElseThrow(() -> new IllegalArgumentException("McpServer not found with id: " + id));
+
         if (name != null) {
             existingMcpServer.setName(name);
         }
@@ -99,6 +147,10 @@ public class McpServerServiceImpl implements McpServerService {
 
         if (environment != null) {
             existingMcpServer.setEnvironment(environment);
+        }
+
+        if (enabled != null) {
+            existingMcpServer.setEnabled(enabled);
         }
 
         return update(existingMcpServer);
@@ -112,11 +164,5 @@ public class McpServerServiceImpl implements McpServerService {
         mcpServer.setTagIds(tagIds);
 
         return mcpServerRepository.save(mcpServer);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<McpServer> getMcpServersByTagId(Long tagId) {
-        return mcpServerRepository.findAllByTagId(tagId);
     }
 }

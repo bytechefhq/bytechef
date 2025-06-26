@@ -1,0 +1,33 @@
+extend type Query {
+    mcpProjectWorkflow(id: ID): McpProjectWorkflow
+    mcpProjectWorkflows: [McpProjectWorkflow]
+    mcpProjectWorkflowsByMcpProjectId(mcpProjectId: ID): [McpProjectWorkflow]
+    mcpProjectWorkflowsByProjectDeploymentWorkflowId(projectDeploymentWorkflowId: ID): [McpProjectWorkflow]
+}
+
+extend type Mutation {
+    createMcpProjectWorkflow(input: McpProjectWorkflowInput!): McpProjectWorkflow
+    updateMcpProjectWorkflow(id: ID!, input: McpProjectWorkflowUpdateInput!): McpProjectWorkflow
+    deleteMcpProjectWorkflow(id: ID!): Boolean
+}
+
+type McpProjectWorkflow {
+    id: ID!
+    mcpProjectId: Long!
+    projectDeploymentWorkflowId: Long!
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+input McpProjectWorkflowInput {
+    mcpProjectId: Long!
+    projectDeploymentWorkflowId: Long!
+}
+
+input McpProjectWorkflowUpdateInput {
+    mcpProjectId: Long
+    projectDeploymentWorkflowId: Long
+}
