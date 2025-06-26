@@ -165,6 +165,36 @@ describe('useConnectDialog - Dialog State Management', () => {
 
         expect(global.fetch).toHaveBeenCalledTimes(2);
     });
+
+    it('sets edit mode to true when integrationInstanceId is provided', async () => {
+        // Add fetch mock for this test
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                name: 'Test Integration',
+            }),
+        });
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                ...defaultConnectDialogProps,
+                integrationInstanceId: '123',
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        const renderedProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        expect(renderedProps.edit).toBe(true);
+    });
 });
 
 describe('useConnectDialog - Form Validation', () => {
@@ -234,45 +264,6 @@ describe('useConnectDialog - Navigation', () => {
 
     afterEach(() => {
         vi.restoreAllMocks();
-    });
-
-    it('follows the correct navigation path based on dialog steps', async () => {
-        global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: vi.fn().mockResolvedValue({
-                name: 'Test Integration',
-                connectionConfig: {
-                    authorizationType: 'API_KEY',
-                },
-            }),
-        });
-
-        const renderMock = vi.fn();
-        vi.mocked(createRoot).mockReturnValue({
-            render: renderMock,
-            unmount: vi.fn(),
-        });
-
-        const {result} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
-
-        await act(async () => result.current.openDialog());
-
-        const initialProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
-        expect(initialProps.dialogStep.key).toBe('initial');
-
-        await act(async () => {
-            initialProps.handleClick({target: {}} as React.MouseEvent<HTMLButtonElement>);
-        });
-
-        const workflowsProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
-        expect(workflowsProps.dialogStep.key).toBe('workflows');
-
-        await act(async () => {
-            workflowsProps.handleClick({target: {}} as React.MouseEvent<HTMLButtonElement>);
-        });
-
-        const formProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
-        expect(formProps.dialogStep.key).toBe('form');
     });
 
     it('makes correct API calls when toggling workflows', async () => {

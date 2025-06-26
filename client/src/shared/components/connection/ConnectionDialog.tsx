@@ -259,6 +259,7 @@ const ConnectionDialog = ({
     }
 
     async function handleCodeSuccess(payload: {code: string; [key: string]: string}) {
+        console.log('handleCodeSuccess: ', payload);
         if (payload.code) {
             await saveConnection(payload);
         }

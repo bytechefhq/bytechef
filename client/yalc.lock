@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "@bytechef/embedded-react": {
+      "signature": "111888a690b1c1ab78c0d309dd84dd3b",
+      "file": true
+    }
+  }
+}

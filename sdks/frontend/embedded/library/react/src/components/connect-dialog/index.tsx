@@ -53,7 +53,13 @@ function createApiClient(baseUrl: string, environment: string, jwtToken: string)
 
                 // Only try to parse JSON if we expect a response body
                 if (method === 'GET' || response.headers.get('content-length') !== '0') {
-                    return await response.json();
+                    try {
+                        return await response.json();
+                    } catch (error: unknown) {
+                        console.warn('Empty or non-JSON response : ', (error as Error).message);
+
+                        return {} as T;
+                    }
                 }
 
                 return {} as T;
@@ -86,6 +92,7 @@ interface UseConnectDialogProps {
     baseUrl?: string;
     environment?: string;
     integrationId: string;
+    integrationInstanceId?: string;
     jwtToken: string;
 }
 
@@ -93,6 +100,7 @@ export default function useConnectDialog({
     baseUrl = 'https://app.bytechef.io',
     environment = 'PRODUCTION',
     integrationId,
+    integrationInstanceId,
     jwtToken,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
     const [integration, setIntegration] = useState<IntegrationType | undefined>(undefined);
@@ -101,6 +109,7 @@ export default function useConnectDialog({
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
     const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([]);
+    const [workflowsView, setWorkflowsView] = useState(!!integrationInstanceId);
 
     const inputRefs = useRef<Record<string, HTMLInputElement>>({});
     const portalContainerRef = useRef<HTMLElement | null>(null);
@@ -119,12 +128,14 @@ export default function useConnectDialog({
                 method: 'POST',
                 body: {
                     connection: {
-                        parameters: payload
-                    }
+                        parameters: payload,
+                    },
                 },
             });
 
-            closeDialog();
+            console.log('setting workflowsView to true');
+
+            setWorkflowsView(true);
         },
         [fetch, integrationId]
     );
@@ -137,12 +148,14 @@ export default function useConnectDialog({
                 method: 'POST',
                 body: {
                     connection: {
-                        parameters: formData
-                    }
+                        parameters: formData,
+                    },
                 },
             });
 
-            closeDialog();
+            console.log('setting workflowsView to true');
+
+            setWorkflowsView(true);
         },
         [fetch, integrationId]
     );
@@ -318,6 +331,8 @@ export default function useConnectDialog({
     };
 
     const closeDialog = () => {
+        setWorkflowsView(false);
+
         setIsOpen(false);
     };
 
@@ -328,7 +343,6 @@ export default function useConnectDialog({
             }
 
             if (isOAuth2) {
-                console.log('invoking getAuth for OAuth2 flow');
                 getAuth();
             } else {
                 handleSubmit();
@@ -411,6 +425,7 @@ export default function useConnectDialog({
 
                 rootRef.current = null;
             }
+
             return;
         }
 
@@ -424,7 +439,6 @@ export default function useConnectDialog({
             rootRef.current.render(
                 <ConnectDialog
                     closeDialog={closeDialog}
-                    edit={false}
                     form={form}
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
@@ -435,6 +449,7 @@ export default function useConnectDialog({
                     properties={integration?.connectionConfig?.inputs}
                     registerFormSubmit={registerFormSubmit}
                     selectedWorkflows={selectedWorkflows}
+                    workflowsView={workflowsView}
                 />
             );
         }
@@ -449,6 +464,8 @@ export default function useConnectDialog({
         handleWorkflowToggle,
         selectedWorkflows,
         handleWorkflowInputChange,
+        integrationInstanceId,
+        workflowsView,
     ]);
 
     useEffect(() => {
@@ -456,6 +473,13 @@ export default function useConnectDialog({
             setIsOAuth2(true);
         }
     }, [isOAuth2AuthorizationType]);
+
+    // When dialog closes, ensure workflowsView is reset
+    useEffect(() => {
+        if (!isOpen) {
+            setWorkflowsView(false);
+        }
+    }, [isOpen]);
 
     return {
         openDialog,

@@ -1,0 +1,38 @@
+{
+    "name": "@bytechef/embedded-react",
+    "version": "0.1.0",
+    "description": "ByteChef Embedded React SDK.",
+    "type": "module",
+    "scripts": {
+        "build": "tsc && vite build",
+        "lint": "eslint 'src/**/*.{ts,tsx}'",
+        "lint:fix": "eslint 'src/**/*.{ts,tsx}' --fix",
+        "format": "prettier --check .",
+        "format:fix": "prettier --write \"**/*.{js,jsx,ts,tsx,md}\" && eslint src --max-warnings=0 --fix",
+        "stylelint": "stylelint **/*.css",
+        "stylelint:fix": "stylelint **/*.css --fix",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build",
+        "test": "vitest",
+        "test:ui": "vitest --ui",
+        "test:watch": "vitest --watch",
+        "coverage": "vitest run --coverage",
+        "watch": "tsc && vite build --watch",
+        "yalc:publish": "npm run build && yalc publish",
+        "yalc:push": "npm run build && yalc push",
+        "dev:yalc": "concurrently \"npm run watch\" \"nodemon --watch dist --delay 1 --exec 'yalc push'\""
+    },
+    "module": "./dist/main.js",
+    "exports": "./dist/main.js",
+    "files": [
+        "dist"
+    ],
+    "types": "./dist/main.d.ts",
+    "peerDependencies": {
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0"
+    },
+    "author": "Kresimir Coko <kresimir.coko@bytechef.io>",
+    "license": "MIT",
+    "yalcSig": "111888a690b1c1ab78c0d309dd84dd3b"
+}

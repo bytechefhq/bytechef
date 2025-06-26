@@ -42,7 +42,7 @@ const Toggle = ({id, pressed, onPressedChange}: ToggleProps) => (
 
 interface DialogProps {
     closeDialog: () => void;
-    edit?: boolean;
+    workflowsView?: boolean;
     form?: FormType;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
@@ -57,7 +57,7 @@ interface DialogProps {
 
 const ConnectDialog = ({
     closeDialog,
-    edit = false,
+    workflowsView = false,
     form,
     handleClick,
     handleWorkflowToggle,
@@ -89,15 +89,17 @@ const ConnectDialog = ({
         return null;
     }
 
+    console.log('workflowsView: ', workflowsView);
+
     return (
         <div className={styles.dialogOverlay} data-testid="dialog-overlay" onClick={closeDialog}>
             <div className={styles.dialogContainer} onClick={(event) => event.stopPropagation()}>
-                <DialogHeader closeDialog={closeDialog} edit={edit} integration={integration} />
+                <DialogHeader closeDialog={closeDialog} integration={integration} />
 
                 {integration ? (
                     <DialogContent
                         closeDialog={closeDialog}
-                        edit={false}
+                        workflowsView={workflowsView}
                         form={form}
                         handleWorkflowToggle={handleWorkflowToggle}
                         handleWorkflowInputChange={handleWorkflowInputChange}
@@ -118,7 +120,9 @@ const ConnectDialog = ({
                     </main>
                 )}
 
-                {integration && <DialogFooter edit={false} handleClick={handleClick} isOAuth2={isOAuth2} />}
+                {integration && (
+                    <DialogFooter workflowsView={workflowsView} handleClick={handleClick} isOAuth2={isOAuth2} />
+                )}
 
                 <DialogPoweredBy />
             </div>
@@ -161,7 +165,11 @@ const DialogWorkflowsContainer = ({
     workflows,
 }: DialogWorkflowsContainerProps) => (
     <div data-testid="workflows-container" className={styles.workflowsContainer}>
-        {workflows?.length === 0 && <p>No workflows available for this integration.</p>}
+        {workflows?.length > 0 ? (
+            <p>Enable, disable and manage your workflows below</p>
+        ) : (
+            <p>No workflows available for this integration.</p>
+        )}
 
         <ul className={styles.workflowsList}>
             {workflows.map((workflow) => {
@@ -219,7 +227,7 @@ const DialogWorkflowsContainer = ({
 
 interface DialogContentProps {
     closeDialog: () => void;
-    edit?: boolean;
+    workflowsView?: boolean;
     form?: FormType;
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
@@ -230,7 +238,7 @@ interface DialogContentProps {
 }
 
 const DialogContent = ({
-    edit = false,
+    workflowsView = false,
     form,
     handleWorkflowToggle,
     handleWorkflowInputChange,
@@ -248,9 +256,9 @@ const DialogContent = ({
 
     return (
         <main className={styles.dialogContent}>
-            <p>{integration.description}</p>
+            {!workflowsView && <p>{integration.description}</p>}
 
-            {!edit && form && (
+            {!workflowsView && form && (
                 <form id="form" onSubmit={form.handleSubmit}>
                     {properties?.map((property) => {
                         const field = form.register(property.name);
@@ -273,7 +281,7 @@ const DialogContent = ({
                 </form>
             )}
 
-            {edit && !!integration.workflows?.length && (
+            {workflowsView && !!integration.workflows?.length && (
                 <DialogWorkflowsContainer
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
@@ -286,30 +294,30 @@ const DialogContent = ({
 };
 
 interface DialogFooterProps {
-    edit?: boolean;
+    workflowsView?: boolean;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     isOAuth2?: boolean;
 }
 
-const DialogFooter = ({edit = false, handleClick, isOAuth2 = false}: DialogFooterProps) => (
+const DialogFooter = ({workflowsView = false, handleClick, isOAuth2 = false}: DialogFooterProps) => (
     <footer className={styles.dialogFooter}>
-        {edit && (
-            <button name="disconnectButton" onClick={handleClick} className={styles.destructiveButton} type="button">
+        {workflowsView && (
+            <button name="disconnectButton" onClick={handleClick} className={styles.buttonDestructive} type="button">
                 Disconnect
             </button>
         )}
 
         <button autoFocus onClick={handleClick} className={styles.buttonPrimary} type="button" form="form">
-            {!edit && isOAuth2 && (
+            {!workflowsView && isOAuth2 && (
                 <span>
                     Authorize
                     <img data-testid="authorize-icon" src={SquareArrowOutUpRightIcon} />
                 </span>
             )}
 
-            {!edit && !isOAuth2 && 'Connect'}
+            {!workflowsView && !isOAuth2 && 'Connect'}
 
-            {edit && 'Update'}
+            {workflowsView && 'Update'}
         </button>
     </footer>
 );
