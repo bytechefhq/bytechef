@@ -213,11 +213,11 @@ function App() {
 
         if (location.pathname.includes('/automation/')) {
             type = ModeType.AUTOMATION;
-        } else {
+        } else if (location.pathname.includes('/embedded/')) {
             type = ModeType.EMBEDDED;
         }
 
-        if (type !== currentType) {
+        if (type !== undefined && type !== currentType) {
             setCurrentType(type);
         }
     }, [currentType, location, setCurrentType]);
