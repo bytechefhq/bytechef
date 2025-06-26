@@ -99,6 +99,28 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
+    public void testCreateWithAuthorizationTypNone() {
+        String componentName = "componentName";
+        int connectionVersion = 1;
+        Environment environment = Environment.PRODUCTION;
+        String name = "name";
+        Map<String, Object> parameters = Map.of("key1", "value1");
+        ModeType type = ModeType.AUTOMATION;
+
+        Connection connection = connectionService.create(
+            null, componentName, connectionVersion, environment, name, parameters, type);
+
+        assertThat(connection)
+            .hasFieldOrPropertyWithValue("authorizationType", connection.getAuthorizationType())
+            .hasFieldOrPropertyWithValue("componentName", componentName)
+            .hasFieldOrPropertyWithValue("connectionVersion", connectionVersion)
+            .hasFieldOrPropertyWithValue("environment", environment)
+            .hasFieldOrPropertyWithValue("name", name)
+            .hasFieldOrPropertyWithValue("parameters", parameters)
+            .hasFieldOrPropertyWithValue("type", type);
+    }
+
+    @Test
     public void testDelete() {
         Connection connection = connectionRepository.save(getConnection());
 
