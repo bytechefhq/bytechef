@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -42,7 +43,7 @@ public class HuggingFaceChatAction {
             URL_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY)
-        .output()
+        .output(ModelUtils::output)
         .perform(HuggingFaceChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new HuggingfaceChatModel(

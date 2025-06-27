@@ -88,6 +88,7 @@ import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.VOCA
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -139,7 +140,7 @@ public class OllamaChatAction {
             MIROSTAT_ETA_PROPERTY,
             PENALIZE_NEW_LINE_PROPERTY,
             TRUNCATE_PROPERTY)
-        .output()
+        .output(ModelUtils::output)
         .perform(OllamaChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {

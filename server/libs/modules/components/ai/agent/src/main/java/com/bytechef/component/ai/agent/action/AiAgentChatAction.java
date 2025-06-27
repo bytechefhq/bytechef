@@ -35,6 +35,7 @@ import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
@@ -84,7 +85,10 @@ public class AiAgentChatAction {
                     RESPONSE_PROPERTY,
                     string(CONVERSATION_ID)
                         .description("The conversation id used in conjunction with memory."))
-                .output());
+                .output(
+                    (MultipleConnectionsOutputFunction) (
+                        inputParameters, componentConnections, extensions, context) -> ModelUtils.output(
+                            inputParameters, null, context)));
 
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;

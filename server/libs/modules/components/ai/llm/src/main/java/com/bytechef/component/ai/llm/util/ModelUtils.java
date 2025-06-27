@@ -16,12 +16,14 @@
 
 package com.bytechef.component.ai.llm.util;
 
+import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.JSON;
 import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.TEXT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
@@ -33,6 +35,8 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -128,6 +132,25 @@ public class ModelUtils {
 
         return RestClient.builder()
             .requestFactory(requestFactory);
+    }
+
+    public static OutputResponse output(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        BaseProperty.BaseValueProperty<?> outputSchemaProperty = string();
+
+        if (inputParameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, TEXT) == JSON) {
+            if (!inputParameters.containsPath(RESPONSE + "." + RESPONSE_SCHEMA)) {
+                return null;
+            }
+
+            String responseSchema = inputParameters.getRequiredFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class);
+
+            outputSchemaProperty = actionContext.outputSchema(
+                outputSchema -> outputSchema.getOutputSchema(responseSchema));
+        }
+
+        return OutputResponse.of(outputSchemaProperty);
     }
 
     private static Message createMessage(ChatModel.Message message, ActionContext actionContext) {
