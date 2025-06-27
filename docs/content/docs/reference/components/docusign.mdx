@@ -150,14 +150,17 @@ Name: downloadEnvelopeDocument
 
 
 
-Type: OBJECT
+Type: FILE_ENTRY
 
 
 #### Properties
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| document | FILE_ENTRY | Downloaded document. |
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 
@@ -165,12 +168,10 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "document" : {
-    "extension" : "",
-    "mimeType" : "",
-    "name" : "",
-    "url" : ""
-  }
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 
