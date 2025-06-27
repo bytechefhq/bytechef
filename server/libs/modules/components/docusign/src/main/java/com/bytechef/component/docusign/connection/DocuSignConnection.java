@@ -16,11 +16,8 @@
 
 package com.bytechef.component.docusign.connection;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.component.definition.Authorization.EXPIRES_IN;
-import static com.bytechef.component.definition.Authorization.REFRESH_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
@@ -33,7 +30,6 @@ import static com.bytechef.component.docusign.util.DocuSignUtils.getAuthorizatio
 
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
@@ -111,45 +107,6 @@ public class DocuSignConnection {
                     }
 
                     return new AuthorizationCallbackResponse(httpResponse.getBody(new TypeReference<>() {}));
-                })
-                .refresh((connectionParameters, context) -> {
-                    String clientId = connectionParameters.getString(CLIENT_ID);
-                    String clientSecret = connectionParameters.getString(CLIENT_SECRET);
-                    String valueToEncode = clientId + ":" + clientSecret;
-                    String encode = context.encoder(
-                        encoder -> encoder.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)));
-
-                    Http.Response httpResponse =
-                        context.http(http -> http.post("https://account-d.docusign.com/oauth/token"))
-                            .headers(
-                                Map.of(
-                                    "Accept", List.of("application/json"),
-                                    "Authorization", List.of("Basic " + encode)))
-                            .body(Http.Body.of(
-                                Map.of(
-                                    "grant_type", "refresh_token",
-                                    "refresh_token", connectionParameters.getRequiredString(REFRESH_TOKEN),
-                                    "client_id", connectionParameters.getRequiredString(CLIENT_ID))))
-                            .configuration(Http.responseType(Http.ResponseType.JSON))
-                            .execute();
-
-                    if (httpResponse.getStatusCode() < 200 || httpResponse.getStatusCode() > 299) {
-                        throw new ConfigurationException(
-                            "OAuth provider rejected token refresh request");
-                    }
-
-                    if (httpResponse.getBody() == null) {
-                        throw new ConfigurationException(
-                            "Unable to locate access_token, body content misses");
-                    }
-
-                    Map<String, Object> responseMap = httpResponse.getBody(new TypeReference<>() {});
-
-                    return new RefreshTokenResponse(
-                        (String) responseMap.get(ACCESS_TOKEN),
-                        (String) responseMap.get(REFRESH_TOKEN),
-                        responseMap.containsKey(EXPIRES_IN)
-                            ? Long.valueOf((Integer) responseMap.get(EXPIRES_IN)) : null);
                 }));
 
     private DocuSignConnection() {
