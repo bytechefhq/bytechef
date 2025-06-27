@@ -302,7 +302,7 @@ Name: insertRow
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | docId | Doc ID | STRING | `ID of the doc.` | true |
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> docId </details> | `ID of the table.` | true |
-| row | | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(column), STRING\(value)&#125;]\(cells)&#125; </details> |  | true |
+| rowValues | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> docId, tableId </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -312,12 +312,7 @@ Name: insertRow
   "parameters" : {
     "docId" : "",
     "tableId" : "",
-    "row" : {
-      "cells" : [ {
-        "column" : "",
-        "value" : ""
-      } ]
-    }
+    "rowValues" : { }
   },
   "type" : "coda/v1/insertRow"
 }
