@@ -81,9 +81,9 @@ class GoogleCalendarUtilsTest {
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Calendar.Events mockedCalendarEvents = mock(Calendar.Events.class);
     private final Calendar.CalendarList mockedCalendarList = mock(Calendar.CalendarList.class);
-    private final Calendar.Events.List mockedEventsList = mock(Calendar.Events.List.class);
-    private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
     private final Event mockedEvent = mock(Event.class);
+    private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
+    private final Calendar.Events.List mockedEventsList = mock(Calendar.Events.List.class);
     private final Calendar.Events.Get mockedGet = mock(Calendar.Events.Get.class);
     private final Calendar.CalendarList.List mockedList = mock(Calendar.CalendarList.List.class);
     private Parameters mockedParameters = mock(Parameters.class);

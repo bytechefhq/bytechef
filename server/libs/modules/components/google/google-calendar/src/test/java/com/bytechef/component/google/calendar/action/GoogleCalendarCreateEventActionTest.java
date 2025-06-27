@@ -62,8 +62,8 @@ class GoogleCalendarCreateEventActionTest {
     private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
     private final EventDateTime eventDateTime = new EventDateTime();
     private final Calendar mockedCalendar = mock(Calendar.class);
-    private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
+    private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final Event mockedEvent = mock(Event.class);
     private final Calendar.Events.Insert mockedInsert = mock(Calendar.Events.Insert.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);

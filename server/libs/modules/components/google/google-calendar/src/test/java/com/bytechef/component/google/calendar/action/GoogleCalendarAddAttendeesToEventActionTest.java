@@ -47,8 +47,8 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarAddAttendeesToEventActionTest {
 
-    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
     private static final String CALENDAR_TIMEZONE = "Europe/Zagreb";
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
     private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
     private MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic;
     private MockedStatic<GoogleServices> googleServicesMockedStatic;
@@ -56,10 +56,10 @@ class GoogleCalendarAddAttendeesToEventActionTest {
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final Event mockedEvent = mock(Event.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters parameters = MockParametersFactory.create(
         Map.of(CALENDAR_ID, "calendarId", EVENT_ID, "eventId", ATTENDEES, List.of("attendee1", "attendee2")));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @BeforeEach
     void beforeEach() {

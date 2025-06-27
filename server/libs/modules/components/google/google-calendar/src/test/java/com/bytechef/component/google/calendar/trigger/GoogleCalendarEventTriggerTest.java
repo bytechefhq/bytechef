@@ -69,10 +69,9 @@ class GoogleCalendarEventTriggerTest {
     private final ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor =
         ArgumentCaptor.forClass(LocalDateTime.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
+    private final Events mockedCalendarEvents = mock(Events.class);
     private final Channels mockedChannels = mock(Channels.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
-    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
-    private final Events mockedCalendarEvents = mock(Events.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final List mockedList = mock(List.class);
@@ -81,6 +80,7 @@ class GoogleCalendarEventTriggerTest {
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Watch mockedWatch = mock(Watch.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
+    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
