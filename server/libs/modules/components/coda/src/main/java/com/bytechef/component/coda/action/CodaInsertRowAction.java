@@ -16,12 +16,15 @@
 
 package com.bytechef.component.coda.action;
 
+import static com.bytechef.component.coda.util.CodaPropertiesUtils.convertPropertyToCodaRowValue;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.coda.util.CodaPropertiesUtils;
 import com.bytechef.component.coda.util.CodaUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -30,7 +33,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,9 +40,9 @@ import java.util.Map;
  */
 public class CodaInsertRowAction {
 
-    protected static final String DOC_ID = "docId";
-    protected static final String ROW = "row";
-    protected static final String TABLE_ID = "tableId";
+    public static final String DOC_ID = "docId";
+    public static final String ROW_VALUES = "rowValues";
+    public static final String TABLE_ID = "tableId";
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("insertRow")
         .title("Insert row")
@@ -57,25 +59,10 @@ public class CodaInsertRowAction {
                 .required(true)
                 .options((ActionOptionsFunction<String>) CodaUtils::getTableIdOptions)
                 .optionsLookupDependsOn(DOC_ID),
-            object(ROW)
-                .required(true)
-                .properties(
-                    array("cells")
-                        .label("Cells")
-                        .required(true)
-                        .items(
-                            object()
-                                .properties(
-                                    string("column")
-                                        .label("Column")
-                                        .description("Column ID.")
-                                        .required(true)
-                                        .options((ActionOptionsFunction<String>) CodaUtils::getColumnOptions)
-                                        .optionsLookupDependsOn(DOC_ID, TABLE_ID),
-                                    string("value")
-                                        .label("Value")
-                                        .description("A Coda result or entity expressed as a string.")
-                                        .required(true)))))
+            dynamicProperties(ROW_VALUES)
+                .properties(CodaPropertiesUtils::createPropertiesForRowValues)
+                .propertiesLookupDependsOn(DOC_ID, TABLE_ID)
+                .required(false))
         .output(
             outputSchema(
                 object()
@@ -95,11 +82,12 @@ public class CodaInsertRowAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
+        Map<String, Object> codaRowValues = convertPropertyToCodaRowValue(inputParameters.getMap(ROW_VALUES));
+
         return context
             .http(http -> http.post("/docs/" + inputParameters.getRequiredString(DOC_ID)
                 + "/tables/" + inputParameters.getRequiredString(TABLE_ID) + "/rows"))
-            .body(
-                Body.of(Map.of("rows", List.of(inputParameters.getMap(ROW)))))
+            .body(Body.of(codaRowValues))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
