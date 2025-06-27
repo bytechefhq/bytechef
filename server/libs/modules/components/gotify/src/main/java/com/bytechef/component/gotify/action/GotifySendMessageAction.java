@@ -100,8 +100,8 @@ public class GotifySendMessageAction {
                             .description("Content of the message that was sent."),
                         string("title")
                             .description("Title of the message that was sent."),
-                        string("date")
-                            .description("Date when the message was sent."),
+                        integer("priority")
+                            .description("Priority of the message that was sent."),
                         object("extras")
                             .description("Extras of the message that was sent.")
                             .properties(
@@ -112,7 +112,9 @@ public class GotifySendMessageAction {
                                             .description("Inner namespace of extra information.")
                                             .properties(
                                                 string("extra_info")
-                                                    .description("Extra information.")))))))
+                                                    .description("Extra information.")))),
+                        string("date")
+                            .description("Date when the message was sent."))))
         .perform(GotifySendMessageAction::perform);
 
     private GotifySendMessageAction() {

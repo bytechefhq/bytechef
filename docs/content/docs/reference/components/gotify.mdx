@@ -89,8 +89,9 @@ Type: OBJECT
 | appid | INTEGER | ID of the app that sent the message. |
 | message | STRING | Content of the message that was sent. |
 | title | STRING | Title of the message that was sent. |
-| date | STRING | Date when the message was sent. |
+| priority | INTEGER | Priority of the message that was sent. |
 | extras | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#123;STRING\(extra_info)&#125;\(sub_namespace)&#125;\(top_namespace)&#125; </details> | Extras of the message that was sent. |
+| date | STRING | Date when the message was sent. |
 
 
 
@@ -102,14 +103,15 @@ Type: OBJECT
   "appid" : 1,
   "message" : "",
   "title" : "",
-  "date" : "",
+  "priority" : 1,
   "extras" : {
     "top_namespace" : {
       "sub_namespace" : {
         "extra_info" : ""
       }
     }
-  }
+  },
+  "date" : ""
 }
 ```
 
