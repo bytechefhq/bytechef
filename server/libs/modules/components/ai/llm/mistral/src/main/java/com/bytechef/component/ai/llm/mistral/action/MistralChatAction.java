@@ -65,7 +65,7 @@ public class MistralChatAction {
             STOP_PROPERTY,
             SEED_PROPERTY,
             SAFE_PROMPT_PROPERTY)
-        .output()
+        .output(ModelUtils::output)
         .perform(MistralChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> MistralAiChatModel.builder()

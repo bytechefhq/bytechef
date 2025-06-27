@@ -74,7 +74,7 @@ public class DeepSeekChatAction {
             LOGIT_BIAS_PROPERTY,
             STOP_PROPERTY,
             USER_PROPERTY)
-        .output()
+        .output(ModelUtils::output)
         .perform(DeepSeekChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> OpenAiChatModel.builder()
