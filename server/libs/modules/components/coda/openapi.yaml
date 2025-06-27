@@ -147,7 +147,7 @@ paths:
                             type: "string"
                             description: "A Coda result or entity expressed as a string."
       responses:
-        200:
+        202:
           description: "A result indicating that the update was queued for processing."
           content:
             application/json:
