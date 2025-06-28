@@ -14,18 +14,24 @@ const ConnectedUsersLeftSidebarNav = ({
 }) => {
     return (
         <LeftSidebarNav
-            body={connectedUsers.map((user) => (
-                <LeftSidebarNavItem
-                    icon={<UsersIcon className="mr-2 size-4" />}
-                    item={{
-                        current: connectedUserId === user.id,
-                        id: user.id,
-                        name: user.name || user.email || `User ${user.externalId}`,
-                    }}
-                    key={user.id}
-                    toLink={`?connectedUserId=${user.id ?? ''}&environment=${environment ?? ''}`}
-                />
-            ))}
+            body={
+                connectedUsers ? (
+                    connectedUsers.map((user) => (
+                        <LeftSidebarNavItem
+                            icon={<UsersIcon className="mr-2 size-4" />}
+                            item={{
+                                current: connectedUserId === user.id,
+                                id: user.id,
+                                name: user.name || user.email || `User ${user.externalId}`,
+                            }}
+                            key={user.id}
+                            toLink={`?connectedUserId=${user.id ?? ''}&environment=${environment ?? ''}`}
+                        />
+                    ))
+                ) : (
+                    <span className="px-3 text-xs">No connected users.</span>
+                )
+            }
             title="Connected Users"
         />
     );
