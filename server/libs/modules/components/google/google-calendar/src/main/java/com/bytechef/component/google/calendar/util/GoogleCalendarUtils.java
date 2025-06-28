@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Monika Kušter
@@ -130,6 +131,7 @@ public class GoogleCalendarUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) throws IOException {
 
+        List<Option<String>> options = new ArrayList<>();
         List<CalendarListEntry> calendarListEntries = GoogleServices.getCalendar(connectionParameters)
             .calendarList()
             .list()
@@ -137,11 +139,8 @@ public class GoogleCalendarUtils {
             .execute()
             .getItems();
 
-        List<Option<String>> options = new ArrayList<>();
-
         for (CalendarListEntry calendarListEntry : calendarListEntries) {
-            options.add(
-                option(calendarListEntry.getSummary(), calendarListEntry.getId()));
+            options.add(option(calendarListEntry.getSummary(), calendarListEntry.getId()));
         }
 
         return options;
@@ -159,9 +158,7 @@ public class GoogleCalendarUtils {
             .setQ(inputParameters.getString(Q))
             .execute()
             .getItems();
-
         String calendarTimezone = getCalendarTimezone(calendar);
-
         Map<String, LocalDateTime> timePeriod = inputParameters.getMap(DATE_RANGE, LocalDateTime.class, Map.of());
 
         LocalDateTime from = timePeriod.get(FROM);
@@ -174,13 +171,10 @@ public class GoogleCalendarUtils {
         if (from == null && to == null) {
             return items;
         } else if (from != null && to == null) {
-
             return items.stream()
                 .filter(event -> isAfter(event.getEnd(), from, timezone))
                 .toList();
-
         } else if (from == null) {
-
             return items.stream()
                 .filter(event -> isBefore(event.getStart(), to, timezone))
                 .toList();
@@ -194,7 +188,8 @@ public class GoogleCalendarUtils {
     private static boolean isAfter(EventDateTime eventDateTime, LocalDateTime from, String timezone) {
         Temporal temporal = convertToTemporalFromEventDateTime(eventDateTime, timezone);
 
-        return temporal instanceof LocalDateTime localDateTime ? localDateTime.isAfter(from)
+        return temporal instanceof LocalDateTime localDateTime
+            ? localDateTime.isAfter(from)
             : LocalDateTime.of(((LocalDate) temporal).minusDays(1), LOCAL_TIME_MAX)
                 .isAfter(from);
     }
@@ -202,7 +197,8 @@ public class GoogleCalendarUtils {
     private static boolean isBefore(EventDateTime eventDateTime, LocalDateTime to, String timezone) {
         Temporal temporal = convertToTemporalFromEventDateTime(eventDateTime, timezone);
 
-        return temporal instanceof LocalDateTime localDateTime ? localDateTime.isBefore(to)
+        return temporal instanceof LocalDateTime localDateTime
+            ? localDateTime.isBefore(to)
             : LocalDateTime.of((LocalDate) temporal, LOCAL_TIME_MIN)
                 .isBefore(to);
     }
@@ -212,11 +208,9 @@ public class GoogleCalendarUtils {
         Temporal end = convertToTemporalFromEventDateTime(event.getEnd(), timezone);
 
         if (start instanceof LocalDateTime startLDT && end instanceof LocalDateTime endLDT) {
-
             return (startLDT.isAfter(from) && startLDT.isBefore(to)) ||
                 (endLDT.isAfter(from) && endLDT.isBefore(to)) ||
                 (startLDT.isBefore(from) && endLDT.isAfter(to));
-
         } else if (start instanceof LocalDate startLD && end instanceof LocalDate endLD) {
             LocalDateTime startMin = LocalDateTime.of(startLD, LOCAL_TIME_MIN);
             LocalDateTime endMax = LocalDateTime.of(endLD.minusDays(1), LOCAL_TIME_MAX);
@@ -236,8 +230,7 @@ public class GoogleCalendarUtils {
     }
 
     public static Event getEvent(Parameters inputParameters, Calendar calendar) throws IOException {
-        return calendar
-            .events()
+        return calendar.events()
             .get(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID))
             .execute();
     }
@@ -246,15 +239,13 @@ public class GoogleCalendarUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) throws IOException {
 
+        List<Option<String>> options = new ArrayList<>();
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
-        List<Event> events = calendar
-            .events()
+        List<Event> events = calendar.events()
             .list(inputParameters.getRequiredString(CALENDAR_ID))
             .execute()
             .getItems();
-
-        List<Option<String>> options = new ArrayList<>();
 
         for (Event event : events) {
             String id = event.getId();
@@ -268,6 +259,7 @@ public class GoogleCalendarUtils {
 
     public static Event updateEvent(Parameters inputParameters, Parameters connectionParameters, Event event)
         throws IOException {
+
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         return calendar
@@ -277,14 +269,12 @@ public class GoogleCalendarUtils {
     }
 
     public static String getCalendarTimezone(Calendar calendar) throws IOException {
-        return calendar
-            .settings()
+        return calendar.settings()
             .list()
             .execute()
             .getItems()
             .stream()
-            .filter(setting -> setting.getId()
-                .equals("timezone"))
+            .filter(setting -> Objects.equals(setting.getId(), "timezone"))
             .findFirst()
             .get()
             .getValue();

@@ -126,8 +126,7 @@ public class GoogleCalendarUpdateEventAction {
         List<String> attendees = inputParameters.getList(ATTENDEES, String.class, List.of());
 
         if (!attendees.isEmpty()) {
-            List<EventAttendee> eventAttendees = attendees
-                .stream()
+            List<EventAttendee> eventAttendees = attendees.stream()
                 .map(attendee -> new EventAttendee().setEmail(attendee))
                 .toList();
 
@@ -155,8 +154,7 @@ public class GoogleCalendarUpdateEventAction {
         String calendarTimezone = getCalendarTimezone(calendar);
 
         if (inputParameters.getBoolean(ALL_DAY) != null) {
-            event
-                .setEnd(createEventDateTime(inputParameters, END, calendarTimezone))
+            event.setEnd(createEventDateTime(inputParameters, END, calendarTimezone))
                 .setStart(createEventDateTime(inputParameters, START, calendarTimezone));
         }
 
