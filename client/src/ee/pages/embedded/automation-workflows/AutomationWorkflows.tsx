@@ -83,7 +83,11 @@ const AutomationWorkflows = () => {
                         <ConnectedUserProjectList connectedUserProjects={data.connectedUserProjects} />
                     </div>
                 ) : (
-                    <EmptyList icon={<Workflow className="size-24 text-gray-300" />} title="No Automation Workflows" />
+                    <EmptyList
+                        icon={<Workflow className="size-24 text-gray-300" />}
+                        message="There is no yet created automation workflows from the Connected Users."
+                        title="No Automation Workflows"
+                    />
                 )}
             </PageLoader>
         </LayoutContainer>
