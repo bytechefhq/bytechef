@@ -1089,13 +1089,6 @@ const WorkflowNodeDetailsPanel = ({
                                         }
                                         currentNode={currentNode}
                                         key={`${currentNode?.componentName}-${currentNode?.type}_output`}
-                                        outputSchemaDefined={
-                                            (currentActionDefinition?.outputSchemaDefined ||
-                                                currentClusterElementDefinition?.outputSchemaDefined ||
-                                                currentTriggerDefinition?.outputSchemaDefined ||
-                                                currentTaskDispatcherDefinition?.outputSchemaDefined) ??
-                                            false
-                                        }
                                         variablePropertiesDefined={
                                             currentTaskDispatcherDefinition?.variablePropertiesDefined
                                         }

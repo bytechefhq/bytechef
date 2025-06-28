@@ -32,18 +32,11 @@ import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 interface OutputTabProps {
     connectionMissing: boolean;
     currentNode: NodeDataType;
-    outputSchemaDefined: boolean;
     variablePropertiesDefined?: boolean;
     workflowId: string;
 }
 
-const OutputTab = ({
-    connectionMissing,
-    currentNode,
-    outputSchemaDefined,
-    variablePropertiesDefined,
-    workflowId,
-}: OutputTabProps) => {
+const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined, workflowId}: OutputTabProps) => {
     const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
@@ -251,14 +244,12 @@ const OutputTab = ({
                                             Upload Sample Output Data
                                         </DropdownMenuItem>
 
-                                        {(outputSchemaDefined || variablePropertiesDefined) && (
-                                            <DropdownMenuItem
-                                                className="cursor-pointer"
-                                                onClick={handlePredefinedOutputSchemaClick}
-                                            >
-                                                Reset
-                                            </DropdownMenuItem>
-                                        )}
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onClick={handlePredefinedOutputSchemaClick}
+                                        >
+                                            Reset
+                                        </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
