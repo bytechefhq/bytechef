@@ -15,8 +15,6 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {useQueryClient} from '@tanstack/react-query';
 
 const WorkflowBuilder = () => {
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
@@ -37,8 +35,6 @@ const WorkflowBuilder = () => {
     } = useWorkflowBuilder();
 
     const {runDisabled} = useRun();
-
-    const queryClient = useQueryClient();
 
     if (!connectedUserProjectWorkflow || !projectId) {
         return <></>;
@@ -64,12 +60,7 @@ const WorkflowBuilder = () => {
                             value={{
                                 ConnectionKeys: ConnectionKeys,
                                 deleteWorkflowNodeParameterMutation,
-                                invalidateWorkflowQueries: () => {
-                                    queryClient.invalidateQueries({
-                                        queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
-                                    });
-                                    // queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
-                                },
+                                invalidateWorkflowQueries: () => {},
                                 updateWorkflowMutation: updateWorkflowEditorMutation,
                                 updateWorkflowNodeParameterMutation,
                                 useCreateConnectionMutation: getCreateConnectedUserProjectWorkflowConnection(
