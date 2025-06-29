@@ -38,11 +38,11 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class McpServerTagGraphQlController {
 
-    private final TagService tagService;
     private final McpServerService mcpServerService;
+    private final TagService tagService;
 
     @SuppressFBWarnings("EI")
-    McpServerTagGraphQlController(TagService tagService, McpServerService mcpServerService) {
+    McpServerTagGraphQlController(McpServerService mcpServerService, TagService tagService) {
         this.tagService = tagService;
         this.mcpServerService = mcpServerService;
     }

@@ -1,10 +1,10 @@
 extend type Query {
-    mcpAction(id: ID): McpAction
-    mcpActions: [McpAction]
-    mcpActionsByComponentId(mcpComponentId: ID): [McpAction]
+    mcpTool(id: ID): McpTool
+    mcpTools: [McpTool]
+    mcpToolsByComponentId(mcpComponentId: ID): [McpTool]
 }
 
-type McpAction {
+type McpTool {
     id: ID!
     name: String!
     parameters: Map

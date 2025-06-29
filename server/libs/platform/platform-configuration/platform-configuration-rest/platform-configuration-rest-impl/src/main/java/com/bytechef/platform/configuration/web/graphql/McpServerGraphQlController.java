@@ -68,4 +68,11 @@ public class McpServerGraphQlController {
 
         return mcpServerService.update(id, name, type, environment, enabled);
     }
+
+    @MutationMapping
+    boolean deleteMcpServer(@Argument long id) {
+        mcpServerService.delete(id);
+
+        return true;
+    }
 }

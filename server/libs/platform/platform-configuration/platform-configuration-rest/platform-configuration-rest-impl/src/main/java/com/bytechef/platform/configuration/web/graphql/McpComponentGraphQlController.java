@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.service.McpComponentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -55,5 +56,12 @@ public class McpComponentGraphQlController {
     @QueryMapping
     public List<McpComponent> mcpComponentsByServerId(@Argument long mcpServerId) {
         return mcpComponentService.getMcpComponentsByServerId(mcpServerId);
+    }
+
+    @MutationMapping
+    public boolean deleteMcpComponent(@Argument long id) {
+        mcpComponentService.delete(id);
+
+        return true;
     }
 }

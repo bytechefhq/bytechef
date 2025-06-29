@@ -16,24 +16,24 @@
 
 package com.bytechef.platform.configuration.repository;
 
-import com.bytechef.platform.configuration.domain.McpAction;
+import com.bytechef.platform.configuration.domain.McpTool;
 import java.util.List;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository for managing {@link McpAction} entities.
+ * Repository for managing {@link McpTool} entities.
  *
  * @author Ivica Cardic
  */
 @Repository
-public interface McpActionRepository extends ListCrudRepository<McpAction, Long> {
+public interface McpToolRepository extends ListCrudRepository<McpTool, Long> {
 
     /**
-     * Find all actions associated with a specific MCP component.
+     * Find all tools associated with a specific MCP component.
      *
      * @param mcpComponentId the ID of the MCP component
-     * @return list of actions associated with the specified component
+     * @return list of tools associated with the specified component
      */
-    List<McpAction> findAllByMcpComponentId(Long mcpComponentId);
+    List<McpTool> findAllByMcpComponentId(Long mcpComponentId);
 }

@@ -10,7 +10,7 @@ type McpComponent {
     componentVersion: Int!
     mcpServerId: ID!
     connectionId: ID
-    mcpActions: [McpAction]
+    mcpTools: [McpTool]
     createdBy: String
     createdDate: Long
     lastModifiedBy: String

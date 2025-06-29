@@ -17,8 +17,8 @@
 package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.configuration.domain.McpAction;
-import com.bytechef.platform.configuration.service.McpActionService;
+import com.bytechef.platform.configuration.domain.McpTool;
+import com.bytechef.platform.configuration.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -26,34 +26,34 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller for managing {@link McpAction} entities.
+ * GraphQL controller for managing {@link McpTool} entities.
  *
  * @author Ivica Cardic
  */
 @Controller
 @ConditionalOnCoordinator
-public class McpActionGraphQlController {
+public class McpToolGraphQlController {
 
-    private final McpActionService mcpActionService;
+    private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
-    public McpActionGraphQlController(McpActionService mcpActionService) {
-        this.mcpActionService = mcpActionService;
+    public McpToolGraphQlController(McpToolService mcpToolService) {
+        this.mcpToolService = mcpToolService;
     }
 
     @QueryMapping
-    public McpAction mcpAction(@Argument long id) {
-        return mcpActionService.fetchMcpAction(id)
+    public McpTool mcpTool(@Argument long id) {
+        return mcpToolService.fetchMcpTool(id)
             .orElse(null);
     }
 
     @QueryMapping
-    public List<McpAction> mcpActions() {
-        return mcpActionService.getMcpActions();
+    public List<McpTool> mcpTools() {
+        return mcpToolService.getMcpTools();
     }
 
     @QueryMapping
-    public List<McpAction> mcpActionsByComponentId(@Argument long mcpComponentId) {
-        return mcpActionService.getMcpActionsByComponentId(mcpComponentId);
+    public List<McpTool> mcpToolsByComponentId(@Argument long mcpComponentId) {
+        return mcpToolService.getMcpToolsByComponentId(mcpComponentId);
     }
 }
