@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20250313170131" author="ByteChef">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="mcp_action"/>
+            <not>
+                <tableExists tableName="mcp_tool"/>
+            </not>
+        </preConditions>
+
+        <!-- Rename table from mcp_action to mcp_tool -->
+        <renameTable oldTableName="mcp_action" newTableName="mcp_tool"/>
+
+        <!-- Update constraint names to reflect new table name -->
+        <dropUniqueConstraint tableName="mcp_tool" constraintName="uk_mcp_action_name_component"/>
+        <addUniqueConstraint constraintName="uk_mcp_tool_name_component" tableName="mcp_tool" columnNames="name,mcp_component_id"/>
+
+        <!-- Update foreign key constraint name -->
+        <dropForeignKeyConstraint baseTableName="mcp_tool" constraintName="fk_mcp_action_mcp_component_id"/>
+        <addForeignKeyConstraint
+            baseTableName="mcp_tool"
+            baseColumnNames="mcp_component_id"
+            constraintName="fk_mcp_tool_mcp_component_id"
+            referencedTableName="mcp_component"
+            referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
