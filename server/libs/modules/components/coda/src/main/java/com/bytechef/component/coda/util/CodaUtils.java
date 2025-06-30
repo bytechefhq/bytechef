@@ -16,6 +16,8 @@
 
 package com.bytechef.component.coda.util;
 
+import static com.bytechef.component.coda.constant.CodaConstants.DOC_ID;
+import static com.bytechef.component.coda.constant.CodaConstants.TABLE_ID;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
@@ -32,6 +34,7 @@ import java.util.Map;
  * This class will not be overwritten on the subsequent calls of the generator.
  */
 public class CodaUtils extends AbstractCodaUtils {
+
     private CodaUtils() {
     }
 
@@ -40,7 +43,7 @@ public class CodaUtils extends AbstractCodaUtils {
         String searchText, Context context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get("/docs/" + inputParameters.getRequiredString("docId") + "/tables"))
+            .http(http -> http.get("/docs/" + inputParameters.getRequiredString(DOC_ID) + "/tables"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -66,8 +69,9 @@ public class CodaUtils extends AbstractCodaUtils {
         String searchText, Context context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get("/docs/" + inputParameters.getRequiredString("docId") + "/tables/"
-                + inputParameters.getRequiredString("tableId") + "/rows"))
+            .http(
+                http -> http.get("/docs/%s/tables/%s/rows".formatted(
+                    inputParameters.getRequiredString(DOC_ID), inputParameters.getRequiredString(TABLE_ID))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -80,8 +84,9 @@ public class CodaUtils extends AbstractCodaUtils {
         String searchText, Context context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get("/docs/" + inputParameters.getRequiredString("docId") + "/tables/"
-                + inputParameters.getRequiredString("tableId") + "/columns"))
+            .http(
+                http -> http.get("/docs/%s/tables/%s/columns".formatted(
+                    inputParameters.getRequiredString(DOC_ID), inputParameters.getRequiredString(TABLE_ID))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -97,7 +102,6 @@ public class CodaUtils extends AbstractCodaUtils {
     }
 
     private static List<Option<String>> getOptions(Map<String, Object> body) {
-
         List<Option<String>> options = new ArrayList<>();
 
         if (body.get("items") instanceof List<?> items) {
@@ -107,6 +111,7 @@ public class CodaUtils extends AbstractCodaUtils {
                 }
             }
         }
+
         return options;
     }
 }

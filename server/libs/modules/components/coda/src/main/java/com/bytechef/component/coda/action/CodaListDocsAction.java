@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class CodaListDocsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("listDocs")
-        .title("List docs")
+        .title("List Docs")
         .description("Returns a list of docs accessible by the user, and which they have opened at least once.")
         .metadata(
             Map.of(

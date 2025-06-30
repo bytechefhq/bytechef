@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class CodaUpdateRowAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
-        .title("Update row")
+        .title("Update Row")
         .description("Updates the specified row in the table.")
         .metadata(
             Map.of(

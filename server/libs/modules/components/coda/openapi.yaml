@@ -9,7 +9,7 @@ servers:
 paths:
   /docs:
     get:
-      summary: "List docs"
+      summary: "List Docs"
       description: "Returns a list of docs accessible by the user, and which they have opened at least once."
       operationId: "listDocs"
       x-ai-agent-tool: true
@@ -44,7 +44,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DocList'
     post:
-      summary: "Copy doc"
+      summary: "Copy Doc"
       description: "Copies an existing doc."
       operationId: "copyDoc"
       x-ai-agent-tool: true
@@ -76,7 +76,7 @@ paths:
 
   /docs/{docId}/tables/{tableId}/rows/{rowId}:
     put:
-      summary: "Update row"
+      summary: "Update Row"
       description: "Updates the specified row in the table."
       operationId: "updateRow"
       x-ai-agent-tool: true
