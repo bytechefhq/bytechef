@@ -24,8 +24,8 @@ import com.bytechef.exception.AbstractErrorType;
  */
 public class WorkspaceErrorType extends AbstractErrorType {
 
-    public static final WorkspaceErrorType DELETE_DEFAULT_WORKSPACE = new WorkspaceErrorType(100);
-    public static final WorkspaceErrorType UPDATE_DEFAULT_WORKSPACE = new WorkspaceErrorType(101);
+    public static final WorkspaceErrorType DEFAULT_WORKSPACE_NOT_DELETABLE = new WorkspaceErrorType(100);
+    public static final WorkspaceErrorType DEFAULT_WORKSPACE_NOT_CHANGEABLE = new WorkspaceErrorType(101);
 
     private WorkspaceErrorType(int errorKey) {
         super(Workspace.class, errorKey);

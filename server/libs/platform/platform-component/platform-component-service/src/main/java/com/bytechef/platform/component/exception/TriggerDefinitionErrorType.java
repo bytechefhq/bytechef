@@ -24,20 +24,18 @@ import com.bytechef.exception.AbstractErrorType;
  */
 public class TriggerDefinitionErrorType extends AbstractErrorType {
 
-    public static final TriggerDefinitionErrorType EXECUTE_DYNAMIC_PROPERTIES = new TriggerDefinitionErrorType(100);
-    public static final TriggerDefinitionErrorType EXECUTE_WORKFLOW_NODE_DESCRIPTION = new TriggerDefinitionErrorType(
+    public static final TriggerDefinitionErrorType DYNAMIC_PROPERTIES_FAILED = new TriggerDefinitionErrorType(100);
+    public static final TriggerDefinitionErrorType WORKFLOW_NODE_DESCRIPTION_FAILED = new TriggerDefinitionErrorType(
         101);
-    public static final TriggerDefinitionErrorType EXECUTE_OPTIONS = new TriggerDefinitionErrorType(102);
-    public static final TriggerDefinitionErrorType EXECUTE_LISTENER_DISABLE = new TriggerDefinitionErrorType(103);
-    public static final TriggerDefinitionErrorType EXECUTE_LISTENER_ENABLE = new TriggerDefinitionErrorType(104);
-    public static final TriggerDefinitionErrorType EXECUTE_DYNAMIC_WEBHOOK_TRIGGER = new TriggerDefinitionErrorType(
+    public static final TriggerDefinitionErrorType OPTIONS_FAILED = new TriggerDefinitionErrorType(102);
+    public static final TriggerDefinitionErrorType LISTENER_DISABLE_FAILED = new TriggerDefinitionErrorType(103);
+    public static final TriggerDefinitionErrorType LISTENER_ENABLE_FAILED = new TriggerDefinitionErrorType(104);
+    public static final TriggerDefinitionErrorType DYNAMIC_WEBHOOK_TRIGGER_FAILED = new TriggerDefinitionErrorType(
         105);
-    public static final TriggerDefinitionErrorType EXECUTE_POLLING_TRIGGER = new TriggerDefinitionErrorType(106);
-    public static final TriggerDefinitionErrorType EXECUTE_STATIC_WEBHOOK_ERROR_TYPE = new TriggerDefinitionErrorType(
+    public static final TriggerDefinitionErrorType POLLING_TRIGGER_FAILED = new TriggerDefinitionErrorType(106);
+    public static final TriggerDefinitionErrorType DYNAMIC_WEBHOOK_DISABLE_FAILED = new TriggerDefinitionErrorType(
         107);
-    public static final TriggerDefinitionErrorType EXECUTE_DYNAMIC_WEBHOOK_DISABLE = new TriggerDefinitionErrorType(
-        108);
-    public static final TriggerDefinitionErrorType EXECUTE_DYNAMIC_WEBHOOK_ENABLE = new TriggerDefinitionErrorType(109);
+    public static final TriggerDefinitionErrorType DYNAMIC_WEBHOOK_ENABLE_FAILED = new TriggerDefinitionErrorType(108);
 
     private TriggerDefinitionErrorType(int errorKey) {
         super(ActionDefinition.class, errorKey);

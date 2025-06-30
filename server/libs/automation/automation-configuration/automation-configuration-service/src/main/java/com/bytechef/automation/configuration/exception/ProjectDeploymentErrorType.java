@@ -24,8 +24,9 @@ import com.bytechef.exception.AbstractErrorType;
  */
 public class ProjectDeploymentErrorType extends AbstractErrorType {
 
-    public static final ProjectDeploymentErrorType CREATE_PROJECT_DEPLOYMENT = new ProjectDeploymentErrorType(100);
-    public static final ProjectDeploymentErrorType REQUIRED_WORKFLOW_CONNECTIONS = new ProjectDeploymentErrorType(101);
+    public static final ProjectDeploymentErrorType PROJECT_NOT_PUBLISHED = new ProjectDeploymentErrorType(100);
+    public static final ProjectDeploymentErrorType WORKFLOW_CONNECTIONS_NOT_FOUND = new ProjectDeploymentErrorType(101);
+    public static final ProjectDeploymentErrorType INVALID_PROJECT_VERSION = new ProjectDeploymentErrorType(102);
 
     private ProjectDeploymentErrorType(int errorKey) {
         super(ProjectDeployment.class, errorKey);

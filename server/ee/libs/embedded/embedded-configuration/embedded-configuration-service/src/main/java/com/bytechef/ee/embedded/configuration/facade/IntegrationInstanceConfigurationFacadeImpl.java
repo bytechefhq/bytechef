@@ -152,14 +152,14 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         if (!integration.isPublished()) {
             throw new ConfigurationException(
                 "Integration id=%s is not published".formatted(integrationId),
-                IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
+                IntegrationInstanceConfigurationErrorType.INTEGRATION_NOT_PUBLISHED);
         }
 
         if (integration.getLastVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
             throw new ConfigurationException(
                 "Integration version v=%s cannot be in DRAFT".formatted(
                     integrationInstanceConfiguration.getIntegrationVersion()),
-                IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
+                IntegrationInstanceConfigurationErrorType.INVALID_INTEGRATION_VERSION);
         }
 
         int integrationVersion = integrationInstanceConfiguration.getIntegrationVersion();
@@ -173,9 +173,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 .getVersion() == integrationVersion)) {
 
             throw new ConfigurationException(
-                "Instance Configuration is already set for environment=%s and integrationVersion=%s".formatted(
+                "Instance Configuration already exists for environment=%s and integrationVersion=%s".formatted(
                     integrationInstanceConfiguration.getEnvironment(), integrationVersion),
-                IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
+                IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_EXISTS);
         }
 
         List<Tag> tags = checkTags(integrationInstanceConfigurationDTO.tags());
@@ -296,7 +296,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .findFirst()
             .orElseThrow(() -> new ConfigurationException(
                 "Integration instance configuration not found",
-                IntegrationInstanceConfigurationErrorType.INTEGRATION_INSTANCE_CONFIGURATION_NOT_FOUND));
+                IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_NOT_FOUND));
     }
 
     @Override
@@ -503,9 +503,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 }
             }
 
-            if (oldIntegrationInstanceConfigurationWorkflow == null) {
-                validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
+            validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
 
+            if (oldIntegrationInstanceConfigurationWorkflow == null) {
                 integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
                     integrationInstanceConfiguration.getId());
 
@@ -521,8 +521,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             } else {
                 boolean oldIntegrationInstanceConfigurationWorkflowEnabled =
                     oldIntegrationInstanceConfigurationWorkflow.isEnabled();
-
-                validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
 
                 String oldWorkflowId = oldIntegrationInstanceConfigurationWorkflow.getWorkflowId();
 
@@ -540,8 +538,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
                     if (integrationInstanceConfiguration.isEnabled() &&
                         !oldIntegrationInstanceConfigurationWorkflowEnabled) {
-
-                        validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
 
                         doEnableIntegrationInstanceConfigurationWorkflow(
                             integrationInstanceConfiguration.getId(),
@@ -654,7 +650,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             if (!requiredComponentConnections.isEmpty() && requiredComponentConnections.size() != connections.size()) {
                 throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
-                    IntegrationInstanceConfigurationErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
+                    IntegrationInstanceConfigurationErrorType.WORKFLOW_CONNECTIONS_NOT_FOUND);
             }
         }
 

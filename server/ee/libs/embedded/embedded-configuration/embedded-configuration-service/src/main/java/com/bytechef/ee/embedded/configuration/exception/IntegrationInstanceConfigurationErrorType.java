@@ -17,12 +17,16 @@ import com.bytechef.exception.AbstractErrorType;
  */
 public class IntegrationInstanceConfigurationErrorType extends AbstractErrorType {
 
-    public static final IntegrationInstanceConfigurationErrorType CREATE_INTEGRATION_INSTANCE_CONFIGURATION =
+    public static final IntegrationInstanceConfigurationErrorType INTEGRATION_NOT_PUBLISHED =
         new IntegrationInstanceConfigurationErrorType(100);
-    public static final IntegrationInstanceConfigurationErrorType REQUIRED_WORKFLOW_CONNECTIONS =
+    public static final IntegrationInstanceConfigurationErrorType WORKFLOW_CONNECTIONS_NOT_FOUND =
         new IntegrationInstanceConfigurationErrorType(101);
-    public static final IntegrationInstanceConfigurationErrorType INTEGRATION_INSTANCE_CONFIGURATION_NOT_FOUND =
+    public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_NOT_FOUND =
         new IntegrationInstanceConfigurationErrorType(102);
+    public static final IntegrationInstanceConfigurationErrorType INVALID_INTEGRATION_VERSION =
+        new IntegrationInstanceConfigurationErrorType(103);
+    public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_EXISTS =
+        new IntegrationInstanceConfigurationErrorType(104);
 
     private IntegrationInstanceConfigurationErrorType(int errorKey) {
         super(IntegrationInstanceConfiguration.class, errorKey);

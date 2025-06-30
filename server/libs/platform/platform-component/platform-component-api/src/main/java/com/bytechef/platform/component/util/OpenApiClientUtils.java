@@ -85,7 +85,7 @@ public class OpenApiClientUtils {
                 try {
                     throw processErrorResponseFunction.apply(response.getStatusCode(), body, context);
                 } catch (Exception e) {
-                    throw new ExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
+                    throw new ExecutionException(e, ActionDefinitionErrorType.ERROR_RESPONSE_NOT_PROCESSED);
                 }
             }
         }
@@ -214,7 +214,7 @@ public class OpenApiClientUtils {
 
     private static class ActionDefinitionErrorType extends AbstractErrorType {
 
-        private static final ActionDefinitionErrorType EXECUTE_PROCESS_ERROR_RESPONSE = new ActionDefinitionErrorType(
+        private static final ActionDefinitionErrorType ERROR_RESPONSE_NOT_PROCESSED = new ActionDefinitionErrorType(
             105);
 
         ActionDefinitionErrorType(int errorKey) {

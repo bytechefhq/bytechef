@@ -51,7 +51,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public void delete(long id) {
         if (id == Workspace.DEFAULT_WORKSPACE_ID) {
             throw new ConfigurationException(
-                "Default workspace cannot be deleted", WorkspaceErrorType.DELETE_DEFAULT_WORKSPACE);
+                "Default workspace cannot be deleted", WorkspaceErrorType.DEFAULT_WORKSPACE_NOT_DELETABLE);
         }
 
         workspaceRepository.deleteById(id);
@@ -79,7 +79,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         if (workspace.getId() == Workspace.DEFAULT_WORKSPACE_ID) {
             throw new ConfigurationException(
-                "Default workspace cannot be updated", WorkspaceErrorType.UPDATE_DEFAULT_WORKSPACE);
+                "Default workspace cannot be updated", WorkspaceErrorType.DEFAULT_WORKSPACE_NOT_CHANGEABLE);
         }
 
         Workspace curWorkspace = OptionalUtils.get(workspaceRepository.findById(workspace.getId()));

@@ -114,7 +114,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
             throw new ConfigurationException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
+                e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_PROPERTIES_FAILED);
         }
     }
 
@@ -147,7 +147,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 context);
         } catch (Exception e) {
             throw new ExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_LISTENER_DISABLE);
+                e, inputParameters, TriggerDefinitionErrorType.LISTENER_DISABLE_FAILED);
         }
     }
 
@@ -171,7 +171,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 context);
         } catch (Exception e) {
             throw new ExecutionException(e, inputParameters,
-                TriggerDefinitionErrorType.EXECUTE_LISTENER_ENABLE);
+                TriggerDefinitionErrorType.LISTENER_ENABLE_FAILED);
         }
     }
 
@@ -195,7 +195,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     wrapResult.lookupDependsOnPathsMap(), searchText, context),
                 Option::new);
         } catch (Exception e) {
-            throw new ConfigurationException(e, inputParameters, TriggerDefinitionErrorType.EXECUTE_OPTIONS);
+            throw new ConfigurationException(e, inputParameters, TriggerDefinitionErrorType.OPTIONS_FAILED);
         }
     }
 
@@ -297,7 +297,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 ParametersFactory.createParameters(outputParameters), workflowExecutionId, context);
         } catch (Exception e) {
             throw new ExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_DISABLE);
+                e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_DISABLE_FAILED);
         }
     }
 
@@ -321,7 +321,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 webhookUrl, workflowExecutionId, context);
         } catch (Exception e) {
             throw new ExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_ENABLE);
+                e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_ENABLE_FAILED);
         }
     }
 
@@ -365,7 +365,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
         } catch (Exception e) {
             throw new ConfigurationException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
+                e, inputParameters, TriggerDefinitionErrorType.WORKFLOW_NODE_DESCRIPTION_FAILED);
         }
     }
 
@@ -442,7 +442,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 ParametersFactory.createParameters(closureParameters), triggerContext);
         } catch (Exception e) {
             throw new ExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_POLLING_TRIGGER);
+                e, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
         }
 
         List<Object> records = new ArrayList<>(
@@ -455,7 +455,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     ParametersFactory.createParameters(pollOutput.closureParameters()), triggerContext);
             } catch (Exception e) {
                 throw new ExecutionException(
-                    e, inputParameters, TriggerDefinitionErrorType.EXECUTE_POLLING_TRIGGER);
+                    e, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
             }
 
             records.addAll(pollOutput.records());
@@ -482,7 +482,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 output, triggerContext);
         } catch (Exception e) {
             throw new ExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_TRIGGER);
+                e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_TRIGGER_FAILED);
         }
 
         return new TriggerOutput(webhookOutput, null, OptionalUtils.orElse(triggerDefinition.getBatch(), false));

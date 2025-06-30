@@ -24,18 +24,18 @@ import com.bytechef.exception.AbstractErrorType;
  */
 public class ConnectionDefinitionErrorType extends AbstractErrorType {
 
-    public static final ConnectionDefinitionErrorType GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION =
+    public static final ConnectionDefinitionErrorType INVALID_CLAIM =
         new ConnectionDefinitionErrorType(100);
-    public static final ConnectionDefinitionErrorType GET_DEFAULT_REFRESH_URL = new ConnectionDefinitionErrorType(101);
-    public static final ConnectionDefinitionErrorType EXECUTE_AUTHORIZATION_APPLY =
+    public static final ConnectionDefinitionErrorType TOKEN_REFRESH_FAILED = new ConnectionDefinitionErrorType(101);
+    public static final ConnectionDefinitionErrorType AUTHORIZATION_APPLY_FAILED =
         new ConnectionDefinitionErrorType(102);
-    public static final ConnectionDefinitionErrorType EXECUTE_AUTHORIZATION_CALLBACK =
+    public static final ConnectionDefinitionErrorType AUTHORIZATION_CALLBACK_FAILED =
         new ConnectionDefinitionErrorType(103);
-    public static final ConnectionDefinitionErrorType GET_OAUTH2_AUTHORIZATION_PARAMETERS =
+    public static final ConnectionDefinitionErrorType INVALID_OAUTH2_AUTHORIZATION_PARAMETERS =
         new ConnectionDefinitionErrorType(104);
-    public static final ConnectionDefinitionErrorType EXECUTE_AUTHORIZATION_REFRESH = new ConnectionDefinitionErrorType(
+    public static final ConnectionDefinitionErrorType OAUTH_TOKEN_REFRESH_FAILED = new ConnectionDefinitionErrorType(
         105);
-    public static final ConnectionDefinitionErrorType EXECUTE_ACQUIRE = new ConnectionDefinitionErrorType(106);
+    public static final ConnectionDefinitionErrorType ACQUIRE_FAILED = new ConnectionDefinitionErrorType(106);
 
     private ConnectionDefinitionErrorType(int errorKey) {
         super(ConnectionDefinition.class, errorKey);

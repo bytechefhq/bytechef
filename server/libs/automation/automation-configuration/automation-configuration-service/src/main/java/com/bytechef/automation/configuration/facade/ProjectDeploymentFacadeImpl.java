@@ -162,13 +162,13 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         if (!project.isPublished()) {
             throw new ConfigurationException(
                 "Project id=%s is not published".formatted(projectId),
-                ProjectDeploymentErrorType.CREATE_PROJECT_DEPLOYMENT);
+                ProjectDeploymentErrorType.PROJECT_NOT_PUBLISHED);
         }
 
         if (project.getLastVersion() == projectDeployment.getProjectVersion()) {
             throw new ConfigurationException(
                 "Project version v=%s cannot be in DRAFT".formatted(projectDeployment.getProjectVersion()),
-                ProjectDeploymentErrorType.CREATE_PROJECT_DEPLOYMENT);
+                ProjectDeploymentErrorType.INVALID_PROJECT_VERSION);
         }
 
         if (!tags.isEmpty()) {
@@ -429,8 +429,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         projectDeploymentService.update(projectDeployment);
 
         checkProjectDeploymentWorkflows(
-            projectDeployment, oldProjectDeployment.getProjectVersion(),
-            projectDeploymentWorkflows, projectWorkflowService.getProjectWorkflows(projectDeployment.getProjectId()));
+            projectDeployment, oldProjectDeployment.getProjectVersion(), projectDeploymentWorkflows,
+            projectWorkflowService.getProjectWorkflows(projectDeployment.getProjectId()));
     }
 
     @Override
@@ -487,9 +487,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
             }
 
-            if (oldProjectDeploymentWorkflow == null) {
-                validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+            validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
+            if (oldProjectDeploymentWorkflow == null) {
                 projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
 
                 projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
@@ -499,8 +499,6 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                         projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
                 }
             } else {
-                validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
-
                 String oldWorkflowId = oldProjectDeploymentWorkflow.getWorkflowId();
 
                 oldProjectDeploymentWorkflow.setConnections(projectDeploymentWorkflow.getConnections());
@@ -512,8 +510,6 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                     projectDeploymentWorkflowService.update(oldProjectDeploymentWorkflow);
 
                     if (projectDeployment.isEnabled() && !oldProjectDeploymentWorkflow.isEnabled()) {
-                        validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
-
                         doEnableProjectDeploymentWorkflow(
                             projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
                     }
@@ -625,7 +621,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             if (!requiredComponentConnections.isEmpty() && requiredComponentConnections.size() != connections.size()) {
                 throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
-                    ProjectDeploymentErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
+                    ProjectDeploymentErrorType.WORKFLOW_CONNECTIONS_NOT_FOUND);
             }
         }
 

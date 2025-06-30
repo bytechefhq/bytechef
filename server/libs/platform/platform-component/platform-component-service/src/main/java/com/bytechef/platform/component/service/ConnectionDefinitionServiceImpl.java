@@ -96,7 +96,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             return OptionalUtils.get(authorization.getAcquire())
                 .apply(ParametersFactory.createParameters(connectionParameters), context);
         } catch (Exception e) {
-            throw new ConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_ACQUIRE);
+            throw new ConfigurationException(e, ConnectionDefinitionErrorType.ACQUIRE_FAILED);
         }
     }
 
@@ -114,7 +114,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         try {
             return applyFunction.apply(ParametersFactory.createParameters(connectionParameters), context);
         } catch (Exception e) {
-            throw new ConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_APPLY);
+            throw new ConfigurationException(e, ConnectionDefinitionErrorType.AUTHORIZATION_APPLY_FAILED);
         }
     }
 
@@ -138,7 +138,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 pkce = pkceFunction.apply(null, null, "SHA256", context);
             } catch (Exception e) {
                 throw new ConfigurationException(
-                    e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
+                    e, ConnectionDefinitionErrorType.AUTHORIZATION_CALLBACK_FAILED);
             }
 
             verifier = pkce.verifier();
@@ -166,7 +166,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 MapUtils.getString(connectionParameters, CODE), redirectUri, verifier, context);
         } catch (Exception e) {
             throw new ConfigurationException(
-                e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
+                e, ConnectionDefinitionErrorType.AUTHORIZATION_CALLBACK_FAILED);
         }
     }
 
@@ -221,7 +221,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         } catch (Exception exception) {
             throw new ConfigurationException(
                 "Unable to perform oauth token refresh", exception,
-                ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_REFRESH);
+                ConnectionDefinitionErrorType.OAUTH_TOKEN_REFRESH_FAILED);
         }
     }
 
@@ -332,7 +332,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 scopesFunction.apply(parameters, context));
         } catch (Exception e) {
             throw new ConfigurationException(
-                e, ConnectionDefinitionErrorType.GET_OAUTH2_AUTHORIZATION_PARAMETERS);
+                e, ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
         }
     }
 
@@ -433,12 +433,12 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
                 if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
                     throw new ConfigurationException(
-                        "Invalid claim", ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
+                        "Invalid claim", ConnectionDefinitionErrorType.INVALID_CLAIM);
                 }
 
                 if (httpResponse.body() == null) {
                     throw new ConfigurationException(
-                        "Invalid claim", ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
+                        "Invalid claim", ConnectionDefinitionErrorType.INVALID_CLAIM);
                 }
 
                 return new AuthorizationCallbackResponse(JsonUtils.read(httpResponse.body(), new TypeReference<>() {}));
@@ -481,13 +481,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
                     throw new ConfigurationException(
                         "OAuth provider rejected token refresh request",
-                        ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
+                        ConnectionDefinitionErrorType.TOKEN_REFRESH_FAILED);
                 }
 
                 if (httpResponse.body() == null) {
                     throw new ConfigurationException(
                         "Unable to locate access_token, body content misses",
-                        ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
+                        ConnectionDefinitionErrorType.INVALID_CLAIM);
                 }
 
                 Map<String, Object> responseMap = JsonUtils.read(httpResponse.body(), new TypeReference<>() {});
@@ -540,7 +540,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         try {
             return tokenUrlFunction.apply(connectionParameters, context);
         } catch (Exception e) {
-            throw new ConfigurationException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
+            throw new ConfigurationException(e, ConnectionDefinitionErrorType.TOKEN_REFRESH_FAILED);
         }
     }
 
