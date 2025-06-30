@@ -28,7 +28,7 @@ import com.google.auto.service.AutoService;
 import java.util.List;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Marija Horvat
  */
 @AutoService(OpenApiComponentHandler.class)
 public class CodaComponentHandler extends AbstractCodaComponentHandler {

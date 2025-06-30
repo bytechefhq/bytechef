@@ -16,7 +16,9 @@
 
 package com.bytechef.component.coda.action;
 
-import static com.bytechef.component.coda.util.CodaPropertiesUtils.convertPropertyToCodaRowValue;
+import static com.bytechef.component.coda.constant.CodaConstants.DOC_ID;
+import static com.bytechef.component.coda.constant.CodaConstants.ROW_VALUES;
+import static com.bytechef.component.coda.constant.CodaConstants.TABLE_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
@@ -32,7 +34,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,12 +42,8 @@ import java.util.Map;
  */
 public class CodaInsertRowAction {
 
-    public static final String DOC_ID = "docId";
-    public static final String ROW_VALUES = "rowValues";
-    public static final String TABLE_ID = "tableId";
-
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("insertRow")
-        .title("Insert row")
+        .title("Insert Row")
         .description("Inserts row into a table.")
         .properties(
             string(DOC_ID)
@@ -79,17 +77,24 @@ public class CodaInsertRowAction {
     private CodaInsertRowAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Map<String, Object> codaRowValues = convertPropertyToCodaRowValue(inputParameters.getMap(ROW_VALUES));
 
-        return context
-            .http(http -> http.post("/docs/" + inputParameters.getRequiredString(DOC_ID)
-                + "/tables/" + inputParameters.getRequiredString(TABLE_ID) + "/rows"))
+        return context.http(
+            http -> http.post("/docs/%s/tables/%s/rows".formatted(
+                inputParameters.getRequiredString(DOC_ID), inputParameters.getRequiredString(TABLE_ID))))
             .body(Body.of(codaRowValues))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
+    }
+
+    private static Map<String, Object> convertPropertyToCodaRowValue(Map<String, ?> rowValuesInput) {
+        List<Map<String, Object>> cells = rowValuesInput.entrySet()
+            .stream()
+            .map(entry -> Map.of("column", entry.getKey(), "value", entry.getValue()))
+            .toList();
+
+        return Map.of("rows", List.of(Map.of("cells", cells)));
     }
 }

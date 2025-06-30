@@ -16,6 +16,8 @@
 
 package com.bytechef.component.coda.util;
 
+import static com.bytechef.component.coda.constant.CodaConstants.DOC_ID;
+import static com.bytechef.component.coda.constant.CodaConstants.TABLE_ID;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
@@ -27,12 +29,12 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,14 +47,14 @@ public class CodaPropertiesUtils {
     private CodaPropertiesUtils() {
     }
 
-    public static List<Property.ValueProperty<?>> createPropertiesForRowValues(
+    public static List<ValueProperty<?>> createPropertiesForRowValues(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        ActionContext context) {
+        ActionContext actionContext) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get("/docs/" + inputParameters.getRequiredString("docId") + "/tables/"
-                + inputParameters.getRequiredString("tableId") + "/columns"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+        Map<String, Object> body = actionContext
+            .http(http -> http.get("/docs/%s/tables/%s/columns".formatted(
+                inputParameters.getRequiredString(DOC_ID), inputParameters.getRequiredString(TABLE_ID))))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -78,52 +80,43 @@ public class CodaPropertiesUtils {
 
         if (type != null) {
             return switch (type) {
-                case "duration", "slider", "scale" -> integer(name).label(name)
+                case "duration", "slider", "scale" -> integer(name)
+                    .label(name)
                     .required(false);
-                case "lookup", "select" -> string(name).label(name)
+                case "lookup", "select", "text", "canvas" -> string(name)
+                    .label(name)
                     .required(false);
-                case "link", "image" -> string(name).label(name)
+                case "link", "image" -> string(name)
+                    .label(name)
                     .required(false)
-                    .controlType(Property.ControlType.URL);
-                case "checkbox" -> bool(name).label(name)
+                    .controlType(ControlType.URL);
+                case "checkbox" -> bool(name)
+                    .label(name)
                     .required(false);
-                case "email" -> string(name).label(name)
+                case "email" -> string(name)
+                    .label(name)
                     .required(false)
-                    .controlType(Property.ControlType.EMAIL);
-                case "text", "canvas" -> string(name).label(name)
-                    .required(false)
-                    .controlType(Property.ControlType.TEXT);
-                case "number", "percent", "currency" -> number(name).label(name)
+                    .controlType(ControlType.EMAIL);
+                case "number", "percent", "currency" -> number(name)
+                    .label(name)
                     .required(false);
-                case "date" -> date(name).label(name)
+                case "date" -> date(name)
+                    .label(name)
                     .required(false);
-                case "dateTime" -> dateTime(name).label(name)
+                case "dateTime" -> dateTime(name)
+                    .label(name)
                     .required(false);
-                case "time" -> time(name).label(name)
+                case "time" -> time(name)
+                    .label(name)
                     .required(false);
-                case "person" -> string(name).label(name)
+                case "person" -> string(name)
+                    .label(name)
                     .description("Use email address to insert person.")
                     .required(false);
-                default -> throw new IllegalArgumentException(
-                    "Unknown Coda field type='%s'".formatted(type));
+                default -> null;
             };
         }
+
         return null;
-    }
-
-    public static Map<String, Object> convertPropertyToCodaRowValue(
-        Map<String, ?> rowValuesInput) {
-
-        Map<String, Object> rowValues = new HashMap<>();
-        for (Map.Entry<String, ?> entry : rowValuesInput.entrySet()) {
-            rowValues.put(entry.getKey(), entry.getValue());
-        }
-
-        List<Map<String, Object>> cells = rowValues.entrySet()
-            .stream()
-            .map(entry -> Map.of("column", entry.getKey(), "value", entry.getValue()))
-            .toList();
-
-        return Map.of("rows", List.of(Map.of("cells", cells)));
     }
 }

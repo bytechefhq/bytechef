@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class CodaCopyDocAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("copyDoc")
-        .title("Copy doc")
+        .title("Copy Doc")
         .description("Copies an existing doc.")
         .metadata(
             Map.of(

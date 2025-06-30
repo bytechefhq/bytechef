@@ -16,18 +16,26 @@
 
 package com.bytechef.component.coda.util;
 
-import static com.bytechef.component.coda.action.CodaInsertRowAction.DOC_ID;
-import static com.bytechef.component.coda.action.CodaInsertRowAction.ROW_VALUES;
-import static com.bytechef.component.coda.action.CodaInsertRowAction.TABLE_ID;
+import static com.bytechef.component.coda.constant.CodaConstants.DOC_ID;
+import static com.bytechef.component.coda.constant.CodaConstants.ROW_VALUES;
+import static com.bytechef.component.coda.constant.CodaConstants.TABLE_ID;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.HashMap;
@@ -37,33 +45,21 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 class CodaPropertiesUtilsTest {
 
+    private static final String TEST_NAME = "testName";
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testCreatePropertiesForRowValues() {
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(DOC_ID, "1", TABLE_ID, "2", ROW_VALUES, Map.of("3", "test")));
 
-        Parameters parameters = MockParametersFactory.create(Map.of(DOC_ID, "1", TABLE_ID, "2",
-            ROW_VALUES, Map.of("3", "test")));
-
-        Map<String, Object> column1 = Map.of(
-            "name", "Text",
-            "format", Map.of("type", "text"));
-
-        Map<String, Object> column2 = Map.of(
-            "name", "Date",
-            "format", Map.of("type", "date"));
-
-        Map<String, Object> column3 = Map.of(
-            "name", "Person",
-            "format", Map.of("type", "person"));
-
-        List<Map<String, Object>> items = List.of(column1, column2, column3);
-        Map<String, Object> mockedResponseBody = Map.of("items", items);
+        Map<String, Object> mockedResponseBody = Map.of("items", createItems());
 
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -74,22 +70,93 @@ class CodaPropertiesUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedResponseBody);
 
-        List<Property.ValueProperty<?>> result = CodaPropertiesUtils.createPropertiesForRowValues(
-            parameters, parameters, new HashMap<>(), mockedActionContext);
+        List<ValueProperty<?>> result = CodaPropertiesUtils.createPropertiesForRowValues(
+            mockedParameters, mockedParameters, new HashMap<>(), mockedActionContext);
 
-        assertEquals("Text", result.get(0)
-            .getName());
-        assertEquals(Property.ControlType.TEXT, result.get(0)
-            .getControlType());
+        assertEquals(getExpectedProperties(), result);
+    }
 
-        assertEquals("Date", result.get(1)
-            .getName());
-        assertEquals(Property.Type.DATE, result.get(1)
-            .getType());
+    private static List<Map<String, Object>> createItems() {
+        return List.of(
+            Map.of("name", TEST_NAME, "format", Map.of("type", "duration")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "slider")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "scale")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "lookup")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "select")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "text")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "canvas")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "link")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "image")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "checkbox")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "email")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "number")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "percent")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "currency")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "date")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "dateTime")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "time")),
+            Map.of("name", TEST_NAME, "format", Map.of("type", "person")));
+    }
 
-        assertEquals("Person", result.get(2)
-            .getName());
-        assertEquals(Property.Type.STRING, result.get(2)
-            .getType());
+    private static List<ValueProperty<?>> getExpectedProperties() {
+        return List.of(
+            integer(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            integer(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            integer(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            string(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            string(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            string(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            string(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            string(TEST_NAME)
+                .label(TEST_NAME)
+                .controlType(ControlType.URL)
+                .required(false),
+            string(TEST_NAME)
+                .label(TEST_NAME)
+                .controlType(ControlType.URL)
+                .required(false),
+            bool(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            string(TEST_NAME)
+                .label(TEST_NAME)
+                .controlType(ControlType.EMAIL)
+                .required(false),
+            number(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            number(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            number(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            date(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            dateTime(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            time(TEST_NAME)
+                .label(TEST_NAME)
+                .required(false),
+            string(TEST_NAME)
+                .label(TEST_NAME)
+                .description("Use email address to insert person.")
+                .required(false));
     }
 }

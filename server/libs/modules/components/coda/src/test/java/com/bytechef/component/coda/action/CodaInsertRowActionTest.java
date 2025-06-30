@@ -16,20 +16,20 @@
 
 package com.bytechef.component.coda.action;
 
-import static com.bytechef.component.coda.action.CodaInsertRowAction.DOC_ID;
-import static com.bytechef.component.coda.action.CodaInsertRowAction.ROW_VALUES;
-import static com.bytechef.component.coda.action.CodaInsertRowAction.TABLE_ID;
+import static com.bytechef.component.coda.constant.CodaConstants.DOC_ID;
+import static com.bytechef.component.coda.constant.CodaConstants.ROW_VALUES;
+import static com.bytechef.component.coda.constant.CodaConstants.TABLE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -41,16 +41,16 @@ import org.mockito.ArgumentCaptor;
  */
 class CodaInsertRowActionTest {
 
-    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Context.Http.Body.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Response mockedResponse = mock(Response.class);
+    private final Object mockedObject = mock(Object.class);
 
     @Test
     void testPerform() {
-        Parameters parameters = MockParametersFactory.create(Map.of(DOC_ID, "1", TABLE_ID, "2",
-            ROW_VALUES, Map.of("3", "test")));
+        Parameters parameters = MockParametersFactory.create(
+            Map.of(DOC_ID, "1", TABLE_ID, "2", ROW_VALUES, Map.of("3", "test")));
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -60,8 +60,8 @@ class CodaInsertRowActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("requestId", "abc", "addedRowIds", List.of("r1")));
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
 
         Object result = CodaInsertRowAction.perform(parameters, parameters, mockedContext);
 
@@ -71,6 +71,6 @@ class CodaInsertRowActionTest {
             "cells", List.of(Map.of("column", "3", "value", "test")))));
 
         assertEquals(expectedBody, body.getContent());
-        assertEquals(Map.of("requestId", "abc", "addedRowIds", List.of("r1")), result);
+        assertEquals(mockedObject, result);
     }
 }

@@ -1741,7 +1741,7 @@
       "required" : false,
       "type" : "INTEGER"
     } ],
-    "title" : "List docs",
+    "title" : "List Docs",
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -3161,7 +3161,7 @@
       "required" : true,
       "type" : "STRING"
     } ],
-    "title" : "Copy doc",
+    "title" : "Copy Doc",
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -3508,7 +3508,7 @@
       "required" : true,
       "type" : "OBJECT"
     } ],
-    "title" : "Update row",
+    "title" : "Update Row",
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -3759,7 +3759,7 @@
       "required" : false,
       "type" : "DYNAMIC_PROPERTIES"
     } ],
-    "title" : "Insert row",
+    "title" : "Insert Row",
     "workflowNodeDescription" : null
   } ],
   "clusterElements" : [ {
@@ -5497,7 +5497,7 @@
       "required" : false,
       "type" : "INTEGER"
     } ],
-    "title" : "List docs",
+    "title" : "List Docs",
     "type" : {
       "key" : "tools",
       "label" : "Tools",
@@ -6914,7 +6914,7 @@
       "required" : true,
       "type" : "STRING"
     } ],
-    "title" : "Copy doc",
+    "title" : "Copy Doc",
     "type" : {
       "key" : "tools",
       "label" : "Tools",
@@ -7258,7 +7258,7 @@
       "required" : true,
       "type" : "OBJECT"
     } ],
-    "title" : "Update row",
+    "title" : "Update Row",
     "type" : {
       "key" : "tools",
       "label" : "Tools",
@@ -7511,7 +7511,7 @@
       "required" : false,
       "type" : "DYNAMIC_PROPERTIES"
     } ],
-    "title" : "Insert row",
+    "title" : "Insert Row",
     "type" : {
       "key" : "tools",
       "label" : "Tools",
