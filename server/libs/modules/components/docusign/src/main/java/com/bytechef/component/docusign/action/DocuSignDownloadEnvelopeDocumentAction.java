@@ -67,9 +67,7 @@ public class DocuSignDownloadEnvelopeDocumentAction {
     private DocuSignDownloadEnvelopeDocumentAction() {
     }
 
-    public static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(
             http -> http.get("/restapi/v2.1/accounts/%s/envelopes/%s/documents/%s".formatted(
                 connectionParameters.getRequiredString(ACCOUNT_ID),
