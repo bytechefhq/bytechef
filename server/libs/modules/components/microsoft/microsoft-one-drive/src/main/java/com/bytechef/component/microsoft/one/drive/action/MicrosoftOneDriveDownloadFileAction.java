@@ -57,7 +57,7 @@ public class MicrosoftOneDriveDownloadFileAction {
 
         Http.Response fileResponse = context
             .http(http -> http.get(response.getFirstHeader("location")))
-            .configuration(Http.responseType(Http.ResponseType.BINARY))
+            .configuration(Http.responseType(Http.ResponseType.binary("text/plain")))
             .execute();
 
         return fileResponse.getBody();
