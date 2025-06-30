@@ -26,11 +26,12 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
 import org.springframework.boot.web.servlet.FilterRegistration;
 
-import java.io.IOException;
-
-@FilterRegistration(name = "multi-tenant-internal-filter", urlPatterns = {"/api/*", "/graphql"})
+@FilterRegistration(name = "multi-tenant-internal-filter", urlPatterns = {
+    "/api/*", "/graphql"
+})
 public class MultiTenantInternalFilter implements Filter {
 
     @Override
@@ -49,11 +50,9 @@ public class MultiTenantInternalFilter implements Filter {
             (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))) {
 
             shouldRunAsTenantId = true;
-        }
-        else if (requestURI.equals("/graphql")) {
+        } else if (requestURI.equals("/graphql")) {
             shouldRunAsTenantId = true;
-        }
-        else if (requestURI.contains("/api/account")) {
+        } else if (requestURI.contains("/api/account")) {
             shouldRunAsTenantId = true;
         }
 
