@@ -3,8 +3,6 @@ title: "Stability AI"
 description: "Activating humanity's potential through generative AI. Open models in every modality, for everyone, everywhere."
 ---
 
-Activating humanity's potential through generative AI. Open models in every modality, for everyone, everywhere.
-
 
 Categories: Artificial Intelligence
 
@@ -52,14 +50,14 @@ Name: createImage
 | imageMessages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(content), NUMBER\(weight)&#125;] </details> | `A list of messages comprising the conversation so far.` | true |
 | height | Height | INTEGER | `Height of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.` | true |
 | width | Width | INTEGER | `Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.` | true |
-| n | Number of Responses | INTEGER | `The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..` | null |
-| responseFormat | Response format | STRING <details> <summary> Options </summary> URL, B64_JSON </details> | `The format in which the generated images are returned.` | null |
-| style | Style | STRING <details> <summary> Options </summary> THREE_D_MODEL, ANALOG_FILM, ANIME, CINEMATIC, COMIC_BOOK, DIGITAL_ART, ENHANCE, FANTASY_ART, ISOMETRIC, LINE_ART, LOW_POLY, MODELING_COMPOUND, NEON_PUNK, ORIGAMI, PHOTOGRAPHIC, PIXEL_ART, TILE_TEXTURE </details> | `Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.` | null |
-| steps | Steps | INTEGER | `Number of diffusion steps to run. Valid range: 10 to 50.` | null |
-| cfgScale | CFG scale | NUMBER | `The strictness level of the diffusion process adherence to the prompt text. Range: 0 to 35.` | null |
-| clipGuidancePreset | Clip guidance preset | STRING | `Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.` | null |
-| sampler | Sampler | STRING | `Which sampler to use for the diffusion process. If this value is omitted, an appropriate sampler will be automatically selected.` | null |
-| seed | Seed | NUMBER | `Random noise seed (omit this option or use 0 for a random seed). Valid range: 0 to 4294967295.` | null |
+| n | Number of Responses | INTEGER | `The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..` | false |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> URL, B64_JSON </details> | `The format in which the generated images are returned.` | false |
+| style | Style | STRING <details> <summary> Options </summary> THREE_D_MODEL, ANALOG_FILM, ANIME, CINEMATIC, COMIC_BOOK, DIGITAL_ART, ENHANCE, FANTASY_ART, ISOMETRIC, LINE_ART, LOW_POLY, MODELING_COMPOUND, NEON_PUNK, ORIGAMI, PHOTOGRAPHIC, PIXEL_ART, TILE_TEXTURE </details> | `Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.` | false |
+| steps | Steps | INTEGER | `Number of diffusion steps to run. Valid range: 10 to 50.` | false |
+| cfgScale | CFG scale | NUMBER | `The strictness level of the diffusion process adherence to the prompt text. Range: 0 to 35.` | false |
+| clipGuidancePreset | Clip guidance preset | STRING | `Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.` | false |
+| sampler | Sampler | STRING | `Which sampler to use for the diffusion process. If this value is omitted, an appropriate sampler will be automatically selected.` | false |
+| seed | Seed | NUMBER | `Random noise seed (omit this option or use 0 for a random seed). Valid range: 0 to 4294967295.` | false |
 
 #### Example JSON Structure
 ```json

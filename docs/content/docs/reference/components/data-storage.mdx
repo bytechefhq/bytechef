@@ -3,8 +3,6 @@ title: "Data Storage"
 description: "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value."
 ---
 
-Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.
-
 
 Categories: Helpers
 
@@ -30,7 +28,7 @@ Name: appendValueToList
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | `The namespace for appending a value.` | true |
 | key | Key | STRING | `The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.` | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | null |
+| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | false |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | `The value to set under given key.` | true |
 | value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The value to set under given key.` | true |
 | value | Value | DATE | `The value to set under given key.` | true |
@@ -41,7 +39,7 @@ Name: appendValueToList
 | value | Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The value to set under given key.` | true |
 | value | Value | STRING | `The value to set under given key.` | true |
 | value | Value | TIME | `The value to set under given key.` | true |
-| appendListAsSingleItem | Append a List as a Single Item | BOOLEAN <details> <summary> Options </summary> true, false </details> | `When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.` | null |
+| appendListAsSingleItem | Append a List as a Single Item | BOOLEAN <details> <summary> Options </summary> true, false </details> | `When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.` | false |
 
 #### Example JSON Structure
 ```json
@@ -77,7 +75,7 @@ Name: atomicIncrement
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | `The identifier of a value to increment.` | true |
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | `The namespace to obtain a value from.` | true |
-| valueToAdd | Value to Add | INTEGER | `The value that can be added to the existing numeric value, which may have a negative value.` | null |
+| valueToAdd | Value to Add | INTEGER | `The value that can be added to the existing numeric value, which may have a negative value.` | false |
 
 #### Example JSON Structure
 ```json
@@ -117,17 +115,17 @@ Name: awaitGetValue
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | `The identifier of a value to wait for.` | true |
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | `The namespace to obtain a value from.` | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | null |
-| defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | DATE | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | DATE_TIME | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | INTEGER | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | NULL | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | NUMBER | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | STRING | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | TIME | `The default value to return if no value exists under the given key.` | null |
+| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | false |
+| defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | DATE | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | DATE_TIME | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | INTEGER | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | NULL | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | NUMBER | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | STRING | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | TIME | `The default value to return if no value exists under the given key.` | false |
 | timeout | Timeout | INTEGER | `If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.` | true |
 
 #### Example JSON Structure
@@ -260,17 +258,17 @@ Name: getValue
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | `The identifier of a value to get, stored earlier in the selected scope.` | true |
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | `The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.` | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | null |
-| defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | DATE | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | DATE_TIME | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | INTEGER | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | NULL | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | NUMBER | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | STRING | `The default value to return if no value exists under the given key.` | null |
-| defaultValue | Default Value | TIME | `The default value to return if no value exists under the given key.` | null |
+| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | false |
+| defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | DATE | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | DATE_TIME | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | INTEGER | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | NULL | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | NUMBER | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | STRING | `The default value to return if no value exists under the given key.` | false |
+| defaultValue | Default Value | TIME | `The default value to return if no value exists under the given key.` | false |
 
 #### Example JSON Structure
 ```json
@@ -305,7 +303,7 @@ Name: setValue
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | `The identifier of a value. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.` | true |
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | `The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.` | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | null |
+| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | false |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | `The value to set under the specified key.` | true |
 | value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The value to set under the specified key.` | true |
 | value | Value | DATE | `The value to set under the specified key.` | true |
@@ -351,7 +349,7 @@ Name: setValueInList
 | key | Key | STRING | `The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.` | true |
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | `The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.` | true |
 | index | Index | INTEGER | `The index in a list to set a value under. The previous value will be overridden.` | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | null |
+| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `The value type.` | false |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | `The value to set under the specified list's key.` | true |
 | value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The value to set under the specified list's key.` | true |
 | value | Value | DATE | `The value to set under the specified list's key.` | true |

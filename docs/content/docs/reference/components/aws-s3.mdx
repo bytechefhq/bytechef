@@ -3,8 +3,6 @@ title: "AWS S3"
 description: "AWS S3 is a simple object storage service provided by Amazon Web Services."
 ---
 
-AWS S3 is a simple object storage service provided by Amazon Web Services.
-
 
 Categories: Developer Tools, File Storage
 
@@ -241,7 +239,7 @@ Name: putObject
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileEntry | File | FILE_ENTRY | `The object property which contains a reference to the file that needs to be written to AWS S3.` | true |
 | key | Key | STRING | `Key is most likely the name of the file.` | true |
-| acl | ACL | STRING <details> <summary> Options </summary> authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, private, public-read, public-read-write </details> | `The canned ACL to apply to the object.` | null |
+| acl | ACL | STRING <details> <summary> Options </summary> authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, private, public-read, public-read-write </details> | `The canned ACL to apply to the object.` | false |
 
 #### Example JSON Structure
 ```json
