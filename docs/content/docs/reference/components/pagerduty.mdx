@@ -1,0 +1,487 @@
+---
+title: "PagerDuty"
+description: "With PagerDuty, you can get real-time alerts, manage on-call schedules, and automate parts of your incident response process."
+---
+
+
+Categories: Project Management
+
+
+Type: pagerDuty/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| api_key | API Key | STRING | `Enter your API Key. Can be found in Integrations -> API Access Keys.` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Incident
+Name: createIncident
+
+`Create an incident synchronously without a corresponding event from a monitoring service.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| From | From | STRING | `The email address of a valid user associated with the account making the request.` | true |
+| title | Title | STRING | `A short description of the nature, symptoms, cause, or effect of the incident.` | true |
+| service | Service | STRING | `The incident will be created on this service.` | true |
+| priority | Priority | STRING | `Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use them.` | false |
+| urgency | Urgency | STRING <details> <summary> Options </summary> high, low </details> | `The urgency level of this incident.` | false |
+| details | Details | STRING | `Details about the incident.` | false |
+| assignments | Assignments | ARRAY <details> <summary> Items </summary> [STRING\($assignee)] </details> | `Assign the incident to these assignees.` | false |
+| incident_key | Incident Key | STRING | `A string which identifies the incident.` | false |
+| incident_type | Incident Type | STRING | `Incident type.` | false |
+| escalation_policy | Escalation Policy | STRING | `Delegate this incident to the specified escalation policy. Cannot be specified if an assignee is given.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Incident",
+  "name" : "createIncident",
+  "parameters" : {
+    "From" : "",
+    "title" : "",
+    "service" : "",
+    "priority" : "",
+    "urgency" : "",
+    "details" : "",
+    "assignments" : [ "" ],
+    "incident_key" : "",
+    "incident_type" : "",
+    "escalation_policy" : ""
+  },
+  "type" : "pagerDuty/v1/createIncident"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| incident | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(incident_number), STRING\(title), STRING\(description), STRING\(created_at), STRING\(updated_at), STRING\(status), STRING\(incident_key), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(service), [&#123;STRING\(at), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(assignee)&#125;]\(assignments), STRING\(assigned_via), STRING\(last_status_change_at), STRING\(resolved_at), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(first_trigger_log_entry), &#123;INTEGER\(all), INTEGER\(triggered), INTEGER\(resolved)&#125;\(alert_counts), BOOLEAN\(is_mergeable), &#123;STRING\(name)&#125;\(incident_type), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(escalation_policy), []\(teams), [&#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\($service)]\(impacted_services), []\(pending_actions), []\(acknowledgements), STRING\(basic_alert_grouping), STRING\(alert_grouping), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(last_status_changed_by), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url), STRING\(account_id), STRING\(color), STRING\(created_at), STRING\(description), STRING\(name), INTEGER\(order), INTEGER\(schema_version), STRING\(updated_at)&#125;\(priority), []\(incidents_responders), []\(responder_requests), []\(subscriber_requests), STRING\(urgency), STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "incident" : {
+    "incident_number" : 1,
+    "title" : "",
+    "description" : "",
+    "created_at" : "",
+    "updated_at" : "",
+    "status" : "",
+    "incident_key" : "",
+    "service" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "assignments" : [ {
+      "at" : "",
+      "assignee" : {
+        "id" : "",
+        "type" : "",
+        "summary" : "",
+        "self" : "",
+        "html_url" : ""
+      }
+    } ],
+    "assigned_via" : "",
+    "last_status_change_at" : "",
+    "resolved_at" : "",
+    "first_trigger_log_entry" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "alert_counts" : {
+      "all" : 1,
+      "triggered" : 1,
+      "resolved" : 1
+    },
+    "is_mergeable" : false,
+    "incident_type" : {
+      "name" : ""
+    },
+    "escalation_policy" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "teams" : [ ],
+    "impacted_services" : [ {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    } ],
+    "pending_actions" : [ ],
+    "acknowledgements" : [ ],
+    "basic_alert_grouping" : "",
+    "alert_grouping" : "",
+    "last_status_changed_by" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "priority" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : "",
+      "account_id" : "",
+      "color" : "",
+      "created_at" : "",
+      "description" : "",
+      "name" : "",
+      "order" : 1,
+      "schema_version" : 1,
+      "updated_at" : ""
+    },
+    "incidents_responders" : [ ],
+    "responder_requests" : [ ],
+    "subscriber_requests" : [ ],
+    "urgency" : "",
+    "id" : "",
+    "type" : "",
+    "summary" : "",
+    "self" : "",
+    "html_url" : ""
+  }
+}
+```
+
+
+### Create Incident Note
+Name: createIncidentNote
+
+`Create a new note for the specified incident.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| From | From | STRING | `The email address of a valid user associated with the account making the request.` | true |
+| incidentId | Incident ID | STRING | `ID of the incident to which the note will be added.` | true |
+| content | Content | STRING | `Content of the incident note.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Incident Note",
+  "name" : "createIncidentNote",
+  "parameters" : {
+    "From" : "",
+    "incidentId" : "",
+    "content" : ""
+  },
+  "type" : "pagerDuty/v1/createIncidentNote"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| note | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), &#123;STRING\(type), STRING\(id), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(user), &#123;STRING\(type), STRING\(id), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(channel), STRING\(content), STRING\(created_at)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "note" : {
+    "id" : "",
+    "user" : {
+      "type" : "",
+      "id" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "channel" : {
+      "type" : "",
+      "id" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "content" : "",
+    "created_at" : ""
+  }
+}
+```
+
+
+### Update Incident
+Name: updateIncident
+
+`Update selected incident.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| From | From | STRING | `The email address of a valid user associated with the account making the request.` | true |
+| incidentId | Incident ID | STRING | `ID of the incident to which the note will be added.` | true |
+| incident_type | Incident Type | STRING | `Incident type.` | true |
+| status | Status | STRING <details> <summary> Options </summary> resolved, acknowledged </details> | `The new status of the incident.` | false |
+| assignments | Assignments | ARRAY <details> <summary> Items </summary> [STRING\($assignee)] </details> | `Assign the incident to these assignees.` | false |
+| resolution | Resolution | STRING | `The resolution for this incident.` | false |
+| title | Title | STRING | `A short description of the nature, symptoms, cause, or effect of the incident.` | false |
+| priority | Priority | STRING | `Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use them.` | false |
+| urgency | Urgency | STRING <details> <summary> Options </summary> high, low </details> | `The urgency level of this incident.` | false |
+| escalation_policy | Escalation Policy | STRING | `Delegate this incident to the specified escalation policy. Cannot be specified if an assignee is given.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Incident",
+  "name" : "updateIncident",
+  "parameters" : {
+    "From" : "",
+    "incidentId" : "",
+    "incident_type" : "",
+    "status" : "",
+    "assignments" : [ "" ],
+    "resolution" : "",
+    "title" : "",
+    "priority" : "",
+    "urgency" : "",
+    "escalation_policy" : ""
+  },
+  "type" : "pagerDuty/v1/updateIncident"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| incident | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(incident_number), STRING\(title), STRING\(description), STRING\(created_at), STRING\(updated_at), STRING\(status), STRING\(incident_key), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(service), [&#123;STRING\(at), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(assignee)&#125;]\(assignments), STRING\(assigned_via), STRING\(last_status_change_at), STRING\(resolved_at), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(first_trigger_log_entry), &#123;INTEGER\(all), INTEGER\(triggered), INTEGER\(resolved)&#125;\(alert_counts), BOOLEAN\(is_mergeable), &#123;STRING\(name)&#125;\(incident_type), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(escalation_policy), []\(teams), [&#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\($service)]\(impacted_services), []\(pending_actions), []\(acknowledgements), STRING\(basic_alert_grouping), STRING\(alert_grouping), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(last_status_changed_by), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url), STRING\(account_id), STRING\(color), STRING\(created_at), STRING\(description), STRING\(name), INTEGER\(order), INTEGER\(schema_version), STRING\(updated_at)&#125;\(priority), []\(incidents_responders), []\(responder_requests), []\(subscriber_requests), STRING\(urgency), STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "incident" : {
+    "incident_number" : 1,
+    "title" : "",
+    "description" : "",
+    "created_at" : "",
+    "updated_at" : "",
+    "status" : "",
+    "incident_key" : "",
+    "service" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "assignments" : [ {
+      "at" : "",
+      "assignee" : {
+        "id" : "",
+        "type" : "",
+        "summary" : "",
+        "self" : "",
+        "html_url" : ""
+      }
+    } ],
+    "assigned_via" : "",
+    "last_status_change_at" : "",
+    "resolved_at" : "",
+    "first_trigger_log_entry" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "alert_counts" : {
+      "all" : 1,
+      "triggered" : 1,
+      "resolved" : 1
+    },
+    "is_mergeable" : false,
+    "incident_type" : {
+      "name" : ""
+    },
+    "escalation_policy" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "teams" : [ ],
+    "impacted_services" : [ {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    } ],
+    "pending_actions" : [ ],
+    "acknowledgements" : [ ],
+    "basic_alert_grouping" : "",
+    "alert_grouping" : "",
+    "last_status_changed_by" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : ""
+    },
+    "priority" : {
+      "id" : "",
+      "type" : "",
+      "summary" : "",
+      "self" : "",
+      "html_url" : "",
+      "account_id" : "",
+      "color" : "",
+      "created_at" : "",
+      "description" : "",
+      "name" : "",
+      "order" : 1,
+      "schema_version" : 1,
+      "updated_at" : ""
+    },
+    "incidents_responders" : [ ],
+    "responder_requests" : [ ],
+    "subscriber_requests" : [ ],
+    "urgency" : "",
+    "id" : "",
+    "type" : "",
+    "summary" : "",
+    "self" : "",
+    "html_url" : ""
+  }
+}
+```
+
+
+
+
+## Triggers
+
+
+### New or Updated Incident Trigger
+Name: newOrUpdatedIncident
+
+`Triggers incident is created or updated.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| service | Service | STRING | `The service that will be watched for the trigger event.` | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the incident that triggered the trigger. |
+| event_type | STRING | Type of the event that triggered the trigger. |
+| resource_type | STRING | Type of the resource that triggered the trigger. |
+| occurred_at | STRING | When did the event occurred. |
+| agent | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(id), STRING\(summary), STRING\(self), STRING\(html_url)&#125; </details> | Agent that triggered the event. |
+| client | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Client on which event occurred. |
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(type), STRING\(self), STRING\(html_url), STRING\(number), STRING\(status), STRING\(incident_key), STRING\(created_at), STRING\(title), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(service), [&#123;STRING\(at), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(assignee)&#125;]\(assignees), &#123;STRING\(id), STRING\(type), STRING\(summary), STRING\(self), STRING\(html_url)&#125;\(escalation_policy), []\(teams), STRING\(priority), STRING\(urgency), STRING\(conference_bridge), STRING\(resolve_reason), &#123;STRING\(name)&#125;\(incident_type)&#125; </details> | Data of the object that triggered the trigger. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New or Updated Incident Trigger",
+  "name" : "newOrUpdatedIncident",
+  "parameters" : {
+    "service" : ""
+  },
+  "type" : "pagerDuty/v1/newOrUpdatedIncident"
+}
+```
+
+
+<hr />
+
+<hr />
+
+# Additional instructions
+<hr />
+
