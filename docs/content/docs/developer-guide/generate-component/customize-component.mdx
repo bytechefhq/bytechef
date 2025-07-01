@@ -58,7 +58,7 @@ For implementation details, refer to examples from existing components such as [
     - Add `x-dynamic-properties: true` to the parameter in your OpenAPI schema to mark it as dynamic.
     - If the dynamic property depends on another parameter, include` x-dynamic-properties-dependency` with the relevant parameter name.
 2. Regenerate the Component:
-    - Run the following command to regenerate the component with updated dynamic options:
+    - Run the following command to regenerate the component with updated dynamic properties:
       ```bash
       ./bytechef.sh component init --open-api-path ../../server/libs/modules/components/newcomponent/openapi.yaml --output-path ../../server/libs/modules/components --name newcomponent
       ```
@@ -67,3 +67,13 @@ For implementation details, refer to examples from existing components such as [
 5. Override the necessary method in the `NewComponentUtils` class to load the correct properties based on your specific needs.
 
 For implementation details, refer to examples from existing components such as [`Airtable`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/airtable).
+
+### AI Agent Tool
+
+1. Define the AI Agent Tool in OpenAPI Schema:
+    - Add `x-ai-agent-tool: true` to the individual endpoint in your OpenAPI schema to indicate that it is an AI Agent Tool.
+2. Regenerate the Component:
+    - Run the following command to regenerate the component:
+    ```bash
+   ./bytechef.sh component init --open-api-path ../../server/libs/modules/components/newcomponent/openapi.yaml --output-path ../../server/libs/modules/components --name newcomponent
+    ``
