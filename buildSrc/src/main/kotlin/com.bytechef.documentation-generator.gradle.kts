@@ -124,7 +124,8 @@ open class FindJsonFilesTask : DefaultTask() {
         }
 
         private fun formatFull(name: String?, label: String?, typeDetails: String, description: String?): String {
-            return "| $name | $label | $typeDetails | `$description` | $required |"
+           val required2 =  if (required == null) "false" else required.toString()
+            return "| $name | $label | $typeDetails | `$description` | $required2 |"
         }
 
         fun toJsonKeyValuePair(name: String?, type: String?, properties: Array<Properties>?, items: Array<Properties>?): String {
@@ -621,8 +622,6 @@ ${actions?.joinToString("\n")}
 title: "$title"
 description: "$description"
 ---
-
-$description
 
 ${getCategoriesString()}
 
