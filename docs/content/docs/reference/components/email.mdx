@@ -3,8 +3,6 @@ title: "Email"
 description: "The Email connector sends emails using an SMTP email server."
 ---
 
-The Email connector sends emails using an SMTP email server.
-
 
 Categories: Communication, Helpers
 
@@ -52,12 +50,12 @@ Name: send
 | port | Port | INTEGER | `Defines the port to connect to the email server.` | true |
 | from | From Email | STRING | `From who to send the email.` | true |
 | to | To Email | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Who to send the email to.` | true |
-| cc | CC Email | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Who to CC on the email.` | null |
-| bcc | BCC Email | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Who to BCC on the email.` | null |
-| replyTo | Reply To | ARRAY <details> <summary> Items </summary> [STRING] </details> | `When someone replies to this email, where should it go to?` | null |
+| cc | CC Email | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Who to CC on the email.` | false |
+| bcc | BCC Email | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Who to BCC on the email.` | false |
+| replyTo | Reply To | ARRAY <details> <summary> Items </summary> [STRING] </details> | `When someone replies to this email, where should it go to?` | false |
 | subject | Subject | STRING | `Your email subject.` | true |
-| content | Content | STRING | `Your email content. Will be sent as a HTML email.` | null |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | null |
+| content | Content | STRING | `Your email content. Will be sent as a HTML email.` | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | false |
 
 #### Example JSON Structure
 ```json

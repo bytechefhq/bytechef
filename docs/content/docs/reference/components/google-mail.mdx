@@ -3,8 +3,6 @@ title: "Gmail"
 description: "Gmail is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps."
 ---
 
-Gmail is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps.
-
 
 Categories: Communication
 
@@ -258,7 +256,7 @@ Name: replyToEmail
 | bcc | Bcc | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Bcc recipients email addresses.` | false |
 | cc | Cc | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Cc recipients email addresses.` | false |
 | body | Body | STRING | `Body text of the email` | true |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | null |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | false |
 
 #### Example JSON Structure
 ```json
@@ -393,7 +391,7 @@ Name: sendEmail
 | cc | Cc | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Cc recipients email addresses.` | false |
 | replyTo | Reply To | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Reply-to email addresses.` | false |
 | body | Body | STRING | `Body text of the email` | true |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | null |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | false |
 
 #### Example JSON Structure
 ```json

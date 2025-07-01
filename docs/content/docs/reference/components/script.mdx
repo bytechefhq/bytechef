@@ -3,8 +3,6 @@ title: "Script"
 description: "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages."
 ---
 
-Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.
-
 
 Categories: Helpers, Developer Tools
 
@@ -28,7 +26,7 @@ Name: javascript
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Initialize parameter values used in the custom code.` | null |
+| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Initialize parameter values used in the custom code.` | false |
 | script | JavaScript Code | STRING | `Add your JavaScript custom logic here.` | true |
 
 #### Example JSON Structure
@@ -60,7 +58,7 @@ Name: python
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Initialize parameter values used in the custom code.` | null |
+| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Initialize parameter values used in the custom code.` | false |
 | script | Python Code | STRING | `Add your Python custom logic here.` | true |
 
 #### Example JSON Structure
@@ -92,7 +90,7 @@ Name: ruby
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Initialize parameter values used in the custom code.` | null |
+| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Initialize parameter values used in the custom code.` | false |
 | script | Ruby Code | STRING | `Add your Ruby custom logic here.` | true |
 
 #### Example JSON Structure

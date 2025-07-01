@@ -3,8 +3,6 @@ title: "CSV File"
 description: "Reads and writes data from a csv file."
 ---
 
-Reads and writes data from a csv file.
-
 
 Categories: Helpers
 
@@ -29,13 +27,13 @@ Name: read
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileEntry | File | FILE_ENTRY | `The object property which contains a reference to the csv file to read from.` | true |
-| delimiter | Delimiter | STRING | `Character used to separate values within the line red from the CSV file.` | null |
-| enclosingCharacter | Enclosing Character | STRING | `Character used to wrap/enclose values. It is usually applied to complex CSV files where values may include delimiter characters.` | null |
-| headerRow | Header Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The first row of the file contains the header names.` | null |
-| includeEmptyCells | Include Empty Cells | BOOLEAN <details> <summary> Options </summary> true, false </details> | `When reading from file the empty cells will be filled with an empty string.` | null |
-| pageSize | Page Size | INTEGER | `The amount of child elements to return in a page.` | null |
-| pageNumber | Page Number | INTEGER | `The page number to get.` | null |
-| readAsString | Read as String | BOOLEAN <details> <summary> Options </summary> true, false </details> | `In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.` | null |
+| delimiter | Delimiter | STRING | `Character used to separate values within the line red from the CSV file.` | false |
+| enclosingCharacter | Enclosing Character | STRING | `Character used to wrap/enclose values. It is usually applied to complex CSV files where values may include delimiter characters.` | false |
+| headerRow | Header Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The first row of the file contains the header names.` | false |
+| includeEmptyCells | Include Empty Cells | BOOLEAN <details> <summary> Options </summary> true, false </details> | `When reading from file the empty cells will be filled with an empty string.` | false |
+| pageSize | Page Size | INTEGER | `The amount of child elements to return in a page.` | false |
+| pageNumber | Page Number | INTEGER | `The page number to get.` | false |
+| readAsString | Read as String | BOOLEAN <details> <summary> Options </summary> true, false </details> | `In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.` | false |
 
 #### Example JSON Structure
 ```json
@@ -78,7 +76,7 @@ Name: write
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | rows | Rows | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | `The array of rows to write to the file.` | true |
-| filename | Filename | STRING | `Filename to set for binary data. By default, "file.csv" will be used.` | null |
+| filename | Filename | STRING | `Filename to set for binary data. By default, "file.csv" will be used.` | false |
 
 #### Example JSON Structure
 ```json

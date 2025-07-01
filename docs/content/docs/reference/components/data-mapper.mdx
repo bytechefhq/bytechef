@@ -3,8 +3,6 @@ title: "Data Mapper"
 description: "The Data Mapper enables you to configure data mappings."
 ---
 
-The Data Mapper enables you to configure data mappings.
-
 
 Categories: Helpers
 
@@ -69,9 +67,9 @@ Name: mapObjectsToObject
 | input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `An object containing one or more properties.` | true |
 | input | Input | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | `An array containing one or more objects.` | true |
 | mappings | Mapping | ARRAY <details> <summary> Items </summary> [&#123;STRING\(from), STRING\(to), BOOLEAN\(requiredField)&#125;] </details> | `An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.` | true |
-| includeUnmapped | Include Unmapped | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Should fields from the original object that do not have mappings be included in the new object?` | null |
-| includeNulls | Include Nulls | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Should fields that have null values be included in the new object?` | null |
-| includeEmptyStrings | Include Empty strings | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Should fields with empty string values be included in the new object?` | null |
+| includeUnmapped | Include Unmapped | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Should fields from the original object that do not have mappings be included in the new object?` | false |
+| includeNulls | Include Nulls | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Should fields that have null values be included in the new object?` | false |
+| includeEmptyStrings | Include Empty strings | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Should fields with empty string values be included in the new object?` | false |
 
 #### Example JSON Structure
 ```json
@@ -183,15 +181,15 @@ Name: replaceAllSpecifiedValues
 | input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `An object containing one or more properties.` | true |
 | input | Input | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | `An array containing one or more objects.` | true |
 | type | Value Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NUMBER, OBJECT, STRING, TIME </details> | `The value type of 'from' and 'to' property values.` | true |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;[]\(from), []\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;BOOLEAN\(from), BOOLEAN\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;DATE\(from), DATE\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;DATE_TIME\(from), DATE_TIME\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(from), INTEGER\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(from), NUMBER\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;&#123;&#125;\(from), &#123;&#125;\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;STRING\(from), STRING\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;TIME\(from), TIME\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;[]\(from), []\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;BOOLEAN\(from), BOOLEAN\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;DATE\(from), DATE\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;DATE_TIME\(from), DATE_TIME\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(from), INTEGER\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(from), NUMBER\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;&#123;&#125;\(from), &#123;&#125;\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;STRING\(from), STRING\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;TIME\(from), TIME\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
 
 #### Example JSON Structure
 ```json
@@ -284,15 +282,15 @@ Name: replaceValue
 | defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `If there is no existing mapping, assign this value as default.` | true |
 | defaultValue | Default Value | STRING | `If there is no existing mapping, assign this value as default.` | true |
 | defaultValue | Default Value | TIME | `If there is no existing mapping, assign this value as default.` | true |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;[]\(from), []\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;BOOLEAN\(from), BOOLEAN\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;DATE\(from), DATE\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;DATE_TIME\(from), DATE_TIME\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(from), INTEGER\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(from), NUMBER\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;&#123;&#125;\(from), &#123;&#125;\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;STRING\(from), STRING\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
-| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;TIME\(from), TIME\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;[]\(from), []\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;BOOLEAN\(from), BOOLEAN\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;DATE\(from), DATE\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;DATE_TIME\(from), DATE_TIME\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(from), INTEGER\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(from), NUMBER\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;&#123;&#125;\(from), &#123;&#125;\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;STRING\(from), STRING\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;TIME\(from), TIME\(to)&#125;] </details> | `An array of objects that contains properties 'from' and 'to'.` | false |
 
 #### Example JSON Structure
 ```json

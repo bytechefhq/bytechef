@@ -3,8 +3,6 @@ title: "File Storage"
 description: "Reads and writes data from a file stored inside the file storage."
 ---
 
-Reads and writes data from a file stored inside the file storage.
-
 
 Categories: File Storage, Helpers
 
@@ -75,7 +73,7 @@ Name: write
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | content | Content | STRING | `String to write to the file.` | true |
-| filename | Filename | STRING | `Filename to set for data. By default, "file.txt" will be used.` | null |
+| filename | Filename | STRING | `Filename to set for data. By default, "file.txt" will be used.` | false |
 
 #### Example JSON Structure
 ```json
@@ -130,7 +128,7 @@ Name: download
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | url | URL | STRING | `The URL to download a file from.` | true |
-| filename | Filename | STRING | `Filename to set for data. By default, "file.txt" will be used.` | null |
+| filename | Filename | STRING | `Filename to set for data. By default, "file.txt" will be used.` | false |
 
 #### Example JSON Structure
 ```json

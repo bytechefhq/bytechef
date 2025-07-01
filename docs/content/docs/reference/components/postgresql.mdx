@@ -3,8 +3,6 @@ title: "PostgreSQL"
 description: "Query, insert and update data from PostgreSQL."
 ---
 
-Query, insert and update data from PostgreSQL.
-
 
 
 Type: postgresql/v1
@@ -48,7 +46,7 @@ Name: query
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | query | Query | STRING | `The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.` | true |
-| parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The list of properties which should be used as query parameters.` | null |
+| parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The list of properties which should be used as query parameters.` | false |
 
 #### Example JSON Structure
 ```json
@@ -81,7 +79,7 @@ Name: insert
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | schema | Schema | STRING | `Name of the schema the table belongs to.` | true |
 | table | Table | STRING | `Name of the table in which to insert data to.` | true |
-| columns | Fields | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | `The list of the table field names where corresponding values would be inserted.` | null |
+| columns | Fields | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | `The list of the table field names where corresponding values would be inserted.` | false |
 | values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
 
 #### Example JSON Structure
@@ -121,7 +119,7 @@ Name: update
 | schema | Schema | STRING | `Name of the schema the table belongs to.` | true |
 | table | Table | STRING | `Name of the table in which to update data in.` | true |
 | condition | Condition | STRING | `Condition that will be checked in the column. Example: column1=5` | true |
-| columns | Fields | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | `The list of the table field names where corresponding values would be updated.` | null |
+| columns | Fields | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | `The list of the table field names where corresponding values would be updated.` | false |
 | values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
 
 #### Example JSON Structure
@@ -194,8 +192,8 @@ Name: execute
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | execute | Execute | STRING | `The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.` | true |
-| columns | Fields to select | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | `List of fields to select from.` | null |
-| parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The list of values which should be used to replace corresponding criteria parameters.` | null |
+| columns | Fields to select | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | `List of fields to select from.` | false |
+| parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The list of values which should be used to replace corresponding criteria parameters.` | false |
 
 #### Example JSON Structure
 ```json
