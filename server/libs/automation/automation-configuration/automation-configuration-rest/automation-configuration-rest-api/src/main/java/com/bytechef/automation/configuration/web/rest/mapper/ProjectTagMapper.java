@@ -25,7 +25,9 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = AutomationConfigurationMapperSpringConfig.class)
+@Mapper(
+    config = AutomationConfigurationMapperSpringConfig.class,
+    implementationName = "AutomationConfigurationProjectTagMapper")
 public interface ProjectTagMapper extends Converter<Tag, TagModel> {
 
     @Override
