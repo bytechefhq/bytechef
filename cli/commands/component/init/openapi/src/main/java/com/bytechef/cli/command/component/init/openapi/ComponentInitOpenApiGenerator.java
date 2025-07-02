@@ -907,6 +907,14 @@ public class ComponentInitOpenApiGenerator {
                 true);
         }
 
+        Map<String, Object> extensions = securityScheme.getExtensions();
+
+        String label = "Value";
+
+        if (extensions != null && extensions.get("x-title") != null) {
+            label = (String) extensions.get("x-title");
+        }
+
         builder.add(
             """
                 authorization(AuthorizationType.API_KEY)
@@ -921,7 +929,7 @@ public class ComponentInitOpenApiGenerator {
                 """,
             "API Key",
             apiKeyCodeBlock,
-            "Value",
+            label,
             true,
             addToCodeBlock);
 
