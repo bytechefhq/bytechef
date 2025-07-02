@@ -279,11 +279,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         if (outputResponse != null && !triggerDefinition.isBatch() &&
             outputResponse.outputSchema() instanceof ArrayProperty arrayProperty) {
 
-            List<?> list = arrayProperty.getItems();
+            List<?> items = arrayProperty.getItems();
 
-            if (!list.isEmpty()) {
+            if (!items.isEmpty()) {
+                List<?> sampleOutput = (List<?>) outputResponse.sampleOutput();
+
                 outputResponse = new OutputResponse(
-                    (BaseProperty) list.getFirst(), outputResponse.sampleOutput(), outputResponse.placeholder());
+                    (BaseProperty) items.getFirst(), sampleOutput.getFirst(), outputResponse.placeholder());
             }
         }
 
