@@ -97,7 +97,6 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
         McpProjectWorkflow existingMcpProjectWorkflow = fetchMcpProjectWorkflow(id)
             .orElseThrow(() -> new IllegalArgumentException("McpProjectWorkflow not found with id: " + id));
 
-        // Only update the non-auditing fields
         if (mcpProjectId != null) {
             existingMcpProjectWorkflow.setMcpProjectId(mcpProjectId);
         }

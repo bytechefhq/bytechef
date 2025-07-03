@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.repository;
-
-import com.bytechef.platform.configuration.domain.McpServer;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.stereotype.Repository;
+package com.bytechef.platform.configuration.domain;
 
 /**
- * Repository for managing {@link McpServer} entities.
+ * Enum for ordering MCP servers.
  *
  * @author Ivica Cardic
  */
-@Repository
-public interface McpServerRepository extends ListCrudRepository<McpServer, Long> {
+public enum McpServerOrderBy {
+    NAME_ASC,
+    NAME_DESC,
+    CREATED_DATE_ASC,
+    CREATED_DATE_DESC,
+    LAST_MODIFIED_DATE_ASC,
+    LAST_MODIFIED_DATE_DESC
 }

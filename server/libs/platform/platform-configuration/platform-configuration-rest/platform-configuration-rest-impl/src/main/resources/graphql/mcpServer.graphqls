@@ -1,24 +1,13 @@
 extend type Query {
     mcpServer(id: ID): McpServer
-    mcpServers(type: ModeType!): [McpServer]
+    mcpServers(type: ModeType!, orderBy: McpServerOrderBy): [McpServer]
 }
 
 extend type Mutation {
-    createMcpServer(name: String!, type: ModeType!, environment: Environment!, enabled: Boolean): McpServer
-    updateMcpServer(id: ID!, name: String, type: ModeType, environment: Environment, enabled: Boolean): McpServer
-}
-
-scalar Long
-
-enum Environment {
-    DEVELOPMENT
-    STAGING
-    PRODUCTION
-}
-
-enum ModeType {
-    AUTOMATION
-    EMBEDDED
+    createMcpServer(input: McpServerInput!): McpServer
+    updateMcpServer(id: ID!, input: McpServerUpdateInput!): McpServer
+    updateMcpServerTags(id: ID!, tags: [TagInput!]!): [Tag]
+    deleteMcpServer(id: ID!): Boolean
 }
 
 type McpServer {
@@ -28,7 +17,7 @@ type McpServer {
     environment: Environment!
     enabled: Boolean!
     mcpComponents: [McpComponent]
-    mcpProjects: [McpProject]
+    tags: [Tag]
     createdBy: String
     createdDate: Long
     lastModifiedBy: String
@@ -45,7 +34,10 @@ input McpServerInput {
 
 input McpServerUpdateInput {
     name: String
-    type: ModeType
-    environment: Environment
     enabled: Boolean
+}
+
+input TagInput {
+    id: ID
+    name: String!
 }

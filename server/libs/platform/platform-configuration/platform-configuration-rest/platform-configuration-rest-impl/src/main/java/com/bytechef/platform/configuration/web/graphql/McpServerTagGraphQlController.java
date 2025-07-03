@@ -42,13 +42,13 @@ public class McpServerTagGraphQlController {
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
-    McpServerTagGraphQlController(McpServerService mcpServerService, TagService tagService) {
+    public McpServerTagGraphQlController(McpServerService mcpServerService, TagService tagService) {
         this.tagService = tagService;
         this.mcpServerService = mcpServerService;
     }
 
     @QueryMapping
-    List<Tag> mcpServerTags(@Argument(name = "type") ModeType type) {
+    public List<Tag> mcpServerTags(@Argument(name = "type") ModeType type) {
         if (type == null) {
             return List.of();
         }

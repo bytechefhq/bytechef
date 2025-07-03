@@ -74,7 +74,8 @@ public class ProjectIntTestConfiguration {
     @EnableJdbcRepositories(
         basePackages = {
             "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.platform.category.repository",
-            "com.bytechef.automation.configuration.repository", "com.bytechef.platform.tag.repository"
+            "com.bytechef.automation.configuration.repository", "com.bytechef.platform.tag.repository",
+            "com.bytechef.platform.configuration.repository"
         })
     public static class ProjectIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 

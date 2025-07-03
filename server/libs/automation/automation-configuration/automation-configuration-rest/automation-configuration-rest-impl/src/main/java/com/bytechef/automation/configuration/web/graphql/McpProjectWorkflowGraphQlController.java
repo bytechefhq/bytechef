@@ -16,8 +16,12 @@
 
 package com.bytechef.automation.configuration.web.graphql;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.McpProjectWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.platform.configuration.domain.McpProjectWorkflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -25,6 +29,7 @@ import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -37,10 +42,18 @@ import org.springframework.stereotype.Controller;
 public class McpProjectWorkflowGraphQlController {
 
     private final McpProjectWorkflowService mcpProjectWorkflowService;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    McpProjectWorkflowGraphQlController(McpProjectWorkflowService mcpProjectWorkflowService) {
+    McpProjectWorkflowGraphQlController(
+        McpProjectWorkflowService mcpProjectWorkflowService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        WorkflowService workflowService) {
+
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.workflowService = workflowService;
     }
 
     @QueryMapping
@@ -95,5 +108,20 @@ public class McpProjectWorkflowGraphQlController {
         mcpProjectWorkflowService.delete(id);
 
         return true;
+    }
+
+    @SchemaMapping
+    ProjectDeploymentWorkflow projectDeploymentWorkflow(McpProjectWorkflow mcpProjectWorkflow) {
+        return projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+            mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+    }
+
+    @SchemaMapping
+    Workflow workflow(McpProjectWorkflow mcpProjectWorkflow) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+                mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+
+        return workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
     }
 }

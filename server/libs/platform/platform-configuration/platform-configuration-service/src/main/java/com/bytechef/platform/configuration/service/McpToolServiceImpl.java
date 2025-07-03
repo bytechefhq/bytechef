@@ -49,7 +49,6 @@ public class McpToolServiceImpl implements McpToolService {
         McpTool currentMcpTool = OptionalUtils.get(mcpToolRepository.findById(mcpTool.getId()));
 
         currentMcpTool.setName(mcpTool.getName());
-        // Skip updating parameters for now to avoid type casting issues
         currentMcpTool.setMcpComponentId(mcpTool.getMcpComponentId());
         currentMcpTool.setVersion(mcpTool.getVersion());
 
@@ -72,7 +71,7 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
-    public List<McpTool> getMcpToolsByComponentId(long mcpComponentId) {
+    public List<McpTool> getMcpComponentMcpTools(long mcpComponentId) {
         return mcpToolRepository.findAllByMcpComponentId(mcpComponentId);
     }
 }

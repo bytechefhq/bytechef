@@ -20,7 +20,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.McpComponent;
 import com.bytechef.platform.configuration.repository.McpComponentRepository;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,9 +47,6 @@ public class McpComponentServiceImpl implements McpComponentService {
     public McpComponent update(McpComponent mcpComponent) {
         McpComponent currentMcpComponent = OptionalUtils.get(mcpComponentRepository.findById(mcpComponent.getId()));
 
-        currentMcpComponent.setComponentName(mcpComponent.getComponentName());
-        currentMcpComponent.setComponentVersion(mcpComponent.getComponentVersion());
-        currentMcpComponent.setMcpServerId(mcpComponent.getMcpServerId());
         currentMcpComponent.setConnectionId(mcpComponent.getConnectionId());
         currentMcpComponent.setVersion(mcpComponent.getVersion());
 
@@ -63,8 +59,8 @@ public class McpComponentServiceImpl implements McpComponentService {
     }
 
     @Override
-    public Optional<McpComponent> fetchMcpComponent(long mcpComponentId) {
-        return mcpComponentRepository.findById(mcpComponentId);
+    public McpComponent getMcpComponent(long mcpComponentId) {
+        return OptionalUtils.get(mcpComponentRepository.findById(mcpComponentId));
     }
 
     @Override
@@ -73,7 +69,7 @@ public class McpComponentServiceImpl implements McpComponentService {
     }
 
     @Override
-    public List<McpComponent> getMcpComponentsByServerId(long mcpServerId) {
+    public List<McpComponent> getMcpServerMcpComponents(long mcpServerId) {
         return mcpComponentRepository.findAllByMcpServerId(mcpServerId);
     }
 }

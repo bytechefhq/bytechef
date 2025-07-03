@@ -18,12 +18,19 @@ package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.domain.McpComponent;
+import com.bytechef.platform.configuration.domain.McpTool;
+import com.bytechef.platform.configuration.facade.McpServerFacade;
 import com.bytechef.platform.configuration.service.McpComponentService;
+import com.bytechef.platform.configuration.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -36,16 +43,20 @@ import org.springframework.stereotype.Controller;
 public class McpComponentGraphQlController {
 
     private final McpComponentService mcpComponentService;
+    private final McpServerFacade mcpServerFacade;
+    private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
-    public McpComponentGraphQlController(McpComponentService mcpComponentService) {
+    public McpComponentGraphQlController(McpComponentService mcpComponentService, McpServerFacade mcpServerFacade,
+        McpToolService mcpToolService) {
         this.mcpComponentService = mcpComponentService;
+        this.mcpServerFacade = mcpServerFacade;
+        this.mcpToolService = mcpToolService;
     }
 
     @QueryMapping
     public McpComponent mcpComponent(@Argument long id) {
-        return mcpComponentService.fetchMcpComponent(id)
-            .orElse(null);
+        return mcpComponentService.getMcpComponent(id);
     }
 
     @QueryMapping
@@ -55,13 +66,75 @@ public class McpComponentGraphQlController {
 
     @QueryMapping
     public List<McpComponent> mcpComponentsByServerId(@Argument long mcpServerId) {
-        return mcpComponentService.getMcpComponentsByServerId(mcpServerId);
+        return mcpComponentService.getMcpServerMcpComponents(mcpServerId);
+    }
+
+    @MutationMapping
+    public McpComponent createMcpComponent(@Argument McpComponentInput input) {
+        return mcpComponentService.create(
+            new McpComponent(
+                input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId()));
+    }
+
+    @MutationMapping
+    public McpComponent createMcpComponentWithTools(@Argument McpComponentWithToolsInput input) {
+        McpComponent mcpComponent = new McpComponent(
+            input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId());
+
+        List<McpTool> mcpTools = input.tools()
+            .stream()
+            .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters(), null))
+            .toList();
+
+        return mcpServerFacade.create(mcpComponent, mcpTools);
+    }
+
+    @MutationMapping
+    public McpComponent updateMcpComponentWithTools(@Argument long id, @Argument McpComponentWithToolsInput input) {
+        McpComponent mcpComponent = new McpComponent(
+            input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId(),
+            input.version());
+        mcpComponent.setId(id);
+
+        List<McpTool> mcpTools = input.tools()
+            .stream()
+            .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters(), null))
+            .toList();
+
+        return mcpServerFacade.update(mcpComponent, mcpTools);
     }
 
     @MutationMapping
     public boolean deleteMcpComponent(@Argument long id) {
-        mcpComponentService.delete(id);
+        mcpServerFacade.deleteMcpComponent(id);
 
         return true;
+    }
+
+    @SchemaMapping
+    public Long connectionId(McpComponent mcpComponent) {
+        return mcpComponent.getConnectionId();
+    }
+
+    @BatchMapping
+    public Map<McpComponent, List<McpTool>> mcpTools(List<McpComponent> mcpComponents) {
+        return mcpComponents.stream()
+            .collect(Collectors.toMap(
+                mcpComponent -> mcpComponent,
+                mcpComponent -> mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())));
+    }
+
+    @SuppressFBWarnings("EI")
+    public record McpComponentInput(String componentName, int componentVersion, Long mcpServerId, Long connectionId) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record McpComponentWithToolsInput(
+        String componentName, int componentVersion, Long mcpServerId, Long connectionId,
+        List<McpToolInputForComponent> tools, int version) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record McpToolInputForComponent(String name, Map<String, String> parameters) {
     }
 }

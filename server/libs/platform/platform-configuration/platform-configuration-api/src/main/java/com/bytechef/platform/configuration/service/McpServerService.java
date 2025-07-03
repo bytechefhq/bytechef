@@ -17,15 +17,14 @@
 package com.bytechef.platform.configuration.service;
 
 import com.bytechef.platform.configuration.domain.McpServer;
+import com.bytechef.platform.configuration.domain.McpServerOrderBy;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Service interface for managing {@link McpServer} entities.
- *
- * @author Ivica Cardic
+ * Service interface for managing MCP servers within the system. Provides methods to create, update, delete, and query
+ * MCP servers.
  */
 public interface McpServerService {
 
@@ -36,16 +35,6 @@ public interface McpServerService {
      * @return the created MCP server
      */
     McpServer create(McpServer mcpServer);
-
-    /**
-     * Creates a new MCP server from the provided input parameters.
-     *
-     * @param name        the name of the server
-     * @param environment the environment of the server
-     * @param enabled     whether the server is enabled (can be null for default value)
-     * @return the created MCP server
-     */
-    McpServer create(String name, Environment environment, Boolean enabled);
 
     /**
      * Creates a new MCP server from the provided input parameters.
@@ -66,20 +55,12 @@ public interface McpServerService {
     void delete(long mcpServerId);
 
     /**
-     * Fetches an MCP server by ID.
+     * Retrieves an MCP server by its unique identifier.
      *
-     * @param mcpServerId the ID of the MCP server to fetch
-     * @return the MCP server, or empty if not found
+     * @param mcpServerId the unique identifier of the MCP server to retrieve
+     * @return the MCP server with the specified ID
      */
-    Optional<McpServer> fetchMcpServer(long mcpServerId);
-
-    /**
-     * Gets MCP servers filtered by tag ID.
-     *
-     * @param tagId the tag ID to filter by
-     * @return a list of MCP servers with the given tag
-     */
-    List<McpServer> getMcpServers(Long tagId);
+    McpServer getMcpServer(long mcpServerId);
 
     /**
      * Gets MCP servers filtered by type.
@@ -88,6 +69,15 @@ public interface McpServerService {
      * @return a list of MCP servers with the given type
      */
     List<McpServer> getMcpServers(ModeType type);
+
+    /**
+     * Gets MCP servers filtered by type with ordering.
+     *
+     * @param type    the type to filter by
+     * @param orderBy the ordering criteria (can be null for default ordering)
+     * @return a list of MCP servers with the given type, ordered as specified
+     */
+    List<McpServer> getMcpServers(ModeType type, McpServerOrderBy orderBy);
 
     /**
      * Updates an existing MCP server.
@@ -100,27 +90,13 @@ public interface McpServerService {
     /**
      * Updates an existing MCP server with the provided input parameters.
      *
-     * @param id          the ID of the MCP server to update
-     * @param name        the name of the server (can be null if not updating)
-     * @param environment the environment of the server (can be null if not updating)
-     * @param enabled     whether the server is enabled (can be null if not updating)
+     * @param id      the ID of the MCP server to update
+     * @param name    the name of the server (can be null if not updating)
+     * @param enabled whether the server is enabled (can be null if not updating)
      * @return the updated MCP server
      * @throws IllegalArgumentException if the MCP server with the given ID is not found
      */
-    McpServer update(long id, String name, Environment environment, Boolean enabled);
-
-    /**
-     * Updates an existing MCP server with the provided input parameters.
-     *
-     * @param id          the ID of the MCP server to update
-     * @param name        the name of the server (can be null if not updating)
-     * @param type        the type of the server (can be null if not updating)
-     * @param environment the environment of the server (can be null if not updating)
-     * @param enabled     whether the server is enabled (can be null if not updating)
-     * @return the updated MCP server
-     * @throws IllegalArgumentException if the MCP server with the given ID is not found
-     */
-    McpServer update(long id, String name, ModeType type, Environment environment, Boolean enabled);
+    McpServer update(long id, String name, Boolean enabled);
 
     /**
      * Updates the tags of an MCP server.

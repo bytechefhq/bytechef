@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.service;
 
 import com.bytechef.platform.configuration.domain.McpComponent;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service interface for managing {@link McpComponent} entities.
@@ -51,12 +50,12 @@ public interface McpComponentService {
     void delete(long mcpComponentId);
 
     /**
-     * Fetches an MCP component by ID.
+     * Retrieves an MCP component by its ID.
      *
-     * @param mcpComponentId the ID of the MCP component to fetch
-     * @return the MCP component, or empty if not found
+     * @param mcpComponentId the ID of the MCP component to retrieve
+     * @return the MCP component with the specified ID
      */
-    Optional<McpComponent> fetchMcpComponent(long mcpComponentId);
+    McpComponent getMcpComponent(long mcpComponentId);
 
     /**
      * Gets all MCP components.
@@ -71,5 +70,5 @@ public interface McpComponentService {
      * @param mcpServerId the ID of the MCP server
      * @return a list of MCP components for the specified server
      */
-    List<McpComponent> getMcpComponentsByServerId(long mcpServerId);
+    List<McpComponent> getMcpServerMcpComponents(long mcpServerId);
 }

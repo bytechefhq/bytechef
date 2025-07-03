@@ -71,7 +71,7 @@ public class McpProjectServiceImpl implements McpProjectService {
     }
 
     @Override
-    public List<McpProject> getMcpProjectsByServerId(long mcpServerId) {
+    public List<McpProject> getMcpServerMcpProjects(long mcpServerId) {
         return mcpProjectRepository.findAllByMcpServerId(mcpServerId);
     }
 }

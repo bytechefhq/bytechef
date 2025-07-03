@@ -71,5 +71,5 @@ public interface McpToolService {
      * @param mcpComponentId the ID of the MCP component
      * @return a list of MCP tools for the specified component
      */
-    List<McpTool> getMcpToolsByComponentId(long mcpComponentId);
+    List<McpTool> getMcpComponentMcpTools(long mcpComponentId);
 }

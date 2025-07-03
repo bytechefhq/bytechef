@@ -21,7 +21,9 @@ import com.bytechef.platform.configuration.domain.McpTool;
 import com.bytechef.platform.configuration.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -54,6 +56,16 @@ public class McpToolGraphQlController {
 
     @QueryMapping
     public List<McpTool> mcpToolsByComponentId(@Argument long mcpComponentId) {
-        return mcpToolService.getMcpToolsByComponentId(mcpComponentId);
+        return mcpToolService.getMcpComponentMcpTools(mcpComponentId);
+    }
+
+    @MutationMapping
+    public McpTool createMcpTool(@Argument McpToolInput input) {
+        return mcpToolService.create(
+            new McpTool(input.name(), input.parameters(), input.mcpComponentId()));
+    }
+
+    @SuppressFBWarnings("EI")
+    public record McpToolInput(String name, Map<String, String> parameters, Long mcpComponentId) {
     }
 }

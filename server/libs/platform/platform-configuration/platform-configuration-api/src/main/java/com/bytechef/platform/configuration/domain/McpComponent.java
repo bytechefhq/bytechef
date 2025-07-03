@@ -74,36 +74,19 @@ public final class McpComponent {
     public McpComponent() {
     }
 
-    public McpComponent(Long id) {
-        this.id = id;
-    }
-
-    public McpComponent(String componentName, int componentVersion, Long mcpServerId) {
-        this.componentName = componentName;
-        this.componentVersion = componentVersion;
-        this.mcpServerId = AggregateReference.to(mcpServerId);
-    }
-
     public McpComponent(String componentName, int componentVersion, Long mcpServerId, Long connectionId) {
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.mcpServerId = AggregateReference.to(mcpServerId);
-        this.connectionId = AggregateReference.to(connectionId);
+        this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
     }
 
-    public McpComponent(Long id, String componentName, int componentVersion, Long mcpServerId) {
-        this.id = id;
+    public McpComponent(String componentName, int componentVersion, Long mcpServerId, Long connectionId, int version) {
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.mcpServerId = AggregateReference.to(mcpServerId);
-    }
-
-    public McpComponent(Long id, String componentName, int componentVersion, Long mcpServerId, Long connectionId) {
-        this.id = id;
-        this.componentName = componentName;
-        this.componentVersion = componentVersion;
-        this.mcpServerId = AggregateReference.to(mcpServerId);
-        this.connectionId = AggregateReference.to(connectionId);
+        this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
+        this.version = version;
     }
 
     public String getCreatedBy() {
@@ -138,8 +121,8 @@ public final class McpComponent {
         return mcpServerId.getId();
     }
 
-    public AggregateReference<Connection, Long> getConnectionId() {
-        return connectionId;
+    public Long getConnectionId() {
+        return connectionId != null ? connectionId.getId() : null;
     }
 
     public int getVersion() {
@@ -178,8 +161,8 @@ public final class McpComponent {
         this.mcpServerId = AggregateReference.to(mcpServerId);
     }
 
-    public void setConnectionId(AggregateReference<Connection, Long> connectionId) {
-        this.connectionId = connectionId;
+    public void setConnectionId(Long connectionId) {
+        this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
     }
 
     public void setId(Long id) {

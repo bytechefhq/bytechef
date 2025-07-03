@@ -71,5 +71,5 @@ public interface McpProjectService {
      * @param mcpServerId the ID of the MCP server
      * @return a list of MCP projects for the specified server
      */
-    List<McpProject> getMcpProjectsByServerId(long mcpServerId);
+    List<McpProject> getMcpServerMcpProjects(long mcpServerId);
 }

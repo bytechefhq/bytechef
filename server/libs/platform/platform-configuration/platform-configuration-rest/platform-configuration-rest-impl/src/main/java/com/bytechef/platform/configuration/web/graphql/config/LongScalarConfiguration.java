@@ -23,6 +23,7 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
+import java.time.Instant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
@@ -52,6 +53,9 @@ class LongScalarConfiguration {
                     }
                     if (dataFetcherResult instanceof Number) {
                         return ((Number) dataFetcherResult).longValue();
+                    }
+                    if (dataFetcherResult instanceof Instant) {
+                        return ((Instant) dataFetcherResult).toEpochMilli();
                     }
                     if (dataFetcherResult instanceof String) {
                         try {

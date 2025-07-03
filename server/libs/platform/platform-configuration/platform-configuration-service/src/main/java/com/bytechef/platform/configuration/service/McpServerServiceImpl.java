@@ -18,11 +18,12 @@ package com.bytechef.platform.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.McpServer;
+import com.bytechef.platform.configuration.domain.McpServerOrderBy;
 import com.bytechef.platform.configuration.repository.McpServerRepository;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,27 +48,13 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
-    public McpServer create(String name, Environment environment, Boolean enabled) {
-        McpServer mcpServer;
-
-        if (enabled != null) {
-            mcpServer = new McpServer(name, ModeType.AUTOMATION, environment, enabled);
-        } else {
-            mcpServer = new McpServer(name, ModeType.AUTOMATION, environment);
-        }
-
-        return create(mcpServer);
-    }
-
-    @Override
     public void delete(long mcpServerId) {
         mcpServerRepository.deleteById(mcpServerId);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<McpServer> fetchMcpServer(long mcpServerId) {
-        return mcpServerRepository.findById(mcpServerId);
+    public McpServer getMcpServer(long mcpServerId) {
+        return OptionalUtils.get(mcpServerRepository.findById(mcpServerId));
     }
 
     @Override
@@ -85,16 +72,40 @@ public class McpServerServiceImpl implements McpServerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<McpServer> getMcpServers(Long tagId) {
-        return mcpServerRepository.findAllByTagId(tagId);
+    public List<McpServer> getMcpServers(ModeType type) {
+        return getMcpServers(type, null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<McpServer> getMcpServers(ModeType type) {
-        return mcpServerRepository.findAll()
+    public List<McpServer> getMcpServers(ModeType type, McpServerOrderBy orderBy) {
+        List<McpServer> servers = mcpServerRepository.findAll()
             .stream()
             .filter(server -> server.getType() == type)
+            .toList();
+
+        if (orderBy == null) {
+            return servers;
+        }
+
+        Comparator<McpServer> comparator = switch (orderBy) {
+            case NAME_ASC -> Comparator.comparing(McpServer::getName, String.CASE_INSENSITIVE_ORDER);
+            case NAME_DESC -> Comparator.comparing(McpServer::getName, String.CASE_INSENSITIVE_ORDER)
+                .reversed();
+            case CREATED_DATE_ASC ->
+                Comparator.comparing(McpServer::getCreatedDate, Comparator.nullsLast(Comparator.naturalOrder()));
+            case CREATED_DATE_DESC ->
+                Comparator.comparing(McpServer::getCreatedDate, Comparator.nullsLast(Comparator.naturalOrder()))
+                    .reversed();
+            case LAST_MODIFIED_DATE_ASC ->
+                Comparator.comparing(McpServer::getLastModifiedDate, Comparator.nullsLast(Comparator.naturalOrder()));
+            case LAST_MODIFIED_DATE_DESC ->
+                Comparator.comparing(McpServer::getLastModifiedDate, Comparator.nullsLast(Comparator.naturalOrder()))
+                    .reversed();
+        };
+
+        return servers.stream()
+            .sorted(comparator)
             .toList();
     }
 
@@ -113,53 +124,23 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
-    public McpServer update(long id, String name, Environment environment, Boolean enabled) {
-        McpServer existingMcpServer = fetchMcpServer(id)
-            .orElseThrow(() -> new IllegalArgumentException("McpServer not found with id: " + id));
+    public McpServer update(long id, String name, Boolean enabled) {
+        McpServer existingMcpServer = getMcpServer(id);
 
         if (name != null) {
             existingMcpServer.setName(name);
-        }
-
-        if (environment != null) {
-            existingMcpServer.setEnvironment(environment);
         }
 
         if (enabled != null) {
             existingMcpServer.setEnabled(enabled);
         }
 
-        return update(existingMcpServer);
-    }
-
-    @Override
-    public McpServer update(long id, String name, ModeType type, Environment environment, Boolean enabled) {
-        McpServer existingMcpServer = fetchMcpServer(id)
-            .orElseThrow(() -> new IllegalArgumentException("McpServer not found with id: " + id));
-
-        if (name != null) {
-            existingMcpServer.setName(name);
-        }
-
-        if (type != null) {
-            existingMcpServer.setType(type);
-        }
-
-        if (environment != null) {
-            existingMcpServer.setEnvironment(environment);
-        }
-
-        if (enabled != null) {
-            existingMcpServer.setEnabled(enabled);
-        }
-
-        return update(existingMcpServer);
+        return mcpServerRepository.save(existingMcpServer);
     }
 
     @Override
     public McpServer updateTags(long id, List<Long> tagIds) {
-        McpServer mcpServer = fetchMcpServer(id)
-            .orElseThrow(() -> new IllegalArgumentException("McpServer not found with id: " + id));
+        McpServer mcpServer = getMcpServer(id);
 
         mcpServer.setTagIds(tagIds);
 

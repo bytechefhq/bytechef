@@ -83,10 +83,6 @@ public final class McpServer {
     public McpServer() {
     }
 
-    public McpServer(Long id) {
-        this.id = id;
-    }
-
     public McpServer(String name, ModeType type, Environment environment) {
         this.name = name;
         this.type = type.ordinal();
@@ -95,22 +91,6 @@ public final class McpServer {
     }
 
     public McpServer(String name, ModeType type, Environment environment, boolean enabled) {
-        this.name = name;
-        this.type = type.ordinal();
-        this.environment = environment.ordinal();
-        this.enabled = enabled;
-    }
-
-    public McpServer(Long id, String name, ModeType type, Environment environment) {
-        this.id = id;
-        this.name = name;
-        this.type = type.ordinal();
-        this.environment = environment.ordinal();
-        this.enabled = true;
-    }
-
-    public McpServer(Long id, String name, ModeType type, Environment environment, boolean enabled) {
-        this.id = id;
         this.name = name;
         this.type = type.ordinal();
         this.environment = environment.ordinal();

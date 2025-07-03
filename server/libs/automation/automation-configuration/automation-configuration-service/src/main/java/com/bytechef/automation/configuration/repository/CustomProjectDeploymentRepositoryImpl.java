@@ -104,6 +104,8 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
             query += "tag_id = ? ";
         }
 
+        query += "AND project_deployment.name NOT LIKE '__MCP_SERVER__%' ";
+
         query += "ORDER BY LOWER(project_deployment.name) ASC, project_deployment.project_version ASC, " +
             "project_deployment.environment ASC";
 

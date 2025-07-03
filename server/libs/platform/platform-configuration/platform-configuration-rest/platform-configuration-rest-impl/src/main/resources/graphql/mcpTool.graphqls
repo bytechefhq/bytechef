@@ -4,6 +4,16 @@ extend type Query {
     mcpToolsByComponentId(mcpComponentId: ID): [McpTool]
 }
 
+extend type Mutation {
+    createMcpTool(input: McpToolInput!): McpTool
+}
+
+input McpToolInput {
+    name: String!
+    parameters: Map
+    mcpComponentId: ID!
+}
+
 type McpTool {
     id: ID!
     name: String!
