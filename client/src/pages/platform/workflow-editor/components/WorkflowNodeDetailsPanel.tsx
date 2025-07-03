@@ -51,7 +51,7 @@ import {
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, XIcon} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -116,6 +116,8 @@ const WorkflowNodeDetailsPanel = ({
     const [clusterElementComponentOperations, setClusterElementComponentOperations] = useState<Array<WorkflowNodeType>>(
         []
     );
+
+    const isOperationNameUpdatingRef = useRef(false);
 
     const {
         activeTab,
@@ -785,34 +787,37 @@ const WorkflowNodeDetailsPanel = ({
         }
     }, [clusterElementsCanvasOpen, rootClusterElementNodeData, workflow]);
 
-    // Set currentOperationName depending on the currentComponentAction.operationName
+    // Set currentOperationName depending on the currentWorkflowNode.operationName
     useEffect(() => {
         if (!workflowNodes?.length) {
             return;
         }
 
-        let curWorkflowNode;
+        let currentWorkflowNode;
 
         if (workflowNodes.length && !clusterElementsCanvasOpen && !isClusterElement) {
-            curWorkflowNode = workflowNodes.find(
+            currentWorkflowNode = workflowNodes.find(
                 (workflowNode) => workflowNode.workflowNodeName === currentNode?.workflowNodeName
             );
         } else if (clusterElementsCanvasOpen) {
             if (currentNode?.rootClusterElement) {
-                curWorkflowNode = workflowNodes.find(
+                currentWorkflowNode = workflowNodes.find(
                     (action) => action.workflowNodeName === currentNode?.workflowNodeName
                 );
             } else if (clusterElementComponentOperations) {
-                curWorkflowNode = clusterElementComponentOperations.find(
+                currentWorkflowNode = clusterElementComponentOperations.find(
                     (action) => action.workflowNodeName === currentNode?.workflowNodeName
                 );
             }
         }
 
-        if (curWorkflowNode?.operationName && curWorkflowNode.operationName !== currentOperationName) {
-            setCurrentOperationName(curWorkflowNode.operationName);
-        }
+        if (currentWorkflowNode?.operationName) {
+            if (currentWorkflowNode.operationName !== currentOperationName) {
+                isOperationNameUpdatingRef.current = true;
 
+                setCurrentOperationName(currentWorkflowNode.operationName);
+            }
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [clusterElementComponentOperations, currentNode?.workflowNodeName, currentOperationName, workflowNodes]);
 
@@ -840,6 +845,12 @@ const WorkflowNodeDetailsPanel = ({
     useEffect(() => {
         if (!currentOperationName || !currentComponentDefinition) {
             setCurrentActionDefinition(undefined);
+
+            return;
+        }
+
+        if (isOperationNameUpdatingRef.current) {
+            isOperationNameUpdatingRef.current = false;
 
             return;
         }
