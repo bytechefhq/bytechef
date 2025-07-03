@@ -1,0 +1,14 @@
+mutation createMcpComponentWithTools($input: McpComponentWithToolsInput!) {
+    createMcpComponentWithTools(input: $input) {
+        id
+        componentName
+        componentVersion
+        mcpServerId
+        connectionId
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+        version
+    }
+}

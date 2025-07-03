@@ -1,40 +1,43 @@
 import {Button} from '@/components/ui/button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {McpComponent, McpServer, useDeleteMcpComponentMutation} from '@/shared/middleware/graphql';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {McpProject, useDeleteMcpProjectMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
-import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
-import McpComponentListItemAlertDialog from './McpComponentListItemAlertDialog';
+import McpProjectListItemAlertDialog from './McpProjectListItemAlertDialog';
 
-interface McpComponentListItemDropDownProps {
-    mcpComponent: McpComponent;
-    mcpServer: McpServer;
+interface McpProjectListItemDropdownMenuProps {
+    mcpProject: McpProject;
+    onUpdateProjectVersionClick: () => void;
 }
 
-const McpComponentListItemDropdownMenu = ({mcpComponent, mcpServer}: McpComponentListItemDropDownProps) => {
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+const McpProjectListItemDropdownMenu = ({
+    mcpProject,
+    onUpdateProjectVersionClick,
+}: McpProjectListItemDropdownMenuProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const queryClient = useQueryClient();
 
-    const deleteMcpComponentMutation = useDeleteMcpComponentMutation({
+    const deleteMcpProjectMutation = useDeleteMcpProjectMutation({
         onError: () => {
             setIsPending(false);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
+                queryKey: ['mcpProjectsByServerId'],
             });
             setShowDeleteDialog(false);
             setIsPending(false);
         },
     });
-
-    const handleEditClick = () => {
-        setIsDialogOpen(true);
-    };
 
     const handleDeleteClick = () => {
         setShowDeleteDialog(true);
@@ -43,11 +46,11 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, mcpServer}: McpComponen
     const handleConfirmDelete = async () => {
         setIsPending(true);
         try {
-            await deleteMcpComponentMutation.mutateAsync({
-                id: mcpComponent.id.toString(),
+            await deleteMcpProjectMutation.mutateAsync({
+                id: mcpProject.id.toString(),
             });
         } catch (error) {
-            console.error('Error deleting MCP component:', error);
+            console.error('Error deleting MCP project:', error);
         }
     };
 
@@ -65,9 +68,9 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, mcpServer}: McpComponen
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={handleEditClick}>
-                        <span className="w-full">Edit</span>
-                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={onUpdateProjectVersionClick}>Update Project Version</DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
 
                     <DropdownMenuItem className="text-destructive" onClick={handleDeleteClick}>
                         <span className="w-full">Delete</span>
@@ -75,15 +78,8 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, mcpServer}: McpComponen
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <McpComponentDialog
-                mcpComponent={mcpComponent}
-                mcpServerId={mcpServer.id}
-                onOpenChange={setIsDialogOpen}
-                open={isDialogOpen}
-            />
-
             {showDeleteDialog && (
-                <McpComponentListItemAlertDialog
+                <McpProjectListItemAlertDialog
                     isPending={isPending}
                     onCancelClick={handleCancelDelete}
                     onDeleteClick={handleConfirmDelete}
@@ -93,4 +89,4 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, mcpServer}: McpComponen
     );
 };
 
-export default McpComponentListItemDropdownMenu;
+export default McpProjectListItemDropdownMenu;

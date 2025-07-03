@@ -140,7 +140,7 @@ const ProjectWorkflowListItem = ({
                 <Tooltip>
                     <TooltipTrigger className="flex items-center text-sm text-muted-foreground">
                         <span className="text-xs">
-                            {`Updated at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
+                            {`Modified at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
                         </span>
                     </TooltipTrigger>
 

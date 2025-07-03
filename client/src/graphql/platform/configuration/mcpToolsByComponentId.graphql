@@ -1,0 +1,8 @@
+query mcpToolsByComponentId($mcpComponentId: ID!) {
+    mcpToolsByComponentId(mcpComponentId: $mcpComponentId) {
+        id
+        name
+        mcpComponentId
+        parameters
+    }
+}

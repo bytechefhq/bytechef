@@ -1,0 +1,45 @@
+query mcpProjectsByServerId($mcpServerId: ID!) {
+    mcpProjectsByServerId(mcpServerId: $mcpServerId) {
+        id
+        projectDeploymentId
+        mcpServerId
+        project {
+            id
+            name
+            category {
+                id
+                name
+            }
+            tags {
+                id
+                name
+            }
+        }
+        mcpProjectWorkflows {
+            id
+            mcpProjectId
+            projectDeploymentWorkflowId
+            projectDeploymentWorkflow {
+                id
+                projectDeploymentId
+                inputs
+                workflowId
+            }
+            workflow {
+                id
+                label
+            }
+            createdBy
+            createdDate
+            lastModifiedBy
+            lastModifiedDate
+            version
+        }
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+        version
+        projectVersion
+    }
+}

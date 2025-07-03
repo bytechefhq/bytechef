@@ -5,7 +5,7 @@ import McpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-
 import {McpServer, useMcpComponentsByServerIdQuery} from '@/shared/middleware/graphql';
 import {ComponentIcon} from 'lucide-react';
 
-import McpComponentDialog from '../McpComponentDialog';
+import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 
 const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
     const {data, isLoading: isMcpComponentsLoading} = useMcpComponentsByServerIdQuery({
@@ -41,11 +41,9 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
     }
 
     return (
-        <div className="border-b border-b-gray-100 py-3 pl-4">
+        <div className="py-3 pl-4">
             {data.mcpComponentsByServerId.length > 0 ? (
                 <>
-                    <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Components</h3>
-
                     <ul className="divide-y divide-gray-100">
                         {data.mcpComponentsByServerId
                             .sort((a, b) => a!.componentName.localeCompare(b!.componentName))
@@ -65,7 +63,7 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
                             <McpComponentDialog
                                 mcpComponent={undefined}
                                 mcpServerId={mcpServer.id}
-                                triggerNode={<Button>Create Component</Button>}
+                                triggerNode={<Button>Add Component</Button>}
                             />
                         }
                         icon={<ComponentIcon className="size-24 text-gray-300" />}

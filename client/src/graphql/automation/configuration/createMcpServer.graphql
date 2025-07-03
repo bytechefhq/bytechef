@@ -1,9 +1,0 @@
-mutation createMcpServer($name: String!, $type: ModeType!, $environment: Environment!, $enabled: Boolean) {
-    createMcpServer(name: $name, type: $type, environment: $environment, enabled: $enabled) {
-        id
-        name
-        type
-        environment
-        enabled
-    }
-}

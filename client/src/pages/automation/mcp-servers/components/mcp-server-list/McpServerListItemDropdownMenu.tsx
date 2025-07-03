@@ -6,16 +6,23 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServerDialog';
 import {McpServer} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
 interface McpServerListItemDropdownMenuProps {
     mcpServer: McpServer;
     onDeleteClick: () => void;
+    onEditClick: () => void;
+    onAddComponentClick: () => void;
+    onAddWorkflowsClick: () => void;
 }
 
-const McpServerListItemDropdownMenu = ({mcpServer, onDeleteClick}: McpServerListItemDropdownMenuProps) => {
+const McpServerListItemDropdownMenu = ({
+    onAddComponentClick,
+    onAddWorkflowsClick,
+    onDeleteClick,
+    onEditClick,
+}: McpServerListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -25,9 +32,13 @@ const McpServerListItemDropdownMenu = ({mcpServer, onDeleteClick}: McpServerList
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                    <McpServerDialog mcpServer={mcpServer} triggerNode={<span className="w-full">Edit</span>} />
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onAddComponentClick}>Add Component</DropdownMenuItem>
+
+                <DropdownMenuItem onClick={onAddWorkflowsClick}>Add Workflows</DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 

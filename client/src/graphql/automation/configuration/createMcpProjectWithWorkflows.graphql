@@ -1,0 +1,8 @@
+mutation createMcpProjectWithWorkflows($input: CreateMcpProjectWithWorkflowsInput!) {
+    createMcpProjectWithWorkflows(input: $input) {
+        id
+        mcpServerId
+        projectDeploymentId
+        projectVersion
+    }
+}

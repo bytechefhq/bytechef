@@ -1,0 +1,5 @@
+mutation updateMcpServerTags($id: ID!, $tags: [TagInput!]!) {
+    updateMcpServerTags(id: $id, tags: $tags) {
+        id
+    }
+}

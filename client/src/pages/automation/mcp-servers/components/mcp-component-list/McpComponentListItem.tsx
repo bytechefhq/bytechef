@@ -1,15 +1,19 @@
 import '@/shared/styles/dropdownMenu.css';
 import {Badge} from '@/components/ui/badge';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
 import {McpComponent, McpServer} from '@/shared/middleware/graphql';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ComponentIcon} from 'lucide-react';
 import {useState} from 'react';
-import {twMerge} from 'tailwind-merge';
 
 const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpComponent; mcpServer: McpServer}) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, setIsHovered] = useState(false);
+
+    const {data: componentDefinition} = useGetComponentDefinitionQuery({
+        componentName: mcpComponent.componentName,
+        componentVersion: mcpComponent.componentVersion,
+    });
 
     const handleComponentClick = () => {
         // Add functionality here if needed, similar to handleWorkflowClick in ProjectDeploymentWorkflowListItem
@@ -22,28 +26,33 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className="flex flex-1 cursor-pointer items-center" onClick={handleComponentClick}>
-                <span className={twMerge('w-80 text-sm font-semibold')}>{mcpComponent.componentName}</span>
+            <div className="flex flex-1 cursor-pointer items-center gap-x-2" onClick={handleComponentClick}>
+                {componentDefinition?.icon ? (
+                    <img alt={`${mcpComponent.componentName} icon`} className="size-4" src={componentDefinition.icon} />
+                ) : (
+                    <ComponentIcon className="size-4 text-gray-500" />
+                )}
 
-                <div className="ml-6 flex space-x-1">
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <ComponentIcon className="mr-2 size-4 text-gray-500" />
-                        </TooltipTrigger>
+                <span className="min-w-60 text-sm font-semibold">{mcpComponent.componentName}</span>
 
-                        <TooltipContent>Component</TooltipContent>
-                    </Tooltip>
+                {mcpComponent.mcpTools && mcpComponent.mcpTools.length > 0 && (
+                    <div className="flex items-center gap-x-1">
+                        <div className="flex items-center gap-x-1">
+                            {mcpComponent.mcpTools.slice(0, 4).map(
+                                (tool, index) =>
+                                    tool?.name && (
+                                        <Badge className="text-xs" key={index} variant="secondary">
+                                            {tool.name}
+                                        </Badge>
+                                    )
+                            )}
 
-                    <Badge className="ml-2" variant="outline">
-                        v{mcpComponent.componentVersion}
-                    </Badge>
-
-                    {mcpComponent.connectionId && (
-                        <Badge className="ml-2" variant="secondary">
-                            Connection
-                        </Badge>
-                    )}
-                </div>
+                            {mcpComponent.mcpTools.length > 4 && (
+                                <span className="text-xs text-gray-500">+{mcpComponent.mcpTools.length - 4} more</span>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="flex items-center gap-x-4">

@@ -1,8 +1,7 @@
-mutation updateMcpServer($id: ID!, $name: String, $environment: Environment, $enabled: Boolean) {
-    updateMcpServer(id: $id, name: $name, environment: $environment, enabled: $enabled) {
+mutation updateMcpServer($id: ID!, $input: McpServerUpdateInput!) {
+    updateMcpServer(id: $id, input: $input) {
         id
         name
-        environment
         enabled
     }
 }

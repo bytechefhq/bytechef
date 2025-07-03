@@ -34,8 +34,22 @@ const formSchema = z.object({
 
 type FormValuesType = z.infer<typeof formSchema>;
 
-const McpServerDialog = ({mcpServer, triggerNode}: {mcpServer?: McpServer; triggerNode: ReactNode}) => {
-    const [open, setOpen] = useState(false);
+const McpServerDialog = ({
+    mcpServer,
+    onOpenChange: externalOnOpenChange,
+    open: externalOpen,
+    triggerNode,
+}: {
+    mcpServer?: McpServer;
+    triggerNode: ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+}) => {
+    const [internalOpen, setInternalOpen] = useState(false);
+
+    // Use external state if provided, otherwise use internal state
+    const open = externalOpen !== undefined ? externalOpen : internalOpen;
+    const setOpen = externalOnOpenChange || setInternalOpen;
     const queryClient = useQueryClient();
 
     const form = useForm<FormValuesType>({
@@ -54,10 +68,11 @@ const McpServerDialog = ({mcpServer, triggerNode}: {mcpServer?: McpServer; trigg
         if (mcpServer) {
             updateMcpServerMutation.mutate(
                 {
-                    enabled: values.enabled,
-                    environment: values.environment as Environment,
                     id: mcpServer.id,
-                    name: values.name,
+                    input: {
+                        enabled: values.enabled,
+                        name: values.name,
+                    },
                 },
                 {
                     onSuccess: () => {
@@ -69,10 +84,12 @@ const McpServerDialog = ({mcpServer, triggerNode}: {mcpServer?: McpServer; trigg
         } else {
             createMcpServerMutation.mutate(
                 {
-                    enabled: values.enabled,
-                    environment: values.environment as Environment,
-                    name: values.name,
-                    type: ModeType.Automation,
+                    input: {
+                        enabled: values.enabled,
+                        environment: values.environment as Environment,
+                        name: values.name,
+                        type: ModeType.Automation,
+                    },
                 },
                 {
                     onSuccess: () => {
@@ -82,6 +99,8 @@ const McpServerDialog = ({mcpServer, triggerNode}: {mcpServer?: McpServer; trigg
                 }
             );
         }
+
+        form.reset({});
     };
 
     return (
@@ -121,7 +140,7 @@ const McpServerDialog = ({mcpServer, triggerNode}: {mcpServer?: McpServer; trigg
                             )}
                         />
 
-                        <FormField
+                        {!mcpServer?.id && <FormField
                             control={form.control}
                             name="environment"
                             render={({field}) => (
@@ -147,7 +166,7 @@ const McpServerDialog = ({mcpServer, triggerNode}: {mcpServer?: McpServer; trigg
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
+                        />}
 
                         <DialogFooter>
                             <DialogClose asChild>

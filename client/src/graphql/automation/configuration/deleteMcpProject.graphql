@@ -1,0 +1,3 @@
+mutation deleteMcpProject($id: ID!) {
+    deleteMcpProject(id: $id)
+}

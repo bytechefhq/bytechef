@@ -1,0 +1,20 @@
+query mcpServers($type: ModeType!) {
+    mcpServers(type: $type, orderBy: NAME_ASC) {
+        id
+        name
+        type
+        environment
+        enabled
+        mcpComponents {
+            id
+            mcpServerId
+            componentName
+            componentVersion
+        }
+        tags {
+            id
+            name
+        }
+        lastModifiedDate
+    }
+}

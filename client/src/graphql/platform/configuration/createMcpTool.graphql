@@ -1,0 +1,8 @@
+mutation createMcpTool($input: McpToolInput!) {
+    createMcpTool(input: $input) {
+        id
+        name
+        mcpComponentId
+        parameters
+    }
+}

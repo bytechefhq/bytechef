@@ -2,7 +2,6 @@ import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ChevronDownIcon, Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
-import {UseMutationResult} from '@tanstack/react-query';
 import CreatableSelect, {SelectOptionType} from 'components/CreatableSelect/CreatableSelect';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
@@ -46,7 +45,7 @@ interface TagListProps {
     remainingTags?: Array<TagType>;
     tags: Array<TagType>;
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    updateTagsMutation: UseMutationResult<void, object, any, unknown>;
+    updateTagsMutation: any;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     getRequest: (id: number, tags: Array<TagType>) => any;
 }

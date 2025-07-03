@@ -1,102 +1,85 @@
 import LoadingIcon from '@/components/LoadingIcon';
+import TagList from '@/components/TagList';
 import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/McpProjectWorkflowDialog';
+import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServerDialog';
+import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItemAlertDialog from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemAlertDialog';
 import McpServerListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
-import {McpServer} from '@/shared/middleware/graphql';
+import {
+    McpProjectWorkflow,
+    McpServer,
+    Tag,
+    useDeleteMcpServerMutation,
+    useUpdateMcpServerMutation,
+    useUpdateMcpServerTagsMutation,
+} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDown, ServerIcon} from 'lucide-react';
 import {useState} from 'react';
 
-const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
+interface McpServerListItemProps {
+    mcpServer: McpServer;
+    mcpProjectWorkflows?: McpProjectWorkflow[];
+    tags?: Tag[];
+}
+
+const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showMcpComponentDialog, setShowMcpComponentDialog] = useState(false);
+    const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [isEnablePending, setIsEnablePending] = useState(false);
-    const [localMcpServer, setLocalMcpServer] = useState<McpServer>(mcpServer);
+
+    const mcpServerTagIds = mcpServer.tags?.map((tag) => tag?.id);
 
     const queryClient = useQueryClient();
 
+    const updateMcpServerMutation = useUpdateMcpServerMutation();
+    const deleteMcpServerMutation = useDeleteMcpServerMutation();
+    const updateMcpServerTagsMutation = useUpdateMcpServerTagsMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['mcpServers']});
+        },
+    });
+
     const handleOnCheckedChange = async (value: boolean) => {
         setIsEnablePending(true);
-        try {
-            const response = await fetch('/graphql', {
-                body: JSON.stringify({
-                    query: `
-                        mutation updateMcpServer($id: Int!, $input: Map!) {
-                            updateMcpServer(id: $id, input: $input) {
-                                id
-                                name
-                                type
-                                environment
-                                enabled
-                            }
-                        }
-                    `,
-                    variables: {
-                        id: localMcpServer.id,
-                        input: {
-                            enabled: value,
-                        },
-                    },
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
+
+        updateMcpServerMutation.mutate(
+            {
+                id: mcpServer.id,
+                input: {
+                    enabled: value,
                 },
-                method: 'POST',
-            });
-
-            const json = await response.json();
-
-            if (json.errors) {
-                throw new Error(json.errors[0].message);
+            },
+            {
+                onSuccess: () => {
+                    queryClient.invalidateQueries({queryKey: ['mcpServers']});
+                    setIsEnablePending(false);
+                },
             }
-
-            queryClient.invalidateQueries({queryKey: ['mcpServers']});
-            setLocalMcpServer({...localMcpServer, enabled: value});
-        } catch (error) {
-            console.error('Error updating MCP server:', error);
-        } finally {
-            setIsEnablePending(false);
-        }
+        );
     };
 
     const handleDeleteClick = async () => {
         setIsPending(true);
-        try {
-            // Note: This is a placeholder for a delete mutation
-            // In a real implementation, you would need to add a delete mutation to the GraphQL schema
-            const response = await fetch('/graphql', {
-                body: JSON.stringify({
-                    query: `
-                        mutation deleteMcpServer($id: Int!) {
-                            deleteMcpServer(id: $id)
-                        }
-                    `,
-                    variables: {
-                        id: localMcpServer.id,
-                    },
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
+
+        deleteMcpServerMutation.mutate(
+            {
+                id: mcpServer.id,
+            },
+            {
+                onSuccess: () => {
+                    queryClient.invalidateQueries({queryKey: ['mcpServers']});
+                    setShowDeleteDialog(false);
                 },
-                method: 'POST',
-            });
-
-            const json = await response.json();
-
-            if (json.errors) {
-                throw new Error(json.errors[0].message);
             }
-
-            queryClient.invalidateQueries({queryKey: ['mcpServers']});
-            setShowDeleteDialog(false);
-        } catch (error) {
-            console.error('Error deleting MCP server:', error);
-        } finally {
-            setIsPending(false);
-        }
+        );
     };
 
     return (
@@ -106,11 +89,11 @@ const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
-                                {localMcpServer.name ? (
+                                {mcpServer.name ? (
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <div className="flex items-center">
-                                                <span className="text-base font-semibold">{localMcpServer.name}</span>
+                                                <span className="text-base font-semibold">{mcpServer.name}</span>
                                             </div>
                                         </TooltipTrigger>
 
@@ -120,7 +103,7 @@ const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
                                     <div className="flex items-center">
                                         <ServerIcon className="mr-2 size-4 text-gray-500" />
 
-                                        <span className="text-base font-semibold">{localMcpServer.name}</span>
+                                        <span className="text-base font-semibold">{mcpServer.name}</span>
                                     </div>
                                 )}
                             </div>
@@ -130,13 +113,40 @@ const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
                             <div className="flex items-center">
                                 <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-muted-foreground">
                                     <span className="mr-1">
-                                        {localMcpServer.mcpComponents?.length === 1
+                                        {mcpServer.mcpComponents?.length === 1
                                             ? `1 component`
-                                            : `${localMcpServer.mcpComponents?.length || 0} components`}
+                                            : `${mcpServer.mcpComponents?.length || 0} components`}
+                                    </span>
+
+                                    <span className="mx-1">-</span>
+
+                                    <span className="mr-1">
+                                        {mcpProjectWorkflows?.length === 1
+                                            ? `1 workflow`
+                                            : `${mcpProjectWorkflows?.length || 0} workflows`}
                                     </span>
 
                                     <ChevronDown className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
+
+                                <div onClick={(event) => event.preventDefault()}>
+                                    <TagList
+                                        getRequest={(id, tags) => ({
+                                            id: id!,
+                                            tags: tags || [],
+                                        })}
+                                        id={parseInt(mcpServer.id!)}
+                                        remainingTags={tags
+                                            ?.filter((tag) => !mcpServerTagIds?.includes(tag.id))
+                                            .map((tag) => {
+                                                return {id: parseInt(tag.id), name: tag.name};
+                                            })}
+                                        tags={(mcpServer.tags ?? []).map((tag) => {
+                                            return {id: parseInt(tag!.id), name: tag!.name};
+                                        })}
+                                        updateTagsMutation={updateMcpServerTagsMutation}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -145,7 +155,7 @@ const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
                         <div className="flex min-w-28 justify-end">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Badge variant="secondary">{localMcpServer.environment}</Badge>
+                                    <Badge variant="secondary">{mcpServer.environment}</Badge>
                                 </TooltipTrigger>
 
                                 <TooltipContent>The environment</TooltipContent>
@@ -157,7 +167,7 @@ const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
                                 {isEnablePending && <LoadingIcon />}
 
                                 <Switch
-                                    checked={localMcpServer.enabled}
+                                    checked={mcpServer.enabled}
                                     disabled={isEnablePending}
                                     onCheckedChange={handleOnCheckedChange}
                                 />
@@ -165,9 +175,9 @@ const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
 
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                                    {localMcpServer.lastModifiedDate ? (
+                                    {mcpServer.lastModifiedDate ? (
                                         <span className="text-xs">
-                                            {`Modified at ${new Date(localMcpServer.lastModifiedDate).toLocaleDateString()} ${new Date(localMcpServer.lastModifiedDate).toLocaleTimeString()}`}
+                                            {`Modified at ${new Date(mcpServer.lastModifiedDate).toLocaleDateString()} ${new Date(mcpServer.lastModifiedDate).toLocaleTimeString()}`}
                                         </span>
                                     ) : (
                                         <span className="text-xs">No modifications</span>
@@ -179,8 +189,11 @@ const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
                         </div>
 
                         <McpServerListItemDropdownMenu
-                            mcpServer={localMcpServer}
+                            mcpServer={mcpServer}
+                            onAddComponentClick={() => setShowMcpComponentDialog(true)}
+                            onAddWorkflowsClick={() => setShowWorkflowDialog(true)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
+                            onEditClick={() => setShowEditDialog(true)}
                         />
                     </div>
                 </div>
@@ -192,6 +205,27 @@ const McpServerListItem = ({mcpServer}: {mcpServer: McpServer}) => {
                     onCancelClick={() => setShowDeleteDialog(false)}
                     onDeleteClick={handleDeleteClick}
                 />
+            )}
+
+            {showEditDialog && (
+                <McpServerDialog
+                    mcpServer={mcpServer}
+                    onOpenChange={setShowEditDialog}
+                    open={showEditDialog}
+                    triggerNode={<></>}
+                />
+            )}
+
+            {showMcpComponentDialog && (
+                <McpComponentDialog
+                    mcpServerId={mcpServer.id}
+                    onOpenChange={setShowMcpComponentDialog}
+                    open={showMcpComponentDialog}
+                />
+            )}
+
+            {showWorkflowDialog && (
+                <McpProjectWorkflowDialog mcpServer={mcpServer} onClose={() => setShowWorkflowDialog(false)} />
             )}
         </>
     );
