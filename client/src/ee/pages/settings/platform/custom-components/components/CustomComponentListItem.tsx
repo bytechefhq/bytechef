@@ -107,7 +107,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                 {customComponent.lastModifiedDate ? (
                                     <span className="text-xs">
-                                        {`Updated at ${customComponent.lastModifiedDate?.toLocaleDateString()} ${customComponent.lastModifiedDate?.toLocaleTimeString()}`}
+                                        {`Modified at ${customComponent.lastModifiedDate?.toLocaleDateString()} ${customComponent.lastModifiedDate?.toLocaleTimeString()}`}
                                     </span>
                                 ) : (
                                     '-'

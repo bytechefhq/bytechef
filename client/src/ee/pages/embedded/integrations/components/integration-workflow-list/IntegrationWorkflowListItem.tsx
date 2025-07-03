@@ -122,7 +122,7 @@ const IntegrationWorkflowListItem = ({
                 <Tooltip>
                     <TooltipTrigger className="flex items-center text-sm text-gray-500">
                         <span className="text-xs">
-                            {`Updated at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
+                            {`Modified at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
                         </span>
                     </TooltipTrigger>
 

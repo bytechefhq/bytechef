@@ -114,7 +114,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                 {apiConnector.lastModifiedDate ? (
                                     <span className="text-xs">
-                                        {`Updated at ${apiConnector.lastModifiedDate?.toLocaleDateString()} ${apiConnector.lastModifiedDate?.toLocaleTimeString()}`}
+                                        {`Modified at ${apiConnector.lastModifiedDate?.toLocaleDateString()} ${apiConnector.lastModifiedDate?.toLocaleTimeString()}`}
                                     </span>
                                 ) : (
                                     '-'

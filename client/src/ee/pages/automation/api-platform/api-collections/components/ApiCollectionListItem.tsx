@@ -174,7 +174,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                     {apiCollection.lastModifiedDate ? (
                                         <span className="text-xs">
-                                            {`Updated at ${apiCollection.lastModifiedDate?.toLocaleDateString()} ${apiCollection.lastModifiedDate?.toLocaleTimeString()}`}
+                                            {`Modified at ${apiCollection.lastModifiedDate?.toLocaleDateString()} ${apiCollection.lastModifiedDate?.toLocaleTimeString()}`}
                                         </span>
                                     ) : (
                                         '-'
