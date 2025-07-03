@@ -166,6 +166,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:json-helper"))
     implementation(project(":server:libs:modules:components:jwt-helper"))
     implementation(project(":server:libs:modules:components:keap"))
+    implementation(project(":server:libs:modules:components:klaviyo"))
     implementation(project(":server:libs:modules:components:linear"))
     implementation(project(":server:libs:modules:components:logger"))
     implementation(project(":server:libs:modules:components:mailchimp"))
