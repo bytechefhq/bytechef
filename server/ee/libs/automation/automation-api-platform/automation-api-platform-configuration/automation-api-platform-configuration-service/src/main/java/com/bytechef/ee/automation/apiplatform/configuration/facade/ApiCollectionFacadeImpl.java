@@ -104,7 +104,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
         projectDeployment.setDescription(apiCollection.getDescription());
         projectDeployment.setEnvironment(apiCollectionDTO.environment());
-        projectDeployment.setName(apiCollection.getName());
+        projectDeployment.setName("__API_COLLECTION__" + apiCollectionDTO.projectId());
         projectDeployment.setProjectId(apiCollectionDTO.projectId());
         projectDeployment.setProjectVersion(apiCollectionDTO.projectVersion());
 
