@@ -140,33 +140,35 @@ const McpServerDialog = ({
                             )}
                         />
 
-                        {!mcpServer?.id && <FormField
-                            control={form.control}
-                            name="environment"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Environment</FormLabel>
+                        {!mcpServer?.id && (
+                            <FormField
+                                control={form.control}
+                                name="environment"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Environment</FormLabel>
 
-                                    <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select environment" />
-                                            </SelectTrigger>
-                                        </FormControl>
+                                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select environment" />
+                                                </SelectTrigger>
+                                            </FormControl>
 
-                                        <SelectContent>
-                                            <SelectItem value="DEVELOPMENT">Development</SelectItem>
+                                            <SelectContent>
+                                                <SelectItem value="DEVELOPMENT">Development</SelectItem>
 
-                                            <SelectItem value="STAGING">Staging</SelectItem>
+                                                <SelectItem value="STAGING">Staging</SelectItem>
 
-                                            <SelectItem value="PRODUCTION">Production</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                                <SelectItem value="PRODUCTION">Production</SelectItem>
+                                            </SelectContent>
+                                        </Select>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />}
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <DialogFooter>
                             <DialogClose asChild>
