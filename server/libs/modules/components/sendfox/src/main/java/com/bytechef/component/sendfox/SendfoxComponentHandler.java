@@ -25,7 +25,7 @@ import com.google.auto.service.AutoService;
  * @author Nikolina Spehar
  */
 @AutoService(OpenApiComponentHandler.class)
-public class SendFoxComponentHandler extends AbstractSendFoxComponentHandler {
+public class SendfoxComponentHandler extends AbstractSendfoxComponentHandler {
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {

@@ -31,8 +31,8 @@ import java.util.Map;
 /**
  * @author Nikolina Spehar
  */
-public class SendFoxUtils extends AbstractSendFoxUtils {
-    private SendFoxUtils() {
+public class SendfoxUtils extends AbstractSendfoxUtils {
+    private SendfoxUtils() {
     }
 
     public static List<Option<String>> getEmailOptions(

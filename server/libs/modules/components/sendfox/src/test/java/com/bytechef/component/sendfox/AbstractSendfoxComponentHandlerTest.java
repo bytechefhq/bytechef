@@ -16,8 +16,17 @@
 
 package com.bytechef.component.sendfox;
 
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
+
 /**
+ * Provides the base test implementation for the REST based component.
+ *
  * @generated
  */
-public class SendFoxComponentHandlerTest extends AbstractSendFoxComponentHandlerTest {
+public abstract class AbstractSendfoxComponentHandlerTest {
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/sendfox_v1.json", new SendfoxComponentHandler().getDefinition());
+    }
 }
