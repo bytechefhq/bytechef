@@ -241,14 +241,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                         integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
                             integrationInstance.getIntegrationInstanceConfigurationId(), workflowId);
 
-                    IntegrationInstanceWorkflow newIntegrationInstanceWorkflow = new IntegrationInstanceWorkflow();
-
-                    newIntegrationInstanceWorkflow.setIntegrationInstanceConfigurationWorkflowId(
-                        integrationInstanceConfigurationWorkflow.getId());
-                    newIntegrationInstanceWorkflow.setIntegrationInstanceId(integrationInstanceId);
-                    newIntegrationInstanceWorkflow.setInputs(Map.of());
-
-                    return newIntegrationInstanceWorkflow;
+                    return integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                        integrationInstanceId, integrationInstanceConfigurationWorkflow.getId());
                 });
 
         integrationInstanceWorkflow.setInputs(inputs);
