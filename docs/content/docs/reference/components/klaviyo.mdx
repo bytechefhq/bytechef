@@ -1,0 +1,369 @@
+---
+title: "Klaviyo"
+description: "Klaviyo is a marketing automation platform primarily used for email and SMS marketing, especially by e-commerce businesses."
+---
+
+
+Categories: Marketing Automation
+
+
+Type: klaviyo/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Get Lists
+Name: getLists
+
+`Get all lists in an account.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| listFields | List Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of fields to include for each related list object.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Lists",
+  "name" : "getLists",
+  "parameters" : {
+    "listFields" : [ "" ]
+  },
+  "type" : "klaviyo/v1/getLists"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(id), &#123;STRING\(name), STRING\(created), STRING\(updated), STRING\(opt_in_process)&#125;\(attributes), &#123;STRING\(self)&#125;\(links), &#123;&#123;&#123;STRING\(self), STRING\(related)&#125;\(links)&#125;\(profiles), &#123;[&#123;STRING\(type), STRING\(id)&#125;]\(data), &#123;STRING\(self), STRING\(related)&#125;\(links)&#125;\(tags), &#123;[&#123;STRING\(type), STRING\(id)&#125;]\(data), &#123;STRING\(self), STRING\(related)&#125;\(links)&#125;\(flow-triggers)&#125;\(relationships)&#125;] </details> |  |
+| links | OBJECT <details> <summary> Properties </summary> &#123;STRING\(self), STRING\(first), STRING\(last), STRING\(prev), STRING\(next)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : [ {
+    "type" : "",
+    "id" : "",
+    "attributes" : {
+      "name" : "",
+      "created" : "",
+      "updated" : "",
+      "opt_in_process" : ""
+    },
+    "links" : {
+      "self" : ""
+    },
+    "relationships" : {
+      "profiles" : {
+        "links" : {
+          "self" : "",
+          "related" : ""
+        }
+      },
+      "tags" : {
+        "data" : [ {
+          "type" : "",
+          "id" : ""
+        } ],
+        "links" : {
+          "self" : "",
+          "related" : ""
+        }
+      },
+      "flow-triggers" : {
+        "data" : [ {
+          "type" : "",
+          "id" : ""
+        } ],
+        "links" : {
+          "self" : "",
+          "related" : ""
+        }
+      }
+    }
+  } ],
+  "links" : {
+    "self" : "",
+    "first" : "",
+    "last" : "",
+    "prev" : "",
+    "next" : ""
+  }
+}
+```
+
+
+### Subscribe Profiles
+Name: subscribeProfiles
+
+`Subscribe one or more profiles to email marketing, SMS marketing, or both.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| profileId | Profile ID | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The IDs of the profile to subscribe.` | true |
+| subscription | Subscription | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The subscription parameters to subscribe to on the email or sms channel.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Subscribe Profiles",
+  "name" : "subscribeProfiles",
+  "parameters" : {
+    "profileId" : [ "" ],
+    "subscription" : [ "" ]
+  },
+  "type" : "klaviyo/v1/subscribeProfiles"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Update Profile
+Name: updateProfile
+
+`Update the profile with the given profile ID.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| profileId | Profile ID | STRING | `Primary key that uniquely identifies this profile.` | true |
+| email | Email | STRING | `Individual's email address.` | false |
+| phone_number | Phone Number | STRING | `Individual's phone number in E.164 format.` | false |
+| first_name | First Name | STRING | `Individual's first name.` | false |
+| last_name | Last Name | STRING | `Individual's last name.` | false |
+| organization | Organization | STRING | `Name of the company or organization within the company for whom the individual works.` | false |
+| locale | Locale | STRING | `The locale of the profile, in the IETF BCP 47 language tag format like (ISO 639-1/2)-(ISO 3166 alpha-2).` | false |
+| title | Title | STRING | `Individual's job title.` | false |
+| image | Image | STRING | `URL pointing to the location of a profile image.` | false |
+| address1 | Address1 | STRING | `First line of street address.` | false |
+| address2 | Address2 | STRING | `Second line of street address.` | false |
+| city | City | STRING | `City name.` | false |
+| country | Country | STRING | `Country name.` | false |
+| region | Region | STRING | `Region within a country, such as state or province.` | false |
+| zip | Zip | STRING | `Zip code.` | false |
+| timezone | Timezone | STRING | `Time zone name. We recommend using time zones from the IANA Time Zone Database..` | false |
+| ip | IP | STRING | `IP address.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Profile",
+  "name" : "updateProfile",
+  "parameters" : {
+    "profileId" : "",
+    "email" : "",
+    "phone_number" : "",
+    "first_name" : "",
+    "last_name" : "",
+    "organization" : "",
+    "locale" : "",
+    "title" : "",
+    "image" : "",
+    "address1" : "",
+    "address2" : "",
+    "city" : "",
+    "country" : "",
+    "region" : "",
+    "zip" : "",
+    "timezone" : "",
+    "ip" : ""
+  },
+  "type" : "klaviyo/v1/updateProfile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(id), &#123;STRING\(email), STRING\(phone_number), STRING\(external_id), STRING\(anonymous_id), STRING\(first_name), STRING\(last_name), STRING\(organization), STRING\(locale), STRING\(title), STRING\(image), STRING\(created), STRING\(updated), STRING\(last_event_date), &#123;STRING\(address1), STRING\(address2), STRING\(city), STRING\(country), &#123;&#125;\(latitude), &#123;&#125;\(longitude), STRING\(region), STRING\(zip), STRING\(timezone), STRING\(ip)&#125;\(location), &#123;&#125;\(properties), &#123;&#123;&#123;BOOLEAN\(can_receive_email_marketing), STRING\(consent), DATE_TIME\(consent_timestamp), DATE_TIME\(last_updated), STRING\(method), STRING\(method_detail), STRING\(custom_method_detail), BOOLEAN\(double_optin), [STRING\($reason), DATE_TIME\($timestamp)]\(suppression), [STRING\($list_id), STRING\($reason), DATE_TIME\($timestamp)]\(list_suppressions)&#125;\(marketing)&#125;\(email), &#123;&#123;BOOLEAN\(can_receive_sms_marketing), STRING\(consent), DATE_TIME\(consent_timestamp), STRING\(method), STRING\(method_detail), DATE_TIME\(last_updated)&#125;\(marketing), &#123;BOOLEAN\(can_receive_sms_transactional), STRING\(consent), DATE_TIME\(consent_timestamp), STRING\(method), STRING\(method_detail), DATE_TIME\(last_updated)&#125;\(transactional)&#125;\(sms), &#123;&#123;BOOLEAN\(can_receive_push_marketing), STRING\(consent), DATE_TIME\(consent_timestamp)&#125;\(marketing)&#125;\(mobile_push)&#125;\(subscriptions), &#123;NUMBER\(historic_clv), NUMBER\(predicted_clv), NUMBER\(total_clv), NUMBER\(historic_number_of_orders), NUMBER\(predicted_number_of_orders), NUMBER\(average_days_between_orders), NUMBER\(average_order_value), NUMBER\(churn_probability), DATE_TIME\(expected_date_of_next_order)&#125;\(predictive_analytics)&#125;\(attributes), &#123;STRING\(self)&#125;\(links), &#123;&#123;&#123;STRING\(type), STRING\(id)&#125;\(data), &#123;STRING\(self), STRING\(related)&#125;\(links)&#125;\(lists), &#123;&#123;STRING\(type), STRING\(id)&#125;\(data), &#123;STRING\(self), STRING\(related)&#125;\(links)&#125;\(segments), &#123;&#123;STRING\(type), STRING\(id)&#125;\(data), &#123;STRING\(self), STRING\(related)&#125;\(links)&#125;\(push-tokens)&#125;\(relationships)&#125; </details> |  |
+| links | OBJECT <details> <summary> Properties </summary> &#123;STRING\(self)&#125; </details> | Links. |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "type" : "",
+    "id" : "",
+    "attributes" : {
+      "email" : "",
+      "phone_number" : "",
+      "external_id" : "",
+      "anonymous_id" : "",
+      "first_name" : "",
+      "last_name" : "",
+      "organization" : "",
+      "locale" : "",
+      "title" : "",
+      "image" : "",
+      "created" : "",
+      "updated" : "",
+      "last_event_date" : "",
+      "location" : {
+        "address1" : "",
+        "address2" : "",
+        "city" : "",
+        "country" : "",
+        "latitude" : { },
+        "longitude" : { },
+        "region" : "",
+        "zip" : "",
+        "timezone" : "",
+        "ip" : ""
+      },
+      "properties" : { },
+      "subscriptions" : {
+        "email" : {
+          "marketing" : {
+            "can_receive_email_marketing" : false,
+            "consent" : "",
+            "consent_timestamp" : "2021-01-01T00:00:00",
+            "last_updated" : "2021-01-01T00:00:00",
+            "method" : "",
+            "method_detail" : "",
+            "custom_method_detail" : "",
+            "double_optin" : false,
+            "suppression" : [ "", "2021-01-01T00:00:00" ],
+            "list_suppressions" : [ "", "", "2021-01-01T00:00:00" ]
+          }
+        },
+        "sms" : {
+          "marketing" : {
+            "can_receive_sms_marketing" : false,
+            "consent" : "",
+            "consent_timestamp" : "2021-01-01T00:00:00",
+            "method" : "",
+            "method_detail" : "",
+            "last_updated" : "2021-01-01T00:00:00"
+          },
+          "transactional" : {
+            "can_receive_sms_transactional" : false,
+            "consent" : "",
+            "consent_timestamp" : "2021-01-01T00:00:00",
+            "method" : "",
+            "method_detail" : "",
+            "last_updated" : "2021-01-01T00:00:00"
+          }
+        },
+        "mobile_push" : {
+          "marketing" : {
+            "can_receive_push_marketing" : false,
+            "consent" : "",
+            "consent_timestamp" : "2021-01-01T00:00:00"
+          }
+        }
+      },
+      "predictive_analytics" : {
+        "historic_clv" : 0.0,
+        "predicted_clv" : 0.0,
+        "total_clv" : 0.0,
+        "historic_number_of_orders" : 0.0,
+        "predicted_number_of_orders" : 0.0,
+        "average_days_between_orders" : 0.0,
+        "average_order_value" : 0.0,
+        "churn_probability" : 0.0,
+        "expected_date_of_next_order" : "2021-01-01T00:00:00"
+      }
+    },
+    "links" : {
+      "self" : ""
+    },
+    "relationships" : {
+      "lists" : {
+        "data" : {
+          "type" : "",
+          "id" : ""
+        },
+        "links" : {
+          "self" : "",
+          "related" : ""
+        }
+      },
+      "segments" : {
+        "data" : {
+          "type" : "",
+          "id" : ""
+        },
+        "links" : {
+          "self" : "",
+          "related" : ""
+        }
+      },
+      "push-tokens" : {
+        "data" : {
+          "type" : "",
+          "id" : ""
+        },
+        "links" : {
+          "self" : "",
+          "related" : ""
+        }
+      }
+    }
+  },
+  "links" : {
+    "self" : ""
+  }
+}
+```
+
+
+
+
