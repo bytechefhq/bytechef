@@ -29,7 +29,7 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.component.sendfox.util.SendFoxUtils;
+import com.bytechef.component.sendfox.util.SendfoxUtils;
 import java.util.Map;
 
 /**
@@ -37,7 +37,7 @@ import java.util.Map;
  *
  * @generated
  */
-public class SendFoxUnsubscribeContactAction {
+public class SendfoxUnsubscribeContactAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("unsubscribeContact")
         .title("Unsubscribe Contact")
         .description("Unsubscribes a contact.")
@@ -53,7 +53,7 @@ public class SendFoxUnsubscribeContactAction {
             .label("Email")
             .description("Email of the Contact.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) SendFoxUtils::getEmailOptions))
+            .options((OptionsDataSource.ActionOptionsFunction<String>) SendfoxUtils::getEmailOptions))
         .output(outputSchema(object().properties(integer("id").description("ID of the contact.")
             .required(false),
             string("email").description("Email of the contact.")
@@ -113,6 +113,6 @@ public class SendFoxUnsubscribeContactAction {
                 Map.of(
                     "responseType", ResponseType.JSON))));
 
-    private SendFoxUnsubscribeContactAction() {
+    private SendfoxUnsubscribeContactAction() {
     }
 }

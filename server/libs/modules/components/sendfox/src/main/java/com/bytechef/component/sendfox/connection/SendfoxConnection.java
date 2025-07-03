@@ -30,7 +30,7 @@ import com.bytechef.component.definition.ComponentDsl;
  *
  * @generated
  */
-public class SendFoxConnection {
+public class SendfoxConnection {
     public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.sendfox.com")
         .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
@@ -46,6 +46,6 @@ public class SendFoxConnection {
             .tokenUrl((connectionParameters, context) -> "https://sendfox.com/oauth/token")
             .refreshUrl((connectionParameters, context) -> "https://sendfox.com/oauth/token"));
 
-    private SendFoxConnection() {
+    private SendfoxConnection() {
     }
 }

@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @generated
  */
-public abstract class AbstractSendFoxUtils {
+public abstract class AbstractSendfoxUtils {
     public static List<Option<String>> getEmailOptions(
         Parameters inputParameters,
         Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,

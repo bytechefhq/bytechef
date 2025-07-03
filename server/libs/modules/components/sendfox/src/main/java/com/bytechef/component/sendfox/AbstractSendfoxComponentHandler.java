@@ -21,28 +21,28 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.sendfox.action.SendFoxCreateContactAction;
-import com.bytechef.component.sendfox.action.SendFoxCreateListAction;
-import com.bytechef.component.sendfox.action.SendFoxUnsubscribeContactAction;
-import com.bytechef.component.sendfox.connection.SendFoxConnection;
+import com.bytechef.component.sendfox.action.SendfoxCreateContactAction;
+import com.bytechef.component.sendfox.action.SendfoxCreateListAction;
+import com.bytechef.component.sendfox.action.SendfoxUnsubscribeContactAction;
+import com.bytechef.component.sendfox.connection.SendfoxConnection;
 
 /**
  * Provides the base implementation for the REST based component.
  *
  * @generated
  */
-public abstract class AbstractSendFoxComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractSendfoxComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("sendfox")
             .title("SendFox")
             .description(
                 "SendFox lets you automate email campaigns, complete with custom opt-in forms and landing pages, so you're not tanking your budget to get new subscribers."))
-                    .actions(modifyActions(SendFoxCreateContactAction.ACTION_DEFINITION,
-                        SendFoxCreateListAction.ACTION_DEFINITION, SendFoxUnsubscribeContactAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(SendFoxConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(SendFoxCreateContactAction.ACTION_DEFINITION),
-                        tool(SendFoxCreateListAction.ACTION_DEFINITION),
-                        tool(SendFoxUnsubscribeContactAction.ACTION_DEFINITION)))
+                    .actions(modifyActions(SendfoxCreateContactAction.ACTION_DEFINITION,
+                        SendfoxCreateListAction.ACTION_DEFINITION, SendfoxUnsubscribeContactAction.ACTION_DEFINITION))
+                    .connection(modifyConnection(SendfoxConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(SendfoxCreateContactAction.ACTION_DEFINITION),
+                        tool(SendfoxCreateListAction.ACTION_DEFINITION),
+                        tool(SendfoxUnsubscribeContactAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

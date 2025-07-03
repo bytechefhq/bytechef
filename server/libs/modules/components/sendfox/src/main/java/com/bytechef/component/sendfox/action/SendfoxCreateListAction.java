@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @generated
  */
-public class SendFoxCreateListAction {
+public class SendfoxCreateListAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createList")
         .title("Create List")
         .description("Creates a new list.")
@@ -59,6 +59,6 @@ public class SendFoxCreateListAction {
                 Map.of(
                     "responseType", ResponseType.JSON))));
 
-    private SendFoxCreateListAction() {
+    private SendfoxCreateListAction() {
     }
 }

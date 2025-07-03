@@ -61,7 +61,7 @@ class SendfoxUtilsTest {
 
     @Test
     void getEmailOptions() {
-        List<Option<String>> result = SendFoxUtils.getEmailOptions(
+        List<Option<String>> result = SendfoxUtils.getEmailOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expected = List.of(
@@ -73,7 +73,7 @@ class SendfoxUtilsTest {
 
     @Test
     void getListsOptions() {
-        List<Option<Long>> result = SendFoxUtils.getListsOptions(
+        List<Option<Long>> result = SendfoxUtils.getListsOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<Long>> expected = List.of(

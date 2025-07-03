@@ -29,7 +29,7 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.component.sendfox.util.SendFoxUtils;
+import com.bytechef.component.sendfox.util.SendfoxUtils;
 import java.util.Map;
 
 /**
@@ -37,7 +37,7 @@ import java.util.Map;
  *
  * @generated
  */
-public class SendFoxCreateContactAction {
+public class SendfoxCreateContactAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
         .description("Creates a new contact.")
@@ -76,7 +76,7 @@ public class SendFoxCreateContactAction {
                 .label("Lists")
                 .description("Lists to which the new contact will be added.")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<Long>) SendFoxUtils::getListsOptions))
+                .options((OptionsDataSource.ActionOptionsFunction<Long>) SendfoxUtils::getListsOptions))
         .output(outputSchema(object().properties(integer("id").description("ID of the contact.")
             .required(false),
             string("email").description("Email of the contact.")
@@ -136,6 +136,6 @@ public class SendFoxCreateContactAction {
                 Map.of(
                     "responseType", ResponseType.JSON))));
 
-    private SendFoxCreateContactAction() {
+    private SendfoxCreateContactAction() {
     }
 }
