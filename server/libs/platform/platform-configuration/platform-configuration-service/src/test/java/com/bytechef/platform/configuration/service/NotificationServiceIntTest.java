@@ -19,7 +19,7 @@ package com.bytechef.platform.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.platform.configuration.config.NotificationIntTestConfiguration;
+import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfiguration;
 import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.domain.NotificationEvent;
 import com.bytechef.platform.configuration.repository.NotificationRepository;
@@ -35,20 +35,20 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 /**
  * @author Matija Petanjek
  */
-@SpringBootTest(classes = NotificationIntTestConfiguration.class)
+@SpringBootTest(classes = PlatformConfigurationIntTestConfiguration.class)
 public class NotificationServiceIntTest {
 
     @MockitoBean
     private MailService mailService;
-
-    @MockitoBean
-    private WorkflowService workflowService;
 
     @Autowired
     private NotificationService notificationService;
 
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @MockitoBean
+    private WorkflowService workflowService;
 
     @AfterEach
     public void afterEach() {
