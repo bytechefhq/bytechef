@@ -69,10 +69,7 @@ const PropertyCodeEditorSheet = ({
         <>
             <Sheet modal={!copilotPanelOpen} onOpenChange={onClose} open={true}>
                 <SheetContent
-                    className={twMerge(
-                        'flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-xl',
-                        copilotPanelOpen && 'mr-[450px]'
-                    )}
+                    className={twMerge('flex flex-col gap-0 p-0 sm:max-w-[1200px]', copilotPanelOpen && 'mr-[460px]')}
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
