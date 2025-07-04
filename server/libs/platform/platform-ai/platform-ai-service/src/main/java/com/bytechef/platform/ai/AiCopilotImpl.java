@@ -168,7 +168,7 @@ public class AiCopilotImpl implements AiCopilot {
                     OrchestratorWorkersWorkflow.WorkerResponse process =
                         orchestratorWorkersWorkflow.process(message, currentWorkflow);
 
-                    yield chatClientWorkflow.prompt()
+                    String definition = chatClientWorkflow.prompt()
                         .system(WORKFLOW_EDITOR_SYSTEM_PROMPT)
                         .user(user -> user
                             .text(WORKFLOW_EDITOR_PROMPT)
@@ -176,9 +176,19 @@ public class AiCopilotImpl implements AiCopilot {
                             .param("task_list", process.workerResponses()))
                         .advisors(advisor -> advisor.param(
                             ChatMemory.CONVERSATION_ID, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
+                        .call()
+                        .content();
+
+                    definition = definition
+                        .replace("```json", "")
+                        .replace("```", "");
+
+                    workflowService.update(workflow.getId(), definition, workflow.getVersion());
+
+                    yield Flux.just(
+                        Map.of(
+                            "workflowUpdated", true,
+                            "text", "Workflow has been updated"));
                 }
                 case CODE_EDITOR -> {
                     Map<String, ?> parameters = contextDTO.parameters();
