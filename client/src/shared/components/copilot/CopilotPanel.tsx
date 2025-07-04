@@ -58,7 +58,7 @@ const CopilotPanel = () => {
                 </div>
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 top-16">
+            <div className="absolute inset-x-0 bottom-0 top-16 -mx-1">
                 <CopilotRuntimeProvider>
                     <Thread />
                 </CopilotRuntimeProvider>

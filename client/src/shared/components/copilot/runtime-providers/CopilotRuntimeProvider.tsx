@@ -1,7 +1,10 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {AppendMessage, AssistantRuntimeProvider, ThreadMessageLike, useExternalStoreRuntime} from '@assistant-ui/react';
+import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
+import {useParams} from 'react-router-dom';
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
     return message;
@@ -16,6 +19,10 @@ export function CopilotRuntimeProvider({
 
     const {addMessage, context, conversationId, messages} = useCopilotStore();
     const {workflow} = useWorkflowDataStore();
+
+    const {projectId, projectWorkflowId} = useParams();
+
+    const queryClient = useQueryClient();
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
@@ -44,13 +51,21 @@ export function CopilotRuntimeProvider({
             // signal: abortSignal,
         });
 
-        const responses: {text: string}[] = await result.json();
+        const responses: {text: string; workflowUpdated: boolean}[] = await result.json();
 
         addMessage({
             content: responses.map((message) => message.text).join(''),
             role: 'assistant',
         });
         setIsRunning(false);
+
+        for (const response of responses) {
+            if (response.workflowUpdated) {
+                queryClient.invalidateQueries({
+                    queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
+                });
+            }
+        }
     };
 
     const runtime = useExternalStoreRuntime({
