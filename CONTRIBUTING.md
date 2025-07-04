@@ -107,7 +107,7 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
     git clone https://github.com/bytechefhq/bytechef.git
     cd bytechef
     ```
-### Server Side   
+### Server Side
 
 3. **Change working directory to the `BYTECHEF_HOME/server` folder.**
 4. Start up the docker container with dependent infrastructure
@@ -115,7 +115,7 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
     ```bash
     docker compose -f docker-compose.dev.infra.yml up -d
     ```
-5. Make sure `java -version` and `JAVA_HOME` references Java JDK 21+   
+5. Make sure `java -version` and `JAVA_HOME` references Java JDK 21+
 6. Compile codebase:
 
     ```bash
