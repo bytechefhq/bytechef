@@ -147,6 +147,12 @@ export const useProject = () => {
             bottomResizablePanelRef.current.resize(0);
         }
 
+        // Reset state when the component unmounts
+        return () => {
+            setCopilotPanelOpen(false);
+            setWorkflow({});
+        };
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -163,12 +169,6 @@ export const useProject = () => {
         if (currentWorkflow) {
             setWorkflow({...currentWorkflow});
         }
-
-        // Reset state when component unmounts
-        return () => {
-            setCopilotPanelOpen(false);
-            setWorkflow({});
-        };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentWorkflow]);
