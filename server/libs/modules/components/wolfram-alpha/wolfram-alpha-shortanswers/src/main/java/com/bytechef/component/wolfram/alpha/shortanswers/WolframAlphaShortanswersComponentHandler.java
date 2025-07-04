@@ -26,4 +26,11 @@ import com.google.auto.service.AutoService;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class WolframAlphaShortanswersComponentHandler extends AbstractWolframAlphaShortanswersComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .icon("path:assets/wolfram-alpha.svg")
+            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE);
+    }
 }
