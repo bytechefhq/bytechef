@@ -277,9 +277,9 @@ export function getConditionBranchSide(
         return 'right';
     }
 
-    const inTrueBranch = (parentConditionTask.parameters?.caseTrue || []).some(
-        (task: WorkflowTask) => task.name === conditionId
-    );
+    const inTrueBranch = Array.isArray(parentConditionTask.parameters?.caseTrue)
+        ? parentConditionTask.parameters.caseTrue.some((task: WorkflowTask) => task.name === conditionId)
+        : false;
 
     return inTrueBranch ? 'left' : 'right';
 }
@@ -294,7 +294,9 @@ export function hasTaskInConditionBranches(conditionId: string, taskId: string, 
         return false;
     }
 
-    const allBranchTasks = [...(condition.parameters.caseTrue || []), ...(condition.parameters.caseFalse || [])];
+    const caseTrueTasks = Array.isArray(condition.parameters.caseTrue) ? condition.parameters.caseTrue : [];
+    const caseFalseTasks = Array.isArray(condition.parameters.caseFalse) ? condition.parameters.caseFalse : [];
+    const allBranchTasks = [...caseTrueTasks, ...caseFalseTasks];
 
     return allBranchTasks.some((task) => task.name === taskId);
 }
@@ -313,8 +315,8 @@ export default function createConditionEdges(conditionNode: Node, allNodes: Node
 
     edges.push(...baseStructureEdges);
 
-    const caseTrueSubtasks: WorkflowTask[] = parameters?.caseTrue || [];
-    const caseFalseSubtasks: WorkflowTask[] = parameters?.caseFalse || [];
+    const caseTrueSubtasks: WorkflowTask[] = Array.isArray(parameters?.caseTrue) ? parameters.caseTrue : [];
+    const caseFalseSubtasks: WorkflowTask[] = Array.isArray(parameters?.caseFalse) ? parameters.caseFalse : [];
 
     const trueEdges = createBranchEdges(conditionId, caseTrueSubtasks, 'left', allNodes);
     const falseEdges = createBranchEdges(conditionId, caseFalseSubtasks, 'right', allNodes);

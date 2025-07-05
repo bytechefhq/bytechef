@@ -502,29 +502,41 @@ export function collectTaskDispatcherData(
 
     if (componentName === 'condition' && parameters) {
         conditionChildTasks[name] = {
-            caseFalse: (parameters.caseFalse || []).map((caseFalseSubtask: WorkflowTask) => caseFalseSubtask.name),
-            caseTrue: (parameters.caseTrue || []).map((caseTrueSubtask: WorkflowTask) => caseTrueSubtask.name),
+            caseFalse: Array.isArray(parameters.caseFalse)
+                ? parameters.caseFalse.map((caseFalseSubtask: WorkflowTask) => caseFalseSubtask.name)
+                : [],
+            caseTrue: Array.isArray(parameters.caseTrue)
+                ? parameters.caseTrue.map((caseTrueSubtask: WorkflowTask) => caseTrueSubtask.name)
+                : [],
         };
     } else if (componentName === 'loop' && parameters?.iteratee) {
         loopChildTasks[name] = {
-            iteratee: parameters.iteratee.map((iteratee: WorkflowTask) => iteratee.name),
+            iteratee: Array.isArray(parameters.iteratee)
+                ? parameters.iteratee.map((iteratee: WorkflowTask) => iteratee.name)
+                : [],
         };
     } else if (componentName === 'branch' && parameters) {
         branchChildTasks[name] = {
-            cases: (parameters.cases || []).reduce((acc: {[key: string]: string[]}, caseItem: BranchCaseType) => {
-                const caseKey = caseItem.key;
+            cases: Array.isArray(parameters.cases)
+                ? parameters.cases.reduce((acc: {[key: string]: string[]}, caseItem: BranchCaseType) => {
+                      const caseKey = caseItem.key;
 
-                const taskNames = (caseItem.tasks || []).map((task: WorkflowTask) => task.name);
+                      const taskNames = Array.isArray(caseItem.tasks)
+                          ? caseItem.tasks.map((task: WorkflowTask) => task.name)
+                          : [];
 
-                acc[caseKey] = taskNames;
+                      acc[caseKey] = taskNames;
 
-                return acc;
-            }, {}),
-            default: (parameters.default || []).map((defaultSubtask: WorkflowTask) => defaultSubtask.name),
+                      return acc;
+                  }, {})
+                : {},
+            default: Array.isArray(parameters.default)
+                ? parameters.default.map((defaultSubtask: WorkflowTask) => defaultSubtask.name)
+                : [],
         };
     } else if (componentName === 'parallel' && parameters?.tasks) {
         parallelChildTasks[name] = {
-            tasks: parameters.tasks.map((task: WorkflowTask) => task.name),
+            tasks: Array.isArray(parameters.tasks) ? parameters.tasks.map((task: WorkflowTask) => task.name) : [],
         };
     } else if (componentName === 'each' && parameters?.iteratee) {
         eachChildTasks[name] = {
