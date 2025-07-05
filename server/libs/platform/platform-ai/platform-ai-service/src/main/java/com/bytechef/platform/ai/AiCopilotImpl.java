@@ -179,16 +179,25 @@ public class AiCopilotImpl implements AiCopilot {
                         .call()
                         .content();
 
-                    definition = definition
-                        .replace("```json", "")
-                        .replace("```", "");
+                    Map<String, ?> result;
 
-                    workflowService.update(workflow.getId(), definition, workflow.getVersion());
+                    if (definition == null) {
+                        result = Map.of(
+                            "workflowUpdated", false,
+                            "text", "Unable to generate workflow, please try again");
+                    } else {
+                        definition = definition
+                            .replace("```json", "")
+                            .replace("```", "");
 
-                    yield Flux.just(
-                        Map.of(
+                        workflowService.update(workflow.getId(), definition, workflow.getVersion());
+
+                        result = Map.of(
                             "workflowUpdated", true,
-                            "text", "Workflow has been updated"));
+                            "text", "Workflow has been updated");
+                    }
+
+                    yield Flux.just(result);
                 }
                 case CODE_EDITOR -> {
                     Map<String, ?> parameters = contextDTO.parameters();
