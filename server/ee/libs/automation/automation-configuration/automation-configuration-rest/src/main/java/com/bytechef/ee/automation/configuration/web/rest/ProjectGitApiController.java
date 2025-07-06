@@ -65,6 +65,11 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
+    public ResponseEntity<List<String>> getProjectRemoteBranches(Long id) {
+        return ResponseEntity.ok(projectGitFacade.getRemoteBranches(id));
+    }
+
+    @Override
     public ResponseEntity<Void> pullProjectFromGit(Long id) {
         projectGitFacade.pullProjectFromGit(id);
 

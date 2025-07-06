@@ -73,6 +73,11 @@ public class GitWorkflowRepositoryTest {
         }
 
         @Override
+        public List<String> getRemoteBranches() {
+            return List.of("main", "develop", "feature/test");
+        }
+
+        @Override
         public String write(List<WorkflowResource> workflowResources, String commitMessage) {
             return "aGVsbG8vMTIz";
         }

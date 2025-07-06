@@ -124,6 +124,10 @@ public class GitWorkflowRepository implements WorkflowRepository {
         return SourceType.GIT;
     }
 
+    public List<String> getRemoteBranches() {
+        return gitWorkflowOperations.getRemoteBranches();
+    }
+
     private static Workflow readWorkflow(WorkflowResource workflowResource) {
         Workflow workflow = null;
 

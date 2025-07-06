@@ -23,6 +23,12 @@ import org.springframework.stereotype.Service;
 @ConditionalOnEEVersion
 public class ProjectGitService {
 
+    public List<String> getRemoteBranches(String url, String username, String password) {
+        GitWorkflowRepository gitWorkflowRepository = new GitWorkflowRepository(url, null, username, password);
+
+        return gitWorkflowRepository.getRemoteBranches();
+    }
+
     public GitWorkflows getWorkflows(String url, String branch, String username, String password) {
         GitWorkflowRepository gitWorkflowRepository = new GitWorkflowRepository(url, branch, username, password);
 

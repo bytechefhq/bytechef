@@ -56,6 +56,30 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /projects/{id}/git/remote-branches:
+    get:
+      description: "Get remote branches of a project git repository."
+      summary: "Get remote branches of a project git repository."
+      tags:
+        - "project-git"
+      operationId: "getProjectRemoteBranches"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of remote branches."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "string"
   /projects/{id}/git/pull:
     post:
       description: "Pulls project from git repository."
