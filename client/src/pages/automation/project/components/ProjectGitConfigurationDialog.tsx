@@ -10,8 +10,9 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Switch} from '@/components/ui/switch';
+import {useGetProjectRemoteBranchesQuery} from '@/ee/queries/projectGit.queries';
 import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import {zodResolver} from '@hookform/resolvers/zod';
 import React from 'react';
@@ -29,6 +30,7 @@ const ProjectGitConfigurationDialog = ({
     onClose,
     onUpdateProjectGitConfigurationSubmit,
     projectGitConfiguration,
+    projectId,
 }: {
     onClose: () => void;
     onUpdateProjectGitConfigurationSubmit: ({
@@ -39,6 +41,7 @@ const ProjectGitConfigurationDialog = ({
         onSuccess: () => void;
     }) => void;
     projectGitConfiguration?: ProjectGitConfiguration;
+    projectId: number;
 }) => {
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -48,6 +51,11 @@ const ProjectGitConfigurationDialog = ({
         resolver: zodResolver(formSchema),
     });
 
+    const {data: remoteBranches, isLoading: isLoadingBranches} = useGetProjectRemoteBranchesQuery(
+        projectId,
+        !!projectId
+    );
+console.log(projectId)
     function handleSubmit(projectGitConfiguration: z.infer<typeof formSchema>) {
         onUpdateProjectGitConfigurationSubmit({
             onSuccess: onClose,
@@ -81,7 +89,28 @@ const ProjectGitConfigurationDialog = ({
                                         <FormLabel>Branch</FormLabel>
 
                                         <FormControl>
-                                            <Input {...field} />
+                                            <Select
+                                                disabled={isLoadingBranches}
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue
+                                                        placeholder={
+                                                            isLoadingBranches
+                                                                ? 'Loading branches...'
+                                                                : 'Select a branch'
+                                                        }
+                                                    />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {remoteBranches?.map((branch) => (
+                                                        <SelectItem key={branch} value={branch}>
+                                                            {branch}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
 
                                         <FormDescription>This is the branch name of a git repository.</FormDescription>

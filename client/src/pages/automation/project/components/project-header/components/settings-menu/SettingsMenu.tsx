@@ -162,6 +162,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                     onClose={() => setShowProjectGitConfigurationDialog(false)}
                     onUpdateProjectGitConfigurationSubmit={handleUpdateProjectGitConfigurationSubmit}
                     projectGitConfiguration={projectGitConfiguration}
+                    projectId={project.id!}
                 />
             )}
 

@@ -447,6 +447,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                     onClose={() => setShowProjectGitConfigurationDialog(false)}
                     onUpdateProjectGitConfigurationSubmit={handleUpdateProjectGitConfigurationSubmit}
                     projectGitConfiguration={projectGitConfiguration}
+                    projectId={project.id!}
                 />
             )}
 
