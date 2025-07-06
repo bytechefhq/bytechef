@@ -15,5 +15,3 @@ spring:
       enabled: false
     livereload:
       enabled: false
-  thymeleaf:
-    cache: true
