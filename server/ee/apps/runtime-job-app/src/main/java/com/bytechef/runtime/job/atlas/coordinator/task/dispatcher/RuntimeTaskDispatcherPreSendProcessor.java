@@ -14,8 +14,11 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.runtime.job.platform.connection.ConnectionContext;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import org.springframework.core.env.Environment;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,12 +29,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class RuntimeTaskDispatcherPreSendProcessor implements TaskDispatcherPreSendProcessor {
 
-    private static final String CONNECTION_ENV_VARIABLE = "BYTECHEF_CONNECTION_%s_PARAMETERS";
+    private final ApplicationArguments applicationArguments;
 
-    private final Environment environment;
-
-    public RuntimeTaskDispatcherPreSendProcessor(Environment environment) {
-        this.environment = environment;
+    public RuntimeTaskDispatcherPreSendProcessor(ApplicationArguments applicationArguments) {
+        this.applicationArguments = applicationArguments;
     }
 
     @Override
@@ -43,15 +44,30 @@ public class RuntimeTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
         String componentName = workflowNodeType.name();
 
         String name = workflowTask.getName();
-        String parameters = environment.getProperty(CONNECTION_ENV_VARIABLE.formatted(workflowTask.getName()));
+
+        List<String> connections = applicationArguments.getOptionValues("connections");
+
+        if (connections == null) {
+            connections = List.of();
+        }
+
+        Map<String, Map<String, Object>> connectionParameters = connections.stream()
+            .map(value -> JsonUtils.read(value, new TypeReference<Map<String, Map<String, Object>>>() {}))
+            .reduce(new HashMap<>(), (a, b) -> {
+                a.putAll(b);
+
+                return a;
+            });
+
+        Map<String, ?> parameters = connectionParameters.get(workflowTask.getName());
 
         if (parameters == null) {
             name = componentName;
-            parameters = environment.getProperty(CONNECTION_ENV_VARIABLE.formatted(componentName.toUpperCase()));
+            parameters = connectionParameters.get(componentName);
         }
 
         if (parameters != null) {
-            long connectionId = ConnectionContext.putConnectionParameters(name, JsonUtils.readMap(parameters));
+            long connectionId = ConnectionContext.putConnectionParameters(name, parameters);
 
             Map<String, Long> connectionIdMap = Map.of(workflowTask.getName(), connectionId);
 

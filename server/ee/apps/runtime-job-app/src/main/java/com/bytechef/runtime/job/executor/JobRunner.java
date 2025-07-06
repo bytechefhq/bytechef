@@ -20,16 +20,16 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class JobExecutor {
+public class JobRunner {
 
     private final JobFacade jobFacade;
 
     @SuppressFBWarnings("EI")
-    public JobExecutor(JobFacade jobFacade) {
+    public JobRunner(JobFacade jobFacade) {
         this.jobFacade = jobFacade;
     }
 
-    public void execute(String workflowName, Map<String, ?> jobParameters) {
+    public void run(String workflowName, Map<String, ?> jobParameters) {
         String substring = workflowName.substring(workflowName.lastIndexOf("/") + 1, workflowName.lastIndexOf('.'));
 
         String id = EncodingUtils.base64EncodeToString(substring);

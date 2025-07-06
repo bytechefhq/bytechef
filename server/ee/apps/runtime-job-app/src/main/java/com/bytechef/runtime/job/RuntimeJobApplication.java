@@ -8,7 +8,7 @@
 package com.bytechef.runtime.job;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.runtime.job.executor.JobExecutor;
+import com.bytechef.runtime.job.executor.JobRunner;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +18,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 /**
  * @version ee
@@ -25,15 +26,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Ivica Cardic
  */
 
-@SpringBootApplication(scanBasePackages = "com.bytechef")
+@SpringBootApplication(scanBasePackages = "com.bytechef", exclude = {
+    DataSourceAutoConfiguration.class
+})
 public class RuntimeJobApplication implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(RuntimeJobApplication.class);
 
-    private final JobExecutor jobExecutor;
+    private final JobRunner jobRunner;
 
-    public RuntimeJobApplication(JobExecutor jobExecutor) {
-        this.jobExecutor = jobExecutor;
+    public RuntimeJobApplication(JobRunner jobRunner) {
+        this.jobRunner = jobRunner;
     }
 
     public static void main(String[] args) {
@@ -50,11 +53,14 @@ public class RuntimeJobApplication implements ApplicationRunner {
         }
 
         List<String> parameters = args.getOptionValues("parameters");
+        List<String> connections = args.getOptionValues("connections");
 
-        log.info("Running workflow: {} with parameters: {}", workflow, parameters == null ? "{}" : parameters);
+        log.info(
+            "Running workflow: {} with parameters: {} and connections: {}",
+            workflow, parameters == null ? "{}" : parameters, connections == null ? "{}" : connections);
 
         Map<String, ?> jobParameters = parameters == null ? Map.of() : JsonUtils.readMap(parameters.getFirst());
 
-        jobExecutor.execute(workflow.getFirst(), jobParameters);
+        jobRunner.run(workflow.getFirst(), jobParameters);
     }
 }
