@@ -66,7 +66,8 @@ public class HttpClientConnection {
             authorization(Authorization.AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
-                    string(TOKEN).label("Token")
+                    string(TOKEN)
+                        .label("Token")
                         .required(true)),
             authorization(Authorization.AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
