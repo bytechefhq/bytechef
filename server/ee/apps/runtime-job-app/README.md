@@ -209,6 +209,50 @@ java -jar server/ee/apps/runtime-job-app/build/libs/runtime-job-app-*.jar \
 ./gradlew :server:ee:apps:runtime-job-app:bootRun --args='--workflow=workflow.json --connections={"openAi":{"token":"test-token"}}'
 ```
 
+### Using Docker
+
+First, build the Docker image:
+
+```bash
+# Build the application and Docker image
+./gradlew :server:ee:apps:runtime-job-app:build
+docker build -t bytechef-runtime-job server/ee/apps/runtime-job-app/
+```
+
+Then run the container with your workflow and arguments:
+
+```bash
+# Basic workflow execution
+docker run --rm \
+  -v /path/to/your/workflows:/workflows \
+  bytechef-runtime-job \
+  --workflow=/workflows/my-workflow.json
+
+# Workflow with parameters
+docker run --rm \
+  -v /path/to/your/workflows:/workflows \
+  bytechef-runtime-job \
+  --workflow=/workflows/my-workflow.json \
+  --parameters='{"inputValue": "Hello World", "count": 5}'
+
+# Workflow with connections
+docker run --rm \
+  -v /path/to/your/workflows:/workflows \
+  bytechef-runtime-job \
+  --workflow=/workflows/my-workflow.json \
+  --connections='{"openAi": {"token": "your-api-key"}}'
+
+# Complete example with all arguments
+docker run --rm \
+  -v /path/to/your/workflows:/workflows \
+  bytechef-runtime-job \
+  --workflow=/workflows/workflow1.json \
+  --parameters='{"message": "Processing batch job"}' \
+  --connections='{"openAi": {"token": "sk-your-openai-token"}}'
+```
+
+**Note**: The `-v` flag mounts your local workflow directory into the container so the application can access your workflow files.
+
 ## Environment Configuration
 
 The application supports different profiles and configurations:
