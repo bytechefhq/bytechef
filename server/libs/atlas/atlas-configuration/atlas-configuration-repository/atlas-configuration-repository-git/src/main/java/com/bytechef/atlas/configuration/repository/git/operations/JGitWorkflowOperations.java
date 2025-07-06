@@ -28,18 +28,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.ObjectReader;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
@@ -123,6 +127,27 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         }
 
         return new HeadFiles(workflowResources, gitInfo);
+    }
+
+    @Override
+    public List<String> getRemoteBranches() {
+        try {
+            LsRemoteCommand lsRemoteCommand = Git.lsRemoteRepository()
+                .setRemote(url)
+                .setHeads(true);
+
+            lsRemoteCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
+
+            Collection<Ref> refs = lsRemoteCommand.call();
+
+            return refs.stream()
+                .map(ref -> ref.getName()
+                    .replace("refs/heads/", ""))
+                .sorted()
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch remote branches", e);
+        }
     }
 
     @Override

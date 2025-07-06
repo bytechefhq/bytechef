@@ -7,12 +7,16 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
+import java.util.List;
+
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
 public interface ProjectGitFacade {
+
+    List<String> getRemoteBranches(long projectId);
 
     void pullProjectFromGit(long projectId);
 

@@ -121,6 +121,16 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     }
 
     @Override
+    public List<String> getRemoteBranches(long projectId) {
+        Workspace workspace = workspaceService.getProjectWorkspace(projectId);
+
+        GitConfigurationDTO gitConfiguration = gitConfigurationFacade.getGitConfiguration(workspace.getId());
+
+        return projectGitService.getRemoteBranches(
+            gitConfiguration.url(), gitConfiguration.username(), gitConfiguration.password());
+    }
+
+    @Override
     public String pushProjectToGit(long projectId, String commitMessage) {
         Project project = projectService.getProject(projectId);
 

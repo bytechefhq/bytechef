@@ -31,6 +31,8 @@ public interface GitWorkflowOperations {
 
     WorkflowResource getFile(String fileId);
 
+    List<String> getRemoteBranches();
+
     String write(List<WorkflowResource> workflowResources, String commitMessage);
 
     @SuppressFBWarnings("EI")
