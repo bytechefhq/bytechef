@@ -26,6 +26,10 @@ export interface GetProjectGitConfigurationRequest {
     id: number;
 }
 
+export interface GetProjectRemoteBranchesRequest {
+    id: number;
+}
+
 export interface GetWorkspaceProjectGitConfigurationsRequest {
     id: number;
 }
@@ -76,6 +80,41 @@ export class ProjectGitApi extends runtime.BaseAPI {
      */
     async getProjectGitConfiguration(requestParameters: GetProjectGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectGitConfiguration> {
         const response = await this.getProjectGitConfigurationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get remote branches of a project git repository.
+     * Get remote branches of a project git repository.
+     */
+    async getProjectRemoteBranchesRaw(requestParameters: GetProjectRemoteBranchesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getProjectRemoteBranches().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/projects/{id}/git/remote-branches`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Get remote branches of a project git repository.
+     * Get remote branches of a project git repository.
+     */
+    async getProjectRemoteBranches(requestParameters: GetProjectRemoteBranchesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.getProjectRemoteBranchesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
