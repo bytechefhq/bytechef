@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T11:56:40.409280+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-06T11:43:27.126375+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "project-git", description = "The Automation Project Git Internal API")
 public interface ProjectGitApi {
@@ -73,6 +73,47 @@ public interface ProjectGitApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"projectId\" : 0, \"branch\" : \"branch\", \"enabled\" : true }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /projects/{id}/git/remote-branches : Get remote branches of a project git repository.
+     * Get remote branches of a project git repository.
+     *
+     * @param id The id of a project. (required)
+     * @return The list of remote branches. (status code 200)
+     */
+    @Operation(
+        operationId = "getProjectRemoteBranches",
+        summary = "Get remote branches of a project git repository.",
+        description = "Get remote branches of a project git repository.",
+        tags = { "project-git" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of remote branches.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = String.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/projects/{id}/git/remote-branches",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<List<String>> getProjectRemoteBranches(
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ \"\", \"\" ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
