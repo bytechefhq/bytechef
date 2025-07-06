@@ -509,9 +509,16 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 if (projectDeploymentWorkflow.isEnabled()) {
                     projectDeploymentWorkflowService.update(oldProjectDeploymentWorkflow);
 
-                    if (projectDeployment.isEnabled() && !oldProjectDeploymentWorkflow.isEnabled()) {
-                        doEnableProjectDeploymentWorkflow(
-                            projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
+                    if (projectDeployment.isEnabled()) {
+                        if (oldProjectDeploymentWorkflow.isEnabled()) {
+                            doEnableProjectDeploymentWorkflow(
+                                projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), false);
+                            doEnableProjectDeploymentWorkflow(
+                                projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
+                        } else {
+                            doEnableProjectDeploymentWorkflow(
+                                projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
+                        }
                     }
                 } else {
                     if (oldProjectDeploymentWorkflow.isEnabled()) {
