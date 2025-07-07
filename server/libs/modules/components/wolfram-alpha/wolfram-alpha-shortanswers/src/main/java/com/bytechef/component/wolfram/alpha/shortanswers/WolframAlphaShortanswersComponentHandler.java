@@ -17,6 +17,8 @@
 package com.bytechef.component.wolfram.alpha.shortanswers;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -24,4 +26,11 @@ import com.google.auto.service.AutoService;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class WolframAlphaShortanswersComponentHandler extends AbstractWolframAlphaShortanswersComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .icon("path:assets/wolfram-alpha.svg")
+            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE);
+    }
 }
