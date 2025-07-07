@@ -22,8 +22,9 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.List;
 import java.util.Map;
 
@@ -32,16 +33,16 @@ import java.util.Map;
  */
 public class KlaviyoConnection {
 
-    public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://a.klaviyo.com")
         .authorizations(
-            authorization(Authorization.AuthorizationType.API_KEY)
+            authorization(AuthorizationType.API_KEY)
                 .title("API Key")
                 .properties(
                     string(KEY)
                         .label("Key")
                         .required(true))
-                .apply((connectionParameters, context) -> Authorization.ApplyResponse.ofHeaders(
+                .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
                     Map.of(
                         AUTHORIZATION, List.of("Klaviyo-API-Key " + connectionParameters.getRequiredString(KEY)),
                         "accept", List.of("application/vnd.api+json"),

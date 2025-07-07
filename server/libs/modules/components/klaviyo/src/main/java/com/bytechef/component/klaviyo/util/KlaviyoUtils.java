@@ -18,6 +18,11 @@ package com.bytechef.component.klaviyo.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ATTRIBUTES;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.DATA;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.EMAIL;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ID;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PHONE_NUMBER;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
@@ -34,8 +39,10 @@ import java.util.Map;
 public class KlaviyoUtils {
 
     public static List<Option<String>> getProfileIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         Map<String, ?> body = context
             .http(http -> http.get("/api/profiles"))
@@ -43,44 +50,39 @@ public class KlaviyoUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get("data") instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map && map.get("attributes") instanceof Map<?, ?> attributes) {
-                    options.add(option((String) attributes.get("email"), (String) map.get("id")));
+        if (body.get(DATA) instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map && map.get(ATTRIBUTES) instanceof Map<?, ?> attributes) {
+                    options.add(option((String) attributes.get(EMAIL), (String) map.get(ID)));
                 }
             }
         }
+
         return options;
     }
 
     public static String getProfileEmail(Context context, String profileId) {
-
-        Map<String, ?> body = getProfile(context, profileId);
-
-        if (body.get("data") instanceof Map<?, ?> map && map.get("attributes") instanceof Map<?, ?> attributes) {
-            return (String) attributes.get("email");
-        }
-        return null;
+        return getProfileAttribute(context, profileId, EMAIL);
     }
 
     public static String getProfilePhoneNumber(Context context, String profileId) {
-
-        Map<String, ?> body = getProfile(context, profileId);
-
-        if (body.get("data") instanceof Map<?, ?> map && map.get("attributes") instanceof Map<?, ?> attributes) {
-            return (String) attributes.get("phone_number");
-        }
-        return null;
+        return getProfileAttribute(context, profileId, PHONE_NUMBER);
     }
 
-    private static Map<String, ?> getProfile(Context context, String profileId) {
-        return context
+    private static String getProfileAttribute(Context context, String profileId, String attributeName) {
+        Map<String, ?> profileData = context
             .http(http -> http.get("/api/profiles/" + profileId))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+
+        if (profileData.get(DATA) instanceof Map<?, ?> dataMap &&
+            dataMap.get(ATTRIBUTES) instanceof Map<?, ?> attributes) {
+
+            return (String) attributes.get(attributeName);
+        }
+
+        return null;
     }
 
     private KlaviyoUtils() {

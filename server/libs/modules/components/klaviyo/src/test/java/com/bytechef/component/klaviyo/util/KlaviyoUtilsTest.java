@@ -17,6 +17,10 @@
 package com.bytechef.component.klaviyo.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ATTRIBUTES;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.DATA;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.EMAIL;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ID;
 import static com.bytechef.component.klaviyo.util.KlaviyoUtils.getProfileEmail;
 import static com.bytechef.component.klaviyo.util.KlaviyoUtils.getProfilePhoneNumber;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
@@ -43,7 +46,6 @@ class KlaviyoUtilsTest {
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
-    private final ArgumentCaptor<Map<String, List<String>>> headerArgumentCaptor = ArgumentCaptor.forClass(Map.class);
     private final Parameters mockedParameters = mock(Parameters.class);
 
     @BeforeEach
@@ -52,37 +54,24 @@ class KlaviyoUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(headerArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
     }
 
     @Test
     void testGetProfileIdOptions() {
-
-        List<Option<String>> expectedOptions = List.of(
-            option("contact1@test.com", "1"),
-            option("contact2@test.com", "2"));
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(
-                "data", List.of(
-                    Map.of(
-                        "id", "1",
-                        "attributes", Map.of("email", "contact1@test.com")),
-                    Map.of(
-                        "id", "2",
-                        "attributes", Map.of("email", "contact2@test.com")))));
+                DATA, List.of(
+                    Map.of(ID, "1", ATTRIBUTES, Map.of(EMAIL, "contact1@test.com")),
+                    Map.of(ID, "2", ATTRIBUTES, Map.of("email", "contact2@test.com")))));
 
         List<Option<String>> actualOptions = KlaviyoUtils.getProfileIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        assertEquals(
-            List.of(Map.of(
-                "accept", List.of("application/vnd.api+json"),
-                "revision", List.of("2025-04-15"))),
-            headerArgumentCaptor.getAllValues());
+        List<Option<String>> expectedOptions = List.of(
+            option("contact1@test.com", "1"),
+            option("contact2@test.com", "2"));
 
         assertEquals(expectedOptions, actualOptions);
     }
@@ -91,8 +80,8 @@ class KlaviyoUtilsTest {
     void testGetProfileEmail() {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(
-                "data", Map.of(
-                    "attributes", Map.of("email", "contact@test.com"))));
+                DATA, Map.of(
+                    ATTRIBUTES, Map.of("email", "contact@test.com"))));
 
         String email = getProfileEmail(mockedContext, "123");
 
@@ -110,5 +99,4 @@ class KlaviyoUtilsTest {
 
         assertEquals("+1234567890", phoneNumber);
     }
-
 }

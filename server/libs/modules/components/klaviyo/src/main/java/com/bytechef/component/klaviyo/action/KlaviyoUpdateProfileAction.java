@@ -24,21 +24,26 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ADDRESS1;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ADDRESS2;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ATTRIBUTES;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.CITY;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.COUNTRY;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.DATA;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.EMAIL;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.FIRST_NAME;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ID;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.IMAGE;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.IP;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.LAST_NAME;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.LOCALE;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ORGANIZATION;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PHONE_NUMBER;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PROFILE;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PROFILE_ID;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PROFILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.REGION;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.TIMEZONE;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.TITLE;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.TYPE;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ZIP;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -49,7 +54,6 @@ import com.bytechef.component.klaviyo.util.KlaviyoUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Marija Horvat
@@ -88,7 +92,8 @@ public class KlaviyoUpdateProfileAction {
             string(LOCALE)
                 .label("Locale")
                 .description(
-                    "The locale of the profile, in the IETF BCP 47 language tag format like (ISO 639-1/2)-(ISO 3166 alpha-2).")
+                    "The locale of the profile, in the IETF BCP 47 language tag format like " +
+                        "(ISO 639-1/2)-(ISO 3166 alpha-2).")
                 .required(false),
             string(TITLE)
                 .label("Title")
@@ -137,39 +142,28 @@ public class KlaviyoUpdateProfileAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         Map<String, Object> attributes = getAttributes(inputParameters);
 
         return context
             .http(http -> http.patch("/api/profiles/" + inputParameters.getRequiredString(PROFILE_ID)))
             .body(
                 Body.of(
-                    "data", Map.of(
-                        "type", "profile",
-                        "id", inputParameters.getRequiredString(PROFILE_ID),
-                        "attributes", attributes)))
+                    DATA, Map.of(
+                        TYPE, PROFILE,
+                        ID, inputParameters.getRequiredString(PROFILE_ID),
+                        ATTRIBUTES, attributes)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();
     }
 
     private static Map<String, Object> getAttributes(Parameters inputParameters) {
-
-        Map<String, Object> attributes = new HashMap<>();
-        Map<String, Object> location = new HashMap<>();
-
         List<String> attributeKeys = List.of(
             EMAIL, PHONE_NUMBER, FIRST_NAME, LAST_NAME, ORGANIZATION, LOCALE, TITLE, IMAGE);
-
         List<String> locationKeys = List.of(ADDRESS1, ADDRESS2, CITY, COUNTRY, REGION, ZIP, TIMEZONE, IP);
 
-        for (String key : attributeKeys) {
-            addIfPresent(attributes, key, inputParameters);
-        }
-
-        for (String key : locationKeys) {
-            addIfPresent(location, key, inputParameters);
-        }
+        Map<String, Object> attributes = buildMap(inputParameters, attributeKeys);
+        Map<String, Object> location = buildMap(inputParameters, locationKeys);
 
         if (!location.isEmpty()) {
             attributes.put("location", location);
@@ -178,9 +172,13 @@ public class KlaviyoUpdateProfileAction {
         return attributes;
     }
 
-    private static void addIfPresent(Map<String, Object> map, String key, Parameters parameters) {
-        Optional.ofNullable(parameters.getString(key))
-            .filter(value -> !value.isBlank())
-            .ifPresent(value -> map.put(key, value));
+    private static Map<String, Object> buildMap(Parameters inputParameters, List<String> keys) {
+        return keys.stream()
+            .filter(key -> isValidValue(inputParameters.getString(key)))
+            .collect(HashMap::new, (map, key) -> map.put(key, inputParameters.getString(key)), HashMap::putAll);
+    }
+
+    private static boolean isValidValue(String value) {
+        return value != null && !value.isBlank();
     }
 }

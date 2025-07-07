@@ -22,8 +22,15 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ATTRIBUTES;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.DATA;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.EMAIL;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ID;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PHONE_NUMBER;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PROFILE;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PROFILE_ID;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.SUBSCRIPTION;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.TYPE;
 import static com.bytechef.component.klaviyo.util.KlaviyoUtils.getProfileEmail;
 import static com.bytechef.component.klaviyo.util.KlaviyoUtils.getProfilePhoneNumber;
 
@@ -37,11 +44,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Marija Horvat
  */
 public class KlaviyoSubscribeProfilesAction {
+
+    enum SubscriptionType {
+        EMAIL("email"),
+        SMS("sms");
+
+        private final String value;
+
+        SubscriptionType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("subscribeProfiles")
         .title("Subscribe Profiles")
@@ -57,7 +80,10 @@ public class KlaviyoSubscribeProfilesAction {
                 .label("Subscription")
                 .description("The subscription parameters to subscribe to on the email or sms channel.")
                 .items(string())
-                .options(List.of(option("EMAIL", "email"), option("SMS", "sms")))
+                .options(
+                    List.of(
+                        option("EMAIL", SubscriptionType.EMAIL.getValue()),
+                        option("SMS", SubscriptionType.SMS.getValue())))
                 .required(true))
         .perform(KlaviyoSubscribeProfilesAction::perform);
 
@@ -65,62 +91,60 @@ public class KlaviyoSubscribeProfilesAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         List<Map<String, Object>> data = getData(inputParameters, context);
 
-        return context
-            .http(http -> http.post("/api/profile-subscription-bulk-create-jobs"))
+        context.http(http -> http.post("/api/profile-subscription-bulk-create-jobs"))
             .body(
                 Body.of(
-                    "data", Map.of(
-                        "type", "profile-subscription-bulk-create-job",
-                        "attributes", Map.of("profiles", Map.of("data", data)))))
+                    DATA, Map.of(
+                        TYPE, "profile-subscription-bulk-create-job",
+                        ATTRIBUTES, Map.of("profiles", Map.of(DATA, data)))))
             .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody();
+            .execute();
+
+        return null;
     }
 
     private static List<Map<String, Object>> getData(Parameters inputParameters, Context context) {
-
-        List<String> profileIds = inputParameters.getList(PROFILE_ID, String.class);
-        List<String> subscriptionTypes = inputParameters.getList(SUBSCRIPTION, String.class);
+        List<String> profileIds = inputParameters.getRequiredList(PROFILE_ID, String.class);
+        List<String> subscriptionTypes = inputParameters.getRequiredList(SUBSCRIPTION, String.class);
 
         List<Map<String, Object>> profilesData = new ArrayList<>();
 
         for (String profileId : profileIds) {
-
             Map<String, Object> subscriptions = new HashMap<>();
             Map<String, Object> attributes = new HashMap<>();
 
-            if (subscriptionTypes.contains("email")) {
-                Map<String, Object> emailSubscription = new HashMap<>();
-                emailSubscription.put("marketing", Map.of("consent", "SUBSCRIBED"));
-                subscriptions.put("email", emailSubscription);
+            addSubscription(subscriptionTypes, subscriptions, context, profileId, SubscriptionType.EMAIL, attributes);
+            addSubscription(subscriptionTypes, subscriptions, context, profileId, SubscriptionType.SMS, attributes);
 
-                String email = getProfileEmail(context, profileId);
-                if (email != null && !email.isEmpty()) {
-                    attributes.put("email", email);
-                }
-            }
-
-            if (subscriptionTypes.contains("sms")) {
-                Map<String, Object> smsSubscription = new HashMap<>();
-                smsSubscription.put("marketing", Map.of("consent", "SUBSCRIBED"));
-                subscriptions.put("sms", smsSubscription);
-
-                String phoneNumber = getProfilePhoneNumber(context, profileId);
-                if (phoneNumber != null && !phoneNumber.isEmpty()) {
-                    attributes.put("phone_number", phoneNumber);
-                }
-            }
             attributes.put("subscriptions", subscriptions);
 
-            Map<String, Object> profileData = Map.of(
-                "type", "profile",
-                "id", profileId,
-                "attributes", attributes);
-            profilesData.add(profileData);
+            profilesData.add(createProfileData(profileId, attributes));
         }
+
         return profilesData;
+    }
+
+    private static void addSubscription(
+        List<String> subscriptionTypes, Map<String, Object> subscriptions, Context context, String profileId,
+        SubscriptionType subscriptionType, Map<String, Object> attributes) {
+
+        if (subscriptionTypes.contains(subscriptionType.getValue())) {
+            Map<String, Object> subscription = Map.of("marketing", Map.of("consent", "SUBSCRIBED"));
+
+            subscriptions.put(subscriptionType.getValue(), subscription);
+
+            String value = subscriptionType == SubscriptionType.EMAIL ? getProfileEmail(context, profileId)
+                : getProfilePhoneNumber(context, profileId);
+
+            Optional.ofNullable(value)
+                .filter(v -> !v.isEmpty())
+                .ifPresent(v -> attributes.put(subscriptionType == SubscriptionType.EMAIL ? EMAIL : PHONE_NUMBER, v));
+        }
+    }
+
+    private static Map<String, Object> createProfileData(String profileId, Map<String, Object> attributes) {
+        return Map.of(TYPE, PROFILE, ID, profileId, ATTRIBUTES, attributes);
     }
 }

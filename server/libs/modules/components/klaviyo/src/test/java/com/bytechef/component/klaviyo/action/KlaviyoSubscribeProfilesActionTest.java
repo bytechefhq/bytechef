@@ -16,11 +16,19 @@
 
 package com.bytechef.component.klaviyo.action;
 
+import static com.bytechef.component.klaviyo.action.KlaviyoSubscribeProfilesAction.SubscriptionType.EMAIL;
+import static com.bytechef.component.klaviyo.action.KlaviyoSubscribeProfilesAction.SubscriptionType.SMS;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ATTRIBUTES;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.DATA;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.ID;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PHONE_NUMBER;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PROFILE;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PROFILE_ID;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.SUBSCRIPTION;
+import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -30,9 +38,9 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.klaviyo.constant.KlaviyoConstants;
 import com.bytechef.component.klaviyo.util.KlaviyoUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -44,60 +52,40 @@ import org.mockito.MockedStatic;
  */
 class KlaviyoSubscribeProfilesActionTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Response mockedResponse = mock(Response.class);
-    private final ArgumentCaptor<Map<String, List<String>>> headerArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(PROFILE_ID, List.of("1", "2", "3"), SUBSCRIPTION, List.of("email", "sms")));
-    private final Object mockedObject = mock(Object.class);
+        Map.of(PROFILE_ID, List.of("1", "2", "3"), SUBSCRIPTION, List.of(EMAIL.getValue(), SMS.getValue())));
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() {
         try (MockedStatic<KlaviyoUtils> klaviyoUtilsMockedStatic = mockStatic(KlaviyoUtils.class)) {
             klaviyoUtilsMockedStatic
-                .when(() -> KlaviyoUtils.getProfileEmail(any(), eq("1")))
-                .thenReturn("test1@example.com");
-            klaviyoUtilsMockedStatic
-                .when(() -> KlaviyoUtils.getProfileEmail(any(), eq("2")))
-                .thenReturn("test2@example.com");
-            klaviyoUtilsMockedStatic
-                .when(() -> KlaviyoUtils.getProfileEmail(any(), eq("3")))
-                .thenReturn("test3@example.com");
+                .when(
+                    () -> KlaviyoUtils.getProfileEmail(contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn("test1@example.com", "test2@example.com", "test3@example.com");
 
             klaviyoUtilsMockedStatic
-                .when(() -> KlaviyoUtils.getProfilePhoneNumber(any(), eq("1")))
-                .thenReturn("+1111111");
-            klaviyoUtilsMockedStatic
-                .when(() -> KlaviyoUtils.getProfilePhoneNumber(any(), eq("2")))
-                .thenReturn("+2222222");
-            klaviyoUtilsMockedStatic
-                .when(() -> KlaviyoUtils.getProfilePhoneNumber(any(), eq("3")))
-                .thenReturn("+3333333");
+                .when(() -> KlaviyoUtils.getProfilePhoneNumber(contextArgumentCaptor.capture(),
+                    stringArgumentCaptor.capture()))
+                .thenReturn("+1111111", "+2222222", "+3333333");
 
             when(mockedContext.http(any()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.configuration(any()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.headers(headerArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
             when(mockedExecutor.body(bodyArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.execute())
                 .thenReturn(mockedResponse);
-            when(mockedResponse.getBody())
-                .thenReturn(mockedObject);
 
             Object result = KlaviyoSubscribeProfilesAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(mockedObject, result);
-
-            assertEquals(
-                List.of(Map.of(
-                    "accept", List.of("application/vnd.api+json"),
-                    "revision", List.of("2025-04-15"))),
-                headerArgumentCaptor.getAllValues());
+            assertNull(result);
 
             Body capturedBody = bodyArgumentCaptor.getValue();
 
@@ -106,28 +94,28 @@ class KlaviyoSubscribeProfilesActionTest {
                 profileMap("2", "test2@example.com", "+2222222"),
                 profileMap("3", "test3@example.com", "+3333333"));
 
-            assertEquals(Map.of(
-                "data", Map.of(
-                    "type", "profile-subscription-bulk-create-job",
-                    "attributes", Map.of(
-                        "profiles", Map.of("data", expectedProfiles)))),
+            assertEquals(
+                Map.of(
+                    DATA, Map.of(
+                        TYPE, "profile-subscription-bulk-create-job",
+                        ATTRIBUTES, Map.of("profiles", Map.of(DATA, expectedProfiles)))),
                 capturedBody.getContent());
+
+            assertEquals(
+                List.of(mockedContext, mockedContext, mockedContext, mockedContext, mockedContext, mockedContext),
+                contextArgumentCaptor.getAllValues());
+            assertEquals(List.of("1", "1", "2", "2", "3", "3"), stringArgumentCaptor.getAllValues());
         }
     }
 
     private Map<String, Object> profileMap(String id, String email, String phone) {
         Map<String, Object> subscriptions = Map.of(
-            "email", Map.of("marketing", Map.of("consent", "SUBSCRIBED")),
-            "sms", Map.of("marketing", Map.of("consent", "SUBSCRIBED")));
+            EMAIL.getValue(), Map.of("marketing", Map.of("consent", "SUBSCRIBED")),
+            SMS.getValue(), Map.of("marketing", Map.of("consent", "SUBSCRIBED")));
 
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("email", email);
-        attributes.put("phone_number", phone);
-        attributes.put("subscriptions", subscriptions);
+        Map<String, Object> attributes = Map.of(
+            KlaviyoConstants.EMAIL, email, PHONE_NUMBER, phone, "subscriptions", subscriptions);
 
-        return Map.of(
-            "type", "profile",
-            "id", id,
-            "attributes", attributes);
+        return Map.of(TYPE, PROFILE, ID, id, ATTRIBUTES, attributes);
     }
 }

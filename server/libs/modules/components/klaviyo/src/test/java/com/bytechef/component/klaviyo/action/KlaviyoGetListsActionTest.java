@@ -40,8 +40,7 @@ class KlaviyoGetListsActionTest {
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Response mockedResponse = mock(Response.class);
-    private final ArgumentCaptor<Map<String, List<String>>> headerArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-    private final ArgumentCaptor<String> queryArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(LIST_FIELDS, List.of("name", "created", "updated", "opt_in_process")));
     private final Object mockedObject = mock(Object.class);
@@ -52,9 +51,7 @@ class KlaviyoGetListsActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(headerArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(queryArgumentCaptor.capture(), queryArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -65,13 +62,7 @@ class KlaviyoGetListsActionTest {
 
         assertEquals(mockedObject, result);
 
-        assertEquals(
-            List.of(Map.of(
-                "accept", List.of("application/vnd.api+json"),
-                "revision", List.of("2025-04-15"))),
-            headerArgumentCaptor.getAllValues());
-
-        Object queryArguments = queryArgumentCaptor.getAllValues();
+        Object queryArguments = stringArgumentCaptor.getAllValues();
 
         assertEquals(List.of("fields[list]", "name,created,updated,opt_in_process"), queryArguments);
     }
