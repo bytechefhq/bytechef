@@ -245,6 +245,10 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                         integrationInstanceId, integrationInstanceConfigurationWorkflow.getId());
                 });
 
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        validateInputs(inputs, workflow);
+
         integrationInstanceWorkflow.setInputs(inputs);
 
         integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
