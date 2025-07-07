@@ -235,6 +235,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:webflow"))
     implementation(project(":server:libs:modules:components:webhook"))
     implementation(project(":server:libs:modules:components:whatsapp"))
+    implementation(project(":server:libs:modules:components:wolfram-alpha:wolfram-alpha-full-results"))
     implementation(project(":server:libs:modules:components:wolfram-alpha:wolfram-alpha-shortanswers"))
     implementation(project(":server:libs:modules:components:woocommerce"))
     implementation(project(":server:libs:modules:components:wordpress"))
