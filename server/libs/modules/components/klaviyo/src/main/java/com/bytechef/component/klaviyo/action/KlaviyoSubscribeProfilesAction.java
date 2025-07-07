@@ -70,9 +70,6 @@ public class KlaviyoSubscribeProfilesAction {
 
         return context
             .http(http -> http.post("/api/profile-subscription-bulk-create-jobs"))
-            .headers(Map.of(
-                "accept", List.of("application/vnd.api+json"),
-                "revision", List.of("2025-04-15")))
             .body(
                 Body.of(
                     "data", Map.of(

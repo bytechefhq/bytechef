@@ -39,9 +39,6 @@ public class KlaviyoUtils {
 
         Map<String, ?> body = context
             .http(http -> http.get("/api/profiles"))
-            .headers(Map.of(
-                "accept", List.of("application/vnd.api+json"),
-                "revision", List.of("2025-04-15")))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -81,9 +78,6 @@ public class KlaviyoUtils {
     private static Map<String, ?> getProfile(Context context, String profileId) {
         return context
             .http(http -> http.get("/api/profiles/" + profileId))
-            .headers(Map.of(
-                "accept", List.of("application/vnd.api+json"),
-                "revision", List.of("2025-04-15")))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

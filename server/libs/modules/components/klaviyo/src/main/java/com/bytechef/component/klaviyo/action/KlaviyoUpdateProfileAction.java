@@ -142,9 +142,6 @@ public class KlaviyoUpdateProfileAction {
 
         return context
             .http(http -> http.patch("/api/profiles/" + inputParameters.getRequiredString(PROFILE_ID)))
-            .headers(Map.of(
-                "accept", List.of("application/vnd.api+json"),
-                "revision", List.of("2025-04-15")))
             .body(
                 Body.of(
                     "data", Map.of(
