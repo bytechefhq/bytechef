@@ -37,6 +37,7 @@ public class KlaviyoComponentHandler implements ComponentHandler {
             "Klaviyo is a marketing automation platform primarily used for email and SMS marketing, especially by e-commerce businesses.")
         .icon("path:assets/klaviyo.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
+        .customAction(true)
         .connection(KlaviyoConnection.CONNECTION_DEFINITION)
         .actions(
             KlaviyoGetListsAction.ACTION_DEFINITION,
