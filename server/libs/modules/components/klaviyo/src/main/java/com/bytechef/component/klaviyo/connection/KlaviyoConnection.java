@@ -42,7 +42,10 @@ public class KlaviyoConnection {
                         .label("Key")
                         .required(true))
                 .apply((connectionParameters, context) -> Authorization.ApplyResponse.ofHeaders(
-                    Map.of(AUTHORIZATION, List.of("Klaviyo-API-Key " + connectionParameters.getRequiredString(KEY))))));
+                    Map.of(
+                        AUTHORIZATION, List.of("Klaviyo-API-Key " + connectionParameters.getRequiredString(KEY)),
+                        "accept", List.of("application/vnd.api+json"),
+                        "revision", List.of("2025-04-15")))));
 
     private KlaviyoConnection() {
     }

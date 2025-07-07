@@ -30,7 +30,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -59,11 +58,7 @@ public class KlaviyoGetListsAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.get("/api/lists"))
-            .headers(Map.of(
-                "accept", List.of("application/vnd.api+json"),
-                "revision", List.of("2025-04-15")))
-            .queryParameter(
-                "fields[list]", String.join(",", inputParameters.getList(LIST_FIELDS, String.class)))
+            .queryParameter("fields[list]", String.join(",", inputParameters.getList(LIST_FIELDS, String.class)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();
