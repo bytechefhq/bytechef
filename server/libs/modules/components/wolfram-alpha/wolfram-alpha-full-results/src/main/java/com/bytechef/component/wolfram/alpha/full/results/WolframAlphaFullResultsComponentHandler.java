@@ -31,6 +31,6 @@ public class WolframAlphaFullResultsComponentHandler extends AbstractWolframAlph
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .icon("path:assets/wolfram-alpha.svg")
-            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE);
+            .categories(ComponentCategory.HELPERS);
     }
 }
