@@ -28,13 +28,17 @@ import com.bytechef.component.klaviyo.action.KlaviyoUpdateProfileAction;
 import com.bytechef.component.klaviyo.connection.KlaviyoConnection;
 import com.google.auto.service.AutoService;
 
+/**
+ * @author Marija Horvat
+ */
 @AutoService(ComponentHandler.class)
 public class KlaviyoComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("klaviyo")
         .title("Klaviyo")
         .description(
-            "Klaviyo is a marketing automation platform primarily used for email and SMS marketing, especially by e-commerce businesses.")
+            "Klaviyo is a marketing automation platform primarily used for email and SMS marketing, especially by " +
+                "e-commerce businesses.")
         .icon("path:assets/klaviyo.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .customAction(true)

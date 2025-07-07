@@ -46,8 +46,10 @@ public class KlaviyoGetListsAction {
                 .items(string())
                 .options(
                     List.of(
-                        option("Name", "name"), option("Created", "created"),
-                        option("Updated", "updated"), option("Opt In Process", "opt_in_process")))
+                        option("Name", "name"),
+                        option("Created", "created"),
+                        option("Updated", "updated"),
+                        option("Opt In Process", "opt_in_process")))
                 .required(true))
         .output(outputSchema(LISTS_OUTPUT_PROPERTY))
         .perform(KlaviyoGetListsAction::perform);
