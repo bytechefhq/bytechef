@@ -1,0 +1,245 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Wolfram Alpha Full Results"
+  description: "Wolfram Alpha Full Results returns the computed results of your query in a variety of formats."
+  version: "v1"
+servers:
+  - url: "https://api.wolframalpha.com/v2"
+paths:
+  /query:
+    get:
+      summary: "Get Full Result"
+      description: "Returns a full result of your query."
+      operationId: "getFullResult"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "input"
+          in: "query"
+          required: true
+          description: "Query that will be answered."
+          schema:
+            type: "string"
+            title: "Query"
+            description: "Query that will be answered."
+        - name: "format"
+          in: "query"
+          required: false
+          description: "The desired format for individual result pods."
+          schema:
+            type: "array"
+            title: "Format"
+            description: "The desired format for individual result pods."
+            items:
+              enum:
+                - "image"
+                - "imagemap"
+                - "plaintext"
+                - "minput"
+                - "moutput"
+                - "cell"
+                - "mathml"
+                - "sound"
+                - "wav"
+        - name: "output"
+          in: "query"
+          required: false
+          description: "The desired format for full results."
+          schema:
+            type: "string"
+            title: "Output"
+            description: "The desired format for full results."
+            enum:
+              - "xml"
+              - "json"
+        - name: "ip"
+          in: "query"
+          required: false
+          description: "Specifies a custom query location based on an IP address."
+          schema:
+            type: "string"
+            title: "IP"
+            description: "Specifies a custom query location based on an IP address."
+        - name: "mag"
+          in: "query"
+          required: false
+          description: "Specify magnification of objects within a pod."
+          schema:
+            type: "string"
+            title: "Magnification"
+            description: "Specify magnification of objects within a pod."
+        - name: "units"
+          in: "query"
+          required: false
+          description: "What system of units to use for measurements and quantities."
+          schema:
+            type: "string"
+            title: "Units"
+            description: "What system of units to use for measurements and quantities."
+            enum:
+              - "metric"
+              - "imperial"
+        - name: "width"
+          in: "query"
+          required: false
+          description: "Specify an approximate width limit for text and tables."
+          schema:
+            type: "string"
+            title: "Width"
+            description: "Specify an approximate width limit for text and tables."
+        - name: "scanner"
+          in: "query"
+          required: false
+          description: "Specifies that only pods produced by the given scanner should be returned. e.g. \"Numeric\", \"Data\", \"Traveling\"."
+          schema:
+            type: "string"
+            title: "Scanner"
+            description: "Specifies that only pods produced by the given scanner should be returned. e.g. \"Numeric\", \"Data\", \"Traveling\"."
+        - name: "latlong"
+          in: "query"
+          required: false
+          description: "Specifies a custom query location based on a latitude/longitude pair. e.g. \"40.42,-3.71\", \"40.11, -88.24\", \"0,0\"."
+          schema:
+            type: "string"
+            title: "Latitude Longitude"
+            description: "Specifies a custom query location based on a latitude/longitude pair. e.g. \"40.42,-3.71\", \"40.11, -88.24\", \"0,0\"."
+        - name: "location"
+          in: "query"
+          required: false
+          description: "Specifies a custom query location based on a string. e.g. \"The North Pole\", \"Beijing\"."
+          schema:
+            type: "string"
+            title: "Location"
+            description: "Specifies a custom query location based on a string. e.g. \"The North Pole\", \"Beijing\"."
+        - name: "maxwidth"
+          in: "query"
+          required: false
+          description: "Specify an extended maximum width for large objects."
+          schema:
+            type: "string"
+            title: "Max Width"
+            description: "Specify an extended maximum width for large objects."
+        - name: "podstate"
+          in: "query"
+          required: false
+          description: "Specifies a pod state change, which replaces a pod with a modified version, such as displaying more digits of a large decimal value. e.g. \"WeatherCharts:WeatherData__Past+5+years\", \"2@DecimalApproximation__More+digits\"."
+          schema:
+            type: "string"
+            title: "Pod State"
+            description: "Specifies a pod state change, which replaces a pod with a modified version, such as displaying more digits of a large decimal value. e.g. \"WeatherCharts:WeatherData__Past+5+years\", \"2@DecimalApproximation__More+digits\"."
+        - name: "podtitle"
+          in: "query"
+          required: false
+          description: "Specifies a pod title to include in the result. e.g. \"Basic+Information\", \"Image\", \"Alternative representations\"."
+          schema:
+            type: "string"
+            title: "Pod Title"
+            description: "Specifies a pod title to include in the result. e.g. \"Basic+Information\", \"Image\", \"Alternative representations\"."
+        - name: "assumption"
+          in: "query"
+          required: false
+          description: "Specifies an assumption, such as the meaning of a word or the value of a formula variable. e.g. \"*C.pi-_*Movie\", \"DateOrder_**Day.Month.Year--\"."
+          schema:
+            type: "string"
+            title: "Assumption"
+            description: "Specifies an assumption, such as the meaning of a word or the value of a formula variable. e.g. \"*C.pi-_*Movie\", \"DateOrder_**Day.Month.Year--\"."
+        - name: "plotwidth"
+          in: "query"
+          required: false
+          description: "Specify an approximate width limit for plots and graphics. e.g. \"100\", \"200\"."
+          schema:
+            type: "string"
+            title: "Plot Width"
+            description: "Specify an approximate width limit for plots and graphics. e.g. \"100\", \"200\"."
+        - name: "ignorecase"
+          in: "query"
+          required: false
+          description: "Force Wolfram Alpha to ignore case in queries."
+          schema:
+            type: "boolean"
+            title: "Ignore Case"
+            description: "Force Wolfram Alpha to ignore case in queries."
+        - name: "podtimeout"
+          in: "query"
+          required: false
+          description: "The number of seconds to allow Wolfram Alpha to spend in the \"format\" stage for any one pod e.g. \"0.5\", \"5.0\"."
+          schema:
+            type: "string"
+            title: "Pod Timeout"
+            description: "The number of seconds to allow Wolfram Alpha to spend in the \"format\" stage for any one pod e.g. \"0.5\", \"5.0\"."
+        - name: "reinterpret"
+          in: "query"
+          required: false
+          description: "Allow Wolfram Alpha to reinterpret queries that would otherwise not be understood."
+          schema:
+            type: "boolean"
+            title: "Reinterpret"
+            description: "Allow Wolfram Alpha to reinterpret queries that would otherwise not be understood."
+        - name: "translation"
+          in: "query"
+          required: false
+          description: "Allow Wolfram Alpha to try to translate simple queries into English."
+          schema:
+            type: "boolean"
+            title: "Translation"
+            description: "Allow Wolfram Alpha to try to translate simple queries into English."
+        - name: "scantimeout"
+          in: "query"
+          required: false
+          description: "The number of seconds to allow Wolfram Alpha to compute results in the \"scan\" stage of processing. e.g. \"0.5\", \"5.0\"."
+          schema:
+            type: "string"
+            title: "Scan Timeout"
+            description: "The number of seconds to allow Wolfram Alpha to compute results in the \"scan\" stage of processing. e.g. \"0.5\", \"5.0\"."
+        - name: "parsetimeout"
+          in: "query"
+          required: false
+          description: "The number of seconds to allow Wolfram Alpha to spend in the \"parsing\" stage of processing. e.g. \"0.5\", \"5.0\"."
+          schema:
+            type: "string"
+            title: "Parse Timeout"
+            description: "The number of seconds to allow Wolfram Alpha to spend in the \"parsing\" stage of processing. e.g. \"0.5\", \"5.0\"."
+        - name: "totaltimeout"
+          in: "query"
+          required: false
+          description: "The total number of seconds to allow Wolfram Alpha to spend on a query. e.g. \"0.5\", \"5.0\"."
+          schema:
+            type: "string"
+            title: "Total Timeout"
+            description: "The total number of seconds to allow Wolfram Alpha to spend on a query. e.g. \"0.5\", \"5.0\"."
+        - name: "excludepodid"
+          in: "query"
+          required: false
+          description: "Specifies a pod ID to exclude from the result e.g. \"Result\", \"BasicInformation: PeopleData\", \"DecimalApproximation\"."
+          schema:
+            type: "string"
+            title: "Exclude Pod ID"
+            description: "Specifies a pod ID to exclude from the result e.g. \"Result\", \"BasicInformation: PeopleData\", \"DecimalApproximation\"."
+        - name: "formattimeout"
+          in: "query"
+          required: false
+          description: "The number of seconds to allow Wolfram Alpha to spend in the \"format\" stage for the entire collection of pods. e.g. \"0.5\", \"5.0\"."
+          schema:
+            type: "string"
+            title: "Format Timeout"
+            description: "The number of seconds to allow Wolfram Alpha to spend in the \"format\" stage for the entire collection of pods. e.g. \"0.5\", \"5.0\"."
+        - name: "includepodid"
+          in: "query"
+          required: false
+          description: "Specifies a pod ID to include in the result e.g. \"Result\", \"BasicInformation: PeopleData\", \"DecimalApproximation\"."
+          schema:
+            type: "string"
+            title: "Include Pod ID"
+            description: "Specifies a pod ID to include in the result e.g. \"Result\", \"BasicInformation: PeopleData\", \"DecimalApproximation\"."
+      responses:
+        200:
+          description: "Full result."
+          x-dynamic-output: true
+components:
+  securitySchemes:
+    ApiKeyQuery:
+      type: apiKey
+      in: "query"
+      name: "appid"
+      description: "App ID that can be found at your Wolfram|Alpha Developer Portal."
+      x-title: "App ID"
