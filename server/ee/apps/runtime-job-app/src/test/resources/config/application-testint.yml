@@ -1,0 +1,5 @@
+bytechef:
+  workflow:
+    repository:
+      filesystem:
+        enabled: false
