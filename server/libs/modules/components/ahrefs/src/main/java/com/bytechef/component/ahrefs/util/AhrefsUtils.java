@@ -16,10 +16,40 @@
 
 package com.bytechef.component.ahrefs.util;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.Context.Http.responseType;
+
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Nikolina Spehar
  */
 public class AhrefsUtils extends AbstractAhrefsUtils {
     private AhrefsUtils() {
+    }
+
+    public static List<Option<String>> getProjectIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Map<String, Object>> projects = context.http(http -> http.get("/management/projects"))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Map<String, Object> project : projects) {
+            options.add(option((String) project.get("project_name"), (String) project.get("project_id")));
+        }
+
+        return options;
     }
 }
