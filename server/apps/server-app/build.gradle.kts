@@ -116,6 +116,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:affinity"))
     implementation(project(":server:libs:modules:components:agile-crm"))
     implementation(project(":server:libs:modules:components:aha"))
+    implementation(project(":server:libs:modules:components:ahrefs"))
     implementation(project(":server:libs:modules:components:ai:agent"))
     implementation(project(":server:libs:modules:components:ai:agent:chat-memory"))
     implementation(project(":server:libs:modules:components:ai:agent:chat-memory:chat-memory-in-memory"))
