@@ -17,11 +17,20 @@
 package com.bytechef.component.ahrefs;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Nikolina Spehar
  */
 @AutoService(OpenApiComponentHandler.class)
 public class AhrefsComponentHandler extends AbstractAhrefsComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .icon("path:assets/ahrefs.svg")
+            .categories(ComponentCategory.ANALYTICS);
+    }
 }
