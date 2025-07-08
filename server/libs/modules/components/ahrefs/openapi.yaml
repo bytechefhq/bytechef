@@ -1,0 +1,210 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Ahrefs"
+  description: "Ahrefs is a comprehensive suite of SEO (Search Engine Optimization) tools used by digital marketers and businesses to improve their website's visibility in search engine results."
+  version: "v0"
+servers:
+  - url: "https://api.ahrefs.com/v3"
+paths:
+  /site-explorer/metrics:
+    get:
+      summary: "Get Metrics"
+      description: "Returns metrics from target."
+      operationId: "getMetrics"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "target"
+          description: "The target of the search: a domain or a URL."
+          in: "query"
+          required: true
+          schema:
+            title: "Target"
+            type: "string"
+        - name: "date"
+          description: "A date to report metrics on in YYYY-MM-DD format."
+          in: "query"
+          required: true
+          schema:
+            title: "Date"
+            type: "string"
+        - name: "volume_mode"
+          description: "The search volume calculation mode: monthly or average. It affects volume, traffic, and traffic value."
+          in: "query"
+          required: false
+          schema:
+            title: "Volume Mode"
+            type: "string"
+            enum:
+              - "monthly"
+              - "average"
+        - name: "protocol"
+          description: "The protocol of your target"
+          in: "query"
+          required: false
+          schema:
+            title: "Protocol"
+            type: "string"
+            enum:
+              - "both"
+              - "http"
+              - "https"
+        - name: "output"
+          description: "The output format."
+          in: "query"
+          required: false
+          schema:
+            title: "Output"
+            type: "string"
+            enum:
+              - "json"
+              - "csv"
+              - "xml"
+              - "php"
+        - name: "mode"
+          description: "The search volume calculation mode: monthly or average. It affects volume, traffic, and traffic value."
+          in: "query"
+          required: false
+          schema:
+            title: "Mode"
+            type: "string"
+            enum:
+              - "exact"
+              - "prefix"
+              - "domain"
+              - "subdomains"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  metrics:
+                    type: "object"
+                    properties:
+                      org_keywords:
+                        type: "integer"
+                        description: "The total number of keywords that your target ranks for in the top 100 organic search results."
+                      paid_keywords:
+                        type: "integer"
+                        description: "The total number of keywords that your target ranks for in paid search results."
+                      org_keywords_1_3:
+                        type: "integer"
+                        description: "The total number of keywords that your target ranks for in the top 3 organic search results."
+                      org_traffic:
+                        type: "integer"
+                        description: "(10 units) The estimated number of monthly visitors that your target gets from organic search."
+                      org_cost:
+                        type: "integer"
+                        description: "(10 units) The estimated value of your target's monthly organic search traffic, in USD cents."
+                      paid_traffic:
+                        type: "integer"
+                        description: "(10 units) The estimated number of monthly visitors that your target gets from paid search."
+                      paid_cost:
+                        type: "integer"
+                        description: "(10 units) The estimated cost of your target's monthly paid search traffic, in USD cents."
+                      paid_pages:
+                        type: "integer"
+                        description: "The total number of pages from a target ranking in paid search results."
+  /subscription-info/limits-and-usages:
+    get:
+      summary: "Get Subscription Information"
+      description: "Returns user subscription information."
+      operationId: "getSubscriptionInfo"
+      x-ai-agent-tool: true
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  limits_and_usage:
+                    type: "object"
+                    properties:
+                      subscription:
+                        type: "string"
+                        description: "Ahrefs subscription plan."
+                      usage_reset_date:
+                        type: "string"
+                        description: "Start date of the next billing period when the API units usage will be reset."
+                      units_limit_workspace:
+                        type: "integer"
+                        description: "Total number of API units available to the workspace."
+                      units_usage_workspace:
+                        type: "integer"
+                        description: "Number of API units consumed by the workspace in the current billing month."
+                      units_limit_api_key:
+                        type: "integer"
+                        description: "Limit for the number of API units that can be consumed via this API key per billing month (null = unlimited)."
+                      units_usage_api_key:
+                        type: "integer"
+                        description: "Number of API units consumed by this API key in the current billing month."
+                      api_key_expiration_date:
+                        type: "string"
+                        description: "Date on which this API key will expire and stop working."
+  /site-audit/page-content:
+    get:
+      summary: "Get Page Content"
+      description: "Returns the content of a page."
+      operationId: "getPageContent"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "target_url"
+          description: "The URL of the page to retrieve content for."
+          in: "query"
+          required: true
+          schema:
+            title: "Target URL"
+            type: "string"
+        - name: "project_id"
+          description: "The unique identifier of the project. Only projects with verified ownership are supported."
+          in: "query"
+          required: true
+          schema:
+            title: "Project ID"
+            type: "string"
+            x-dynamic-options: true
+        - name: "select"
+          description: "A comma-separated list of columns to return."
+          in: "query"
+          required: true
+          schema:
+            title: "Select"
+            type: "string"
+            enum:
+              - "crawl_datetime"
+              - "page_text"
+              - "raw_html"
+              - "rendered_html"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  page-content:
+                    type: "object"
+                    properties:
+                      crawl_datetime:
+                        type: "string"
+                        description: "The timestamp when the page was crawled."
+                      page_text:
+                        type: "string"
+                        description: "The text extracted from the page content."
+                      raw_html:
+                        type: "string"
+                        description: "The raw HTML of the page."
+                      rendered_html:
+                        type: "string"
+                        description: "The rendered HTML of the page."
+components:
+  securitySchemes:
+    api_key:
+      type: "http"
+      scheme: "bearer"
