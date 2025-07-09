@@ -9,7 +9,6 @@ export default function LabeledClusterElementsEdge({
     sourceX,
     sourceY,
     style,
-    targetPosition,
     targetX,
     targetY,
 }: EdgeProps) {
@@ -23,7 +22,6 @@ export default function LabeledClusterElementsEdge({
         sourcePosition,
         sourceX,
         sourceY,
-        targetPosition,
         targetX,
         targetY,
     });
@@ -55,7 +53,7 @@ export default function LabeledClusterElementsEdge({
 
             <EdgeLabelRenderer key={id}>
                 <div
-                    className="w-14 items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white p-1 text-center text-xs font-medium"
+                    className="max-w-20 items-center text-wrap rounded-md border border-stroke-neutral-tertiary bg-white p-0.5 text-center text-xs"
                     style={{
                         position: 'absolute',
                         transform: getEdgeLabelPosition(),
