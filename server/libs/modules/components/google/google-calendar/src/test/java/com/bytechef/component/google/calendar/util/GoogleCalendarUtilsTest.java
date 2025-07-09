@@ -61,6 +61,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -222,6 +223,10 @@ class GoogleCalendarUtilsTest {
                 .thenReturn(mockedList);
             when(mockedList.setMinAccessRole(stringArgumentCaptor.capture()))
                 .thenReturn(mockedList);
+            when(mockedList.setMaxResults(integerArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setPageToken(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
             when(mockedList.execute())
                 .thenReturn(new CalendarList().setItems(calendarListEntries));
 
@@ -230,8 +235,15 @@ class GoogleCalendarUtilsTest {
                     mockedParameters, mockedParameters, Map.of(), anyString(), mockedActionContext);
 
             assertEquals(List.of(option("summary", "id")), result);
-            assertEquals("writer", stringArgumentCaptor.getValue());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(250, integerArgumentCaptor.getValue());
+
+            List<String> strings = new ArrayList<>();
+
+            strings.add("writer");
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
         }
     }
 
@@ -322,6 +334,10 @@ class GoogleCalendarUtilsTest {
                 .thenReturn(mockedSettings);
             when(mockedSettings.list())
                 .thenReturn(mockedSettingsList);
+            when(mockedSettingsList.setMaxResults(integerArgumentCaptor.capture()))
+                .thenReturn(mockedSettingsList);
+            when(mockedSettingsList.setPageToken(stringArgumentCaptor.capture()))
+                .thenReturn(mockedSettingsList);
             when(mockedSettingsList.execute())
                 .thenReturn(new Settings().setItems(List.of(
                     new Setting().setId("timezone")
@@ -336,9 +352,16 @@ class GoogleCalendarUtilsTest {
                     createCustomEvent(e4, timezone), createCustomEvent(e9, timezone)),
                 result);
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of("calendarId", "q"), stringArgumentCaptor.getAllValues());
-            assertEquals(10, integerArgumentCaptor.getValue());
+            assertEquals(List.of(10, 250), integerArgumentCaptor.getAllValues());
             assertEquals(eventTypes, listArgumentCaptor.getValue());
+
+            List<String> strings = new ArrayList<>();
+
+            strings.add("calendarId");
+            strings.add("q");
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
         }
     }
 
@@ -373,6 +396,10 @@ class GoogleCalendarUtilsTest {
                 .thenReturn(mockedEvents);
             when(mockedEvents.list(stringArgumentCaptor.capture()))
                 .thenReturn(mockedEventsList);
+            when(mockedEventsList.setMaxResults(integerArgumentCaptor.capture()))
+                .thenReturn(mockedEventsList);
+            when(mockedEventsList.setPageToken(stringArgumentCaptor.capture()))
+                .thenReturn(mockedEventsList);
             Events events = new Events().setItems(
                 List.of(
                     new Event().setId("123")
@@ -386,7 +413,14 @@ class GoogleCalendarUtilsTest {
 
             assertEquals(List.of(option("summary", "123"), option("abc", "abc")), result);
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-            assertEquals("calendarId", stringArgumentCaptor.getValue());
+            assertEquals(2500, integerArgumentCaptor.getValue());
+
+            List<String> strings = new ArrayList<>();
+
+            strings.add("calendarId");
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
         }
     }
 

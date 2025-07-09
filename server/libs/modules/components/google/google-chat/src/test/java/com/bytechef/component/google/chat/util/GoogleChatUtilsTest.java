@@ -29,9 +29,12 @@ import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
@@ -44,10 +47,13 @@ class GoogleChatUtilsTest {
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Map<String, Object> responseMap = Map.of(
         "spaces", List.of(Map.of("name", "testName", DISPLAY_NAME, "testDisplayName")));
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
-    void perform() {
+    void testPerform() {
         when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -62,5 +68,16 @@ class GoogleChatUtilsTest {
         List<Option<String>> expected = List.of(option("testDisplayName", "testName"));
 
         assertEquals(expected, result);
+
+        Object[] query = queryArgumentCaptor.getValue();
+
+        List<Object> queryParameters = new ArrayList<>();
+
+        queryParameters.add("pageSize");
+        queryParameters.add(1000);
+        queryParameters.add("pageToken");
+        queryParameters.add(null);
+
+        assertEquals(queryParameters, Arrays.asList(query));
     }
 }

@@ -55,7 +55,7 @@ class GoogleUtilsTest {
         .setMimeType("application/pdf");
 
     @Test
-    void test() throws IOException {
+    void testCopyFileOnGoogleDrive() throws IOException {
         when(mockedDrive.files())
             .thenReturn(mockedFiles);
         when(mockedFiles.get(fileIdArgumentCaptor.capture()))

@@ -52,6 +52,7 @@ import com.google.api.services.gmail.model.MessagePartHeader;
 import com.google.api.services.gmail.model.Thread;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -63,16 +64,17 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailUtilsTest {
 
+    private final ArgumentCaptor<Long> longArgumentCaptor = ArgumentCaptor.forClass(Long.class);
     private final ArgumentCaptor<Message> messageArgumentCaptor = ArgumentCaptor.forClass(Message.class);
-    protected ActionContext mockedActionContext = mock(ActionContext.class);
-    protected Gmail mockedGmail = mock(Gmail.class);
-    protected Gmail.Users.Labels mockedLabels = mock(Gmail.Users.Labels.class);
-    protected Gmail.Users.Labels.List mockedLabelsList = mock(Gmail.Users.Labels.List.class);
-    protected Gmail.Users.Messages.List mockedMesagesList = mock(Gmail.Users.Messages.List.class);
-    protected Parameters parameters;
-    protected Gmail.Users.Threads mockedThreads = mock(Gmail.Users.Threads.class);
-    protected Gmail.Users.Threads.List mockedThreadsList = mock(Gmail.Users.Threads.List.class);
-    protected Gmail.Users mockedUsers = mock(Gmail.Users.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Gmail mockedGmail = mock(Gmail.class);
+    private final Gmail.Users.Labels mockedLabels = mock(Gmail.Users.Labels.class);
+    private final Gmail.Users.Labels.List mockedLabelsList = mock(Gmail.Users.Labels.List.class);
+    private final Gmail.Users.Messages.List mockedMesagesList = mock(Gmail.Users.Messages.List.class);
+    private Parameters parameters;
+    private final Gmail.Users.Threads mockedThreads = mock(Gmail.Users.Threads.class);
+    private final Gmail.Users.Threads.List mockedThreadsList = mock(Gmail.Users.Threads.List.class);
+    private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
     private final Gmail.Users.Messages.Get mockedGet = mock(Gmail.Users.Messages.Get.class);
@@ -158,6 +160,10 @@ class GoogleMailUtilsTest {
                 .thenReturn(mockedMessages);
             when(mockedMessages.list(stringArgumentCaptor.capture()))
                 .thenReturn(mockedMesagesList);
+            when(mockedMesagesList.setMaxResults(longArgumentCaptor.capture()))
+                .thenReturn(mockedMesagesList);
+            when(mockedMesagesList.setPageToken(stringArgumentCaptor.capture()))
+                .thenReturn(mockedMesagesList);
             when(mockedMesagesList.execute())
                 .thenReturn(new ListMessagesResponse().setMessages(messages));
 
@@ -168,7 +174,14 @@ class GoogleMailUtilsTest {
 
             assertEquals(expectedOptions, messageIdOptions);
             assertEquals(parameters, parametersArgumentCaptor.getValue());
-            assertEquals(ME, stringArgumentCaptor.getValue());
+
+            List<String> strings = new ArrayList<>();
+
+            strings.add(ME);
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
+            assertEquals(500L, longArgumentCaptor.getValue());
         }
     }
 
@@ -212,6 +225,10 @@ class GoogleMailUtilsTest {
                 .thenReturn(mockedThreads);
             when(mockedThreads.list(stringArgumentCaptor.capture()))
                 .thenReturn(mockedThreadsList);
+            when(mockedThreadsList.setMaxResults(longArgumentCaptor.capture()))
+                .thenReturn(mockedThreadsList);
+            when(mockedThreadsList.setPageToken(stringArgumentCaptor.capture()))
+                .thenReturn(mockedThreadsList);
             when(mockedThreadsList.execute())
                 .thenReturn(new ListThreadsResponse().setThreads(threads));
 
@@ -222,7 +239,13 @@ class GoogleMailUtilsTest {
 
             assertEquals(expectedOptions, threadIdOptions);
             assertEquals(parameters, parametersArgumentCaptor.getValue());
-            assertEquals(ME, stringArgumentCaptor.getValue());
+            List<String> strings = new ArrayList<>();
+
+            strings.add(ME);
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
+            assertEquals(500L, longArgumentCaptor.getValue());
         }
     }
 
