@@ -7,6 +7,7 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import deleteClusterElement from './deleteClusterElement';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleDeleteTaskProps {
@@ -171,53 +172,48 @@ export default function handleDeleteTask({
         }) as Array<WorkflowTaskType>;
     } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
         const rootClusterElementTask = workflowTasks.find((task) => task.name === rootClusterElementNodeData?.name);
-        const updatedClusterElements = {...rootClusterElementNodeData.clusterElements};
 
-        if (rootClusterElementTask && rootClusterElementTask.clusterElements) {
-            const currentClusterElementType =
-                data.clusterElementType as keyof typeof rootClusterElementTask.clusterElements;
-
-            const clusterElementValue = rootClusterElementTask.clusterElements[currentClusterElementType];
-
-            if (Array.isArray(clusterElementValue) && currentClusterElementType !== undefined) {
-                const clusterElementName = data.name;
-
-                updatedClusterElements[currentClusterElementType] = clusterElementValue.filter(
-                    (element) => element.name !== clusterElementName
-                );
-
-                rootClusterElementTask.clusterElements[currentClusterElementType] = [
-                    ...updatedClusterElements[currentClusterElementType],
-                ];
-            } else {
-                updatedClusterElements[currentClusterElementType] = null;
-
-                rootClusterElementTask.clusterElements[currentClusterElementType] = null;
-            }
+        if (!rootClusterElementTask || !rootClusterElementTask.clusterElements) {
+            return;
         }
 
-        if (setRootClusterElementNodeData && setCurrentNode) {
-            if (currentNode?.rootClusterElement) {
-                setCurrentNode({
-                    ...currentNode,
-                    clusterElements: updatedClusterElements,
-                });
-            } else {
+        const deleteResult = deleteClusterElement(
+            rootClusterElementTask.clusterElements,
+            data.name,
+            data.clusterElementType
+        );
+
+        const updatedRootClusterElementTask = {
+            ...rootClusterElementTask,
+            clusterElements: deleteResult.elements,
+        };
+
+        if (deleteResult.elementFound) {
+            const updatedClusterElements = deleteResult.elements;
+
+            if (setRootClusterElementNodeData && setCurrentNode) {
+                if (currentNode?.rootClusterElement) {
+                    setCurrentNode({
+                        ...currentNode,
+                        clusterElements: updatedClusterElements,
+                    });
+                }
+
                 setRootClusterElementNodeData({
                     ...rootClusterElementNodeData,
                     clusterElements: updatedClusterElements,
                 });
-            }
 
-            if (currentNode?.name === data.name) {
-                useWorkflowNodeDetailsPanelStore.getState().reset();
+                if (currentNode?.name === data.name) {
+                    useWorkflowNodeDetailsPanelStore.getState().reset();
 
-                setCurrentNode({
-                    ...rootClusterElementNodeData,
-                    clusterElements: updatedClusterElements,
-                });
+                    setCurrentNode({
+                        ...rootClusterElementNodeData,
+                        clusterElements: updatedClusterElements,
+                    });
 
-                useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(true);
+                    useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(true);
+                }
             }
         }
 
@@ -226,7 +222,7 @@ export default function handleDeleteTask({
                 return task;
             }
 
-            return rootClusterElementTask;
+            return updatedRootClusterElementTask;
         }) as Array<WorkflowTaskType>;
     } else {
         updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
