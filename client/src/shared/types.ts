@@ -135,13 +135,17 @@ export type TaskDispatcherDataType = BranchDataType &
     ParallelDataType;
 
 export type ClusterElementItemType = {
+    clusterElements?: ClusterElementsType;
     label?: string;
+    isNestedClusterRoot?: boolean;
     metadata?: {
         ui?: {
             nodePosition?: {x: number; y: number};
+            placeholderPositions?: Record<string, {x: number; y: number}>;
         };
     };
     name: string;
+    parentClusterRootId?: string;
     type: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters?: {[key: string]: any};
@@ -174,6 +178,7 @@ export type NodeDataType = {
     eachId?: string;
     eachData?: EachDataType;
     icon?: JSX.Element | ReactNode | string;
+    isNestedClusterRoot?: boolean;
     label?: string;
     loopBreakData?: LoopBreakDataType;
     loopData?: LoopDataType;
@@ -194,6 +199,7 @@ export type NodeDataType = {
         parallelId: string;
         index: number;
     };
+    parentClusterRootId?: string;
     rootClusterElement?: boolean;
     taskDispatcher?: boolean;
     taskDispatcherId?: string;

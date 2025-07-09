@@ -21,7 +21,6 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
-import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -80,8 +79,6 @@ const WorkflowEditorLayout = ({
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
     const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(currentComponent?.componentName as string);
-
-    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (currentNode?.rootClusterElement) {
@@ -143,7 +140,6 @@ const WorkflowEditorLayout = ({
                     if (!open) {
                         saveClusterElementNodesPosition({
                             invalidateWorkflowQueries: invalidateWorkflowQueries!,
-                            queryClient,
                             updateWorkflowMutation: updateWorkflowMutation!,
                             workflow,
                         });

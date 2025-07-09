@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {NODE_WIDTH, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
@@ -14,7 +15,11 @@ import {memo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 
-import {convertNameToCamelCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {
+    calculateNodeWidth,
+    convertNameToCamelCase,
+    getHandlePosition,
+} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -40,7 +45,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         if (clusterElementsCanvasOpen) {
             saveClusterElementNodesPosition({
                 invalidateWorkflowQueries,
-                queryClient,
                 updateWorkflowMutation,
                 workflow,
             });
@@ -73,38 +77,25 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const rootClusterElementComponentVersion =
         Number(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, '')) || 1;
 
-    const rootClusterElementComponentName = rootClusterElementNodeData?.componentName || '';
-
     const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
         {
-            componentName: rootClusterElementComponentName,
-            componentVersion: rootClusterElementComponentVersion,
+            componentName: data.componentName,
+            componentVersion: (data.version as number) || rootClusterElementComponentVersion,
         },
         clusterElementsCanvasOpen && !!isRootClusterElement && !!rootClusterElementNodeData
     );
 
-    const getHandlePosition = (index: number, totalHandles: number = 1): string => {
-        const nodeWidth = 252;
-        const nodeEdgeBuffer = nodeWidth * 0.1;
+    const isClusterElement = !!data.clusterElementType;
+    const isNestedClusterRoot = !!data.isNestedClusterRoot;
+    const parentClusterRootId = data.parentClusterRootId || id.split('-')[0];
+    const clusterElementTypesCount = rootClusterElementDefinition?.clusterElementTypes?.length || 0;
 
-        const usableNodeWidth = nodeWidth - nodeEdgeBuffer * 2;
-
-        if (totalHandles === 1) {
-            return `${nodeWidth / 2}px`;
-        }
-
-        const stepWidth = totalHandles > 1 ? usableNodeWidth / (totalHandles - 1) : 0;
-
-        const handlePosition = nodeEdgeBuffer + stepWidth * index;
-
-        return `${handlePosition}px`;
-    };
+    const nodeWidth =
+        isRootClusterElement || isNestedClusterRoot ? calculateNodeWidth(clusterElementTypesCount) : NODE_WIDTH;
 
     const queryClient = useQueryClient();
 
     const {updateWorkflowMutation} = useWorkflowEditor();
-
-    const isClusterElement = 'clusterElementType' in data;
 
     const handleDeleteNodeClick = (data: NodeDataType) => {
         if (data) {
@@ -180,7 +171,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             hideClusterElementComponents={!data.clusterElementType}
                             hideTaskDispatchers={!!data.clusterElementType}
                             hideTriggerComponents
-                            sourceNodeId={currentNode.name}
+                            sourceNodeId={data.clusterElementType ? parentClusterRootId : id}
                         >
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
@@ -221,14 +212,20 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 workflowNodeDetailsPanelOpen &&
                                 !isRootClusterElement &&
                                 'border-blue-300 bg-blue-100 shadow-none',
-                            isRootClusterElement && `min-w-[252px]`
+                            isRootClusterElement && 'nodrag',
+                            (isRootClusterElement || isNestedClusterRoot) && `min-w-[${ROOT_CLUSTER_WIDTH}px]`
                         )}
                         onClick={handleNodeClick}
+                        style={isRootClusterElement || isNestedClusterRoot ? {minWidth: `${nodeWidth}px`} : undefined}
                     >
-                        <div className={twMerge(isRootClusterElement && 'flex items-center gap-4')}>
+                        <div
+                            className={twMerge(
+                                (isRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4'
+                            )}
+                        >
                             {data.icon ? data.icon : <ComponentIcon className="size-9 text-black" />}
 
-                            {isRootClusterElement && (
+                            {(isRootClusterElement || isNestedClusterRoot) && (
                                 <div className="flex w-full min-w-max flex-col items-start">
                                     <span className="font-semibold text-black">{data.title || data.label}</span>
 
@@ -266,31 +263,67 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 )}
             </HoverCard>
 
-            {!isRootClusterElement && (
+            {!(isRootClusterElement || isNestedClusterRoot) && (
                 <div className={twMerge('ml-2 flex w-full min-w-max flex-col items-start', isClusterElement && 'ml-0')}>
-                    <span className="font-semibold">{data.title || data.label}</span>
+                    <span className={twMerge('font-semibold', isClusterElement && 'text-sm')}>
+                        {data.title || data.label}
+                    </span>
 
-                    {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
+                    {data.operationName && (
+                        <pre className={twMerge('text-sm', isClusterElement && 'text-xs')}>{data.operationName}</pre>
+                    )}
 
-                    <span className="text-sm text-gray-500">{data.workflowNodeName}</span>
+                    {!isClusterElement && <span className="text-sm text-gray-500">{data.workflowNodeName}</span>}
                 </div>
             )}
 
             {!isRootClusterElement ? (
                 <>
-                    <Handle
-                        className={twMerge('left-node-handle-placement', styles.handle)}
-                        isConnectable={false}
-                        position={Position.Top}
-                        type="target"
-                    />
+                    {isNestedClusterRoot && rootClusterElementDefinition?.clusterElementTypes?.length ? (
+                        <>
+                            <Handle
+                                className={twMerge(`left-${nodeWidth / 2}px`, styles.handle)}
+                                isConnectable={false}
+                                position={Position.Top}
+                                type="target"
+                            />
 
-                    <Handle
-                        className={twMerge('left-node-handle-placement', styles.handle)}
-                        isConnectable={false}
-                        position={Position.Bottom}
-                        type="source"
-                    />
+                            {rootClusterElementDefinition.clusterElementTypes.map((clusterElementType, index) => (
+                                <Handle
+                                    className={twMerge(styles.handle)}
+                                    id={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
+                                    isConnectable={false}
+                                    key={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
+                                    position={Position.Bottom}
+                                    style={{
+                                        left: `${getHandlePosition(
+                                            index,
+                                            rootClusterElementDefinition?.clusterElementTypes?.length || 1,
+                                            nodeWidth
+                                        )}px`,
+                                        transform: 'translateX(-50%)',
+                                    }}
+                                    type="source"
+                                />
+                            ))}
+                        </>
+                    ) : (
+                        <>
+                            <Handle
+                                className={twMerge('left-node-handle-placement', styles.handle)}
+                                isConnectable={false}
+                                position={Position.Top}
+                                type="target"
+                            />
+
+                            <Handle
+                                className={twMerge('left-node-handle-placement', styles.handle)}
+                                isConnectable={false}
+                                position={Position.Bottom}
+                                type="source"
+                            />
+                        </>
+                    )}
                 </>
             ) : (
                 <>
@@ -302,10 +335,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             key={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
                             position={Position.Bottom}
                             style={{
-                                left: getHandlePosition(
+                                left: `${getHandlePosition(
                                     index,
-                                    rootClusterElementDefinition.clusterElementTypes?.length
-                                ),
+                                    rootClusterElementDefinition.clusterElementTypes?.length || 1,
+                                    nodeWidth
+                                )}px`,
+                                transform: 'translateX(-50%)',
                             }}
                             type="source"
                         />

@@ -1,3 +1,4 @@
+import {ROOT_CLUSTER_HANDLE_STEP, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {ClusterElementItemType, ClusterElementsType} from '@/shared/types';
 
@@ -25,6 +26,7 @@ export function initializeClusterElementsObject(
                 clusterElements[clusterElementType] = (
                     clusterElementsData[clusterElementType] as ClusterElementItemType[]
                 ).map((element) => ({
+                    clusterElements: element.clusterElements,
                     label: element.label,
                     metadata: element.metadata,
                     name: element.name,
@@ -36,6 +38,7 @@ export function initializeClusterElementsObject(
 
                 if (element && !Array.isArray(element)) {
                     clusterElements[clusterElementType] = {
+                        clusterElements: element.clusterElements,
                         label: element.label,
                         metadata: element.metadata,
                         name: element.name,
@@ -50,6 +53,33 @@ export function initializeClusterElementsObject(
     });
 
     return clusterElements;
+}
+
+export function calculateNodeWidth(handleCount: number): number {
+    const baseWidth = ROOT_CLUSTER_WIDTH;
+    const handleStep = ROOT_CLUSTER_HANDLE_STEP;
+
+    if (!handleCount || handleCount <= 4) {
+        return baseWidth;
+    }
+
+    return baseWidth + (handleCount - 4) * handleStep;
+}
+
+export function getHandlePosition(index: number, totalHandles: number, nodeWidth: number): number {
+    const nodeEdgeBuffer = nodeWidth * 0.1;
+
+    const usableNodeWidth = nodeWidth - nodeEdgeBuffer * 2;
+
+    if (totalHandles === 1) {
+        return nodeWidth / 2;
+    }
+
+    const stepWidth = usableNodeWidth / (totalHandles - 1);
+
+    const handlePosition = nodeEdgeBuffer + stepWidth * index;
+
+    return handlePosition;
 }
 
 export function convertNameToCamelCase(typeName: string): string {

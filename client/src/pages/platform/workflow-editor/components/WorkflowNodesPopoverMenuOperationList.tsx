@@ -5,11 +5,13 @@ import {
     ActionDefinitionApi,
     ClusterElementDefinitionApi,
     ComponentDefinition,
+    ComponentDefinitionApi,
     TriggerDefinition,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
+import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
@@ -35,6 +37,7 @@ import getParametersWithDefaultValues from '../utils/getParametersWithDefaultVal
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
 import handleTaskDispatcherSubtaskOperationClick from '../utils/handleTaskDispatcherSubtaskOperationClick';
+import processClusterElementsHierarchy from '../utils/processClusterElementsHierarchy';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesPopoverMenuOperationListProps {
@@ -67,7 +70,11 @@ const WorkflowNodesPopoverMenuOperationList = ({
         }))
     );
 
-    const {nodes: clusterElementNodes} = useClusterElementsDataStore();
+    const {nodes: clusterElementNodes} = useClusterElementsDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
 
     const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
         useWorkflowEditorStore();
@@ -141,18 +148,25 @@ const WorkflowNodesPopoverMenuOperationList = ({
     );
 
     const saveClusterElementToWorkflow = useCallback(
-        (clusterElementData: ClusterElementItemType, clusterElementType: string, isMultipleElements: boolean) => {
+        (
+            clusterElementData: ClusterElementItemType,
+            clusterElementType: string,
+            isMultipleElements: boolean,
+            sourceNodeId: string
+        ) => {
             if (!workflow.definition || !rootClusterElementDefinition) {
                 return;
             }
 
             const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-            const currentClusterRootTask = workflowDefinitionTasks?.find(
+            const mainClusterRootTask = workflowDefinitionTasks?.find(
                 (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
             );
 
-            if (!currentClusterRootTask) return;
+            if (!mainClusterRootTask) {
+                return;
+            }
 
             const nodePositions = clusterElementNodes.reduce<Record<string, {x: number; y: number}>>(
                 (accumulator, node) => {
@@ -167,100 +181,49 @@ const WorkflowNodesPopoverMenuOperationList = ({
             );
 
             const clusterElements = initializeClusterElementsObject(
-                currentClusterRootTask?.clusterElements || {},
+                mainClusterRootTask?.clusterElements || {},
                 rootClusterElementDefinition
             );
 
-            if (isMultipleElements) {
-                clusterElements[clusterElementType] = [
-                    ...(Array.isArray(clusterElements[clusterElementType]) ? clusterElements[clusterElementType] : []),
-                    clusterElementData,
-                ];
-            } else {
-                clusterElements[clusterElementType] = clusterElementData;
-            }
-
-            Object.entries(clusterElements).forEach(([elementKey, elementValue]) => {
-                if (elementKey !== clusterElementType || isMultipleElements) {
-                    if (Array.isArray(elementValue)) {
-                        clusterElements[elementKey] = elementValue.map((element) => {
-                            const elementNodeId = element.name;
-
-                            const elementPosition = nodePositions[elementNodeId];
-
-                            if (elementPosition) {
-                                return {
-                                    ...element,
-                                    metadata: {
-                                        ...element?.metadata,
-                                        ui: {
-                                            ...element?.metadata?.ui,
-                                            nodePosition: elementPosition,
-                                        },
-                                    },
-                                };
-                            }
-
-                            return element;
-                        });
-                    } else if (elementValue != null && 'name' in elementValue) {
-                        const elementNodeId = elementValue.name;
-                        const elementPosition = nodePositions[elementNodeId];
-
-                        if (elementPosition) {
-                            clusterElements[elementKey] = {
-                                ...elementValue,
-                                metadata: {
-                                    ...elementValue?.metadata,
-                                    ui: {
-                                        ...elementValue?.metadata?.ui,
-                                        nodePosition: elementPosition,
-                                    },
-                                },
-                            } as ClusterElementItemType;
-                        }
-                    }
-                }
+            const updatedClusterElements = processClusterElementsHierarchy({
+                clusterElementData,
+                clusterElements,
+                elementType: clusterElementType,
+                isMultipleElements,
+                mainRootId: rootClusterElementNodeData?.workflowNodeName,
+                nodePositions,
+                sourceNodeId,
             });
 
-            const placeholderPositions = Object.entries(nodePositions).reduce<Record<string, {x: number; y: number}>>(
-                (accumulator, [nodeId, position]) => {
-                    if (nodeId.includes('placeholder')) {
-                        accumulator[nodeId] = position;
-                    }
-                    return accumulator;
-                },
-                {}
-            );
-
-            const rootNodePosition = rootClusterElementNodeData?.workflowNodeName
+            const mainRootNodePosition = rootClusterElementNodeData?.workflowNodeName
                 ? nodePositions[rootClusterElementNodeData.workflowNodeName]
                 : undefined;
 
             const metadata = {
-                ...currentClusterRootTask.metadata,
+                ...mainClusterRootTask.metadata,
                 ui: {
-                    ...currentClusterRootTask.metadata?.ui,
-                    nodePosition: rootNodePosition,
-                    placeholderPositions: placeholderPositions || {},
+                    ...mainClusterRootTask.metadata?.ui,
+                    nodePosition: mainRootNodePosition,
                 },
             };
 
             const updatedNodeData = {
-                ...currentClusterRootTask,
-                clusterElements,
+                ...mainClusterRootTask,
+                clusterElements: updatedClusterElements.nestedClusterElements,
                 metadata,
             };
 
             setRootClusterElementNodeData({
                 ...rootClusterElementNodeData,
-                clusterElements,
+                clusterElements: updatedClusterElements.nestedClusterElements,
+                metadata,
             } as typeof rootClusterElementNodeData);
 
             if (currentNode?.rootClusterElement) {
                 setCurrentNode({
                     ...currentNode,
-                    clusterElements,
+                    clusterElements: updatedClusterElements.nestedClusterElements,
+                    metadata,
                 });
             }
 
@@ -285,9 +248,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
             setRootClusterElementNodeData,
             currentNode,
             invalidateWorkflowQueries,
-            queryClient,
             updateWorkflowMutation,
             setCurrentNode,
+            queryClient,
         ]
     );
 
@@ -328,22 +291,53 @@ const WorkflowNodesPopoverMenuOperationList = ({
             if (clusterElementsCanvasOpen && clusterElementType) {
                 captureComponentUsed(componentName, undefined, operationName);
 
-                const currentClusterElementDefinition = rootClusterElementDefinition?.clusterElementTypes?.find(
+                const sourceNode = clusterElementNodes.find((node) => node.id === sourceNodeId);
+
+                const isClusterRoot = !!sourceNode?.data?.clusterElements;
+
+                let parentDefinition: ComponentDefinition | undefined;
+
+                if (isClusterRoot) {
+                    const clusterRootComponentName =
+                        sourceNode?.data.componentName || (sourceNode?.data.type as string)?.split('/')[0];
+                    const clusterRootComponentVersion =
+                        Number((sourceNode?.data.type as string)?.split('/')[1].replace(/^v/, '')) || 1;
+
+                    parentDefinition = await queryClient.fetchQuery({
+                        queryFn: () =>
+                            new ComponentDefinitionApi().getComponentDefinition({
+                                componentName: clusterRootComponentName as string,
+                                componentVersion: clusterRootComponentVersion,
+                            }),
+                        queryKey: ComponentDefinitionKeys.componentDefinition({
+                            componentName: clusterRootComponentName as string,
+                            componentVersion: clusterRootComponentVersion,
+                        }),
+                    });
+                }
+
+                if (!parentDefinition) {
+                    console.error('Could not find definition for parent cluster root');
+
+                    return;
+                }
+
+                const currentClusterElementTypeDefinition = parentDefinition?.clusterElementTypes?.find(
                     (currentClusterElementType) =>
                         convertNameToCamelCase(currentClusterElementType.name as string) === clusterElementType
                 );
 
-                if (!currentClusterElementDefinition) {
+                if (!currentClusterElementTypeDefinition) {
                     console.error(`Unknown cluster element type: ${clusterElementType}`);
 
                     return;
                 }
 
-                const isMultipleElements = !!currentClusterElementDefinition.multipleElements;
+                const isMultipleElements = !!currentClusterElementTypeDefinition.multipleElements;
 
                 const getClusterElementDefinitionRequest = {
                     clusterElementName: operationName,
-                    componentName: componentName,
+                    componentName,
                     componentVersion: version,
                 };
 
@@ -356,6 +350,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 });
 
                 const clusterElementData = {
+                    clusterElements: componentDefinition.clusterRoot ? {} : undefined,
                     label: clickedOperation.componentLabel,
                     metadata: {},
                     name: getFormattedName(componentName),
@@ -366,7 +361,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     type: `${componentName}/v${version}/${operationName}`,
                 };
 
-                saveClusterElementToWorkflow(clusterElementData, clusterElementType, isMultipleElements);
+                saveClusterElementToWorkflow(clusterElementData, clusterElementType, isMultipleElements, sourceNodeId);
 
                 setPopoverOpen(false);
 
@@ -475,14 +470,14 @@ const WorkflowNodesPopoverMenuOperationList = ({
             captureComponentUsed,
             saveNodeToWorkflow,
             setPopoverOpen,
-            rootClusterElementDefinition?.clusterElementTypes,
+            clusterElementNodes,
             saveClusterElementToWorkflow,
+            sourceNodeId,
             edges,
             nodes,
             invalidateWorkflowQueries,
             updateWorkflowMutation,
             workflow,
-            sourceNodeId,
         ]
     );
 
