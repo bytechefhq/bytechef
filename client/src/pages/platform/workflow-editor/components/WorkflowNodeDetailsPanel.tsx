@@ -541,14 +541,13 @@ const WorkflowNodeDetailsPanel = ({
         if (clusterElementsCanvasOpen) {
             saveClusterElementNodesPosition({
                 invalidateWorkflowQueries,
-                queryClient,
                 updateWorkflowMutation,
                 workflow,
             });
         }
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
-    }, [clusterElementsCanvasOpen, invalidateWorkflowQueries, queryClient, updateWorkflowMutation, workflow]);
+    }, [clusterElementsCanvasOpen, invalidateWorkflowQueries, updateWorkflowMutation, workflow]);
 
     // Get the node version for different definition types
     function getNodeVersion(node: typeof currentWorkflowNode): string {

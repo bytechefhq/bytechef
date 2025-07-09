@@ -1,17 +1,29 @@
-import {DEFAULT_NODE_POSITION} from '@/shared/constants';
+import {DEFAULT_NODE_POSITION, NODE_HEIGHT, NODE_WIDTH, PLACEHOLDER_NODE_WIDTH} from '@/shared/constants';
 import {ClusterElementItemType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
+import {calculateNodeWidth, getHandlePosition} from './clusterElementsUtils';
+
 export function createPlaceholderNode(
-    currentRootClusterElementNodeName: string,
+    clusterElementTypeIndex: number = 0,
+    clusterRootId: string,
+    currentNodePositions: Record<string, {x: number; y: number}> = {},
     elementLabel: string,
     elementType: string,
-    nodePositions: Record<string, {x: number; y: number}> = {},
-    rootPlaceholderPositions: Record<string, {x: number; y: number}> = {}
+    totalClusterElementTypeCount: number = 1
 ): Node {
-    const nodeId = `${currentRootClusterElementNodeName}-${elementType}-placeholder-0`;
+    const nodeId = `${clusterRootId}-${elementType}-placeholder-0`;
+
+    const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
+
+    const handleX = getHandlePosition(clusterElementTypeIndex, totalClusterElementTypeCount, nodeWidth);
+
+    const position = {
+        x: handleX - PLACEHOLDER_NODE_WIDTH / 2,
+        y: 160,
+    };
 
     return {
         data: {
@@ -20,26 +32,38 @@ export function createPlaceholderNode(
             label: '+',
         },
         id: nodeId,
-        position: rootPlaceholderPositions[nodeId] || nodePositions[nodeId] || DEFAULT_NODE_POSITION,
+        parentId: clusterRootId,
+        position: position || currentNodePositions[elementType] || DEFAULT_NODE_POSITION,
         type: 'placeholder',
     };
 }
 
 export function createSingleElementsNode(
     clusterElementData: ClusterElementItemType,
+    clusterElementTypeIndex: number = 0,
+    clusterRootId: string,
+    currentNodePositions: Record<string, {x: number; y: number}> = {},
     elementLabel: string,
     elementType: string,
-    nodePositions: Record<string, {x: number; y: number}> = {}
+    totalClusterElementTypeCount: number = 1
 ): Node {
     const {label, metadata, name, parameters, type} = clusterElementData;
     const typeSegments = type.split('/');
-    const nodePosition = metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION;
+
+    const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
+
+    const handleX = getHandlePosition(clusterElementTypeIndex, totalClusterElementTypeCount, nodeWidth);
+
+    const position = {
+        x: handleX - NODE_WIDTH / 2,
+        y: 300 + clusterElementTypeIndex * NODE_HEIGHT * 2,
+    };
 
     const enhancedMetadata = {
         ...(metadata || {}),
         ui: {
             ...(metadata?.ui || {}),
-            nodePosition: nodePositions[name] || metadata?.ui?.nodePosition,
+            nodePosition: currentNodePositions[name] ?? metadata?.ui?.nodePosition ?? position,
         },
     };
 
@@ -60,7 +84,7 @@ export function createSingleElementsNode(
                 />
             ),
             label,
-            metadata: enhancedMetadata || {},
+            metadata: enhancedMetadata,
             name,
             operationName: typeSegments[2],
             parameters,
@@ -69,26 +93,39 @@ export function createSingleElementsNode(
             workflowNodeName: name,
         },
         id: name,
-        position: nodePositions[name] || nodePosition,
+        parentId: clusterRootId,
+        position: position || currentNodePositions[name] || DEFAULT_NODE_POSITION,
         type: 'workflow',
     };
 }
 
 export function createMultipleElementsNode(
+    clusterElementTypeIndex: number = 0,
+    clusterRootId: string,
+    currentNodePositions: Record<string, {x: number; y: number}> = {},
     element: ClusterElementItemType,
     elementType: string,
     isMultipleElementsNode: boolean,
-    nodePositions: Record<string, {x: number; y: number}> = {}
+    multipleElementIndex: number = 0,
+    totalClusterElementTypeCount: number = 1
 ) {
     const {label, metadata, name, parameters, type} = element;
     const typeSegments = type.split('/');
-    const nodePosition = metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION;
+
+    const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
+
+    const handleX = getHandlePosition(clusterElementTypeIndex, totalClusterElementTypeCount, nodeWidth);
+
+    const position = {
+        x: handleX - NODE_WIDTH / 2 + multipleElementIndex * NODE_WIDTH,
+        y: 300 + (multipleElementIndex * NODE_HEIGHT) / 2,
+    };
 
     const enhancedMetadata = {
         ...(metadata || {}),
         ui: {
             ...(metadata?.ui || {}),
-            nodePosition: nodePositions[name] || metadata?.ui?.nodePosition,
+            nodePosition: currentNodePositions[name] ?? metadata?.ui?.nodePosition ?? position,
         },
     };
 
@@ -118,7 +155,8 @@ export function createMultipleElementsNode(
             workflowNodeName: name,
         },
         id: name,
-        position: nodePositions[name] || nodePosition,
+        parentId: clusterRootId,
+        position: position || currentNodePositions[name] || DEFAULT_NODE_POSITION,
         type: 'workflow',
     };
 }

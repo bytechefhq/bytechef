@@ -1,5 +1,5 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {NodeDataType} from '@/shared/types';
+import {ClusterElementsType, NodeDataType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 
@@ -17,20 +17,36 @@ export default function getFormattedName(itemName: string): string {
 
         const {clusterElements} = task;
 
-        if (clusterElements) {
-            Object.keys(clusterElements).forEach((elementType) => {
-                const elements = clusterElements[elementType];
+        const extractElementNames = (elements: ClusterElementsType, names: string[]) => {
+            if (!elements) return;
 
-                if (Array.isArray(elements)) {
-                    elements.forEach((element) => {
+            Object.keys(elements).forEach((elementType) => {
+                const typeElements = elements[elementType];
+
+                if (Array.isArray(typeElements)) {
+                    typeElements.forEach((element) => {
                         if (element.name?.includes(itemName)) {
-                            elementNames.push(element.name);
+                            names.push(element.name);
+                        }
+
+                        if (element.clusterElements) {
+                            extractElementNames(element.clusterElements, names);
                         }
                     });
-                } else if (elements?.name?.includes(itemName)) {
-                    elementNames.push(elements.name);
+                } else if (typeElements && typeof typeElements === 'object') {
+                    if (typeElements.name?.includes(itemName)) {
+                        names.push(typeElements.name);
+                    }
+
+                    if (typeElements.clusterElements) {
+                        extractElementNames(typeElements.clusterElements, names);
+                    }
                 }
             });
+        };
+
+        if (clusterElements) {
+            extractElementNames(clusterElements, elementNames);
         }
 
         return elementNames;
