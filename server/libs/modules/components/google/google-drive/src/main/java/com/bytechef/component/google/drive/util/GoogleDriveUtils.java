@@ -17,6 +17,7 @@
 package com.bytechef.component.google.drive.util;
 
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
+import static com.bytechef.google.commons.GoogleUtils.fetchAllFiles;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.Parameters;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +46,8 @@ public class GoogleDriveUtils {
     }
 
     public static PollOutput getPollOutput(
-        Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters, boolean newFile) {
+        Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters, boolean newFile)
+        throws IOException {
 
         ZoneId zoneId = ZoneId.systemDefault();
 
@@ -52,13 +55,16 @@ public class GoogleDriveUtils {
 
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
-        try {
-            String mimeType = newFile
-                ? "mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'"
-                : "mimeType = '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'";
+        String mimeType = newFile
+            ? "mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'"
+            : "mimeType = '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'";
 
-            Drive drive = GoogleServices.getDrive(connectionParameters);
+        Drive drive = GoogleServices.getDrive(connectionParameters);
 
+        List<File> files = new ArrayList<>();
+        String nextPageToken = null;
+
+        do {
             FileList fileList = drive.files()
                 .list()
                 .setQ(mimeType + " and '" + inputParameters.getRequiredString(FOLDER_ID) + "' in parents and " +
@@ -66,13 +72,15 @@ public class GoogleDriveUtils {
                     startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")) + "'")
                 .setFields("files(id, name, mimeType, webViewLink, kind)")
                 .setOrderBy("createdTime asc")
+                .setPageSize(1000)
+                .setPageToken(nextPageToken)
                 .execute();
 
-            return new PollOutput(fileList.getFiles(), Map.of(LAST_TIME_CHECKED, now), false);
+            files.addAll(fileList.getFiles());
+            nextPageToken = fileList.getNextPageToken();
+        } while (nextPageToken != null);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return new PollOutput(files, Map.of(LAST_TIME_CHECKED, now), false);
     }
 
     public static List<File> listFiles(String folderId, boolean isEqualMimetype, Parameters connectionParameters)
@@ -82,12 +90,7 @@ public class GoogleDriveUtils {
         String query = "mimeType %s '%s' and trashed = false and parents in '%s'".formatted(
             operator, APPLICATION_VND_GOOGLE_APPS_FOLDER, folderId);
 
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-
-        return drive.files()
-            .list()
-            .setQ(query)
-            .execute()
-            .getFiles();
+        return fetchAllFiles(connectionParameters, query);
     }
+
 }

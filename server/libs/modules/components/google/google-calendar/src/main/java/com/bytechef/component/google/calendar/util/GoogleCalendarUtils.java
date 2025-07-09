@@ -33,14 +33,19 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttachment;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.Events;
+import com.google.api.services.calendar.model.Setting;
+import com.google.api.services.calendar.model.Settings;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -56,6 +61,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Monika Kušter
@@ -131,19 +137,33 @@ public class GoogleCalendarUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) throws IOException {
 
-        List<Option<String>> options = new ArrayList<>();
-        List<CalendarListEntry> calendarListEntries = GoogleServices.getCalendar(connectionParameters)
-            .calendarList()
-            .list()
-            .setMinAccessRole("writer")
-            .execute()
-            .getItems();
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+        List<CalendarListEntry> calendarListEntries = fetchAllCalendarListEntries(calendar);
 
-        for (CalendarListEntry calendarListEntry : calendarListEntries) {
-            options.add(option(calendarListEntry.getSummary(), calendarListEntry.getId()));
-        }
+        return calendarListEntries.stream()
+            .map(entry -> option(entry.getSummary(), entry.getId()))
+            .collect(Collectors.toList());
+    }
 
-        return options;
+    private static List<CalendarListEntry> fetchAllCalendarListEntries(Calendar calendar)
+        throws IOException {
+        List<CalendarListEntry> calendarListEntries = new ArrayList<>();
+        String nextPageToken = null;
+
+        do {
+            CalendarList calendarList = calendar
+                .calendarList()
+                .list()
+                .setMinAccessRole("writer")
+                .setMaxResults(250)
+                .setPageToken(nextPageToken)
+                .execute();
+
+            calendarListEntries.addAll(calendarList.getItems());
+            nextPageToken = calendarList.getNextPageToken();
+        } while (nextPageToken != null);
+
+        return calendarListEntries;
     }
 
     public static List<CustomEvent> getCustomEvents(Parameters inputParameters, Parameters connectionParameters)
@@ -239,22 +259,36 @@ public class GoogleCalendarUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) throws IOException {
 
-        List<Option<String>> options = new ArrayList<>();
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+        List<Event> events = fetchAllCalendarEvents(calendar, inputParameters.getRequiredString(CALENDAR_ID));
 
-        List<Event> events = calendar.events()
-            .list(inputParameters.getRequiredString(CALENDAR_ID))
-            .execute()
-            .getItems();
+        return events.stream()
+            .map(event -> {
+                String summary = event.getSummary();
+                String id = event.getId();
 
-        for (Event event : events) {
-            String id = event.getId();
-            String summary = event.getSummary();
+                return option(summary != null && !summary.isEmpty() ? summary : id, id);
+            })
+            .collect(Collectors.toList());
+    }
 
-            options.add(option(summary != null && !summary.isEmpty() ? summary : id, id));
-        }
+    private static List<Event> fetchAllCalendarEvents(Calendar calendar, String calendarId)
+        throws IOException {
+        List<Event> allEvents = new ArrayList<>();
+        String nextPageToken = null;
 
-        return options;
+        do {
+            Events events = calendar.events()
+                .list(calendarId)
+                .setMaxResults(2500)
+                .setPageToken(nextPageToken)
+                .execute();
+
+            allEvents.addAll(events.getItems());
+            nextPageToken = events.getNextPageToken();
+        } while (nextPageToken != null);
+
+        return allEvents;
     }
 
     public static Event updateEvent(Parameters inputParameters, Parameters connectionParameters, Event event)
@@ -269,15 +303,32 @@ public class GoogleCalendarUtils {
     }
 
     public static String getCalendarTimezone(Calendar calendar) throws IOException {
-        return calendar.settings()
-            .list()
-            .execute()
-            .getItems()
-            .stream()
+        List<Setting> settings = fetchAllCalendarSettings(calendar);
+
+        return settings.stream()
             .filter(setting -> Objects.equals(setting.getId(), "timezone"))
             .findFirst()
-            .get()
-            .getValue();
+            .map(Setting::getValue)
+            .orElseThrow(() -> new ProviderException("Timezone setting not found."));
+    }
+
+    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) throws IOException {
+        List<Setting> allSettings = new ArrayList<>();
+
+        String nextPageToken = null;
+
+        do {
+            Settings settings = calendar.settings()
+                .list()
+                .setMaxResults(250)
+                .setPageToken(nextPageToken)
+                .execute();
+
+            allSettings.addAll(settings.getItems());
+            nextPageToken = settings.getNextPageToken();
+        } while (nextPageToken != null);
+
+        return allSettings;
     }
 
     @SuppressFBWarnings("EI")

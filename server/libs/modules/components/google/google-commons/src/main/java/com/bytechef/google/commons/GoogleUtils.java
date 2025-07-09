@@ -27,8 +27,11 @@ import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunctio
 import com.bytechef.component.definition.Parameters;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Monika Kušter
@@ -71,17 +74,33 @@ public class GoogleUtils {
     private static List<Option<String>> getFileOptions(
         String mimeType, boolean isEqualMimetype, Parameters connectionParameters) throws IOException {
 
-        Drive drive = GoogleServices.getDrive(connectionParameters);
         String operator = isEqualMimetype ? "=" : "!=";
         String query = String.format("mimeType %s '%s' and trashed = false", operator, mimeType);
 
-        return drive.files()
-            .list()
-            .setQ(query)
-            .execute()
-            .getFiles()
-            .stream()
-            .map(folder -> (Option<String>) option(folder.getName(), folder.getId()))
-            .toList();
+        List<File> files = fetchAllFiles(connectionParameters, query);
+
+        return files.stream()
+            .map(folder -> option(folder.getName(), folder.getId()))
+            .collect(Collectors.toList());
+    }
+
+    public static List<File> fetchAllFiles(Parameters connectionParameters, String query) throws IOException {
+        Drive drive = GoogleServices.getDrive(connectionParameters);
+
+        List<File> files = new ArrayList<>();
+        String nextPageToken = null;
+
+        do {
+            FileList fileList = drive.files()
+                .list()
+                .setQ(query)
+                .setPageSize(1000)
+                .setPageToken(nextPageToken)
+                .execute();
+
+            files.addAll(fileList.getFiles());
+            nextPageToken = fileList.getNextPageToken();
+        } while (nextPageToken != null);
+        return files;
     }
 }
