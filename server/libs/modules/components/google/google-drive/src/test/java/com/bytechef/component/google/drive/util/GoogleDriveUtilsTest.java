@@ -20,7 +20,6 @@ import static com.bytechef.component.google.drive.util.GoogleDriveUtils.LAST_TIM
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -55,12 +54,14 @@ class GoogleDriveUtilsTest {
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FOLDER_ID, "parent", LAST_TIME_CHECKED, LocalDateTime.of(2000, 1, 1, 1, 1, 1)));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void testGetPollOutput() throws IOException {
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic
-                .when(() -> GoogleServices.getDrive(any(Parameters.class)))
+                .when(() -> GoogleServices.getDrive(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedDrive);
             when(mockedDrive.files())
                 .thenReturn(mockedFiles);
@@ -72,20 +73,65 @@ class GoogleDriveUtilsTest {
                 .thenReturn(mockedList);
             when(mockedList.setOrderBy(stringArgumentCaptor.capture()))
                 .thenReturn(mockedList);
+            when(mockedList.setPageSize(integerArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setPageToken(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
             when(mockedList.execute())
                 .thenReturn(new FileList().setFiles(files));
 
-            PollOutput pollOutput =
-                GoogleDriveUtils.getPollOutput(mockedParameters, mockedParameters, mockedParameters, false);
+            PollOutput pollOutput = GoogleDriveUtils.getPollOutput(
+                mockedParameters, mockedParameters, mockedParameters, false);
 
             assertEquals(files, pollOutput.records());
             assertFalse(pollOutput.pollImmediately());
 
-            assertEquals(
-                List.of(
-                    "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and createdTime > '2000-01-01T01:01:01'",
-                    "files(id, name, mimeType, webViewLink, kind)", "createdTime asc"),
-                stringArgumentCaptor.getAllValues());
+            List<String> strings = new ArrayList<>();
+
+            strings.add(
+                "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and createdTime > '2000-01-01T01:01:01'");
+            strings.add("files(id, name, mimeType, webViewLink, kind)");
+            strings.add("createdTime asc");
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
+            assertEquals(1000, integerArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+        }
+    }
+
+    @Test
+    void testListFiles() throws IOException {
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDrive(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedDrive);
+
+            when(mockedDrive.files())
+                .thenReturn(mockedFiles);
+            when(mockedFiles.list())
+                .thenReturn(mockedList);
+            when(mockedList.setQ(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setPageSize(integerArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setPageToken(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.execute())
+                .thenReturn(new FileList().setFiles(files));
+
+            List<File> result = GoogleDriveUtils.listFiles("folderId", true, mockedParameters);
+
+            assertEquals(files, result);
+
+            List<String> strings = new ArrayList<>();
+
+            strings
+                .add("mimeType = 'application/vnd.google-apps.folder' and trashed = false and parents in 'folderId'");
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
+            assertEquals(1000, integerArgumentCaptor.getValue());
         }
     }
 }
