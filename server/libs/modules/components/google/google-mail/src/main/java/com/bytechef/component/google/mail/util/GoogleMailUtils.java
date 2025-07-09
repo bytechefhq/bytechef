@@ -61,6 +61,8 @@ import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Label;
+import com.google.api.services.gmail.model.ListMessagesResponse;
+import com.google.api.services.gmail.model.ListThreadsResponse;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartBody;
@@ -322,18 +324,30 @@ public class GoogleMailUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context)
         throws IOException {
-
-        List<Message> messages = GoogleServices.getMail(connectionParameters)
-            .users()
-            .messages()
-            .list(ME)
-            .execute()
-            .getMessages();
-
         List<Option<String>> options = new ArrayList<>();
 
+        Gmail gmail = GoogleServices.getMail(connectionParameters);
+
+        List<Message> messages = new ArrayList<>();
+        String nextPageToken = null;
+
+        do {
+            ListMessagesResponse listMessagesResponse = gmail.users()
+                .messages()
+                .list(ME)
+                .setMaxResults(500L)
+                .setPageToken(nextPageToken)
+                .execute();
+
+            messages.addAll(listMessagesResponse.getMessages());
+
+            nextPageToken = listMessagesResponse.getNextPageToken();
+        } while (nextPageToken != null);
+
         for (Message message : messages) {
-            options.add(option(message.getId(), message.getId()));
+            String id = message.getId();
+
+            options.add(option(id, id));
         }
 
         return options;
@@ -494,12 +508,24 @@ public class GoogleMailUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) throws IOException {
 
-        List<Thread> threads = GoogleServices.getMail(connectionParameters)
-            .users()
-            .threads()
-            .list(ME)
-            .execute()
-            .getThreads();
+        Gmail gmail = GoogleServices.getMail(connectionParameters);
+
+        List<Thread> threads = new ArrayList<>();
+
+        String nextPageToken = null;
+        do {
+            ListThreadsResponse listThreadsResponse = gmail
+                .users()
+                .threads()
+                .list(ME)
+                .setMaxResults(500L)
+                .setPageToken(nextPageToken)
+                .execute();
+
+            threads.addAll(listThreadsResponse.getThreads());
+
+            nextPageToken = listThreadsResponse.getNextPageToken();
+        } while (nextPageToken != null);
 
         List<Option<String>> options = new ArrayList<>();
 

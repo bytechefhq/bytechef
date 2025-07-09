@@ -31,6 +31,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.google.commons.GoogleUtils;
+import java.io.IOException;
 
 /**
  * @author Monika Kušter
@@ -58,7 +59,7 @@ public class GoogleDriveNewFolderTrigger {
 
     protected static PollOutput poll(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
-        TriggerContext context) {
+        TriggerContext context) throws IOException {
 
         return getPollOutput(inputParameters, connectionParameters, closureParameters, false);
     }

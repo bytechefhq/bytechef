@@ -35,21 +35,34 @@ import java.util.Map;
 public class GoogleChatUtils {
 
     public static List<Option<String>> getSpaceOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        Map<String, List<Map<String, Object>>> spacesMap = context
+        List<Option<String>> options = new ArrayList<>();
+        String nextPageToken = null;
+
+        do {
+            Map<String, ?> body = fetchSpaces(context, nextPageToken);
+            nextPageToken = (String) body.get("nextPageToken");
+
+            if (body.get("spaces") instanceof List<?> spaces) {
+                for (Object space : spaces) {
+                    if (space instanceof Map<?, ?> item) {
+                        options.add(option((String) item.get(DISPLAY_NAME), (String) item.get("name")));
+                    }
+                }
+            }
+        } while (nextPageToken != null);
+
+        return options;
+    }
+
+    private static Map<String, ?> fetchSpaces(Context context, String pageToken) {
+        return context
             .http(http -> http.get("https://chat.googleapis.com/v1/spaces"))
+            .queryParameters("pageSize", 1000, "pageToken", pageToken)
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
-
-        for (Map<String, Object> item : spacesMap.get("spaces")) {
-            options.add(option((String) item.get(DISPLAY_NAME), (String) item.get("name")));
-        }
-
-        return options;
     }
 }
