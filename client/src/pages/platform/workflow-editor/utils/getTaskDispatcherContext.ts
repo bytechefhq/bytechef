@@ -114,6 +114,10 @@ export default function getTaskDispatcherContext({
         return getContextFromPlaceholderNode(node);
     }
 
+    if (edge && !nodes) {
+        return undefined;
+    }
+
     const {source, target} = edge!;
 
     const sourceNode = nodes!.find((node) => node.id === source);
@@ -129,6 +133,7 @@ export default function getTaskDispatcherContext({
     const isTargetGhost = target.includes('ghost');
 
     const isSourceTopGhost = sourceNode?.type === 'taskDispatcherTopGhostNode';
+    const isSourceBottomGhost = sourceNode?.type === 'taskDispatcherBottomGhostNode';
 
     const isSourceNestedBottomGhost = sourceNode?.data.isNestedBottomGhost;
 
@@ -170,6 +175,10 @@ export default function getTaskDispatcherContext({
         return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
     }
 
+    if (isSourceBottomGhost && isTargetTask) {
+        return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
+    }
+
     if (isSourceGhost && !isSourceNestedBottomGhost && isTargetTask) {
         return getContextFromTaskNodeData(targetNode.data as NodeDataType, 1);
     }
@@ -196,3 +205,5 @@ export default function getTaskDispatcherContext({
 
     return context;
 }
+
+export {getContextFromTaskNodeData, getContextFromPlaceholderNode};
