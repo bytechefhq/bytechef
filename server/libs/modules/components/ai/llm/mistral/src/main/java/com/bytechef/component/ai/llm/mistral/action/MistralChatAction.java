@@ -37,6 +37,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -44,6 +45,7 @@ import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.mistralai.MistralAiChatModel;
 import org.springframework.ai.mistralai.MistralAiChatOptions;
 import org.springframework.ai.mistralai.api.MistralAiApi;
+import org.springframework.ai.retry.RetryUtils;
 
 /**
  * @author Marko Kriskovic
@@ -68,7 +70,10 @@ public class MistralChatAction {
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> MistralAiChatModel.builder()
         .mistralAiApi(
-            new MistralAiApi(connectionParameters.getString(TOKEN)))
+            new MistralAiApi("https://api.mistral.ai",
+                connectionParameters.getString(TOKEN),
+                ModelUtils.getRestClientBuilder(),
+                RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER))
         .defaultOptions(
             MistralAiChatOptions.builder()
                 .model(inputParameters.getRequiredString(MODEL))
