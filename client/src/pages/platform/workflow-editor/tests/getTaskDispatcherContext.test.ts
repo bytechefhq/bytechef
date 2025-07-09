@@ -1,7 +1,7 @@
 import getTaskDispatcherContext, {
     getContextFromPlaceholderNode,
     getContextFromTaskNodeData,
-} from './getTaskDispatcherContext';
+} from '../utils/getTaskDispatcherContext';
 
 import type {NodeDataType} from '@/shared/types';
 import type {Edge, Node} from '@xyflow/react';

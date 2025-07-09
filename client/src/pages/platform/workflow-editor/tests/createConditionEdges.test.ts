@@ -1,7 +1,7 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
 
-import {getConditionBranchSide, hasTaskInConditionBranches} from './createConditionEdges';
+import {getConditionBranchSide, hasTaskInConditionBranches} from '../utils/createConditionEdges';
 
 describe('createConditionEdges', () => {
     describe('hasTaskInConditionBranches', () => {
