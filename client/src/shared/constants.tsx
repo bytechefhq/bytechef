@@ -81,7 +81,9 @@ export const PATH_UNICODE_REPLACEMENT_PREFIX = '__UNICODE_';
 export const NODE_WIDTH = 240;
 export const NODE_HEIGHT = 100;
 export const PLACEHOLDER_NODE_HEIGHT = 28;
-export const ROOT_CLUSTER_WIDTH = 250;
+export const PLACEHOLDER_NODE_WIDTH = 28;
+export const ROOT_CLUSTER_WIDTH = 280;
+export const ROOT_CLUSTER_HANDLE_STEP = 180;
 export const DIRECTION = 'TB';
 export const DEFAULT_NODE_POSITION = {x: 0, y: 0};
 

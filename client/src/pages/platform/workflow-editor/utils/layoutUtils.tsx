@@ -19,7 +19,6 @@ import {
 import {
     BranchCaseType,
     BranchChildTasksType,
-    ClusterElementsType,
     ConditionChildTasksType,
     EachChildTasksType,
     LoopChildTasksType,
@@ -159,70 +158,50 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
     }
 
     if (isClusterElementsCanvas) {
-        const rootNode = nodes.find((node) => node.data.clusterElements);
+        const mainRootNode = nodes.find((node) => node.data.clusterElements && !node.parentId);
 
-        const hasValidClusterElements =
-            rootNode &&
-            Object.entries(rootNode.data.clusterElements as ClusterElementsType).some(
-                ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
-            );
+        const allNodes = [...nodes];
 
-        const nodesWithPositions = hasValidClusterElements
-            ? nodes.filter(
-                  (node) => containsNodePosition(node.data.metadata) || (node.position.x !== 0 && node.position.y !== 0)
-              )
-            : [];
+        const placeholderNodes = allNodes.filter((node) => node.type === 'placeholder');
+        const nonPlaceholderNodes = allNodes.filter((node) => node.type !== 'placeholder');
 
-        const nodesToLayout = hasValidClusterElements
-            ? nodes.filter(
-                  (node) => !containsNodePosition(node.data.metadata) && node.position.x === 0 && node.position.y === 0
-              )
-            : nodes;
+        let positionedNodes = [] as Node[];
+        let centeredMainRootNode = [] as Node[];
 
-        let centeringOffsetX = 0;
-
-        if (nodesToLayout.length > 0) {
-            const dagrePositions = nodesToLayout.map((node) => dagreGraph.node(node.id).x);
-
-            const minX = Math.min(...dagrePositions);
-            const maxX = Math.max(...dagrePositions);
-
-            const graphWidth = maxX - minX + NODE_WIDTH;
-
-            const graphCenter = minX + graphWidth / 2;
-
-            centeringOffsetX = canvasWidth / 2 - graphCenter;
-        }
-
-        let positionedNodes;
-
-        if (hasValidClusterElements && nodesWithPositions.length > 0) {
+        if (nonPlaceholderNodes.length > 0) {
             positionedNodes = [
-                ...nodesWithPositions.map((node) => ({
+                ...positionedNodes,
+                ...nonPlaceholderNodes.map((node) => ({
                     ...node,
                     position: containsNodePosition(node.data.metadata)
                         ? node.data.metadata.ui.nodePosition
                         : node.position,
                 })),
-                ...nodesToLayout.map((node) => ({
-                    ...node,
-                    position: {
-                        x: dagreGraph.node(node.id).x + centeringOffsetX,
-                        y: dagreGraph.node(node.id).y + NODE_HEIGHT,
-                    },
-                })),
             ];
-        } else {
-            positionedNodes = nodesToLayout.map((node) => ({
-                ...node,
-                position: {
-                    x: dagreGraph.node(node.id).x + centeringOffsetX,
-                    y: dagreGraph.node(node.id).y + NODE_HEIGHT,
-                },
-            }));
         }
 
-        return {edges, nodes: positionedNodes};
+        if (mainRootNode && !containsNodePosition(mainRootNode.data.metadata)) {
+            const dagreNode = dagreGraph.node(mainRootNode.id);
+
+            const centeringOffsetX = canvasWidth / 2 - dagreNode.x - ROOT_CLUSTER_WIDTH / 2;
+
+            centeredMainRootNode = [
+                {
+                    ...mainRootNode,
+                    position: {
+                        x: dagreNode.x + centeringOffsetX,
+                        y: NODE_HEIGHT,
+                    },
+                },
+            ];
+        }
+
+        positionedNodes = [...positionedNodes, ...placeholderNodes, ...centeredMainRootNode];
+
+        return {
+            edges,
+            nodes: positionedNodes,
+        };
     }
 
     const allNodes = nodes.map((node) => {
@@ -234,7 +213,7 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
                 ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
             );
 
-        if (hasValidClusterElements && node.type === 'aiAgentNode') {
+        if (hasValidClusterElements && ROOT_CLUSTER_ELEMENT_NAMES.includes(node.data.componentName as string)) {
             positionX -= 85;
         }
 
