@@ -148,14 +148,14 @@ Type: NUMBER
 ### Extract Date Units
 Name: extractDateUnits
 
-`Extract date units (year/month/day/hour/minute/second/day of week/month name) from a date.`
+`Extracts specific units (year, month, day, hour, minute, second, day of week, month name, date, or time) from a given date.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputDate | Date | DATE_TIME |  | true |
-| unit | Unit to Extract | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second, dayOfWeek, monthName </details> | `Unit to extract from date.` | true |
+| inputDate | Date | DATE_TIME | `The date from which to extract the specified unit.` | true |
+| unit | Unit to Extract | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second, dayOfWeek, monthName, date, time </details> | `Unit to extract from the input date.` | true |
 
 #### Example JSON Structure
 ```json
@@ -172,13 +172,7 @@ Name: extractDateUnits
 
 #### Output
 
-
-
-Type: STRING
-
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
 
