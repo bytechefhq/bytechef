@@ -316,7 +316,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             editorProps: {
                 attributes: {
                     class: twMerge(
-                        'text-sm outline-none max-w-full border-none ring-0',
+                        'text-sm outline-none max-w-full border-none ring-0 break-words whitespace-pre-wrap w-full min-w-0 break-all',
                         controlType === 'RICH_TEXT' && 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl',
                         className
                     ),
