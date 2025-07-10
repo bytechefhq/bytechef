@@ -16,6 +16,7 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY_OF_WEEK;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
@@ -24,6 +25,7 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.M
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH_NAME;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.TIME;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.UNIT;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.YEAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +36,9 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -135,6 +139,28 @@ class DateHelperExtractDateUnitsActionTest {
             DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(Month.JANUARY.getDisplayName(TextStyle.FULL, Locale.getDefault()), result);
+    }
+
+    @Test
+    void testPerformDate() {
+        mockedParameters = MockParametersFactory.create(
+            Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, DATE));
+
+        Object result =
+            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+
+        assertEquals(LocalDate.of(2023, 1, 1), result);
+    }
+
+    @Test
+    void testPerformTime() {
+        mockedParameters = MockParametersFactory.create(
+            Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, TIME));
+
+        Object result =
+            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+
+        assertEquals(LocalTime.of(0, 0, 0), result);
     }
 
     @Test
