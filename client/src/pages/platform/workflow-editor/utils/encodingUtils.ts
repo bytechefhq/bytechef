@@ -4,6 +4,7 @@ import {
     PATH_DIGIT_PREFIX,
     PATH_HASH_REPLACEMENT,
     PATH_OPENING_PARENTHESIS_REPLACEMENT,
+    PATH_SLASH_REPLACEMENT,
     PATH_SPACE_REPLACEMENT,
     PATH_UNICODE_REPLACEMENT_PREFIX,
 } from '@/shared/constants';
@@ -103,6 +104,12 @@ export function encodeParameters(parameters: {[key: string]: unknown}): {[key: s
         replacementFn: (match) => `${PATH_UNICODE_REPLACEMENT_PREFIX}${match.charCodeAt(0)}_`,
     });
 
+    encodedParameters = encodeParametersGeneric({
+        matchPattern: /\//g,
+        parameters: encodedParameters,
+        replacement: PATH_SLASH_REPLACEMENT,
+    });
+
     return encodedParameters;
 }
 
@@ -113,9 +120,8 @@ export function decodePath(path: string): string {
         decodedPath = decodedPath.replace(new RegExp(PATH_SPACE_REPLACEMENT, 'g'), ' ');
     }
 
-    if (decodedPath.includes(PATH_DIGIT_PREFIX)) {
-        decodedPath = decodedPath.replace(new RegExp(PATH_DIGIT_PREFIX, 'g'), '');
-    }
+    // Decode digit at the start of any segment (after dot or at start)
+    decodedPath = decodedPath.replace(new RegExp(`(\\.|^)${PATH_DIGIT_PREFIX}(\\d)`, 'g'), '$1$2');
 
     if (decodedPath.includes(PATH_DASH_REPLACEMENT)) {
         decodedPath = decodedPath.replace(new RegExp(PATH_DASH_REPLACEMENT, 'g'), '-');
@@ -137,13 +143,17 @@ export function decodePath(path: string): string {
         decodedPath = decodeNonAsciiCharacters(decodedPath);
     }
 
+    if (decodedPath.includes(PATH_SLASH_REPLACEMENT)) {
+        decodedPath = decodedPath.replace(new RegExp(PATH_SLASH_REPLACEMENT, 'g'), '/');
+    }
+
     return decodedPath;
 }
 
 export function encodePath(path: string): string {
     let encodedPath = encodePathGeneric(path, /\s/g, PATH_SPACE_REPLACEMENT);
 
-    encodedPath = encodePathGeneric(encodedPath, /^\d/, PATH_DIGIT_PREFIX);
+    encodedPath = encodedPath.replace(/(\.|^)(\d)/g, `$1${PATH_DIGIT_PREFIX}$2`);
 
     encodedPath = encodePathGeneric(encodedPath, /-/g, PATH_DASH_REPLACEMENT);
 
@@ -154,6 +164,8 @@ export function encodePath(path: string): string {
     encodedPath = encodePathGeneric(encodedPath, /\)/g, PATH_CLOSING_PARENTHESIS_REPLACEMENT);
 
     encodedPath = encodeNonAsciiCharacters(encodedPath);
+
+    encodedPath = encodePathGeneric(encodedPath, /\//g, PATH_SLASH_REPLACEMENT);
 
     return encodedPath;
 }
