@@ -1,3 +1,4 @@
+import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';
 import {
@@ -14,6 +15,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {WorkflowInputType} from '@/shared/types';
+import {RefObject} from 'react';
 import {UseFormReturn} from 'react-hook-form';
 
 interface WorkflowInputsEditDialogProps {
@@ -21,6 +23,7 @@ interface WorkflowInputsEditDialogProps {
     currentInputIndex?: number;
     form: UseFormReturn<WorkflowInputType, unknown, WorkflowInputType>;
     isEditDialogOpen: boolean;
+    nameInputRef: RefObject<HTMLInputElement>;
     openEditDialog: (index?: number) => void;
     saveWorkflowInput: (input: WorkflowInputType) => void;
 }
@@ -30,6 +33,7 @@ const WorkflowInputsEditDialog = ({
     currentInputIndex,
     form,
     isEditDialogOpen,
+    nameInputRef,
     openEditDialog,
     saveWorkflowInput,
 }: WorkflowInputsEditDialogProps) => (
@@ -61,10 +65,12 @@ const WorkflowInputsEditDialog = ({
                         name="name"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Name</FormLabel>
+                                <FormLabel>
+                                    Name <RequiredMark />
+                                </FormLabel>
 
                                 <FormControl>
-                                    <Input {...field} readOnly={currentInputIndex !== -1} />
+                                    <Input {...field} readOnly={currentInputIndex !== -1} ref={nameInputRef} />
                                 </FormControl>
 
                                 <FormMessage />
@@ -78,7 +84,9 @@ const WorkflowInputsEditDialog = ({
                         name="label"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Label</FormLabel>
+                                <FormLabel>
+                                    Label <RequiredMark />
+                                </FormLabel>
 
                                 <FormControl>
                                     <Input {...field} />
@@ -95,10 +103,12 @@ const WorkflowInputsEditDialog = ({
                         name="type"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Type</FormLabel>
+                                <FormLabel>
+                                    Type <RequiredMark />
+                                </FormLabel>
 
                                 <FormControl>
-                                    <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                    <Select onValueChange={field.onChange} value={field.value ?? ''}>
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select input type" />
                                         </SelectTrigger>

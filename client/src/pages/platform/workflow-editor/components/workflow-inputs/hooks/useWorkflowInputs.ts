@@ -5,7 +5,7 @@ import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType, WorkflowInputType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
@@ -27,6 +27,8 @@ export default function useWorkflowInputs({
     const {updateWorkflowMutation} = useWorkflowEditor();
 
     const {setWorkflow, workflow} = useWorkflowDataStore();
+
+    const nameInputRef = useRef<HTMLInputElement>(null);
 
     const currentInput = workflow?.inputs?.[currentInputIndex];
 
@@ -144,6 +146,11 @@ export default function useWorkflowInputs({
             inputs[currentInputIndex] = input;
         }
 
+        setWorkflow({
+            ...workflow,
+            inputs,
+        });
+
         updateWorkflowMutation!.mutate(
             {
                 id: workflow.id!,
@@ -160,8 +167,39 @@ export default function useWorkflowInputs({
                 },
             },
             {
+                onError: () => {
+                    const originalInputs = workflowDefinition.inputs ?? [];
+
+                    setWorkflow({
+                        ...workflow,
+                        inputs: originalInputs,
+                    });
+                },
                 onSuccess: async () => {
                     if (!getValues().testValue) {
+                        setWorkflow({
+                            ...workflow,
+                            inputs,
+                            version: (workflow.version ?? 0) + 1,
+                        });
+
+                        form.reset({
+                            label: '',
+                            name: '',
+                            required: false,
+                            testValue: '',
+                            type: undefined,
+                        });
+
+                        setTimeout(() => {
+                            const nameInput = document.querySelector('input[name="name"]') as HTMLInputElement;
+                            if (nameInput) {
+                                nameInput.focus();
+                            }
+                        }, 0);
+
+                        invalidateWorkflowQueries();
+
                         return;
                     }
 
@@ -178,7 +216,24 @@ export default function useWorkflowInputs({
                     setWorkflow({
                         ...workflow,
                         inputs,
+                        version: (workflow.version ?? 0) + 1,
                     });
+
+                    form.reset({
+                        label: '',
+                        name: '',
+                        required: false,
+                        testValue: '',
+                        type: undefined,
+                    });
+
+                    setTimeout(() => {
+                        const nameInput = document.querySelector('input[name="name"]') as HTMLInputElement;
+
+                        if (nameInput) {
+                            nameInput.focus();
+                        }
+                    }, 0);
 
                     invalidateWorkflowQueries();
                 },
@@ -194,6 +249,11 @@ export default function useWorkflowInputs({
         const index = inputs.findIndex((curInput) => curInput.name === input.name);
 
         inputs.splice(index, 1);
+
+        setWorkflow({
+            ...workflow,
+            inputs,
+        });
 
         updateWorkflowMutation!.mutate(
             {
@@ -211,19 +271,36 @@ export default function useWorkflowInputs({
                 },
             },
             {
-                onSuccess: () => {
-                    invalidateWorkflowQueries();
+                onError: () => {
+                    const originalInputs = definitionObject.inputs ?? [];
 
                     setWorkflow({
                         ...workflow,
-                        inputs,
+                        inputs: originalInputs,
                     });
+                },
+                onSuccess: () => {
+                    setWorkflow({
+                        ...workflow,
+                        inputs,
+                        version: (workflow.version ?? 0) + 1,
+                    });
+
+                    invalidateWorkflowQueries();
 
                     setIsDeleteDialogOpen(false);
                 },
             }
         );
     }
+
+    useEffect(() => {
+        if (isEditDialogOpen) {
+            setTimeout(() => {
+                nameInputRef.current?.focus();
+            }, 0);
+        }
+    }, [isEditDialogOpen]);
 
     return {
         closeDeleteDialog,
@@ -234,6 +311,7 @@ export default function useWorkflowInputs({
         getFormattedInputName,
         isDeleteDialogOpen,
         isEditDialogOpen,
+        nameInputRef,
         openDeleteDialog,
         openEditDialog,
         saveWorkflowInput,

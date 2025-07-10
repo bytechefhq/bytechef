@@ -29,6 +29,7 @@ const WorkflowInputsSheet = ({
         form,
         isDeleteDialogOpen,
         isEditDialogOpen,
+        nameInputRef,
         openDeleteDialog,
         openEditDialog,
         saveWorkflowInput,
@@ -62,6 +63,7 @@ const WorkflowInputsSheet = ({
                         currentInputIndex={currentInputIndex}
                         form={form}
                         isEditDialogOpen={isEditDialogOpen}
+                        nameInputRef={nameInputRef}
                         openEditDialog={openEditDialog}
                         saveWorkflowInput={saveWorkflowInput}
                     />
