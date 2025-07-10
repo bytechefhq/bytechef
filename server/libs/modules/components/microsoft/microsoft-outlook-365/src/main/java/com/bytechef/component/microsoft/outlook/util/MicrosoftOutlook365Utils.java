@@ -26,7 +26,6 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
@@ -72,31 +71,6 @@ public class MicrosoftOutlook365Utils {
             (String) messageBody.get("bodyPreview"),
             bodyHtml,
             getFileEntries(context, messageBody, id));
-    }
-
-    public static List<Map<?, ?>> getItemsFromNextPage(String link, Context context) {
-        List<Map<?, ?>> otherItems = new ArrayList<>();
-
-        while (link != null && !link.isEmpty()) {
-            String finalLink = link;
-
-            Map<String, Object> body = context.http(http -> http.get(finalLink))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
-
-            if (body.get(VALUE) instanceof List<?> list) {
-                for (Object o : list) {
-                    if (o instanceof Map<?, ?> map) {
-                        otherItems.add(map);
-                    }
-                }
-            }
-
-            link = (String) body.get(ODATA_NEXT_LINK);
-        }
-
-        return otherItems;
     }
 
     public static String getMailboxTimeZone(Context context) {

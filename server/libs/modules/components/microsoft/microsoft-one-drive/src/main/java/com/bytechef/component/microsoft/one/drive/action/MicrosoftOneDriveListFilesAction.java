@@ -25,6 +25,8 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.ODATA_NEXT_LINK;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -79,6 +81,14 @@ public class MicrosoftOneDriveListFilesAction {
                 if (item instanceof Map<?, ?> map && map.containsKey(FILE)) {
                     files.add(map);
                 }
+            }
+        }
+
+        List<Map<?, ?>> itemsFromNextPage = getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
+
+        for (Map<?, ?> map : itemsFromNextPage) {
+            if (map.containsKey(FILE)) {
+                files.add(map);
             }
         }
 

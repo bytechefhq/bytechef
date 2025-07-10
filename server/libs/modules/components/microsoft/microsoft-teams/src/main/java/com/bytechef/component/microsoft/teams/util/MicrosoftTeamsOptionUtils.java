@@ -22,6 +22,7 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.VALUE;
 import static com.bytechef.component.microsoft.teams.util.MicrosoftTeamsUtils.getChatMembers;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -82,7 +83,7 @@ public class MicrosoftTeamsOptionUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body);
+        return getOptions(context, body, DISPLAY_NAME, ID);
     }
 
     public static List<Option<String>> getTeamIdOptions(
@@ -94,20 +95,6 @@ public class MicrosoftTeamsOptionUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body);
-    }
-
-    private static List<Option<String>> getOptions(Map<String, Object> body) {
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(DISPLAY_NAME), (String) map.get(ID)));
-                }
-            }
-        }
-
-        return options;
+        return getOptions(context, body, DISPLAY_NAME, ID);
     }
 }

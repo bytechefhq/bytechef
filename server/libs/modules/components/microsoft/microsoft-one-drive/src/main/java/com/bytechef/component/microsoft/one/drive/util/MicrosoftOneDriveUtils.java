@@ -21,6 +21,8 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.ODATA_NEXT_LINK;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -59,6 +61,14 @@ public class MicrosoftOneDriveUtils {
             }
         }
 
+        List<Map<?, ?>> itemsFromNextPage = getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), actionContext);
+
+        for (Map<?, ?> map : itemsFromNextPage) {
+            if (map.containsKey(FILE)) {
+                options.add(option((String) map.get(NAME), (String) map.get(ID)));
+            }
+        }
+
         return options;
     }
 
@@ -82,6 +92,14 @@ public class MicrosoftOneDriveUtils {
                 if (item instanceof Map<?, ?> map && map.containsKey("folder")) {
                     options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
+            }
+        }
+
+        List<Map<?, ?>> itemsFromNextPage = getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
+
+        for (Map<?, ?> map : itemsFromNextPage) {
+            if (map.containsKey("folder")) {
+                options.add(option((String) map.get(NAME), (String) map.get(ID)));
             }
         }
 

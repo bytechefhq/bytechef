@@ -33,6 +33,7 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUES;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
@@ -292,7 +293,7 @@ public class MicrosoftExcelUtils {
 
     public static List<Option<String>> getWorkbookIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http.get("/me/drive/items/root/search(q='.xlsx')"))
@@ -300,12 +301,12 @@ public class MicrosoftExcelUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, ID);
+        return getOptions(context, body, NAME, ID);
     }
 
     public static List<Option<String>> getWorksheetNameOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http
@@ -315,7 +316,7 @@ public class MicrosoftExcelUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, NAME);
+        return getOptions(context, body, NAME, NAME);
     }
 
     protected static String columnToLabel(int columnNumber, boolean addColumnPrefix) {
@@ -372,20 +373,6 @@ public class MicrosoftExcelUtils {
                 options.add(option(string, string));
             }
         }
-        return options;
-    }
-
-    private static List<Option<String>> getOptions(Map<String, Object> body, String value) {
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object object : list) {
-                if (object instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(NAME), (String) map.get(value)));
-                }
-            }
-        }
-
         return options;
     }
 }

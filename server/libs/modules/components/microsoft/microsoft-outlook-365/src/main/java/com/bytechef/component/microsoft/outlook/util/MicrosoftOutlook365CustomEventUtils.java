@@ -33,6 +33,7 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -100,8 +101,7 @@ public class MicrosoftOutlook365CustomEventUtils {
             }
         }
 
-        List<Map<?, ?>> eventsFromNextPage =
-            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
+        List<Map<?, ?>> eventsFromNextPage = getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
 
         events.addAll(eventsFromNextPage);
 
