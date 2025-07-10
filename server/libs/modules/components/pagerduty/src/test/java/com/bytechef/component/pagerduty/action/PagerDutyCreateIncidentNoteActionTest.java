@@ -44,10 +44,7 @@ class PagerDutyCreateIncidentNoteActionTest {
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            FROM, "from",
-            INCIDENT_ID, "incidentId",
-            CONTENT, "content"));
+        Map.of(FROM, "from", INCIDENT_ID, "incidentId", CONTENT, "content"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of();
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -70,15 +67,11 @@ class PagerDutyCreateIncidentNoteActionTest {
         Map<String, Object> result = PagerDutyCreateIncidentNoteAction.perform(
             mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(Map.of(), result);
+        assertEquals(responseMap, result);
 
         Body body = bodyArgumentCaptor.getValue();
-        Map<String, Object> expectedBodyContent = Map.of(
-            "note", Map.of(CONTENT, "content"));
 
-        assertEquals(expectedBodyContent, body.getContent());
-
-        List<String> expectedHeader = List.of(FROM, "from");
-        assertEquals(expectedHeader, stringArgumentCaptor.getAllValues());
+        assertEquals(Map.of("note", Map.of(CONTENT, "content")), body.getContent());
+        assertEquals(List.of(FROM, "from"), stringArgumentCaptor.getAllValues());
     }
 }

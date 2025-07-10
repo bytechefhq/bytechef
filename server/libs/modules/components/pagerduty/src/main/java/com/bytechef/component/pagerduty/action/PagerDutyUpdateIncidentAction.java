@@ -26,6 +26,7 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIG
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNMENTS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ESCALATION_POLICY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.FROM;
+import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_ID;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_OBJECT;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_TYPE;
@@ -98,8 +99,8 @@ public class PagerDutyUpdateIncidentAction {
             string(PRIORITY)
                 .label("Priority")
                 .description(
-                    "Priority of the incident. Priorities must be enabled in your PagerDuty account in order to " +
-                        "use them.")
+                    "Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use " +
+                        "them.")
                 .options((ActionOptionsFunction<String>) PagerDutyUtils::getPriorityOptions)
                 .required(false),
             string(URGENCY)
@@ -125,9 +126,9 @@ public class PagerDutyUpdateIncidentAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context.http(http -> http.put(
-            "/incidents/%s".formatted(inputParameters.getRequiredString(INCIDENT_ID))))
-            .body(Body.of(Map.of("incident", getRequestBody(inputParameters))))
+        return context.http(
+            http -> http.put("/incidents/%s".formatted(inputParameters.getRequiredString(INCIDENT_ID))))
+            .body(Body.of(Map.of(INCIDENT, getRequestBody(inputParameters))))
             .header(FROM, inputParameters.getRequiredString(FROM))
             .configuration(responseType(ResponseType.JSON))
             .execute()

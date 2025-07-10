@@ -24,6 +24,7 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.BODY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.DETAILS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ESCALATION_POLICY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ID;
+import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_KEY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_TYPE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.NAME;
@@ -89,7 +90,8 @@ public class PagerDutyUtils {
 
     public static Map<String, Object> getRequestBody(Parameters parameters) {
         Map<String, Object> body = new HashMap<>();
-        body.put(TYPE, "incident");
+
+        body.put(TYPE, INCIDENT);
 
         addIfNotNull(SERVICE, parameters.getString(SERVICE), body);
         addIfNotNull(PRIORITY, parameters.getString(PRIORITY), body);
@@ -100,14 +102,13 @@ public class PagerDutyUtils {
         addIfNotNull(DETAILS, parameters.getString(DETAILS), body);
         addIfNotNull(INCIDENT_TYPE, parameters.getString(INCIDENT_TYPE), body);
 
-        List<String> assigneeIds = parameters.getList(ASSIGNMENTS, String.class);
+        List<String> assignments = parameters.getList(ASSIGNMENTS, String.class);
         List<Object> assignees = new ArrayList<>();
 
-        if (assigneeIds != null) {
-            for (String assigneeId : assigneeIds) {
-                assignees.add(Map.of(ASSIGNEE, Map.of(
-                    ID, assigneeId,
-                    TYPE, "user_reference")));
+        if (assignments != null) {
+            for (String assignment : assignments) {
+                assignees.add(
+                    Map.of(ASSIGNEE, Map.of(ID, assignment, TYPE, "user_reference")));
             }
 
             body.put(ASSIGNMENTS, assignees);
@@ -145,22 +146,21 @@ public class PagerDutyUtils {
     }
 
     private static List<Option<String>> getIdOptions(Context context, String url, String label) {
+        List<Option<String>> idOptions = new ArrayList<>();
 
         Map<String, Object> response = context.http(http -> http.get("/" + url))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> optionsList = new ArrayList<>();
-
         if (response.get(url) instanceof List<?> options) {
             for (Object optionsObject : options) {
                 if (optionsObject instanceof Map<?, ?> option) {
-                    optionsList.add(option((String) option.get(label), (String) option.get(ID)));
+                    idOptions.add(option((String) option.get(label), (String) option.get(ID)));
                 }
             }
         }
 
-        return optionsList;
+        return idOptions;
     }
 }

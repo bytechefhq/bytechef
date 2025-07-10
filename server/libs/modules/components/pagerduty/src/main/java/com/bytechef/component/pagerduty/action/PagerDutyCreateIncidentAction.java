@@ -27,6 +27,7 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIG
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.DETAILS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ESCALATION_POLICY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.FROM;
+import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_KEY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_OBJECT;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_TYPE;
@@ -122,7 +123,7 @@ public class PagerDutyCreateIncidentAction {
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return context.http(http -> http.post("/incidents"))
-            .body(Body.of(Map.of("incident", getRequestBody(inputParameters))))
+            .body(Body.of(Map.of(INCIDENT, getRequestBody(inputParameters))))
             .header(FROM, inputParameters.getRequiredString(FROM))
             .configuration(responseType(ResponseType.JSON))
             .execute()

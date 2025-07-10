@@ -107,10 +107,10 @@ public class PagerDutyCreateIncidentNoteAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context.http(http -> http.post(
-            "/incidents/%s/notes".formatted(inputParameters.getRequiredString(INCIDENT_ID))))
-            .body(Body.of(Map.of("note", Map.of(CONTENT, inputParameters.getRequiredString(CONTENT)))))
+        return context.http(
+            http -> http.post("/incidents/%s/notes".formatted(inputParameters.getRequiredString(INCIDENT_ID))))
             .header(FROM, inputParameters.getRequiredString(FROM))
+            .body(Body.of(Map.of("note", Map.of(CONTENT, inputParameters.getRequiredString(CONTENT)))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

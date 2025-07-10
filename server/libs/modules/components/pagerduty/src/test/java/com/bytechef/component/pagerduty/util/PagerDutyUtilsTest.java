@@ -57,15 +57,9 @@ class PagerDutyUtilsTest {
     private static final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private static final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            TITLE, "title",
-            SERVICE, "service",
-            PRIORITY, "priority",
-            URGENCY, "urgency",
-            DETAILS, "details",
-            ASSIGNMENTS, List.of("assignee1", "assignee2"),
-            INCIDENT_KEY, "incidentKey",
-            INCIDENT_TYPE, "incidentType",
-            ESCALATION_POLICY, "escalationPolicy"));
+            TITLE, "title", SERVICE, "service", PRIORITY, "priority", URGENCY, "urgency",
+            DETAILS, "details", ASSIGNMENTS, List.of("assignee1", "assignee2"), INCIDENT_KEY, "incidentKey",
+            INCIDENT_TYPE, "incidentType", ESCALATION_POLICY, "escalationPolicy"));
     private static final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
@@ -153,7 +147,6 @@ class PagerDutyUtilsTest {
         Map<String, Object> expectedBody = getExpectedBody();
 
         assertEquals(expectedBody, body);
-
     }
 
     @Test
@@ -202,9 +195,11 @@ class PagerDutyUtilsTest {
         expectedBodyContent.put(INCIDENT_KEY, "incidentKey");
         expectedBodyContent.put(URGENCY, "urgency");
         expectedBodyContent.put(INCIDENT_TYPE, Map.of("name", "incidentType"));
-        expectedBodyContent.put(ASSIGNMENTS, List.of(
-            Map.of(ASSIGNEE, Map.of(ID, "assignee1", TYPE, "user_reference")),
-            Map.of(ASSIGNEE, Map.of(ID, "assignee2", TYPE, "user_reference"))));
+        expectedBodyContent.put(
+            ASSIGNMENTS,
+            List.of(
+                Map.of(ASSIGNEE, Map.of(ID, "assignee1", TYPE, "user_reference")),
+                Map.of(ASSIGNEE, Map.of(ID, "assignee2", TYPE, "user_reference"))));
 
         return expectedBodyContent;
     }
