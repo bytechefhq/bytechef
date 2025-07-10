@@ -46,11 +46,14 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
@@ -61,6 +64,7 @@ class MicrosoftSharePointUtilsTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testCreatePropertiesForListItem() {
@@ -203,17 +207,6 @@ class MicrosoftSharePointUtilsTest {
 
     @Test
     void testGetListIdOptions() {
-        Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
-        List<Map<String, Object>> lists = new ArrayList<>();
-        Map<String, Object> listMap = new LinkedHashMap<>();
-
-        listMap.put(DISPLAY_NAME, "list");
-        listMap.put(ID, "listId");
-
-        lists.add(listMap);
-
-        map.put(VALUE, lists);
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -221,7 +214,7 @@ class MicrosoftSharePointUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
+            .thenReturn(Map.of(VALUE, List.of(Map.of(DISPLAY_NAME, "list", ID, "listId"))));
 
         List<Option<String>> expectedOptions = new ArrayList<>();
 
@@ -247,64 +240,51 @@ class MicrosoftSharePointUtilsTest {
 
     @Test
     void testGetFolderIdOptions() {
-        Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
-        List<Map<String, Object>> folders = new ArrayList<>();
-        Map<String, Object> folderMap = new LinkedHashMap<>();
-
-        folderMap.put(NAME, "folderName");
-        folderMap.put(ID, "folderId");
-
-        folders.add(folderMap);
-
-        map.put(VALUE, folders);
-
         when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
+            .thenReturn(Map.of(VALUE, List.of(Map.of(NAME, "folderName", ID, "folderId"))));
 
         List<Option<String>> expectedOptions = new ArrayList<>();
 
         expectedOptions.add(option("folderName", "folderId"));
 
+        List<Option<String>> folderIdOptions = MicrosoftSharePointUtils.getFolderIdOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+
+        assertEquals(expectedOptions, folderIdOptions);
         assertEquals(
-            expectedOptions,
-            MicrosoftSharePointUtils.getFolderIdOptions(mockedParameters, mockedParameters, Map.of(), "",
-                mockedContext));
+            List.of("$filter", URLEncoder.encode("folder ne null", StandardCharsets.UTF_8)),
+            stringArgumentCaptor.getAllValues());
     }
 
     @Test
     void testGetSiteOptions() {
-        Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
-        List<Map<String, Object>> sites = new ArrayList<>();
-        Map<String, Object> siteMap = new LinkedHashMap<>();
-
-        siteMap.put(NAME, "site");
-        siteMap.put(ID, "siteId");
-
-        sites.add(siteMap);
-
-        map.put(VALUE, sites);
-
         when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
+            .thenReturn(Map.of(VALUE, List.of(Map.of(NAME, "site", ID, "siteId"))));
 
         List<Option<String>> expectedOptions = new ArrayList<>();
 
         expectedOptions.add(option("site", "siteId"));
 
-        assertEquals(
-            expectedOptions,
-            MicrosoftSharePointUtils.getSiteOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        List<Option<String>> siteOptions = MicrosoftSharePointUtils.getSiteOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+
+        assertEquals(expectedOptions, siteOptions);
+        assertEquals(List.of("search", "*&select=displayName,id,name"), stringArgumentCaptor.getAllValues());
     }
 }

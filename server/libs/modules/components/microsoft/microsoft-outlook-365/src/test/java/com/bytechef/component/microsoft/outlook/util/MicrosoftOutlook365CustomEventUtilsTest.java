@@ -44,6 +44,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
@@ -60,8 +61,7 @@ class MicrosoftOutlook365CustomEventUtilsTest {
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<String> nameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> valueArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testCreateCustomEvent() {
@@ -146,7 +146,7 @@ class MicrosoftOutlook365CustomEventUtilsTest {
 
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.header(nameArgumentCaptor.capture(), valueArgumentCaptor.capture()))
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -163,7 +163,7 @@ class MicrosoftOutlook365CustomEventUtilsTest {
                 .thenReturn("zone");
 
             microsoftOutlook365UtilsMockedStatic
-                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedActionContext))
+                .when(() -> MicrosoftUtils.getItemsFromNextPage("link", mockedActionContext))
                 .thenReturn(List.of());
 
             List<MicrosoftOutlook365CustomEventUtils.CustomEvent> customEvents =
@@ -173,8 +173,7 @@ class MicrosoftOutlook365CustomEventUtilsTest {
                 List.of(createCustomEvent(e1), createCustomEvent(e2), createCustomEvent(e3), createCustomEvent(e4)),
                 customEvents);
 
-            assertEquals("Prefer", nameArgumentCaptor.getValue());
-            assertEquals("outlook.timezone=\"zone\"", valueArgumentCaptor.getValue());
+            assertEquals(List.of("Prefer", "outlook.timezone=\"zone\""), stringArgumentCaptor.getAllValues());
         }
     }
 }
