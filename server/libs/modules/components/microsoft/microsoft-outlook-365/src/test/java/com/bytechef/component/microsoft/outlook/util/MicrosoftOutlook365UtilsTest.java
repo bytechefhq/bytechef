@@ -96,26 +96,6 @@ class MicrosoftOutlook365UtilsTest {
     }
 
     @Test
-    void testGetItemsFromNextPage() {
-        List<Map<String, String>> items = List.of(Map.of("displayName", "abc"));
-
-        Map<String, Object> body = Map.of(VALUE, items);
-
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
-
-        List<Map<?, ?>> result = MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedContext);
-
-        assertEquals(items, result);
-    }
-
-    @Test
     void testGetMailboxTImeZone() {
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);

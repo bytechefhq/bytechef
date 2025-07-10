@@ -33,7 +33,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -78,14 +78,13 @@ class MicrosoftOutlook365SearchEmailActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
-        try (MockedStatic<MicrosoftOutlook365Utils> microsoftOutlook365UtilsMockedStatic =
-            mockStatic(MicrosoftOutlook365Utils.class)) {
-            microsoftOutlook365UtilsMockedStatic
-                .when(() -> MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedContext))
+        try (MockedStatic<MicrosoftUtils> microsoftUtilsMockedStatic = mockStatic(MicrosoftUtils.class)) {
+            microsoftUtilsMockedStatic
+                .when(() -> MicrosoftUtils.getItemsFromNextPage("link", mockedContext))
                 .thenReturn(List.of());
 
-            Object result =
-                MicrosoftOutlook365SearchEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Object result = MicrosoftOutlook365SearchEmailAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mails, result);
 
