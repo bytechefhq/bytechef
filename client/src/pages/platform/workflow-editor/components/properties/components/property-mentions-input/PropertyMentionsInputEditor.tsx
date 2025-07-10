@@ -100,6 +100,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
         );
+
         const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
         const memoizedWorkflowTask = useMemo(() => {

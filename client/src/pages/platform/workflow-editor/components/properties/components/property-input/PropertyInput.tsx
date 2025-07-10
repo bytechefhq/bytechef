@@ -3,6 +3,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ChangeEvent, InputHTMLAttributes, ReactNode, forwardRef, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -51,6 +52,8 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
     ) => {
         const [isFocused, setIsFocused] = useState(false);
         const [localValue, setLocalValue] = useState(value);
+
+        const {setFocusedInput} = useWorkflowNodeDetailsPanelStore();
 
         const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
             setLocalValue(event.target.value);
@@ -138,7 +141,11 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                             name={name}
                             onBlur={() => setIsFocused(false)}
                             onChange={handleInputChange}
-                            onFocus={() => setIsFocused(true)}
+                            onFocus={() => {
+                                setIsFocused(true);
+
+                                setFocusedInput(null);
+                            }}
                             placeholder={placeholder}
                             ref={ref}
                             required={required}
