@@ -16,19 +16,17 @@
 
 package com.bytechef.component.microsoft.todo.util;
 
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.ID;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TASK_LIST_ID;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TITLE;
-import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +49,7 @@ public class MicrosoftToDoUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, TITLE);
+        return getOptions(actionContext, body, TITLE, ID);
     }
 
     public static List<Option<String>> getTaskListIdOptions(
@@ -64,20 +62,6 @@ public class MicrosoftToDoUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, DISPLAY_NAME);
-    }
-
-    private static List<Option<String>> getOptions(Map<String, ?> body, String label) {
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(label), (String) map.get(ID)));
-                }
-            }
-        }
-
-        return options;
+        return getOptions(actionContext, body, DISPLAY_NAME, ID);
     }
 }

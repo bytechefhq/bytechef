@@ -24,6 +24,8 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.ODATA_NEXT_LINK;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -32,6 +34,8 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,15 +63,28 @@ public class MicrosoftOneDriveListFoldersAction {
     private MicrosoftOneDriveListFoldersAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static List<Map<?, ?>>
+        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Map<String, ?> body = context
             .http(http -> http.get(
                 "/me/drive/items/%s/children".formatted(getFolderId(inputParameters.getString(PARENT_ID)))))
-            .queryParameters("$filter", "folder ne null")
+            .queryParameter("$filter", "folder ne null")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return body.get(VALUE);
+        List<Map<?, ?>> folders = new ArrayList<>();
+
+        if (body.get(VALUE) instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    folders.add(map);
+                }
+            }
+        }
+
+        folders.addAll(getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context));
+
+        return folders;
     }
 }

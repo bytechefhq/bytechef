@@ -38,6 +38,7 @@ import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSha
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.REQUIRED;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
@@ -205,23 +206,14 @@ public class MicrosoftSharePointUtils {
         String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
 
         Map<String, ?> body = context
-            .http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) +
-                "/drive/items/root/children?$filter=" + encode))
+            .http(
+                http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/root/children"))
+            .queryParameter("$filter", encode)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get("value") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
-                }
-            }
-        }
-
-        return options;
+        return getOptions(context, body, NAME, ID);
     }
 
     public static List<Option<String>> getListIdOptions(
@@ -234,37 +226,19 @@ public class MicrosoftSharePointUtils {
                 .execute()
                 .getBody(new TypeReference<>() {});
 
-        return getOptions(body, DISPLAY_NAME);
+        return getOptions(context, body, DISPLAY_NAME, ID);
     }
 
     public static List<Option<String>> getSiteOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ?> body = context.http(http -> http.get("/sites?search=*&select=displayName,id,name"))
+        Map<String, ?> body = context.http(http -> http.get("/sites"))
+            .queryParameter("search", "*&select=displayName,id,name")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, NAME);
-    }
-
-    private static List<Option<String>> getOptions(Map<String, ?> body, String label) {
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    String name = (String) map.get(label);
-                    String id = (String) map.get(ID);
-
-                    if (name != null && id != null) {
-                        options.add(option(name, id));
-                    }
-                }
-            }
-        }
-
-        return options;
+        return getOptions(context, body, NAME, ID);
     }
 }
