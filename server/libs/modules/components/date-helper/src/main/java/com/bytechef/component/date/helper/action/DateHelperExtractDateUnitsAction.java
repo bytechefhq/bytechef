@@ -16,6 +16,7 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY_OF_WEEK;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
@@ -24,14 +25,14 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.M
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH_NAME;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.TIME;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.UNIT;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.YEAR;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.date.helper.constants.DateHelperConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -48,14 +49,17 @@ public class DateHelperExtractDateUnitsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("extractDateUnits")
         .title("Extract Date Units")
-        .description("Extract date units (year/month/day/hour/minute/second/day of week/month name) from a date.")
+        .description(
+            "Extracts specific units (year, month, day, hour, minute, second, day of week, month name, date, or " +
+                "time) from a given date.")
         .properties(
             dateTime(INPUT_DATE)
                 .label("Date")
+                .description("The date from which to extract the specified unit.")
                 .required(true),
-            string(DateHelperConstants.UNIT)
+            string(UNIT)
                 .label("Unit to Extract")
-                .description("Unit to extract from date.")
+                .description("Unit to extract from the input date.")
                 .options(
                     option("Year", YEAR),
                     option("Month", MONTH),
@@ -64,9 +68,11 @@ public class DateHelperExtractDateUnitsAction {
                     option("Minute", MINUTE),
                     option("Second", SECOND),
                     option("Day of Week", DAY_OF_WEEK),
-                    option("Month name", MONTH_NAME))
+                    option("Month name", MONTH_NAME),
+                    option("Date", DATE),
+                    option("Time", TIME))
                 .required(true))
-        .output(outputSchema(string().description("Extracted date unit.")))
+        .output()
         .perform(DateHelperExtractDateUnitsAction::perform);
 
     private DateHelperExtractDateUnitsAction() {
@@ -77,7 +83,7 @@ public class DateHelperExtractDateUnitsAction {
 
         LocalDateTime inputDate = inputParameters.getRequiredLocalDateTime(INPUT_DATE);
 
-        String unitToExtract = inputParameters.getRequiredString(DateHelperConstants.UNIT);
+        String unitToExtract = inputParameters.getRequiredString(UNIT);
 
         return switch (unitToExtract) {
             case YEAR -> inputDate.getYear();
@@ -96,6 +102,8 @@ public class DateHelperExtractDateUnitsAction {
 
                 yield month.getDisplayName(TextStyle.FULL, Locale.getDefault());
             }
+            case DATE -> inputDate.toLocalDate();
+            case TIME -> inputDate.toLocalTime();
             default -> throw new IllegalArgumentException("Unsupported unit " + unitToExtract);
         };
     }
