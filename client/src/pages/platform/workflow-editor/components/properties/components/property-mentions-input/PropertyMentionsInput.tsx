@@ -101,6 +101,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
         useEffect(() => {
             if (!focusedInput) {
+                setIsFocused(false);
+
                 return;
             }
 
