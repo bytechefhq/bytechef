@@ -20,6 +20,7 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIG
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.DETAILS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ESCALATION_POLICY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.FROM;
+import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_KEY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_TYPE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.PRIORITY;
@@ -93,14 +94,12 @@ class PagerDutyCreateIncidentActionTest {
             Map<String, Object> result = PagerDutyCreateIncidentAction.perform(
                 mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(Map.of(), result);
+            assertEquals(responseMap, result);
 
             Body body = bodyArgumentCaptor.getValue();
-            assertEquals(Map.of("incident", Map.of()), body.getContent());
 
-            List<String> expectedHeader = List.of(FROM, "from");
-            assertEquals(expectedHeader, stringArgumentCaptor.getAllValues());
-
+            assertEquals(Map.of(INCIDENT, Map.of()), body.getContent());
+            assertEquals(List.of(FROM, "from"), stringArgumentCaptor.getAllValues());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
         }
     }

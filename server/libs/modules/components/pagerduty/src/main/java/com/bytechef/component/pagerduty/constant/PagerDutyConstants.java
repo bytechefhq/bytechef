@@ -38,6 +38,7 @@ public class PagerDutyConstants {
     public static final String ESCALATION_POLICY = "escalation_policy";
     public static final String FROM = "From";
     public static final String ID = "id";
+    public static final String INCIDENT = "incident";
     public static final String INCIDENT_ID = "incidentId";
     public static final String INCIDENT_KEY = "incident_key";
     public static final String INCIDENT_TYPE = "incident_type";

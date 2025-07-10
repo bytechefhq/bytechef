@@ -19,6 +19,7 @@ package com.bytechef.component.pagerduty.action;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNMENTS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ESCALATION_POLICY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.FROM;
+import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_ID;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_TYPE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.PRIORITY;
@@ -55,16 +56,9 @@ class PagerDutyUpdateIncidentActionTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            FROM, "from",
-            INCIDENT_ID, "incidentId",
-            INCIDENT_TYPE, "incidentType",
-            STATUS, "status",
-            ASSIGNMENTS, List.of("assignee1", "assignee2"),
-            RESOLUTION, "resolution",
-            TITLE, "title",
-            PRIORITY, "priority",
-            URGENCY, "urgency",
-            ESCALATION_POLICY, "escalationPolicy"));
+            FROM, "from", INCIDENT_ID, "incidentId", INCIDENT_TYPE, "incidentType", STATUS, "status",
+            ASSIGNMENTS, List.of("assignee1", "assignee2"), RESOLUTION, "resolution", TITLE, "title",
+            PRIORITY, "priority", URGENCY, "urgency", ESCALATION_POLICY, "escalationPolicy"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final Map<String, Object> responseMap = Map.of();
@@ -93,14 +87,12 @@ class PagerDutyUpdateIncidentActionTest {
             Map<String, Object> result = PagerDutyUpdateIncidentAction.perform(
                 mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(Map.of(), result);
+            assertEquals(responseMap, result);
 
             Body body = bodyArgumentCaptor.getValue();
-            assertEquals(Map.of("incident", Map.of()), body.getContent());
 
-            List<String> expectedHeader = List.of(FROM, "from");
-            assertEquals(expectedHeader, stringArgumentCaptor.getAllValues());
-
+            assertEquals(Map.of(INCIDENT, Map.of()), body.getContent());
+            assertEquals(List.of(FROM, "from"), stringArgumentCaptor.getAllValues());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
         }
     }

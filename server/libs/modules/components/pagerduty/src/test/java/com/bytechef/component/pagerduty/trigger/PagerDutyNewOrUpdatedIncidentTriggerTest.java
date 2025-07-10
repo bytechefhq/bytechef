@@ -45,7 +45,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Nikolina Spehar
  */
-class PagerDutyNewUpdatedIncidentTriggerTest {
+class PagerDutyNewOrUpdatedIncidentTriggerTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
     private final Executor mockedExecutor = mock(Executor.class);
@@ -59,7 +59,6 @@ class PagerDutyNewUpdatedIncidentTriggerTest {
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    private static final String workflowExecutionId = "testWorkflowExecutionId";
 
     @Test
     void testWebhookDisable() {
@@ -71,7 +70,7 @@ class PagerDutyNewUpdatedIncidentTriggerTest {
             .thenReturn(mockedResponse);
 
         PagerDutyNewOrUpdatedIncidentTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+            mockedParameters, mockedParameters, mockedParameters, "testWorkflowExecutionId", mockedTriggerContext);
 
         verify(mockedTriggerContext, times(1)).http(any());
         verify(mockedExecutor, times(1)).execute();
@@ -92,7 +91,7 @@ class PagerDutyNewUpdatedIncidentTriggerTest {
 
         String webhookUrl = "testWebhookUrl";
         WebhookEnableOutput webhookEnableOutput = PagerDutyNewOrUpdatedIncidentTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+            mockedParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedTriggerContext);
 
         WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
@@ -133,5 +132,4 @@ class PagerDutyNewUpdatedIncidentTriggerTest {
 
         assertEquals(Map.of(), result);
     }
-
 }

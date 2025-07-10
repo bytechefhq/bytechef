@@ -183,7 +183,6 @@ public class PagerDutyNewOrUpdatedIncidentTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         context.http(http -> http.delete("/webhook_subscriptions/%s".formatted(outputParameters.get(ID))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
 
@@ -196,7 +195,8 @@ public class PagerDutyNewOrUpdatedIncidentTrigger {
                 Http.Body.of(
                     "webhook_subscription", Map.of(
                         "delivery_method", Map.of("type", "http_delivery_method", "url", webhookUrl),
-                        "events", List.of("incident.acknowledged",
+                        "events", List.of(
+                            "incident.acknowledged",
                             "incident.annotated",
                             "incident.delegated",
                             "incident.escalated",
