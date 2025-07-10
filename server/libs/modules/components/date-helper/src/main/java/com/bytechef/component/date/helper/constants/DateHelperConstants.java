@@ -31,6 +31,7 @@ public class DateHelperConstants {
     public static final String BUSINESS_HOURS_END = "businessHoursEnd";
     public static final String BUSINESS_WEEK_START = "businessWeekStart";
     public static final String BUSINESS_WEEK_END = "businessWeekEnd";
+    public static final String DATE = "date";
     public static final String DATE_FORMAT = "dateFormat";
     public static final String DATE_TIMESTAMP = "dateTimestamp";
     public static final String DAY = "day";
@@ -41,6 +42,7 @@ public class DateHelperConstants {
     public static final String MONTH = "month";
     public static final String MONTH_NAME = "monthName";
     public static final String SECOND = "second";
+    public static final String TIME = "time";
     public static final String TIME_ZONE = "timeZone";
     public static final String UNIT = "unit";
     public static final String UNIX_TIMESTAMP = "UnixTimestamp";
