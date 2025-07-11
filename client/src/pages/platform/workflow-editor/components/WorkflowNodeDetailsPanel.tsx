@@ -16,9 +16,7 @@ import {
     ComponentDefinitionBasic,
     GetComponentActionDefinitionRequest,
     GetComponentClusterElementDefinitionRequest,
-    GetComponentTriggerDefinitionRequest,
     TaskDispatcherDefinition,
-    TriggerDefinitionApi,
     WorkflowNodeOutput,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
@@ -30,10 +28,7 @@ import {
 } from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {
-    TriggerDefinitionKeys,
-    useGetTriggerDefinitionQuery,
-} from '@/shared/queries/platform/triggerDefinitions.queries';
+import {useGetTriggerDefinitionQuery} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -51,7 +46,7 @@ import {
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, XIcon} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -116,8 +111,6 @@ const WorkflowNodeDetailsPanel = ({
     const [clusterElementComponentOperations, setClusterElementComponentOperations] = useState<Array<WorkflowNodeType>>(
         []
     );
-
-    const isOperationNameUpdatingRef = useRef(false);
 
     const {
         activeTab,
@@ -373,6 +366,10 @@ const WorkflowNodeDetailsPanel = ({
 
     const handleOperationSelectChange = useCallback(
         async (newOperationName: string) => {
+            if (currentOperationName === newOperationName) {
+                return;
+            }
+
             setCurrentOperationName(newOperationName);
 
             if (!currentComponentDefinition || !currentComponent) {
@@ -392,47 +389,6 @@ const WorkflowNodeDetailsPanel = ({
                 queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
             });
 
-            let operationData;
-
-            if (currentNode?.trigger) {
-                const triggerDefinitionRequest: GetComponentTriggerDefinitionRequest = {
-                    componentName: currentComponentDefinition?.name,
-                    componentVersion: currentComponentDefinition?.version,
-                    triggerName: newOperationName,
-                };
-
-                operationData = await queryClient.fetchQuery({
-                    queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(triggerDefinitionRequest),
-                    queryKey: TriggerDefinitionKeys.triggerDefinition(triggerDefinitionRequest),
-                });
-            } else if (clusterElementsCanvasOpen && isClusterElement) {
-                const clusterElementDefinitionRequest: GetComponentClusterElementDefinitionRequest = {
-                    clusterElementName: newOperationName,
-                    componentName: currentComponentDefinition?.name,
-                    componentVersion: currentComponentDefinition?.version,
-                };
-
-                operationData = await queryClient.fetchQuery({
-                    queryFn: () =>
-                        new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
-                            clusterElementDefinitionRequest
-                        ),
-                    queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(clusterElementDefinitionRequest),
-                });
-            } else {
-                const componentActionDefinitionRequest: GetComponentActionDefinitionRequest = {
-                    actionName: newOperationName,
-                    componentName: currentComponentDefinition.name,
-                    componentVersion: currentComponentDefinition.version,
-                };
-
-                operationData = await queryClient.fetchQuery({
-                    queryFn: () =>
-                        new ActionDefinitionApi().getComponentActionDefinition(componentActionDefinitionRequest),
-                    queryKey: ActionDefinitionKeys.actionDefinition(componentActionDefinitionRequest),
-                });
-            }
-
             const {componentName, description, label, workflowNodeName} = currentComponent;
 
             const nodeData: NodeDataType = {
@@ -442,7 +398,7 @@ const WorkflowNodeDetailsPanel = ({
                 name: workflowNodeName || currentNode?.workflowNodeName || '',
                 operationName: newOperationName,
                 parameters: getParametersWithDefaultValues({
-                    properties: operationData.properties as Array<PropertyAllType>,
+                    properties: currentOperationProperties as Array<PropertyAllType>,
                 }),
                 trigger: currentNode?.trigger,
                 type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
@@ -520,20 +476,20 @@ const WorkflowNodeDetailsPanel = ({
             });
         },
         [
+            currentOperationName,
             currentComponentDefinition,
             currentComponent,
-            queryClient,
-            currentNode,
             deleteWorkflowNodeTestOutputMutation,
-            invalidateWorkflowQueries,
-            clusterElementsCanvasOpen,
+            workflow.id,
+            currentNode,
+            queryClient,
+            currentOperationProperties,
             isClusterElement,
+            invalidateWorkflowQueries,
             updateWorkflowMutation,
             currentNodeIndex,
-            currentOperationProperties,
             setCurrentComponent,
             setCurrentNode,
-            workflow.id,
         ]
     );
 
@@ -845,9 +801,8 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
-        if (isOperationNameUpdatingRef.current && currentOperationName !== currentNode?.operationName) {
-            isOperationNameUpdatingRef.current = false;
-
+        // Prevent duplicate fetch if already present
+        if (currentActionDefinition?.name === currentOperationName) {
             return;
         }
 
