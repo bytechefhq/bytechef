@@ -1,4 +1,4 @@
-import {Controls, ReactFlow, ReactFlowProvider} from '@xyflow/react';
+import {Background, BackgroundVariant, Controls, ReactFlow, ReactFlowProvider} from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 import {useShallow} from 'zustand/react/shallow';
@@ -50,6 +50,8 @@ const ClusterElementsWorkflowEditor = () => {
                     zoomOnDoubleClick={false}
                     zoomOnScroll={false}
                 >
+                    <Background color="#ccc" size={2} variant={BackgroundVariant.Dots} />
+
                     <Controls
                         className="m-2 rounded-md border border-stroke-neutral-secondary bg-background"
                         fitViewOptions={{duration: 500, minZoom: 0.2}}

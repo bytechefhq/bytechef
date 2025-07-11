@@ -309,7 +309,7 @@ const WorkflowEditor = ({
                     nodeColor={MINIMAP_NODE_COLOR}
                 />
 
-                <Background color="#ccc" variant={BackgroundVariant.Dots} />
+                <Background color="#ccc" size={2} variant={BackgroundVariant.Dots} />
 
                 <Controls
                     className="m-2 mb-3 rounded-md border border-stroke-neutral-secondary bg-background"
