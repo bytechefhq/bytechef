@@ -164,6 +164,7 @@ const Property = ({
         required = false,
         type,
     } = property;
+    // console.log('property', property);
 
     let {displayCondition} = property;
 

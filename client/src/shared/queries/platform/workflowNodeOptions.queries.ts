@@ -1,5 +1,6 @@
 /* eslint-disable sort-keys */
 import {
+    GetClusterElementNodeOptionsRequest,
     GetWorkflowNodeOptionsRequest,
     type Option,
     WorkflowNodeOptionApi,
@@ -16,6 +17,21 @@ export const WorkflowNodeOptionKeys = {
         loadDependencyValueKey,
     ],
     workflowNodeOptions: ['workflowNodeOptions'] as const,
+
+    propertyClusterElementNodeOptions: (
+        request: GetClusterElementNodeOptionsRequest,
+        loadDependencyValueKey: string
+    ) => [
+        ...WorkflowNodeOptionKeys.clusterElementNodeOptions,
+        request.id,
+        request.workflowNodeName,
+        request.clusterElementType,
+        request.clusterElement,
+        request.propertyName,
+        request.searchText,
+        loadDependencyValueKey,
+    ],
+    clusterElementNodeOptions: ['clusterElementNodeOptions'] as const,
 };
 
 export const useGetWorkflowNodeOptionsQuery = (
@@ -25,6 +41,17 @@ export const useGetWorkflowNodeOptionsQuery = (
     useQuery<Array<Option>, Error>({
         queryKey: WorkflowNodeOptionKeys.propertyWorkflowNodeOptions(request, loadDependencyValueKey),
         queryFn: () => new WorkflowNodeOptionApi().getWorkflowNodeOptions(request),
+        enabled: enabled === undefined ? true : enabled,
+        staleTime: 60000,
+    });
+
+export const useGetClusterElementNodeOptionsQuery = (
+    {loadDependencyValueKey, request}: {loadDependencyValueKey: string; request: GetClusterElementNodeOptionsRequest},
+    enabled?: boolean
+) =>
+    useQuery<Array<Option>, Error>({
+        queryKey: WorkflowNodeOptionKeys.propertyClusterElementNodeOptions(request, loadDependencyValueKey),
+        queryFn: () => new WorkflowNodeOptionApi().getClusterElementNodeOptions(request),
         enabled: enabled === undefined ? true : enabled,
         staleTime: 60000,
     });
