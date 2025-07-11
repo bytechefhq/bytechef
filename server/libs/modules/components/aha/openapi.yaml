@@ -136,7 +136,7 @@ paths:
                             description: "Color code associated with the status."
   /products/{productId}/ideas:
     post:
-      summary: "Create Ides"
+      summary: "Create Idea"
       description: "Creates a new idea."
       operationId: "createIdea"
       parameters:

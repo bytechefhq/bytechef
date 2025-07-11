@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public class AhaCreateIdeaAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createIdea")
-        .title("Create Ides")
+        .title("Create Idea")
         .description("Creates a new idea.")
         .metadata(
             Map.of(
