@@ -22,19 +22,17 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ATTACHMENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_BYTES;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REPLY_TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.createRecipientList;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getAttachments;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -43,9 +41,6 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.microsoft.outlook.constant.ContentType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -123,10 +118,10 @@ public class MicrosoftOutlook365SendEmailAction {
                     new Object[] {
                         SUBJECT, inputParameters.getRequiredString(SUBJECT),
                         BODY, inputParameters.get(BODY),
-                        TO_RECIPIENTS, getRecipients(inputParameters.getList(TO_RECIPIENTS, String.class)),
-                        CC_RECIPIENTS, getRecipients(inputParameters.getList(CC_RECIPIENTS, String.class)),
-                        BCC_RECIPIENTS, getRecipients(inputParameters.getList(BCC_RECIPIENTS, String.class)),
-                        REPLY_TO, getRecipients(inputParameters.getList(REPLY_TO, String.class)),
+                        TO_RECIPIENTS, createRecipientList(inputParameters.getList(TO_RECIPIENTS, String.class)),
+                        CC_RECIPIENTS, createRecipientList(inputParameters.getList(CC_RECIPIENTS, String.class)),
+                        BCC_RECIPIENTS, createRecipientList(inputParameters.getList(BCC_RECIPIENTS, String.class)),
+                        REPLY_TO, createRecipientList(inputParameters.getList(REPLY_TO, String.class)),
                         ATTACHMENTS, getAttachments(context, inputParameters.getList(ATTACHMENTS, FileEntry.class))
                     }))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -134,37 +129,4 @@ public class MicrosoftOutlook365SendEmailAction {
 
         return null;
     }
-
-    private static List<Map<String, Map<String, String>>> getRecipients(List<String> recipients) {
-        if (recipients == null) {
-            return null;
-        }
-
-        return recipients
-            .stream()
-            .map(recipient -> Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, recipient)))
-            .toList();
-    }
-
-    private static List<Map<String, Object>> getAttachments(Context context, List<FileEntry> attachments) {
-        if (attachments == null) {
-            return null;
-        }
-
-        List<Map<String, Object>> encodedAttachments = new ArrayList<>();
-
-        for (FileEntry attachment : attachments) {
-            byte[] file1 = context.file(file -> file.readAllBytes(attachment));
-
-            encodedAttachments.add(
-                Map.of(
-                    "@odata.type", "#microsoft.graph.fileAttachment",
-                    NAME, attachment.getName(),
-                    CONTENT_TYPE, attachment.getMimeType(),
-                    CONTENT_BYTES, context.encoder(encoder -> encoder.base64EncodeToString(file1))));
-        }
-
-        return encodedAttachments;
-    }
-
 }

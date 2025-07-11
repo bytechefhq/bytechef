@@ -22,6 +22,7 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_BYTES;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
@@ -48,6 +49,17 @@ public class MicrosoftOutlook365Utils {
     private MicrosoftOutlook365Utils() {
     }
 
+    public static List<Map<String, Map<String, String>>> createRecipientList(List<String> recipients) {
+        if (recipients == null) {
+            return null;
+        }
+
+        return recipients
+            .stream()
+            .map(recipient -> Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, recipient)))
+            .toList();
+    }
+
     public static SimpleMessage createSimpleMessage(Context context, Map<?, ?> messageBody, String id) {
         String from = null;
         if (messageBody.get(FROM) instanceof Map<?, ?> fromMap &&
@@ -71,6 +83,27 @@ public class MicrosoftOutlook365Utils {
             (String) messageBody.get("bodyPreview"),
             bodyHtml,
             getFileEntries(context, messageBody, id));
+    }
+
+    public static List<Map<String, Object>> getAttachments(Context context, List<FileEntry> attachments) {
+        if (attachments == null) {
+            return null;
+        }
+
+        List<Map<String, Object>> encodedAttachments = new ArrayList<>();
+
+        for (FileEntry attachment : attachments) {
+            byte[] file1 = context.file(file -> file.readAllBytes(attachment));
+
+            encodedAttachments.add(
+                Map.of(
+                    "@odata.type", "#microsoft.graph.fileAttachment",
+                    NAME, attachment.getName(),
+                    CONTENT_TYPE, attachment.getMimeType(),
+                    CONTENT_BYTES, context.encoder(encoder -> encoder.base64EncodeToString(file1))));
+        }
+
+        return encodedAttachments;
     }
 
     public static String getMailboxTimeZone(Context context) {

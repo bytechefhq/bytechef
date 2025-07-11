@@ -17,16 +17,31 @@
 package com.bytechef.component.microsoft.outlook.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ATTACHMENTS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.COMMENT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.createRecipientList;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getAttachments;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.microsoft.outlook.constant.ContentType;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,23 +58,75 @@ public class MicrosoftOutlook365ReplyToEmailAction {
                 .description("Id of the message to reply to.")
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true),
-            string(COMMENT)
-                .label("Comment")
-                .description("Content of the reply to the email.")
-                .required(true))
+            array(BCC_RECIPIENTS)
+                .label("Bcc Recipients")
+                .description("The Bcc recipients for the message.")
+                .items(string().controlType(ControlType.EMAIL))
+                .required(false),
+            array(CC_RECIPIENTS)
+                .label("Cc Recipients")
+                .description("The Cc recipients for the message.")
+                .items(string().controlType(ControlType.EMAIL))
+                .required(false),
+            string(CONTENT_TYPE)
+                .label("Content Type")
+                .description("The type of the content.")
+                .options(
+                    option("Text", ContentType.TEXT.name()),
+                    option("HTML", ContentType.HTML.name()))
+                .defaultValue(ContentType.TEXT.name())
+                .required(false),
+            string(CONTENT)
+                .label("HTML Content")
+                .description("Body text of the email in HTML format.")
+                .controlType(ControlType.RICH_TEXT)
+                .displayCondition("contentType == '%s'".formatted(ContentType.HTML))
+                .required(false),
+            string(CONTENT)
+                .label("Text Content")
+                .description("Body text of the email.")
+                .controlType(ControlType.TEXT_AREA)
+                .displayCondition("contentType == '%s'".formatted(ContentType.TEXT))
+                .required(false),
+            array(ATTACHMENTS)
+                .label("Attachments")
+                .description("A list of attachments to send with the email.")
+                .items(fileEntry())
+                .required(false))
         .perform(MicrosoftOutlook365ReplyToEmailAction::perform);
 
     private MicrosoftOutlook365ReplyToEmailAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Map<String, Object> message = new HashMap<>();
+
+        addRecipients(inputParameters, message, CC_RECIPIENTS);
+        addRecipients(inputParameters, message, BCC_RECIPIENTS);
+        addAttachments(inputParameters.getList(ATTACHMENTS, FileEntry.class), context, message);
+
         context.http(http -> http.post("/me/messages/%s/reply".formatted(inputParameters.getRequiredString(ID))))
             .body(
                 Http.Body.of(
-                    Map.of(COMMENT, inputParameters.getString(COMMENT))))
+                    "message", message,
+                    COMMENT, inputParameters.getString(CONTENT)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
         return null;
+    }
+
+    private static void addRecipients(Parameters inputParameters, Map<String, Object> message, String recipientType) {
+        List<String> recipients = inputParameters.getList(recipientType, String.class);
+
+        if (recipients != null && !recipients.isEmpty()) {
+            message.put(recipientType, createRecipientList(recipients));
+        }
+    }
+
+    private static void addAttachments(List<FileEntry> attachments, Context context, Map<String, Object> message) {
+        if (attachments != null && !attachments.isEmpty()) {
+            message.put(ATTACHMENTS, getAttachments(context, attachments));
+        }
     }
 }
