@@ -20,16 +20,13 @@ export default function getDataPillsFromProperties(
     const dataPills: Array<DataPillType> = [];
 
     properties.forEach((componentProperty, index) => {
-        if (!componentProperty?.properties?.length) {
+        if (!componentProperty) {
             return;
         }
 
         const {componentDefinition} = componentProperty;
 
-        const existingProperties = getExistingProperties(componentProperty.properties);
-
         const filteredNodeNames = previousNodeNames.filter((name) => name !== 'manual' && !name.includes('condition'));
-
         const nodeName = filteredNodeNames[index];
 
         dataPills.push({
@@ -38,6 +35,12 @@ export default function getDataPillsFromProperties(
             nodeName,
             value: nodeName,
         });
+
+        if (!componentProperty.properties?.length) {
+            return;
+        }
+
+        const existingProperties = getExistingProperties(componentProperty.properties);
 
         const allPropertiesFlat: Array<DataPillType> = [];
 
