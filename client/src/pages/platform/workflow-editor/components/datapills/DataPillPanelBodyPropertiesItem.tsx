@@ -73,10 +73,12 @@ const DataPillPanelBodyPropertiesItem = ({
         title = operation.taskDispatcherDefinition.title;
     }
 
-    const curWorkflowNode = workflowNodes.find((workflowNode) => workflowNode.workflowNodeName === workflowNodeName);
+    const currentWorkflowNode = workflowNodes.find(
+        (workflowNode) => workflowNode.workflowNodeName === workflowNodeName
+    );
 
-    const curComponentDefinition = componentDefinitions.find(
-        (componentDefinition) => componentDefinition.name === curWorkflowNode?.name
+    const currentComponentDefinition = componentDefinitions.find(
+        (componentDefinition) => componentDefinition.name === currentWorkflowNode?.name
     );
 
     const redirectTargetNode = nodes.find((workflowNode) => workflowNode.id === workflowNodeName);
@@ -107,9 +109,9 @@ const DataPillPanelBodyPropertiesItem = ({
                     </h3>
                 </div>
 
-                {curWorkflowNode?.operationName && (
+                {currentWorkflowNode?.operationName && (
                     <span className="ml-auto mr-4 max-w-36 truncate rounded bg-muted px-2 py-1 text-xs">
-                        {curWorkflowNode?.operationName}
+                        {currentWorkflowNode?.operationName}
                     </span>
                 )}
 
@@ -164,16 +166,16 @@ const DataPillPanelBodyPropertiesItem = ({
                     </>
                 ) : (
                     <div className="flex flex-col gap-3">
-                        {curComponentDefinition ? (
+                        {currentComponentDefinition ? (
                             <>
                                 <span className="font-semibold">Test Action</span>
 
                                 <p className="text-sm">
-                                    <span className="font-semibold">{curWorkflowNode?.workflowNodeName} </span>
+                                    <span className="font-semibold">{currentWorkflowNode?.workflowNodeName} </span>
                                     needs to be tested to generate an output schema. Please go to the
                                     <span className="font-semibold"> &quot;Output&quot; </span>
                                     tab of the
-                                    <span className="font-semibold"> {curWorkflowNode?.workflowNodeName} </span>
+                                    <span className="font-semibold"> {currentWorkflowNode?.workflowNodeName} </span>
                                     action.
                                 </p>
                             </>
@@ -182,11 +184,11 @@ const DataPillPanelBodyPropertiesItem = ({
                                 <span className="font-semibold">Configure Flow</span>
 
                                 <p className="text-sm">
-                                    <span className="font-semibold">{curWorkflowNode?.workflowNodeName} </span>
+                                    <span className="font-semibold">{currentWorkflowNode?.workflowNodeName} </span>
                                     needs to be configured. Please go to the
                                     <span className="font-semibold"> &quot;Properties&quot; </span>
                                     tab of the
-                                    <span className="font-semibold"> {curWorkflowNode?.workflowNodeName} </span>
+                                    <span className="font-semibold"> {currentWorkflowNode?.workflowNodeName} </span>
                                     flow.
                                 </p>
                             </>
@@ -198,7 +200,7 @@ const DataPillPanelBodyPropertiesItem = ({
                             variant="secondary"
                         >
                             Go to
-                            <span className="-ml-1 font-semibold">{curWorkflowNode?.workflowNodeName}</span>
+                            <span className="-ml-1 font-semibold">{currentWorkflowNode?.workflowNodeName}</span>
                         </Button>
                     </div>
                 )}
