@@ -3326,7 +3326,7 @@
       "required" : false,
       "type" : "STRING"
     } ],
-    "title" : "Create Ides",
+    "title" : "Create Idea",
     "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
