@@ -320,7 +320,12 @@ Name: replyToEmail
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Message ID | STRING | `Id of the message to reply to.` | true |
-| comment | Comment | STRING | `Content of the reply to the email.` | true |
+| bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The Bcc recipients for the message.` | false |
+| ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The Cc recipients for the message.` | false |
+| contentType | Content Type | STRING <details> <summary> Options </summary> TEXT, HTML </details> | `The type of the content.` | false |
+| content | HTML Content | STRING | `Body text of the email in HTML format.` | false |
+| content | Text Content | STRING | `Body text of the email.` | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | false |
 
 #### Example JSON Structure
 ```json
@@ -329,7 +334,16 @@ Name: replyToEmail
   "name" : "replyToEmail",
   "parameters" : {
     "id" : "",
-    "comment" : ""
+    "bccRecipients" : [ "" ],
+    "ccRecipients" : [ "" ],
+    "contentType" : "",
+    "content" : "",
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ]
   },
   "type" : "microsoftOutlook365/v1/replyToEmail"
 }
