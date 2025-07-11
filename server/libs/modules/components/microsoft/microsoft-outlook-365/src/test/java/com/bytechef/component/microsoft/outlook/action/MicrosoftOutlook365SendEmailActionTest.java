@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
@@ -40,10 +41,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
@@ -51,12 +54,16 @@ import org.mockito.ArgumentCaptor;
 class MicrosoftOutlook365SendEmailActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    @SuppressWarnings("rawtypes")
+    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
+    @SuppressWarnings("unchecked")
     @Test
     void testPerform() {
         when(mockedParameters.getRequiredString(SUBJECT))
@@ -74,51 +81,66 @@ class MicrosoftOutlook365SendEmailActionTest {
         when(mockedParameters.getList(ATTACHMENTS, FileEntry.class))
             .thenReturn(List.of(mockedFileEntry));
 
-        byte[] fileContent = new byte[] {
-            1, 2, 3
-        };
+        try (MockedStatic<MicrosoftOutlook365Utils> microsoftOutlook365UtilsMockedStatic =
+            mockStatic(MicrosoftOutlook365Utils.class)) {
 
-        String encodedToString = EncodingUtils.base64EncodeToString(fileContent);
+            microsoftOutlook365UtilsMockedStatic.when(
+                () -> MicrosoftOutlook365Utils.createRecipientList(listArgumentCaptor.capture()))
+                .thenReturn(
+                    List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1"))),
+                    List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address2"))),
+                    List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address3"))),
+                    List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address4"))));
 
-        when(mockedFileEntry.getName())
-            .thenReturn("file.txt");
-        when(mockedFileEntry.getMimeType())
-            .thenReturn("text/plain");
-        when(mockedContext.file(any()))
-            .thenReturn(fileContent);
-        when(mockedContext.encoder(any()))
-            .thenReturn(encodedToString);
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
+            byte[] fileContent = new byte[] {
+                1, 2, 3
+            };
 
-        Object result = MicrosoftOutlook365SendEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+            String encodedToString = EncodingUtils.base64EncodeToString(fileContent);
 
-        assertNull(result);
-
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        Map<String, Map<String, Object>> expectedBody = Map.of(
-            "message",
-            Map.of(
-                SUBJECT, "testSubject",
-                BODY, Map.of(CONTENT, "test", CONTENT_TYPE, "text"),
-                TO_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1"))),
-                CC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address2"))),
-                BCC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address3"))),
-                REPLY_TO, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address4"))),
-                ATTACHMENTS, List.of(
+            microsoftOutlook365UtilsMockedStatic.when(
+                () -> MicrosoftOutlook365Utils.getAttachments(contextArgumentCaptor.capture(),
+                    listArgumentCaptor.capture()))
+                .thenReturn(List.of(
                     Map.of(
                         "@odata.type", "#microsoft.graph.fileAttachment",
                         NAME, "file.txt",
                         CONTENT_TYPE, "text/plain",
-                        CONTENT_BYTES, encodedToString))));
+                        CONTENT_BYTES, encodedToString)));
 
-        assertEquals(expectedBody, body.getContent());
+            when(mockedContext.http(any()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.configuration(any()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.execute())
+                .thenReturn(mockedResponse);
+
+            Object result = MicrosoftOutlook365SendEmailAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
+
+            assertNull(result);
+
+            Http.Body body = bodyArgumentCaptor.getValue();
+
+            Map<String, Map<String, Object>> expectedBody = Map.of(
+                "message",
+                Map.of(
+                    SUBJECT, "testSubject",
+                    BODY, Map.of(CONTENT, "test", CONTENT_TYPE, "text"),
+                    TO_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1"))),
+                    CC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address2"))),
+                    BCC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address3"))),
+                    REPLY_TO, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address4"))),
+                    ATTACHMENTS, List.of(
+                        Map.of(
+                            "@odata.type", "#microsoft.graph.fileAttachment",
+                            NAME, "file.txt",
+                            CONTENT_TYPE, "text/plain",
+                            CONTENT_BYTES, encodedToString))));
+
+            assertEquals(expectedBody, body.getContent());
+        }
     }
 }
