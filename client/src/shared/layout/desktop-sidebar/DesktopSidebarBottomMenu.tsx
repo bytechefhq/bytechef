@@ -127,9 +127,9 @@ const DesktopSidebarBottomMenu = () => {
                                     onValueChange={handleModeTypeChange}
                                     value={currentType?.toString()}
                                 >
-                                    <DropdownMenuRadioItem value="1">Embedded</DropdownMenuRadioItem>
-
                                     <DropdownMenuRadioItem value="0">Automation</DropdownMenuRadioItem>
+
+                                    <DropdownMenuRadioItem value="1">Embedded</DropdownMenuRadioItem>
                                 </DropdownMenuRadioGroup>
                             </DropdownMenuSubContent>
                         </DropdownMenuPortal>
