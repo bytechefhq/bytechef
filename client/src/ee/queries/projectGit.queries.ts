@@ -6,7 +6,11 @@ import {useQuery} from '@tanstack/react-query';
 export const ProjectGitConfigurationKeys = {
     projectGitConfiguration: (id: number) => [...ProjectGitConfigurationKeys.projectGitConfigurations, id],
     projectGitConfigurations: ['projectGitConfigurations'] as const,
-    projectRemoteBranches: (id: number) => [...ProjectGitConfigurationKeys.projectGitConfigurations, 'remoteBranches', id],
+    projectRemoteBranches: (id: number) => [
+        ...ProjectGitConfigurationKeys.projectGitConfigurations,
+        'remoteBranches',
+        id,
+    ],
 };
 
 export const useGetProjectGitConfigurationQuery = (id: number) =>

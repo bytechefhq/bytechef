@@ -55,7 +55,7 @@ const ProjectGitConfigurationDialog = ({
         projectId,
         !!projectId
     );
-console.log(projectId)
+
     function handleSubmit(projectGitConfiguration: z.infer<typeof formSchema>) {
         onUpdateProjectGitConfigurationSubmit({
             onSuccess: onClose,
@@ -103,6 +103,7 @@ console.log(projectId)
                                                         }
                                                     />
                                                 </SelectTrigger>
+
                                                 <SelectContent>
                                                     {remoteBranches?.map((branch) => (
                                                         <SelectItem key={branch} value={branch}>
