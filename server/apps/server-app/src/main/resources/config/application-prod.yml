@@ -40,7 +40,7 @@ post-hog:
 bytechef:
   analytics:
     enabled: true
-  help-hub:
-    enabled: true
+#  help-hub:
+#    enabled: true
   public-url: http://127.0.0.1:8080
   webhook-url: ${bytechef.public-url}/webhooks/{id}
