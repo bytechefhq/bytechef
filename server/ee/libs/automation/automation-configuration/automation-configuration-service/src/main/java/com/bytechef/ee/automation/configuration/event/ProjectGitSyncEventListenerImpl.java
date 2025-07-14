@@ -59,6 +59,10 @@ public class ProjectGitSyncEventListenerImpl implements ProjectGitSyncEventListe
             ProjectGitConfiguration projectGitConfiguration = projectGitConfigurationOptional.get();
             ProjectVersion projectVersion = project.getLastPublishedProjectVersion();
 
+            if (projectVersion == null) {
+                return;
+            }
+
             String description = projectVersion.getDescription();
 
             if (description == null) {

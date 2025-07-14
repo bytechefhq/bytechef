@@ -180,11 +180,12 @@ public final class Project {
         return getMaxProjectVersion().getVersion();
     }
 
+    @Nullable
     public ProjectVersion getLastPublishedProjectVersion() {
         return projectVersions.stream()
             .filter(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED)
             .max(Comparator.comparingInt(ProjectVersion::getVersion))
-            .orElseThrow();
+            .orElse(null);
     }
 
     public List<ProjectVersion> getProjectVersions() {
