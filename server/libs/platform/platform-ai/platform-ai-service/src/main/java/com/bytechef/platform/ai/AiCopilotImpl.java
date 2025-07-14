@@ -51,17 +51,32 @@ public class AiCopilotImpl implements AiCopilot {
         "other",
         "The user wants something else.");
     private static final String WORKFLOW_EDITOR_SYSTEM_PROMPT = """
-        Return your response in a JSON format in a similar structure to the Workflows in the
-        context.""";
+        Return your response in a JSON format in a similar structure to the Workflows in the context.
+
+        Workflow Building Rules:
+        - Use the "structure" to build the workflow according to instructions
+        - Use the "output" to understand available variables from previous components
+
+        Using Flows:
+        - If task involves conditional logic, use condition/v1 flow
+        - If task involves iteration/looping, use loop/v1 flow
+
+        Using References:
+        - When referencing previous component outputs in parameters, use the format: $\\{componentName.outputProperty\\}
+        - For array access, use: $\\{componentName.outputProperty[index]\\}
+        - For nested objects, use: $\\{componentName.outputProperty.nestedProperty\\}
+
+        Handling Missing Components:
+        - If task.type is "trigger" and task.structure.type is "missing/v1/missing", don't put any trigger
+        - If task.type is "action" and task.structure.type is "missing/v1/missing", pass the missing Component
+        """;
     private static final String WORKFLOW_EDITOR_PROMPT = """
-        Merge all the task.structure according to instructions. Only use tasks that are provided in this prompt.
-        If the task.type is 'trigger' and task.structure.type is 'missing/v1/missing', don't put any trigger.
-        If the task.type is 'action' and task.structure.type is 'missing/v1/missing', pass the 'missing' Component.
+        Merge all the component.structure according to instructions. Only use components that are provided in this prompt.
 
         instructions:
         {task_analysis}
 
-        subtasks:
+        components:
         {task_list}
         """;
     private static final String WORKFLOW_ROUTE = "workflow";
@@ -72,8 +87,7 @@ public class AiCopilotImpl implements AiCopilot {
         {message}
         """;
     private static final String MESSAGE_SYSTEM_PROMPT = """
-        You are a ByteChef workflow building assistant. Respond in a helpful manner,
-        but professional tone. Offer helpful suggestions on what the user could ask you next.
+        You are a ByteChef workflow building assistant. Respond in a helpful manner, but professional tone. Offer helpful suggestions on what the user could ask you next.
         """;
 
     private final ChatClient chatClientWorkflow;
@@ -101,6 +115,7 @@ public class AiCopilotImpl implements AiCopilot {
                 SearchRequest.builder()
                     .filterExpression("category == 'components' or category == 'flows'")
                     .topK(15)
+                    .similarityThreshold(0.7)
                     .build())
             .build();
 

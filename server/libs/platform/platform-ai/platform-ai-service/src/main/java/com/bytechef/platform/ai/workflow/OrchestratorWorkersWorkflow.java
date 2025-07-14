@@ -31,16 +31,10 @@ import org.springframework.util.Assert;
  */
 public class OrchestratorWorkersWorkflow {
 
-    private static final String DEFAULT_ORCHESTRATOR_PROMPT = """
+    private static final String DEFAULT_ORCHESTRATOR_SYSTEM_PROMPT = """
         Analyze this task and break it down into subtasks so that the first subtask is always a single Trigger, and
         each subsequent subtask is either an Action or a Flow. Use the 'condition' flow for the 'if' function and
         'loop' flow for the 'for each' function.
-
-        Current workflow:
-        {workflow}
-
-        Task:
-        {task}
 
         Return your response in this JSON format:
         \\{
@@ -62,35 +56,88 @@ public class OrchestratorWorkersWorkflow {
         \\}
         """;
 
-    private static final String DEFAULT_WORKER_PROMPT = """
-        Search the context for an existing Component that best matches the tasks description.
+    private static final String DEFAULT_ORCHESTRATOR_USER_PROMPT = """
+        Current workflow:
+        {workflow}
 
-        Generate content based on:
-        Original task: {original_task}
-        Task Type: {task_type}
-        Task Description: {task_description}
+        Task:
+        {task}
+        """;
 
-        Return your response in a JSON format like the one in the Component's context: 'Example JSON
-        structure' in 'structure', 'Output JSON' in 'output' if it exists and task type into 'type'.
-        Only use the properties and parameters described in the context with the task type and name.
-        If there is no such task, return the 'missing' Component with a custom label.
-
+    private static final String DEFAULT_WORKER_SYSTEM_PROMPT = """
         Return your response in this JSON format:
         \\{
-            "structure": \\{
-                "label": "Name of missing action or trigger",
-                "name": "missingComponentName",
-                "type": "missing/v1/missing",
-                "parameters": \\{\\}
-            \\},
-            "type": "action",
-            "output": \\{\\}
+          "structure": \\{
+            "label": "Name of action, trigger, or flow",
+            "name": "componentName",
+            "type": "componentType",
+            "parameters": \\{\\}
+          \\},
+          "type": "action|trigger|flow",
+          "output": \\{\\}
         \\}
+
+        If no matching component exists, return the missing component:
+        \\{
+          "structure": \\{
+            "label": "Name of missing component",
+            "name": "missingComponentName",
+            "type": "missing/v1/missing",
+            "parameters": \\{\\}
+          \\},
+          "type": "action",
+          "output": \\{\\}
+        \\}
+
+        For Flow Types:
+        - If task involves conditional logic, use condition/v1 flow
+        - If task involves iteration/looping, use loop/v1 flow
+
+        Flow Templates:
+        Condition Flow:
+        \\{
+          "structure": \\{
+            "label": "Condition description",
+            "name": "condition1",
+            "type": "condition/v1",
+            "parameters": \\{
+              "rawExpression": true,
+              "expression": "condition_expression",
+              "caseTrue": [\\{ "label": "Component when true", "name": "component1", "type": "taskType" \\}],
+              "caseFalse": [\\{ "label": "Component when false", "name": "component2", "type": "taskType" \\}]
+            \\}
+          \\},
+          "type": "flow",
+          "output": \\{\\}
+        \\}
+
+        Loop Flow:
+        \\{
+          "structure": \\{
+            "label": "Loop description",
+            "name": "loop1",
+            "type": "loop/v1",
+            "parameters": \\{
+              "items": "array_or_collection_reference",
+              "iteratee": [\\{ "label": "Component for each item", "name": "component1", "type": "taskType" \\}]
+            \\}
+          \\},
+          "type": "flow",
+          "output": \\{"item": \\{\\}\\}
+        \\}
+
+        Output Rules:
+        - If the component exists in context and has example output, paste the exact output structure in the "output" key
+        - If the component exists but has no example output, use empty object \\{\\} for "output" (dynamic output)
+        """;
+
+    private static final String DEFAULT_WORKER_USER_PROMPT = """
+        Search the context for an existing Component that best matches the task description. Generate content based on:
+        - Task Type: {task_type}
+        - Task Description: {task_description}
         """;
 
     private final ChatClient chatClient;
-    private final String orchestratorPrompt;
-    private final String workerPrompt;
 
     /**
      * Creates a new OrchestratorWorkers with default prompts.
@@ -98,24 +145,9 @@ public class OrchestratorWorkersWorkflow {
      * @param chatClient The ChatClient to use for LLM interactions
      */
     public OrchestratorWorkersWorkflow(ChatClient chatClient) {
-        this(chatClient, DEFAULT_ORCHESTRATOR_PROMPT, DEFAULT_WORKER_PROMPT);
-    }
-
-    /**
-     * Creates a new OrchestratorWorkers with custom prompts.
-     *
-     * @param chatClient         The ChatClient to use for LLM interactions
-     * @param orchestratorPrompt Custom prompt for the orchestrator LLM
-     * @param workerPrompt       Custom prompt for the worker LLMs
-     */
-    public OrchestratorWorkersWorkflow(ChatClient chatClient, String orchestratorPrompt, String workerPrompt) {
         Assert.notNull(chatClient, "ChatClient must not be null");
-        Assert.hasText(orchestratorPrompt, "Orchestrator prompt must not be empty");
-        Assert.hasText(workerPrompt, "Worker prompt must not be empty");
 
         this.chatClient = chatClient;
-        this.orchestratorPrompt = orchestratorPrompt;
-        this.workerPrompt = workerPrompt;
     }
 
     /**
@@ -133,7 +165,8 @@ public class OrchestratorWorkersWorkflow {
 
         // 1. Orchestrator analyzes task and determines subtasks
         OrchestratorResponse orchestratorResponse = this.chatClient.prompt()
-            .user(u -> u.text(this.orchestratorPrompt)
+            .system(DEFAULT_ORCHESTRATOR_SYSTEM_PROMPT)
+            .user(u -> u.text(DEFAULT_ORCHESTRATOR_USER_PROMPT)
                 .param("task", taskDescription)
                 .param("workflow", currentWorkflow))
             .call()
@@ -145,13 +178,18 @@ public class OrchestratorWorkersWorkflow {
         List<String> workerResponses = orchestratorResponse.tasks()
             .parallelStream()
             .map(task -> this.chatClient.prompt()
-                .user(u -> u.text(this.workerPrompt)
-                    .param("original_task", orchestratorResponse.analysis())
+                .system(DEFAULT_WORKER_SYSTEM_PROMPT)
+                .user(u -> u.text(DEFAULT_WORKER_USER_PROMPT)
+//                    .param("original_task", orchestratorResponse.analysis())
                     .param("task_type", task.type())
-                    .param("task_description", task.description()))
+                    .param("task_description", task.description())
+                )
                 .call()
                 .content())
             .toList();
+
+        System.out.println(orchestratorResponse.analysis());
+        System.out.println(workerResponses);
 
         // 3. Results are combined into the final response
         return new WorkerResponse(orchestratorResponse.analysis(), workerResponses);
