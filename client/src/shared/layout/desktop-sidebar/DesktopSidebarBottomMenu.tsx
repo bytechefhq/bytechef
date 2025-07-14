@@ -15,7 +15,6 @@ import {
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -34,8 +33,6 @@ const DesktopSidebarBottomMenu = () => {
 
     const analytics = useAnalytics();
 
-    const helpHub = useHelpHub();
-
     const {pathname} = useLocation();
 
     const navigate = useNavigate();
@@ -49,7 +46,6 @@ const DesktopSidebarBottomMenu = () => {
 
     const handleLogOutClick = () => {
         analytics.reset();
-        helpHub.shutdown();
         queryClient.resetQueries();
         logout();
     };
@@ -206,11 +202,16 @@ const DesktopSidebarBottomMenu = () => {
                         </div>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => helpHub.open()}>
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                        className="cursor-pointer font-semibold"
+                        onClick={() => window.open('https://docs.bytechef.io', '_blank')}
+                    >
                         <div className="flex items-center space-x-1">
                             <HelpCircleIcon className="size-5" />
 
-                            <span>Resource Center</span>
+                            <span>Documentation</span>
                         </div>
                     </DropdownMenuItem>
                 </div>
