@@ -101,6 +101,10 @@ openapi:
 
 spring:
   ai:
+    mcp:
+      server:
+        name: bytechef-mcp-server
+        sse-message-endpoint: /api/v1/mcp/message
     openai:
       api-key: ${bytechef.ai.copilot.openai.api-key}
       chat:

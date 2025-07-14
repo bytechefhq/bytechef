@@ -82,6 +82,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:core:tenant:tenant-single-service"))
+    implementation(project(":server:libs:mcp:mcp-server"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-rest"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-service"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))

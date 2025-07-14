@@ -52,6 +52,7 @@ public class ApplicationProperties {
     private HelpHub helpHub = new HelpHub();
     private Observability observability = new Observability();
     private Mail mail = new Mail();
+    private Mcp mcp = new Mcp();
     private MessageBroker messageBroker = new MessageBroker();
     private Oauth2 oauth2 = new Oauth2();
     private String publicUrl;
@@ -126,6 +127,10 @@ public class ApplicationProperties {
 
     public Mail getMail() {
         return mail;
+    }
+
+    public Mcp getMcp() {
+        return mcp;
     }
 
     public MessageBroker getMessageBroker() {
@@ -234,6 +239,10 @@ public class ApplicationProperties {
 
     public void setMail(Mail mail) {
         this.mail = mail;
+    }
+
+    public void setMcp(Mcp mcp) {
+        this.mcp = mcp;
     }
 
     public void setMessageBroker(MessageBroker messageBroker) {
@@ -1583,6 +1592,39 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+    }
+
+    /**
+     * Represents the MCP configuration structure. Provides access to the server configuration settings.
+     */
+    public static class Mcp {
+
+        private Server server = new Server();
+
+        public Server getServer() {
+            return server;
+        }
+
+        public void setServer(Server server) {
+            this.server = server;
+        }
+
+        /**
+         * Represents the server configuration settings. This configuration determines whether the server is enabled or
+         * disabled.
+         */
+        public static class Server {
+
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
         }
     }
 

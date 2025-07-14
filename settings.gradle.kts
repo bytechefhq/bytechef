@@ -112,6 +112,9 @@ include("server:libs:core:rest:rest-impl")
 include("server:libs:core:tenant:tenant-api")
 include("server:libs:core:tenant:tenant-single-service")
 
+include("server:libs:mcp:mcp-server")
+include("server:libs:mcp:mcp-tool")
+
 include("server:libs:platform:platform-ai:platform-ai-api")
 include("server:libs:platform:platform-ai:platform-ai-rest")
 include("server:libs:platform:platform-ai:platform-ai-service")
