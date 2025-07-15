@@ -200,6 +200,8 @@ export default function useWorkflowInputs({
 
                         invalidateWorkflowQueries();
 
+                        closeEditDialog();
+
                         return;
                     }
 
