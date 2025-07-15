@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptionFacade {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowNodeDescriptionFacadeImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowNodeDescriptionFacadeImpl.class);
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final Evaluator evaluator;
@@ -91,8 +91,8 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
                     try {
                         inputParameters = workflowTask.evaluateParameters(inputs, evaluator);
                     } catch (Exception e) {
-                        if (LOGGER.isTraceEnabled()) {
-                            LOGGER.trace(e.getMessage());
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(e.getMessage());
                         }
 
                         inputParameters = workflowTask.getParameters();

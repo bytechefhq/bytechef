@@ -66,7 +66,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFacade {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowNodeParameterFacadeImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowNodeParameterFacadeImpl.class);
 
     protected static final Pattern ARRAY_INDEX_VALUE_PATTERN = Pattern.compile("\\[(\\d+)]");
     private static final Pattern ARRAY_INDEXES_PATTERN =
@@ -330,8 +330,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         try {
             evaluate = evaluator.evaluate(parameterMap, outputs);
         } catch (Exception e) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(e.getMessage());
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage());
             }
 
             evaluate = new HashMap<>(parameterMap);

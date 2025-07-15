@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(LoopTaskDispatcherDefinitionFactory.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(LoopTaskDispatcherDefinitionFactory.class);
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP)
         .title("Loop")
@@ -83,8 +83,8 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         try {
             list = MapUtils.getList(inputParameters, ITEMS, List.of());
         } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(e.getMessage());
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage());
             }
         }
 
