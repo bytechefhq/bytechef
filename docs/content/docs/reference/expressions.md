@@ -336,7 +336,7 @@ Usage example:
 | `range(start, end)` | Creates a list of integers from start to end (inclusive). |
 | `remove(list, element)` | Removes an element from a list and returns the modified list. |
 | `set(list, index, element)` | Sets an element at a specific index in a list and returns the modified list. |
-| `size(list)` | Returns the size of a list or map. |
+| `size(list)` | Returns the size of a list. If list is `null` returns `-1`. |
 | `sort(list)` | Sorts a list in ascending order. |
 
 ### Map Functions
