@@ -171,7 +171,7 @@ const WorkflowNodeDetailsPanel = ({
                 ...(currentComponentDefinition?.actions || []),
                 ...(currentComponentDefinition?.triggers || []),
                 ...(currentComponentDefinition?.clusterElements || []),
-            ].find((action) => action?.name === currentOperationName),
+            ].find((operationDefinition) => operationDefinition?.name === currentOperationName),
         [currentComponentDefinition, currentOperationName]
     );
 
@@ -715,11 +715,11 @@ const WorkflowNodeDetailsPanel = ({
 
             Object.entries(currentRootClusterTaskClusterElements).forEach(([, value]) => {
                 if (Array.isArray(value)) {
-                    const multipleClusterElements = value.map((element) => ({
-                        name: element.componentName || '',
-                        operationName: element.type ? element.type.split('/')[2] : '',
-                        version: +element.type!.split('/')[1].replace('v', ''),
-                        workflowNodeName: element.name || '',
+                    const multipleClusterElements = value.map((clusterElement) => ({
+                        name: clusterElement.componentName || '',
+                        operationName: clusterElement.type ? clusterElement.type.split('/')[2] : '',
+                        version: +clusterElement.type!.split('/')[1].replace('v', ''),
+                        workflowNodeName: clusterElement.workflowNodeName || '',
                     }));
 
                     clusterElementsWorkflowNodeTypes = [
@@ -731,7 +731,7 @@ const WorkflowNodeDetailsPanel = ({
                         name: value.componentName || '',
                         operationName: value.type ? value.type.split('/')[2] : '',
                         version: +value.type!.split('/')[1].replace('v', ''),
-                        workflowNodeName: value.name || '',
+                        workflowNodeName: value.workflowNodeName || '',
                     });
                 }
             });
@@ -757,11 +757,11 @@ const WorkflowNodeDetailsPanel = ({
         } else if (clusterElementsCanvasOpen) {
             if (currentNode?.rootClusterElement) {
                 currentWorkflowNode = workflowNodes.find(
-                    (action) => action.workflowNodeName === currentNode?.workflowNodeName
+                    (workflowNodeType) => workflowNodeType.workflowNodeName === currentNode?.workflowNodeName
                 );
             } else if (clusterElementComponentOperations) {
                 currentWorkflowNode = clusterElementComponentOperations.find(
-                    (action) => action.workflowNodeName === currentNode?.workflowNodeName
+                    (workflowNodeType) => workflowNodeType.workflowNodeName === currentNode?.workflowNodeName
                 );
             }
         }
