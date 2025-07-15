@@ -36,21 +36,20 @@ import org.springframework.web.servlet.function.ServerResponse;
  * @author Ivica Cardic
  */
 //@Configuration
-public class McpServerConfiguration {
+public class EmbeddedMcpServerConfiguration {
 
     private final ToolFacade toolFacade;
 
     @SuppressFBWarnings("EI")
-    public McpServerConfiguration(ToolFacade toolFacade) {
+    public EmbeddedMcpServerConfiguration(ToolFacade toolFacade) {
         this.toolFacade = toolFacade;
     }
 
     @Bean
     WebMvcSseServerTransportProvider webMvcSseServerTransportProvider(ObjectMapper objectMapper) {
         // TODO - Set /embedded/mcp/message, check ConnectedUserAuthenticationFilter
-        // TODO - Set /embedded/sse
 
-        return new WebMvcSseServerTransportProvider(objectMapper, "/api/embedded/v1/mcp/message");
+        return new WebMvcSseServerTransportProvider(objectMapper, "/api/embedded/v1/mcp/message", "/embedded/sse");
     }
 
     @Bean
