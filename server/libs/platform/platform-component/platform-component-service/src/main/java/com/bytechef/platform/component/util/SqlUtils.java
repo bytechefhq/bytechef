@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SqlUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SqlUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlUtils.class);
 
     private static final List<DateTimeFormatter> DATE_TIME_FORMATTERS = Arrays.asList(
         DateTimeFormatter.ISO_OFFSET_DATE_TIME,
@@ -117,8 +117,8 @@ public class SqlUtils {
                 try {
                     return LocalDate.parse(dateString, formatter);
                 } catch (DateTimeParseException e2) {
-                    if (LOGGER.isTraceEnabled()) {
-                        LOGGER.trace("Unable to parse date string: {} with formatter: {}", dateString, formatter);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Unable to parse date string: {} with formatter: {}", dateString, formatter);
                     }
                 }
             }
