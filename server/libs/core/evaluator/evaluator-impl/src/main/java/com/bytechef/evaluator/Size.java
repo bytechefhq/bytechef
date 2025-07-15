@@ -35,6 +35,10 @@ class Size implements MethodExecutor {
 
         List<?> l1 = (List<?>) arguments[0];
 
+        if (l1 == null) {
+            return new TypedValue(-1);
+        }
+
         return new TypedValue(l1.size());
     }
 }

@@ -433,4 +433,15 @@ public class SpelEvaluatorTest {
 
         Assertions.assertEquals(2, MapUtils.getInteger(map, "size"));
     }
+
+    @Test
+    public void test44() {
+        Map<String, Object> testMap = new HashMap<>();
+
+        testMap.put("list", null);
+
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("size", "=size(${list})"), testMap);
+
+        Assertions.assertEquals(-1, MapUtils.getInteger(map, "size"));
+    }
 }
