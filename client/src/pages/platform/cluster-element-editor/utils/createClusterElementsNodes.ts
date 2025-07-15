@@ -28,22 +28,22 @@ export default function createClusterElementNodes({
     const totalClusterElementTypeCount = clusterRootComponentDefinition.clusterElementTypes.length;
 
     clusterRootComponentDefinition.clusterElementTypes.forEach((clusterElementType, clusterElementTypeIndex) => {
-        const elementType = convertNameToCamelCase(clusterElementType.name || '');
-        const elementLabel = clusterElementType.label || '';
-        const isMultipleElementsNode = clusterElementType.multipleElements;
-        const clusterElementData = clusterElements[elementType];
+        const clusterElementTypeName = convertNameToCamelCase(clusterElementType.name || '');
+        const clusterElementTypeLabel = clusterElementType.label || '';
+        const isMultipleClusterElementsNode = clusterElementType.multipleElements;
+        const clusterElementValue = clusterElements[clusterElementTypeName];
 
-        if (isMultipleElementsNode) {
-            if (Array.isArray(clusterElementData) && clusterElementData.length) {
-                clusterElementData.forEach((element, multipleElementIndex) => {
+        if (isMultipleClusterElementsNode) {
+            if (Array.isArray(clusterElementValue) && clusterElementValue.length) {
+                clusterElementValue.forEach((element, multipleElementIndex) => {
                     // Create the multiple element node
                     const elementNode = createMultipleElementsNode(
                         clusterElementTypeIndex,
                         clusterRootId,
                         currentNodePositions,
                         element,
-                        elementType,
-                        isMultipleElementsNode,
+                        clusterElementTypeName,
+                        isMultipleClusterElementsNode,
                         multipleElementIndex,
                         totalClusterElementTypeCount
                     );
@@ -80,42 +80,42 @@ export default function createClusterElementNodes({
                 clusterElementTypeIndex,
                 clusterRootId,
                 currentNodePositions,
-                elementLabel,
-                elementType,
+                clusterElementTypeLabel,
+                clusterElementTypeName,
                 totalClusterElementTypeCount
             );
 
             createdNodes.push(placeholderNode);
         } else {
-            if (clusterElementData && !Array.isArray(clusterElementData)) {
+            if (clusterElementValue && !Array.isArray(clusterElementValue)) {
                 // Create the single element node
                 const elementNode = createSingleElementsNode(
-                    clusterElementData,
+                    clusterElementValue,
                     clusterElementTypeIndex,
                     clusterRootId,
                     currentNodePositions,
-                    elementLabel,
-                    elementType,
+                    clusterElementTypeLabel,
+                    clusterElementTypeName,
                     totalClusterElementTypeCount
                 );
 
                 // Set root parent/child relationship
                 elementNode.data.parentClusterRootId = clusterRootId;
-                elementNode.data.isNestedClusterRoot = !!clusterElementData.clusterElements;
+                elementNode.data.isNestedClusterRoot = !!clusterElementValue.clusterElements;
 
                 createdNodes.push(elementNode);
 
                 // Process nested roots
-                if (clusterElementData.clusterElements) {
-                    const componentName = clusterElementData.type?.split('/')[0];
+                if (clusterElementValue.clusterElements) {
+                    const componentName = clusterElementValue.type?.split('/')[0];
 
                     const nestedDefinition = nestedClusterRootsDefinitions[componentName];
 
                     if (nestedDefinition) {
                         const childNodes = createClusterElementNodes({
-                            clusterElements: clusterElementData.clusterElements,
+                            clusterElements: clusterElementValue.clusterElements,
                             clusterRootComponentDefinition: nestedDefinition,
-                            clusterRootId: clusterElementData.name,
+                            clusterRootId: clusterElementValue.name,
                             currentNodePositions,
                             nestedClusterRootsDefinitions,
                         });
@@ -128,8 +128,8 @@ export default function createClusterElementNodes({
                     clusterElementTypeIndex,
                     clusterRootId,
                     currentNodePositions,
-                    elementLabel,
-                    elementType,
+                    clusterElementTypeLabel,
+                    clusterElementTypeName,
                     totalClusterElementTypeCount
                 );
 

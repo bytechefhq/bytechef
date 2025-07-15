@@ -39,15 +39,15 @@ export function createPlaceholderNode(
 }
 
 export function createSingleElementsNode(
-    clusterElementData: ClusterElementItemType,
+    clusterElementItem: ClusterElementItemType,
     clusterElementTypeIndex: number = 0,
     clusterRootId: string,
     currentNodePositions: Record<string, {x: number; y: number}> = {},
-    elementLabel: string,
-    elementType: string,
+    clusterElementTypeLabel: string,
+    clusterElementTypeName: string,
     totalClusterElementTypeCount: number = 1
 ): Node {
-    const {label, metadata, name, parameters, type} = clusterElementData;
+    const {label, metadata, name, parameters, type} = clusterElementItem;
     const typeSegments = type.split('/');
 
     const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
@@ -71,10 +71,10 @@ export function createSingleElementsNode(
 
     return {
         data: {
-            ...clusterElementData,
-            clusterElementLabel: elementLabel,
-            clusterElementName: elementType,
-            clusterElementType: elementType,
+            ...clusterElementItem,
+            clusterElementLabel: clusterElementTypeLabel,
+            clusterElementName: clusterElementTypeName,
+            clusterElementType: clusterElementTypeName,
             componentName: typeSegments[0],
             icon: (
                 <InlineSVG
