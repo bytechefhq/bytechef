@@ -26,7 +26,7 @@ export interface GetClusterElementOutputRequest {
     id: string;
     workflowNodeName: string;
     clusterElementType: string;
-    clusterElementName: string;
+    clusterElementWorkflowNodeName: string;
 }
 
 export interface GetPreviousWorkflowNodeOutputsRequest {
@@ -70,10 +70,10 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['clusterElementName'] == null) {
+        if (requestParameters['clusterElementWorkflowNodeName'] == null) {
             throw new runtime.RequiredError(
-                'clusterElementName',
-                'Required parameter "clusterElementName" was null or undefined when calling getClusterElementOutput().'
+                'clusterElementWorkflowNodeName',
+                'Required parameter "clusterElementWorkflowNodeName" was null or undefined when calling getClusterElementOutput().'
             );
         }
 
@@ -82,7 +82,7 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}/outputs/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
+            path: `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/outputs/{clusterElementWorkflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

@@ -38,7 +38,7 @@ export interface DeleteClusterElementParameterRequest {
     id: string;
     workflowNodeName: string;
     clusterElementType: string;
-    clusterElementName: string;
+    clusterElementWorkflowNodeName: string;
     deleteWorkflowNodeParameterRequest?: DeleteWorkflowNodeParameterRequest;
 }
 
@@ -52,7 +52,7 @@ export interface GetClusterElementParameterDisplayConditionsRequest {
     id: string;
     workflowNodeName: string;
     clusterElementType: string;
-    clusterElementName: string;
+    clusterElementWorkflowNodeName: string;
 }
 
 export interface GetWorkflowNodeParameterDisplayConditionsRequest {
@@ -64,7 +64,7 @@ export interface UpdateClusterElementParameterRequest {
     id: string;
     workflowNodeName: string;
     clusterElementType: string;
-    clusterElementName: string;
+    clusterElementWorkflowNodeName: string;
     updateWorkflowNodeParameterRequest?: UpdateWorkflowNodeParameterRequest;
 }
 
@@ -105,10 +105,10 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['clusterElementName'] == null) {
+        if (requestParameters['clusterElementWorkflowNodeName'] == null) {
             throw new runtime.RequiredError(
-                'clusterElementName',
-                'Required parameter "clusterElementName" was null or undefined when calling deleteClusterElementParameter().'
+                'clusterElementWorkflowNodeName',
+                'Required parameter "clusterElementWorkflowNodeName" was null or undefined when calling deleteClusterElementParameter().'
             );
         }
 
@@ -119,7 +119,7 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
+            path: `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/parameters/{clusterElementWorkflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -209,10 +209,10 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['clusterElementName'] == null) {
+        if (requestParameters['clusterElementWorkflowNodeName'] == null) {
             throw new runtime.RequiredError(
-                'clusterElementName',
-                'Required parameter "clusterElementName" was null or undefined when calling getClusterElementParameterDisplayConditions().'
+                'clusterElementWorkflowNodeName',
+                'Required parameter "clusterElementWorkflowNodeName" was null or undefined when calling getClusterElementParameterDisplayConditions().'
             );
         }
 
@@ -221,7 +221,7 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}/display-conditions`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
+            path: `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/parameters/{clusterElementWorkflowNodeName}/display-conditions`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -307,10 +307,10 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['clusterElementName'] == null) {
+        if (requestParameters['clusterElementWorkflowNodeName'] == null) {
             throw new runtime.RequiredError(
-                'clusterElementName',
-                'Required parameter "clusterElementName" was null or undefined when calling updateClusterElementParameter().'
+                'clusterElementWorkflowNodeName',
+                'Required parameter "clusterElementWorkflowNodeName" was null or undefined when calling updateClusterElementParameter().'
             );
         }
 
@@ -321,7 +321,7 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
+            path: `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/parameters/{clusterElementWorkflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName']))),
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
