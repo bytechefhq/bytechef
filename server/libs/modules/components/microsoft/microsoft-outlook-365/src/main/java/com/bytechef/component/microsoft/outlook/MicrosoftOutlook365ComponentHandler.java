@@ -27,6 +27,7 @@ import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365Delete
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetEventsAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetFreeTimeSlotsAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetMailAction;
+import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365MoveEmailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365ReplyToEmailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365SearchEmailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365SendEmailAction;
@@ -55,6 +56,7 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
             MicrosoftOutlook365GetEventsAction.ACTION_DEFINITION,
             MicrosoftOutlook365GetFreeTimeSlotsAction.ACTION_DEFINITION,
             MicrosoftOutlook365GetMailAction.ACTION_DEFINITION,
+            MicrosoftOutlook365MoveEmailAction.ACTION_DEFINITION,
             MicrosoftOutlook365ReplyToEmailAction.ACTION_DEFINITION,
             MicrosoftOutlook365SearchEmailAction.ACTION_DEFINITION,
             MicrosoftOutlook365SendEmailAction.ACTION_DEFINITION)
@@ -64,6 +66,7 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
             tool(MicrosoftOutlook365GetEventsAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365GetFreeTimeSlotsAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365GetMailAction.ACTION_DEFINITION),
+            tool(MicrosoftOutlook365MoveEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365ReplyToEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365SearchEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365SendEmailAction.ACTION_DEFINITION))

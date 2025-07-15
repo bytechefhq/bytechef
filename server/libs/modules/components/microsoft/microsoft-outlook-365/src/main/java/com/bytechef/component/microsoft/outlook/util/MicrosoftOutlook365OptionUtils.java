@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.outlook.util;
 
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
@@ -61,7 +62,7 @@ public class MicrosoftOutlook365OptionUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(actionContext, body, "displayName", "displayName");
+        return getOptions(actionContext, body, DISPLAY_NAME, DISPLAY_NAME);
     }
 
     public static List<Option<String>> getEventOptions(
@@ -75,6 +76,19 @@ public class MicrosoftOutlook365OptionUtils {
             .getBody(new TypeReference<>() {});
 
         return getOptions(actionContext, body, SUBJECT, ID);
+    }
+
+    public static List<Option<String>> getFolderIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext actionContext) {
+
+        Map<String, Object> body = actionContext.http(http -> http.get("/me/mailFolders"))
+            .queryParameters("$top", 100)
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(actionContext, body, DISPLAY_NAME, ID);
     }
 
     public static List<Option<String>> getMessageIdOptions(
