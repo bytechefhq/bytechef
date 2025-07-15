@@ -310,6 +310,38 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### Move Email
+Name: moveEmail
+
+`Moves a email to another folder within the user's mailbox. `
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Message ID | STRING | `ID of the message to move.` | true |
+| destinationId | Folder ID | STRING | `The destination folder ID.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Move Email",
+  "name" : "moveEmail",
+  "parameters" : {
+    "id" : "",
+    "destinationId" : ""
+  },
+  "type" : "microsoftOutlook365/v1/moveEmail"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
 ### Reply to Email
 Name: replyToEmail
 

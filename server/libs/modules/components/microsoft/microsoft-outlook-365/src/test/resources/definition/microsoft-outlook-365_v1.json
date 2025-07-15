@@ -1682,6 +1682,72 @@
   }, {
     "batch" : null,
     "deprecated" : null,
+    "description" : "Moves a email to another folder within the user's mailbox. ",
+    "help" : null,
+    "metadata" : null,
+    "name" : "moveEmail",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "perform" : { },
+    "processErrorResponse" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "controlType" : "SELECT",
+      "defaultValue" : null,
+      "description" : "ID of the message to move.",
+      "displayCondition" : null,
+      "exampleValue" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "label" : "Message ID",
+      "languageId" : null,
+      "maxLength" : null,
+      "metadata" : { },
+      "minLength" : null,
+      "name" : "id",
+      "options" : null,
+      "optionsDataSource" : {
+        "options" : { },
+        "optionsLookupDependsOn" : null
+      },
+      "placeholder" : null,
+      "regex" : null,
+      "required" : true,
+      "type" : "STRING"
+    }, {
+      "advancedOption" : null,
+      "controlType" : "SELECT",
+      "defaultValue" : null,
+      "description" : "The destination folder ID.",
+      "displayCondition" : null,
+      "exampleValue" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "label" : "Folder ID",
+      "languageId" : null,
+      "maxLength" : null,
+      "metadata" : { },
+      "minLength" : null,
+      "name" : "destinationId",
+      "options" : null,
+      "optionsDataSource" : {
+        "options" : { },
+        "optionsLookupDependsOn" : null
+      },
+      "placeholder" : null,
+      "regex" : null,
+      "required" : true,
+      "type" : "STRING"
+    } ],
+    "title" : "Move Email",
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
     "description" : "Creates a new reply to email.",
     "help" : null,
     "metadata" : null,
@@ -4695,6 +4761,74 @@
       "type" : "STRING"
     } ],
     "title" : "Get Mail",
+    "type" : {
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "name" : "TOOLS",
+      "required" : false
+    }
+  }, {
+    "description" : "Moves a email to another folder within the user's mailbox. ",
+    "element" : { },
+    "help" : null,
+    "name" : "moveEmail",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "controlType" : "SELECT",
+      "defaultValue" : null,
+      "description" : "ID of the message to move.",
+      "displayCondition" : null,
+      "exampleValue" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "label" : "Message ID",
+      "languageId" : null,
+      "maxLength" : null,
+      "metadata" : { },
+      "minLength" : null,
+      "name" : "id",
+      "options" : null,
+      "optionsDataSource" : {
+        "options" : { },
+        "optionsLookupDependsOn" : null
+      },
+      "placeholder" : null,
+      "regex" : null,
+      "required" : true,
+      "type" : "STRING"
+    }, {
+      "advancedOption" : null,
+      "controlType" : "SELECT",
+      "defaultValue" : null,
+      "description" : "The destination folder ID.",
+      "displayCondition" : null,
+      "exampleValue" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "label" : "Folder ID",
+      "languageId" : null,
+      "maxLength" : null,
+      "metadata" : { },
+      "minLength" : null,
+      "name" : "destinationId",
+      "options" : null,
+      "optionsDataSource" : {
+        "options" : { },
+        "optionsLookupDependsOn" : null
+      },
+      "placeholder" : null,
+      "regex" : null,
+      "required" : true,
+      "type" : "STRING"
+    } ],
+    "title" : "Move Email",
     "type" : {
       "key" : "tools",
       "label" : "Tools",
