@@ -135,12 +135,12 @@ const PropertyComboBox = ({
         () => ({
             loadDependencyValueKey: lookupDependsOnValuesKey,
             request: {
-                clusterElement: currentNode!.clusterElementName!,
                 clusterElementType: currentNode!.clusterElementType!,
+                clusterElementWorkflowNodeName: currentNode!.name!,
                 id: workflowId,
                 lookupDependsOnPaths,
                 propertyName: path!,
-                workflowNodeName,
+                workflowNodeName, // Mora biti ime od cluster element root node-a, npr. aiAgent_1
             },
         }),
         [lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName, currentNode]
