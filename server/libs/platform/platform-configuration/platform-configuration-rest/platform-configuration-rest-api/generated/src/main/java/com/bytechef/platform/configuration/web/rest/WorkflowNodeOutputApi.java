@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T23:18:46.779804+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-15T08:55:38.299003+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "workflow-node-output", description = "The Platform Workflow Node Output Internal API")
 public interface WorkflowNodeOutputApi {
@@ -43,13 +43,13 @@ public interface WorkflowNodeOutputApi {
     }
 
     /**
-     * GET /workflows/{id}/outputs/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName} : Get cluster element node output used in a workflow
+     * GET /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/outputs/{clusterElementWorkflowNodeName} : Get cluster element node output used in a workflow
      * Get cluster element node output used in a workflow.
      *
      * @param id The workflow id (required)
      * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
      * @param clusterElementType The name of a cluster element type. (required)
-     * @param clusterElementName The name of a cluster element name. (required)
+     * @param clusterElementWorkflowNodeName The name of a cluster element workflow node. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -65,7 +65,7 @@ public interface WorkflowNodeOutputApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflows/{id}/outputs/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}",
+        value = "/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/outputs/{clusterElementWorkflowNodeName}",
         produces = { "application/json" }
     )
     
@@ -73,7 +73,7 @@ public interface WorkflowNodeOutputApi {
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "clusterElementType", description = "The name of a cluster element type.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementType") String clusterElementType,
-        @Parameter(name = "clusterElementName", description = "The name of a cluster element name.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementName") String clusterElementName
+        @Parameter(name = "clusterElementWorkflowNodeName", description = "The name of a cluster element workflow node.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementWorkflowNodeName") String clusterElementWorkflowNodeName
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

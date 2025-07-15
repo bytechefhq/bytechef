@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T23:18:46.779804+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-15T08:55:38.299003+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 @Validated
 @Tag(name = "workflow-node-option", description = "The Platform Workflow Node Option Internal API")
 public interface WorkflowNodeOptionApi {
@@ -43,13 +43,13 @@ public interface WorkflowNodeOptionApi {
     }
 
     /**
-     * GET /workflows/{id}/cluster-roots/{workflowNodeName}/cluster-element-types/{clusterElementType}/properties/{clusterElement}/options/{propertyName} : Get an action or trigger property options shown in the editor
+     * GET /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/properties/{clusterElementWorkflowNodeName}/options/{propertyName} : Get an action or trigger property options shown in the editor
      * Get an action or trigger property options shown in the editor.
      *
      * @param id The workflow id (required)
      * @param workflowNodeName The name of a workflow&#39;s cluster root action task (E.g. mailchimp_1) (required)
      * @param clusterElementType The name of a cluster element type. (required)
-     * @param clusterElement The name of a cluster element. (required)
+     * @param clusterElementWorkflowNodeName The name of a cluster element workflow node. (required)
      * @param propertyName The name of a property. (required)
      * @param lookupDependsOnPaths The list of dependency paths. (optional)
      * @param searchText Optional search text used to filter option items (optional)
@@ -68,7 +68,7 @@ public interface WorkflowNodeOptionApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflows/{id}/cluster-roots/{workflowNodeName}/cluster-element-types/{clusterElementType}/properties/{clusterElement}/options/{propertyName}",
+        value = "/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/properties/{clusterElementWorkflowNodeName}/options/{propertyName}",
         produces = { "application/json" }
     )
     
@@ -76,7 +76,7 @@ public interface WorkflowNodeOptionApi {
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow's cluster root action task (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "clusterElementType", description = "The name of a cluster element type.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementType") String clusterElementType,
-        @Parameter(name = "clusterElement", description = "The name of a cluster element.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElement") String clusterElement,
+        @Parameter(name = "clusterElementWorkflowNodeName", description = "The name of a cluster element workflow node.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementWorkflowNodeName") String clusterElementWorkflowNodeName,
         @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
         @Parameter(name = "lookupDependsOnPaths", description = "The list of dependency paths.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "lookupDependsOnPaths", required = false) List<String> lookupDependsOnPaths,
         @Parameter(name = "searchText", description = "Optional search text used to filter option items", in = ParameterIn.QUERY) @Valid @RequestParam(value = "searchText", required = false) String searchText

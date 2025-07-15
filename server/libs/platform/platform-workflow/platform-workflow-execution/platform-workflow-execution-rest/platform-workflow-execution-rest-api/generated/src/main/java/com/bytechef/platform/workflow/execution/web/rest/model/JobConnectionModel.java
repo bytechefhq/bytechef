@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobConnection", description = "The connection used in a particular task.")
 @JsonTypeName("JobConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T11:56:48.093409+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-15T08:55:41.723674+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class JobConnectionModel {
 
   private @Nullable Long id;

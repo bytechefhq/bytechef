@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("IntegrationWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-06-24T21:36:46.689421+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-15T08:55:35.604994+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class IntegrationWorkflowModel {
 
   private @Nullable String description;
