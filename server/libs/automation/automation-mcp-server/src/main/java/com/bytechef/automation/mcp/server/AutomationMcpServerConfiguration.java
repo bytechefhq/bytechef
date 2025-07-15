@@ -1,8 +1,17 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the ByteChef Enterprise license (the "Enterprise License");
- * you may not use this file except in compliance with the Enterprise License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.bytechef.automation.mcp.server;
@@ -18,16 +27,15 @@ import java.util.List;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
 /**
- * @version ee
- *
  * @author Ivica Cardic
  */
-//@Configuration
-public class McpServerConfiguration {
+@Configuration
+public class AutomationMcpServerConfiguration {
 
 //    private final ToolFacade toolFacade;
 
@@ -38,10 +46,7 @@ public class McpServerConfiguration {
 
     @Bean
     WebMvcSseServerTransportProvider webMvcSseServerTransportProvider(ObjectMapper objectMapper) {
-        // TODO - Set /embedded/mcp/message, check ConnectedUserAuthenticationFilter
-        // TODO - Set /embedded/sse
-
-        return new WebMvcSseServerTransportProvider(objectMapper, "/api/embedded/v1/mcp/message");
+        return new WebMvcSseServerTransportProvider(objectMapper, "/api/automation/v1/mcp/message", "/automation/sse");
     }
 
     @Bean
@@ -59,7 +64,7 @@ public class McpServerConfiguration {
             .build();
 
         return McpServer.sync(transportProvider)
-            .serverInfo("MCP ByteChef Embedded Server", "1.0.0")
+            .serverInfo("bytechef-automation-mcp-server", "1.0.0")
             .capabilities(capabilities)
             .tools(McpToolUtils.toSyncToolSpecification(getToolCallbacks()))
             .build();
