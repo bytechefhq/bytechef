@@ -153,8 +153,10 @@ public class SecurityConfiguration {
                 // See https://stackoverflow.com/q/74447118/65681
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
+                .ignoringRequestMatchers(regexMatcher("^/api/v[0-9]+/mcp/.+"))
                 .ignoringRequestMatchers("/api/o/**")
                 .ignoringRequestMatchers("/sse")
+                .ignoringRequestMatchers(regexMatcher("^/(automation|embedded)/sse"))
                 // For internal calls from the embedded workflow builder
                 .ignoringRequestMatchers(request -> request.getHeader("Authorization") != null));
 
@@ -189,12 +191,20 @@ public class SecurityConfiguration {
                 .permitAll()
                 .requestMatchers(mvc.matcher("/api/account/reset-password/finish"))
                 .permitAll()
+                .requestMatchers(mvc.matcher("/api/*/mcp/message"))
+                .permitAll()
+                .requestMatchers(mvc.matcher("/api/automation/*/mcp/message"))
+                .permitAll()
+                .requestMatchers(mvc.matcher("/api/embedded/*/mcp/message"))
+                .permitAll()
                 .requestMatchers(mvc.matcher("/api/**"))
                 .authenticated()
                 .requestMatchers(mvc.matcher("/graphql"))
                 .authenticated()
                 .requestMatchers(mvc.matcher("/sse"))
-                .authenticated())
+                .permitAll()
+                .requestMatchers(mvc.matcher("/*/sse"))
+                .permitAll())
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
                 .rememberMeParameter("remember-me")
