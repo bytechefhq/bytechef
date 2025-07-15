@@ -44,9 +44,8 @@ public class ModularRagComponentHandler implements ComponentHandler {
             component(MODULAR_RAG)
                 .title("Modular RAG")
                 .description(
-                    "Retrieval Augmentation is a powerful tool that allows you to retrieve relevant information " +
-                        "from a vector database, such as Pinecone, and use it to enhance your AI agent's responses.")
-                .icon("path:assets/rag.svg")
+                    "A modular RAG (Retrieval-Augmented Generation) component that provides a flexible and customizable approach to building RAG systems. It allows you to combine different retrieval, augmentation, and generation strategies into a cohesive pipeline for enhanced AI-driven information processing and response generation.")
+                .icon("path:assets/modular-rag.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .clusterElements(
                     new ModularRag(clusterElementDefinitionService).clusterElementDefinition));

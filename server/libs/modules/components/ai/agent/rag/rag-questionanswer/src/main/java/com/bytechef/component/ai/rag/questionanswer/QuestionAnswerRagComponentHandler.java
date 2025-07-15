@@ -42,11 +42,10 @@ public class QuestionAnswerRagComponentHandler implements ComponentHandler {
     public QuestionAnswerRagComponentHandler(@Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new ModularRagComponentDefinitionImpl(
             component(QUESTION_ANSWER_RAG)
-                .title("Modular RAG")
+                .title("Question Answer RAG")
                 .description(
-                    "Retrieval Augmentation is a powerful tool that allows you to retrieve relevant information " +
-                        "from a vector database, such as Pinecone, and use it to enhance your AI agent's responses.")
-                .icon("path:assets/rag.svg")
+                    "A component that enables Question-Answer Retrieval Augmented Generation (RAG) capabilities. It combines natural language processing with document retrieval to provide accurate answers based on the given context.")
+                .icon("path:assets/questionanswer-rag.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .clusterElements(
                     new QuestionAnswerRag(clusterElementDefinitionService).clusterElementDefinition));
