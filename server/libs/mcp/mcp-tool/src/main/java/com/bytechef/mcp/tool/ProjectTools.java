@@ -26,6 +26,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -44,6 +46,7 @@ public class ProjectTools {
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
 
+    @SuppressFBWarnings("EI")
     public ProjectTools(ProjectService projectService, ProjectWorkflowService projectWorkflowService) {
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
