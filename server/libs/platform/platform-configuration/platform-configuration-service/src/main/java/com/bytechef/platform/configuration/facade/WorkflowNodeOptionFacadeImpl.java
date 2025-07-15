@@ -72,11 +72,12 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     @Override
     @SuppressWarnings("unchecked")
     public List<Option> getClusterElementNodeOptions(
-        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName,
         String propertyName, List<String> lookupDependsOnPaths, @Nullable String searchText) {
 
         Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfigurationConnectionId(workflowId, clusterElementName)
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, clusterElementWorkflowNodeName)
             .orElse(null);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -95,10 +96,11 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
         ClusterElement clusterElement = clusterElementMap.getClusterElements(clusterElementType)
             .stream()
-            .filter(curClusterElement -> Objects.equals(curClusterElement.getName(), clusterElementName))
+            .filter(curClusterElement -> Objects.equals(
+                curClusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName))
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException(
-                "Cluster element %s not found".formatted(clusterElementName)));
+                "Cluster element %s not found".formatted(clusterElementWorkflowNodeName)));
 
         WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 

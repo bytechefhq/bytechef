@@ -26,19 +26,21 @@ import java.util.Map;
 public interface WorkflowNodeParameterFacade {
 
     Map<String, ?> deleteClusterElementParameter(
-        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
-        String path);
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName, String path);
 
     Map<String, ?> deleteWorkflowNodeParameter(String workflowId, String workflowNodeName, String path);
 
     DisplayConditionResultDTO getClusterElementDisplayConditions(
-        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName);
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName);
 
     DisplayConditionResultDTO getWorkflowNodeDisplayConditions(String workflowId, String workflowNodeName);
 
     UpdateParameterResultDTO updateClusterElementParameter(
-        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
-        String parameterPath, Object value, String type, boolean includeInMetadata);
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
+        boolean includeInMetadata);
 
     UpdateParameterResultDTO updateWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,

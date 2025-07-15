@@ -97,7 +97,7 @@ public class VectorStoreDocumentRetriever {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         String filterExpression = inputParameters.getString(FILTER_EXPRESSION);
 

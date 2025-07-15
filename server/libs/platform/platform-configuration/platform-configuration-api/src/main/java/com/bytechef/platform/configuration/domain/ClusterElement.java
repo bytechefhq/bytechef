@@ -31,20 +31,20 @@ public class ClusterElement {
     private final String componentName;
     private final int componentVersion;
     private final Map<String, ?> extensions;
-    private final String name;
     private final String type;
     private final String label;
     private final String description;
     private final Map<String, ?> parameters;
+    private final String workflowNodeName;
 
     public ClusterElement(
-        String name, String type, String label, String description, Map<String, ?> parameters,
+        String workflowNodeName, String type, String label, String description, Map<String, ?> parameters,
         Map<String, ?> extensions) {
 
         this.extensions = Collections.unmodifiableMap(extensions);
         this.description = description;
         this.label = label;
-        this.name = name;
+        this.workflowNodeName = workflowNodeName;
         this.parameters = Collections.unmodifiableMap(parameters);
         this.type = type;
 
@@ -68,11 +68,7 @@ public class ClusterElement {
     }
 
     public Map<String, ?> getExtensions() {
-        return Collections.unmodifiableMap(extensions);
-    }
-
-    public String getName() {
-        return name;
+        return extensions;
     }
 
     public String getType() {
@@ -88,7 +84,11 @@ public class ClusterElement {
     }
 
     public Map<String, ?> getParameters() {
-        return Collections.unmodifiableMap(parameters);
+        return parameters;
+    }
+
+    public String getWorkflowNodeName() {
+        return workflowNodeName;
     }
 
     @Override
@@ -103,23 +103,28 @@ public class ClusterElement {
 
         var that = (ClusterElement) obj;
 
-        return Objects.equals(this.name, that.name) && Objects.equals(this.type, that.type) &&
-            Objects.equals(this.label, that.label) && Objects.equals(this.description, that.description) &&
-            Objects.equals(this.parameters, that.parameters);
+        return Objects.equals(this.workflowNodeName, that.workflowNodeName) &&
+            Objects.equals(this.type, that.type) && Objects.equals(this.label, that.label) &&
+            Objects.equals(this.description, that.description) && Objects.equals(this.parameters, that.parameters);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, label, description, parameters);
+        return Objects.hash(workflowNodeName, type, label, description, parameters);
     }
 
     @Override
     public String toString() {
-        return "ClusterElement[" +
-            "name=" + name + ", " +
-            "type=" + type + ", " +
-            "label=" + label + ", " +
-            "description=" + description + ", " +
-            "parameters=" + parameters + ']';
+        return "ClusterElement{" +
+            "workflowNodeName='" + workflowNodeName + '\'' +
+            ", componentName='" + componentName + '\'' +
+            ", componentVersion=" + componentVersion +
+            ", clusterElementName='" + clusterElementName + '\'' +
+            ", type='" + type + '\'' +
+            ", label='" + label + '\'' +
+            ", description='" + description + '\'' +
+            ", parameters=" + parameters +
+            ", extensions=" + extensions +
+            '}';
     }
 }

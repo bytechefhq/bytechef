@@ -26,8 +26,9 @@ import org.springframework.lang.Nullable;
 public interface WorkflowNodeOptionFacade {
 
     List<Option> getClusterElementNodeOptions(
-        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
-        String propertyName, List<String> lookupDependsOnPaths, @Nullable String searchText);
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
+        @Nullable String searchText);
 
     List<Option> getWorkflowNodeOptions(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,

@@ -104,20 +104,20 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     public Map<String, ?> deleteClusterElementParameter(
-        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
-        String path) {
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName, String path) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
         WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
-            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap);
+            workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap);
 
         String[] pathItems = path.split("\\.");
 
         setDynamicPropertyTypeItem(path, null, getMetadataMap(
-            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap));
+            workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap));
         setParameter(pathItems, null, true, workflowNodeStructure.parameterMap);
 
         workflowService.update(
@@ -148,7 +148,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     public DisplayConditionResultDTO getClusterElementDisplayConditions(
-        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName) {
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName) {
         Map<String, Boolean> displayConditionMap = new HashMap<>();
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -156,7 +157,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
         WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
-            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap);
+            workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap);
 
         Set<String> keySet = workflowNodeStructure.parameterMap.keySet();
 
@@ -199,7 +200,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     public UpdateParameterResultDTO updateClusterElementParameter(
-        String workflowId, String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName,
         String parameterPath, Object value, String type, boolean includeInMetadata) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -207,10 +209,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
         WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
-            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap);
+            workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap);
 
         Map<String, Object> metadataMap = getMetadataMap(
-            workflowNodeName, clusterElementTypeName, clusterElementName, definitionMap);
+            workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap);
 
         Map<String, ?> dynamicPropertyTypesMap = getDynamicPropertyTypesMap(metadataMap);
 
@@ -682,7 +684,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressWarnings("unchecked")
     private static Map<String, ?> getClusterElementMap(
-        String clusterElementTypeName, String clusterElementName, Map<String, ?> taskMap) {
+        String clusterElementTypeName, String clusterElementWorkflowNodeName, Map<String, ?> taskMap) {
 
         Map<String, ?> clusterElementsMap = (Map<String, ?>) taskMap.get(WorkflowExtConstants.CLUSTER_ELEMENTS);
 
@@ -695,7 +697,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 if (item instanceof Map<?, ?> map) {
                     String name = (String) map.get(WorkflowConstants.NAME);
 
-                    if (name.equals(clusterElementName)) {
+                    if (name.equals(clusterElementWorkflowNodeName)) {
                         clusterElementMap = (Map<String, ?>) map;
 
                         break;
@@ -706,7 +708,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         if (clusterElementMap == null) {
             throw new ConfigurationException(
-                "Cluster element with name: %s does not exist".formatted(clusterElementName),
+                "Cluster element with name: %s does not exist".formatted(clusterElementWorkflowNodeName),
                 WorkflowErrorType.CLUSTER_ELEMENT_NOT_FOUND);
         }
 
@@ -715,7 +717,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> getMetadataMap(
-        String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        String workflowNodeName, String clusterElementTypeName, String clusterElementWorkflowNodeName,
         Map<String, ?> definitionMap) {
 
         Map<String, Object> metadataMap;
@@ -743,7 +745,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 }
             } else {
                 Map<String, ?> clusterElementMap = getClusterElementMap(
-                    clusterElementTypeName, clusterElementName, taskMap);
+                    clusterElementTypeName, clusterElementWorkflowNodeName, taskMap);
 
                 metadataMap = (Map<String, Object>) clusterElementMap.get(METADATA);
             }
@@ -866,7 +868,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressWarnings("unchecked")
     private WorkflowNodeStructure getWorkflowNodeStructure(
-        String workflowNodeName, String clusterElementTypeName, String clusterElementName,
+        String workflowNodeName, String clusterElementTypeName, String clusterElementWorkflowNodeName,
         Map<String, ?> definitionMap) {
 
         Map<String, ?> parameterMap;
@@ -914,7 +916,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 }
             } else {
                 Map<String, ?> clusterElementMap = getClusterElementMap(
-                    clusterElementTypeName, clusterElementName, taskMap);
+                    clusterElementTypeName, clusterElementWorkflowNodeName, taskMap);
 
                 parameterMap = (Map<String, ?>) clusterElementMap.get(WorkflowConstants.PARAMETERS);
 

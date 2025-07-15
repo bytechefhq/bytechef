@@ -88,7 +88,8 @@ public class ModularRag {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-                ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+                ComponentConnection componentConnection =
+                    componentConnections.get(clusterElement.getWorkflowNodeName());
 
                 try {
                     return documentJoinerFunction.apply(
@@ -112,7 +113,8 @@ public class ModularRag {
                         clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                         clusterElement.getClusterElementName());
 
-                ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+                ComponentConnection componentConnection =
+                    componentConnections.get(clusterElement.getWorkflowNodeName());
 
                 try {
                     return documentRetrieverFunction.apply(
@@ -137,7 +139,8 @@ public class ModularRag {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-                ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+                ComponentConnection componentConnection =
+                    componentConnections.get(clusterElement.getWorkflowNodeName());
 
                 try {
                     return queryAugmenterFunction.apply(
@@ -160,7 +163,8 @@ public class ModularRag {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-                ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+                ComponentConnection componentConnection =
+                    componentConnections.get(clusterElement.getWorkflowNodeName());
 
                 try {
                     return queryExpanderFunction.apply(
@@ -188,7 +192,7 @@ public class ModularRag {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-            ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+            ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
             queryTransformers.add(
                 queryTransformerFunction.apply(

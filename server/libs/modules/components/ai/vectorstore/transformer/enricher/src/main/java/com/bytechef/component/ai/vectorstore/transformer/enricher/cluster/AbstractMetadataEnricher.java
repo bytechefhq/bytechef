@@ -49,7 +49,7 @@ public abstract class AbstractMetadataEnricher {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         try {
             return (ChatModel) modelFunction.apply(

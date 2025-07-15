@@ -107,7 +107,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     public ClusterElementOutputDTO getClusterElementOutput(
-        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementName) {
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName) {
 
         ClusterElementOutputDTO clusterElementOutputDTO = null;
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -117,7 +117,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         for (WorkflowTask workflowTask : workflowTasks) {
             if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
                 clusterElementOutputDTO = getClusterElementOutputDTO(
-                    workflowId, workflowTask, clusterElementType, clusterElementName);
+                    workflowId, workflowTask, clusterElementType, clusterElementWorkflowNodeName);
 
                 break;
             }
@@ -302,7 +302,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private ClusterElementOutputDTO getClusterElementOutputDTO(
-        String workflowId, WorkflowTask workflowTask, String clusterElementTypeName, String clusterElementName) {
+        String workflowId, WorkflowTask workflowTask, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
@@ -314,10 +315,11 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         ClusterElement clusterElement = clusterElementMap.getClusterElements(clusterElementType)
             .stream()
-            .filter(curClusterElement -> Objects.equals(curClusterElement.getName(), clusterElementName))
+            .filter(curClusterElement -> Objects.equals(
+                curClusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName))
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException(
-                "Cluster element %s not found".formatted(clusterElementName)));
+                "Cluster element %s not found".formatted(clusterElementWorkflowNodeName)));
 
         WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
@@ -329,7 +331,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
 
         OutputResponse outputResponse = workflowNodeTestOutputService
-            .fetchWorkflowTestNodeOutput(workflowId, clusterElementName)
+            .fetchWorkflowTestNodeOutput(workflowId, clusterElementWorkflowNodeName)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .or(() -> getClusterElementDynamicOutputResponse(workflowId, workflowTask, clusterElement))
             .orElse(null);
@@ -338,7 +340,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             outputResponse = checkOutputSchemaIsFileEntryProperty(clusterElementDefinition.getOutputResponse());
         }
 
-        return new ClusterElementOutputDTO(clusterElementDefinition, outputResponse, clusterElementName);
+        return new ClusterElementOutputDTO(clusterElementDefinition, outputResponse, clusterElementWorkflowNodeName);
     }
 
     @SuppressWarnings("unchecked")
@@ -357,7 +359,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         Map<String, Long> connectionIds = MapUtils.toMap(
             workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                workflowId, clusterElement.getName()),
+                workflowId, clusterElement.getWorkflowNodeName()),
             WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
             WorkflowTestConfigurationConnection::getConnectionId);
 

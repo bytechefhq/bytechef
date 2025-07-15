@@ -98,7 +98,7 @@ public class QuestionAnswerRag {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         return QuestionAnswerAdvisor
             .builder(

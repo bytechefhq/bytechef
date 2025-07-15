@@ -30,7 +30,7 @@ public interface WorkflowNodeOutputFacade {
     String PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE = "WorkflowNodeOutputFacade.previousWorkflowNodeSampleOutputs";
 
     ClusterElementOutputDTO getClusterElementOutput(
-        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementName);
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName);
 
     WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName);
 

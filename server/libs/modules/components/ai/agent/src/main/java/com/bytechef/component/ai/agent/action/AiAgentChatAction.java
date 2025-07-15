@@ -113,7 +113,7 @@ public class AiAgentChatAction {
                 clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                 clusterElement.getClusterElementName());
 
-            ComponentConnection componentConnection = connectionParameters.get(clusterElement.getName());
+            ComponentConnection componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
 
             ChatModel chatModel = (ChatModel) modelFunction.apply(
                 ParametersFactory.createParameters(clusterElement.getParameters()),
@@ -174,7 +174,7 @@ public class AiAgentChatAction {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         try {
             return chatMemoryFunction.apply(
@@ -195,7 +195,7 @@ public class AiAgentChatAction {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         try {
             return ragFunction.apply(

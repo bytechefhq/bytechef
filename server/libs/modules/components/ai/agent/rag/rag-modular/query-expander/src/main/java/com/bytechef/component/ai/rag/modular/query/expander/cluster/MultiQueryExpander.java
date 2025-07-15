@@ -85,7 +85,7 @@ public class MultiQueryExpander {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         ChatModel chatModel = (ChatModel) modelFunction
             .apply(

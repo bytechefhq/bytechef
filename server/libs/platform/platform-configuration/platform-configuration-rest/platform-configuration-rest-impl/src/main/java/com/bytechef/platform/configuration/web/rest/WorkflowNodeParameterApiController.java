@@ -54,13 +54,13 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     @Override
     @SuppressWarnings("unchecked")
     public ResponseEntity<DeleteWorkflowNodeParameter200ResponseModel> deleteClusterElementParameter(
-        String id, String workflowNodeName, String clusterElementType, String clusterElementName,
+        String id, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
         DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequestModel) {
 
         return ResponseEntity.ok(
             new DeleteWorkflowNodeParameter200ResponseModel().parameters(
                 (Map<String, Object>) workflowNodeParameterFacade.deleteClusterElementParameter(
-                    id, workflowNodeName, clusterElementType, clusterElementName,
+                    id, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
                     deleteWorkflowNodeParameterRequestModel.getPath())));
     }
 
@@ -79,11 +79,11 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     @Override
     public ResponseEntity<GetWorkflowNodeParameterDisplayConditions200ResponseModel>
         getClusterElementParameterDisplayConditions(
-            String id, String workflowNodeName, String clusterElementType, String clusterElementName) {
+            String id, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName) {
 
         DisplayConditionResultDTO displayConditionResultDTO =
             workflowNodeParameterFacade.getClusterElementDisplayConditions(
-                id, workflowNodeName, clusterElementType, clusterElementName);
+                id, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName);
 
         return ResponseEntity.ok(
             new GetWorkflowNodeParameterDisplayConditions200ResponseModel()
@@ -106,11 +106,11 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
 
     @Override
     public ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateClusterElementParameter(
-        String id, String workflowNodeName, String clusterElementType, String clusterElementName,
+        String id, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
         UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
 
         UpdateParameterResultDTO updateParameterResultDTO = workflowNodeParameterFacade.updateClusterElementParameter(
-            id, workflowNodeName, clusterElementType, clusterElementName,
+            id, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
             updateWorkflowNodeParameterRequestModel.getPath(), updateWorkflowNodeParameterRequestModel.getValue(),
             updateWorkflowNodeParameterRequestModel.getType(),
             updateWorkflowNodeParameterRequestModel.getIncludeInMetadata());
