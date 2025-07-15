@@ -29,7 +29,7 @@ public class MicrosoftOutlook365Connection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
         (connection, context) -> List.of(
-            "Mail.Read", "MailboxSettings.Read", "Mail.Send", "offline_access", "Calendars.ReadWrite"));
+            "Mail.ReadWrite", "MailboxSettings.Read", "Mail.Send", "offline_access", "Calendars.ReadWrite"));
 
     private MicrosoftOutlook365Connection() {
     }
