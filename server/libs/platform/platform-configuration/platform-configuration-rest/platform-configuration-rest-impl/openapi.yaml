@@ -781,7 +781,7 @@ paths:
                   description:
                     type: string
 
-  /workflows/{id}/cluster-roots/{workflowNodeName}/cluster-element-types/{clusterElementType}/properties/{clusterElement}/options/{propertyName}:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/properties/{clusterElementWorkflowNodeName}/options/{propertyName}:
     get:
       description: "Get an action or trigger property options shown in the editor."
       summary: "Get an action or trigger property options shown in the editor"
@@ -807,8 +807,8 @@ paths:
           in: "path"
           schema:
             type: "string"
-        - name: "clusterElement"
-          description: "The name of a cluster element."
+        - name: "clusterElementWorkflowNodeName"
+          description: "The name of a cluster element workflow node."
           required: true
           in: "path"
           schema:
@@ -941,7 +941,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeOutput"
-  /workflows/{id}/outputs/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/outputs/{clusterElementWorkflowNodeName}:
     get:
       description: "Get cluster element node output used in a workflow."
       summary: "Get cluster element node output used in a workflow"
@@ -967,8 +967,8 @@ paths:
           in: "path"
           schema:
             type: "string"
-        - name: "clusterElementName"
-          description: "The name of a cluster element name."
+        - name: "clusterElementWorkflowNodeName"
+          description: "The name of a cluster element workflow node."
           required: true
           in: "path"
           schema:
@@ -1090,7 +1090,7 @@ paths:
                     type: "array"
                     items:
                       type: "string"
-  /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/parameters/{clusterElementWorkflowNodeName}:
     delete:
       description: "Deletes a cluster element parameter."
       summary: "Deletes a cluster element parameter"
@@ -1116,8 +1116,8 @@ paths:
           in: "path"
           schema:
             type: "string"
-        - name: "clusterElementName"
-          description: "The name of a cluster element name."
+        - name: "clusterElementWorkflowNodeName"
+          description: "The name of a cluster element workflow node name."
           required: true
           in: "path"
           schema:
@@ -1170,8 +1170,8 @@ paths:
           in: "path"
           schema:
             type: "string"
-        - name: "clusterElementName"
-          description: "The name of a cluster element name."
+        - name: "clusterElementWorkflowNodeName"
+          description: "The name of a cluster element workflow node name."
           required: true
           in: "path"
           schema:
@@ -1260,7 +1260,7 @@ paths:
                     type: "array"
                     items:
                       type: "string"
-  /workflows/{id}/parameters/{workflowNodeName}/cluster-element-types/{clusterElementType}/cluster-element-names/{clusterElementName}/display-conditions:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/parameters/{clusterElementWorkflowNodeName}/display-conditions:
     get:
       description: "Get cluster element options shown in the editor."
       summary: "Get cluster element property options shown in the editor"
@@ -1286,8 +1286,8 @@ paths:
           in: "path"
           schema:
             type: "string"
-        - name: "clusterElementName"
-          description: "The name of a cluster element name."
+        - name: "clusterElementWorkflowNodeName"
+          description: "The name of a cluster element workflow node name."
           required: true
           in: "path"
           schema:
