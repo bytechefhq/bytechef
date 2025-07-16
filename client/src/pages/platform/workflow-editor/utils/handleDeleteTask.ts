@@ -7,7 +7,7 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import deleteClusterElement from './deleteClusterElement';
+import findAndRemoveClusterElement from './findAndRemoveClusterElement';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleDeleteTaskProps {
@@ -171,25 +171,25 @@ export default function handleDeleteTask({
             return parentEachTask;
         }) as Array<WorkflowTaskType>;
     } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
-        const rootClusterElementTask = workflowTasks.find((task) => task.name === rootClusterElementNodeData?.name);
+        const mainRootClusterElementTask = workflowTasks.find((task) => task.name === rootClusterElementNodeData?.name);
 
-        if (!rootClusterElementTask || !rootClusterElementTask.clusterElements) {
+        if (!mainRootClusterElementTask || !mainRootClusterElementTask.clusterElements) {
             return;
         }
 
-        const deleteResult = deleteClusterElement(
-            rootClusterElementTask.clusterElements,
-            data.name,
-            data.clusterElementType
-        );
+        const clusterElementRemovalResult = findAndRemoveClusterElement({
+            clickedElementName: data.name,
+            clickedElementType: data.clusterElementType,
+            clusterElements: mainRootClusterElementTask.clusterElements,
+        });
 
         const updatedRootClusterElementTask = {
-            ...rootClusterElementTask,
-            clusterElements: deleteResult.elements,
+            ...mainRootClusterElementTask,
+            clusterElements: clusterElementRemovalResult.elements,
         };
 
-        if (deleteResult.elementFound) {
-            const updatedClusterElements = deleteResult.elements;
+        if (clusterElementRemovalResult.elementFound) {
+            const updatedClusterElements = clusterElementRemovalResult.elements;
 
             if (setRootClusterElementNodeData && setCurrentNode) {
                 if (currentNode?.rootClusterElement) {
@@ -218,7 +218,7 @@ export default function handleDeleteTask({
         }
 
         updatedTasks = workflowTasks.map((task) => {
-            if (task.name !== rootClusterElementTask?.name) {
+            if (task.name !== mainRootClusterElementTask?.name) {
                 return task;
             }
 
