@@ -24,6 +24,7 @@
     "dev": "vite",
     "codegen": "graphql-codegen --config codegen.ts",
     "build": "tsc && vite build",
+    "build:cloud": "dotenv -e .env.cloud -- tsc && vite build --mode cloud",
     "serve": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest watch",
