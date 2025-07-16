@@ -9,7 +9,7 @@ interface CreateClusterElementNodesProps {
     clusterElements: ClusterElementsType;
     clusterRootComponentDefinition: ComponentDefinition;
     clusterRootId: string;
-    currentNodePositions?: Record<string, {x: number; y: number}>;
+    currentNodePositions: Record<string, {x: number; y: number}>;
     nestedClusterRootsDefinitions: Record<string, ComponentDefinition>;
 }
 
@@ -17,7 +17,7 @@ export default function createClusterElementNodes({
     clusterElements,
     clusterRootComponentDefinition,
     clusterRootId,
-    currentNodePositions,
+    currentNodePositions = {},
     nestedClusterRootsDefinitions,
 }: CreateClusterElementNodesProps) {
     if (!clusterRootComponentDefinition?.clusterElementTypes || !clusterElements) {
@@ -37,101 +37,102 @@ export default function createClusterElementNodes({
             if (Array.isArray(clusterElementValue) && clusterElementValue.length) {
                 clusterElementValue.forEach((element, multipleElementIndex) => {
                     // Create the multiple element node
-                    const elementNode = createMultipleElementsNode(
+                    const multipleElementsNode = createMultipleElementsNode({
                         clusterElementTypeIndex,
+                        clusterElementTypeName,
                         clusterRootId,
                         currentNodePositions,
                         element,
-                        clusterElementTypeName,
                         isMultipleClusterElementsNode,
                         multipleElementIndex,
-                        totalClusterElementTypeCount
-                    );
+                        totalClusterElementTypeCount,
+                    });
 
                     // Set root parent/child relationship
-                    elementNode.data.parentClusterRootId = clusterRootId;
-                    elementNode.data.isNestedClusterRoot = !!element.clusterElements;
+                    multipleElementsNode.data.parentClusterRootId = clusterRootId;
+                    multipleElementsNode.data.isNestedClusterRoot = !!element.clusterElements;
 
-                    createdNodes.push(elementNode);
+                    createdNodes.push(multipleElementsNode);
 
                     // Process nested roots
                     if (element.clusterElements) {
                         const componentName = element.type?.split('/')[0];
 
-                        const nestedDefinition = nestedClusterRootsDefinitions[componentName];
+                        const nestedClusterRootDefinition = nestedClusterRootsDefinitions[componentName];
 
-                        if (nestedDefinition) {
-                            const childNodes = createClusterElementNodes({
+                        if (nestedClusterRootDefinition) {
+                            const nestedClusterElementNodes = createClusterElementNodes({
                                 clusterElements: element.clusterElements,
-                                clusterRootComponentDefinition: nestedDefinition,
+                                clusterRootComponentDefinition: nestedClusterRootDefinition,
                                 clusterRootId: element.name,
                                 currentNodePositions,
                                 nestedClusterRootsDefinitions,
                             });
 
-                            createdNodes.push(...childNodes);
+                            createdNodes.push(...nestedClusterElementNodes);
                         }
                     }
                 });
             }
 
             // Always add placeholders for multiple elements nodes
-            const placeholderNode = createPlaceholderNode(
+            const placeholderNode = createPlaceholderNode({
                 clusterElementTypeIndex,
-                clusterRootId,
-                currentNodePositions,
                 clusterElementTypeLabel,
                 clusterElementTypeName,
-                totalClusterElementTypeCount
-            );
+                clusterRootId,
+                currentNodePositions,
+                isMultipleClusterElementsNode,
+                totalClusterElementTypeCount,
+            });
 
             createdNodes.push(placeholderNode);
         } else {
             if (clusterElementValue && !Array.isArray(clusterElementValue)) {
                 // Create the single element node
-                const elementNode = createSingleElementsNode(
-                    clusterElementValue,
+                const singleElementNode = createSingleElementsNode({
+                    clusterElementItem: clusterElementValue,
                     clusterElementTypeIndex,
-                    clusterRootId,
-                    currentNodePositions,
                     clusterElementTypeLabel,
                     clusterElementTypeName,
-                    totalClusterElementTypeCount
-                );
+                    clusterRootId,
+                    currentNodePositions,
+                    totalClusterElementTypeCount,
+                });
 
                 // Set root parent/child relationship
-                elementNode.data.parentClusterRootId = clusterRootId;
-                elementNode.data.isNestedClusterRoot = !!clusterElementValue.clusterElements;
+                singleElementNode.data.parentClusterRootId = clusterRootId;
+                singleElementNode.data.isNestedClusterRoot = !!clusterElementValue.clusterElements;
 
-                createdNodes.push(elementNode);
+                createdNodes.push(singleElementNode);
 
                 // Process nested roots
                 if (clusterElementValue.clusterElements) {
                     const componentName = clusterElementValue.type?.split('/')[0];
 
-                    const nestedDefinition = nestedClusterRootsDefinitions[componentName];
+                    const nestedClusterRootDefinition = nestedClusterRootsDefinitions[componentName];
 
-                    if (nestedDefinition) {
-                        const childNodes = createClusterElementNodes({
+                    if (nestedClusterRootDefinition) {
+                        const nestedClusterElementNodes = createClusterElementNodes({
                             clusterElements: clusterElementValue.clusterElements,
-                            clusterRootComponentDefinition: nestedDefinition,
+                            clusterRootComponentDefinition: nestedClusterRootDefinition,
                             clusterRootId: clusterElementValue.name,
                             currentNodePositions,
                             nestedClusterRootsDefinitions,
                         });
 
-                        createdNodes.push(...childNodes);
+                        createdNodes.push(...nestedClusterElementNodes);
                     }
                 }
             } else {
-                const placeholderNode = createPlaceholderNode(
+                const placeholderNode = createPlaceholderNode({
                     clusterElementTypeIndex,
-                    clusterRootId,
-                    currentNodePositions,
                     clusterElementTypeLabel,
                     clusterElementTypeName,
-                    totalClusterElementTypeCount
-                );
+                    clusterRootId,
+                    currentNodePositions,
+                    totalClusterElementTypeCount,
+                });
 
                 createdNodes.push(placeholderNode);
             }

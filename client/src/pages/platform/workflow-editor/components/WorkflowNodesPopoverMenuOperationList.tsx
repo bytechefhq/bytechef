@@ -5,13 +5,11 @@ import {
     ActionDefinitionApi,
     ClusterElementDefinitionApi,
     ComponentDefinition,
-    ComponentDefinitionApi,
     TriggerDefinition,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
-import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
@@ -23,7 +21,6 @@ import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsDataStore from '../../cluster-element-editor/stores/useClusterElementsDataStore';
 import {
-    convertNameToCamelCase,
     getClusterElementsLabel,
     initializeClusterElementsObject,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
@@ -45,6 +42,7 @@ interface WorkflowNodesPopoverMenuOperationListProps {
     componentDefinition: ComponentDefinition;
     edgeId?: string;
     invalidateWorkflowQueries: () => void;
+    multipleClusterElementsNode?: boolean;
     rootClusterElementDefinition?: ComponentDefinition;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
@@ -56,6 +54,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
     componentDefinition,
     edgeId,
     invalidateWorkflowQueries,
+    multipleClusterElementsNode,
     rootClusterElementDefinition,
     setPopoverOpen,
     sourceNodeId,
@@ -148,12 +147,17 @@ const WorkflowNodesPopoverMenuOperationList = ({
     );
 
     const saveClusterElementToWorkflow = useCallback(
-        (
-            clusterElementData: ClusterElementItemType,
-            clusterElementType: string,
-            isMultipleElements: boolean,
-            sourceNodeId: string
-        ) => {
+        ({
+            clusterElementData,
+            clusterElementType,
+            isMultipleElements = false,
+            sourceNodeId,
+        }: {
+            clusterElementData: ClusterElementItemType;
+            clusterElementType: string;
+            isMultipleElements?: boolean;
+            sourceNodeId: string;
+        }) => {
             if (!workflow.definition || !rootClusterElementDefinition) {
                 return;
             }
@@ -291,50 +295,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
             if (clusterElementsCanvasOpen && clusterElementType) {
                 captureComponentUsed(componentName, undefined, operationName);
 
-                const sourceNode = clusterElementNodes.find((node) => node.id === sourceNodeId);
-
-                const isClusterRoot = !!sourceNode?.data?.clusterElements;
-
-                let parentDefinition: ComponentDefinition | undefined;
-
-                if (isClusterRoot) {
-                    const clusterRootComponentName =
-                        sourceNode?.data.componentName || (sourceNode?.data.type as string)?.split('/')[0];
-                    const clusterRootComponentVersion =
-                        Number((sourceNode?.data.type as string)?.split('/')[1].replace(/^v/, '')) || 1;
-
-                    parentDefinition = await queryClient.fetchQuery({
-                        queryFn: () =>
-                            new ComponentDefinitionApi().getComponentDefinition({
-                                componentName: clusterRootComponentName as string,
-                                componentVersion: clusterRootComponentVersion,
-                            }),
-                        queryKey: ComponentDefinitionKeys.componentDefinition({
-                            componentName: clusterRootComponentName as string,
-                            componentVersion: clusterRootComponentVersion,
-                        }),
-                    });
-                }
-
-                if (!parentDefinition) {
-                    console.error('Could not find definition for parent cluster root');
-
-                    return;
-                }
-
-                const currentClusterElementTypeDefinition = parentDefinition?.clusterElementTypes?.find(
-                    (currentClusterElementType) =>
-                        convertNameToCamelCase(currentClusterElementType.name as string) === clusterElementType
-                );
-
-                if (!currentClusterElementTypeDefinition) {
-                    console.error(`Unknown cluster element type: ${clusterElementType}`);
-
-                    return;
-                }
-
-                const isMultipleElements = !!currentClusterElementTypeDefinition.multipleElements;
-
                 const getClusterElementDefinitionRequest = {
                     clusterElementName: operationName,
                     componentName,
@@ -361,7 +321,12 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     type: `${componentName}/v${version}/${operationName}`,
                 };
 
-                saveClusterElementToWorkflow(clusterElementData, clusterElementType, isMultipleElements, sourceNodeId);
+                saveClusterElementToWorkflow({
+                    clusterElementData,
+                    clusterElementType,
+                    isMultipleElements: multipleClusterElementsNode,
+                    sourceNodeId,
+                });
 
                 setPopoverOpen(false);
 
@@ -470,8 +435,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
             captureComponentUsed,
             saveNodeToWorkflow,
             setPopoverOpen,
-            clusterElementNodes,
             saveClusterElementToWorkflow,
+            multipleClusterElementsNode,
             sourceNodeId,
             edges,
             nodes,
