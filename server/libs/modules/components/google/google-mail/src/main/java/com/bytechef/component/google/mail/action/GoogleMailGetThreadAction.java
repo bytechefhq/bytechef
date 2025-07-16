@@ -17,14 +17,20 @@
 package com.bytechef.component.google.mail.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGES;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SNIPPET;
 import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessageOutputProperty;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -34,6 +40,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.google.mail.util.GoogleMailUtils.SimpleMessage;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
@@ -60,7 +67,7 @@ public class GoogleMailGetThreadAction {
                 .required(true),
             FORMAT_PROPERTY,
             METADATA_HEADERS_PROPERTY)
-        .output()
+        .output(GoogleMailGetThreadAction::getOutput)
         .perform(GoogleMailGetThreadAction::perform);
 
     private GoogleMailGetThreadAction() {
@@ -100,5 +107,22 @@ public class GoogleMailGetThreadAction {
     @SuppressFBWarnings("EI")
     protected record ThreadCustom(
         String id, String snippet, BigInteger historyId, List<SimpleMessage> messages) {
+    }
+
+    public static OutputResponse getOutput(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
+        return OutputResponse.of(
+            object()
+                .properties(
+                    string(ID)
+                        .description("The unique ID of the thread."),
+                    string(SNIPPET)
+                        .description("A short part of the message text."),
+                    string(HISTORY_ID)
+                        .description("The ID of the last history record that modified this thread."),
+                    array(MESSAGES)
+                        .description("List of messages in the thread.")
+                        .items(getMessageOutputProperty(inputParameters.getRequired(FORMAT, Format.class)))));
     }
 }
