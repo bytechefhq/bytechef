@@ -90,7 +90,8 @@ class MicrosoftOutlook365UtilsTest {
             TO_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1"))),
             CC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address2"))),
             BCC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address3"))),
-            "bodyPreview", "Hello World!");
+            "bodyPreview", "Hello World!",
+            "webLink", "https://example.com");
 
         MicrosoftOutlook365Utils.SimpleMessage result = MicrosoftOutlook365Utils.createSimpleMessage(
             mockedContext, messageBody, "messageId");
@@ -105,7 +106,8 @@ class MicrosoftOutlook365UtilsTest {
                 List.of("address3"),
                 "Hello World!",
                 "Hello World!",
-                List.of(mockedFileEntry)),
+                List.of(mockedFileEntry),
+                "https://example.com"),
             result);
     }
 
