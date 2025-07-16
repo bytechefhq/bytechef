@@ -343,7 +343,7 @@
     "metadata" : null,
     "name" : "getMail",
     "outputDefinition" : {
-      "output" : null,
+      "output" : { },
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -468,7 +468,7 @@
     "metadata" : null,
     "name" : "getThread",
     "outputDefinition" : {
-      "output" : null,
+      "output" : { },
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -2852,7 +2852,7 @@
     "help" : null,
     "name" : "getMail",
     "outputDefinition" : {
-      "output" : null,
+      "output" : { },
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -2979,7 +2979,7 @@
     "help" : null,
     "name" : "getThread",
     "outputDefinition" : {
-      "output" : null,
+      "output" : { },
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
