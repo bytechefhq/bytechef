@@ -14,45 +14,69 @@ export function initializeClusterElementsObject(
 
     rootClusterElementDefinition.clusterElementTypes.forEach((elementType) => {
         const clusterElementType = convertNameToCamelCase(elementType.name || '');
+        const elementData = clusterElementsData?.[clusterElementType];
 
-        const hasElementData = clusterElementsData?.[clusterElementType] != null;
-
-        if (hasElementData) {
-            if (elementType.multipleElements) {
-                if (!Array.isArray(clusterElementsData[clusterElementType])) {
-                    clusterElements[clusterElementType] = [];
-                }
-
-                clusterElements[clusterElementType] = (
-                    clusterElementsData[clusterElementType] as ClusterElementItemType[]
-                ).map((element) => ({
+        if (elementType.multipleElements) {
+            if (Array.isArray(elementData) && elementData.length > 0) {
+                clusterElements[clusterElementType] = elementData.map((element) => ({
                     clusterElements: element.clusterElements,
                     label: element.label,
                     metadata: element.metadata,
                     name: element.name,
-                    parameters: element.parameters,
+                    parameters: element.parameters || {},
                     type: element.type,
                 }));
             } else {
-                const element = clusterElementsData[clusterElementType];
-
-                if (element && !Array.isArray(element)) {
-                    clusterElements[clusterElementType] = {
-                        clusterElements: element.clusterElements,
-                        label: element.label,
-                        metadata: element.metadata,
-                        name: element.name,
-                        parameters: element.parameters || {},
-                        type: element.type,
-                    };
-                }
+                clusterElements[clusterElementType] = [];
             }
         } else {
-            clusterElements[clusterElementType] = elementType.multipleElements ? [] : null;
+            if (elementData && isPlainObject(elementData)) {
+                clusterElements[clusterElementType] = {
+                    clusterElements: elementData.clusterElements,
+                    label: elementData.label,
+                    metadata: elementData.metadata,
+                    name: elementData.name,
+                    parameters: elementData.parameters || {},
+                    type: elementData.type,
+                };
+            } else {
+                clusterElements[clusterElementType] = null;
+            }
         }
     });
 
     return clusterElements;
+}
+
+interface AddElementToClusterRootProps {
+    clusterElementTypeLabel: string;
+    clusterElementValue: ClusterElementItemType;
+    clusterElements: ClusterElementsType;
+    isMultipleElements: boolean;
+}
+
+export function addElementToClusterRoot({
+    clusterElementTypeLabel,
+    clusterElementValue,
+    clusterElements,
+    isMultipleElements,
+}: AddElementToClusterRootProps) {
+    if (isMultipleElements) {
+        return {
+            ...clusterElements,
+            [clusterElementTypeLabel]: [
+                ...(Array.isArray(clusterElements[clusterElementTypeLabel])
+                    ? clusterElements[clusterElementTypeLabel]
+                    : []),
+                clusterElementValue,
+            ],
+        };
+    } else {
+        return {
+            ...clusterElements,
+            [clusterElementTypeLabel]: clusterElementValue,
+        };
+    }
 }
 
 export function calculateNodeWidth(handleCount: number): number {
@@ -66,16 +90,22 @@ export function calculateNodeWidth(handleCount: number): number {
     return baseWidth + (handleCount - 4) * handleStep;
 }
 
-export function getHandlePosition(index: number, totalHandles: number, nodeWidth: number): number {
+interface GetHandlePositionProps {
+    index: number;
+    handlesCount: number;
+    nodeWidth: number;
+}
+
+export function getHandlePosition({handlesCount, index, nodeWidth}: GetHandlePositionProps): number {
     const nodeEdgeBuffer = nodeWidth * 0.1;
 
     const usableNodeWidth = nodeWidth - nodeEdgeBuffer * 2;
 
-    if (totalHandles === 1) {
+    if (handlesCount === 1) {
         return nodeWidth / 2;
     }
 
-    const stepWidth = usableNodeWidth / (totalHandles - 1);
+    const stepWidth = usableNodeWidth / (handlesCount - 1);
 
     const handlePosition = nodeEdgeBuffer + stepWidth * index;
 
@@ -104,4 +134,8 @@ export function getClusterElementsLabel(clusterElementType: string) {
     clusterElementType = clusterElementType.replace(/([a-z])([A-Z])/g, '$1 $2');
 
     return clusterElementType.charAt(0).toUpperCase() + clusterElementType.slice(1);
+}
+
+export function isPlainObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
