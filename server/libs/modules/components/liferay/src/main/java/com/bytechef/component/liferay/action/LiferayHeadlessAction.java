@@ -1,0 +1,63 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.component.liferay.action;
+
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
+
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import java.time.Duration;
+
+/**
+ * @author Igor Beslic
+ */
+public class LiferayHeadlessAction {
+
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("headless")
+        .title("Headless Api")
+        .description("The Headless endpoint to use.")
+        .properties(
+            string("endpoint")
+                .label("Endpoint")
+                .required(true)
+                .placeholder("headless-portal/v1.0)"))
+        .output()
+        .perform(LiferayHeadlessAction::perform);
+
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String baseUri = connectionParameters.getRequiredString(BASE_URI);
+        String endpointUri = baseUri + "/" + inputParameters.getRequiredString("endpoint");
+
+        Context.Http.Response response = context.http(
+            http -> http.exchange(endpointUri, Context.Http.RequestMethod.GET))
+            .configuration(Context.Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
+            .execute();
+
+        return inputParameters.getRequiredString("endpoint");
+    }
+
+    private Context.OutputSchema createSchema() {
+        // This is how to set schema. Update output on completed perform method
+        // Call this from perform method
+        // context.outputSchema(outputSchema -> outputSchema.getOutputSchema());
+        return null;
+    }
+
+}
