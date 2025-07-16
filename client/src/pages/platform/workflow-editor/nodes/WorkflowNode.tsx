@@ -11,7 +11,7 @@ import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {ArrowLeftRightIcon, ComponentIcon, TrashIcon} from 'lucide-react';
-import {memo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 
@@ -29,7 +29,6 @@ import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPos
 import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
-    const [isHovered, setIsHovered] = useState(false);
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
     const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
@@ -55,7 +54,10 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const isSelected = currentNode?.name === data.name;
 
-    const isRootClusterElement = data.rootClusterElement;
+    const isMainRootClusterElement = data.rootClusterElement;
+    const isClusterElement = !!data.clusterElementType;
+    const isNestedClusterRoot = !!data.isNestedClusterRoot;
+    const parentClusterRootId = data.parentClusterRootId || id.split('-')[0];
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
@@ -77,21 +79,39 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const rootClusterElementComponentVersion =
         Number(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, '')) || 1;
 
-    const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
-        {
+    const componentDefinitionKey = useMemo(() => {
+        return {
             componentName: data.componentName,
             componentVersion: (data.version as number) || rootClusterElementComponentVersion,
-        },
-        clusterElementsCanvasOpen && !!isRootClusterElement && !!rootClusterElementNodeData
+        };
+    }, [data.componentName, data.version, rootClusterElementComponentVersion]);
+
+    const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
+        componentDefinitionKey,
+        clusterElementsCanvasOpen && (!!isMainRootClusterElement || isNestedClusterRoot)
     );
 
-    const isClusterElement = !!data.clusterElementType;
-    const isNestedClusterRoot = !!data.isNestedClusterRoot;
-    const parentClusterRootId = data.parentClusterRootId || id.split('-')[0];
-    const clusterElementTypesCount = rootClusterElementDefinition?.clusterElementTypes?.length || 0;
+    const clusterElementTypesCount = useMemo(
+        () =>
+            (clusterElementsCanvasOpen &&
+                (isMainRootClusterElement || isNestedClusterRoot) &&
+                rootClusterElementDefinition?.clusterElementTypes?.length) ||
+            0,
+        [
+            clusterElementsCanvasOpen,
+            isNestedClusterRoot,
+            isMainRootClusterElement,
+            rootClusterElementDefinition?.clusterElementTypes?.length,
+        ]
+    );
 
-    const nodeWidth =
-        isRootClusterElement || isNestedClusterRoot ? calculateNodeWidth(clusterElementTypesCount) : NODE_WIDTH;
+    const nodeWidth = useMemo(
+        () =>
+            clusterElementsCanvasOpen && (isMainRootClusterElement || isNestedClusterRoot)
+                ? calculateNodeWidth(clusterElementTypesCount)
+                : NODE_WIDTH,
+        [clusterElementsCanvasOpen, isMainRootClusterElement, isNestedClusterRoot, clusterElementTypesCount]
+    );
 
     const queryClient = useQueryClient();
 
@@ -122,18 +142,16 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     return (
         <div
             className={twMerge(
-                'relative flex min-w-60 cursor-pointer justify-center',
+                'group relative flex min-w-60 cursor-pointer justify-center',
                 !data.taskDispatcher && 'items-center',
-                !isClusterElement && !isRootClusterElement && 'nodrag',
+                !isClusterElement && !isMainRootClusterElement && 'nodrag',
                 isClusterElement && 'flex-col items-start gap-1'
             )}
             data-nodetype={data.trigger ? 'trigger' : 'task'}
             key={id}
-            onMouseOut={() => setIsHovered(false)}
-            onMouseOver={() => setIsHovered(true)}
         >
-            {isHovered && !isRootClusterElement && !isClusterElement && (
-                <div className="absolute left-workflow-node-popover-hover pr-4">
+            {!isMainRootClusterElement && !isClusterElement && (
+                <div className="invisible absolute left-workflow-node-popover-hover pr-4 group-hover:visible">
                     {data.trigger ? (
                         <WorkflowNodesPopoverMenu
                             hideActionComponents
@@ -162,8 +180,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </div>
             )}
 
-            {isHovered && isClusterElement && (
-                <div className="absolute left-workflow-node-popover-hover top-0 flex flex-col gap-1 pr-4">
+            {isClusterElement && (
+                <div className="invisible absolute left-workflow-node-popover-hover top-0 flex flex-col gap-1 pr-4 group-hover:visible">
                     {!data.multipleClusterElementsNode && currentNode && (
                         <WorkflowNodesPopoverMenu
                             clusterElementType={data.clusterElementType}
@@ -210,22 +228,24 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             'size-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none [&_svg]:size-9',
                             isSelected &&
                                 workflowNodeDetailsPanelOpen &&
-                                !isRootClusterElement &&
+                                !isMainRootClusterElement &&
                                 'border-blue-300 bg-blue-100 shadow-none',
-                            isRootClusterElement && 'nodrag',
-                            (isRootClusterElement || isNestedClusterRoot) && `min-w-[${ROOT_CLUSTER_WIDTH}px]`
+                            isMainRootClusterElement && 'nodrag',
+                            (isMainRootClusterElement || isNestedClusterRoot) && `min-w-[${ROOT_CLUSTER_WIDTH}px]`
                         )}
                         onClick={handleNodeClick}
-                        style={isRootClusterElement || isNestedClusterRoot ? {minWidth: `${nodeWidth}px`} : undefined}
+                        style={
+                            isMainRootClusterElement || isNestedClusterRoot ? {minWidth: `${nodeWidth}px`} : undefined
+                        }
                     >
                         <div
                             className={twMerge(
-                                (isRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4'
+                                (isMainRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4'
                             )}
                         >
                             {data.icon ? data.icon : <ComponentIcon className="size-9 text-black" />}
 
-                            {(isRootClusterElement || isNestedClusterRoot) && (
+                            {(isMainRootClusterElement || isNestedClusterRoot) && (
                                 <div className="flex w-full min-w-max flex-col items-start">
                                     <span className="font-semibold text-black">{data.title || data.label}</span>
 
@@ -240,7 +260,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     </Button>
                 </HoverCardTrigger>
 
-                {!isRootClusterElement && (
+                {!isMainRootClusterElement && (
                     <HoverCardPortal>
                         <HoverCardContent className="w-fit min-w-72 max-w-xl text-sm" side="right">
                             {nodeDescription && (
@@ -263,7 +283,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 )}
             </HoverCard>
 
-            {!(isRootClusterElement || isNestedClusterRoot) && (
+            {!(isMainRootClusterElement || isNestedClusterRoot) && (
                 <div className={twMerge('ml-2 flex w-full min-w-max flex-col items-start', isClusterElement && 'ml-0')}>
                     <span className={twMerge('font-semibold', isClusterElement && 'text-sm')}>
                         {data.title || data.label}
@@ -277,7 +297,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </div>
             )}
 
-            {!isRootClusterElement ? (
+            {!isMainRootClusterElement ? (
                 <>
                     {isNestedClusterRoot && rootClusterElementDefinition?.clusterElementTypes?.length ? (
                         <>
@@ -296,11 +316,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     key={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
                                     position={Position.Bottom}
                                     style={{
-                                        left: `${getHandlePosition(
+                                        left: `${getHandlePosition({
+                                            handlesCount: clusterElementTypesCount,
                                             index,
-                                            rootClusterElementDefinition?.clusterElementTypes?.length || 1,
-                                            nodeWidth
-                                        )}px`,
+                                            nodeWidth,
+                                        })}px`,
                                         transform: 'translateX(-50%)',
                                     }}
                                     type="source"
@@ -335,11 +355,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             key={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
                             position={Position.Bottom}
                             style={{
-                                left: `${getHandlePosition(
+                                left: `${getHandlePosition({
+                                    handlesCount: clusterElementTypesCount,
                                     index,
-                                    rootClusterElementDefinition.clusterElementTypes?.length || 1,
-                                    nodeWidth
-                                )}px`,
+                                    nodeWidth,
+                                })}px`,
                                 transform: 'translateX(-50%)',
                             }}
                             type="source"
