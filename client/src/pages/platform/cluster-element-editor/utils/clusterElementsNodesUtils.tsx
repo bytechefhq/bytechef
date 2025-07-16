@@ -6,19 +6,34 @@ import InlineSVG from 'react-inlinesvg';
 
 import {calculateNodeWidth, getHandlePosition} from './clusterElementsUtils';
 
-export function createPlaceholderNode(
-    clusterElementTypeIndex: number = 0,
-    clusterRootId: string,
-    currentNodePositions: Record<string, {x: number; y: number}> = {},
-    elementLabel: string,
-    elementType: string,
-    totalClusterElementTypeCount: number = 1
-): Node {
-    const nodeId = `${clusterRootId}-${elementType}-placeholder-0`;
+interface CreatePlaceholderNodeProps {
+    clusterElementTypeIndex?: number;
+    clusterRootId: string;
+    currentNodePositions?: Record<string, {x: number; y: number}>;
+    clusterElementTypeLabel: string;
+    clusterElementTypeName: string;
+    isMultipleClusterElementsNode?: boolean;
+    totalClusterElementTypeCount?: number;
+}
+
+export function createPlaceholderNode({
+    clusterElementTypeIndex = 0,
+    clusterElementTypeLabel,
+    clusterElementTypeName,
+    clusterRootId,
+    currentNodePositions = {},
+    isMultipleClusterElementsNode = false,
+    totalClusterElementTypeCount = 1,
+}: CreatePlaceholderNodeProps): Node {
+    const nodeId = `${clusterRootId}-${clusterElementTypeName}-placeholder-0`;
 
     const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
 
-    const handleX = getHandlePosition(clusterElementTypeIndex, totalClusterElementTypeCount, nodeWidth);
+    const handleX = getHandlePosition({
+        handlesCount: totalClusterElementTypeCount,
+        index: clusterElementTypeIndex,
+        nodeWidth,
+    });
 
     const position = {
         x: handleX - PLACEHOLDER_NODE_WIDTH / 2,
@@ -27,32 +42,47 @@ export function createPlaceholderNode(
 
     return {
         data: {
-            clusterElementLabel: elementLabel,
-            clusterElementType: elementType,
+            clusterElementLabel: clusterElementTypeLabel,
+            clusterElementType: clusterElementTypeName,
             label: '+',
+            multipleClusterElementsNode: isMultipleClusterElementsNode,
         },
         id: nodeId,
         parentId: clusterRootId,
-        position: position || currentNodePositions[elementType] || DEFAULT_NODE_POSITION,
+        position: position || currentNodePositions[clusterElementTypeName] || DEFAULT_NODE_POSITION,
         type: 'placeholder',
     };
 }
 
-export function createSingleElementsNode(
-    clusterElementItem: ClusterElementItemType,
-    clusterElementTypeIndex: number = 0,
-    clusterRootId: string,
-    currentNodePositions: Record<string, {x: number; y: number}> = {},
-    clusterElementTypeLabel: string,
-    clusterElementTypeName: string,
-    totalClusterElementTypeCount: number = 1
-): Node {
+interface CreateSingleElementsNodeProps {
+    clusterElementItem: ClusterElementItemType;
+    clusterElementTypeIndex: number;
+    clusterRootId: string;
+    currentNodePositions: Record<string, {x: number; y: number}>;
+    clusterElementTypeLabel: string;
+    clusterElementTypeName: string;
+    totalClusterElementTypeCount?: number;
+}
+
+export function createSingleElementsNode({
+    clusterElementItem,
+    clusterElementTypeIndex = 0,
+    clusterElementTypeLabel,
+    clusterElementTypeName,
+    clusterRootId,
+    currentNodePositions = {},
+    totalClusterElementTypeCount = 1,
+}: CreateSingleElementsNodeProps): Node {
     const {label, metadata, name, parameters, type} = clusterElementItem;
     const typeSegments = type.split('/');
 
     const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
 
-    const handleX = getHandlePosition(clusterElementTypeIndex, totalClusterElementTypeCount, nodeWidth);
+    const handleX = getHandlePosition({
+        handlesCount: totalClusterElementTypeCount,
+        index: clusterElementTypeIndex,
+        nodeWidth,
+    });
 
     const position = {
         x: handleX - NODE_WIDTH / 2,
@@ -99,22 +129,37 @@ export function createSingleElementsNode(
     };
 }
 
-export function createMultipleElementsNode(
-    clusterElementTypeIndex: number = 0,
-    clusterRootId: string,
-    currentNodePositions: Record<string, {x: number; y: number}> = {},
-    element: ClusterElementItemType,
-    elementType: string,
-    isMultipleElementsNode: boolean,
-    multipleElementIndex: number = 0,
-    totalClusterElementTypeCount: number = 1
-) {
+interface CreateMultipleElementsNodeProps {
+    clusterElementTypeIndex: number;
+    clusterElementTypeName: string;
+    clusterRootId: string;
+    currentNodePositions: Record<string, {x: number; y: number}>;
+    element: ClusterElementItemType;
+    isMultipleClusterElementsNode: boolean;
+    multipleElementIndex: number;
+    totalClusterElementTypeCount: number;
+}
+
+export function createMultipleElementsNode({
+    clusterElementTypeIndex = 0,
+    clusterElementTypeName,
+    clusterRootId,
+    currentNodePositions = {},
+    element,
+    isMultipleClusterElementsNode,
+    multipleElementIndex = 0,
+    totalClusterElementTypeCount = 1,
+}: CreateMultipleElementsNodeProps): Node {
     const {label, metadata, name, parameters, type} = element;
     const typeSegments = type.split('/');
 
     const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
 
-    const handleX = getHandlePosition(clusterElementTypeIndex, totalClusterElementTypeCount, nodeWidth);
+    const handleX = getHandlePosition({
+        handlesCount: totalClusterElementTypeCount,
+        index: clusterElementTypeIndex,
+        nodeWidth,
+    });
 
     const position = {
         x: handleX - NODE_WIDTH / 2 + multipleElementIndex * NODE_WIDTH,
@@ -135,7 +180,7 @@ export function createMultipleElementsNode(
         data: {
             ...element,
             clusterElementName: typeSegments[2],
-            clusterElementType: elementType,
+            clusterElementType: clusterElementTypeName,
             componentName: typeSegments[0],
             icon: (
                 <InlineSVG
@@ -145,8 +190,8 @@ export function createMultipleElementsNode(
                 />
             ),
             label,
-            metadata: enhancedMetadata || {},
-            multipleClusterElementsNode: isMultipleElementsNode,
+            metadata: enhancedMetadata,
+            multipleClusterElementsNode: isMultipleClusterElementsNode,
             name,
             operationName: typeSegments[2],
             parameters,

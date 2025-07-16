@@ -18,7 +18,6 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
 
     const nodeIndex = nodes.findIndex((node) => node.id === id);
-
     const isClusterElement = !!data.clusterElementType;
     const rootClusterElementId = id.split('-')[0];
 
@@ -30,6 +29,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
             hideTaskDispatchers={!!data.clusterElementType}
             hideTriggerComponents
             key={`${id}-${nodeIndex}`}
+            multipleClusterElementsNode={data.multipleClusterElementsNode}
             nodeIndex={nodeIndex}
             sourceNodeId={data.clusterElementType ? rootClusterElementId : id}
         >

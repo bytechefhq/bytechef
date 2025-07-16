@@ -25,6 +25,7 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     hideClusterElementComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
+    multipleClusterElementsNode?: boolean;
     nodeIndex?: number;
     sourceNodeId: string;
 }
@@ -37,6 +38,7 @@ const WorkflowNodesPopoverMenu = ({
     hideClusterElementComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
+    multipleClusterElementsNode = false,
     nodeIndex,
     sourceNodeId,
 }: WorkflowNodesPopoverMenuProps) => {
@@ -75,12 +77,17 @@ const WorkflowNodesPopoverMenu = ({
 
     const rootClusterElementComponentName = rootClusterElementNodeData?.componentName || '';
 
-    const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
-        {
+    const componentDefinitionKey = useMemo(
+        () => ({
             componentName: rootClusterElementComponentName,
             componentVersion: rootClusterElementComponentVersion,
-        },
-        !!rootClusterElementNodeData
+        }),
+        [rootClusterElementComponentName, rootClusterElementComponentVersion]
+    );
+
+    const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
+        componentDefinitionKey,
+        !!rootClusterElementNodeData?.workflowNodeName
     );
 
     const handleComponentClick = useCallback(
@@ -201,6 +208,7 @@ const WorkflowNodesPopoverMenu = ({
                             componentDefinition={componentDefinitionToBeAdded}
                             edgeId={edgeId}
                             invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                            multipleClusterElementsNode={multipleClusterElementsNode}
                             rootClusterElementDefinition={rootClusterElementDefinition}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}
