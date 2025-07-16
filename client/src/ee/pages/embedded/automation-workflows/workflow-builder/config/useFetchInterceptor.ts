@@ -10,9 +10,15 @@ export default function useFetchInterceptor() {
 
     const {toast} = useToast();
 
+    const apiBasePath = import.meta.env.VITE_API_BASE_PATH;
+
     const unregister = fetchIntercept.register({
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         request(url: string, config: any): Promise<any[]> | any[] {
+            if (apiBasePath && !url.startsWith(apiBasePath)) {
+                url = apiBasePath + url;
+            }
+
             if (url.includes('/internal/')) {
                 return [
                     url,
