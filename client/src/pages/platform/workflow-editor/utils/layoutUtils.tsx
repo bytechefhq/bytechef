@@ -163,15 +163,15 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
         const allNodes = [...nodes];
 
         const placeholderNodes = allNodes.filter((node) => node.type === 'placeholder');
-        const nonPlaceholderNodes = allNodes.filter((node) => node.type !== 'placeholder');
+        const clusterElementWorkflowNodes = allNodes.filter((node) => node.type !== 'placeholder');
 
         let positionedNodes = [] as Node[];
         let centeredMainRootNode = [] as Node[];
 
-        if (nonPlaceholderNodes.length > 0) {
+        if (clusterElementWorkflowNodes.length > 0) {
             positionedNodes = [
                 ...positionedNodes,
-                ...nonPlaceholderNodes.map((node) => ({
+                ...clusterElementWorkflowNodes.map((node) => ({
                     ...node,
                     position: containsNodePosition(node.data.metadata)
                         ? node.data.metadata.ui.nodePosition
