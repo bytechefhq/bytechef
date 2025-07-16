@@ -7,14 +7,14 @@ import {
 import {ClusterElementItemType, ClusterElementsType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {Edge, Node} from '@xyflow/react';
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
-import useWorkflowNodeDetailsPanelStore from '../../workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {getLayoutedElements} from '../../workflow-editor/utils/layoutUtils';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
+import {isPlainObject} from '../utils/clusterElementsUtils';
 import createClusterElementsEdges from '../utils/createClusterElementsEdges';
 import createClusterElementsNodes from '../utils/createClusterElementsNodes';
 
@@ -24,22 +24,27 @@ const useClusterElementsLayout = () => {
     >({});
 
     const {rootClusterElementNodeData} = useWorkflowEditorStore();
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
     const {workflow} = useWorkflowDataStore.getState();
 
     const queryClient = useQueryClient();
 
-    const rootClusterElementComponentVersion =
-        Number(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, '')) || 1;
+    const mainClusterRootQueryParameters = useMemo(() => {
+        if (!rootClusterElementNodeData?.type || !rootClusterElementNodeData?.componentName) {
+            return {
+                componentName: '',
+                componentVersion: 1,
+            };
+        }
 
-    const rootClusterElementComponentName = rootClusterElementNodeData?.componentName || '';
+        return {
+            componentName: rootClusterElementNodeData?.componentName,
+            componentVersion: Number(rootClusterElementNodeData?.type?.split('/')[1]?.replace(/^v/, '')) || 1,
+        };
+    }, [rootClusterElementNodeData]);
 
-    const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
-        {
-            componentName: rootClusterElementComponentName,
-            componentVersion: rootClusterElementComponentVersion,
-        },
-        !!rootClusterElementNodeData && currentNode?.rootClusterElement
+    const {data: mainRootClusterElementDefinition} = useGetComponentDefinitionQuery(
+        mainClusterRootQueryParameters,
+        !!rootClusterElementNodeData?.workflowNodeName
     );
 
     const {nodes, setEdges, setNodes} = useClusterElementsDataStore(
@@ -50,25 +55,41 @@ const useClusterElementsLayout = () => {
         }))
     );
 
-    const nodePositions = nodes.reduce<Record<string, {x: number; y: number}>>((accumulator, node) => {
-        accumulator[node.id] = {
-            x: node.position.x,
-            y: node.position.y,
-        };
-        return accumulator;
-    }, {});
+    const nodePositions = useMemo(
+        () =>
+            nodes.reduce<Record<string, {x: number; y: number}>>((accumulator, node) => {
+                accumulator[node.id] = {
+                    x: node.position.x,
+                    y: node.position.y,
+                };
+                return accumulator;
+            }, {}),
+        [nodes]
+    );
 
     const canvasWidth = window.innerWidth - 80;
+
+    const workflowDefinitionTasks = useMemo(() => {
+        if (!workflow.definition) {
+            return [];
+        }
+
+        return JSON.parse(workflow.definition).tasks;
+    }, [workflow.definition]);
+
+    const mainRootClusterElementTask = workflowDefinitionTasks.find(
+        (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
+    );
 
     const {allNodes, taskEdges} = useMemo(() => {
         const nodes: Array<Node> = [];
         const edges: Array<Edge> = [];
 
-        if (!rootClusterElementNodeData || !rootClusterElementDefinition || !workflow.definition) {
+        if (!rootClusterElementNodeData || !mainRootClusterElementDefinition || !workflow.definition) {
             return {allNodes: nodes, taskEdges: edges};
         }
 
-        const rootClusterElementNode = {
+        const mainRootClusterElementNode = {
             data: rootClusterElementNodeData,
             id: rootClusterElementNodeData.workflowNodeName,
             position:
@@ -78,110 +99,123 @@ const useClusterElementsLayout = () => {
             type: 'workflow',
         };
 
-        nodes.push(rootClusterElementNode);
+        nodes.push(mainRootClusterElementNode);
 
-        const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+        const clusterElements = mainRootClusterElementTask.clusterElements || {};
 
-        const currentClusterRootTask = workflowDefinitionTasks.find(
-            (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-        );
-
-        const clusterElements = currentClusterRootTask.clusterElements || {};
-
-        const childNodes = createClusterElementsNodes({
+        const clusterElementNodes = createClusterElementsNodes({
             clusterElements,
-            clusterRootComponentDefinition: rootClusterElementDefinition,
+            clusterRootComponentDefinition: mainRootClusterElementDefinition,
             clusterRootId: rootClusterElementNodeData.workflowNodeName,
             currentNodePositions: nodePositions,
             nestedClusterRootsDefinitions: nestedClusterRootsDefinitions || {},
         });
 
-        nodes.push(...childNodes);
+        nodes.push(...clusterElementNodes);
 
-        const childEdges = createClusterElementsEdges({
-            clusterRootComponentDefinition: rootClusterElementDefinition,
+        const clusterElementEdges = createClusterElementsEdges({
+            clusterRootComponentDefinition: mainRootClusterElementDefinition,
             clusterRootId: rootClusterElementNodeData.workflowNodeName,
             nestedClusterRootsDefinitions: nestedClusterRootsDefinitions || {},
             nodes,
         });
 
-        edges.push(...childEdges);
+        edges.push(...clusterElementEdges);
 
         return {allNodes: nodes, taskEdges: edges};
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [nestedClusterRootsDefinitions, rootClusterElementNodeData, rootClusterElementDefinition, workflow]);
+    }, [nestedClusterRootsDefinitions, rootClusterElementNodeData, mainRootClusterElementDefinition, workflow]);
+
+    const getClusterRootQueryParameters = useCallback(
+        (elements: ClusterElementsType): Array<{componentName: string; componentVersion: number}> =>
+            Object.values(elements).flatMap((value) => {
+                if (Array.isArray(value)) {
+                    return value.flatMap((item: ClusterElementItemType) => {
+                        if (item.clusterElements) {
+                            return [
+                                {
+                                    componentName: item.type.split('/')[0],
+                                    componentVersion: Number(item.type?.split('/')[1]?.replace(/^v/, '')) || 1,
+                                },
+                                ...getClusterRootQueryParameters(item.clusterElements),
+                            ];
+                        }
+
+                        return [];
+                    });
+                } else if (isPlainObject(value)) {
+                    if (value.clusterElements) {
+                        return [
+                            {
+                                componentName: value.type.split('/')[0],
+                                componentVersion: Number(value.type?.split('/')[1]?.replace(/^v/, '')) || 1,
+                            },
+                            ...getClusterRootQueryParameters(value.clusterElements),
+                        ];
+                    }
+                }
+
+                return [];
+            }),
+        []
+    );
+
+    const getClusterRootDefinitionQuery = useCallback(
+        (roots: Array<{componentName: string; componentVersion: number}>) =>
+            roots.map((root) => ({
+                componentName: root.componentName,
+                componentVersion: root.componentVersion,
+                queryFn: () =>
+                    new ComponentDefinitionApi().getComponentDefinition({
+                        componentName: root.componentName,
+                        componentVersion: root.componentVersion,
+                    }),
+                queryKey: ComponentDefinitionKeys.componentDefinition({
+                    componentName: root.componentName,
+                    componentVersion: root.componentVersion,
+                }),
+            })),
+        []
+    );
 
     useEffect(() => {
-        if (!rootClusterElementNodeData || !rootClusterElementDefinition || !workflow.definition) {
+        if (!rootClusterElementNodeData || !mainRootClusterElementDefinition || !workflow.definition) {
             return;
         }
 
-        const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+        const clusterElements = mainRootClusterElementTask.clusterElements || {};
+        const clusterRoots = getClusterRootQueryParameters(clusterElements);
 
-        const currentClusterRootTask = workflowDefinitionTasks.find(
-            (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-        );
-        const clusterElements = currentClusterRootTask.clusterElements || {};
+        const fetchAndUpdateDefinitions = async () => {
+            const clusterRootDefinitionQuery = getClusterRootDefinitionQuery(clusterRoots);
+            const definitions: Record<string, ComponentDefinition> = {...nestedClusterRootsDefinitions};
 
-        const clusterRoots: {componentName: string; componentVersion: number}[] = [];
-
-        const findClusterRoots = (elements: ClusterElementsType) => {
-            Object.entries(elements).forEach(([, value]) => {
-                if (Array.isArray(value)) {
-                    (value as ClusterElementItemType[]).forEach((item) => {
-                        if (item.clusterElements) {
-                            clusterRoots.push({
-                                componentName: item.type.split('/')[0],
-                                componentVersion: Number(item.type?.split('/')[1]?.replace(/^v/, '')) || 1,
-                            });
-
-                            findClusterRoots(item.clusterElements);
-                        }
-                    });
-                } else if (value && typeof value === 'object') {
-                    const typedValue = value as ClusterElementItemType;
-
-                    if (typedValue.clusterElements) {
-                        clusterRoots.push({
-                            componentName: typedValue.type.split('/')[0],
-                            componentVersion: Number(typedValue.type?.split('/')[1]?.replace(/^v/, '')) || 1,
-                        });
-
-                        findClusterRoots(typedValue.clusterElements);
-                    }
-                }
-            });
-        };
-
-        findClusterRoots(clusterElements);
-
-        const fetchDefinitions = async () => {
-            const definitions: Record<string, ComponentDefinition> = {};
-
-            await Promise.all(
-                clusterRoots.map(async (root) => {
+            for (const query of clusterRootDefinitionQuery) {
+                if (!definitions[query.componentName]) {
                     const definition = await queryClient.fetchQuery({
-                        queryFn: () =>
-                            new ComponentDefinitionApi().getComponentDefinition({
-                                componentName: root.componentName,
-                                componentVersion: root.componentVersion,
-                            }),
-                        queryKey: ComponentDefinitionKeys.componentDefinition({
-                            componentName: root.componentName,
-                            componentVersion: root.componentVersion,
-                        }),
+                        queryFn: query.queryFn,
+                        queryKey: query.queryKey,
                     });
 
-                    definitions[root.componentName] = definition;
-                })
-            );
+                    definitions[query.componentName] = definition;
+                }
+            }
 
             setNestedClusterRootsDefinitions(definitions);
         };
 
-        fetchDefinitions();
-    }, [rootClusterElementNodeData, rootClusterElementDefinition, workflow, queryClient]);
+        fetchAndUpdateDefinitions();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        rootClusterElementNodeData,
+        mainRootClusterElementDefinition,
+        workflow.definition,
+        queryClient,
+        getClusterRootQueryParameters,
+        getClusterRootDefinitionQuery,
+        workflowDefinitionTasks,
+    ]);
 
     useEffect(() => {
         const layoutNodes = allNodes;
