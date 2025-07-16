@@ -118,7 +118,7 @@ Type: OBJECT
 | unique_email_id | STRING | An identifier for the address across all of Mailchimp. |
 | contact_id | STRING | As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address. |
 | full_name | STRING | The contact's full name. |
-| web_id | STRING | The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}. |
+| web_id | STRING | The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://&#123;dc&#125;.admin.mailchimp.com/lists/members/view?id=&#123;web_id&#125;. |
 | email_type | STRING | Type of email this member asked to get ('html' or 'text'). |
 | status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | Subscriber's current status. |
 | unsubscribe_reason | STRING | A subscriber's reason for unsubscribing. |
