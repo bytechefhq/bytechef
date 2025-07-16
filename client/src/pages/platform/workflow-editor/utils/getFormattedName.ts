@@ -1,6 +1,7 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {ClusterElementsType, NodeDataType} from '@/shared/types';
 
+import {isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 
 export default function getFormattedName(itemName: string): string {
@@ -17,8 +18,10 @@ export default function getFormattedName(itemName: string): string {
 
         const {clusterElements} = task;
 
-        const extractElementNames = (elements: ClusterElementsType, names: string[]) => {
-            if (!elements) return;
+        const getClusterElementNames = (elements: ClusterElementsType, names: string[]) => {
+            if (!elements) {
+                return;
+            }
 
             Object.keys(elements).forEach((elementType) => {
                 const typeElements = elements[elementType];
@@ -30,23 +33,23 @@ export default function getFormattedName(itemName: string): string {
                         }
 
                         if (element.clusterElements) {
-                            extractElementNames(element.clusterElements, names);
+                            getClusterElementNames(element.clusterElements, names);
                         }
                     });
-                } else if (typeElements && typeof typeElements === 'object') {
+                } else if (isPlainObject(typeElements)) {
                     if (typeElements.name?.includes(itemName)) {
                         names.push(typeElements.name);
                     }
 
                     if (typeElements.clusterElements) {
-                        extractElementNames(typeElements.clusterElements, names);
+                        getClusterElementNames(typeElements.clusterElements, names);
                     }
                 }
             });
         };
 
         if (clusterElements) {
-            extractElementNames(clusterElements, elementNames);
+            getClusterElementNames(clusterElements, elementNames);
         }
 
         return elementNames;
