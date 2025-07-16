@@ -5,7 +5,10 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {
+    useGetClusterElementNodeOptionsQuery,
+    useGetWorkflowNodeOptionsQuery,
+} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {CaretSortIcon, CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {FocusEventHandler, ReactNode, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -16,6 +19,7 @@ import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey'
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
 import type {
+    GetClusterElementNodeOptionsRequest,
     GetWorkflowNodeOptionsRequest,
     Option,
     OptionsDataSource,
@@ -123,6 +127,26 @@ const PropertyComboBox = ({
         }),
         [lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
     );
+    // console.log('queryOptions', queryOptions);
+
+    const clusterElementQueryOptions: {
+        loadDependencyValueKey: string;
+        request: GetClusterElementNodeOptionsRequest;
+    } = useMemo(
+        () => ({
+            loadDependencyValueKey: lookupDependsOnValuesKey,
+            request: {
+                clusterElementType: currentNode!.clusterElementType!,
+                clusterElementWorkflowNodeName: currentNode!.workflowNodeName!,
+                id: workflowId,
+                lookupDependsOnPaths,
+                propertyName: path!,
+                workflowNodeName: currentNode!.parentClusterRootId!, // Mora biti ime od cluster element root node-a, npr. aiAgent_1
+            },
+        }),
+        [lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, currentNode]
+    );
+    // console.log('clusterElementQueryOptions', clusterElementQueryOptions);
 
     const queryEnabled = useMemo(
         () =>
@@ -139,7 +163,25 @@ const PropertyComboBox = ({
         data: optionsData,
         isLoading,
         isRefetching,
-    } = useGetWorkflowNodeOptionsQuery(queryOptions, Boolean(queryEnabled));
+    } = useGetWorkflowNodeOptionsQuery(queryOptions, Boolean(queryEnabled && !currentNode?.clusterElementType));
+
+    const {
+        data: clusterElementNodeOptionsData,
+        isLoading: isClusterElementNodeOptionsLoading,
+        isRefetching: isClusterElementNodeOptionsRefetching,
+    } = useGetClusterElementNodeOptionsQuery(
+        clusterElementQueryOptions,
+        Boolean(queryEnabled && currentNode?.clusterElementType)
+    );
+    // console.log('clusterElementNodeOptionsData', clusterElementNodeOptionsData);
+    // console.log('workflowId', workflowId);
+    // console.log('isLoading', isLoading);
+    // console.log('isrefetching', isRefetching);
+    // console.log('current node', currentNode);
+    // console.log('queryEnabled', queryEnabled);
+    // console.log('lookupDependsOnValues', lookupDependsOnValues);
+    // console.log('connectionRequirementMet', connectionRequirementMet);
+    // console.log('optionsDataSource', optionsDataSource);
 
     const options = useMemo(() => {
         if (optionsData) {
