@@ -82,7 +82,8 @@ public class MicrosoftOutlook365Utils {
             getRecipients(messageBody, BCC_RECIPIENTS),
             (String) messageBody.get("bodyPreview"),
             bodyHtml,
-            getFileEntries(context, messageBody, id));
+            getFileEntries(context, messageBody, id),
+            (String) messageBody.get("webLink"));
     }
 
     public static List<Map<String, Object>> getAttachments(Context context, List<FileEntry> attachments) {
@@ -163,6 +164,6 @@ public class MicrosoftOutlook365Utils {
     @SuppressFBWarnings("EI")
     public record SimpleMessage(
         String id, String subject, String from, List<String> to, List<String> cc, List<String> bcc, String bodyPlain,
-        String bodyHtml, List<FileEntry> attachments) {
+        String bodyHtml, List<FileEntry> attachments, String webLink) {
     }
 }
