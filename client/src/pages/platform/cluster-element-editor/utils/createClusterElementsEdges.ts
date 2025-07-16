@@ -62,7 +62,7 @@ export default function createClusterElementsEdges({
             relevantMultipleNodes.forEach((node) => {
                 createdEdges.push(createEdgeForMultipleClusterElementNode(clusterRootId, node));
 
-                // for nested roots
+                // For nested roots
                 if (node.data.clusterElements) {
                     const componentName = (node.data.type as string)?.split('/')[0];
                     const nestedDefinition = nestedClusterRootsDefinitions[componentName];
@@ -92,7 +92,7 @@ export default function createClusterElementsEdges({
                 if (singleNode) {
                     createdEdges.push(createEdgeForClusterElementNode(clusterRootId, singleNode));
 
-                    // for nested roots
+                    // For nested roots
                     if (singleNode.data.clusterElements) {
                         const componentName = (singleNode.data.type as string)?.split('/')[0];
                         const nestedDefinition = nestedClusterRootsDefinitions[componentName];
