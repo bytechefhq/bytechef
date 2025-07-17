@@ -7,7 +7,8 @@ import '@xyflow/react/dist/base.css';
 import './WorkflowEditorLayout.css';
 
 import PageLoader from '@/components/PageLoader';
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Button} from '@/components/ui/button';
+import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
 import WorkflowNodesSidebar from '@/pages/platform/workflow-editor/components/WorkflowNodesSidebar';
@@ -21,6 +22,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
+import {XIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -177,6 +179,16 @@ const WorkflowEditorLayout = ({
                             />
                         </>
                     )}
+
+                    <DialogClose asChild>
+                        <Button
+                            className="absolute right-2 top-2 size-10 border bg-white p-2 shadow-none [&_svg]:size-5"
+                            title="Close the canvas"
+                            variant="ghost"
+                        >
+                            <XIcon />
+                        </Button>
+                    </DialogClose>
                 </DialogContent>
             </Dialog>
 
