@@ -42,16 +42,18 @@ import org.junit.jupiter.api.Test;
  * @author Nikolina Spehar
  */
 class AmplitudeUtilsTest {
-    private static final Context mockedContext = mock(Context.class);
-    private static final Parameters mockedParameters = MockParametersFactory.create(
+
+    private final Context mockedContext = mock(Context.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             API_KEY, "api_key", EVENT_TYPE, "eventType", PLATFORM, "platform", ID, "id",
             IDENTIFIER, Map.of(KEY, "identifierKey", VALUE, "identifierValue"),
             USER_PROPERTIES, List.of(Map.of(KEY, "userPropertyKey", VALUE, "userPropertyValue"))));
-    private static final String responseString = "response";
 
     @Test
     void testGetEventJson() {
+        String responseString = "response";
+
         when(mockedContext.json(any()))
             .thenReturn(responseString);
 
