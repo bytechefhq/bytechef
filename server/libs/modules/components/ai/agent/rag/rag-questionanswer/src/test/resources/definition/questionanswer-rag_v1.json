@@ -99,7 +99,7 @@
   "name" : "questionAnswerRag",
   "resources" : null,
   "tags" : null,
-  "title" : "Modular RAG",
+  "title" : "Question Answer RAG",
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1
