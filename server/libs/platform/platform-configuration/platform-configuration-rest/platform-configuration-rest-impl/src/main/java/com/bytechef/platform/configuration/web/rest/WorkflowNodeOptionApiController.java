@@ -52,8 +52,8 @@ public class WorkflowNodeOptionApiController implements WorkflowNodeOptionApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 workflowNodeOptionFacade.getClusterElementNodeOptions(
-                    workflowId, workflowNodeName, clusterElementTypeName, clusterElementName, propertyName,
-                    lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, searchText),
+                    workflowId, workflowNodeName, clusterElementTypeName.toUpperCase(), clusterElementName,
+                    propertyName, lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, searchText),
                 option -> conversionService.convert(option, OptionModel.class)));
     }
 
