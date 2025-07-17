@@ -1,0 +1,306 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Bitbucket"
+  description: "Elevate your software delivery from planning to production and beyond, with built-in AI, CI/CD, and a best-in-class Jira integration."
+  version: "v0"
+servers:
+  - url: "https://api.bitbucket.org/2.0"
+paths:
+  /repositories/{workspace}/{repo_slug}:
+    post:
+      summary: "Create Repository"
+      description: "Creates a repository in a selected workspace."
+      operationId: "createRepository"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "workspace"
+          description: "Workspace in which repository will be created."
+          in: "path"
+          required: true
+          schema:
+            title: "Workspace"
+            type: "string"
+            x-dynamic-options: true
+        - name: "repo_slug"
+          description: "Repository slug that is used as identifier for the repository."
+          in: "path"
+          required: true
+          schema:
+            title: "Repository Slug"
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "repository"
+              required:
+                - "name"
+                - "project"
+                - "scm"
+              properties:
+                name:
+                  type: "string"
+                  description: "The name of the repository."
+                  title: "Name"
+                scm:
+                  type: "string"
+                  description: "Specifies the version control system that your repository will use."
+                  title: "Source Control Management."
+                  enum:
+                    - "git"
+                project:
+                  type: "object"
+                  description: "Parent project of the repository."
+                  title: "Project"
+                  properties:
+                    key:
+                      type: "string"
+                      description: "The key of the parent project."
+                      title: "Key"
+                      x-dynamic-options: true
+                      x-dynamic-options-dependency:
+                        - "workspace"
+                is_private:
+                  type: "boolean"
+                  description: "Whether the repository is private or not."
+                  title: "Is Private"
+                description:
+                  type: "string"
+                  description: "The description of repository."
+                  title: "Description"
+                fork_policy:
+                  type: "string"
+                  description: "Specifies the fork policy for the repository."
+                  title: "Fork Policy"
+                  enum:
+                    - "allow_forks"
+                    - "no_public_forks"
+                    - "no_forks"
+                language:
+                  type: "string"
+                  description: "Main programming language of the repository"
+                  title: "Language"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositoryObject'
+  /workspaces/{workspace}/projects:
+    post:
+      summary: "Create Project"
+      description: "Creates a project in selected workspace."
+      operationId: "createProject"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "workspace"
+          description: "Workspace where the project will be added."
+          in: "path"
+          required: true
+          schema:
+            title: "Workspace"
+            type: "string"
+            x-dynamic-options: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "project"
+              required:
+                - "name"
+                - "key"
+              properties:
+                name:
+                  type: "string"
+                  description: "The name of the project."
+                  title: "Name"
+                key:
+                  type: "string"
+                  description: "Key of the project (eg. AT, for a project named Atlassian). Project keys must start with a letter and may only consist of ASCII letters, numbers and underscores (A-Z, a-z, 0-9, _)."
+                  title: "Key"
+                description:
+                  type: "string"
+                  description: "The description of project."
+                  title: "Description"
+                is_private:
+                  type: "boolean"
+                  description: "Whether the project is private or not."
+                  title: "Is Private"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  metrics:
+                    type: "object"
+                    properties:
+                      org_keywords:
+                        type: "integer"
+                        description: "The total number of keywords that your target ranks for in the top 100 organic search results."
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    RepositoryObject:
+      type: object
+      description: "Bitbucket repository object returned from the API."
+      properties:
+        type:
+          type: "string"
+          description: "The type of the object (usually \"repository\")."
+        links:
+          type: "object"
+          description: "A collection of relevant resource links."
+          properties:
+            self:
+              $ref: '#/components/schemas/LinkObject'
+            html:
+              $ref: '#/components/schemas/LinkObject'
+            avatar:
+              $ref: '#/components/schemas/LinkObject'
+            pullrequests:
+              $ref: '#/components/schemas/LinkObject'
+            commits:
+              $ref: '#/components/schemas/LinkObject'
+            forks:
+              $ref: '#/components/schemas/LinkObject'
+            watchers:
+              $ref: '#/components/schemas/LinkObject'
+            downloads:
+              $ref: '#/components/schemas/LinkObject'
+            clone:
+              type: "array"
+              description: "List of clone URLs (HTTPS and/or SSH)."
+              items:
+                $ref: '#/components/schemas/LinkObject'
+            hooks:
+              $ref: '#/components/schemas/LinkObject'
+        uuid:
+          type: "string"
+          description: "The globally unique identifier for the repository."
+        full_name:
+          type: "string"
+          description: "The full name of the repository (workspace/repo_slug)."
+        is_private:
+          type: "boolean"
+          description: "Indicates whether the repository is private."
+        scm:
+          type: "string"
+          description: "The source control system (only \"git\" is supported)."
+        owner:
+          type: "object"
+          description: "The user or team that owns the repository."
+          properties:
+            type:
+              type: "string"
+              description: "The type of the owner (usually \"user\" or \"team\")."
+        name:
+          type: "string"
+          description: "The display name of the repository."
+        description:
+          type: "string"
+          description: "A short description of the repository."
+        created_on:
+          type: "string"
+          description: "Timestamp of when the repository was created."
+        updated_on:
+          type: "string"
+          description: "Timestamp of the last repository update."
+        size:
+          type: "integer"
+          description: "Total size of the repository in bytes."
+        language:
+          type: "string"
+          description: "The primary programming language of the repository."
+        has_issues:
+          type: "boolean"
+          description: "Indicates whether the issue tracker is enabled."
+        has_wiki:
+          type: "boolean"
+          description: "Indicates whether the wiki is enabled."
+        fork_policy:
+          type: "string"
+          description: "Repository fork policy."
+        project:
+          type: "object"
+          description: "Project that the repository belongs to."
+          properties:
+            type:
+              type: "string"
+              description: "Type of the project object."
+        mainbranch:
+          type: "object"
+          description: "The default branch of the repository."
+          properties:
+            type:
+              type: "string"
+              description: "Type of the branch object."
+    LinkObject:
+      type: "object"
+      description: "A hyperlink reference with optional name."
+      properties:
+        href:
+          type: "string"
+          description: "The URL of the link."
+        name:
+          type: "string"
+          description: "A human-readable name for the link."
+    ProjectObject:
+      type: "object"
+      description: "Bitbucket project object returned from the API."
+      properties:
+        type:
+          type: "string"
+          description: "The type of the object (typically 'project')."
+        links:
+          type: "object"
+          description: "Relevant links for the project."
+          properties:
+            html:
+              $ref: "#/components/schemas/LinkObject"
+            avatar:
+              $ref: "#/components/schemas/LinkObject"
+        uuid:
+          type: "string"
+          description: "Globally unique identifier for the project."
+        key:
+          type: "string"
+          description: "Unique key identifying the project within the workspace."
+        owner:
+          type: "object"
+          description: "The workspace or user who owns the project."
+          properties:
+            type:
+              type: "string"
+              description: "Type of the owner (usually 'user' or 'workspace')."
+        name:
+          type: "string"
+          description: "Human-readable name of the project."
+        description:
+          type: "string"
+          description: "Description of the project."
+        is_private:
+          type: "boolean"
+          description: "Indicates whether the project is private."
+        created_on:
+          type: "string"
+          format: "date-time"
+          description: "Timestamp of when the project was created."
+        updated_on:
+          type: "string"
+          format: "date-time"
+          description: "Timestamp of the last update to the project."
+        has_publicly_visible_repos:
+          type: "boolean"
+          description: "Indicates if the project contains any public repositories."
