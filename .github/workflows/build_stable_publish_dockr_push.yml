@@ -1,0 +1,75 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: CI Build on Stable Branch and Push to Cloud Repository
+
+on:
+  push:
+    branches: [ "stable" ]
+
+permissions:
+  contents: write
+
+jobs:
+  pushToCloudRepository:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout external repo
+      uses: actions/checkout@v4
+      with:
+        repository: bytechefhq/bytechef-cloud
+        token: ${{ secrets.PRIVATE_REPOSITORY_GIT_API_TOKEN }}  # PAT with 'repo' scope
+        path: bytechef-merge
+    - name: Investigate private repository checkout results
+      env:
+        ENV_BRANCH_NAME: stable-env-branch-name
+      run: |
+        pwd
+        ls -la bytechef-merge
+        cd bytechef-merge
+        git branch
+        git remote show
+        git remote rename origin origin-cloud
+        echo "Remote renamed"
+        git remote show
+        git remote add origin-public git@github.com:bytechefhq/bytechef.git
+        echo "New Remote Added"
+        git remote show
+        echo "Setup authorization"
+        /usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+        echo "Setup authorization - STEP 1"
+        /usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+        echo "Setup authorization - STEP 2"
+        /usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+        echo "Setup authorization - STEP 3"
+        /usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+        echo "Setup authorization - STEP 4"
+        /usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ${{ secrets.PRIVATE_REPOSITORY_GIT_API_TOKEN }}
+        echo "Fetch public ${ENV_BRANCH_NAME}"
+        git fetch origin-public stable
+        git checkout -b stable-public origin-public/stable
+        echo "New Branch Added"
+        git branch
+        git remote show
+    - name: Remove last commit
+      run: |
+        pwd
+        cd bytechef-merge
+        ls -la
+        git remote show
+        git reset --hard HEAD~1
+        git remote show
+        echo "Done with git preparation"
+    - name: Push to private repository
+      run: |
+        pwd
+        ls -la
+        cd bytechef-merge
+        git remote show
+        git push -f origin-cloud stable-public:stable
+
