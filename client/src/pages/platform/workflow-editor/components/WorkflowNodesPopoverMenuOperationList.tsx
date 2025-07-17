@@ -21,6 +21,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsDataStore from '../../cluster-element-editor/stores/useClusterElementsDataStore';
 import {
+    convertNameToSnakeCase,
     getClusterElementsLabel,
     initializeClusterElementsObject,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
@@ -88,9 +89,21 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
     const {actions, clusterElement, clusterElements, icon, name, title, triggers, version} = componentDefinition;
 
+    const clusterElementOperations = useMemo(() => {
+        if (!clusterElementType) {
+            return [];
+        }
+
+        const matchingOperations = clusterElements?.filter((clusterElement) => {
+            return clusterElement.type === convertNameToSnakeCase(clusterElementType as string);
+        });
+
+        return matchingOperations;
+    }, [clusterElementType, clusterElements]);
+
     const operations = useMemo(
-        () => (trigger ? triggers : clusterElementsCanvasOpen && clusterElement ? clusterElements : actions),
-        [trigger, triggers, clusterElementsCanvasOpen, clusterElement, clusterElements, actions]
+        () => (trigger ? triggers : clusterElementsCanvasOpen && clusterElement ? clusterElementOperations : actions),
+        [trigger, triggers, clusterElementsCanvasOpen, clusterElement, clusterElementOperations, actions]
     );
 
     const getNodeData = useCallback(
