@@ -3,7 +3,7 @@ import {ClusterElementsType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import {createMultipleElementsNode, createPlaceholderNode, createSingleElementsNode} from './clusterElementsNodesUtils';
-import {convertNameToCamelCase} from './clusterElementsUtils';
+import {convertNameToCamelCase, isPlainObject} from './clusterElementsUtils';
 
 interface CreateClusterElementNodesProps {
     clusterElements: ClusterElementsType;
@@ -88,7 +88,7 @@ export default function createClusterElementNodes({
 
             createdNodes.push(placeholderNode);
         } else {
-            if (clusterElementValue && !Array.isArray(clusterElementValue)) {
+            if (clusterElementValue && isPlainObject(clusterElementValue)) {
                 // Create the single element node
                 const singleElementNode = createSingleElementsNode({
                     clusterElementItem: clusterElementValue,
