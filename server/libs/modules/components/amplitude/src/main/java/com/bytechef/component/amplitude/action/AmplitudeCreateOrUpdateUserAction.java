@@ -45,7 +45,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,8 +71,9 @@ public class AmplitudeCreateOrUpdateUserAction {
                 .required(true),
             string(USER_ID)
                 .label("User ID")
-                .description("Unique user ID specified by you. If you send a request with a user ID that's not in " +
-                    "the Amplitude system, new user will be created (e.g. email address).")
+                .description(
+                    "Unique user ID specified by you. If you send a request with a user ID that's not in the " +
+                        "Amplitude system, new user will be created (e.g. email address).")
                 .displayCondition("%s == '%s'".formatted(ID, USER_ID))
                 .required(true),
             USER_PROPERTIES_OBJECT,
@@ -139,7 +139,7 @@ public class AmplitudeCreateOrUpdateUserAction {
             .header(CONTENT_TYPE, CONTENT_TYPE_URLENCODED)
             .body(Body.of(body, BodyContentType.FORM_URL_ENCODED))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody(String.class);
     }
 
     private static void checkIfNull(Map<String, Object> body, String key, String value) {
