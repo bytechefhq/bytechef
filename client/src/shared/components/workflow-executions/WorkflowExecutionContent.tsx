@@ -160,7 +160,9 @@ const WorkflowExecutionContent = ({endDate, error, input, output, startDate}: Wo
                                         <div className="text-sm font-semibold">Stack Trace</div>
 
                                         <div className="text-sm">
-                                            {error?.stackTrace?.map((line, index) => <div key={index}>{line}</div>)}
+                                            {error?.stackTrace?.map((line, index) => (
+                                                <div key={index}>{line}</div>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
