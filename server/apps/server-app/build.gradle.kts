@@ -169,6 +169,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:bash"))
     implementation(project(":server:libs:modules:components:beamer"))
     implementation(project(":server:libs:modules:components:binance"))
+    implementation(project(":server:libs:modules:components:bitbucket"))
     implementation(project(":server:libs:modules:components:bolna"))
     implementation(project(":server:libs:modules:components:box"))
     implementation(project(":server:libs:modules:components:brevo"))
