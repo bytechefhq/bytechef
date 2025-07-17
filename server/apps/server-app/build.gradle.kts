@@ -372,6 +372,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:modules:components:api-platform"))
     implementation(project(":server:ee:libs:modules:components:code-workflow"))
+    implementation(project(":server:ee:libs:config:cloud-config"))
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.zaxxer:HikariCP")
