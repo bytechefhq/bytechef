@@ -1,6 +1,7 @@
 import {
     CONDITION_CASE_FALSE,
     CONDITION_CASE_TRUE,
+    DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM,
     DIRECTION,
     EDGE_STYLES,
     FINAL_PLACEHOLDER_NODE_ID,
@@ -183,7 +184,8 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
         if (mainRootNode && !containsNodePosition(mainRootNode.data.metadata)) {
             const dagreNode = dagreGraph.node(mainRootNode.id);
 
-            const centeringOffsetX = canvasWidth / 2 - dagreNode.x - ROOT_CLUSTER_WIDTH / 2;
+            const centeringOffsetX =
+                canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM / 2 - dagreNode.x - ROOT_CLUSTER_WIDTH / 2;
 
             centeredMainRootNode = [
                 {

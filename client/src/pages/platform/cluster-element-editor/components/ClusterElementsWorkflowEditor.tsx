@@ -1,6 +1,7 @@
 import {Background, BackgroundVariant, Controls, ReactFlow, ReactFlowProvider} from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
+import {DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
 import {useShallow} from 'zustand/react/shallow';
 
 import PlaceholderNode from '../../workflow-editor/nodes/PlaceholderNode';
@@ -34,6 +35,7 @@ const ClusterElementsWorkflowEditor = () => {
         <div className="size-full rounded-lg bg-surface-popover-canvas">
             <ReactFlowProvider>
                 <ReactFlow
+                    defaultViewport={{x: 0, y: 0, zoom: DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM}}
                     edgeTypes={clusterElementsEdgeTypes}
                     edges={edges}
                     maxZoom={1}
@@ -54,7 +56,6 @@ const ClusterElementsWorkflowEditor = () => {
 
                     <Controls
                         className="m-2 rounded-md border border-stroke-neutral-secondary bg-background"
-                        fitViewOptions={{duration: 500, minZoom: 0.2}}
                         showInteractive={false}
                     />
                 </ReactFlow>
