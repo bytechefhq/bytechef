@@ -16,7 +16,16 @@
 
 package com.bytechef.component.bitbucket;
 
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -24,4 +33,32 @@ import com.google.auto.service.AutoService;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .icon("path:assets/bitbucket.svg")
+            .categories(ComponentCategory.PROJECT_MANAGEMENT)
+            .customAction(true);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition
+        modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .baseUri((connectionParameters, context) -> "https://api.bitbucket.org/2.0")
+            .authorizations(
+                authorization(AuthorizationType.BASIC_AUTH)
+                    .title("API Key Authorization")
+                    .properties(
+                        string(USERNAME)
+                            .label("Username")
+                            .description("Email address of your Bitbucket account.")
+                            .required(true),
+                        string(PASSWORD)
+                            .label("API Key")
+                            .description("API key creation steps in documentation.")
+                            .required(true)));
+    }
 }
