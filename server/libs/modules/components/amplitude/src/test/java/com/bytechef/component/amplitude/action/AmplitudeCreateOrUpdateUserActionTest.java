@@ -38,7 +38,6 @@ import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -51,29 +50,22 @@ import org.mockito.MockedStatic;
  */
 class AmplitudeCreateOrUpdateUserActionTest {
 
-    private static final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private static final String identificationJson = "identificationJson";
-    private static final Context mockedContext = mock(Context.class);
-    private static final Executor mockedExecutor = mock(Executor.class);
-    private static final Map<String, Object> mockedIdentification = Map.of();
-    private static final Parameters mockedParameters = MockParametersFactory.create(
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final Context mockedContext = mock(Context.class);
+    private final Executor mockedExecutor = mock(Executor.class);
+    private final Map<String, Object> mockedIdentification = Map.of();
+    private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             API_KEY, "api_key", ID, "id", USER_PROPERTIES,
             List.of(Map.of(KEY, "userPropertyKey", VALUE, "userPropertyValue"))));
-    private static final Response mockedResponse = mock(Response.class);
-    private static final ArgumentCaptor<Parameters> parametersArgumentCaptor =
-        ArgumentCaptor.forClass(Parameters.class);
-    private static final String responseString = "response";
-    private static final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Response mockedResponse = mock(Response.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(responseType(any())))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
+        String identificationJson = "identificationJson";
+        String responseString = "response";
 
         try (MockedStatic<AmplitudeUtils> amplitudeUtilsMockedStatic = mockStatic(AmplitudeUtils.class)) {
             amplitudeUtilsMockedStatic
@@ -84,25 +76,29 @@ class AmplitudeCreateOrUpdateUserActionTest {
             when(mockedContext.json(any()))
                 .thenReturn(identificationJson);
 
+            when(mockedContext.http(any()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.configuration(responseType(any())))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
             when(mockedExecutor.body(bodyArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.execute())
                 .thenReturn(mockedResponse);
-            when(mockedResponse.getBody(any(TypeReference.class)))
+            when(mockedResponse.getBody(String.class))
                 .thenReturn(responseString);
 
-            String response =
-                AmplitudeCreateOrUpdateUserAction.perform(mockedParameters, mockedParameters, mockedContext);
+            String response = AmplitudeCreateOrUpdateUserAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
+
             assertEquals(responseString, response);
-
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-
-            List<String> expectedHeader = List.of(CONTENT_TYPE, CONTENT_TYPE_URLENCODED);
-            assertEquals(expectedHeader, stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(CONTENT_TYPE, CONTENT_TYPE_URLENCODED), stringArgumentCaptor.getAllValues());
 
             Body body = bodyArgumentCaptor.getValue();
-            assertEquals(Map.of(API_KEY, "api_key", IDENTIFICATION, identificationJson), body.getContent());
 
+            assertEquals(Map.of(API_KEY, "api_key", IDENTIFICATION, identificationJson), body.getContent());
             assertEquals(BodyContentType.FORM_URL_ENCODED, body.getContentType());
         }
     }

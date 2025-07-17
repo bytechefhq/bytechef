@@ -38,7 +38,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Nikolina Spehar
@@ -67,8 +66,9 @@ public class AmplitudeCreateAttributionEventAction {
                 .properties(
                     string(KEY)
                         .label("Identifier Key")
-                        .description("For iOS input the Identifier for Advertiser or the Identifier for Vendor." +
-                            "For Android input the Google ADID or App Set ID")
+                        .description(
+                            "For iOS input the Identifier for Advertiser or the Identifier for Vendor.For Android " +
+                                "input the Google ADID or App Set ID.")
                         .options((ActionOptionsFunction<String>) AmplitudeUtils::getIdentifierKeyOptions)
                         .optionsLookupDependsOn(PLATFORM)
                         .required(true),
@@ -87,13 +87,12 @@ public class AmplitudeCreateAttributionEventAction {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         return context.http(http -> http.post("/attribution"))
             .configuration(responseType(ResponseType.TEXT))
             .queryParameters(
                 API_KEY, connectionParameters.getRequiredString(API_KEY),
                 EVENT, getEventJson(inputParameters, context))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody(String.class);
     }
 }

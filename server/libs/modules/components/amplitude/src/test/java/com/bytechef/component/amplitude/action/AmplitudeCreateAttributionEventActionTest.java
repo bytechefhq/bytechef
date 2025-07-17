@@ -35,7 +35,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -48,27 +47,22 @@ import org.mockito.MockedStatic;
  */
 class AmplitudeCreateAttributionEventActionTest {
 
-    private static final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private static final String jsonString = "jsonString";
-    private static final Context mockedContext = mock(Context.class);
-    private static final Executor mockedExecutor = mock(Executor.class);
-    private static final Parameters mockedParameters = MockParametersFactory.create(
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final Context mockedContext = mock(Context.class);
+    private final Executor mockedExecutor = mock(Executor.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             API_KEY, "api_key", EVENT_TYPE, "eventType", PLATFORM, "platform",
             IDENTIFIER, Map.of(KEY, "identifierKey", VALUE, "identifierValue"),
             USER_PROPERTIES, List.of(Map.of(KEY, "userPropertyKey", VALUE, "userPropertyValue"))));
-    private static final Response mockedResponse = mock(Response.class);
-    private static final ArgumentCaptor<Parameters> parametersArgumentCaptor =
-        ArgumentCaptor.forClass(Parameters.class);
-    private static final String responseString = "response";
-    private static final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Response mockedResponse = mock(Response.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(responseType(any())))
-            .thenReturn(mockedExecutor);
+        String jsonString = "jsonString";
+        String responseString = "response";
 
         try (MockedStatic<AmplitudeUtils> amplitudeUtilsMockedStatic = mockStatic(AmplitudeUtils.class)) {
             amplitudeUtilsMockedStatic
@@ -76,24 +70,26 @@ class AmplitudeCreateAttributionEventActionTest {
                     parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(jsonString);
 
+            when(mockedContext.http(any()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.configuration(responseType(any())))
+                .thenReturn(mockedExecutor);
             when(mockedExecutor.queryParameters(
                 stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
                 stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                     .thenReturn(mockedExecutor);
             when(mockedExecutor.execute())
                 .thenReturn(mockedResponse);
-            when(mockedResponse.getBody(any(TypeReference.class)))
+            when(mockedResponse.getBody(String.class))
                 .thenReturn(responseString);
 
-            String response =
-                AmplitudeCreateAttributionEventAction.perform(mockedParameters, mockedParameters, mockedContext);
-            assertEquals(responseString, response);
+            String response = AmplitudeCreateAttributionEventAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
+            assertEquals(responseString, response);
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-
-            List<String> expectedQueryParameters = List.of(API_KEY, "api_key", "event", jsonString);
-            assertEquals(expectedQueryParameters, stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(API_KEY, "api_key", "event", jsonString), stringArgumentCaptor.getAllValues());
         }
     }
 }

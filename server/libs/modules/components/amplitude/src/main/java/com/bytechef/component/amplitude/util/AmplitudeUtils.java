@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,8 +68,9 @@ public class AmplitudeUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (inputParameters.getRequiredString(PLATFORM)
-            .equals("ios")) {
+        String platform = inputParameters.getRequiredString(PLATFORM);
+
+        if (platform.equals("ios")) {
             options.add(option("The Identifier for Advertiser", "idfa"));
             options.add(option("The Identifier for Vendor", "idfv"));
         } else {
@@ -82,15 +84,11 @@ public class AmplitudeUtils {
     public static Map<String, String> getUserProperties(Parameters inputParameters) {
         Map<String, String> userProperties = new HashMap<>();
 
-        List<Map> userPropertiesList = inputParameters.getList(USER_PROPERTIES, Map.class);
+        List<Map<String, String>> userPropertiesList = inputParameters.getList(
+            USER_PROPERTIES, new TypeReference<>() {}, List.of());
 
-        if (userPropertiesList != null) {
-            for (Map<?, ?> userProperty : userPropertiesList) {
-                userProperties.put(userProperty.get(KEY)
-                    .toString(),
-                    userProperty.get(VALUE)
-                        .toString());
-            }
+        for (Map<String, String> userProperty : userPropertiesList) {
+            userProperties.put(userProperty.get(KEY), userProperty.get(VALUE));
         }
 
         return userProperties;
