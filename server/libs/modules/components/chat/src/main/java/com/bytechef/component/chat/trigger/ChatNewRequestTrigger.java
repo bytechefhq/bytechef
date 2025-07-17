@@ -50,7 +50,7 @@ public class ChatNewRequestTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newChatRequest")
         .title("New Chat Request")
-        .description(".")
+        .description("A new chat request comes from the chat interface.")
         .type(TriggerType.STATIC_WEBHOOK)
         .workflowSyncExecution(true)
         .workflowSyncExecution(true)

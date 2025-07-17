@@ -179,7 +179,7 @@
     "batch" : null,
     "deduplicate" : null,
     "deprecated" : null,
-    "description" : ".",
+    "description" : "A new chat request comes from the chat interface.",
     "dynamicWebhookRefresh" : null,
     "help" : null,
     "listenerDisable" : null,
