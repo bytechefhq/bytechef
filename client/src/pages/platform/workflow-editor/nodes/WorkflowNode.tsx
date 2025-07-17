@@ -145,7 +145,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 'group relative flex min-w-60 cursor-pointer justify-center',
                 !data.taskDispatcher && 'items-center',
                 !isClusterElement && !isMainRootClusterElement && 'nodrag',
-                isClusterElement && 'flex-col items-start gap-1'
+                isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center gap-1'
             )}
             data-nodetype={data.trigger ? 'trigger' : 'task'}
             key={id}
@@ -284,7 +284,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             </HoverCard>
 
             {!(isMainRootClusterElement || isNestedClusterRoot) && (
-                <div className={twMerge('ml-2 flex w-full min-w-max flex-col items-start', isClusterElement && 'ml-0')}>
+                <div
+                    className={twMerge(
+                        'ml-2 flex w-full min-w-max flex-col items-start',
+                        isClusterElement && !isNestedClusterRoot && 'absolute top-full ml-0 items-center text-center'
+                    )}
+                >
                     <span className={twMerge('font-semibold', isClusterElement && 'text-sm')}>
                         {data.title || data.label}
                     </span>
