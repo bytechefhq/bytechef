@@ -51,7 +51,7 @@ public class MicrosoftOneDriveUploadFileAction {
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false),
             fileEntry(FILE)
-                .label("File")
+                .label("File Entry")
                 .description("File to upload.")
                 .required(true))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))

@@ -66,8 +66,8 @@ public class CryptoHelperPgpDecryptAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)
-                .label("File")
-                .description("File that will be decrypted.")
+                .label("File Entry")
+                .description("File object with content that will be decrypted.")
                 .required(true),
             string(PASSPHRASE)
                 .label("Passphrase")

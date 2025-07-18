@@ -49,7 +49,7 @@ public class CsvFileConstants {
     @SuppressFBWarnings("MS")
     public static final Property[] READ_PROPERTIES = {
         fileEntry(FILE_ENTRY)
-            .label("File")
+            .label("File Entry")
             .description("The object property which contains a reference to the csv file to read from.")
             .required(true),
         string(DELIMITER)

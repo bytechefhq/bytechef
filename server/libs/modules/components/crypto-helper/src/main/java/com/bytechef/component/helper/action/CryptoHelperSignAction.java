@@ -47,8 +47,8 @@ public class CryptoHelperSignAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)
-                .label("File")
-                .description("File that will be signed")
+                .label("File Entry")
+                .description("File object with content that will be signed")
                 .required(true))
         .output(outputSchema(fileEntry().description("Signature of the file.")))
         .perform(CryptoHelperSignAction::perform);

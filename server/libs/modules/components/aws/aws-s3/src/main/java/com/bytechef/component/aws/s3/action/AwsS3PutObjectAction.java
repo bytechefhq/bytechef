@@ -50,7 +50,7 @@ public class AwsS3PutObjectAction {
         .description("Store an object to AWS S3.")
         .properties(
             fileEntry(FILE_ENTRY)
-                .label("File")
+                .label("File Entry")
                 .description(
                     "The object property which contains a reference to the file that needs to be written to AWS S3.")
                 .required(true),

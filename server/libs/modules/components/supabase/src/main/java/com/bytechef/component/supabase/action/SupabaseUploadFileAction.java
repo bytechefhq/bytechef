@@ -54,7 +54,7 @@ public class SupabaseUploadFileAction {
                 .description("Name of the file that will be uploaded.")
                 .required(true),
             fileEntry(FILE)
-                .label("File")
+                .label("File Entry")
                 .description("File you want to upload to Supabase.")
                 .required(true))
         .output(
