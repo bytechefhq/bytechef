@@ -66,8 +66,8 @@ public class CryptoHelperPgpEncryptAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)
-                .label("File")
-                .description("File that will be encrypted.")
+                .label("File Entry")
+                .description("File object with content that will be encrypted.")
                 .required(true))
         .output(outputSchema(fileEntry().description("PGP encrypted file.")))
         .perform(CryptoHelperPgpEncryptAction::perform);

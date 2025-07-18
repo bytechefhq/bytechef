@@ -1134,7 +1134,7 @@
       "exampleValue" : null,
       "expressionEnabled" : null,
       "hidden" : null,
-      "label" : "File",
+      "label" : "File Entry",
       "metadata" : { },
       "name" : "file",
       "placeholder" : null,

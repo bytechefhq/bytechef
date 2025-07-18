@@ -54,7 +54,7 @@ public class OdsFileReadAction {
         .description("Reads data from a ODS file.")
         .properties(
             fileEntry(FILE_ENTRY)
-                .label("File")
+                .label("File Entry")
                 .description("The object property which contains a reference to the ODS file to read from.")
                 .required(true),
             string(SHEET_NAME)

@@ -45,8 +45,8 @@ public class CryptoHelperVerifyAction {
                 .description("Public RSA key that will verify the signature.")
                 .required(true),
             fileEntry(FILE)
-                .label("File")
-                .description("File whose signature will be verified.")
+                .label("File Entry")
+                .description("File object whose signature will be verified.")
                 .required(true),
             fileEntry(SIGNATURE)
                 .label("Signature")

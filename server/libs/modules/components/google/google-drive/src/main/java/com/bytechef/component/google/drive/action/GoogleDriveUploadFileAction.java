@@ -51,7 +51,7 @@ public class GoogleDriveUploadFileAction {
         .description("Uploads a file in your Google Drive.")
         .properties(
             fileEntry(FILE_ENTRY)
-                .label("File")
+                .label("File Entry")
                 .description("The object property which contains a reference to the file to upload.")
                 .required(true),
             string(FOLDER_ID)

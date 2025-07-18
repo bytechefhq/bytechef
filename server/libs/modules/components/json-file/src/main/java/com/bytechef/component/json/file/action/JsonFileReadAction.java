@@ -62,7 +62,7 @@ public class JsonFileReadAction {
                 .defaultValue(FileType.JSON.name())
                 .required(true),
             fileEntry(FILE_ENTRY)
-                .label("File")
+                .label("File Entry")
                 .description(
                     "The object property which contains a reference to the JSON file to read from.")
                 .required(true),
