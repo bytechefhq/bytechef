@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
@@ -69,14 +70,14 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
         List<WorkflowTask> allTasks = workflow.getTasks(true);
 
         for (WorkflowTask workflowTask : allTasks) {
+            List<ComponentConnection> componentConnections = componentConnectionFacade.getComponentConnections(
+                CollectionUtils.getFirst(
+                    allTasks,
+                    curWorkflowTask -> Objects.equals(curWorkflowTask.getName(), workflowTask.getName())));
             workflowTaskDTOs.add(
                 new WorkflowTaskDTO(
-                    workflowTask,
-                    ClusterElementMap.of(workflowTask.getExtensions()),
-                    componentConnectionFacade.getComponentConnections(
-                        CollectionUtils.getFirst(
-                            allTasks,
-                            curWorkflowTask -> Objects.equals(curWorkflowTask.getName(), workflowTask.getName())))));
+                    workflowTask, ClusterElementMap.of(workflowTask.getExtensions(), componentConnections),
+                    componentConnections));
         }
 
         List<WorkflowTriggerDTO> workflowTriggerDTOs = new ArrayList<>();

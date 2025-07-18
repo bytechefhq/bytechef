@@ -27,6 +27,7 @@ import java.util.Objects;
  */
 public class ClusterElement {
 
+    private final ComponentConnection connection;
     private final String clusterElementName;
     private final String componentName;
     private final int componentVersion;
@@ -38,9 +39,10 @@ public class ClusterElement {
     private final String workflowNodeName;
 
     public ClusterElement(
-        String workflowNodeName, String type, String label, String description, Map<String, ?> parameters,
-        Map<String, ?> extensions) {
+        ComponentConnection connection, String description, Map<String, ?> extensions, String label, String type,
+        Map<String, ?> parameters, String workflowNodeName) {
 
+        this.connection = connection;
         this.extensions = Collections.unmodifiableMap(extensions);
         this.description = description;
         this.label = label;
@@ -55,12 +57,16 @@ public class ClusterElement {
         this.componentVersion = workflowNodeType.version();
     }
 
-    public String getComponentName() {
-        return componentName;
+    public ComponentConnection getConnection() {
+        return connection;
     }
 
     public String getClusterElementName() {
         return clusterElementName;
+    }
+
+    public String getComponentName() {
+        return componentName;
     }
 
     public int getComponentVersion() {
@@ -92,25 +98,24 @@ public class ClusterElement {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if (obj == null || obj.getClass() != this.getClass()) {
+    public boolean equals(Object o) {
+        if (!(o instanceof ClusterElement that)) {
             return false;
         }
 
-        var that = (ClusterElement) obj;
-
-        return Objects.equals(this.workflowNodeName, that.workflowNodeName) &&
-            Objects.equals(this.type, that.type) && Objects.equals(this.label, that.label) &&
-            Objects.equals(this.description, that.description) && Objects.equals(this.parameters, that.parameters);
+        return componentVersion == that.componentVersion && Objects.equals(connection, that.connection) &&
+            Objects.equals(clusterElementName, that.clusterElementName) &&
+            Objects.equals(componentName, that.componentName) && Objects.equals(extensions, that.extensions) &&
+            Objects.equals(type, that.type) && Objects.equals(label, that.label) &&
+            Objects.equals(description, that.description) && Objects.equals(parameters, that.parameters) &&
+            Objects.equals(workflowNodeName, that.workflowNodeName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(workflowNodeName, type, label, description, parameters);
+        return Objects.hash(
+            connection, clusterElementName, componentName, componentVersion, extensions, type, label, description,
+            parameters, workflowNodeName);
     }
 
     @Override
@@ -120,6 +125,7 @@ public class ClusterElement {
             ", componentName='" + componentName + '\'' +
             ", componentVersion=" + componentVersion +
             ", clusterElementName='" + clusterElementName + '\'' +
+            ", connection=" + connection +
             ", type='" + type + '\'' +
             ", label='" + label + '\'' +
             ", description='" + description + '\'' +

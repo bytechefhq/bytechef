@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -53,8 +54,12 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
         this.entrySet = entrySet;
     }
 
-    @SuppressWarnings("unchecked")
     public static ClusterElementMap of(Map<String, ?> extensions) {
+        return of(extensions, List.of());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static ClusterElementMap of(Map<String, ?> extensions, List<ComponentConnection> connections) {
         Set<Map.Entry<String, Object>> clusterElementSet = new HashSet<>();
 
         if (extensions.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
@@ -68,7 +73,7 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
                 if (clusterElementEntryValue instanceof List<?> list) {
                     for (Object item : list) {
                         if (item instanceof Map<?, ?> map) {
-                            add((Map<String, ?>) map, clusterElements);
+                            add((Map<String, ?>) map, clusterElements, connections);
                         }
                     }
 
@@ -81,7 +86,7 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
                     clusterElementSet.add(
                         Map.entry(
                             clusterElementsEntry.getKey(),
-                            toClusterElement((Map<String, ?>) clusterElementEntryValue)));
+                            toClusterElement((Map<String, ?>) clusterElementEntryValue, connections)));
                 }
             }
         }
@@ -117,9 +122,11 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
         return clusterElements == null ? List.of() : clusterElements;
     }
 
-    private static void add(Map<String, ?> clusterElementMap, List<ClusterElement> clusterElements) {
+    private static void add(
+        Map<String, ?> clusterElementMap, List<ClusterElement> clusterElements, List<ComponentConnection> connections) {
+
         try {
-            clusterElements.add(toClusterElement(clusterElementMap));
+            clusterElements.add(toClusterElement(clusterElementMap, connections));
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug(e.getMessage());
@@ -127,7 +134,9 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
         }
     }
 
-    private static ClusterElement toClusterElement(Map<String, ?> clusterElementMap) {
+    private static ClusterElement toClusterElement(
+        Map<String, ?> clusterElementMap, List<ComponentConnection> connections) {
+
         Map<String, Object> extensions = new HashMap<>();
 
         for (Map.Entry<String, ?> entry : clusterElementMap.entrySet()) {
@@ -136,12 +145,18 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
             }
         }
 
+        String name = MapUtils.getRequiredString(clusterElementMap, WorkflowConstants.NAME);
+
+        ComponentConnection connection = connections.stream()
+            .filter(componentConnection -> Objects.equals(componentConnection.key(), name))
+            .findFirst()
+            .orElse(null);
+
         return new ClusterElement(
-            MapUtils.getRequiredString(clusterElementMap, WorkflowConstants.NAME),
-            MapUtils.getRequiredString(clusterElementMap, WorkflowConstants.TYPE),
+            connection, MapUtils.getString(clusterElementMap, WorkflowConstants.DESCRIPTION), extensions,
             MapUtils.getString(clusterElementMap, WorkflowConstants.LABEL),
-            MapUtils.getString(clusterElementMap, WorkflowConstants.DESCRIPTION),
+            MapUtils.getRequiredString(clusterElementMap, WorkflowConstants.TYPE),
             MapUtils.getMap(clusterElementMap, WorkflowConstants.PARAMETERS, new TypeReference<>() {}, Map.of()),
-            extensions);
+            name);
     }
 }
