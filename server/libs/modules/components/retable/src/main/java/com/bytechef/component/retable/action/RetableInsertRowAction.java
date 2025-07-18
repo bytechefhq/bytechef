@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.Context.Http.Body;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.retable.constant.RetableConstants.COLUMNS;
+import static com.bytechef.component.retable.constant.RetableConstants.COLUMN_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.DATA;
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.RETABLE_ID;
@@ -124,22 +125,20 @@ public class RetableInsertRowAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, Object> retableRowValues = convertPropertyToRetableRowValue(inputParameters.getMap(ROWS_IDS));
+        List<Map<String, Object>> retableRowValues = convertPropertyToRetableRowValue(inputParameters.getMap(ROWS_IDS));
 
         return context
             .http(http -> http.post("/retable/" + inputParameters.getRequiredString(RETABLE_ID) + "/data"))
             .configuration(responseType(ResponseType.JSON))
-            .body(Body.of(retableRowValues))
+            .body(Body.of(Map.of(DATA, List.of(Map.of(COLUMNS, retableRowValues)))))
             .execute()
             .getBody();
     }
 
-    private static Map<String, Object> convertPropertyToRetableRowValue(Map<String, ?> rowValuesInput) {
-        List<Map<String, Object>> cells = rowValuesInput.entrySet()
+    private static List<Map<String, Object>> convertPropertyToRetableRowValue(Map<String, ?> rowValuesInput) {
+        return rowValuesInput.entrySet()
             .stream()
-            .map(entry -> Map.of("column_id", entry.getKey(), "cell_value", entry.getValue()))
+            .map(entry -> Map.of(COLUMN_ID, entry.getKey(), "cell_value", entry.getValue()))
             .toList();
-
-        return Map.of(DATA, List.of(Map.of(COLUMNS, cells)));
     }
 }
