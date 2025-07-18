@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.evaluator.Evaluator;
@@ -28,6 +29,7 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -77,7 +79,13 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         String propertyName, List<String> lookupDependsOnPaths, @Nullable String searchText) {
 
         Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfigurationConnectionId(workflowId, clusterElementWorkflowNodeName)
+            .fetchWorkflowTestConfiguration(workflowId)
+            .stream()
+            .flatMap(workflowTestConfiguration -> CollectionUtils.stream(workflowTestConfiguration.getConnections()))
+            .filter(workflowTestConfigurationConnection -> Objects.equals(
+                workflowTestConfigurationConnection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
+            .findFirst()
+            .map(WorkflowTestConfigurationConnection::getConnectionId)
             .orElse(null);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
