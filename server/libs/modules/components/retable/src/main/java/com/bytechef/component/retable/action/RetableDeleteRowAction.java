@@ -27,7 +27,7 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.RETABLE_ID;
-import static com.bytechef.component.retable.constant.RetableConstants.ROWS;
+import static com.bytechef.component.retable.constant.RetableConstants.ROWS_IDS;
 import static com.bytechef.component.retable.constant.RetableConstants.WORKSPACE_ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -48,23 +48,23 @@ public class RetableDeleteRowAction {
             string(WORKSPACE_ID)
                 .label("Workspace ID")
                 .description("ID of the workspace.")
-                .options((ActionOptionsFunction<String>) RetableUtils::getWorkspaceOptions)
+                .options((ActionOptionsFunction<String>) RetableUtils::getWorkspaceIdOptions)
                 .required(true),
             string(PROJECT_ID)
                 .label("Project ID")
                 .description("ID of the project.")
                 .optionsLookupDependsOn(WORKSPACE_ID)
-                .options((ActionOptionsFunction<String>) RetableUtils::getProjectOptions)
+                .options((ActionOptionsFunction<String>) RetableUtils::getProjectIdOptions)
                 .required(true),
             string(RETABLE_ID)
                 .label("Retable ID")
                 .description("ID of the retable.")
                 .optionsLookupDependsOn(PROJECT_ID)
-                .options((ActionOptionsFunction<String>) RetableUtils::getRetableOptions)
+                .options((ActionOptionsFunction<String>) RetableUtils::getRetableIdOptions)
                 .required(true),
-            array(ROWS)
-                .label("Rows")
-                .description("Row IDs that will be deleted rows.")
+            array(ROWS_IDS)
+                .label("Rows IDs")
+                .description("ID of the rows to delete.")
                 .required(true)
                 .items(integer()))
         .output(
@@ -84,7 +84,7 @@ public class RetableDeleteRowAction {
         return context
             .http(http -> http.delete("/retable/" + inputParameters.getRequiredString(RETABLE_ID) + "/data"))
             .configuration(responseType(ResponseType.JSON))
-            .body(Body.of(ROWS, inputParameters.getList(ROWS)))
+            .body(Body.of(ROWS_IDS, inputParameters.getList(ROWS_IDS)))
             .execute()
             .getBody();
     }

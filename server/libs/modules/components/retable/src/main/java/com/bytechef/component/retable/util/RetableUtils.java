@@ -19,6 +19,9 @@ package com.bytechef.component.retable.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.retable.constant.RetableConstants.DATA;
+import static com.bytechef.component.retable.constant.RetableConstants.ID;
+import static com.bytechef.component.retable.constant.RetableConstants.NAME;
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.WORKSPACE_ID;
 
@@ -35,23 +38,22 @@ import java.util.Map;
  */
 public class RetableUtils {
 
-    public static List<Option<String>> getWorkspaceOptions(
+    public static List<Option<String>> getWorkspaceIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         Map<String, Map<String, ?>> body = context.http(http -> http.get("/workspace"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        Map<String, ?> data = body.get("data");
+        Map<String, ?> data = body.get(DATA);
         if (data != null && data.get("workspaces") instanceof List<?> workspaces) {
             for (Object workspace : workspaces) {
                 if (workspace instanceof Map<?, ?> map) {
-
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
         }
@@ -59,25 +61,23 @@ public class RetableUtils {
         return options;
     }
 
-    public static List<Option<String>> getProjectOptions(
+    public static List<Option<String>> getProjectIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Map<String, ?>> body = context
-            .http(http -> http.get("/workspace/%s/projects".formatted(
-                inputParameters.getRequiredString(WORKSPACE_ID))))
+        List<Option<String>> options = new ArrayList<>();
+
+        Map<String, Map<String, ?>> body = context.http(
+            http -> http.get("/workspace/%s/projects".formatted(inputParameters.getRequiredString(WORKSPACE_ID))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        Map<String, ?> data = body.get("data");
+        Map<String, ?> data = body.get(DATA);
         if (data != null && data.get("projects") instanceof List<?> projects) {
             for (Object project : projects) {
                 if (project instanceof Map<?, ?> map) {
-
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
         }
@@ -85,25 +85,23 @@ public class RetableUtils {
         return options;
     }
 
-    public static List<Option<String>> getRetableOptions(
+    public static List<Option<String>> getRetableIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Map<String, ?>> body = context
-            .http(http -> http.get("/project/%s/retable".formatted(
-                inputParameters.getRequiredString(PROJECT_ID))))
+        List<Option<String>> options = new ArrayList<>();
+
+        Map<String, Map<String, ?>> body = context.http(
+            http -> http.get("/project/%s/retable".formatted(inputParameters.getRequiredString(PROJECT_ID))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        Map<String, ?> data = body.get("data");
+        Map<String, ?> data = body.get(DATA);
         if (data != null && data.get("retables") instanceof List<?> retables) {
             for (Object retable : retables) {
                 if (retable instanceof Map<?, ?> map) {
-
-                    options.add(option((String) map.get("title"), (String) map.get("id")));
+                    options.add(option((String) map.get("title"), (String) map.get(ID)));
                 }
             }
         }

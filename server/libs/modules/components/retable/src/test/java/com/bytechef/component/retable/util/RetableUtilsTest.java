@@ -40,18 +40,15 @@ import org.mockito.ArgumentCaptor;
  */
 class RetableUtilsTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final List<Option<String>> expectedOptions = List.of(option("One", "1"), option("Two", "2"));
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Response mockedResponse = mock(Response.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-
-    List<Option<String>> expected = List.of(
-        option("One", "1"),
-        option("Two", "2"));
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -63,8 +60,7 @@ class RetableUtilsTest {
     }
 
     @Test
-    void testGetWorkspaceOptions() {
-
+    void testGetWorkspaceIdOptions() {
         Map<String, Object> mockResponse = Map.of(
             "data",
             Map.of("workspaces",
@@ -75,15 +71,14 @@ class RetableUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockResponse);
 
-        List<Option<String>> result = RetableUtils.getWorkspaceOptions(
+        List<Option<String>> result = RetableUtils.getWorkspaceIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        assertEquals(expected, result);
+        assertEquals(expectedOptions, result);
     }
 
     @Test
-    void testGetProjectOptions() {
-
+    void testGetProjectIdOptions() {
         Map<String, Object> mockResponse = Map.of(
             "data",
             Map.of("projects",
@@ -94,15 +89,14 @@ class RetableUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockResponse);
 
-        List<Option<String>> result = RetableUtils.getProjectOptions(
+        List<Option<String>> result = RetableUtils.getProjectIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        assertEquals(expected, result);
+        assertEquals(expectedOptions, result);
     }
 
     @Test
-    void testGetRetableOptions() {
-
+    void testGetRetableIdOptions() {
         Map<String, Object> mockResponse = Map.of(
             "data",
             Map.of("retables",
@@ -113,9 +107,9 @@ class RetableUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockResponse);
 
-        List<Option<String>> result = RetableUtils.getRetableOptions(
+        List<Option<String>> result = RetableUtils.getRetableIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        assertEquals(expected, result);
+        assertEquals(expectedOptions, result);
     }
 }

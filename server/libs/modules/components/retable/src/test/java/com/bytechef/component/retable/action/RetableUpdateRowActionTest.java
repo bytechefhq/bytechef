@@ -18,7 +18,7 @@ package com.bytechef.component.retable.action;
 
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.RETABLE_ID;
-import static com.bytechef.component.retable.constant.RetableConstants.ROWS;
+import static com.bytechef.component.retable.constant.RetableConstants.ROWS_IDS;
 import static com.bytechef.component.retable.constant.RetableConstants.ROW_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.WORKSPACE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,7 +51,7 @@ class RetableUpdateRowActionTest {
     @Test
     void testPerform() {
         Parameters parameters = MockParametersFactory.create(
-            Map.of(WORKSPACE_ID, "1", PROJECT_ID, "2", RETABLE_ID, "3", ROW_ID, "4", ROWS, Map.of("5", "test")));
+            Map.of(WORKSPACE_ID, "1", PROJECT_ID, "2", RETABLE_ID, "3", ROW_ID, 4, ROWS_IDS, Map.of("5", "test")));
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -71,11 +71,10 @@ class RetableUpdateRowActionTest {
         Map<String, Object> expectedBody = Map.of(
             "rows", List.of(
                 Map.of(
-                    ROW_ID, "4",
+                    ROW_ID, 4,
                     "columns", List.of(Map.of("column_id", "5", "update_cell_value", "test")))));
 
-        assertEquals(expectedBody.toString(), body.getContent()
-            .toString());
+        assertEquals(expectedBody, body.getContent());
         assertEquals(mockedObject, result);
     }
 }
