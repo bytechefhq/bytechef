@@ -19,6 +19,7 @@ package com.bytechef.component.bitbucket.util;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.KEY;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.NAME;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.PAGE;
+import static com.bytechef.component.bitbucket.constant.BitbucketConstants.SLUG;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.VALUES;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.WORKSPACE;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -50,6 +51,27 @@ class BitbucketUtilsTest {
     private final Map<String, Object> responseMap = Map.of(VALUES, List.of(
         Map.of(NAME, "name1", KEY, "key1"), Map.of(NAME, "name2", KEY, "key2")));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
+    @Test
+    void testGetPaginationList() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
+
+        String mockedUrl = "mockedUrl";
+        List<Map<String, Object>> result = BitbucketUtils.getPaginationList(mockedContext, mockedUrl);
+
+        assertEquals(responseMap.get(VALUES), result);
+
+        assertEquals(List.of(PAGE, "1"), stringArgumentCaptor.getAllValues());
+    }
 
     @Test
     void testGetKeyOptions() {
