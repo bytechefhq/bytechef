@@ -58,7 +58,7 @@ public class BoxUploadFileAction {
                 .defaultValue("0")
                 .required(true),
             fileEntry(FILE)
-                .label("File")
+                .label("File Entry")
                 .required(true))
         .output(
             outputSchema(

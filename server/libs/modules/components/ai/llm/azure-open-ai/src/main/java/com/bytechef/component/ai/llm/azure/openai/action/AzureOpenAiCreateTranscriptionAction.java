@@ -58,7 +58,7 @@ public class AzureOpenAiCreateTranscriptionAction {
         .description("Transcribes audio into the input language.")
         .properties(
             fileEntry(FILE)
-                .label("File")
+                .label("File Entry")
                 .description("The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, " +
                     "mpga, m4a, ogg, wav, or webm.")
                 .required(true),

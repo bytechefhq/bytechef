@@ -57,7 +57,7 @@ public class MicrosoftSharePointUploadFileAction {
                 .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
                 .required(false),
             fileEntry(FILE)
-                .label("File")
+                .label("File Entry")
                 .description("File to upload.")
                 .required(true))
         .output(

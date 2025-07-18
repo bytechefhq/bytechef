@@ -51,10 +51,10 @@ public class ElevenLabsCreateTranscriptAction {
                 .defaultValue("scribe_v1")
                 .required(true),
             fileEntry(FILE)
-                .label("File")
+                .label("File Entry")
                 .description(
-                    "The file to transcribe. All major audio and video formats are supported. The file size must be " +
-                        "less than 1GB.")
+                    "The file object with content to transcribe. All major audio and video formats are supported. " +
+                        "The file size must be less than 1GB.")
                 .required(true))
         .output(
             outputSchema(

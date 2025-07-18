@@ -48,8 +48,8 @@ public class CryptoHelperRsaDecryptAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)
-                .label("File")
-                .description("File that will be decrypted.")
+                .label("File Entry")
+                .description("File object with content that will be decrypted.")
                 .required(true))
         .output(outputSchema(fileEntry().description("Decrypted file.")))
         .perform(CryptoHelperRsaDecryptAction::perform);

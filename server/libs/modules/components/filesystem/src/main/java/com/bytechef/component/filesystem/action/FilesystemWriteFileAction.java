@@ -45,7 +45,7 @@ public class FilesystemWriteFileAction {
         .title("Write to File")
         .properties(
             fileEntry(FILE_ENTRY)
-                .label("File")
+                .label("File Entry")
                 .description("File entry object to be written.")
                 .required(true),
             string(FILENAME)
