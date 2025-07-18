@@ -268,6 +268,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:reddit"))
     implementation(project(":server:libs:modules:components:resend"))
     implementation(project(":server:libs:modules:components:request"))
+    implementation(project(":server:libs:modules:components:retable"))
     implementation(project(":server:libs:modules:components:rocketchat"))
     implementation(project(":server:libs:modules:components:salesflare"))
     implementation(project(":server:libs:modules:components:salesforce"))
