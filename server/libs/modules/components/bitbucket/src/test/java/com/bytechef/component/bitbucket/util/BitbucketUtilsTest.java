@@ -49,7 +49,8 @@ class BitbucketUtilsTest {
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(WORKSPACE, "workspace"));
     private final Response mockedResponse = mock(Response.class);
     private final Map<String, Object> responseMap = Map.of(VALUES, List.of(
-        Map.of(NAME, "name1", KEY, "key1"), Map.of(NAME, "name2", KEY, "key2")));
+        Map.of(NAME, "name1", KEY, "key1", SLUG, "slug1"),
+        Map.of(NAME, "name2", KEY, "key2", SLUG, "slug2")));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
@@ -69,6 +70,31 @@ class BitbucketUtilsTest {
         List<Map<String, Object>> result = BitbucketUtils.getPaginationList(mockedContext, mockedUrl);
 
         assertEquals(responseMap.get(VALUES), result);
+
+        assertEquals(List.of(PAGE, "1"), stringArgumentCaptor.getAllValues());
+    }
+
+    @Test
+    void testGetRepositoryOptions() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
+
+        List<Option<String>> options = BitbucketUtils.getRepositoryOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+
+        List<Option<String>> expectedOptions = List.of(
+            option("name1", "slug1"),
+            option("name2", "slug2"));
+
+        assertEquals(expectedOptions, options);
 
         assertEquals(List.of(PAGE, "1"), stringArgumentCaptor.getAllValues());
     }

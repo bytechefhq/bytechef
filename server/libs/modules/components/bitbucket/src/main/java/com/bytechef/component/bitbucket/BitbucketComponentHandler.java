@@ -25,12 +25,14 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.bitbucket.action.BitbucketListProjectsAction;
 import com.bytechef.component.bitbucket.action.BitbucketListRepositoriesAction;
+import com.bytechef.component.bitbucket.trigger.BitbucketRepositoryPushTrigger;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.google.auto.service.AutoService;
 import java.util.List;
 
@@ -45,6 +47,11 @@ public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler
         return List.of(
             BitbucketListProjectsAction.ACTION_DEFINITION,
             BitbucketListRepositoriesAction.ACTION_DEFINITION);
+    }
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(BitbucketRepositoryPushTrigger.TRIGGER_DEFINITION);
     }
 
     @Override

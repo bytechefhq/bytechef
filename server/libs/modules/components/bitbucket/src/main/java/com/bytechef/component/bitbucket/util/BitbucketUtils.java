@@ -19,6 +19,7 @@ package com.bytechef.component.bitbucket.util;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.KEY;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.NAME;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.PAGE;
+import static com.bytechef.component.bitbucket.constant.BitbucketConstants.SLUG;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.VALUES;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.WORKSPACE;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -90,6 +91,14 @@ public class BitbucketUtils extends AbstractBitbucketUtils {
         } while (response.get("next") != null);
 
         return options;
+    }
+
+    public static List<Option<String>> getRepositoryOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        return getPaginationValues(
+            context, "/repositories/%s".formatted(inputParameters.getRequiredString(WORKSPACE)), NAME, SLUG);
     }
 
     public static List<Option<String>> getKeyOptions(
