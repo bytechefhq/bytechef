@@ -23,7 +23,15 @@ if (project.hasProperty("prod")) {
     }
 
     configure<org.springframework.boot.gradle.dsl.SpringBootExtension> {
-        buildInfo()
+        buildInfo {
+            properties {
+                additional = mapOf(
+                    "description" to project.getDescription(),
+                    "java.version" to JavaVersion.current(),
+                    "image.version" to project.properties["bytechefImageVersion"].toString()
+                )
+            }
+        }
     }
 } else {
     dependencies {
@@ -36,6 +44,11 @@ if (project.hasProperty("prod")) {
         buildInfo {
             properties {
                 time = null
+                additional = mapOf(
+                    "description" to (project.getDescription() ?: ""),
+                    "java.version" to JavaVersion.current(),
+                    "image.version" to project.properties["bytechefImageVersion"].toString()
+                )
             }
         }
     }
