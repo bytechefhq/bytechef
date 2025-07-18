@@ -38,6 +38,32 @@ import java.util.Map;
  */
 public class BitbucketUtils extends AbstractBitbucketUtils {
 
+    public static List<Map<String, Object>> getPaginationList(Context context, String url) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        Map<String, Object> response;
+
+        do {
+            int page = 0;
+
+            response = context.http(http -> http.get(url))
+                .queryParameter(PAGE, String.valueOf(++page))
+                .configuration(responseType(ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (response.get(VALUES) instanceof List<?> values) {
+                for (Object value : values) {
+                    if (value instanceof Map<?, ?> valueMap)
+                        list.add((Map<String, Object>) valueMap);
+                }
+            }
+
+        } while (response.get("next") != null);
+
+        return list;
+    }
+
     private static List<Option<String>> getPaginationValues(
         Context context, String startUrl, String optionLabel, String optionValue) {
 

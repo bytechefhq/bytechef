@@ -20,19 +20,40 @@ import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.bitbucket.action.BitbucketListProjectsAction;
+import com.bytechef.component.bitbucket.action.BitbucketListRepositoriesAction;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
+import java.util.List;
 
 /**
  * @author Nikolina Spehar
  */
 @AutoService(OpenApiComponentHandler.class)
 public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler {
+
+    @Override
+    public List<? extends ModifiableActionDefinition> getCustomActions() {
+        return List.of(
+            BitbucketListProjectsAction.ACTION_DEFINITION,
+            BitbucketListRepositoriesAction.ACTION_DEFINITION);
+    }
+
+    @Override
+    public List<ClusterElementDefinition<?>>
+        modifyClusterElements(ClusterElementDefinition<?>... clusterElementDefinitions) {
+        return List.of(
+            tool(BitbucketListProjectsAction.ACTION_DEFINITION),
+            tool(BitbucketListRepositoriesAction.ACTION_DEFINITION));
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
