@@ -47,7 +47,7 @@ public class XmlFileReadAction {
         .description("Reads data from a XML file.")
         .properties(
             fileEntry(FILE_ENTRY)
-                .label("File")
+                .label("File Entry")
                 .description("The object property which contains a reference to the XML file to read from.")
                 .required(true),
             bool(IS_ARRAY)

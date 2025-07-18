@@ -46,7 +46,7 @@ public class DropboxUploadFileAction {
         .description("Create a new file up to a size of 150MB with the contents provided in the request.")
         .properties(
             fileEntry(FILE_ENTRY)
-                .label("File")
+                .label("File Entry")
                 .description("The object property which contains a reference to the file to be written.")
                 .required(true),
             string(PATH)
