@@ -20,12 +20,15 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,11 +43,16 @@ import org.springframework.stereotype.Service;
 public class WorkflowFacadeImpl implements WorkflowFacade {
 
     private final ComponentConnectionFacade componentConnectionFacade;
+    private final ComponentDefinitionService componentDefinitionService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public WorkflowFacadeImpl(ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
+    public WorkflowFacadeImpl(
+        ComponentConnectionFacade componentConnectionFacade, ComponentDefinitionService componentDefinitionService,
+        WorkflowService workflowService) {
+
         this.componentConnectionFacade = componentConnectionFacade;
+        this.componentDefinitionService = componentDefinitionService;
         this.workflowService = workflowService;
     }
 
@@ -74,9 +82,16 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
                 CollectionUtils.getFirst(
                     allTasks,
                     curWorkflowTask -> Objects.equals(curWorkflowTask.getName(), workflowTask.getName())));
+
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                workflowNodeType.name(), workflowNodeType.version());
+
             workflowTaskDTOs.add(
                 new WorkflowTaskDTO(
-                    workflowTask, ClusterElementMap.of(workflowTask.getExtensions(), componentConnections),
+                    workflowTask,
+                    componentDefinition.isClusterRoot() ? ClusterElementMap.of(workflowTask.getExtensions()) : null,
                     componentConnections));
         }
 
