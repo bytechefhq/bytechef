@@ -22,6 +22,7 @@ package com.bytechef.component.retable.constant;
 public class RetableConstants {
 
     public static final String COLUMNS = "columns";
+    public static final String COLUMN_ID = "column_id";
     public static final String DATA = "data";
     public static final String ID = "id";
     public static final String NAME = "name";

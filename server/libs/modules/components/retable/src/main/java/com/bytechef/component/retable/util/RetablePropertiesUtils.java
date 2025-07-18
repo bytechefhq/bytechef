@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.retable.constant.RetableConstants.COLUMNS;
+import static com.bytechef.component.retable.constant.RetableConstants.COLUMN_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.DATA;
 import static com.bytechef.component.retable.constant.RetableConstants.RETABLE_ID;
 
@@ -71,31 +72,32 @@ public class RetablePropertiesUtils {
     }
 
     private static ModifiableValueProperty<?, ?> createProperty(Map<?, ?> columnMap) {
+        String columnId = (String) columnMap.get(COLUMN_ID);
         String title = (String) columnMap.get("title");
         String type = (String) columnMap.get("type");
 
         if (type != null) {
             return switch (type) {
-                case "text", "select", "color", "phone_number" -> string(title)
+                case "text", "select", "color", "phone_number" -> string(columnId)
                     .label(title)
                     .required(false);
-                case "email" -> string(title)
+                case "email" -> string(columnId)
                     .label(title)
                     .required(false)
                     .controlType(ControlType.EMAIL);
-                case "checkbox" -> bool(title)
+                case "checkbox" -> bool(columnId)
                     .label(title)
                     .required(false);
-                case "number", "percent", "currency" -> number(title)
+                case "number", "percent", "currency" -> number(columnId)
                     .label(title)
                     .required(false);
-                case "rating", "duration" -> integer(title)
+                case "rating", "duration" -> integer(columnId)
                     .label(title)
                     .required(false);
-                case "calendar" -> dateTime(title)
+                case "calendar" -> dateTime(columnId)
                     .label(title)
                     .required(false);
-                case "attachment", "image" -> fileEntry(title)
+                case "attachment", "image" -> fileEntry(columnId)
                     .label(title)
                     .required(false);
                 default -> null;

@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.retable.constant.RetableConstants.COLUMN_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.ROWS_IDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,6 +48,7 @@ import org.junit.jupiter.api.Test;
  */
 class RetablePropetiesUtilsTest {
 
+    private static final String TEST_ID = "testId";
     private static final String TEST_NAME = "testName";
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Executor mockedExecutor = mock(Executor.class);
@@ -76,65 +78,65 @@ class RetablePropetiesUtilsTest {
 
     private static List<Map<String, Object>> createItems() {
         return List.of(
-            Map.of("title", TEST_NAME, "type", "text"),
-            Map.of("title", TEST_NAME, "type", "select"),
-            Map.of("title", TEST_NAME, "type", "color"),
-            Map.of("title", TEST_NAME, "type", "phone_number"),
-            Map.of("title", TEST_NAME, "type", "email"),
-            Map.of("title", TEST_NAME, "type", "checkbox"),
-            Map.of("title", TEST_NAME, "type", "number"),
-            Map.of("title", TEST_NAME, "type", "percent"),
-            Map.of("title", TEST_NAME, "type", "currency"),
-            Map.of("title", TEST_NAME, "type", "rating"),
-            Map.of("title", TEST_NAME, "type", "duration"),
-            Map.of("title", TEST_NAME, "type", "calendar"),
-            Map.of("title", TEST_NAME, "type", "attachment"),
-            Map.of("title", TEST_NAME, "type", "image"));
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "text"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "select"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "color"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "phone_number"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "email"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "checkbox"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "number"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "percent"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "currency"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "rating"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "duration"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "calendar"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "attachment"),
+            Map.of(COLUMN_ID, TEST_ID, "title", TEST_NAME, "type", "image"));
     }
 
     private static List<ValueProperty<?>> getExpectedProperties() {
         return List.of(
-            string(TEST_NAME)
+            string(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            string(TEST_NAME)
+            string(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            string(TEST_NAME)
+            string(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            string(TEST_NAME)
+            string(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            string(TEST_NAME)
+            string(TEST_ID)
                 .label(TEST_NAME)
                 .controlType(ControlType.EMAIL)
                 .required(false),
-            bool(TEST_NAME)
+            bool(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            number(TEST_NAME)
+            number(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            number(TEST_NAME)
+            number(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            number(TEST_NAME)
+            number(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            integer(TEST_NAME)
+            integer(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            integer(TEST_NAME)
+            integer(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            dateTime(TEST_NAME)
+            dateTime(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            fileEntry(TEST_NAME)
+            fileEntry(TEST_ID)
                 .label(TEST_NAME)
                 .required(false),
-            fileEntry(TEST_NAME)
+            fileEntry(TEST_ID)
                 .label(TEST_NAME)
                 .required(false));
     }

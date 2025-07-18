@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.retable.constant.RetableConstants.COLUMNS;
+import static com.bytechef.component.retable.constant.RetableConstants.COLUMN_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.RETABLE_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.ROWS_IDS;
@@ -89,25 +90,27 @@ public class RetableUpdateRowAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, Object> retableRowValues = convertPropertyToRetableRowValue(inputParameters);
+        List<Map<String, Object>> retableRowValues = convertPropertyToRetableRowValue(inputParameters.getMap(ROWS_IDS));
 
         return context
             .http(http -> http.put("/retable/" + inputParameters.getRequiredString(RETABLE_ID) + "/data"))
             .configuration(responseType(ResponseType.JSON))
-            .body(Body.of(retableRowValues))
+            .body(
+                Body.of(
+                    Map.of(
+                        "rows", List.of(
+                            Map.of(
+                                ROW_ID, inputParameters.getRequiredInteger(ROW_ID),
+                                COLUMNS, retableRowValues)))))
             .execute()
             .getBody();
     }
 
-    private static Map<String, Object> convertPropertyToRetableRowValue(Parameters inputParameters) {
-        List<Map<String, Object>> cells = inputParameters.getMap(ROWS_IDS)
+    private static List<Map<String, Object>> convertPropertyToRetableRowValue(Map<String, ?> rowsIds) {
+        return rowsIds
             .entrySet()
             .stream()
-            .map(entry -> Map.of("column_id", entry.getKey(), "update_cell_value", entry.getValue()))
+            .map(entry -> Map.of(COLUMN_ID, entry.getKey(), "update_cell_value", entry.getValue()))
             .toList();
-
-        return Map.of("rows",
-            List.of(
-                Map.of(ROW_ID, inputParameters.getRequiredInteger(ROW_ID), COLUMNS, cells)));
     }
 }
