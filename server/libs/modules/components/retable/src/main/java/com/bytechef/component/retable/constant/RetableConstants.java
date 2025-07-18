@@ -21,10 +21,14 @@ package com.bytechef.component.retable.constant;
  */
 public class RetableConstants {
 
+    public static final String COLUMNS = "columns";
+    public static final String DATA = "data";
+    public static final String ID = "id";
+    public static final String NAME = "name";
     public static final String PROJECT_ID = "project_id";
     public static final String RETABLE_ID = "retable_id";
     public static final String ROW_ID = "row_id";
-    public static final String ROWS = "row_ids";
+    public static final String ROWS_IDS = "row_ids";
     public static final String WORKSPACE_ID = "workspace_id";
 
     private RetableConstants() {

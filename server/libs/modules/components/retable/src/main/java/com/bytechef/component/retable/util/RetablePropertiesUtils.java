@@ -24,12 +24,15 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.retable.constant.RetableConstants.COLUMNS;
+import static com.bytechef.component.retable.constant.RetableConstants.DATA;
 import static com.bytechef.component.retable.constant.RetableConstants.RETABLE_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +47,7 @@ public class RetablePropertiesUtils {
     private RetablePropertiesUtils() {
     }
 
-    public static List<Property.ValueProperty<?>> createPropertiesForRowValues(
+    public static List<ValueProperty<?>> createPropertiesForRowValues(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext actionContext) {
 
@@ -54,45 +57,46 @@ public class RetablePropertiesUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (!(body.get("data")
-            .get("columns") instanceof List<?> items)) {
-            return List.of();
+        Map<String, Object> data = body.get(DATA);
+
+        if (data.get(COLUMNS) instanceof List<?> items) {
+            return new ArrayList<>(items.stream()
+                .filter(o -> o instanceof Map<?, ?>)
+                .map(o -> createProperty((Map<?, ?>) o))
+                .filter(Objects::nonNull)
+                .toList());
         }
 
-        return new ArrayList<>(items.stream()
-            .filter(o -> o instanceof Map<?, ?>)
-            .map(o -> createProperty((Map<?, ?>) o))
-            .filter(Objects::nonNull)
-            .toList());
+        return List.of();
     }
 
     private static ModifiableValueProperty<?, ?> createProperty(Map<?, ?> columnMap) {
-        String name = (String) columnMap.get("title");
+        String title = (String) columnMap.get("title");
         String type = (String) columnMap.get("type");
 
         if (type != null) {
             return switch (type) {
-                case "text", "select", "color", "phone_number" -> string(name)
-                    .label(name)
+                case "text", "select", "color", "phone_number" -> string(title)
+                    .label(title)
                     .required(false);
-                case "email" -> string(name)
-                    .label(name)
+                case "email" -> string(title)
+                    .label(title)
                     .required(false)
-                    .controlType(Property.ControlType.EMAIL);
-                case "checkbox" -> bool(name)
-                    .label(name)
+                    .controlType(ControlType.EMAIL);
+                case "checkbox" -> bool(title)
+                    .label(title)
                     .required(false);
-                case "number", "percent", "currency" -> number(name)
-                    .label(name)
+                case "number", "percent", "currency" -> number(title)
+                    .label(title)
                     .required(false);
-                case "rating", "duration" -> integer(name)
-                    .label(name)
+                case "rating", "duration" -> integer(title)
+                    .label(title)
                     .required(false);
-                case "calendar" -> dateTime(name)
-                    .label(name)
+                case "calendar" -> dateTime(title)
+                    .label(title)
                     .required(false);
-                case "attachment", "image" -> fileEntry(name)
-                    .label(name)
+                case "attachment", "image" -> fileEntry(title)
+                    .label(title)
                     .required(false);
                 default -> null;
             };

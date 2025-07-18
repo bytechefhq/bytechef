@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Marija Horvat
  */
-public class RetableComponentHandlerTest {
+class RetableComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {

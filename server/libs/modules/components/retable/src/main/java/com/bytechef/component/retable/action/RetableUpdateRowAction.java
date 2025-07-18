@@ -25,9 +25,10 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.retable.constant.RetableConstants.COLUMNS;
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.RETABLE_ID;
-import static com.bytechef.component.retable.constant.RetableConstants.ROWS;
+import static com.bytechef.component.retable.constant.RetableConstants.ROWS_IDS;
 import static com.bytechef.component.retable.constant.RetableConstants.ROW_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.WORKSPACE_ID;
 
@@ -53,25 +54,25 @@ public class RetableUpdateRowAction {
             string(WORKSPACE_ID)
                 .label("Workspace ID")
                 .description("ID of the workspace.")
-                .options((ActionOptionsFunction<String>) RetableUtils::getWorkspaceOptions)
+                .options((ActionOptionsFunction<String>) RetableUtils::getWorkspaceIdOptions)
                 .required(true),
             string(PROJECT_ID)
                 .label("Project ID")
                 .description("ID of the project.")
                 .optionsLookupDependsOn(WORKSPACE_ID)
-                .options((ActionOptionsFunction<String>) RetableUtils::getProjectOptions)
+                .options((ActionOptionsFunction<String>) RetableUtils::getProjectIdOptions)
                 .required(true),
             string(RETABLE_ID)
                 .label("Retable ID")
                 .description("ID of the retable.")
                 .optionsLookupDependsOn(PROJECT_ID)
-                .options((ActionOptionsFunction<String>) RetableUtils::getRetableOptions)
+                .options((ActionOptionsFunction<String>) RetableUtils::getRetableIdOptions)
                 .required(true),
             integer(ROW_ID)
                 .label("Row ID")
                 .description("ID of the row to update.")
                 .required(true),
-            dynamicProperties(ROWS)
+            dynamicProperties(ROWS_IDS)
                 .properties(RetablePropertiesUtils::createPropertiesForRowValues)
                 .propertiesLookupDependsOn(PROJECT_ID)
                 .required(false))
@@ -99,7 +100,7 @@ public class RetableUpdateRowAction {
     }
 
     private static Map<String, Object> convertPropertyToRetableRowValue(Parameters inputParameters) {
-        List<Map<String, Object>> cells = inputParameters.getMap(ROWS)
+        List<Map<String, Object>> cells = inputParameters.getMap(ROWS_IDS)
             .entrySet()
             .stream()
             .map(entry -> Map.of("column_id", entry.getKey(), "update_cell_value", entry.getValue()))
@@ -107,6 +108,6 @@ public class RetableUpdateRowAction {
 
         return Map.of("rows",
             List.of(
-                Map.of(ROW_ID, inputParameters.getRequiredInteger(ROW_ID), "columns", cells)));
+                Map.of(ROW_ID, inputParameters.getRequiredInteger(ROW_ID), COLUMNS, cells)));
     }
 }

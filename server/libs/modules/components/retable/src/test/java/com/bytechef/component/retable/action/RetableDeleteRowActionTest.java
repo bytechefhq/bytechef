@@ -18,7 +18,7 @@ package com.bytechef.component.retable.action;
 
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.RETABLE_ID;
-import static com.bytechef.component.retable.constant.RetableConstants.ROWS;
+import static com.bytechef.component.retable.constant.RetableConstants.ROWS_IDS;
 import static com.bytechef.component.retable.constant.RetableConstants.WORKSPACE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +50,7 @@ class RetableDeleteRowActionTest {
     @Test
     void testPerform() {
         Parameters parameters = MockParametersFactory.create(
-            Map.of(WORKSPACE_ID, "1", PROJECT_ID, "2", RETABLE_ID, "3", ROWS, List.of(1, 2, 3)));
+            Map.of(WORKSPACE_ID, "1", PROJECT_ID, "2", RETABLE_ID, "3", ROWS_IDS, List.of(1, 2, 3)));
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -67,7 +67,7 @@ class RetableDeleteRowActionTest {
 
         Body body = bodyArgumentCaptor.getValue();
 
-        Map<String, Object> expectedBody = Map.of(ROWS, List.of(1, 2, 3));
+        Map<String, Object> expectedBody = Map.of(ROWS_IDS, List.of(1, 2, 3));
 
         assertEquals(expectedBody, body.getContent());
         assertEquals(mockedObject, result);

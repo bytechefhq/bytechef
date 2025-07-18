@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
-import static com.bytechef.component.retable.constant.RetableConstants.ROWS;
+import static com.bytechef.component.retable.constant.RetableConstants.ROWS_IDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -33,7 +33,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.HashMap;
@@ -54,7 +55,7 @@ class RetablePropetiesUtilsTest {
     @Test
     void testCreatePropertiesForRowValues() {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(PROJECT_ID, "1", ROWS, Map.of("2", "test")));
+            Map.of(PROJECT_ID, "1", ROWS_IDS, Map.of("2", "test")));
 
         Map<String, Object> mockedResponseBody = Map.of("data", Map.of("columns", createItems()));
 
@@ -67,7 +68,7 @@ class RetablePropetiesUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedResponseBody);
 
-        List<Property.ValueProperty<?>> result = RetablePropertiesUtils.createPropertiesForRowValues(
+        List<ValueProperty<?>> result = RetablePropertiesUtils.createPropertiesForRowValues(
             mockedParameters, mockedParameters, new HashMap<>(), mockedActionContext);
 
         assertEquals(getExpectedProperties(), result);
@@ -91,7 +92,7 @@ class RetablePropetiesUtilsTest {
             Map.of("title", TEST_NAME, "type", "image"));
     }
 
-    private static List<Property.ValueProperty<?>> getExpectedProperties() {
+    private static List<ValueProperty<?>> getExpectedProperties() {
         return List.of(
             string(TEST_NAME)
                 .label(TEST_NAME)
@@ -107,7 +108,7 @@ class RetablePropetiesUtilsTest {
                 .required(false),
             string(TEST_NAME)
                 .label(TEST_NAME)
-                .controlType(Property.ControlType.EMAIL)
+                .controlType(ControlType.EMAIL)
                 .required(false),
             bool(TEST_NAME)
                 .label(TEST_NAME)
