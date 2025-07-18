@@ -174,7 +174,7 @@ open class FindJsonFilesTask : DefaultTask() {
             val sb = StringBuilder()
             sb.append("[\n")
             if (items != null) {
-                for (property: Properties in items!!) {
+                for (property: Properties in items) {
                     sb.append(getJsonValue(property.type, property.properties, property.items))
                     sb.append(",\n")
                 }
