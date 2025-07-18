@@ -552,6 +552,7 @@ ${authorizations?.joinToString("\n")}
         var actions: Array<Action>? = null
         var componentCategories: Array<ComponentCategory>? = null
         var connection: Connection? = null
+        var customAction: Boolean? = null
         var description: String? = null
         var icon: String? = null
         var name: String? = null
@@ -608,6 +609,20 @@ ${actions?.joinToString("\n")}
 """
         }
 
+        private fun getCustomActionString(): String {
+            return if (customAction == true) {
+"""
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+"""
+            } else {
+                ""
+            }
+        }
+
         override fun toString(): String {
             actions?.forEach { action ->
                 action.componentName = name
@@ -630,10 +645,9 @@ Type: $name/v$version
 <hr />
 
 ${getConnectionString()}
-
 ${getActionsString()}
-
 ${getTriggerString()}
+${getCustomActionString()}
 """
         }
     }
@@ -669,7 +683,7 @@ ${getTriggerString()}
                 mdFile.writeText(json)
 
                 if (readmeFile.exists()) {
-                    mdFile.appendText("<hr />\n\n# Additional instructions\n<hr />\n\n")
+                    mdFile.appendText("<hr />\n\n# Additional instructions\n\n")
                     mdFile.appendText(readmeFile.readText())
                 }
             }
