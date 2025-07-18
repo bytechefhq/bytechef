@@ -1,5 +1,6 @@
 group = "com.bytechef.server"
 description = "ByteChef server app"
+version = properties["bytechefVersion"].toString()
 
 springBoot {
     mainClass.set("com.bytechef.server.ServerApplication")
@@ -379,4 +380,8 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation(project(":server:libs:test:test-int-support"))
+}
+
+configure<com.gorylenko.GitPropertiesPluginExtension> {
+    dotGitDirectory = project.rootProject.layout.projectDirectory.dir(".git")
 }
