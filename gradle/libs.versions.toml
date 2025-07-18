@@ -48,7 +48,7 @@ org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.52.0"
-gradle-git-properties = "com.gorylenko.gradle-git-properties:2.5.0"
+gradle-git-properties = "com.gorylenko.gradle-git-properties:2.5.2"
 jib = "com.google.cloud.tools.jib:3.4.5"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.0.0"
 org-graalvm-buildtools-native = "org.graalvm.buildtools.native:0.10.6"
