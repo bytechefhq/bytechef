@@ -34,7 +34,6 @@ Version: 1
 <hr />
 
 
-
 ## Actions
 
 
@@ -118,7 +117,7 @@ Type: OBJECT
 | unique_email_id | STRING | An identifier for the address across all of Mailchimp. |
 | contact_id | STRING | As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address. |
 | full_name | STRING | The contact's full name. |
-| web_id | STRING | The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://&#123;dc&#125;.admin.mailchimp.com/lists/members/view?id=&#123;web_id&#125;. |
+| web_id | STRING | The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}. |
 | email_type | STRING | Type of email this member asked to get ('html' or 'text'). |
 | status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | Subscriber's current status. |
 | unsubscribe_reason | STRING | A subscriber's reason for unsubscribing. |
@@ -219,7 +218,6 @@ Type: OBJECT
 
 
 
-
 ## Triggers
 
 
@@ -269,4 +267,11 @@ Type: OBJECT
 
 
 <hr />
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
