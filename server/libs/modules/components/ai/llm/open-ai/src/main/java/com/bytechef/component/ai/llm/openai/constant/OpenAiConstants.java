@@ -42,7 +42,17 @@ public final class OpenAiConstants {
 
     public static final List<Option<String>> CHAT_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(OpenAiApi.ChatModel.values())
-            .collect(Collectors.toMap(OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue)));
+            .collect(Collectors.toMap(
+                chatModel -> {
+                    String value = chatModel.getValue();
+
+                    return value.replace("\n", "");
+                },
+                chatModel -> {
+                    String value = chatModel.getValue();
+
+                    return value.replace("\n", "");
+                })));
 
     public static final List<Option<String>> EMBEDDING_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(OpenAiApi.EmbeddingModel.values())

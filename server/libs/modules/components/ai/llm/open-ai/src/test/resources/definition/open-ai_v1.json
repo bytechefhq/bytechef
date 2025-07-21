@@ -79,8 +79,8 @@
         "value" : "gpt-4o-mini-audio-preview"
       }, {
         "description" : null,
-        "label" : "gpt-4o-mini-realtime-preview\n",
-        "value" : "gpt-4o-mini-realtime-preview\n"
+        "label" : "gpt-4o-mini-realtime-preview",
+        "value" : "gpt-4o-mini-realtime-preview"
       }, {
         "description" : null,
         "label" : "gpt-4o-mini-search-preview",
@@ -2062,8 +2062,8 @@
         "value" : "gpt-4o-mini-audio-preview"
       }, {
         "description" : null,
-        "label" : "gpt-4o-mini-realtime-preview\n",
-        "value" : "gpt-4o-mini-realtime-preview\n"
+        "label" : "gpt-4o-mini-realtime-preview",
+        "value" : "gpt-4o-mini-realtime-preview"
       }, {
         "description" : null,
         "label" : "gpt-4o-mini-search-preview",
