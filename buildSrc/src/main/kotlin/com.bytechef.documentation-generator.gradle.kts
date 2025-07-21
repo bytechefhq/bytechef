@@ -70,7 +70,7 @@ open class FindJsonFilesTask : DefaultTask() {
             val name2 = if (name == null) "" else name
             val description2 = if (description == null) "" else description
 
-            return "| $name2 | $typeDetails | $description2 |"
+            return "| $name2 | $typeDetails | ${description2?.escapeHtml()} |"
         }
 
         override fun toString(): String {
@@ -124,8 +124,8 @@ open class FindJsonFilesTask : DefaultTask() {
         }
 
         private fun formatFull(name: String?, label: String?, typeDetails: String, description: String?): String {
-           val required2 =  if (required == null) "false" else required.toString()
-            return "| $name | $label | $typeDetails | `$description` | $required2 |"
+            val required2 = if (required == null) "false" else required.toString()
+            return "| $name | $label | $typeDetails | ${description?.escapeHtml()} | $required2 |"
         }
 
         fun toJsonKeyValuePair(name: String?, type: String?, properties: Array<Properties>?, items: Array<Properties>?): String {
