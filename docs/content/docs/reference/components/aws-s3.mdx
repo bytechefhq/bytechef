@@ -48,8 +48,8 @@ Name: getObject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| filename | Filename | STRING | `Filename to set for binary data.` | true |
-| key | Key | STRING | `Key is most likely the name of the file.` | true |
+| filename | Filename | STRING | Filename to set for binary data. | true |
+| key | Key | STRING | Key is most likely the name of the file. | true |
 
 #### Example JSON Structure
 ```json
@@ -103,7 +103,7 @@ Name: getUrl
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| key | Key or Entity Tag (Etag) | STRING | `Key is most likely the name of the file.` | true |
+| key | Key or Entity Tag (Etag) | STRING | Key is most likely the name of the file. | true |
 
 #### Example JSON Structure
 ```json
@@ -144,7 +144,7 @@ Name: listObjects
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| prefix | Prefix | STRING | `The prefix of an AWS S3 objects.` | true |
+| prefix | Prefix | STRING | The prefix of an AWS S3 objects. | true |
 
 #### Example JSON Structure
 ```json
@@ -198,8 +198,8 @@ Name: presignGetObject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| key | Key | STRING | `Key is most likely the name of the file.` | true |
-| signatureDuration | Signature Duration | STRING | `Time interval until the pre-signed URL expires` | true |
+| key | Key | STRING | Key is most likely the name of the file. | true |
+| signatureDuration | Signature Duration | STRING | Time interval until the pre-signed URL expires | true |
 
 #### Example JSON Structure
 ```json
@@ -236,9 +236,9 @@ Name: putObject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileEntry | File | FILE_ENTRY | `The object property which contains a reference to the file that needs to be written to AWS S3.` | true |
-| key | Key | STRING | `Key is most likely the name of the file.` | true |
-| acl | ACL | STRING <details> <summary> Options </summary> authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, private, public-read, public-read-write </details> | `The canned ACL to apply to the object.` | false |
+| fileEntry | File | FILE_ENTRY | The object property which contains a reference to the file that needs to be written to AWS S3. | true |
+| key | Key | STRING | Key is most likely the name of the file. | true |
+| acl | ACL | STRING <details> <summary> Options </summary> authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, private, public-read, public-read-write </details> | The canned ACL to apply to the object. | false |
 
 #### Example JSON Structure
 ```json

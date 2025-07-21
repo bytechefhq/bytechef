@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| api_key | API Key | STRING | `Enter your API Key. Can be found in Integrations -> API Access Keys.` | true |
+| api_key | API Key | STRING | Enter your API Key. Can be found in Integrations -&gt; API Access Keys. | true |
 
 
 
@@ -45,16 +45,16 @@ Name: createIncident
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| From | From | STRING | `The email address of a valid user associated with the account making the request.` | true |
-| title | Title | STRING | `A short description of the nature, symptoms, cause, or effect of the incident.` | true |
-| service | Service | STRING | `The incident will be created on this service.` | true |
-| priority | Priority | STRING | `Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use them.` | false |
-| urgency | Urgency | STRING <details> <summary> Options </summary> high, low </details> | `The urgency level of this incident.` | false |
-| details | Details | STRING | `Details about the incident.` | false |
-| assignments | Assignments | ARRAY <details> <summary> Items </summary> [STRING\($assignee)] </details> | `Assign the incident to these assignees.` | false |
-| incident_key | Incident Key | STRING | `A string which identifies the incident.` | false |
-| incident_type | Incident Type | STRING | `Incident type.` | false |
-| escalation_policy | Escalation Policy | STRING | `Delegate this incident to the specified escalation policy. Cannot be specified if an assignee is given.` | false |
+| From | From | STRING | The email address of a valid user associated with the account making the request. | true |
+| title | Title | STRING | A short description of the nature, symptoms, cause, or effect of the incident. | true |
+| service | Service | STRING | The incident will be created on this service. | true |
+| priority | Priority | STRING | Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use them. | false |
+| urgency | Urgency | STRING <details> <summary> Options </summary> high, low </details> | The urgency level of this incident. | false |
+| details | Details | STRING | Details about the incident. | false |
+| assignments | Assignments | ARRAY <details> <summary> Items </summary> [STRING\($assignee)] </details> | Assign the incident to these assignees. | false |
+| incident_key | Incident Key | STRING | A string which identifies the incident. | false |
+| incident_type | Incident Type | STRING | Incident type. | false |
+| escalation_policy | Escalation Policy | STRING | Delegate this incident to the specified escalation policy. Cannot be specified if an assignee is given. | false |
 
 #### Example JSON Structure
 ```json
@@ -204,9 +204,9 @@ Name: createIncidentNote
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| From | From | STRING | `The email address of a valid user associated with the account making the request.` | true |
-| incidentId | Incident ID | STRING | `ID of the incident to which the note will be added.` | true |
-| content | Content | STRING | `Content of the incident note.` | true |
+| From | From | STRING | The email address of a valid user associated with the account making the request. | true |
+| incidentId | Incident ID | STRING | ID of the incident to which the note will be added. | true |
+| content | Content | STRING | Content of the incident note. | true |
 
 #### Example JSON Structure
 ```json
@@ -273,16 +273,16 @@ Name: updateIncident
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| From | From | STRING | `The email address of a valid user associated with the account making the request.` | true |
-| incidentId | Incident ID | STRING | `ID of the incident to which the note will be added.` | true |
-| incident_type | Incident Type | STRING | `Incident type.` | true |
-| status | Status | STRING <details> <summary> Options </summary> resolved, acknowledged </details> | `The new status of the incident.` | false |
-| assignments | Assignments | ARRAY <details> <summary> Items </summary> [STRING\($assignee)] </details> | `Assign the incident to these assignees.` | false |
-| resolution | Resolution | STRING | `The resolution for this incident.` | false |
-| title | Title | STRING | `A short description of the nature, symptoms, cause, or effect of the incident.` | false |
-| priority | Priority | STRING | `Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use them.` | false |
-| urgency | Urgency | STRING <details> <summary> Options </summary> high, low </details> | `The urgency level of this incident.` | false |
-| escalation_policy | Escalation Policy | STRING | `Delegate this incident to the specified escalation policy. Cannot be specified if an assignee is given.` | false |
+| From | From | STRING | The email address of a valid user associated with the account making the request. | true |
+| incidentId | Incident ID | STRING | ID of the incident to which the note will be added. | true |
+| incident_type | Incident Type | STRING | Incident type. | true |
+| status | Status | STRING <details> <summary> Options </summary> resolved, acknowledged </details> | The new status of the incident. | false |
+| assignments | Assignments | ARRAY <details> <summary> Items </summary> [STRING\($assignee)] </details> | Assign the incident to these assignees. | false |
+| resolution | Resolution | STRING | The resolution for this incident. | false |
+| title | Title | STRING | A short description of the nature, symptoms, cause, or effect of the incident. | false |
+| priority | Priority | STRING | Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use them. | false |
+| urgency | Urgency | STRING <details> <summary> Options </summary> high, low </details> | The urgency level of this incident. | false |
+| escalation_policy | Escalation Policy | STRING | Delegate this incident to the specified escalation policy. Cannot be specified if an assignee is given. | false |
 
 #### Example JSON Structure
 ```json
@@ -438,7 +438,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| service | Service | STRING | `The service that will be watched for the trigger event.` | true |
+| service | Service | STRING | The service that will be watched for the trigger event. | true |
 
 
 #### Output

@@ -49,7 +49,7 @@ Name: appendRow
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workbookId | Workbook ID | STRING |  | true |
 | worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
-| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> |  | true |
 
 #### Example JSON Structure
@@ -85,7 +85,7 @@ Name: clearWorksheet
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workbookId | Workbook ID | STRING |  | true |
 | worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
-| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 
 #### Example JSON Structure
 ```json
@@ -119,7 +119,7 @@ Name: deleteRow
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workbookId | Workbook ID | STRING |  | true |
 | worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
-| rowNumber | Row Number | INTEGER | `The row number to delete.` | true |
+| rowNumber | Row Number | INTEGER | The row number to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -153,8 +153,8 @@ Name: findRowByNum
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workbookId | Workbook ID | STRING |  | true |
 | worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
-| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
-| rowNumber | Row Number | INTEGER | `The row number to get the values from.` | true |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| rowNumber | Row Number | INTEGER | The row number to get the values from. | true |
 
 #### Example JSON Structure
 ```json
@@ -189,9 +189,9 @@ Name: updateRow
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workbookId | Workbook ID | STRING |  | true |
 | worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
-| rowNumber | Row Number | INTEGER | `The row number to update.` | true |
-| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
-| updateWholeRow | Update Whole Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether to update the whole row or just specific columns.` | true |
+| rowNumber | Row Number | INTEGER | The row number to update. | true |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| updateWholeRow | Update Whole Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to update the whole row or just specific columns. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> workbookId, worksheetName, isTheFirstRowHeader, updateWholeRow </details> |  | true |
 
 #### Example JSON Structure

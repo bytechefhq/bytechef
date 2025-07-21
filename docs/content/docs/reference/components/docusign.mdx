@@ -24,11 +24,11 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| clientId | Integration Key | STRING | `DocuSign app integration key.` | true |
-| clientSecret | Secret Key | STRING | `DocuSign app secret key.` | true |
-| accountId | API Account ID | STRING | `DocuSign API account ID.` | true |
-| environment | Environment | STRING <details> <summary> Options </summary> demo, www, eu </details> | `Environment of the connection.` | true |
-| baseUri | Account Base URI | STRING | `DocuSign account base URI.` | true |
+| clientId | Integration Key | STRING | DocuSign app integration key. | true |
+| clientSecret | Secret Key | STRING | DocuSign app secret key. | true |
+| accountId | API Account ID | STRING | DocuSign API account ID. | true |
+| environment | Environment | STRING <details> <summary> Options </summary> demo, www, eu </details> | Environment of the connection. | true |
+| baseUri | Account Base URI | STRING | DocuSign account base URI. | true |
 
 
 
@@ -49,11 +49,11 @@ Name: createEnvelope
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| documents | Documents | ARRAY <details> <summary> Items </summary> [&#123;FILE_ENTRY\(documentFile), STRING\(name), INTEGER\(documentId)&#125;\($document)] </details> | `The documents to be signed.` | true |
-| status | Status | STRING <details> <summary> Options </summary> sent, created </details> | `The status of the envelope.` | true |
-| emailSubject | Email Subject | STRING | `The subject of the email used to send the envelope.` | true |
-| signers | Signer Recipients | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(email), INTEGER\(recipientId)&#125;\($recipient)] </details> | `The recipients of the envelope that have to sign the documents inside it.` | true |
-| carbonCopies | Cc Recipients | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(email), INTEGER\(recipientId)&#125;\($recipient)] </details> | `The recipients of the envelope that can only view the documents inside it.` | false |
+| documents | Documents | ARRAY <details> <summary> Items </summary> [&#123;FILE_ENTRY\(documentFile), STRING\(name), INTEGER\(documentId)&#125;\($document)] </details> | The documents to be signed. | true |
+| status | Status | STRING <details> <summary> Options </summary> sent, created </details> | The status of the envelope. | true |
+| emailSubject | Email Subject | STRING | The subject of the email used to send the envelope. | true |
+| signers | Signer Recipients | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(email), INTEGER\(recipientId)&#125;\($recipient)] </details> | The recipients of the envelope that have to sign the documents inside it. | true |
+| carbonCopies | Cc Recipients | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(email), INTEGER\(recipientId)&#125;\($recipient)] </details> | The recipients of the envelope that can only view the documents inside it. | false |
 
 #### Example JSON Structure
 ```json
@@ -127,9 +127,9 @@ Name: downloadEnvelopeDocument
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fromDate | From Date | DATE | `Envelops that were created from this date will be fetched.` | true |
-| envelopeId | Envelope ID | STRING <details> <summary> Depends On </summary> fromDate </details> | `The ID of the envelope.` | true |
-| documentId | Document ID | STRING <details> <summary> Depends On </summary> envelopeId </details> | `ID of the document that will be downloaded from the envelope.` | true |
+| fromDate | From Date | DATE | Envelops that were created from this date will be fetched. | true |
+| envelopeId | Envelope ID | STRING <details> <summary> Depends On </summary> fromDate </details> | The ID of the envelope. | true |
+| documentId | Document ID | STRING <details> <summary> Depends On </summary> envelopeId </details> | ID of the document that will be downloaded from the envelope. | true |
 
 #### Example JSON Structure
 ```json

@@ -26,7 +26,7 @@ Version: 1
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
-| key | API key | STRING | `The API key registered in https://my.myob.com.au/au/bd/DevAppList.aspx` | true |
+| key | API key | STRING | The API key registered in https://my.myob.com.au/au/bd/DevAppList.aspx | true |
 
 
 
@@ -47,13 +47,13 @@ Name: createCustomer
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| companyFile | Company File | STRING | `The MYOB company file to use.` | true |
-| IsIndividual | Is Individual? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Does customer contact represent an individual or a company?` | true |
-| FirstName | First Name | STRING | `First name for an individual contact.` | true |
-| LastName | Last Name | STRING | `Last name for an individual contact.` | true |
-| CompanyName | Company Name | STRING | `Company name of the customer contact.` | true |
-| IsActive | Is Active? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Is customer contact active?` | true |
-| Addresses | Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)&#125;] </details> | `List of addresses for the customer contact.` | false |
+| companyFile | Company File | STRING | The MYOB company file to use. | true |
+| IsIndividual | Is Individual? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Does customer contact represent an individual or a company? | true |
+| FirstName | First Name | STRING | First name for an individual contact. | true |
+| LastName | Last Name | STRING | Last name for an individual contact. | true |
+| CompanyName | Company Name | STRING | Company name of the customer contact. | true |
+| IsActive | Is Active? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is customer contact active? | true |
+| Addresses | Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)&#125;] </details> | List of addresses for the customer contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -98,7 +98,7 @@ Name: createCustomerPayment
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| companyFile | Company File | STRING | `The MYOB company file to use.` | true |
+| companyFile | Company File | STRING | The MYOB company file to use. | true |
 | PayFrom | Pay From | STRING <details> <summary> Options </summary> Account, ElectronicPayments </details> |  | true |
 | Account | Account | STRING |  | true |
 | Customer | Customer UID | STRING <details> <summary> Depends On </summary> companyFile </details> |  | true |
@@ -134,13 +134,13 @@ Name: createSupplier
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| companyFile | Company File | STRING | `The MYOB company file to use.` | true |
-| IsIndividual | Is Individual? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Does supplier contact represent an individual or a company?` | true |
-| FirstName | First Name | STRING | `First name for an individual contact.` | true |
-| LastName | Last Name | STRING | `Last name for an individual contact.` | true |
-| CompanyName | Company Name | STRING | `Company name of the supplier contact.` | true |
-| IsActive | Is Active? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Is supplier contact active?` | false |
-| Addresses | Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)&#125;] </details> | `List of addresses for the customer contact.` | false |
+| companyFile | Company File | STRING | The MYOB company file to use. | true |
+| IsIndividual | Is Individual? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Does supplier contact represent an individual or a company? | true |
+| FirstName | First Name | STRING | First name for an individual contact. | true |
+| LastName | Last Name | STRING | Last name for an individual contact. | true |
+| CompanyName | Company Name | STRING | Company name of the supplier contact. | true |
+| IsActive | Is Active? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is supplier contact active? | false |
+| Addresses | Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)&#125;] </details> | List of addresses for the customer contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -185,7 +185,7 @@ Name: createSupplierPayment
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| companyFile | Company File | STRING | `The MYOB company file to use.` | true |
+| companyFile | Company File | STRING | The MYOB company file to use. | true |
 | PayFrom | Pay From | STRING <details> <summary> Options </summary> Account, ElectronicPayments </details> |  | true |
 | Account | Account | STRING |  | true |
 | Supplier | Supplier UID | STRING <details> <summary> Depends On </summary> companyFile </details> |  | true |

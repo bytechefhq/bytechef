@@ -46,9 +46,9 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email | STRING | `Email address of the contact.` | true |
-| FIRSTNAME | First Name | STRING | `First name of the contact.` | false |
-| LASTNAME | Last Name | STRING | `Last name of the contact.` | false |
+| email | Email | STRING | Email address of the contact. | true |
+| FIRSTNAME | First Name | STRING | First name of the contact. | false |
+| LASTNAME | Last Name | STRING | Last name of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -97,9 +97,9 @@ Name: updateContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email | STRING | `Email address of the contact to update.` | true |
-| FIRSTNAME | First Name | STRING | `New first name of the contact.` | false |
-| LASTNAME | Last Name | STRING | `New last name of the contact.` | false |
+| email | Email | STRING | Email address of the contact to update. | true |
+| FIRSTNAME | First Name | STRING | New first name of the contact. | false |
+| LASTNAME | Last Name | STRING | New last name of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -131,14 +131,14 @@ Name: sendTransactionalEmail
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| senderEmail | Sender Email | STRING | `Email of the sender from which the emails will be sent.` | true |
-| to | To Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The To: recipients for the message.` | true |
-| bcc | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The Bcc recipients for the message.` | false |
-| cc | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The Cc recipients for the message.` | false |
-| subject | Subject | STRING | `Subject of the email.` | true |
-| contentType | Content Type | STRING <details> <summary> Options </summary> TEXT, HTML </details> | `Content type of the email.` | true |
-| content | Text Content | STRING | `Plain text body of the message.` | true |
-| content | HTML Content | STRING | `HTML body of the message.` | true |
+| senderEmail | Sender Email | STRING | Email of the sender from which the emails will be sent. | true |
+| to | To Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The To: recipients for the message. | true |
+| bcc | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Bcc recipients for the message. | false |
+| cc | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Cc recipients for the message. | false |
+| subject | Subject | STRING | Subject of the email. | true |
+| contentType | Content Type | STRING <details> <summary> Options </summary> TEXT, HTML </details> | Content type of the email. | true |
+| content | Text Content | STRING | Plain text body of the message. | true |
+| content | HTML Content | STRING | HTML body of the message. | true |
 
 #### Example JSON Structure
 ```json

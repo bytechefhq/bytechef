@@ -24,8 +24,8 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| username | Account SID | STRING | `The Account SID from your Twilio account.` | true |
-| password | Auth Token | STRING | `The Auth Token from your Twilio account.` | true |
+| username | Account SID | STRING | The Account SID from your Twilio account. | true |
+| password | Auth Token | STRING | The Auth Token from your Twilio account. | true |
 
 
 
@@ -46,9 +46,9 @@ Name: sendSMS
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| To | To | STRING | `The recipient's phone number in E.164 format.` | true |
-| From | From | STRING | `The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter must be a sender that is hosted within Twilio and belongs to the Account creating the Message. If you are using messaging_service_sid, this parameter can be empty (Twilio assigns a from value from the Messaging Service's Sender Pool) or you can provide a specific sender from your Sender Pool.` | true |
-| Body | Body | STRING | `The text content of the outgoing message. SMS only: If the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is segmented and charged accordingly. For long body text, consider using the send_as_mms parameter.` | true |
+| To | To | STRING | The recipient's phone number in E.164 format. | true |
+| From | From | STRING | The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter must be a sender that is hosted within Twilio and belongs to the Account creating the Message. If you are using messaging_service_sid, this parameter can be empty (Twilio assigns a from value from the Messaging Service's Sender Pool) or you can provide a specific sender from your Sender Pool. | true |
+| Body | Body | STRING | The text content of the outgoing message. SMS only: If the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is segmented and charged accordingly. For long body text, consider using the send_as_mms parameter. | true |
 
 #### Example JSON Structure
 ```json
@@ -150,12 +150,12 @@ Name: sendWhatsAppMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| To | To | STRING | `The recipient channel address.` | true |
-| From | From | STRING | `The sender's Twilio channel address.` | true |
-| useTemplate | Use Template | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Use a template for the message body.` | true |
-| ContentSid | Content Sid | STRING | `The SID of the content template to be used for the message body.` | true |
-| ContentVariables | null | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Key-value pairs of template variables and their substitution values.` | false |
-| Body | Body | STRING | `The text content of the outgoing message.` | true |
+| To | To | STRING | The recipient channel address. | true |
+| From | From | STRING | The sender's Twilio channel address. | true |
+| useTemplate | Use Template | BOOLEAN <details> <summary> Options </summary> true, false </details> | Use a template for the message body. | true |
+| ContentSid | Content Sid | STRING | The SID of the content template to be used for the message body. | true |
+| ContentVariables | null | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Key-value pairs of template variables and their substitution values. | false |
+| Body | Body | STRING | The text content of the outgoing message. | true |
 
 #### Example JSON Structure
 ```json

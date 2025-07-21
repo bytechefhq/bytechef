@@ -46,11 +46,11 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| role | Contact Role | STRING <details> <summary> Options </summary> user, lead </details> | `Role of the contact` | true |
-| email | Contact Email | STRING | `Email of the contact` | true |
-| name | Contact Name | STRING | `Name of the contact` | false |
-| phone | Contact Phone | STRING | `Phone of the contact must start with a "+" sign` | false |
-| avatar | Contact Image | STRING | `Image of the contact` | false |
+| role | Contact Role | STRING <details> <summary> Options </summary> user, lead </details> | Role of the contact | true |
+| email | Contact Email | STRING | Email of the contact | true |
+| name | Contact Name | STRING | Name of the contact | false |
+| phone | Contact Phone | STRING | Phone of the contact must start with a "+" sign | false |
+| avatar | Contact Image | STRING | Image of the contact | false |
 
 #### Example JSON Structure
 ```json
@@ -168,11 +168,11 @@ Name: sendMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| message_type | Message Type | STRING <details> <summary> Options </summary> inapp, email </details> | `In app message or email message` | true |
-| subject | Title | STRING | `Title of the Email/Message` | true |
-| body | Content | STRING | `Content of the message` | true |
-| template | Template | STRING <details> <summary> Options </summary> plain, personal </details> | `The style of the outgoing message` | true |
-| to | To | STRING | `ID of the contact to send the message to.` | true |
+| message_type | Message Type | STRING <details> <summary> Options </summary> inapp, email </details> | In app message or email message | true |
+| subject | Title | STRING | Title of the Email/Message | true |
+| body | Content | STRING | Content of the message | true |
+| template | Template | STRING <details> <summary> Options </summary> plain, personal </details> | The style of the outgoing message | true |
+| to | To | STRING | ID of the contact to send the message to. | true |
 
 #### Example JSON Structure
 ```json

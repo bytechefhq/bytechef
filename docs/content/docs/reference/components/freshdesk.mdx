@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| domain | Domain | STRING | `Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2` | true |
+| domain | Domain | STRING | Your helpdesk domain name, e.g. https://&#123;your_domain&#125;.freshdesk.com/api/v2 | true |
 | username | API key | STRING |  | true |
 
 
@@ -46,9 +46,9 @@ Name: createCompany
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Name of the company.` | true |
-| description | Description | STRING | `Description of the company.` | false |
-| note | Note | STRING | `Any specific note about the company.` | false |
+| name | Name | STRING | Name of the company. | true |
+| description | Description | STRING | Description of the company. | false |
+| note | Note | STRING | Any specific note about the company. | false |
 
 #### Example JSON Structure
 ```json
@@ -103,12 +103,12 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Full name of the contact` | true |
-| email | Email | STRING | `Primary email address of the contact.` | true |
-| phone | Work Phone | STRING | `Telephone number of the contact.` | false |
-| mobile | Mobile | STRING | `Mobile number of the contact.` | false |
-| description | Description | STRING | `A small description of the contact.` | false |
-| job_title | Job Title | STRING | `Job title of the contact.` | false |
+| name | Name | STRING | Full name of the contact | true |
+| email | Email | STRING | Primary email address of the contact. | true |
+| phone | Work Phone | STRING | Telephone number of the contact. | false |
+| mobile | Mobile | STRING | Mobile number of the contact. | false |
+| description | Description | STRING | A small description of the contact. | false |
+| job_title | Job Title | STRING | Job title of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -166,11 +166,11 @@ Name: createTicket
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| subject | Subject | STRING | `Subject of the ticket.` | true |
-| email | Email | STRING | `Email address of the requester. If no contact exists with this email address in Freshdesk, it will be added as a new contact.` | true |
-| description | Description | STRING | `HTML content of the ticket.` | true |
-| priority | Priority | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | `Priority of the ticket.` | false |
-| status | Status | INTEGER <details> <summary> Options </summary> 2, 3, 4, 5 </details> | `Status of the ticket.` | false |
+| subject | Subject | STRING | Subject of the ticket. | true |
+| email | Email | STRING | Email address of the requester. If no contact exists with this email address in Freshdesk, it will be added as a new contact. | true |
+| description | Description | STRING | HTML content of the ticket. | true |
+| priority | Priority | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | Priority of the ticket. | false |
+| status | Status | INTEGER <details> <summary> Options </summary> 2, 3, 4, 5 </details> | Status of the ticket. | false |
 
 #### Example JSON Structure
 ```json

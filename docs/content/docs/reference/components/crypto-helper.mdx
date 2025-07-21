@@ -25,8 +25,8 @@ Name: hash
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| algorithm | Cryptographic Algorithm | STRING <details> <summary> Options </summary> MD5, SHA-1, SHA-256 </details> | `The cryptographic algorithm that will be used to hash the input.` | true |
-| input | Input | STRING | `Calculates the hash of the provided input.` | true |
+| algorithm | Cryptographic Algorithm | STRING <details> <summary> Options </summary> MD5, SHA-1, SHA-256 </details> | The cryptographic algorithm that will be used to hash the input. | true |
+| input | Input | STRING | Calculates the hash of the provided input. | true |
 
 #### Example JSON Structure
 ```json
@@ -63,9 +63,9 @@ Name: hmac
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| algorithm | Cryptographic Algorithm | STRING <details> <summary> Options </summary> HmacMD5, HmacSHA1, HmacSHA256 </details> | `The cryptographic algorithm that will be used to hash the input.` | true |
-| input | Input | STRING | `Generates a cryptographic HMAC for the provided input.` | true |
-| key | Key | STRING | `Key that will be used for the encryption.` | true |
+| algorithm | Cryptographic Algorithm | STRING <details> <summary> Options </summary> HmacMD5, HmacSHA1, HmacSHA256 </details> | The cryptographic algorithm that will be used to hash the input. | true |
+| input | Input | STRING | Generates a cryptographic HMAC for the provided input. | true |
+| key | Key | STRING | Key that will be used for the encryption. | true |
 
 #### Example JSON Structure
 ```json
@@ -103,9 +103,9 @@ Name: pgpDecrypt
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| privateKey | Private PGP Key | STRING | `Private PGP key that will decrypt the file. Make sure there is a new line after the PGP header.` | true |
-| file | File | FILE_ENTRY | `File that will be decrypted.` | true |
-| passphrase | Passphrase | STRING | `Passphrase that was used for encryption.` | true |
+| privateKey | Private PGP Key | STRING | Private PGP key that will decrypt the file. Make sure there is a new line after the PGP header. | true |
+| file | File | FILE_ENTRY | File that will be decrypted. | true |
+| passphrase | Passphrase | STRING | Passphrase that was used for encryption. | true |
 
 #### Example JSON Structure
 ```json
@@ -165,8 +165,8 @@ Name: pgpEncrypt
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| publicKey | Public PGP Key | STRING | `Public PGP key of the recipient of the encrypted file. Make sure there is a new line after the PGP header.` | true |
-| file | File | FILE_ENTRY | `File that will be encrypted.` | true |
+| publicKey | Public PGP Key | STRING | Public PGP key of the recipient of the encrypted file. Make sure there is a new line after the PGP header. | true |
+| file | File | FILE_ENTRY | File that will be encrypted. | true |
 
 #### Example JSON Structure
 ```json
@@ -225,8 +225,8 @@ Name: rsaDecrypt
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| privateKey | Private RSA Key | STRING | `Private RSA key that will decrypt the file.` | true |
-| file | File | FILE_ENTRY | `File that will be decrypted.` | true |
+| privateKey | Private RSA Key | STRING | Private RSA key that will decrypt the file. | true |
+| file | File | FILE_ENTRY | File that will be decrypted. | true |
 
 #### Example JSON Structure
 ```json
@@ -285,8 +285,8 @@ Name: rsaEncrypt
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| publicKey | Public RSA Key | STRING | `Public RSA key of the recipient of the encrypted file.` | true |
-| file | File | FILE_ENTRY | `File that will be encrypted.` | true |
+| publicKey | Public RSA Key | STRING | Public RSA key of the recipient of the encrypted file. | true |
+| file | File | FILE_ENTRY | File that will be encrypted. | true |
 
 #### Example JSON Structure
 ```json
@@ -345,8 +345,8 @@ Name: sign
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| privateKey | Private RSA Key | STRING | `Private RSA key that will be used to sign the file.` | true |
-| file | File | FILE_ENTRY | `File that will be signed` | true |
+| privateKey | Private RSA Key | STRING | Private RSA key that will be used to sign the file. | true |
+| file | File | FILE_ENTRY | File that will be signed | true |
 
 #### Example JSON Structure
 ```json
@@ -405,9 +405,9 @@ Name: verify
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| publicKey | Public RSA Key | STRING | `Public RSA key that will verify the signature.` | true |
-| file | File | FILE_ENTRY | `File whose signature will be verified.` | true |
-| signature | Signature | FILE_ENTRY | `Signature that will be verified.` | true |
+| publicKey | Public RSA Key | STRING | Public RSA key that will verify the signature. | true |
+| file | File | FILE_ENTRY | File whose signature will be verified. | true |
+| signature | Signature | FILE_ENTRY | Signature that will be verified. | true |
 
 #### Example JSON Structure
 ```json

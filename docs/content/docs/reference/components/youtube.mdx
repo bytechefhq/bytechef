@@ -46,11 +46,11 @@ Name: uploadVideo
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| file | Video File | FILE_ENTRY | `Video file that will be uploaded.` | true |
-| title | Video Title | STRING | `Title of the video.` | true |
-| description | Video Description | STRING | `Description of the video.` | true |
-| tags | Video Tags | ARRAY <details> <summary> Items </summary> [STRING\($tag)] </details> | `Tags of the video.` | false |
-| privacyStatus | Privacy Status | STRING <details> <summary> Options </summary> private, public, unlisted </details> | `Privacy status of the video.` | true |
+| file | Video File | FILE_ENTRY | Video file that will be uploaded. | true |
+| title | Video Title | STRING | Title of the video. | true |
+| description | Video Description | STRING | Description of the video. | true |
+| tags | Video Tags | ARRAY <details> <summary> Items </summary> [STRING\($tag)] </details> | Tags of the video. | false |
+| privacyStatus | Privacy Status | STRING <details> <summary> Options </summary> private, public, unlisted </details> | Privacy status of the video. | true |
 | categoryId | Video Category ID | STRING |  | true |
 
 #### Example JSON Structure
@@ -153,7 +153,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| identifier | Username/Channel Handle | STRING | `Youtube username or a channel handle (e.g. @Youtube).` | true |
+| identifier | Username/Channel Handle | STRING | Youtube username or a channel handle (e.g. @Youtube). | true |
 
 
 #### Output

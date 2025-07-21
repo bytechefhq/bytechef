@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| companyDomain | Company Domain | STRING | `Text before .bamboohr.com when logged in to BambooHR.` | true |
+| companyDomain | Company Domain | STRING | Text before .bamboohr.com when logged in to BambooHR. | true |
 | username | API Key | STRING |  | true |
 
 
@@ -46,13 +46,13 @@ Name: createEmployee
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| firstName | First Name | STRING | `The first name of the employee.` | true |
-| lastName | Last Name | STRING | `The last name of the employee.` | true |
-| employeeNumber | Employee Number | STRING | `The employee number of the employee.` | false |
-| jobTitle | Job Title | STRING | `The job title of the employee.` | false |
-| location | Location | STRING | `The employee's current location.` | false |
-| employmentHistoryStatus | Employee Status | STRING | `The employment status of the employee.` | false |
-| hireDate | Hire Date | DATE | `The date the employee was hired.` | false |
+| firstName | First Name | STRING | The first name of the employee. | true |
+| lastName | Last Name | STRING | The last name of the employee. | true |
+| employeeNumber | Employee Number | STRING | The employee number of the employee. | false |
+| jobTitle | Job Title | STRING | The job title of the employee. | false |
+| location | Location | STRING | The employee's current location. | false |
+| employmentHistoryStatus | Employee Status | STRING | The employment status of the employee. | false |
+| hireDate | Hire Date | DATE | The date the employee was hired. | false |
 
 #### Example JSON Structure
 ```json
@@ -107,13 +107,13 @@ Name: updateEmployee
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Employee ID | STRING | `The ID of the employee.` | true |
-| firstName | Updated First Name | STRING | `The updated first name of the employee.` | false |
-| lastName | Updated Last Name | STRING | `The updated last name of the employee.` | false |
-| jobTitle | Updated Job Title | STRING | `The updated job title of the employee.` | false |
-| location | Updated Location | STRING | `The updated employee's current location.` | false |
-| employmentHistoryStatus | Updated Employee Status | STRING | `The updated employment status of the employee.` | false |
-| hireDate | Updated Hire Date | DATE | `The updated date the employee was hired.` | false |
+| id | Employee ID | STRING | The ID of the employee. | true |
+| firstName | Updated First Name | STRING | The updated first name of the employee. | false |
+| lastName | Updated Last Name | STRING | The updated last name of the employee. | false |
+| jobTitle | Updated Job Title | STRING | The updated job title of the employee. | false |
+| location | Updated Location | STRING | The updated employee's current location. | false |
+| employmentHistoryStatus | Updated Employee Status | STRING | The updated employment status of the employee. | false |
+| hireDate | Updated Hire Date | DATE | The updated date the employee was hired. | false |
 
 #### Example JSON Structure
 ```json
@@ -149,8 +149,8 @@ Name: getEmployee
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Employee ID | STRING | `The ID of the employee.` | true |
-| fields | null | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Fields you want to get from employee. See documentation for available fields.` | true |
+| id | Employee ID | STRING | The ID of the employee. | true |
+| fields | null | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields you want to get from employee. See documentation for available fields. | true |
 
 #### Example JSON Structure
 ```json
@@ -181,11 +181,11 @@ Name: updateEmployeeFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Employee ID | STRING | `The ID of the employee.` | true |
-| fileId | File ID | STRING <details> <summary> Depends On </summary> id </details> | `The ID of the employee file being updated.` | true |
-| name | Updated Name Of The File | STRING | `Use if you want to rename the file.` | false |
-| categoryId | Updated Category ID | STRING | `Use if you want to move the file to a different category.` | false |
-| shareWithEmployee | Update Sharing The File | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Use if you want to update whether this file is shared or not.` | false |
+| id | Employee ID | STRING | The ID of the employee. | true |
+| fileId | File ID | STRING <details> <summary> Depends On </summary> id </details> | The ID of the employee file being updated. | true |
+| name | Updated Name Of The File | STRING | Use if you want to rename the file. | false |
+| categoryId | Updated Category ID | STRING | Use if you want to move the file to a different category. | false |
+| shareWithEmployee | Update Sharing The File | BOOLEAN <details> <summary> Options </summary> true, false </details> | Use if you want to update whether this file is shared or not. | false |
 
 #### Example JSON Structure
 ```json
@@ -225,8 +225,8 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| monitorFields | Fields to Monitor | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The fields to monitor for changes.` | true |
-| postFields | Fields to include in the Output | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The fields to include in the output.` | true |
+| monitorFields | Fields to Monitor | ARRAY <details> <summary> Items </summary> [STRING] </details> | The fields to monitor for changes. | true |
+| postFields | Fields to include in the Output | ARRAY <details> <summary> Items </summary> [STRING] </details> | The fields to include in the output. | true |
 
 
 #### Output

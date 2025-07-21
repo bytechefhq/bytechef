@@ -47,8 +47,8 @@ Name: addAttendeesToEvent
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar Identifier | STRING |  | true |
-| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | `ID of the event to add attendees to.` | true |
-| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The attendees of the event.` | true |
+| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to add attendees to. | true |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees of the event. | true |
 
 #### Example JSON Structure
 ```json
@@ -147,21 +147,21 @@ Name: createEvent
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar Identifier | STRING |  | true |
-| summary | Title | STRING | `Title of the event.` | false |
+| summary | Title | STRING | Title of the event. | false |
 | allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
-| start | Start Date | DATE | `The start date of the event.` | true |
-| end | End Date | DATE | `The end date of the event.` | true |
-| start | Start Date Time | DATE_TIME | `The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.` | true |
-| end | End Date Time | DATE_TIME | `The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance.` | true |
-| description | Description | STRING | `Description of the event. Can contain HTML.` | false |
-| location | Location | STRING | `Geographic location of the event as free-form text.` | false |
+| start | Start Date | DATE | The start date of the event. | true |
+| end | End Date | DATE | The end date of the event. | true |
+| start | Start Date Time | DATE_TIME | The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |
+| end | End Date Time | DATE_TIME | The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance. | true |
+| description | Description | STRING | Description of the event. Can contain HTML. | false |
+| location | Location | STRING | Geographic location of the event as free-form text. | false |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |  | false |
-| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The attendees of the event.` | false |
-| guestsCanInviteOthers | Guest Can Invite Others | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether attendees other than the organizer can invite others to the event.` | false |
-| guestsCanModify | Guest Can Modify | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether attendees other than the organizer can modify the event.` | false |
-| guestsCanSeeOtherGuests | Guest Can See Other Guests | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether attendees other than the organizer can see who the event's attendees are.` | false |
-| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | `Whether to send notifications about the creation of the new event. Note that some emails might still be sent.` | false |
-| useDefault | Use Default Reminders | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether the default reminders of the calendar apply to the event.` | true |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees of the event. | false |
+| guestsCanInviteOthers | Guest Can Invite Others | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can invite others to the event. | false |
+| guestsCanModify | Guest Can Modify | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can modify the event. | false |
+| guestsCanSeeOtherGuests | Guest Can See Other Guests | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can see who the event's attendees are. | false |
+| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
+| useDefault | Use Default Reminders | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the default reminders of the calendar apply to the event. | true |
 | reminders | Reminders | ARRAY <details> <summary> Items </summary> [&#123;STRING\(method), INTEGER\(minutes)&#125;] </details> |  | false |
 
 #### Example JSON Structure
@@ -281,8 +281,8 @@ Name: createQuickEvent
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar Identifier | STRING |  | true |
-| text | Text | STRING | `The text describing the event to be created.` | true |
-| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | `Whether to send notifications about the creation of the new event. Note that some emails might still be sent.` | false |
+| text | Text | STRING | The text describing the event to be created. | true |
+| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
 
 #### Example JSON Structure
 ```json
@@ -381,7 +381,7 @@ Name: deleteEvent
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar Identifier | STRING |  | true |
-| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | `ID of the event to delete.` | true |
+| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -413,10 +413,10 @@ Name: getEvents
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar Identifier | STRING |  | true |
-| eventType | Event Type | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Event types to return.` | false |
-| maxResults | Max Results | INTEGER | `Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response.` | false |
-| q | Search Terms | STRING | `Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email, workingLocationProperties.officeLocation.buildingId, workingLocationProperties.officeLocation.deskId, workingLocationProperties.officeLocation.label and workingLocationProperties.customLocation.label` | false |
-| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | `Date range to find events that exist in this range.` | false |
+| eventType | Event Type | ARRAY <details> <summary> Items </summary> [STRING] </details> | Event types to return. | false |
+| maxResults | Max Results | INTEGER | Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. | false |
+| q | Search Terms | STRING | Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email, workingLocationProperties.officeLocation.buildingId, workingLocationProperties.officeLocation.deskId, workingLocationProperties.officeLocation.label and workingLocationProperties.customLocation.label | false |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find events that exist in this range. | false |
 
 #### Example JSON Structure
 ```json
@@ -523,7 +523,7 @@ Name: getFreeTimeSlots
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar Identifier | STRING |  | true |
-| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | `Date range to find free time.` | true |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find free time. | true |
 
 #### Example JSON Structure
 ```json
@@ -580,15 +580,15 @@ Name: updateEvent
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar Identifier | STRING |  | true |
-| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | `ID of the event to update.` | true |
-| summary | Title | STRING | `New title of the event.` | false |
+| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to update. | true |
+| summary | Title | STRING | New title of the event. | false |
 | allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
-| start | Start Date | DATE | `New start date of the event.` | true |
-| end | End Date | DATE | `New end date of the event.` | true |
-| start | Start Date Time | DATE_TIME | `New (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.` | true |
-| end | End Date Time | DATE_TIME | `New (exclusive) end time of the event. For a recurring event, this is the end time of the first instance.` | true |
-| description | Description | STRING | `New description of the event. Can contain HTML.` | false |
-| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | `New attendees of the event.` | false |
+| start | Start Date | DATE | New start date of the event. | true |
+| end | End Date | DATE | New end date of the event. | true |
+| start | Start Date Time | DATE_TIME | New (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |
+| end | End Date Time | DATE_TIME | New (exclusive) end time of the event. For a recurring event, this is the end time of the first instance. | true |
+| description | Description | STRING | New description of the event. Can contain HTML. | false |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | New attendees of the event. | false |
 
 #### Example JSON Structure
 ```json

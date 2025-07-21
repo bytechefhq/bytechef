@@ -46,9 +46,9 @@ Name: createRecords
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | `ID of the workspace.` | true |
-| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | `ID of the base.` | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | `ID of the table.` | true |
+| workspaceId | Workspace ID | STRING | ID of the workspace. | true |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
 | tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> |  | null |
 
 #### Example JSON Structure
@@ -102,10 +102,10 @@ Name: deleteRecords
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | `ID of the workspace.` | true |
-| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | `ID of the base.` | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | `ID of the table.` | true |
-| recordId | Records ID | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | `ID of the records to delete.` | true |
+| workspaceId | Workspace ID | STRING | ID of the workspace. | true |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
+| recordId | Records ID | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | ID of the records to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -158,11 +158,11 @@ Name: getRecord
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | `ID of the workspace.` | true |
-| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | `ID of the base.` | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | `ID of the table.` | true |
-| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> | `ID of the record to retrieve.` | true |
-| fields | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Fields to include in the response. By default, all the fields are included in the response.` | false |
+| workspaceId | Workspace ID | STRING | ID of the workspace. | true |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> | ID of the record to retrieve. | true |
+| fields | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields to include in the response. By default, all the fields are included in the response. | false |
 
 #### Example JSON Structure
 ```json
@@ -196,9 +196,9 @@ Name: updateRecords
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | `ID of the workspace.` | true |
-| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | `ID of the base.` | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | `ID of the table.` | true |
+| workspaceId | Workspace ID | STRING | ID of the workspace. | true |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
 | tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> |  | null |
 
 #### Example JSON Structure

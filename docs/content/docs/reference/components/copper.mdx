@@ -46,10 +46,10 @@ Name: createActivity
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| activity_type | Activity Type ID | STRING | `Id of activity type for this activity.` | true |
-| details | Details | STRING | `Text body of this activity.` | true |
-| type | Parent Type | STRING <details> <summary> Options </summary> lead, person, company, opportunity </details> | `Parent type to associate this activity with.` | true |
-| id | Parent ID | STRING <details> <summary> Depends On </summary> type </details> | `ID of the parent this activity will be associated with.` | true |
+| activity_type | Activity Type ID | STRING | Id of activity type for this activity. | true |
+| details | Details | STRING | Text body of this activity. | true |
+| type | Parent Type | STRING <details> <summary> Options </summary> lead, person, company, opportunity </details> | Parent type to associate this activity with. | true |
+| id | Parent ID | STRING <details> <summary> Depends On </summary> type </details> | ID of the parent this activity will be associated with. | true |
 
 #### Example JSON Structure
 ```json
@@ -111,16 +111,16 @@ Name: createCompany
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `The name of the company.` | true |
-| assignee_id | Assignee ID | STRING | `ID of the user that will be the owner of the company.` | false |
-| email_domain | Email Domain | STRING | `The domain to which email addresses for the company belong.` | false |
-| contact_type_id | Contact Type ID | STRING | `ID of the Contact type for the company.` | false |
-| details | Details | STRING | `Description of the company.` | false |
-| phone_numbers | Phone Numbers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(number), STRING\(category)&#125;] </details> | `Phone numbers belonging to the company.` | false |
-| socials | Socials | ARRAY <details> <summary> Items </summary> [&#123;STRING\(url), STRING\(category)&#125;] </details> | `Social profiles belonging to the company.` | false |
-| websites | Websites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(url), STRING\(category)&#125;] </details> | `Websites belonging to the company.` | false |
-| address | Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)&#125; </details> | `Company's street, city, state, postal code, and country.` | false |
-| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Tags associated with the company` | false |
+| name | Name | STRING | The name of the company. | true |
+| assignee_id | Assignee ID | STRING | ID of the user that will be the owner of the company. | false |
+| email_domain | Email Domain | STRING | The domain to which email addresses for the company belong. | false |
+| contact_type_id | Contact Type ID | STRING | ID of the Contact type for the company. | false |
+| details | Details | STRING | Description of the company. | false |
+| phone_numbers | Phone Numbers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(number), STRING\(category)&#125;] </details> | Phone numbers belonging to the company. | false |
+| socials | Socials | ARRAY <details> <summary> Items </summary> [&#123;STRING\(url), STRING\(category)&#125;] </details> | Social profiles belonging to the company. | false |
+| websites | Websites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(url), STRING\(category)&#125;] </details> | Websites belonging to the company. | false |
+| address | Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)&#125; </details> | Company's street, city, state, postal code, and country. | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the company | false |
 
 #### Example JSON Structure
 ```json
@@ -226,18 +226,18 @@ Name: createPerson
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `The first and last name of the person.` | true |
-| emails | Emails | ARRAY <details> <summary> Items </summary> [&#123;STRING\(email), STRING\(category)&#125;\($Email)] </details> | `Email addresses belonging to the person.` | false |
-| assignee_id | Assignee ID | STRING | `User ID that will be the owner of the person.` | false |
-| title | Title | STRING | `The professional title of the person.` | false |
-| company_id | Company ID | STRING | `ID of the primary company with which the person is associated.` | false |
-| contact_type_id | Contact Type ID | STRING | `The unique identifier of the contact type of the person.` | false |
-| details | Details | STRING | `Description of the person.` | false |
-| phone_numbers | Phone Numbers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(number), STRING\(category)&#125;] </details> | `Phone numbers belonging to the person.` | false |
-| socials | Socials | ARRAY <details> <summary> Items </summary> [&#123;STRING\(url), STRING\(category)&#125;] </details> | `Social profiles belonging to the person.` | false |
-| websites | Websites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(url), STRING\(category)&#125;] </details> | `Websites belonging to the person.` | false |
-| address | Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)&#125; </details> | `Person's street, city, state, postal code, and country.` | false |
-| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Tags associated with the person.` | false |
+| name | Name | STRING | The first and last name of the person. | true |
+| emails | Emails | ARRAY <details> <summary> Items </summary> [&#123;STRING\(email), STRING\(category)&#125;\($Email)] </details> | Email addresses belonging to the person. | false |
+| assignee_id | Assignee ID | STRING | User ID that will be the owner of the person. | false |
+| title | Title | STRING | The professional title of the person. | false |
+| company_id | Company ID | STRING | ID of the primary company with which the person is associated. | false |
+| contact_type_id | Contact Type ID | STRING | The unique identifier of the contact type of the person. | false |
+| details | Details | STRING | Description of the person. | false |
+| phone_numbers | Phone Numbers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(number), STRING\(category)&#125;] </details> | Phone numbers belonging to the person. | false |
+| socials | Socials | ARRAY <details> <summary> Items </summary> [&#123;STRING\(url), STRING\(category)&#125;] </details> | Social profiles belonging to the person. | false |
+| websites | Websites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(url), STRING\(category)&#125;] </details> | Websites belonging to the person. | false |
+| address | Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)&#125; </details> | Person's street, city, state, postal code, and country. | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the person. | false |
 
 #### Example JSON Structure
 ```json
@@ -357,14 +357,14 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `The name of the task.` | true |
-| assignee_id | Assignee ID | STRING | `ID of the user to assign the task to.` | false |
-| due_date | Due Date | DATE | `The due date of the task.` | false |
-| reminder_date | Reminder Date | DATE | `The reminder date of the task.` | false |
-| details | Description | STRING | `Description of the task.` | false |
-| priority | Priority | STRING <details> <summary> Options </summary> None, Low, Medium, High </details> | `The priority of the task.` | true |
+| name | Name | STRING | The name of the task. | true |
+| assignee_id | Assignee ID | STRING | ID of the user to assign the task to. | false |
+| due_date | Due Date | DATE | The due date of the task. | false |
+| reminder_date | Reminder Date | DATE | The reminder date of the task. | false |
+| details | Description | STRING | Description of the task. | false |
+| priority | Priority | STRING <details> <summary> Options </summary> None, Low, Medium, High </details> | The priority of the task. | true |
 | tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | false |
-| status | Status | STRING <details> <summary> Options </summary> Open, Completed </details> | `The status of the task.` | true |
+| status | Status | STRING <details> <summary> Options </summary> Open, Completed </details> | The status of the task. | true |
 
 #### Example JSON Structure
 ```json

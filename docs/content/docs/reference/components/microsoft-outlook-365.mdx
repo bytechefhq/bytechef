@@ -48,15 +48,15 @@ Name: createEvent
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendar | Calendar ID | STRING |  | true |
-| subject | Subject | STRING | `The subject of the event.` | false |
+| subject | Subject | STRING | The subject of the event. | false |
 | allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
-| start | Start Date | DATE | `The start date of the event.` | true |
-| end | End Date | DATE | `The end date of the event.` | true |
-| start | Start Date Time | DATE_TIME | `The start time of the event.` | true |
-| end | End Date Time | DATE_TIME | `The end time of the event.` | true |
-| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The attendees of the event.` | false |
-| isOnlineMeeting | Is Online Meeting? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Is the event an online meeting?` | false |
-| reminderMinutesBeforeStart | Reminder Minutes Before Start | INTEGER | `The number of minutes before the event start time that the reminder alert occurs.` | false |
+| start | Start Date | DATE | The start date of the event. | true |
+| end | End Date | DATE | The end date of the event. | true |
+| start | Start Date Time | DATE_TIME | The start time of the event. | true |
+| end | End Date Time | DATE_TIME | The end time of the event. | true |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees of the event. | false |
+| isOnlineMeeting | Is Online Meeting? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is the event an online meeting? | false |
+| reminderMinutesBeforeStart | Reminder Minutes Before Start | INTEGER | The number of minutes before the event start time that the reminder alert occurs. | false |
 
 #### Example JSON Structure
 ```json
@@ -127,7 +127,7 @@ Name: deleteEvent
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendar | Calendar ID | STRING |  | true |
-| event | Event ID | STRING <details> <summary> Depends On </summary> calendar </details> | `Id of the event to delete.` | true |
+| event | Event ID | STRING <details> <summary> Depends On </summary> calendar </details> | Id of the event to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -159,7 +159,7 @@ Name: getEvents
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendar | Calendar ID | STRING |  | true |
-| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | `Date range to find events that exist in this range.` | false |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find events that exist in this range. | false |
 
 #### Example JSON Structure
 ```json
@@ -230,7 +230,7 @@ Name: getFreeTimeSlots
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendar | Calendar ID | STRING |  | true |
-| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | `Date range to find free time.` | true |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find free time. | true |
 
 #### Example JSON Structure
 ```json
@@ -286,8 +286,8 @@ Name: getMail
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Message Id | STRING | `Id of the message.` | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, FULL </details> | `The format to return the message in.` | true |
+| id | Message Id | STRING | Id of the message. | true |
+| format | Format | STRING <details> <summary> Options </summary> SIMPLE, FULL </details> | The format to return the message in. | true |
 
 #### Example JSON Structure
 ```json
@@ -318,8 +318,8 @@ Name: moveEmail
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Message ID | STRING | `ID of the message to move.` | true |
-| destinationId | Folder ID | STRING | `The destination folder ID.` | true |
+| id | Message ID | STRING | ID of the message to move. | true |
+| destinationId | Folder ID | STRING | The destination folder ID. | true |
 
 #### Example JSON Structure
 ```json
@@ -350,13 +350,13 @@ Name: replyToEmail
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Message ID | STRING | `Id of the message to reply to.` | true |
-| bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The Bcc recipients for the message.` | false |
-| ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The Cc recipients for the message.` | false |
-| contentType | Content Type | STRING <details> <summary> Options </summary> TEXT, HTML </details> | `The type of the content.` | false |
-| content | HTML Content | STRING | `Body text of the email in HTML format.` | false |
-| content | Text Content | STRING | `Body text of the email.` | false |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | false |
+| id | Message ID | STRING | Id of the message to reply to. | true |
+| bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Bcc recipients for the message. | false |
+| ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Cc recipients for the message. | false |
+| contentType | Content Type | STRING <details> <summary> Options </summary> TEXT, HTML </details> | The type of the content. | false |
+| content | HTML Content | STRING | Body text of the email in HTML format. | false |
+| content | Text Content | STRING | Body text of the email. | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | false |
 
 #### Example JSON Structure
 ```json
@@ -396,10 +396,10 @@ Name: searchEmail
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| from | From | STRING | `The address sending the mail` | false |
-| to | To | STRING | `The address receiving the new mail` | false |
-| subject | Subject | STRING | `Words in the subject line` | false |
-| category | Category | STRING | `Messages in a certain category` | false |
+| from | From | STRING | The address sending the mail | false |
+| to | To | STRING | The address receiving the new mail | false |
+| subject | Subject | STRING | Words in the subject line | false |
+| category | Category | STRING | Messages in a certain category | false |
 
 #### Example JSON Structure
 ```json
@@ -468,13 +468,13 @@ Name: sendEmail
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| toRecipients | To Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The To: recipients for the message.` | true |
-| subject | Subject | STRING | `The subject of the message.` | true |
-| bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The Bcc recipients for the message.` | false |
-| ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The Cc recipients for the message.` | false |
-| replyTo | Reply To | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The email addresses to use when replying.` | false |
-| body | Body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content), STRING\(content)&#125; </details> | `The body of the message. It can be in HTML or text format.` | true |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | false |
+| toRecipients | To Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The To: recipients for the message. | true |
+| subject | Subject | STRING | The subject of the message. | true |
+| bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Bcc recipients for the message. | false |
+| ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Cc recipients for the message. | false |
+| replyTo | Reply To | ARRAY <details> <summary> Items </summary> [STRING] </details> | The email addresses to use when replying. | false |
+| body | Body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content), STRING\(content)&#125; </details> | The body of the message. It can be in HTML or text format. | true |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | false |
 
 #### Example JSON Structure
 ```json
@@ -524,7 +524,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, FULL </details> | `The format to return the message in.` | true |
+| format | Format | STRING <details> <summary> Options </summary> SIMPLE, FULL </details> | The format to return the message in. | true |
 
 
 #### Output

@@ -46,9 +46,9 @@ Name: clearSheet
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | `The ID of the sheet.` | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 
 #### Example JSON Structure
 ```json
@@ -80,9 +80,9 @@ Name: createColumn
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | `The name of the sheet.` | true |
-| columnName | Column Name | STRING | `Name of the new column.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
+| columnName | Column Name | STRING | Name of the new column. | true |
 
 #### Example JSON Structure
 ```json
@@ -135,9 +135,9 @@ Name: createSheet
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetName | Sheet Name | STRING | `The name of the new sheet.` | true |
-| headers | Headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The headers of the new sheet.` | false |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetName | Sheet Name | STRING | The name of the new sheet. | true |
+| headers | Headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | The headers of the new sheet. | false |
 
 #### Example JSON Structure
 ```json
@@ -190,8 +190,8 @@ Name: createSpreadsheet
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Title | STRING | `Title of the new spreadsheet to be created.` | true |
-| folderId | Folder ID | STRING | `ID of the folder where the new spreadsheet will be stored. If no folder is selected, the folder will be created in the root folder.` | false |
+| title | Title | STRING | Title of the new spreadsheet to be created. | true |
+| folderId | Folder ID | STRING | ID of the folder where the new spreadsheet will be stored. If no folder is selected, the folder will be created in the root folder. | false |
 
 #### Example JSON Structure
 ```json
@@ -222,9 +222,9 @@ Name: deleteColumn
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | `The ID of the sheet.` | true |
-| label | Column Label | STRING | `The label of the column to be deleted.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
+| label | Column Label | STRING | The label of the column to be deleted. | true |
 
 #### Example JSON Structure
 ```json
@@ -256,9 +256,9 @@ Name: deleteRow
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | `The ID of the sheet.` | true |
-| rowNumber | Row Number | INTEGER | `The row number to delete.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
+| rowNumber | Row Number | INTEGER | The row number to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -290,8 +290,8 @@ Name: deleteSheet
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | `The ID of the sheet.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
 
 #### Example JSON Structure
 ```json
@@ -322,10 +322,10 @@ Name: findRowByNum
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | `The name of the sheet.` | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
-| rowNumber | Row Number | INTEGER | `The row number to get from the sheet.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| rowNumber | Row Number | INTEGER | The row number to get from the sheet. | true |
 
 #### Example JSON Structure
 ```json
@@ -358,9 +358,9 @@ Name: getRows
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | `The name of the sheet.` | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 
 #### Example JSON Structure
 ```json
@@ -392,10 +392,10 @@ Name: insertMultipleRows
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | `The name of the sheet.` | true |
-| valueInputOption | Value Input Option | STRING <details> <summary> Options </summary> RAW, USER_ENTERED </details> | `How the input data should be interpreted.` | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
+| valueInputOption | Value Input Option | STRING <details> <summary> Options </summary> RAW, USER_ENTERED </details> | How the input data should be interpreted. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | rows | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader </details> |  | true |
 
 #### Example JSON Structure
@@ -430,10 +430,10 @@ Name: insertRow
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | `The name of the sheet.` | true |
-| valueInputOption | Value Input Option | STRING <details> <summary> Options </summary> RAW, USER_ENTERED </details> | `How the input data should be interpreted.` | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
+| valueInputOption | Value Input Option | STRING <details> <summary> Options </summary> RAW, USER_ENTERED </details> | How the input data should be interpreted. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader </details> |  | true |
 
 #### Example JSON Structure
@@ -468,7 +468,7 @@ Name: listSheets
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 
 #### Example JSON Structure
 ```json
@@ -522,11 +522,11 @@ Name: updateRow
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet ID | STRING | `The ID of the spreadsheet to apply the updates to.` | true |
-| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | `The name of the sheet.` | true |
-| rowNumber | Row Number | INTEGER | `The row number to update.` | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
-| updateWholeRow | Update Whole Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether to update the whole row or just specific columns.` | true |
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
+| rowNumber | Row Number | INTEGER | The row number to update. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| updateWholeRow | Update Whole Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to update the whole row or just specific columns. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader, updateWholeRow </details> |  | true |
 
 #### Example JSON Structure
@@ -568,9 +568,9 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spreadsheetId | Spreadsheet | STRING | `The spreadsheet to apply the updates to.` | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the first row is header.` | true |
-| sheetName | Sheet | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | `The name of the sheet` | true |
+| spreadsheetId | Spreadsheet | STRING | The spreadsheet to apply the updates to. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| sheetName | Sheet | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet | true |
 
 
 #### Output

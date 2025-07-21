@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| baseUrl | Base URL | STRING | `Open your Mautic instance and copy the URL from the address bar. If your dashboard link is "https://mautic.ddev.site/s/dashboard", set your base URL as "https://mautic.ddev.site/".` | true |
+| baseUrl | Base URL | STRING | Open your Mautic instance and copy the URL from the address bar. If your dashboard link is "https://mautic.ddev.site/s/dashboard", set your base URL as "https://mautic.ddev.site/". | true |
 | username | Username | STRING |  | true |
 | password | Password | STRING |  | true |
 
@@ -48,8 +48,8 @@ Name: createCompany
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | companyname | Company Name | STRING |  | true |
-| isPublished | Is Published | INTEGER <details> <summary> Options </summary> 1, 0 </details> | `Will the company be published after creation.` | true |
-| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, then empty values are set to fields.Otherwise empty values are skipped.` | false |
+| isPublished | Is Published | INTEGER <details> <summary> Options </summary> 1, 0 </details> | Will the company be published after creation. | true |
+| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, then empty values are set to fields.Otherwise empty values are skipped. | false |
 
 #### Example JSON Structure
 ```json
@@ -117,7 +117,7 @@ Name: createContact
 | firstname | First Name | STRING |  | true |
 | lastname | Last Name | STRING |  | true |
 | email | Email | STRING |  | true |
-| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, then empty values are set to fields.Otherwise empty values are skipped.` | false |
+| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, then empty values are set to fields.Otherwise empty values are skipped. | false |
 
 #### Example JSON Structure
 ```json
@@ -201,7 +201,7 @@ Name: getCompany
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Company ID | STRING | `ID of the company you want to retrieve.` | true |
+| id | Company ID | STRING | ID of the company you want to retrieve. | true |
 
 #### Example JSON Structure
 ```json
@@ -264,7 +264,7 @@ Name: getContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Contact ID | STRING | `ID of the contact you want to retrieve.` | true |
+| id | Contact ID | STRING | ID of the contact you want to retrieve. | true |
 
 #### Example JSON Structure
 ```json

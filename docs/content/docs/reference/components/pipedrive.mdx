@@ -46,11 +46,11 @@ Name: getDeals
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| user_id | User ID | INTEGER | `Deals matching the given user will be returned. However, `filter_id` and `owned_by_you` takes precedence over `user_id` when supplied.` | false |
-| filter_id | Filter ID | INTEGER | `ID of the filter to use.` | false |
-| stage_id | Stage ID | INTEGER | `Deals within the given stage will be returned.` | false |
+| user_id | User ID | INTEGER | Deals matching the given user will be returned. However, `filter_id` and `owned_by_you` takes precedence over `user_id` when supplied. | false |
+| filter_id | Filter ID | INTEGER | ID of the filter to use. | false |
+| stage_id | Stage ID | INTEGER | Deals within the given stage will be returned. | false |
 | status | Status | STRING <details> <summary> Options </summary> open, won, lost, deleted, all_not_deleted </details> |  | false |
-| sort | Sort | STRING | `The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys).` | false |
+| sort | Sort | STRING | The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys). | false |
 
 #### Example JSON Structure
 ```json
@@ -120,18 +120,18 @@ Name: addDeal
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Title | STRING | `The title of the deal` | true |
-| value | Value | STRING | `The value of the deal.` | false |
-| currency | Currency | STRING | `The currency of the deal. If omitted, currency will be set to the default currency of the authorized user.` | false |
-| user_id | User ID | INTEGER | `ID of the user which will be the owner of the created deal. If not provided, the user making the request will be used.` | false |
-| person_id | Person ID | INTEGER | `ID of the person which this deal will be linked to. This property is required unless `org_id` is specified.` | false |
-| org_id | Organization ID | INTEGER | `ID of the organization which this deal will be linked to. This property is required unless `person_id` is specified.` | false |
-| pipeline_id | Pipeline ID | INTEGER | `Id of the pipeline this deal will be added to. By default, the deal will be added to the first stage of the specified pipeline. Please note that `pipeline_id` and `stage_id` should not be used together as `pipeline_id` will be ignored.` | false |
-| stage_id | Stage ID | INTEGER | `Stage this deal will be added to. Please note that a pipeline will be assigned automatically based on the `stage_id`. If omitted, the deal will be placed in the first stage of the default pipeline.` | false |
+| title | Title | STRING | The title of the deal | true |
+| value | Value | STRING | The value of the deal. | false |
+| currency | Currency | STRING | The currency of the deal. If omitted, currency will be set to the default currency of the authorized user. | false |
+| user_id | User ID | INTEGER | ID of the user which will be the owner of the created deal. If not provided, the user making the request will be used. | false |
+| person_id | Person ID | INTEGER | ID of the person which this deal will be linked to. This property is required unless `org_id` is specified. | false |
+| org_id | Organization ID | INTEGER | ID of the organization which this deal will be linked to. This property is required unless `person_id` is specified. | false |
+| pipeline_id | Pipeline ID | INTEGER | Id of the pipeline this deal will be added to. By default, the deal will be added to the first stage of the specified pipeline. Please note that `pipeline_id` and `stage_id` should not be used together as `pipeline_id` will be ignored. | false |
+| stage_id | Stage ID | INTEGER | Stage this deal will be added to. Please note that a pipeline will be assigned automatically based on the `stage_id`. If omitted, the deal will be placed in the first stage of the default pipeline. | false |
 | status | Status | STRING <details> <summary> Options </summary> open, won, lost, deleted </details> |  | false |
-| expected_close_date | Expected Close Date | DATE | `The expected close date of the deal.` | false |
-| probability | Probability | NUMBER | `The success probability percentage of the deal. Used/shown only when `deal_probability` for the pipeline of the deal is enabled.` | false |
-| lost_reason | Lost Reason | STRING | `The optional message about why the deal was lost.` | false |
+| expected_close_date | Expected Close Date | DATE | The expected close date of the deal. | false |
+| probability | Probability | NUMBER | The success probability percentage of the deal. Used/shown only when `deal_probability` for the pipeline of the deal is enabled. | false |
+| lost_reason | Lost Reason | STRING | The optional message about why the deal was lost. | false |
 
 #### Example JSON Structure
 ```json
@@ -208,13 +208,13 @@ Name: searchDeals
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| term | Term | STRING | `The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.` | true |
-| fields | Fields | STRING <details> <summary> Options </summary> custom_fields, notes, title </details> | `A comma-separated string array. The fields to perform the search from. Defaults to all of them.` | false |
-| exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | `When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.` | false |
-| person_id | Person ID | INTEGER | `Will filter deals by the provided person.` | false |
-| organization_id | Organization ID | INTEGER | `Will filter deals by the provided organization.` | false |
-| status | Status | STRING <details> <summary> Options </summary> open, won, lost </details> | `Will filter deals by the provided specific status.` | false |
-| include_fields | Include Fields | STRING <details> <summary> Options </summary> deal.cc_email </details> | `Supports including optional fields in the results which are not provided by default.` | false |
+| term | Term | STRING | The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded. | true |
+| fields | Fields | STRING <details> <summary> Options </summary> custom_fields, notes, title </details> | A comma-separated string array. The fields to perform the search from. Defaults to all of them. | false |
+| exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | When enabled, only full exact matches against the given term are returned. It is &lt;b&gt;not&lt;/b&gt; case sensitive. | false |
+| person_id | Person ID | INTEGER | Will filter deals by the provided person. | false |
+| organization_id | Organization ID | INTEGER | Will filter deals by the provided organization. | false |
+| status | Status | STRING <details> <summary> Options </summary> open, won, lost </details> | Will filter deals by the provided specific status. | false |
+| include_fields | Include Fields | STRING <details> <summary> Options </summary> deal.cc_email </details> | Supports including optional fields in the results which are not provided by default. | false |
 
 #### Example JSON Structure
 ```json
@@ -289,7 +289,7 @@ Name: deleteDeal
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Deal ID | INTEGER | `Id of the deal to delete.` | true |
+| id | Deal ID | INTEGER | Id of the deal to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -404,12 +404,12 @@ Name: getLeads
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| archived_status | Archived Status | STRING <details> <summary> Options </summary> archived, not_archived, all </details> | `Filtering based on the archived status of a lead.` | false |
-| owner_id | Owner iD | INTEGER | `Leads matching the given user will be returned. However, `filter_id` takes precedence over `owner_id` when supplied.` | false |
-| person_id | Person ID | INTEGER | `If supplied, only leads matching the given person will be returned. However, `filter_id` takes precedence over `person_id` when supplied.` | false |
-| organization_id | Organization ID | INTEGER | `If supplied, only leads matching the given organization will be returned. However, `filter_id` takes precedence over `organization_id` when supplied.` | false |
-| filter_id | Filter ID | INTEGER | `Filter to use` | false |
-| sort | Sort | STRING <details> <summary> Options </summary> id, title, owner_id, creator_id, was_seen, expected_close_date, next_activity_id, add_time, update_time </details> | `The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys).` | false |
+| archived_status | Archived Status | STRING <details> <summary> Options </summary> archived, not_archived, all </details> | Filtering based on the archived status of a lead. | false |
+| owner_id | Owner iD | INTEGER | Leads matching the given user will be returned. However, `filter_id` takes precedence over `owner_id` when supplied. | false |
+| person_id | Person ID | INTEGER | If supplied, only leads matching the given person will be returned. However, `filter_id` takes precedence over `person_id` when supplied. | false |
+| organization_id | Organization ID | INTEGER | If supplied, only leads matching the given organization will be returned. However, `filter_id` takes precedence over `organization_id` when supplied. | false |
+| filter_id | Filter ID | INTEGER | Filter to use | false |
+| sort | Sort | STRING <details> <summary> Options </summary> id, title, owner_id, creator_id, was_seen, expected_close_date, next_activity_id, add_time, update_time </details> | The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys). | false |
 
 #### Example JSON Structure
 ```json
@@ -471,13 +471,13 @@ Name: addLead
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Title | STRING | `The name of the lead.` | true |
-| owner_id | Owner ID | INTEGER | `User which will be the owner of the created lead.` | false |
-| label_ids | Lead Labels IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | `ID of the labels which will be associated with the lead.` | false |
-| person_id | Person ID | INTEGER | `Person which this lead will be linked to.` | false |
-| organization_id | Organization ID | INTEGER | `Organization which this lead will be linked to.` | false |
-| value | Value | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(amount), STRING\(currency)&#125; </details> | `The potential value of the lead` | false |
-| expected_close_date | Expected Close Date | DATE | `The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.` | false |
+| title | Title | STRING | The name of the lead. | true |
+| owner_id | Owner ID | INTEGER | User which will be the owner of the created lead. | false |
+| label_ids | Lead Labels IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | ID of the labels which will be associated with the lead. | false |
+| person_id | Person ID | INTEGER | Person which this lead will be linked to. | false |
+| organization_id | Organization ID | INTEGER | Organization which this lead will be linked to. | false |
+| value | Value | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(amount), STRING\(currency)&#125; </details> | The potential value of the lead | false |
+| expected_close_date | Expected Close Date | DATE | The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD. | false |
 
 #### Example JSON Structure
 ```json
@@ -543,7 +543,7 @@ Name: deleteLead
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Lead ID | STRING | `The ID of the lead` | true |
+| id | Lead ID | STRING | The ID of the lead | true |
 
 #### Example JSON Structure
 ```json
@@ -649,12 +649,12 @@ Name: searchLeads
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| term | Term | STRING | `The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.` | true |
-| fields | Fields | STRING <details> <summary> Options </summary> custom_fields, notes, title </details> | `A comma-separated string array. The fields to perform the search from. Defaults to all of them.` | false |
-| exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | `When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.` | false |
-| person_id | Person ID | INTEGER | `Will filter leads by the provided person ID.` | false |
-| organization_id | Organization ID | INTEGER | `Will filter leads by the provided organization ID.` | false |
-| include_fields | Include Fields | STRING <details> <summary> Options </summary> lead.was_seen </details> | `Supports including optional fields in the results which are not provided by default.` | false |
+| term | Term | STRING | The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded. | true |
+| fields | Fields | STRING <details> <summary> Options </summary> custom_fields, notes, title </details> | A comma-separated string array. The fields to perform the search from. Defaults to all of them. | false |
+| exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | When enabled, only full exact matches against the given term are returned. It is &lt;b&gt;not&lt;/b&gt; case sensitive. | false |
+| person_id | Person ID | INTEGER | Will filter leads by the provided person ID. | false |
+| organization_id | Organization ID | INTEGER | Will filter leads by the provided organization ID. | false |
+| include_fields | Include Fields | STRING <details> <summary> Options </summary> lead.was_seen </details> | Supports including optional fields in the results which are not provided by default. | false |
 
 #### Example JSON Structure
 ```json
@@ -718,10 +718,10 @@ Name: getOrganizations
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| user_id | User ID | INTEGER | `Organizations owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.` | false |
-| filter_id | Filter ID | INTEGER | `Filter to use` | false |
-| first_char | First Characters | STRING | `Organizations whose name starts with the specified letter will be returned (case insensitive)` | false |
-| sort | Sort | STRING | `The field names and sorting mode separated by a comma (`field_name_1ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys).` | false |
+| user_id | User ID | INTEGER | Organizations owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied. | false |
+| filter_id | Filter ID | INTEGER | Filter to use | false |
+| first_char | First Characters | STRING | Organizations whose name starts with the specified letter will be returned (case insensitive) | false |
+| sort | Sort | STRING | The field names and sorting mode separated by a comma (`field_name_1ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys). | false |
 
 #### Example JSON Structure
 ```json
@@ -780,8 +780,8 @@ Name: addOrganization
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `The name of the organization.` | true |
-| owner_id | Owner ID | INTEGER | `ID of the user who will be marked as the owner of this organization.` | false |
+| name | Name | STRING | The name of the organization. | true |
+| owner_id | Owner ID | INTEGER | ID of the user who will be marked as the owner of this organization. | false |
 
 #### Example JSON Structure
 ```json
@@ -838,9 +838,9 @@ Name: searchOrganization
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| term | Term | STRING | `The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.` | true |
-| fields | Fields | STRING <details> <summary> Options </summary> address, custom_fields, notes, name </details> | `A comma-separated string array. The fields to perform the search from. Defaults to all of them.` | false |
-| exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | `When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.` | false |
+| term | Term | STRING | The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded. | true |
+| fields | Fields | STRING <details> <summary> Options </summary> address, custom_fields, notes, name </details> | A comma-separated string array. The fields to perform the search from. Defaults to all of them. | false |
+| exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | When enabled, only full exact matches against the given term are returned. It is &lt;b&gt;not&lt;/b&gt; case sensitive. | false |
 
 #### Example JSON Structure
 ```json
@@ -900,7 +900,7 @@ Name: deleteOrganization
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Organization | INTEGER | `Organization to delete` | true |
+| id | Organization | INTEGER | Organization to delete | true |
 
 #### Example JSON Structure
 ```json
@@ -949,7 +949,7 @@ Name: getOrganizationDetails
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Organizaton | INTEGER | `Organization to get details.` | true |
+| id | Organizaton | INTEGER | Organization to get details. | true |
 
 #### Example JSON Structure
 ```json
@@ -1005,10 +1005,10 @@ Name: getPersons
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| user_id | User ID | INTEGER | `Persons owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.` | false |
-| filter_id | Filter ID | INTEGER | `Filter to use.` | false |
-| first_char | First Characters | STRING | `Persons whose name starts with the specified letter will be returned (case insensitive)` | false |
-| sort | Sort | STRING | `The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys).` | false |
+| user_id | User ID | INTEGER | Persons owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied. | false |
+| filter_id | Filter ID | INTEGER | Filter to use. | false |
+| first_char | First Characters | STRING | Persons whose name starts with the specified letter will be returned (case insensitive) | false |
+| sort | Sort | STRING | The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys). | false |
 
 #### Example JSON Structure
 ```json
@@ -1082,11 +1082,11 @@ Name: addPerson
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Person full name` | true |
-| owner_id | Owner ID | INTEGER | `ID of the user who will be marked as the owner of this person.` | false |
-| org_id | Organization ID | INTEGER | `ID of the organization this person will belong to.` | false |
-| email | Email | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), BOOLEAN\(primary), STRING\(label)&#125;] </details> | `An email addresses related to the person.` | false |
-| phone | Phone | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), BOOLEAN\(primary), STRING\(label)&#125;] </details> | `A phone numbers related to the person.` | false |
+| name | Name | STRING | Person full name | true |
+| owner_id | Owner ID | INTEGER | ID of the user who will be marked as the owner of this person. | false |
+| org_id | Organization ID | INTEGER | ID of the organization this person will belong to. | false |
+| email | Email | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), BOOLEAN\(primary), STRING\(label)&#125;] </details> | An email addresses related to the person. | false |
+| phone | Phone | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), BOOLEAN\(primary), STRING\(label)&#125;] </details> | A phone numbers related to the person. | false |
 
 #### Example JSON Structure
 ```json
@@ -1169,10 +1169,10 @@ Name: searchPersons
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| term | Term | STRING | `The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.` | true |
-| fields | Fields | STRING <details> <summary> Options </summary> custom_fields, email, notes, phone, name </details> | `A comma-separated string array. The fields to perform the search from. Defaults to all of them.` | false |
-| exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | `When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.` | false |
-| organization_id | Organization ID | INTEGER | `Will filter persons by the provided organization.` | false |
+| term | Term | STRING | The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded. | true |
+| fields | Fields | STRING <details> <summary> Options </summary> custom_fields, email, notes, phone, name </details> | A comma-separated string array. The fields to perform the search from. Defaults to all of them. | false |
+| exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | When enabled, only full exact matches against the given term are returned. It is &lt;b&gt;not&lt;/b&gt; case sensitive. | false |
+| organization_id | Organization ID | INTEGER | Will filter persons by the provided organization. | false |
 
 #### Example JSON Structure
 ```json
@@ -1248,7 +1248,7 @@ Name: deletePerson
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Person | INTEGER | `Person to delete` | true |
+| id | Person | INTEGER | Person to delete | true |
 
 #### Example JSON Structure
 ```json
@@ -1297,7 +1297,7 @@ Name: getPersonDetails
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Person | INTEGER | `Person to get details` | true |
+| id | Person | INTEGER | Person to get details | true |
 
 #### Example JSON Structure
 ```json

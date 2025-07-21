@@ -45,9 +45,9 @@ Name: createFeatureRequest
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Feature Request Title | STRING | `The name of the new feature request.` | true |
-| content | Feature Request Content | STRING | `The content of the new feature request.` | false |
-| userEmail | User Email | STRING | `The email of the user that is creating the new feature request.` | false |
+| title | Feature Request Title | STRING | The name of the new feature request. | true |
+| content | Feature Request Content | STRING | The content of the new feature request. | false |
+| userEmail | User Email | STRING | The email of the user that is creating the new feature request. | false |
 
 #### Example JSON Structure
 ```json
@@ -135,10 +135,10 @@ Name: createPost
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Title | STRING | `Title of the new post.` | true |
-| content | Content | STRING | `Content of the new post.` | true |
-| category | Category | STRING <details> <summary> Options </summary> new, improvement, fix, comingsoon, announcement, other </details> | `Category of the new post.` | true |
-| userEmail | User Email | STRING | `Email of the user that is creating the new post.` | false |
+| title | Title | STRING | Title of the new post. | true |
+| content | Content | STRING | Content of the new post. | true |
+| category | Category | STRING <details> <summary> Options </summary> new, improvement, fix, comingsoon, announcement, other </details> | Category of the new post. | true |
+| userEmail | User Email | STRING | Email of the user that is creating the new post. | false |
 
 #### Example JSON Structure
 ```json
@@ -249,12 +249,12 @@ Name: newComment
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| postId | Post | STRING | `ID of the post that will have the new comment.` | true |
-| text | Text | STRING | `Text of the comment.` | false |
-| userId | User ID | STRING | `ID of the user that is creating the new comment.` | false |
-| userEmail | User Email | STRING | `Email of the user that is creating the new comment.` | false |
-| userFirstname | User First Name | STRING | `First name of the user that is creating the new comment.` | false |
-| userLastname | User Last Name | STRING | `Last name of the user that is creating the new comment.` | false |
+| postId | Post | STRING | ID of the post that will have the new comment. | true |
+| text | Text | STRING | Text of the comment. | false |
+| userId | User ID | STRING | ID of the user that is creating the new comment. | false |
+| userEmail | User Email | STRING | Email of the user that is creating the new comment. | false |
+| userFirstname | User First Name | STRING | First name of the user that is creating the new comment. | false |
+| userLastname | User Last Name | STRING | Last name of the user that is creating the new comment. | false |
 
 #### Example JSON Structure
 ```json
@@ -322,11 +322,11 @@ Name: newVote
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| requestId | Feature Request ID | STRING | `ID of the feature request that will have the new vote.` | true |
-| userId | User ID | STRING | `ID of the user that is creating the new vote.` | false |
-| userEmail | User Email | STRING | `Email of the user that is creating the new vote.` | false |
-| userFirstname | User First Name | STRING | `First name of the user that is creating the new vote.` | false |
-| userLastname | User Last Name | STRING | `Last name of the user that is creating the new vote.` | false |
+| requestId | Feature Request ID | STRING | ID of the feature request that will have the new vote. | true |
+| userId | User ID | STRING | ID of the user that is creating the new vote. | false |
+| userEmail | User Email | STRING | Email of the user that is creating the new vote. | false |
+| userFirstname | User First Name | STRING | First name of the user that is creating the new vote. | false |
+| userLastname | User Last Name | STRING | Last name of the user that is creating the new vote. | false |
 
 #### Example JSON Structure
 ```json

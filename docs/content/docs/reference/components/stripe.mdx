@@ -45,8 +45,8 @@ Name: createCustomer
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email | STRING | `Customer’s email address.` | false |
-| name | Name | STRING | `The customer's full name.` | false |
+| email | Email | STRING | Customer’s email address. | false |
+| name | Name | STRING | The customer's full name. | false |
 | description | Description | STRING |  | false |
 | phone | Phone | STRING |  | false |
 | address | Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)&#125; </details> |  | false |
@@ -124,9 +124,9 @@ Name: createInvoice
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| customer | Customer ID | STRING | `ID of the customer who will be billed.` | true |
-| currency | Currency | STRING | `Currency used for invoice.` | true |
-| description | Description | STRING | `Description for the invoice.` | false |
+| customer | Customer ID | STRING | ID of the customer who will be billed. | true |
+| currency | Currency | STRING | Currency used for invoice. | true |
+| description | Description | STRING | Description for the invoice. | false |
 
 #### Example JSON Structure
 ```json

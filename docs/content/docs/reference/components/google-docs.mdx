@@ -46,8 +46,8 @@ Name: createDocument
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Title | STRING | `Document title.` | true |
-| body | Content | STRING | `Document content.` | true |
+| title | Title | STRING | Document title. | true |
+| body | Content | STRING | Document content. | true |
 
 #### Example JSON Structure
 ```json
@@ -78,11 +78,11 @@ Name: createDocumentFromTemplate
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileId | Template Document ID | STRING | `The ID of the template document from which the new document will be created.` | true |
-| fileName | New Document Name | STRING | `Name of the new document.` | true |
-| folderId | Folder for New Document | STRING | `Folder ID where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document.` | false |
-| values | Variables | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Don't include the "[[]]", only the key name and its value.` | false |
-| images | Images | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Key: Image ID (get it manually from the Read File Action), Value: Image URL.` | false |
+| fileId | Template Document ID | STRING | The ID of the template document from which the new document will be created. | true |
+| fileName | New Document Name | STRING | Name of the new document. | true |
+| folderId | Folder for New Document | STRING | Folder ID where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document. | false |
+| values | Variables | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Don't include the "[[]]", only the key name and its value. | false |
+| images | Images | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Key: Image ID (get it manually from the Read File Action), Value: Image URL. | false |
 
 #### Example JSON Structure
 ```json
@@ -116,7 +116,7 @@ Name: getDocument
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| documentId | Document Id | STRING | `The ID of the document to read.` | true |
+| documentId | Document Id | STRING | The ID of the document to read. | true |
 
 #### Example JSON Structure
 ```json
@@ -153,13 +153,13 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 
 [Setting up OAuth2](https://support.google.com/googleapi/answer/6158849?hl=en)
 
-<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(50.05219207% + 32px)">
-    <iframe src="https://www.guidejar.com/embed/fec74020-26bb-43dd-814c-f8b907f6f45b?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+<div style={{ position: 'relative', height: 0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)' }}>
+    <iframe src="https://www.guidejar.com/embed/fec74020-26bb-43dd-814c-f8b907f6f45b?type=1&controls=on" width="100%" height="100%" style={{ height: '100%', position: 'absolute', inset: 0 }} allowfullscreen frameborder="0"></iframe>
 </div>
 
 Turning on Docs API
-<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(50.05219207% + 32px)">
-    <iframe src="https://www.guidejar.com/embed/2fbfa39b-38f6-43f4-a55d-6f8d0588f6fb?type=1&controls=on" width="100%" height="100%" style="position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+<div style={{ position: 'relative', height: 0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)' }}>
+    <iframe src="https://www.guidejar.com/embed/2fbfa39b-38f6-43f4-a55d-6f8d0588f6fb?type=1&controls=on" width="100%" height="100%" style={{ position: 'absolute', inset: 0 }} allowfullscreen frameborder="0"></iframe>
 </div>
 
 ![anl-c-google-docs-md](https://static.scarf.sh/a.png?x-pxid=44cee406-a4a2-4c9f-80f5-bd560babff6e)

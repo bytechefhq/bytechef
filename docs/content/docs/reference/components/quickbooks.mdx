@@ -24,8 +24,8 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| base | Base | STRING <details> <summary> Options </summary> https://sandbox-quickbooks.api.intuit.com, https://quickbooks.api.intuit.com </details> | `The base URL for Quickbooks.` | true |
-| companyId | Company Id | STRING | `To get the company id, go to your dashboard. On the top right corner press the gear logo and click Additional information. There you will see your company ID.` | true |
+| base | Base | STRING <details> <summary> Options </summary> https://sandbox-quickbooks.api.intuit.com, https://quickbooks.api.intuit.com </details> | The base URL for Quickbooks. | true |
+| companyId | Company Id | STRING | To get the company id, go to your dashboard. On the top right corner press the gear logo and click Additional information. There you will see your company ID. | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
 
@@ -48,7 +48,7 @@ Name: createCategory
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Name of the category.` | true |
+| name | Name | STRING | Name of the category. | true |
 
 #### Example JSON Structure
 ```json
@@ -102,12 +102,12 @@ Name: createCustomer
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| displayName | Display Name | STRING | `The name of the person or organization as displayed.` | true |
-| givenName | First Name | STRING | `Given name or first name of a person.` | false |
-| familyName | Last Name | STRING | `Family name or the last name of the person.` | false |
-| suffix | Suffix | STRING | `Suffix of the name.` | false |
-| title | Title | STRING | `Title of the person.` | false |
-| middleName | Middle Name | STRING | `Middle name of the person.` | false |
+| displayName | Display Name | STRING | The name of the person or organization as displayed. | true |
+| givenName | First Name | STRING | Given name or first name of a person. | false |
+| familyName | Last Name | STRING | Family name or the last name of the person. | false |
+| suffix | Suffix | STRING | Suffix of the name. | false |
+| title | Title | STRING | Title of the person. | false |
+| middleName | Middle Name | STRING | Middle name of the person. | false |
 
 #### Example JSON Structure
 ```json
@@ -170,11 +170,11 @@ Name: createItem
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Name of the item.` | true |
-| type | Type | STRING <details> <summary> Options </summary> INVENTORY, SERVICE, NON_INVENTORY </details> | `Type of item.` | true |
+| name | Name | STRING | Name of the item. | true |
+| type | Type | STRING <details> <summary> Options </summary> INVENTORY, SERVICE, NON_INVENTORY </details> | Type of item. | true |
 | account | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> type </details> |  | null |
 | expenseAccountRef | Expense Account | STRING |  | true |
-| qtyOnHand | Quantity on Hand | NUMBER | `Current quantity of the inventory items available for sale.` | true |
+| qtyOnHand | Quantity on Hand | NUMBER | Current quantity of the inventory items available for sale. | true |
 
 #### Example JSON Structure
 ```json
@@ -242,7 +242,7 @@ Name: createPayment
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | customer | Customer | STRING |  | true |
-| totalAmt | Total Amount | NUMBER | `Total amount of the transaction.` | true |
+| totalAmt | Total Amount | NUMBER | Total amount of the transaction. | true |
 
 #### Example JSON Structure
 ```json
@@ -300,7 +300,7 @@ Name: getCustomer
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| customer | Customer ID | STRING | `ID of the customer to get.` | true |
+| customer | Customer ID | STRING | ID of the customer to get. | true |
 
 #### Example JSON Structure
 ```json
@@ -358,7 +358,7 @@ Name: getInvoice
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| invoice | Invoice ID | STRING | `ID of the invoice to get.` | true |
+| invoice | Invoice ID | STRING | ID of the invoice to get. | true |
 
 #### Example JSON Structure
 ```json
@@ -413,7 +413,7 @@ Name: getItem
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| item | Item ID | STRING | `ID of the item to get.` | true |
+| item | Item ID | STRING | ID of the item to get. | true |
 
 #### Example JSON Structure
 ```json
@@ -476,7 +476,7 @@ Name: getPayment
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| payment | Payment ID | STRING | `ID of the payment to get.` | true |
+| payment | Payment ID | STRING | ID of the payment to get. | true |
 
 #### Example JSON Structure
 ```json

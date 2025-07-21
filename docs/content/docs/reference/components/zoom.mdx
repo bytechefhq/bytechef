@@ -46,14 +46,14 @@ Name: createMeeting
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| topic | Topic | STRING | `The meeting's topic.` | true |
-| duration | Duration | NUMBER | `Duration of the meeting in minutes.` | false |
+| topic | Topic | STRING | The meeting's topic. | true |
+| duration | Duration | NUMBER | Duration of the meeting in minutes. | false |
 | auto_recording | Auto Recording | STRING <details> <summary> Options </summary> local, cloud, none </details> |  | false |
-| audio | Audio | STRING <details> <summary> Options </summary> both, telephony, voip, thirdParty </details> | `How participants join the audio portion of the meeting.` | false |
-| agenda | Agenda | STRING | `The meeting's agenda. This value has a maximum length of 2,000 characters.` | false |
-| password | Password | STRING | `The password required to join the meeting. By default, a password can only have a maximum length of 10 characters and only contain alphanumeric characters and the @, -, _, and * characters.` | false |
+| audio | Audio | STRING <details> <summary> Options </summary> both, telephony, voip, thirdParty </details> | How participants join the audio portion of the meeting. | false |
+| agenda | Agenda | STRING | The meeting's agenda. This value has a maximum length of 2,000 characters. | false |
+| password | Password | STRING | The password required to join the meeting. By default, a password can only have a maximum length of 10 characters and only contain alphanumeric characters and the @, -, _, and * characters. | false |
 | settings | Settings | OBJECT <details> <summary> Properties </summary> &#123;STRING\(schedule_for), INTEGER\(approval_type)&#125; </details> |  | false |
-| join_url | Join Url | STRING | `URL for participants to join the meeting.` | false |
+| join_url | Join Url | STRING | URL for participants to join the meeting. | false |
 
 #### Example JSON Structure
 ```json
@@ -178,17 +178,17 @@ Name: addMeetingRegistrant
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| meetingId | Meeting ID | INTEGER | `ID of the meeting where the registrant will be added.` | true |
-| first_name | First Name | STRING | `First name of the registrant.` | true |
-| last_name | Last Name | STRING | `Last name of the registrant.` | false |
-| email | Email | STRING | `Email of the registrant.` | true |
-| address | Address | STRING | `Address of the registrant.` | false |
-| city | City | STRING | `City of the registrant.` | false |
+| meetingId | Meeting ID | INTEGER | ID of the meeting where the registrant will be added. | true |
+| first_name | First Name | STRING | First name of the registrant. | true |
+| last_name | Last Name | STRING | Last name of the registrant. | false |
+| email | Email | STRING | Email of the registrant. | true |
+| address | Address | STRING | Address of the registrant. | false |
+| city | City | STRING | City of the registrant. | false |
 | state | State | STRING |  | false |
 | zip | Zip | STRING |  | false |
-| country | Country | STRING | `Country of the registrant.` | false |
-| phone | Phone | STRING | `Phone number of the registrant.` | false |
-| comments | Comments | STRING | `Additional comment about the registrant.` | false |
+| country | Country | STRING | Country of the registrant. | false |
+| phone | Phone | STRING | Phone number of the registrant. | false |
+| comments | Comments | STRING | Additional comment about the registrant. | false |
 | industry | Industry | STRING |  | false |
 | job_title | Job Title | STRING |  | false |
 | no_of_employees | Number of Employees | STRING <details> <summary> Options </summary> 1-20, 21-50, 51-100, 101-500, 501-1,000, 1,001-5,000, 5,001-10,000, More than 10,000 </details> |  | false |

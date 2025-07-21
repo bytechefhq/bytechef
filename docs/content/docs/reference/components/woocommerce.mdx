@@ -24,9 +24,9 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| domain | Domain | STRING | `The domain of your app.` | true |
-| username | Consumer Key | STRING | `The consumer key generated from your app.` | true |
-| password | Consumer Secret | STRING | `The consumer secret generated from your app.` | true |
+| domain | Domain | STRING | The domain of your app. | true |
+| username | Consumer Key | STRING | The consumer key generated from your app. | true |
+| password | Consumer Secret | STRING | The consumer secret generated from your app. | true |
 
 
 
@@ -47,16 +47,16 @@ Name: createCoupon
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| code | Code | STRING | `Coupon code.` | true |
-| amount | Amount | STRING | `The amount of discount. Should always be numeric, even if setting a percentage.` | true |
-| discount_type | Discount Type | STRING <details> <summary> Options </summary> percent, fixed_cart, fixed_product </details> | `Determines the type of discount that will be applied.` | true |
-| description | Description | STRING | `Coupon description.` | false |
-| date_expires | Date Expires | DATE_TIME | `The date the coupon expires, in the site's timezone.` | false |
-| individual_use | Individual Use | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, the coupon can only be used individually. Other applied coupons will be removed from the cart.` | false |
-| product_ids | Product Ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | `List of product IDs the coupon can be used on.` | false |
-| exclude_sale_items | Exclude Sale Items | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, this coupon will not be applied to items that have sale prices.` | false |
-| minimum_amount | Minimum Amount | STRING | `Minimum order amount that needs to be in the cart before coupon applies.` | false |
-| maximum_amount | Maximum Amount | STRING | `Maximum order amount allowed when using the coupon.` | false |
+| code | Code | STRING | Coupon code. | true |
+| amount | Amount | STRING | The amount of discount. Should always be numeric, even if setting a percentage. | true |
+| discount_type | Discount Type | STRING <details> <summary> Options </summary> percent, fixed_cart, fixed_product </details> | Determines the type of discount that will be applied. | true |
+| description | Description | STRING | Coupon description. | false |
+| date_expires | Date Expires | DATE_TIME | The date the coupon expires, in the site's timezone. | false |
+| individual_use | Individual Use | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, the coupon can only be used individually. Other applied coupons will be removed from the cart. | false |
+| product_ids | Product Ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of product IDs the coupon can be used on. | false |
+| exclude_sale_items | Exclude Sale Items | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, this coupon will not be applied to items that have sale prices. | false |
+| minimum_amount | Minimum Amount | STRING | Minimum order amount that needs to be in the cart before coupon applies. | false |
+| maximum_amount | Maximum Amount | STRING | Maximum order amount allowed when using the coupon. | false |
 
 #### Example JSON Structure
 ```json
@@ -177,12 +177,12 @@ Name: createCustomer
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email | STRING | `The email address for the customer.` | true |
-| first_name | First Name | STRING | `Customer first name.` | true |
-| last_name | Last Name | STRING | `Customer last name.` | true |
-| username | Username | STRING | `Customer login name.` | true |
-| billing | Billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | `List of billing address data.` | false |
-| shipping | Shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(phone)&#125; </details> | `List of shipping address data.` | false |
+| email | Email | STRING | The email address for the customer. | true |
+| first_name | First Name | STRING | Customer first name. | true |
+| last_name | Last Name | STRING | Customer last name. | true |
+| username | Username | STRING | Customer login name. | true |
+| billing | Billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | List of billing address data. | false |
+| shipping | Shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(phone)&#125; </details> | List of shipping address data. | false |
 
 #### Example JSON Structure
 ```json
@@ -320,14 +320,14 @@ Name: createOrder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| customer_id | Customer Id | STRING | `User ID who owns the order. 0 for guests.` | true |
-| line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(product_id), INTEGER\(quantity)&#125;] </details> | `Line items data.` | true |
-| status | Status | STRING <details> <summary> Options </summary> pending, processing, on-hold, completed, cancelled, refunded, failed </details> | `Order status.` | false |
-| customer_note | Customer Note | STRING | `Note left by customer during checkout.` | false |
-| billing | Billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | `List of billing address data.` | false |
-| shipping | Shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(phone)&#125; </details> | `List of shipping address data.` | false |
-| payment_method | Payment Method | STRING | `Payment method ID.` | false |
-| set_paid | Set Paid | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Define if the order is paid. It will set the status to processing and reduce stock items.` | false |
+| customer_id | Customer Id | STRING | User ID who owns the order. 0 for guests. | true |
+| line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(product_id), INTEGER\(quantity)&#125;] </details> | Line items data. | true |
+| status | Status | STRING <details> <summary> Options </summary> pending, processing, on-hold, completed, cancelled, refunded, failed </details> | Order status. | false |
+| customer_note | Customer Note | STRING | Note left by customer during checkout. | false |
+| billing | Billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | List of billing address data. | false |
+| shipping | Shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(phone)&#125; </details> | List of shipping address data. | false |
+| payment_method | Payment Method | STRING | Payment method ID. | false |
+| set_paid | Set Paid | BOOLEAN <details> <summary> Options </summary> true, false </details> | Define if the order is paid. It will set the status to processing and reduce stock items. | false |
 
 #### Example JSON Structure
 ```json
@@ -573,18 +573,18 @@ Name: createProduct
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Product name.` | true |
-| regular_price | Regular Price | STRING | `Product regular price.` | true |
-| type | Type | STRING <details> <summary> Options </summary> simple, grouped, external, variable </details> | `Product type.` | false |
-| description | Description | STRING | `Product description.` | false |
-| manage_stock | Manage Stock | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Stock management at product level.` | false |
-| stock_quantity | Stock Quantity | INTEGER | `Stock quantity.` | false |
-| stock_status | Stock Status | STRING <details> <summary> Options </summary> instock, outofstock, onbackorder </details> | `Controls the stock status of the product.` | false |
-| weight | Weight | STRING | `Product weight (kg).` | false |
-| dimensions | Dimensions | OBJECT <details> <summary> Properties </summary> &#123;STRING\(length), STRING\(width), STRING\(height)&#125; </details> | `Product dimensions.` | false |
-| categories | Categories | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of categories.` | false |
-| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of tags.` | false |
-| images | Images | ARRAY <details> <summary> Items </summary> [&#123;STRING\(src), STRING\(name)&#125;] </details> | `List of images.` | false |
+| name | Name | STRING | Product name. | true |
+| regular_price | Regular Price | STRING | Product regular price. | true |
+| type | Type | STRING <details> <summary> Options </summary> simple, grouped, external, variable </details> | Product type. | false |
+| description | Description | STRING | Product description. | false |
+| manage_stock | Manage Stock | BOOLEAN <details> <summary> Options </summary> true, false </details> | Stock management at product level. | false |
+| stock_quantity | Stock Quantity | INTEGER | Stock quantity. | false |
+| stock_status | Stock Status | STRING <details> <summary> Options </summary> instock, outofstock, onbackorder </details> | Controls the stock status of the product. | false |
+| weight | Weight | STRING | Product weight (kg). | false |
+| dimensions | Dimensions | OBJECT <details> <summary> Properties </summary> &#123;STRING\(length), STRING\(width), STRING\(height)&#125; </details> | Product dimensions. | false |
+| categories | Categories | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of categories. | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of tags. | false |
+| images | Images | ARRAY <details> <summary> Items </summary> [&#123;STRING\(src), STRING\(name)&#125;] </details> | List of images. | false |
 
 #### Example JSON Structure
 ```json

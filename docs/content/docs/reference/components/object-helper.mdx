@@ -25,19 +25,19 @@ Name: addValueByKey
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Source object to be added or updated` | true |
-| key | Key | STRING | `Key of the value to be added or updated.` | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | `Type of value to be added or updated.` | true |
-| value | Value | ARRAY <details> <summary> Items </summary> [] </details> | `Value to be added or updated.` | true |
-| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Value to be added or updated.` | true |
-| value | Value | DATE | `Value to be added or updated.` | true |
-| value | Value | DATE_TIME | `Value to be added or updated.` | true |
-| value | Value | INTEGER | `Value to be added or updated.` | true |
-| value | Value | NULL | `Value to be added or updated.` | true |
-| value | Value | NUMBER | `Value to be added or updated.` | true |
-| value | Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Value to be added or updated.` | true |
-| value | Value | STRING | `Value to be added or updated.` | true |
-| value | Value | TIME | `Value to be added or updated.` | true |
+| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Source object to be added or updated | true |
+| key | Key | STRING | Key of the value to be added or updated. | true |
+| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | Type of value to be added or updated. | true |
+| value | Value | ARRAY <details> <summary> Items </summary> [] </details> | Value to be added or updated. | true |
+| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | Value to be added or updated. | true |
+| value | Value | DATE | Value to be added or updated. | true |
+| value | Value | DATE_TIME | Value to be added or updated. | true |
+| value | Value | INTEGER | Value to be added or updated. | true |
+| value | Value | NULL | Value to be added or updated. | true |
+| value | Value | NUMBER | Value to be added or updated. | true |
+| value | Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Value to be added or updated. | true |
+| value | Value | STRING | Value to be added or updated. | true |
+| value | Value | TIME | Value to be added or updated. | true |
 
 #### Example JSON Structure
 ```json
@@ -70,8 +70,8 @@ Name: addKeyValuePairs
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Source object to be added or updated` | false |
-| list | Key-Value Pairs | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(type), []\(value), BOOLEAN\(value), DATE\(value), DATE_TIME\(value), INTEGER\(value), NULL\(value), NUMBER\(value), &#123;&#125;\(value), STRING\(value), TIME\(value)&#125;] </details> | `Key-Value pairs to be added or updated.` | true |
+| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Source object to be added or updated | false |
+| list | Key-Value Pairs | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(type), []\(value), BOOLEAN\(value), DATE\(value), DATE_TIME\(value), INTEGER\(value), NULL\(value), NUMBER\(value), &#123;&#125;\(value), STRING\(value), TIME\(value)&#125;] </details> | Key-Value pairs to be added or updated. | true |
 
 #### Example JSON Structure
 ```json
@@ -106,8 +106,8 @@ Name: contains
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Object that you'd like to check.` | true |
-| key | Key | STRING | `Key to check for existence.` | true |
+| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Object that you'd like to check. | true |
+| key | Key | STRING | Key to check for existence. | true |
 
 #### Example JSON Structure
 ```json
@@ -144,8 +144,8 @@ Name: deleteKeyValuePair
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The object from which to delete the key-value pair.` | true |
-| key | Key | STRING | `The key of the key-value pair to delete.` | true |
+| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The object from which to delete the key-value pair. | true |
+| key | Key | STRING | The key of the key-value pair to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -176,8 +176,8 @@ Name: equals
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The source object to compare.` | true |
-| target | Target | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The target object to compare against.` | true |
+| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The source object to compare. | true |
+| target | Target | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The target object to compare against. | true |
 
 #### Example JSON Structure
 ```json
@@ -214,8 +214,8 @@ Name: mergeTwoObjects
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The source object to merge.` | true |
-| target | Target | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The target object to merge into.` | true |
+| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The source object to merge. | true |
+| target | Target | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The target object to merge into. | true |
 
 #### Example JSON Structure
 ```json

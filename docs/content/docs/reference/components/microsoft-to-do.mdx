@@ -47,10 +47,10 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| taskListId | Task List ID | STRING | `ID of the task list where the task will be created.` | true |
-| title | Title | STRING | `Title of the task.` | true |
-| importance | Importance | STRING <details> <summary> Options </summary> low, normal, high </details> | `Importance of the task` | false |
-| isReminderOn | Reminder | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Set to true if an alert is set to remind the user of the task.` | false |
+| taskListId | Task List ID | STRING | ID of the task list where the task will be created. | true |
+| title | Title | STRING | Title of the task. | true |
+| importance | Importance | STRING <details> <summary> Options </summary> low, normal, high </details> | Importance of the task | false |
+| isReminderOn | Reminder | BOOLEAN <details> <summary> Options </summary> true, false </details> | Set to true if an alert is set to remind the user of the task. | false |
 
 #### Example JSON Structure
 ```json
@@ -124,7 +124,7 @@ Name: createTaskList
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| displayName | Title | STRING | `Title of the task list.` | true |
+| displayName | Title | STRING | Title of the task list. | true |
 
 #### Example JSON Structure
 ```json
@@ -183,8 +183,8 @@ Name: getTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| taskListId | Task List ID | STRING | `ID of the task list where the task will be created.` | true |
-| taskId | Task ID | STRING <details> <summary> Depends On </summary> taskListId </details> | `ID of the task to retrieve.` | true |
+| taskListId | Task List ID | STRING | ID of the task list where the task will be created. | true |
+| taskId | Task ID | STRING <details> <summary> Depends On </summary> taskListId </details> | ID of the task to retrieve. | true |
 
 #### Example JSON Structure
 ```json

@@ -47,8 +47,8 @@ Name: addAssigneesToIssue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | repository | Repository | STRING |  | true |
-| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | `The number of the issue to add assignee to.` | true |
-| assignees | Assignees | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The list of assignees to add to the issue.` | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue to add assignee to. | true |
+| assignees | Assignees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of assignees to add to the issue. | true |
 
 #### Example JSON Structure
 ```json
@@ -123,8 +123,8 @@ Name: addLabelsToIssue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | repository | Repository | STRING |  | true |
-| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | `The number of the issue to add labels to.` | true |
-| labels | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The list of labels to add to the issue.` | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue to add labels to. | true |
+| labels | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of labels to add to the issue. | true |
 
 #### Example JSON Structure
 ```json
@@ -183,8 +183,8 @@ Name: createCommentOnIssue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | repository | Repository | STRING |  | true |
-| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | `The number of the issue to comment on.` | true |
-| body | Comment | STRING | `The comment to add to the issue.` | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue to comment on. | true |
+| body | Comment | STRING | The comment to add to the issue. | true |
 
 #### Example JSON Structure
 ```json
@@ -258,9 +258,9 @@ Name: createIssue
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| repository | Repository | STRING | `Repository where new issue will be created.` | true |
-| title | Title | STRING | `Title of the issue.` | false |
-| body | Description | STRING | `The description of the issue.` | false |
+| repository | Repository | STRING | Repository where new issue will be created. | true |
+| title | Title | STRING | Title of the issue. | false |
+| body | Description | STRING | The description of the issue. | false |
 
 #### Example JSON Structure
 ```json
@@ -335,7 +335,7 @@ Name: getIssue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | repository | Repository | STRING |  | true |
-| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | `The number of the issue you want to get details from.` | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue you want to get details from. | true |
 
 #### Example JSON Structure
 ```json
@@ -408,8 +408,8 @@ Name: listIssues
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| filter | Filter | STRING <details> <summary> Options </summary> assigned, created, mentioned, subscribed, repos, all </details> | `Specifies the types of issues to return.` | true |
-| state | State | STRING <details> <summary> Options </summary> open, closed, all </details> | `Indicates the state of the issues to return.` | true |
+| filter | Filter | STRING <details> <summary> Options </summary> assigned, created, mentioned, subscribed, repos, all </details> | Specifies the types of issues to return. | true |
+| state | State | STRING <details> <summary> Options </summary> open, closed, all </details> | Indicates the state of the issues to return. | true |
 
 #### Example JSON Structure
 ```json
@@ -485,7 +485,7 @@ Name: listRepositoryIssues
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| repository | Repository | STRING | `The name of the repository` | true |
+| repository | Repository | STRING | The name of the repository | true |
 
 #### Example JSON Structure
 ```json
@@ -560,8 +560,8 @@ Name: starRepository
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| owner | Owner | STRING | `The account owner of the repository. The name is not case sensitive.` | true |
-| repository | Repository | STRING | `The name of the repository including owner without the .git extension. The name is not case sensitive.` | true |
+| owner | Owner | STRING | The account owner of the repository. The name is not case sensitive. | true |
+| repository | Repository | STRING | The name of the repository including owner without the .git extension. The name is not case sensitive. | true |
 
 #### Example JSON Structure
 ```json

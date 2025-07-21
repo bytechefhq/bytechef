@@ -48,12 +48,12 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| contact_name | Contact Name | STRING | `Name of the contact.` | true |
-| company_name | Company Name | STRING | `Name of the contact's company. ` | false |
-| website | Website | STRING | `Website of the contact.` | false |
-| currency_id | Currency ID | STRING | `Currency ID of the customer's currency.` | false |
-| billing_address | Billing Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(attention), STRING\(address), STRING\(street2), STRING\(state_code), STRING\(city), STRING\(state), STRING\(zip), STRING\(country), STRING\(fax), STRING\(phone)&#125; </details> | `Billing address of the contact.` | false |
-| shipping_address | Shipping Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(attention), STRING\(address), STRING\(street2), STRING\(state_code), STRING\(city), STRING\(state), STRING\(zip), STRING\(country), STRING\(fax), STRING\(phone)&#125; </details> | `Customer's shipping address to which the goods must be delivered.` | false |
+| contact_name | Contact Name | STRING | Name of the contact. | true |
+| company_name | Company Name | STRING | Name of the contact's company.  | false |
+| website | Website | STRING | Website of the contact. | false |
+| currency_id | Currency ID | STRING | Currency ID of the customer's currency. | false |
+| billing_address | Billing Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(attention), STRING\(address), STRING\(street2), STRING\(state_code), STRING\(city), STRING\(state), STRING\(zip), STRING\(country), STRING\(fax), STRING\(phone)&#125; </details> | Billing address of the contact. | false |
+| shipping_address | Shipping Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(attention), STRING\(address), STRING\(street2), STRING\(state_code), STRING\(city), STRING\(state), STRING\(zip), STRING\(country), STRING\(fax), STRING\(phone)&#125; </details> | Customer's shipping address to which the goods must be delivered. | false |
 
 #### Example JSON Structure
 ```json
@@ -131,12 +131,12 @@ Name: createInvoice
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| customer_id | Customer ID | STRING | `ID of the customer the invoice has to be created.` | true |
-| use_custom_invoice_number | Use Custom Invoice Number | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, create custom invoice number, if false, use auto invoice number generation.` | true |
-| invoice_number | Invoice Number | STRING | `Number of invoice.` | true |
-| line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(item_id), NUMBER\(quantity)&#125;] </details> | `Items in invoice.` | true |
-| date | Invoice Date | DATE | `The date of the invoice.` | false |
-| payment_terms | Payment Terms | INTEGER | `Payment terms in days e.g. 15, 30, 60. Invoice due date will be calculated based on this.` | false |
+| customer_id | Customer ID | STRING | ID of the customer the invoice has to be created. | true |
+| use_custom_invoice_number | Use Custom Invoice Number | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, create custom invoice number, if false, use auto invoice number generation. | true |
+| invoice_number | Invoice Number | STRING | Number of invoice. | true |
+| line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(item_id), NUMBER\(quantity)&#125;] </details> | Items in invoice. | true |
+| date | Invoice Date | DATE | The date of the invoice. | false |
+| payment_terms | Payment Terms | INTEGER | Payment terms in days e.g. 15, 30, 60. Invoice due date will be calculated based on this. | false |
 
 #### Example JSON Structure
 ```json
@@ -195,10 +195,10 @@ Name: createItem
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Item Name | STRING | `Name of the item.` | true |
-| rate | Rate | NUMBER | `Per unit price of an item.` | true |
-| product_type | Product Type | STRING <details> <summary> Options </summary> goods, service </details> | `Specify the type of an item.` | true |
-| description | Description | STRING | `Description for the item.` | false |
+| name | Item Name | STRING | Name of the item. | true |
+| rate | Rate | NUMBER | Per unit price of an item. | true |
+| product_type | Product Type | STRING <details> <summary> Options </summary> goods, service </details> | Specify the type of an item. | true |
+| description | Description | STRING | Description for the item. | false |
 
 #### Example JSON Structure
 ```json

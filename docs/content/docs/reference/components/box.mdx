@@ -46,8 +46,8 @@ Name: createFolder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Folder Name | STRING | `The name for the new folder.` | true |
-| id | Parent Folder ID | STRING | `ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.` | true |
+| name | Folder Name | STRING | The name for the new folder. | true |
+| id | Parent Folder ID | STRING | ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder. | true |
 
 #### Example JSON Structure
 ```json
@@ -105,8 +105,8 @@ Name: downloadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Parent Folder ID | STRING | `ID of the folder from which you want to download the file.` | true |
-| fileId | File ID | STRING <details> <summary> Depends On </summary> id </details> | `ID of the file to download.` | true |
+| id | Parent Folder ID | STRING | ID of the folder from which you want to download the file. | true |
+| fileId | File ID | STRING <details> <summary> Depends On </summary> id </details> | ID of the file to download. | true |
 
 #### Example JSON Structure
 ```json
@@ -160,7 +160,7 @@ Name: uploadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Parent Folder ID | STRING | `ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.` | true |
+| id | Parent Folder ID | STRING | ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder. | true |
 | file | File | FILE_ENTRY |  | true |
 
 #### Example JSON Structure
@@ -229,7 +229,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderId | Folder ID | STRING | `ID of the folder in which file uploads will trigger this webhook.` | true |
+| folderId | Folder ID | STRING | ID of the folder in which file uploads will trigger this webhook. | true |
 
 
 #### Output
@@ -275,7 +275,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderId | Folder ID | STRING | `ID of the folder in which new folder will trigger this webhook.` | true |
+| folderId | Folder ID | STRING | ID of the folder in which new folder will trigger this webhook. | true |
 
 
 #### Output

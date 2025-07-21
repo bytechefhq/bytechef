@@ -25,7 +25,7 @@ Version: 1
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | API Key | STRING |  | true |
-| baseUrl | Base URL | STRING | `Personalized base URL for API requests.` | true |
+| baseUrl | Base URL | STRING | Personalized base URL for API requests. | true |
 
 
 
@@ -46,9 +46,9 @@ Name: sendSMS
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| sender | From | STRING | `The sender ID. It can be alphanumeric or numeric (e.g., CompanyName).` | true |
-| to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Message recipient numbers.` | true |
-| text | Text | STRING | `Content of the message being sent.` | true |
+| sender | From | STRING | The sender ID. It can be alphanumeric or numeric (e.g., CompanyName). | true |
+| to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | Message recipient numbers. | true |
+| text | Text | STRING | Content of the message being sent. | true |
 
 #### Example JSON Structure
 ```json
@@ -113,9 +113,9 @@ Name: sendWhatsappTemplateMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| from | From | STRING | `Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.` | true |
-| to | To | STRING | `Message recipient number. Must be in international format.` | true |
-| templateName | Template Name | STRING <details> <summary> Depends On </summary> from </details> | `Name of the WhatsApp template to use.` | true |
+| from | From | STRING | Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements. | true |
+| to | To | STRING | Message recipient number. Must be in international format. | true |
+| templateName | Template Name | STRING <details> <summary> Depends On </summary> from </details> | Name of the WhatsApp template to use. | true |
 | placeholders | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> templateName </details> |  | null |
 
 #### Example JSON Structure
@@ -178,9 +178,9 @@ Name: sendWhatsappTextMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| from | From | STRING | `Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.` | true |
-| to | To | STRING | `Message recipient number. Must be in international format.` | true |
-| text | Text | STRING | `Content of the message being sent.` | true |
+| from | From | STRING | Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements. | true |
+| to | To | STRING | Message recipient number. Must be in international format. | true |
+| text | Text | STRING | Content of the message being sent. | true |
 
 #### Example JSON Structure
 ```json

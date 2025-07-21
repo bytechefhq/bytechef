@@ -47,9 +47,9 @@ Name: createChannel
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| teamId | Team ID | STRING | `ID of the team where the channel will be created.` | true |
+| teamId | Team ID | STRING | ID of the team where the channel will be created. | true |
 | displayName | Channel Name | STRING |  | true |
-| description | Description | STRING | `Description for the channel.` | false |
+| description | Description | STRING | Description for the channel. | false |
 
 #### Example JSON Structure
 ```json
@@ -110,8 +110,8 @@ Name: sendChannelMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| teamId | Team ID | STRING | `ID of the team where the channel is located.` | true |
-| channelId | Channel ID | STRING <details> <summary> Depends On </summary> teamId </details> | `Channel to send message to.` | true |
+| teamId | Team ID | STRING | ID of the team where the channel is located. | true |
+| channelId | Channel ID | STRING <details> <summary> Depends On </summary> teamId </details> | Channel to send message to. | true |
 | contentType | Message Text Format | STRING <details> <summary> Options </summary> text, html </details> |  | true |
 | content | Message Text | STRING |  | true |
 

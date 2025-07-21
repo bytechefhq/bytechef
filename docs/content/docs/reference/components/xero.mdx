@@ -46,13 +46,13 @@ Name: createBill
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| ContactID | Contact ID | STRING | `ID of the contact to create the bill for.` | true |
-| Date | Date | DATE | `Date of the bill. If no date is specified, the current date will be used.` | true |
-| DueDate | Due Date | DATE | `Date bill is due. If no date is specified, the current date will be used.` | false |
+| ContactID | Contact ID | STRING | ID of the contact to create the bill for. | true |
+| Date | Date | DATE | Date of the bill. If no date is specified, the current date will be used. | true |
+| DueDate | Due Date | DATE | Date bill is due. If no date is specified, the current date will be used. | false |
 | LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> Exclusive, Inclusive, NoTax </details> |  | false |
-| LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), NUMBER\(Quantity), NUMBER\(UnitAmount), STRING\(AccountCode)&#125;\($LineItem)] </details> | `Line items on the bill.` | true |
-| CurrencyCode | Currency | STRING | `Currency that bill is raised in.` | false |
-| Reference | Invoice Reference | STRING | `Reference number of the bill.` | false |
+| LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), NUMBER\(Quantity), NUMBER\(UnitAmount), STRING\(AccountCode)&#125;\($LineItem)] </details> | Line items on the bill. | true |
+| CurrencyCode | Currency | STRING | Currency that bill is raised in. | false |
+| Reference | Invoice Reference | STRING | Reference number of the bill. | false |
 
 #### Example JSON Structure
 ```json
@@ -132,15 +132,15 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| Name | Name | STRING | `Full name of a contact or organisation.` | true |
-| CompanyNumber | Company Number | STRING | `Company registration number.` | false |
-| AccountNumber | Account Number | STRING | `Unique account number to identify, reference and search for the contact.` | false |
-| ContactStatus | Contact Status | STRING <details> <summary> Options </summary> ACTIVE, ARCHIVED, GDPRREQUEST </details> | `Current status of a contact.` | false |
-| FirstName | First Name | STRING | `First name of primary person.` | false |
-| LastName | Last Name | STRING | `Last name of primary person.` | false |
-| EmailAddress | Email Address | STRING | `Email address of contact person.` | false |
-| BankAccountDetails | Bank Account Number | STRING | `Bank account number of contact.` | false |
-| TaxNumber | Tax Number | STRING | `Tax number of contact – this is also known as the ABN (Australia), GST Number (New Zealand), VAT Number (UK) or Tax ID Number (US and global) in the Xero UI depending on which regionalized version of Xero you are using.` | false |
+| Name | Name | STRING | Full name of a contact or organisation. | true |
+| CompanyNumber | Company Number | STRING | Company registration number. | false |
+| AccountNumber | Account Number | STRING | Unique account number to identify, reference and search for the contact. | false |
+| ContactStatus | Contact Status | STRING <details> <summary> Options </summary> ACTIVE, ARCHIVED, GDPRREQUEST </details> | Current status of a contact. | false |
+| FirstName | First Name | STRING | First name of primary person. | false |
+| LastName | Last Name | STRING | Last name of primary person. | false |
+| EmailAddress | Email Address | STRING | Email address of contact person. | false |
+| BankAccountDetails | Bank Account Number | STRING | Bank account number of contact. | false |
+| TaxNumber | Tax Number | STRING | Tax number of contact – this is also known as the ABN (Australia), GST Number (New Zealand), VAT Number (UK) or Tax ID Number (US and global) in the Xero UI depending on which regionalized version of Xero you are using. | false |
 | Phones | Phones | ARRAY <details> <summary> Items </summary> [&#123;STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)&#125;] </details> |  | false |
 | Addresses | Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)&#125;] </details> |  | false |
 
@@ -243,13 +243,13 @@ Name: createSalesInvoice
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| ContactID | Contact ID | STRING | `ID of the contact to create the invoice for.` | true |
-| Date | Date | DATE | `Date invoice was issued. If no date is specified, the current date will be used.` | false |
-| DueDate | Due Date | DATE | `Date invoice is due. If no date is specified, the current date will be used.` | false |
+| ContactID | Contact ID | STRING | ID of the contact to create the invoice for. | true |
+| Date | Date | DATE | Date invoice was issued. If no date is specified, the current date will be used. | false |
+| DueDate | Due Date | DATE | Date invoice is due. If no date is specified, the current date will be used. | false |
 | LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> Exclusive, Inclusive, NoTax </details> |  | false |
-| LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)&#125;] </details> | `Line items on the invoice.` | true |
-| CurrencyCode | Currency Code | STRING | `Currency code that invoice is raised in.` | false |
-| Reference | Invoice Reference | STRING | `Reference number of the invoice.` | false |
+| LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)&#125;] </details> | Line items on the invoice. | true |
+| CurrencyCode | Currency Code | STRING | Currency code that invoice is raised in. | false |
+| Reference | Invoice Reference | STRING | Reference number of the invoice. | false |
 
 #### Example JSON Structure
 ```json
@@ -329,18 +329,18 @@ Name: createQuote
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| ContactID | Contact ID | STRING | `ID of the contact that the quote is being raised for.` | true |
-| Date | Date | DATE | `Date quote was issued.` | true |
-| LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)&#125;] </details> | `Line items on the invoice.` | true |
+| ContactID | Contact ID | STRING | ID of the contact that the quote is being raised for. | true |
+| Date | Date | DATE | Date quote was issued. | true |
+| LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)&#125;] </details> | Line items on the invoice. | true |
 | LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> Exclusive, Inclusive, NoTax </details> |  | false |
-| ExpiryDate | Expiry Date | DATE | `Date quote expires` | false |
-| CurrencyCode | Currency Code | STRING | `The currency code that quote has been raised in.` | false |
-| QuoteNumber | Quote Number | STRING | `Unique alpha numeric code identifying a quote.` | false |
-| Reference | Reference | STRING | `Additional reference number` | false |
-| BrandingThemeID | Branding Theme ID | STRING | `The branding theme ID to be applied to this quote.` | false |
-| Title | Title | STRING | `The title of the quote.` | false |
-| Summary | Summary | STRING | `The summary of the quote.` | false |
-| Terms | Terms | STRING | `The terms of the quote.` | false |
+| ExpiryDate | Expiry Date | DATE | Date quote expires | false |
+| CurrencyCode | Currency Code | STRING | The currency code that quote has been raised in. | false |
+| QuoteNumber | Quote Number | STRING | Unique alpha numeric code identifying a quote. | false |
+| Reference | Reference | STRING | Additional reference number | false |
+| BrandingThemeID | Branding Theme ID | STRING | The branding theme ID to be applied to this quote. | false |
+| Title | Title | STRING | The title of the quote. | false |
+| Summary | Summary | STRING | The summary of the quote. | false |
+| Terms | Terms | STRING | The terms of the quote. | false |
 
 #### Example JSON Structure
 ```json
@@ -445,7 +445,7 @@ Type: STATIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| webhookKey | Webhook Key | STRING | `The key used to sign the webhook request.` | true |
+| webhookKey | Webhook Key | STRING | The key used to sign the webhook request. | true |
 
 
 #### Output
@@ -495,7 +495,7 @@ Type: STATIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| webhookKey | Webhook Key | STRING | `The key used to sign the webhook request.` | true |
+| webhookKey | Webhook Key | STRING | The key used to sign the webhook request. | true |
 
 
 #### Output
@@ -549,7 +549,7 @@ Type: STATIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| webhookKey | Webhook Key | STRING | `The key used to sign the webhook request.` | true |
+| webhookKey | Webhook Key | STRING | The key used to sign the webhook request. | true |
 
 
 #### Output

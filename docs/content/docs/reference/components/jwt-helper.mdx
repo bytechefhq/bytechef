@@ -25,8 +25,8 @@ Name: sign
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| payload | Payload | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(value)&#125;\($item)] </details> | `Payload of the JWT token.` | true |
-| secret | Secret | STRING | `Secret of the JWT token.` | true |
+| payload | Payload | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(value)&#125;\($item)] </details> | Payload of the JWT token. | true |
+| secret | Secret | STRING | Secret of the JWT token. | true |
 
 #### Example JSON Structure
 ```json
@@ -66,8 +66,8 @@ Name: verify
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| jwtToken | JWT Token | STRING | `JWT token you want to verify.` | true |
-| secret | Secret | STRING | `Secret of the JWT token.` | true |
+| jwtToken | JWT Token | STRING | JWT token you want to verify. | true |
+| secret | Secret | STRING | Secret of the JWT token. | true |
 
 #### Example JSON Structure
 ```json

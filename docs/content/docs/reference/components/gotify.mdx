@@ -24,8 +24,8 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| token | Token | STRING | `Application token of the app you created for receiving and sending messages.` | true |
-| baseUri | Base URI | STRING | `Base URI of your Gotify server (e.g. http://localhost:1024).` | true |
+| token | Token | STRING | Application token of the app you created for receiving and sending messages. | true |
+| baseUri | Base URI | STRING | Base URI of your Gotify server (e.g. http://localhost:1024). | true |
 
 
 
@@ -46,10 +46,10 @@ Name: sendMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Message Title | STRING | `The title of the message that will be sent.` | false |
-| message | Message Content | STRING | `The content message that will be sent.` | true |
-| priority | Priority | INTEGER | `The priority of the message. If unset, then the default priority of the application will be used.` | false |
-| extras | Extras | ARRAY <details> <summary> Items </summary> [&#123;STRING\(topNamespace), STRING\(subNamespace), STRING\(extraInfoKey), STRING\(extraInfoValue)&#125;\($extra)] </details> | `The extra data sent along the message.` | false |
+| title | Message Title | STRING | The title of the message that will be sent. | false |
+| message | Message Content | STRING | The content message that will be sent. | true |
+| priority | Priority | INTEGER | The priority of the message. If unset, then the default priority of the application will be used. | false |
+| extras | Extras | ARRAY <details> <summary> Items </summary> [&#123;STRING\(topNamespace), STRING\(subNamespace), STRING\(extraInfoKey), STRING\(extraInfoValue)&#125;\($extra)] </details> | The extra data sent along the message. | false |
 
 #### Example JSON Structure
 ```json

@@ -25,8 +25,8 @@ Name: base64EncodeDecode
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | `The text to be Base64 encode or decode.` | true |
-| operation | Encode or Decode | STRING <details> <summary> Options </summary> ENCODE, DECODE </details> | `Select whether to encode or decode the text.` | true |
+| text | Text | STRING | The text to be Base64 encode or decode. | true |
+| operation | Encode or Decode | STRING <details> <summary> Options </summary> ENCODE, DECODE </details> | Select whether to encode or decode the text. | true |
 
 #### Example JSON Structure
 ```json
@@ -63,8 +63,8 @@ Name: concatenate
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| texts | Texts | ARRAY <details> <summary> Items </summary> [STRING\($text)] </details> | `A list of texts to concatenate.` | true |
-| separator | Separator | STRING | `The text that separates the texts you want to concatenate.` | false |
+| texts | Texts | ARRAY <details> <summary> Items </summary> [STRING\($text)] </details> | A list of texts to concatenate. | true |
+| separator | Separator | STRING | The text that separates the texts you want to concatenate. | false |
 
 #### Example JSON Structure
 ```json
@@ -102,7 +102,7 @@ Name: contains
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | Text | STRING |  | true |
-| expression | Expression | STRING | `Text to search for.` | true |
+| expression | Expression | STRING | Text to search for. | true |
 
 #### Example JSON Structure
 ```json
@@ -139,11 +139,11 @@ Name: extractContentFromHtml
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| content | HTML Content | STRING | `HTML content to extract content from.` | true |
-| querySelector | CSS Selector | STRING | `The CSS selector to search for.` | true |
-| returnValue | Return Value | STRING <details> <summary> Options </summary> ATTRIBUTE, HTML, TEXT </details> | `The data to return.` | true |
-| attribute | Attribute | STRING | `The name of the attribute to return the value of` | true |
-| returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string.` | false |
+| content | HTML Content | STRING | HTML content to extract content from. | true |
+| querySelector | CSS Selector | STRING | The CSS selector to search for. | true |
+| returnValue | Return Value | STRING <details> <summary> Options </summary> ATTRIBUTE, HTML, TEXT </details> | The data to return. | true |
+| attribute | Attribute | STRING | The name of the attribute to return the value of | true |
+| returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string. | false |
 
 #### Example JSON Structure
 ```json
@@ -177,7 +177,7 @@ Name: extractUrls
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | `The text from which to extract URLs.` | true |
+| text | Text | STRING | The text from which to extract URLs. | true |
 
 #### Example JSON Structure
 ```json
@@ -220,11 +220,11 @@ Name: formatCurrency
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| currency | Currency | STRING <details> <summary> Options </summary> ADP, AED, AFA, AFN, ALL, AMD, ANG, AOA, ARS, ATS, AUD, AWG, AYM, AZM, AZN, BAM, BBD, BDT, BEF, BGL, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYB, BYN, BYR, BZD, CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CSD, CUC, CUP, CVE, CYP, CZK, DEM, DJF, DKK, DOP, DZD, EEK, EGP, ERN, ESP, ETB, EUR, FIM, FJD, FKP, FRF, GBP, GEL, GHC, GHS, GIP, GMD, GNF, GRD, GTQ, GWP, GYD, HKD, HNL, HRK, HTG, HUF, IDR, IEP, ILS, INR, IQD, IRR, ISK, ITL, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD, KYD, KZT, LAK, LBP, LKR, LRD, LSL, LTL, LUF, LVL, LYD, MAD, MDL, MGA, MGF, MKD, MMK, MNT, MOP, MRO, MRU, MTL, MUR, MVR, MWK, MXN, MXV, MYR, MZM, MZN, NAD, NGN, NIO, NLG, NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PTE, PYG, QAR, ROL, RON, RSD, RUB, RUR, RWF, SAR, SBD, SCR, SDD, SDG, SEK, SGD, SHP, SIT, SKK, SLE, SLL, SOS, SRD, SRG, SSP, STD, STN, SVC, SYP, SZL, THB, TJS, TMM, TMT, TND, TOP, TPE, TRL, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, USS, UYI, UYU, UZS, VEB, VED, VEF, VES, VND, VUV, WST, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XDR, XFO, XFU, XOF, XPD, XPF, XPT, XSU, XTS, XUA, XXX, YER, YUM, ZAR, ZMK, ZMW, ZWD, ZWL, ZWN, ZWR </details> | `The type of currency you wish to use.` | true |
-| amount | Amount | NUMBER | `The amount to be formatted.` | true |
-| decimalDigits | Decimal Digits | INTEGER | `Digits you would like after your decimal.` | true |
-| decimalSeparator | Decimal Separator | STRING | `The character you would like to use as a decimal separator.` | true |
-| thousandsSeparator | Thousands Separator | STRING | `The character you would like to use as a thousands separator.` | true |
+| currency | Currency | STRING <details> <summary> Options </summary> ADP, AED, AFA, AFN, ALL, AMD, ANG, AOA, ARS, ATS, AUD, AWG, AYM, AZM, AZN, BAM, BBD, BDT, BEF, BGL, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYB, BYN, BYR, BZD, CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CSD, CUC, CUP, CVE, CYP, CZK, DEM, DJF, DKK, DOP, DZD, EEK, EGP, ERN, ESP, ETB, EUR, FIM, FJD, FKP, FRF, GBP, GEL, GHC, GHS, GIP, GMD, GNF, GRD, GTQ, GWP, GYD, HKD, HNL, HRK, HTG, HUF, IDR, IEP, ILS, INR, IQD, IRR, ISK, ITL, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD, KYD, KZT, LAK, LBP, LKR, LRD, LSL, LTL, LUF, LVL, LYD, MAD, MDL, MGA, MGF, MKD, MMK, MNT, MOP, MRO, MRU, MTL, MUR, MVR, MWK, MXN, MXV, MYR, MZM, MZN, NAD, NGN, NIO, NLG, NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PTE, PYG, QAR, ROL, RON, RSD, RUB, RUR, RWF, SAR, SBD, SCR, SDD, SDG, SEK, SGD, SHP, SIT, SKK, SLE, SLL, SOS, SRD, SRG, SSP, STD, STN, SVC, SYP, SZL, THB, TJS, TMM, TMT, TND, TOP, TPE, TRL, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, USS, UYI, UYU, UZS, VEB, VED, VEF, VES, VND, VUV, WST, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XDR, XFO, XFU, XOF, XPD, XPF, XPT, XSU, XTS, XUA, XXX, YER, YUM, ZAR, ZMK, ZMW, ZWD, ZWL, ZWN, ZWR </details> | The type of currency you wish to use. | true |
+| amount | Amount | NUMBER | The amount to be formatted. | true |
+| decimalDigits | Decimal Digits | INTEGER | Digits you would like after your decimal. | true |
+| decimalSeparator | Decimal Separator | STRING | The character you would like to use as a decimal separator. | true |
+| thousandsSeparator | Thousands Separator | STRING | The character you would like to use as a thousands separator. | true |
 
 #### Example JSON Structure
 ```json
@@ -264,7 +264,7 @@ Name: HTMLToMarkdown
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| html | HTML Content | STRING | `HTML content to be converted to markdown.` | true |
+| html | HTML Content | STRING | HTML content to be converted to markdown. | true |
 
 #### Example JSON Structure
 ```json
@@ -336,7 +336,7 @@ Name: markdownToHTML
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| markdown | Markdown content | STRING | `Markdown content to convert to HTML.` | true |
+| markdown | Markdown content | STRING | Markdown content to convert to HTML. | true |
 
 #### Example JSON Structure
 ```json
@@ -373,8 +373,8 @@ Name: replace
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | Text | STRING |  | true |
-| searchValue | Search Value | STRING | `Can be plain text or a regex expression.` | true |
-| replaceValue | Replace Value | STRING | `Leave blank to remove the search value.` | false |
+| searchValue | Search Value | STRING | Can be plain text or a regex expression. | true |
+| replaceValue | Replace Value | STRING | Leave blank to remove the search value. | false |
 | replaceOnlyFirst | Replace Only First Match | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
 
 #### Example JSON Structure
@@ -415,7 +415,7 @@ Name: selectFirstNCharacters
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | Text | STRING |  | true |
-| numberOfCharacters | Number of Characters | INTEGER | `The number of characters to select.` | true |
+| numberOfCharacters | Number of Characters | INTEGER | The number of characters to select. | true |
 
 #### Example JSON Structure
 ```json
@@ -453,7 +453,7 @@ Name: selectLastNCharacters
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | Text | STRING |  | true |
-| numberOfCharacters | Number of Characters | INTEGER | `The number of characters to select.` | true |
+| numberOfCharacters | Number of Characters | INTEGER | The number of characters to select. | true |
 
 #### Example JSON Structure
 ```json
@@ -491,7 +491,7 @@ Name: split
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | Text | STRING |  | true |
-| delimiter | Delimiter | STRING | `Delimiter used for splitting the text.` | true |
+| delimiter | Delimiter | STRING | Delimiter used for splitting the text. | true |
 
 #### Example JSON Structure
 ```json
@@ -607,8 +607,8 @@ Name: urlEncodeDecode
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | `The text to be URL encode or decode.` | true |
-| operation | Encode or Decode | STRING <details> <summary> Options </summary> ENCODE, DECODE </details> | `Select whether to encode or decode the text.` | true |
+| text | Text | STRING | The text to be URL encode or decode. | true |
+| operation | Encode or Decode | STRING <details> <summary> Options </summary> ENCODE, DECODE </details> | Select whether to encode or decode the text. | true |
 
 #### Example JSON Structure
 ```json

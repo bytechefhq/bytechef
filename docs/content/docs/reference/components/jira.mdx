@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| yourDomain | Your domain | STRING | `e.g https://{yourDomain}}.atlassian.net` | true |
+| yourDomain | Your domain | STRING | e.g https://&#123;yourDomain&#125;&#125;.atlassian.net | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
 
@@ -47,13 +47,13 @@ Name: createIssue
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | `ID of the project to create the issue in.` | true |
-| summary | Summary | STRING | `A brief summary of the issue.` | true |
-| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | `Id of the issue type.` | true |
-| parent | Parent Issue ID | STRING <details> <summary> Depends On </summary> project </details> | `ID of the parent issue.` | true |
-| assignee | Assignee ID | STRING <details> <summary> Depends On </summary> project </details> | `ID of the user who will be assigned to the issue.` | false |
-| priority | Priority ID | STRING | `ID of the priority of the issue.` | false |
-| description | Description | STRING | `Description of the issue.` | false |
+| project | Project ID | STRING | ID of the project to create the issue in. | true |
+| summary | Summary | STRING | A brief summary of the issue. | true |
+| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | Id of the issue type. | true |
+| parent | Parent Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the parent issue. | true |
+| assignee | Assignee ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the user who will be assigned to the issue. | false |
+| priority | Priority ID | STRING | ID of the priority of the issue. | false |
+| description | Description | STRING | Description of the issue. | false |
 
 #### Example JSON Structure
 ```json
@@ -110,9 +110,9 @@ Name: createIssueComment
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | `ID of the project where the issue is located.` | true |
-| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | `ID of the issue where the comment will be added.` | true |
-| comment | Comment | STRING | `The text of the comment.` | true |
+| project | Project ID | STRING | ID of the project where the issue is located. | true |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue where the comment will be added. | true |
+| comment | Comment | STRING | The text of the comment. | true |
 
 #### Example JSON Structure
 ```json
@@ -189,7 +189,7 @@ Name: getIssue
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | `ID of the project where the issue is located.` | true |
+| project | Project ID | STRING | ID of the project where the issue is located. | true |
 | issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> |  | true |
 
 #### Example JSON Structure
@@ -262,8 +262,8 @@ Name: searchForIssuesUsingJql
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| jql | JQL | STRING | `The JQL that defines the search. If no JQL expression is provided, all issues are returned` | false |
-| maxResults | Max Results | INTEGER | `The maximum number of items to return per page.` | true |
+| jql | JQL | STRING | The JQL that defines the search. If no JQL expression is provided, all issues are returned | false |
+| maxResults | Max Results | INTEGER | The maximum number of items to return per page. | true |
 
 #### Example JSON Structure
 ```json
@@ -344,8 +344,8 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | `Id of the project where new issue is created.` | true |
-| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | `ID of the issue type.` | false |
+| project | Project ID | STRING | Id of the project where new issue is created. | true |
+| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue type. | false |
 
 
 #### Output
@@ -392,8 +392,8 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | `ID of the project where issues is updated.` | true |
-| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | `ID of the issue type.` | false |
+| project | Project ID | STRING | ID of the project where issues is updated. | true |
+| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue type. | false |
 
 
 #### Output

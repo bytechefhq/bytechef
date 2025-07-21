@@ -46,22 +46,22 @@ Name: addMemberToList
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| listId | List ID | STRING | `The unique ID for the list.` | true |
-| skip_merge_validation | Skip Merge Validation | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false.` | false |
-| email_address | Email Address | STRING | `Email address for a subscriber.` | true |
-| status | Status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | `Subscriber's current status.` | true |
-| email_type | Email Type | STRING <details> <summary> Options </summary> html, text </details> | `Type of email this member asked to get ('html' or 'text').` | false |
-| merge_fields | Merge Fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `A dictionary of merge fields where the keys are the merge tags.` | false |
-| interests | Interests | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The key of this object's properties is the ID of the interest in question.` | false |
-| language | Language | STRING | `If set/detected, the subscriber's language.` | false |
-| vip | Vip | BOOLEAN <details> <summary> Options </summary> true, false </details> | `VIP status for subscriber.` | false |
-| location | Location | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(latitude), NUMBER\(longitude)&#125; </details> | `Subscriber location information.` | false |
-| marketing_permissions | Marketing Permissions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(marketing_permission_id), BOOLEAN\(enabled)&#125;] </details> | `The marketing permissions for the subscriber.` | false |
-| ip_signup | Ip Signup | STRING | `IP address the subscriber signed up from.` | false |
-| timestamp_signup | Timestamp Signup | STRING | `The date and time the subscriber signed up for the list in ISO 8601 format.` | false |
-| ip_opt | Ip Opt | STRING | `The IP address the subscriber used to confirm their opt-in status.` | false |
-| timestamp_opt | Timestamp Opt | STRING | `The date and time the subscriber confirmed their opt-in status in ISO 8601 format.` | false |
-| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The tags that are associated with a member.` | false |
+| listId | List ID | STRING | The unique ID for the list. | true |
+| skip_merge_validation | Skip Merge Validation | BOOLEAN <details> <summary> Options </summary> true, false </details> | If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false. | false |
+| email_address | Email Address | STRING | Email address for a subscriber. | true |
+| status | Status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | Subscriber's current status. | true |
+| email_type | Email Type | STRING <details> <summary> Options </summary> html, text </details> | Type of email this member asked to get ('html' or 'text'). | false |
+| merge_fields | Merge Fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | A dictionary of merge fields where the keys are the merge tags. | false |
+| interests | Interests | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The key of this object's properties is the ID of the interest in question. | false |
+| language | Language | STRING | If set/detected, the subscriber's language. | false |
+| vip | Vip | BOOLEAN <details> <summary> Options </summary> true, false </details> | VIP status for subscriber. | false |
+| location | Location | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(latitude), NUMBER\(longitude)&#125; </details> | Subscriber location information. | false |
+| marketing_permissions | Marketing Permissions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(marketing_permission_id), BOOLEAN\(enabled)&#125;] </details> | The marketing permissions for the subscriber. | false |
+| ip_signup | Ip Signup | STRING | IP address the subscriber signed up from. | false |
+| timestamp_signup | Timestamp Signup | STRING | The date and time the subscriber signed up for the list in ISO 8601 format. | false |
+| ip_opt | Ip Opt | STRING | The IP address the subscriber used to confirm their opt-in status. | false |
+| timestamp_opt | Timestamp Opt | STRING | The date and time the subscriber confirmed their opt-in status in ISO 8601 format. | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The tags that are associated with a member. | false |
 
 #### Example JSON Structure
 ```json
@@ -117,7 +117,7 @@ Type: OBJECT
 | unique_email_id | STRING | An identifier for the address across all of Mailchimp. |
 | contact_id | STRING | As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address. |
 | full_name | STRING | The contact's full name. |
-| web_id | STRING | The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}. |
+| web_id | STRING | The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://&#123;dc&#125;.admin.mailchimp.com/lists/members/view?id=&#123;web_id&#125;. |
 | email_type | STRING | Type of email this member asked to get ('html' or 'text'). |
 | status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | Subscriber's current status. |
 | unsubscribe_reason | STRING | A subscriber's reason for unsubscribing. |
@@ -232,7 +232,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| listId | List Id | STRING | `The list id of intended audience to which you would like to add the contact.` | true |
+| listId | List Id | STRING | The list id of intended audience to which you would like to add the contact. | true |
 
 
 #### Output

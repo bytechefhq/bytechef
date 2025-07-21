@@ -46,12 +46,12 @@ Name: createIssue
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Issue Title | STRING | `The title of the new issue.` | true |
-| teamId | Team ID | STRING | `The ID of the team where this issue should be created.` | true |
-| statusId | Status | STRING | `The status of the issue.` | true |
-| priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | `The priority of the issue.` | false |
-| assigneeId | Assignee ID | STRING | `The identifier of the user to assign the issue to.` | false |
-| description | Description | STRING | `The detailed description of the issue.` | false |
+| title | Issue Title | STRING | The title of the new issue. | true |
+| teamId | Team ID | STRING | The ID of the team where this issue should be created. | true |
+| statusId | Status | STRING | The status of the issue. | true |
+| priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | The priority of the issue. | false |
+| assigneeId | Assignee ID | STRING | The identifier of the user to assign the issue to. | false |
+| description | Description | STRING | The detailed description of the issue. | false |
 
 #### Example JSON Structure
 ```json
@@ -108,13 +108,13 @@ Name: updateIssue
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| teamId | Team ID | STRING | `The ID of the team where this issue should be created.` | true |
-| issueId | Issue ID | STRING <details> <summary> Depends On </summary> teamId </details> | `The identifier of the issue to update.` | true |
-| title | Issue Title | STRING | `The title of the new issue.` | false |
-| statusId | Status | STRING | `The status of the issue.` | false |
-| priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | `The priority of the issue.` | false |
-| assigneeId | Assignee ID | STRING | `The identifier of the user to assign the issue to.` | false |
-| description | Description | STRING | `The detailed description of the issue.` | false |
+| teamId | Team ID | STRING | The ID of the team where this issue should be created. | true |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> teamId </details> | The identifier of the issue to update. | true |
+| title | Issue Title | STRING | The title of the new issue. | false |
+| statusId | Status | STRING | The status of the issue. | false |
+| priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | The priority of the issue. | false |
+| assigneeId | Assignee ID | STRING | The identifier of the user to assign the issue to. | false |
+| description | Description | STRING | The detailed description of the issue. | false |
 
 #### Example JSON Structure
 ```json
@@ -172,12 +172,12 @@ Name: createProject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Project Name | STRING | `The name of the project.` | true |
-| teamId | Team ID | STRING | `The ID of the team where this project should be created.` | true |
-| statusId | Status | STRING | `The status of the project.` | false |
-| priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | `The priority of the project.` | false |
-| startDate | Start Date | DATE | `The planned start date of the project.` | false |
-| description | Description | STRING | `The detailed description of the project.` | false |
+| name | Project Name | STRING | The name of the project. | true |
+| teamId | Team ID | STRING | The ID of the team where this project should be created. | true |
+| statusId | Status | STRING | The status of the project. | false |
+| priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | The priority of the project. | false |
+| startDate | Start Date | DATE | The planned start date of the project. | false |
+| description | Description | STRING | The detailed description of the project. | false |
 
 #### Example JSON Structure
 ```json
@@ -234,12 +234,12 @@ Name: updateProject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| projectId | Project ID | STRING | `The identifier of the project to update.` | true |
-| name | Project Name | STRING | `The name of the project.` | false |
-| statusId | Status | STRING | `The status of the project.` | false |
-| priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | `The priority of the project.` | false |
-| startDate | Start Date | DATE | `The planned start date of the project.` | false |
-| description | Description | STRING | `The detailed description of the issue.` | false |
+| projectId | Project ID | STRING | The identifier of the project to update. | true |
+| name | Project Name | STRING | The name of the project. | false |
+| statusId | Status | STRING | The status of the project. | false |
+| priority | Priority | INTEGER <details> <summary> Options </summary> 0, 1, 2, 3, 4 </details> | The priority of the project. | false |
+| startDate | Start Date | DATE | The planned start date of the project. | false |
+| description | Description | STRING | The detailed description of the issue. | false |
 
 #### Example JSON Structure
 ```json
@@ -296,9 +296,9 @@ Name: createComment
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| teamId | Team ID | STRING | `The ID of the team where this issue should be created.` | true |
-| issueId | Issue ID | STRING <details> <summary> Depends On </summary> teamId </details> | `The identifier of the issue to update.` | true |
-| body | Comment Body | STRING | `The comment content in markdown format.` | true |
+| teamId | Team ID | STRING | The ID of the team where this issue should be created. | true |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> teamId </details> | The identifier of the issue to update. | true |
+| body | Comment Body | STRING | The comment content in markdown format. | true |
 
 #### Example JSON Structure
 ```json
@@ -355,8 +355,8 @@ Name: rawGraphqlQuery
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| query | Query | STRING | `The query to perform.` | true |
-| variables | Variables | STRING | `The variables for the query.` | false |
+| query | Query | STRING | The query to perform. | true |
+| variables | Variables | STRING | The variables for the query. | false |
 
 #### Example JSON Structure
 ```json
@@ -410,7 +410,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| allPublicTeams | All Public Teams | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, the webhook will be created for all public teams.` | true |
+| allPublicTeams | All Public Teams | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, the webhook will be created for all public teams. | true |
 | teamId | Team ID | STRING |  | true |
 
 
@@ -461,7 +461,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| allPublicTeams | All Public Teams | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, the webhook will be created for all public teams.` | true |
+| allPublicTeams | All Public Teams | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, the webhook will be created for all public teams. | true |
 | teamId | Team ID | STRING |  | true |
 
 
@@ -512,7 +512,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| allPublicTeams | All Public Teams | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If true, the webhook will be created for all public teams.` | true |
+| allPublicTeams | All Public Teams | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, the webhook will be created for all public teams. | true |
 | teamId | Team ID | STRING |  | true |
 
 

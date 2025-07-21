@@ -45,8 +45,8 @@ Name: createRecord
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| baseId | Base ID | STRING | `ID of the base where table is located.` | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | `The table where the record will be created.` | true |
+| baseId | Base ID | STRING | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | The table where the record will be created. | true |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> baseId, tableId </details> |  | false |
 
 #### Example JSON Structure
@@ -79,9 +79,9 @@ Name: deleteRecord
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| baseId | Base ID | STRING | `ID of the base where table is located.` | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | `ID of the table where the record is located.` | true |
-| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | `ID of the record that will be deleted.` | true |
+| baseId | Base ID | STRING | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table where the record is located. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | ID of the record that will be deleted. | true |
 
 #### Example JSON Structure
 ```json
@@ -132,9 +132,9 @@ Name: getRecord
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| baseId | Base ID | STRING | `ID of the base where table is located.` | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | `ID of the table where the record is located.` | true |
-| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | `ID of the record that will be retrieved.` | true |
+| baseId | Base ID | STRING | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table where the record is located. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | ID of the record that will be retrieved. | true |
 
 #### Example JSON Structure
 ```json
@@ -172,9 +172,9 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| baseId | Base ID | STRING | `ID of the base which contains the table that you want to monitor.` | true |
-| tableId | Table | STRING <details> <summary> Depends On </summary> baseId </details> | `The table to monitor for new records.` | true |
-| triggerField | Trigger Field | STRING | `It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.` | true |
+| baseId | Base ID | STRING | ID of the base which contains the table that you want to monitor. | true |
+| tableId | Table | STRING <details> <summary> Depends On </summary> baseId </details> | The table to monitor for new records. | true |
+| triggerField | Trigger Field | STRING | It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one. | true |
 
 
 #### Output

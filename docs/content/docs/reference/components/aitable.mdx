@@ -46,7 +46,7 @@ Name: createRecord
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spaceId | Space ID | STRING |  | true |
-| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | `AITable Datasheet ID` | true |
+| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
 
 #### Example JSON Structure
@@ -80,10 +80,10 @@ Name: findRecords
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spaceId | Space ID | STRING |  | true |
-| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | `AITable Datasheet ID` | true |
-| fields | Field Names | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The returned record results are limited to the specified fields.` | false |
-| recordIds | Record IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The IDs of the records to find.` | false |
-| maxRecords | Max Records | INTEGER | `How many records are returned in total` | false |
+| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
+| fields | Field Names | ARRAY <details> <summary> Items </summary> [STRING] </details> | The returned record results are limited to the specified fields. | false |
+| recordIds | Record IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | The IDs of the records to find. | false |
+| maxRecords | Max Records | INTEGER | How many records are returned in total | false |
 
 #### Example JSON Structure
 ```json
@@ -118,8 +118,8 @@ Name: updateRecord
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spaceId | Space ID | STRING |  | true |
-| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | `AITable Datasheet ID` | true |
-| recordId | Record ID | STRING <details> <summary> Depends On </summary> datasheetId </details> | `ID of the record to update.` | true |
+| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> datasheetId </details> | ID of the record to update. | true |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
 
 #### Example JSON Structure

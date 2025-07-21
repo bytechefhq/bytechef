@@ -45,17 +45,17 @@ Name: sendEmail
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| from | From | STRING | `Sender email address.` | true |
-| to | To | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | `Recipients email addresses.` | true |
-| subject | Subject | STRING | `Email subject.` | true |
-| bcc | Bcc | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | `Bcc recipients email addresses.` | false |
-| cc | Cc | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | `Cc recipients email addresses.` | false |
-| reply_to | Reply To | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | `Reply-to email addresses.` | false |
+| from | From | STRING | Sender email address. | true |
+| to | To | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | Recipients email addresses. | true |
+| subject | Subject | STRING | Email subject. | true |
+| bcc | Bcc | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | Bcc recipients email addresses. | false |
+| cc | Cc | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | Cc recipients email addresses. | false |
+| reply_to | Reply To | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | Reply-to email addresses. | false |
 | contentType | Content Type | STRING <details> <summary> Options </summary> HTML, TEXT </details> |  | true |
-| html | HTML | STRING | `The HTML version of the message.` | false |
-| text | Text | STRING | `The plain text version of the message.` | false |
-| headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `Custom headers to add to the email.` | false |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | `A list of attachments to send with the email.` | false |
+| html | HTML | STRING | The HTML version of the message. | false |
+| text | Text | STRING | The plain text version of the message. | false |
+| headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom headers to add to the email. | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | false |
 | tags | | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(value)&#125;] </details> |  | false |
 
 #### Example JSON Structure

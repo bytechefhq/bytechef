@@ -57,11 +57,11 @@ Name: updateDeal
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| opportunity_id | Opportunity Id | STRING | `The ID for the deal you want to update.` | true |
-| owner_id | Owner ID | STRING | `The ID for the deal owner within your team's Apollo account.` | false |
-| name | Name | STRING | `New name for the deal.` | false |
-| closed_date | Close Date | DATE | `Updated estimated close date for the deal. This can be a future or past date.` | false |
-| account_id | Account ID | STRING | `The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created.` | false |
+| opportunity_id | Opportunity Id | STRING | The ID for the deal you want to update. | true |
+| owner_id | Owner ID | STRING | The ID for the deal owner within your team's Apollo account. | false |
+| name | Name | STRING | New name for the deal. | false |
+| closed_date | Close Date | DATE | Updated estimated close date for the deal. This can be a future or past date. | false |
+| account_id | Account ID | STRING | The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created. | false |
 
 #### Example JSON Structure
 ```json
@@ -126,11 +126,11 @@ Name: createDeal
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Name the deal you are creating.` | true |
-| owner_id | Owner ID | STRING | `The ID for the deal owner within your team's Apollo account.` | false |
-| account_id | Account ID | STRING | `The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created.` | false |
-| amount | Amount | STRING | `The monetary value of the deal being created. Do not enter commas or currency symbols for the value. ` | false |
-| closed_date | Close Date | DATE | `The estimated close date for the deal. This can be a future or past date.` | false |
+| name | Name | STRING | Name the deal you are creating. | true |
+| owner_id | Owner ID | STRING | The ID for the deal owner within your team's Apollo account. | false |
+| account_id | Account ID | STRING | The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created. | false |
+| amount | Amount | STRING | The monetary value of the deal being created. Do not enter commas or currency symbols for the value.  | false |
+| closed_date | Close Date | DATE | The estimated close date for the deal. This can be a future or past date. | false |
 
 #### Example JSON Structure
 ```json
@@ -195,13 +195,13 @@ Name: enrichPerson
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| first_name | First Name | STRING | `The first name of the person.` | false |
-| last_name | Last Name | STRING | `The lst name of the person.` | false |
-| name | Name | STRING | `The full name of the person.` | false |
-| email | Email | STRING | `The email address of the person.` | false |
-| organization_name | Organization Name | STRING | `The name of the person's employer.` | false |
-| domain | Domain | STRING | `The domain name for the person's employer. This can be the current employer or a previous employer. Do not include www., the @ symbol, or similar.` | false |
-| linkedin_url | LinkedIn URL | STRING | `The URL for the person's LinkedIn profile.` | false |
+| first_name | First Name | STRING | The first name of the person. | false |
+| last_name | Last Name | STRING | The lst name of the person. | false |
+| name | Name | STRING | The full name of the person. | false |
+| email | Email | STRING | The email address of the person. | false |
+| organization_name | Organization Name | STRING | The name of the person's employer. | false |
+| domain | Domain | STRING | The domain name for the person's employer. This can be the current employer or a previous employer. Do not include www., the @ symbol, or similar. | false |
+| linkedin_url | LinkedIn URL | STRING | The URL for the person's LinkedIn profile. | false |
 
 #### Example JSON Structure
 ```json
@@ -269,7 +269,7 @@ Name: enrichCompany
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| domain | Domain | STRING | `The domain of the company that you want to enrich. Do not include www., the @ symbol, or similar.` | true |
+| domain | Domain | STRING | The domain of the company that you want to enrich. Do not include www., the @ symbol, or similar. | true |
 
 #### Example JSON Structure
 ```json

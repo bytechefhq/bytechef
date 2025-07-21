@@ -48,7 +48,7 @@ Name: createFolder
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | siteId | Site ID | STRING |  | true |
-| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | `If no folder is selected, file will be uploaded to root folder.` | false |
+| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, file will be uploaded to root folder. | false |
 | name | Folder Name | STRING |  | true |
 
 #### Example JSON Structure
@@ -253,8 +253,8 @@ Name: uploadFile
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | siteId | Site ID | STRING |  | true |
-| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | `If no folder is selected, file will be uploaded to root folder` | false |
-| file | File | FILE_ENTRY | `File to upload.` | true |
+| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, file will be uploaded to root folder | false |
+| file | File | FILE_ENTRY | File to upload. | true |
 
 #### Example JSON Structure
 ```json

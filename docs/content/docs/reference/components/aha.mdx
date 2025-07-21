@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| subdomain | Subdomain | STRING | `The subdomain of your Aha! account. For example, if your Aha! URL is https://mycompany.aha.io, then the subdomain is mycompany.` | true |
+| subdomain | Subdomain | STRING | The subdomain of your Aha! account. For example, if your Aha! URL is https://mycompany.aha.io, then the subdomain is mycompany. | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
 
@@ -47,9 +47,9 @@ Name: createFeature
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| productId | Product ID | STRING | `ID of the product to which the release belongs.` | true |
-| releaseId | Release ID | STRING <details> <summary> Depends On </summary> productId </details> | `Numeric ID or key of the release.` | true |
-| name | Name | STRING | `Name of the feature.` | true |
+| productId | Product ID | STRING | ID of the product to which the release belongs. | true |
+| releaseId | Release ID | STRING <details> <summary> Depends On </summary> productId </details> | Numeric ID or key of the release. | true |
+| name | Name | STRING | Name of the feature. | true |
 
 #### Example JSON Structure
 ```json
@@ -129,9 +129,9 @@ Name: createIdea
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| productId | Product ID | STRING | `Numeric ID or key of the product.` | true |
-| name | Name | STRING | `Name of the idea.` | true |
-| description | Description | STRING | `Description of the idea.` | false |
+| productId | Product ID | STRING | Numeric ID or key of the product. | true |
+| name | Name | STRING | Name of the idea. | true |
+| description | Description | STRING | Description of the idea. | false |
 
 #### Example JSON Structure
 ```json

@@ -46,10 +46,10 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Title | STRING | `Title of the new task to be created.` | true |
-| listId | List ID | STRING | `ID of the list where the new task will be stored.` | true |
-| status | Status | STRING <details> <summary> Options </summary> needsAction, completed </details> | `Status of the task.` | true |
-| notes | Notes | STRING | `Notes describing the task.` | false |
+| title | Title | STRING | Title of the new task to be created. | true |
+| listId | List ID | STRING | ID of the list where the new task will be stored. | true |
+| status | Status | STRING <details> <summary> Options </summary> needsAction, completed </details> | Status of the task. | true |
+| notes | Notes | STRING | Notes describing the task. | false |
 
 #### Example JSON Structure
 ```json
@@ -105,8 +105,8 @@ Name: listTasks
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| listId | List ID | STRING | `ID of the list where tasks are stored.` | true |
-| showCompleted | Show completed | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Show also completed tasks. By default both completed task and task that needs action will be shown.` | true |
+| listId | List ID | STRING | ID of the list where tasks are stored. | true |
+| showCompleted | Show completed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Show also completed tasks. By default both completed task and task that needs action will be shown. | true |
 
 #### Example JSON Structure
 ```json
@@ -163,11 +163,11 @@ Name: updateTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| listId | List ID | STRING | `ID of the list where specific task is stored.` | true |
-| taskId | Task ID | STRING <details> <summary> Depends On </summary> listId </details> | `ID of the task to update.` | true |
-| title | Title | STRING | `Title of the task to be updated. If empty, title will not be changed.` | false |
-| status | Status | STRING <details> <summary> Options </summary> needsAction, completed </details> | `Status of the task. If empty, status will not be changed.` | false |
-| notes | Notes | STRING | `Notes describing the task. If empty, notes will not be changed.` | false |
+| listId | List ID | STRING | ID of the list where specific task is stored. | true |
+| taskId | Task ID | STRING <details> <summary> Depends On </summary> listId </details> | ID of the task to update. | true |
+| title | Title | STRING | Title of the task to be updated. If empty, title will not be changed. | false |
+| status | Status | STRING <details> <summary> Options </summary> needsAction, completed </details> | Status of the task. If empty, status will not be changed. | false |
+| notes | Notes | STRING | Notes describing the task. If empty, notes will not be changed. | false |
 
 #### Example JSON Structure
 ```json
@@ -230,7 +230,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| listId | List ID | STRING | `ID of the list where new task is added.` | true |
+| listId | List ID | STRING | ID of the list where new task is added. | true |
 
 
 #### Output

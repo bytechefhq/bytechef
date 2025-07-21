@@ -46,10 +46,10 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email Address | STRING | `Email address of the contact.` | true |
-| first_name | First Name | STRING | `First name of the contact.` | false |
-| last_name | Last Name | STRING | `Last name of the contact.` | false |
-| lists | Lists | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | `Lists to which the new contact will be added.` | false |
+| email | Email Address | STRING | Email address of the contact. | true |
+| first_name | First Name | STRING | First name of the contact. | false |
+| last_name | Last Name | STRING | Last name of the contact. | false |
+| lists | Lists | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Lists to which the new contact will be added. | false |
 
 #### Example JSON Structure
 ```json
@@ -148,7 +148,7 @@ Name: createList
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Name of the list.` | true |
+| name | Name | STRING | Name of the list. | true |
 
 #### Example JSON Structure
 ```json
@@ -199,7 +199,7 @@ Name: unsubscribeContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email | STRING | `Email of the Contact.` | true |
+| email | Email | STRING | Email of the Contact. | true |
 
 #### Example JSON Structure
 ```json
