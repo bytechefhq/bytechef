@@ -3535,7 +3535,7 @@
       "advancedOption" : null,
       "controlType" : "FILE_ENTRY",
       "defaultValue" : null,
-      "description" : "The file to transcribe. All major audio and video formats are supported. The file size must be less than 1GB.",
+      "description" : "The file object with content to transcribe. All major audio and video formats are supported. The file size must be less than 1GB.",
       "displayCondition" : null,
       "exampleValue" : null,
       "expressionEnabled" : null,
