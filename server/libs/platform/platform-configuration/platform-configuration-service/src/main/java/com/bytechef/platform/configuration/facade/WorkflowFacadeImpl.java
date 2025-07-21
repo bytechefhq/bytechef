@@ -85,13 +85,15 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
 
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-                workflowNodeType.name(), workflowNodeType.version());
+            Boolean clusterRoot = componentDefinitionService
+                .fetchComponentDefinition(workflowNodeType.name(), workflowNodeType.version())
+                .map(ComponentDefinition::isClusterRoot)
+                .orElse(null);
 
             workflowTaskDTOs.add(
                 new WorkflowTaskDTO(
                     workflowTask,
-                    componentDefinition.isClusterRoot() ? ClusterElementMap.of(workflowTask.getExtensions()) : null,
+                    Boolean.TRUE.equals(clusterRoot) ? ClusterElementMap.of(workflowTask.getExtensions()) : null,
                     componentConnections));
         }
 
