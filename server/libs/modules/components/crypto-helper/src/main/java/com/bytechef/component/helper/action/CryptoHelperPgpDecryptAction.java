@@ -73,7 +73,7 @@ public class CryptoHelperPgpDecryptAction {
                 .label("Passphrase")
                 .description("Passphrase that was used for encryption.")
                 .required(true))
-        .output(outputSchema(fileEntry().description("Decrypted file.")))
+        .output(outputSchema(fileEntry().description("File object with decrypted content.")))
         .perform(CryptoHelperPgpDecryptAction::perform);
 
     private CryptoHelperPgpDecryptAction() {

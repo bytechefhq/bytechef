@@ -51,7 +51,7 @@ public class CryptoHelperRsaDecryptAction {
                 .label("File Entry")
                 .description("File object with content that will be decrypted.")
                 .required(true))
-        .output(outputSchema(fileEntry().description("Decrypted file.")))
+        .output(outputSchema(fileEntry().description("File object with decrypted content.")))
         .perform(CryptoHelperRsaDecryptAction::perform);
 
     private CryptoHelperRsaDecryptAction() {
