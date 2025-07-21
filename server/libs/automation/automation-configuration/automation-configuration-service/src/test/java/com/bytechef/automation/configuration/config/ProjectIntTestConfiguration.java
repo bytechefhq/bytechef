@@ -23,6 +23,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
@@ -61,6 +62,9 @@ public class ProjectIntTestConfiguration {
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
 
+    @Autowired
+    private ComponentDefinitionService componentDefinitionService;
+
     @Bean
     Evaluator evaluator() {
         return SpelEvaluator.create();
@@ -68,7 +72,7 @@ public class ProjectIntTestConfiguration {
 
     @Bean
     WorkflowFacade workflowFacade(WorkflowService workflowService) {
-        return new WorkflowFacadeImpl(componentConnectionFacade, workflowService);
+        return new WorkflowFacadeImpl(componentConnectionFacade, componentDefinitionService, workflowService);
     }
 
     @EnableJdbcRepositories(
