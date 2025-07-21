@@ -16,6 +16,12 @@
 
 package com.bytechef.component.rss.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+
 /**
  * @author Nikolina Spehar
  */
@@ -23,4 +29,22 @@ public class RssConstants {
 
     public static final String API_KEY = "apiKey";
     public static final String API_SECRET = "apiSecret";
+
+    public static final ModifiableObjectProperty ITEM_OBJECT = object()
+        .description("Feed item object")
+        .properties(
+            string("url")
+                .description("URL of the item on the feed."),
+            string("title")
+                .description("Title of the item."),
+            string("description_text")
+                .description("Description of the item."),
+            string("thumbnail")
+                .description("Thumbnail of the item."),
+            string("date_published")
+                .description("Date when the item was published."),
+            array("authors")
+                .description("Authors of the item.")
+                .items(
+                    string("author")));
 }
