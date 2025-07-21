@@ -26,6 +26,7 @@ import com.bytechef.component.slack.action.SlackSendApprovalMessageAction;
 import com.bytechef.component.slack.action.SlackSendDirectMessageAction;
 import com.bytechef.component.slack.action.SlackSendMessageAction;
 import com.bytechef.component.slack.connection.SlackConnection;
+import com.bytechef.component.slack.trigger.SlackAnyEventTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -48,7 +49,8 @@ public final class SlackComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(SlackSendApprovalMessageAction.ACTION_DEFINITION),
             tool(SlackSendMessageAction.ACTION_DEFINITION),
-            tool(SlackSendDirectMessageAction.ACTION_DEFINITION));
+            tool(SlackSendDirectMessageAction.ACTION_DEFINITION))
+        .triggers(SlackAnyEventTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
