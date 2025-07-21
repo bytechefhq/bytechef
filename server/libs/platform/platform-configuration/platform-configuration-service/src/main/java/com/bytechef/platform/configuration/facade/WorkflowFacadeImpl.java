@@ -88,12 +88,12 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
             Boolean clusterRoot = componentDefinitionService
                 .fetchComponentDefinition(workflowNodeType.name(), workflowNodeType.version())
                 .map(ComponentDefinition::isClusterRoot)
-                .orElse(null);
+                .orElse(Boolean.FALSE);
 
             workflowTaskDTOs.add(
                 new WorkflowTaskDTO(
                     workflowTask,
-                    Boolean.TRUE.equals(clusterRoot) ? ClusterElementMap.of(workflowTask.getExtensions()) : null,
+                    clusterRoot ? ClusterElementMap.of(workflowTask.getExtensions()) : null,
                     componentConnections));
         }
 
