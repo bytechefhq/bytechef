@@ -1,0 +1,85 @@
+---
+openapi: "3.0.2"
+info:
+  title: "RSS"
+  description: "RSS.app is a web-based tool that helps you create, customize, and manage RSS feeds—even from websites that don’t provide them natively."
+  version: "v1"
+servers:
+  - url: "https://api.rss.app/v1"
+paths:
+  /feeds:
+    post:
+      summary: "Create Feed"
+      description: "Creates feed from website by using website URL."
+      operationId: "createFeed"
+      x-ai-agent-tool: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "feed"
+              required:
+                - "url"
+              properties:
+                url:
+                  type: "string"
+                  description: "A valid Website URL is required (example: https://bbc.com)."
+      responses:
+        201:
+          description: "RSS feed created."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    description: "Unique ID of the RSS feed."
+                  title:
+                    type: "string"
+                    description: "Title of the RSS feed."
+                  rss_feed_url:
+                    type: "string"
+                    description: "Direct URL to the RSS XML feed."
+                  source_url:
+                    type: "string"
+                    description: "Original source URL for the content."
+                  description:
+                    type: "string"
+                    description: "Description of the RSS feed."
+                  items:
+                    type: "array"
+                    description: "List of items in the RSS feed."
+                    items:
+                      type: "object"
+                      properties:
+                        url:
+                          type: "string"
+                          description: "URL of the individual feed item."
+                        title:
+                          type: "string"
+                          description: "Title of the feed item."
+                        description_text:
+                          type: "string"
+                          description: "Plain-text summary of the item."
+                        description_html:
+                          type: "string"
+                          description: "HTML content of the feed item."
+                        thumbnail:
+                          type: "string"
+                          description: "Thumbnail image for the item."
+                        date_published:
+                          type: "string"
+                          description: "Date the item was published."
+                        authors:
+                          type: "array"
+                          description: "List of authors for the item."
+                          items:
+                            type: "string"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: "bearer"
