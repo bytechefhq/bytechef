@@ -27,6 +27,8 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.rss.trigger.RssNewItemInFeedTrigger;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,11 @@ import java.util.Map;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class RssComponentHandler extends AbstractRssComponentHandler {
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(RssNewItemInFeedTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
