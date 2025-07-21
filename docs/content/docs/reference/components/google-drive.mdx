@@ -46,9 +46,9 @@ Name: copyFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileId | File ID | STRING | `The id of the file to be copied.` | true |
-| fileName | New File Name | STRING | `The name of the new file created as a result of the copy operation.` | true |
-| folderId | Destination Folder ID | STRING | `The ID of the folder where the copied file will be stored.` | true |
+| fileId | File ID | STRING | The id of the file to be copied. | true |
+| fileName | New File Name | STRING | The name of the new file created as a result of the copy operation. | true |
+| folderId | Destination Folder ID | STRING | The ID of the folder where the copied file will be stored. | true |
 
 #### Example JSON Structure
 ```json
@@ -103,8 +103,8 @@ Name: createNewFolder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderName | Folder Name | STRING | `The name of the new folder.` | true |
-| folderId | Parent Folder ID | STRING | `ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.` | false |
+| folderName | Folder Name | STRING | The name of the new folder. | true |
+| folderId | Parent Folder ID | STRING | ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder. | false |
 
 #### Example JSON Structure
 ```json
@@ -163,10 +163,10 @@ Name: createNewTextFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileName | File Name | STRING | `The name of the new text file.` | true |
-| text | Text | STRING | `The text content to add to file.` | true |
-| mimeType | File Type | STRING <details> <summary> Options </summary> plain/text, text/csv, text/xml </details> | `Select file type.` | true |
-| folderId | Parent Folder ID | STRING | `ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder.` | false |
+| fileName | File Name | STRING | The name of the new text file. | true |
+| text | Text | STRING | The text content to add to file. | true |
+| mimeType | File Type | STRING <details> <summary> Options </summary> plain/text, text/csv, text/xml </details> | Select file type. | true |
+| folderId | Parent Folder ID | STRING | ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder. | false |
 
 #### Example JSON Structure
 ```json
@@ -227,7 +227,7 @@ Name: deleteFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileId | File ID | STRING | `The id of a file to delete.` | true |
+| fileId | File ID | STRING | The id of a file to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -257,7 +257,7 @@ Name: downloadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileId | File ID | STRING | `ID of the file to download.` | true |
+| fileId | File ID | STRING | ID of the file to download. | true |
 
 #### Example JSON Structure
 ```json
@@ -310,7 +310,7 @@ Name: getFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileId | File ID | STRING | `ID of the file to be retrieved.` | true |
+| fileId | File ID | STRING | ID of the file to be retrieved. | true |
 
 #### Example JSON Structure
 ```json
@@ -363,7 +363,7 @@ Name: listFiles
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderId | Parent Folder ID | STRING | `ID of the folder from which you want to list files. If no folder is specified, the root folder will be used.` | false |
+| folderId | Parent Folder ID | STRING | ID of the folder from which you want to list files. If no folder is specified, the root folder will be used. | false |
 
 #### Example JSON Structure
 ```json
@@ -419,7 +419,7 @@ Name: listFolders
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderId | Parent Folder ID | STRING | `ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used.` | false |
+| folderId | Parent Folder ID | STRING | ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used. | false |
 
 #### Example JSON Structure
 ```json
@@ -475,8 +475,8 @@ Name: uploadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileEntry | File | FILE_ENTRY | `The object property which contains a reference to the file to upload.` | true |
-| folderId | Parent Folder ID | STRING | `ID of the folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder.` | false |
+| fileEntry | File | FILE_ENTRY | The object property which contains a reference to the file to upload. | true |
+| folderId | Parent Folder ID | STRING | ID of the folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder. | false |
 
 #### Example JSON Structure
 ```json

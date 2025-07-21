@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| subdomain | Subdomain | STRING | `The subdomain of your Salesforce instance.` | true |
+| subdomain | Subdomain | STRING | The subdomain of your Salesforce instance. | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
 
@@ -99,7 +99,7 @@ Name: deleteRecord
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | object | Salesforce Object | STRING |  | true |
-| id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | `ID of the object to delete.` | true |
+| id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | ID of the object to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -130,7 +130,7 @@ Name: soqlQuery
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| q | Query | STRING | `SOQL query to execute.` | true |
+| q | Query | STRING | SOQL query to execute. | true |
 
 #### Example JSON Structure
 ```json
@@ -161,7 +161,7 @@ Name: updateRecord
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | object | Salesforce Object | STRING |  | true |
-| id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | `ID of the record to update.` | true |
+| id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | ID of the record to update. | true |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> object </details> |  | true |
 | customFields | Custom Fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  | false |
 

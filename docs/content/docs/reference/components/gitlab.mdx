@@ -46,9 +46,9 @@ Name: createIssue
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| projectId | Project ID | STRING | `ID of the project where new issue will be created.` | true |
-| title | Title | STRING | `The title of an issue.` | true |
-| description | Description | STRING | `The description of an issue.` | false |
+| projectId | Project ID | STRING | ID of the project where new issue will be created. | true |
+| title | Title | STRING | The title of an issue. | true |
+| description | Description | STRING | The description of an issue. | false |
 
 #### Example JSON Structure
 ```json
@@ -108,8 +108,8 @@ Name: createCommentOnIssue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | projectId | Project ID | STRING |  | true |
-| issueId | Issue ID | INTEGER <details> <summary> Depends On </summary> projectId </details> | `ID of the issue to comment on.` | true |
-| body | Comment | STRING | `The comment to add to the issue.` | true |
+| issueId | Issue ID | INTEGER <details> <summary> Depends On </summary> projectId </details> | ID of the issue to comment on. | true |
+| body | Comment | STRING | The comment to add to the issue. | true |
 
 #### Example JSON Structure
 ```json

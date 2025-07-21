@@ -24,8 +24,8 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| clientId | Client ID | STRING | `Client ID of your Wrike app.` | true |
-| clientSecret | Client Secret | STRING | `Client Secret of your Wrike app.` | true |
+| clientId | Client ID | STRING | Client ID of your Wrike app. | true |
+| clientSecret | Client Secret | STRING | Client Secret of your Wrike app. | true |
 
 
 
@@ -46,10 +46,10 @@ Name: createComment
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parent | Parent | STRING <details> <summary> Options </summary> folders, tasks </details> | `Choose whether the comment will be added to a task or to a folder.` | true |
-| parentId | Parent ID | STRING <details> <summary> Depends On </summary> parent </details> | `ID of the parent folder or the parent task.` | true |
-| text | Text | STRING | `Comment text.` | true |
-| plainText | Plain Text | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether the comment will be treated as plain text or as HTML.` | false |
+| parent | Parent | STRING <details> <summary> Options </summary> folders, tasks </details> | Choose whether the comment will be added to a task or to a folder. | true |
+| parentId | Parent ID | STRING <details> <summary> Depends On </summary> parent </details> | ID of the parent folder or the parent task. | true |
+| text | Text | STRING | Comment text. | true |
+| plainText | Plain Text | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the comment will be treated as plain text or as HTML. | false |
 
 #### Example JSON Structure
 ```json
@@ -109,8 +109,8 @@ Name: createFolder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parentId | Parent ID | STRING | `ID of the parent folder.` | true |
-| title | Title | STRING | `The title of the folder.` | true |
+| parentId | Parent ID | STRING | ID of the parent folder. | true |
+| title | Title | STRING | The title of the folder. | true |
 
 #### Example JSON Structure
 ```json
@@ -177,14 +177,14 @@ Name: createProject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parentId | Parent ID | STRING | `ID of the parent folder.` | true |
-| title | Title | STRING | `The title of the project.` | true |
-| description | Description | STRING | `The description of the project.` | false |
-| startDate | Start Date | DATE | `The start date of the project.` | false |
-| endDate | End Date | DATE | `The end date of the project.` | false |
-| contractType | Contract Type | STRING <details> <summary> Options </summary> Billable, NonBillable </details> | `The contract type of the project.` | false |
-| ownerIds | Owner IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of project owner IDs.` | false |
-| budget | Budget | INTEGER | `The budget of the project.` | false |
+| parentId | Parent ID | STRING | ID of the parent folder. | true |
+| title | Title | STRING | The title of the project. | true |
+| description | Description | STRING | The description of the project. | false |
+| startDate | Start Date | DATE | The start date of the project. | false |
+| endDate | End Date | DATE | The end date of the project. | false |
+| contractType | Contract Type | STRING <details> <summary> Options </summary> Billable, NonBillable </details> | The contract type of the project. | false |
+| ownerIds | Owner IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of project owner IDs. | false |
+| budget | Budget | INTEGER | The budget of the project. | false |
 
 #### Example JSON Structure
 ```json
@@ -265,12 +265,12 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parentId | Parent ID | STRING | `ID of the parent folder.` | true |
-| title | Title | STRING | `The title of the task.` | true |
-| description | Description | STRING | `Description of task, will be left blank, if not set.` | false |
-| status | Status | STRING <details> <summary> Options </summary> Active, Completed, Deferred, Cancelled </details> | `The status of the task.` | false |
-| importance | Importance | STRING <details> <summary> Options </summary> High, Normal, Low </details> | `The importance of the task.` | false |
-| responsibles | Assignees | ARRAY <details> <summary> Items </summary> [STRING\($assigneeId)] </details> | `Choose assignees for the task.` | false |
+| parentId | Parent ID | STRING | ID of the parent folder. | true |
+| title | Title | STRING | The title of the task. | true |
+| description | Description | STRING | Description of task, will be left blank, if not set. | false |
+| status | Status | STRING <details> <summary> Options </summary> Active, Completed, Deferred, Cancelled </details> | The status of the task. | false |
+| importance | Importance | STRING <details> <summary> Options </summary> High, Normal, Low </details> | The importance of the task. | false |
+| responsibles | Assignees | ARRAY <details> <summary> Items </summary> [STRING\($assigneeId)] </details> | Choose assignees for the task. | false |
 
 #### Example JSON Structure
 ```json

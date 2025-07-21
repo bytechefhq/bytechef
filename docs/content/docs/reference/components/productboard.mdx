@@ -46,7 +46,7 @@ Name: getFeature
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | X-Version | X - Version | INTEGER |  | true |
-| id | Id | STRING | `ID of the feature` | true |
+| id | Id | STRING | ID of the feature | true |
 
 #### Example JSON Structure
 ```json
@@ -154,7 +154,7 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(title), STRING\(content), STRING\(displayUrl), STRING\(externalDisplayUrl), &#123;STRING\(id)&#125;\(company), &#123;STRING\(id)&#125;\(user), &#123;STRING\(email), STRING\(name)&#125;\(owner), [&#123;STRING\(memberId), STRING\(memberName), STRING\(memberEmail), STRING\(teamId), STRING\(teamName)&#125;]\(followers), STRING\(state), &#123;STRING\(origin), STRING\(record_id)&#125;\(source), STRING\(tags), [&#123;STRING\(id), STRING\(type), INTEGER\(importance)&#125;]\(features), DATE_TIME\(createdAt), DATE_TIME\(updatedAt), &#123;STRING\(email), STRING\(name), STRING\(uuid)&#125;\(createdBy)&#125;] </details> |  |
-| pageCursor | STRING | Use this pageCursor returned by search results to get next page of results. GET /notes?pageCursor={pageCursor} |
+| pageCursor | STRING | Use this pageCursor returned by search results to get next page of results. GET /notes?pageCursor=&#123;pageCursor&#125; |
 | totalResults | INTEGER | Total number of notes that meet the specified parameters for the query |
 
 
@@ -221,8 +221,8 @@ Name: createNote
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | X-Version | X - Version | INTEGER |  | true |
-| title | Title | STRING | `Title of note.` | true |
-| content | Content | STRING | `HTML-encoded rich text supported by certain tags; unsupported tags will be stripped out.` | true |
+| title | Title | STRING | Title of note. | true |
+| content | Content | STRING | HTML-encoded rich text supported by certain tags; unsupported tags will be stripped out. | true |
 
 #### Example JSON Structure
 ```json
@@ -278,7 +278,7 @@ Name: deleteNote
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | X-Version | X - Version | INTEGER |  | true |
-| noteId | Note ID | STRING | `ID of the note` | true |
+| noteId | Note ID | STRING | ID of the note | true |
 
 #### Example JSON Structure
 ```json
@@ -310,7 +310,7 @@ Name: getNote
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | X-Version | X - Version | INTEGER |  | true |
-| noteId | Note ID | STRING | `ID of the note` | true |
+| noteId | Note ID | STRING | ID of the note | true |
 
 #### Example JSON Structure
 ```json
@@ -400,7 +400,7 @@ Name: updateNote
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | X-Version | X - Version | INTEGER |  | true |
-| noteId | Note ID | STRING | `ID of the note` | true |
+| noteId | Note ID | STRING | ID of the note | true |
 | data | Data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(content), &#123;STRING\(email), STRING\(name)&#125;\(owner), [STRING]\(tags), STRING\(title)&#125; </details> |  | true |
 
 #### Example JSON Structure

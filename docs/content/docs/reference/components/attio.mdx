@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| token | Access Token | STRING | `Can be found in Workspace Settings -> Developers -> Access tokens.` | true |
+| token | Access Token | STRING | Can be found in Workspace Settings -&gt; Developers -&gt; Access tokens. | true |
 
 
 
@@ -45,7 +45,7 @@ Name: createRecord
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| record_type | Record Type | STRING | `Type of record that will be created.` | true |
+| record_type | Record Type | STRING | Type of record that will be created. | true |
 | people | Person | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(email_address), STRING\(description), STRING\(company), STRING\(job_title), STRING\(facebook), STRING\(instagram), STRING\(linkedin), [STRING\($deal)]\(associated_deals), [STRING\($user)]\(associated_users)&#125; </details> |  | true |
 | companies | Company | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domains), STRING\(name), STRING\(description), STRING\(facebook), STRING\(instagram), STRING\(linkedin), STRING\(estimated_arr_usd), DATE\(foundation_date), STRING\(employee_range), [STRING\($category)]\(categories), [STRING\($deal)]\(associated_deals), [STRING\($workspace)]\(associated_workspaces)&#125; </details> |  | true |
 | users | | OBJECT <details> <summary> Properties </summary> &#123;STRING\(person), STRING\(email_address), STRING\(user_id), [STRING\($workspace)]\(workspace)&#125; </details> |  | true |
@@ -128,11 +128,11 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| content | Content | STRING | `Content of the task.` | true |
-| deadline_at | Deadline | DATE_TIME | `Deadline of the task.` | true |
-| is_completed | Is Completed | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Weather the task completed.` | true |
-| linked_records | Linked Records | ARRAY <details> <summary> Items </summary> [&#123;STRING\(target_object), STRING\(target_record_id)&#125;] </details> | `Records linked to the task.` | true |
-| assignees | Assignees | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Assignees of the task.` | false |
+| content | Content | STRING | Content of the task. | true |
+| deadline_at | Deadline | DATE_TIME | Deadline of the task. | true |
+| is_completed | Is Completed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Weather the task completed. | true |
+| linked_records | Linked Records | ARRAY <details> <summary> Items </summary> [&#123;STRING\(target_object), STRING\(target_record_id)&#125;] </details> | Records linked to the task. | true |
+| assignees | Assignees | ARRAY <details> <summary> Items </summary> [STRING] </details> | Assignees of the task. | false |
 
 #### Example JSON Structure
 ```json
@@ -207,8 +207,8 @@ Name: updateRecord
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| record_type | Record Type | STRING | `Type of record that will be created.` | true |
-| record_id | Record ID | STRING <details> <summary> Depends On </summary> record_type </details> | `ID of the record that will be updated.` | true |
+| record_type | Record Type | STRING | Type of record that will be created. | true |
+| record_id | Record ID | STRING <details> <summary> Depends On </summary> record_type </details> | ID of the record that will be updated. | true |
 | people | Person | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(email_address), STRING\(description), STRING\(company), STRING\(job_title), STRING\(facebook), STRING\(instagram), STRING\(linkedin), [STRING\($deal)]\(associated_deals), [STRING\($user)]\(associated_users)&#125; </details> |  | true |
 | companies | Company | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domains), STRING\(name), STRING\(description), STRING\(facebook), STRING\(instagram), STRING\(linkedin), STRING\(estimated_arr_usd), DATE\(foundation_date), STRING\(employee_range), [STRING\($category)]\(categories), [STRING\($deal)]\(associated_deals), [STRING\($workspace)]\(associated_workspaces)&#125; </details> |  | true |
 | users | | OBJECT <details> <summary> Properties </summary> &#123;STRING\(person), STRING\(email_address), STRING\(user_id), [STRING\($workspace)]\(workspace)&#125; </details> |  | true |

@@ -47,9 +47,9 @@ Name: copyFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | File ID | STRING | `ID of the file to copy.` | true |
-| name | New File Name | STRING | `The new name for the copy. If this isn't provided, the same name will be used as the original.` | false |
-| parentId | Destination Folder ID | STRING | `The ID of the folder where the copied file will be stored. If not specified, the root folder will be used.` | false |
+| id | File ID | STRING | ID of the file to copy. | true |
+| name | New File Name | STRING | The new name for the copy. If this isn't provided, the same name will be used as the original. | false |
+| parentId | Destination Folder ID | STRING | The ID of the folder where the copied file will be stored. If not specified, the root folder will be used. | false |
 
 #### Example JSON Structure
 ```json
@@ -81,8 +81,8 @@ Name: createNewFolder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Folder Name | STRING | `The name of the new folder.` | true |
-| parentId | Parent Folder ID | STRING | `ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.` | false |
+| name | Folder Name | STRING | The name of the new folder. | true |
+| parentId | Parent Folder ID | STRING | ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder. | false |
 
 #### Example JSON Structure
 ```json
@@ -160,10 +160,10 @@ Name: createNewTextFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | File Name | STRING | `The name of the new text file.` | true |
-| text | Text | STRING | `The text content to add to file.` | true |
-| mimeType | File Type | STRING <details> <summary> Options </summary> plain/text, text/csv, text/xml </details> | `Select file type.` | true |
-| parentId | Parent Folder ID | STRING | `ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder.` | false |
+| name | File Name | STRING | The name of the new text file. | true |
+| text | Text | STRING | The text content to add to file. | true |
+| mimeType | File Type | STRING <details> <summary> Options </summary> plain/text, text/csv, text/xml </details> | Select file type. | true |
+| parentId | Parent Folder ID | STRING | ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder. | false |
 
 #### Example JSON Structure
 ```json
@@ -246,7 +246,7 @@ Name: deleteFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | File ID | STRING | `The id of a file to delete.` | true |
+| id | File ID | STRING | The id of a file to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -276,7 +276,7 @@ Name: downloadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | File ID | STRING | `ID of the file to download.` | true |
+| id | File ID | STRING | ID of the file to download. | true |
 
 #### Example JSON Structure
 ```json
@@ -329,7 +329,7 @@ Name: getFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | File ID | STRING | `ID of the file to retrieve.` | true |
+| id | File ID | STRING | ID of the file to retrieve. | true |
 
 #### Example JSON Structure
 ```json
@@ -409,7 +409,7 @@ Name: listFiles
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parentId | Parent Folder ID | STRING | `ID of the folder from which you want to list files. If no folder is specified, the root folder will be used.` | false |
+| parentId | Parent Folder ID | STRING | ID of the folder from which you want to list files. If no folder is specified, the root folder will be used. | false |
 
 #### Example JSON Structure
 ```json
@@ -492,7 +492,7 @@ Name: listFolders
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parentId | Parent Folder ID | STRING | `ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used.` | false |
+| parentId | Parent Folder ID | STRING | ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used. | false |
 
 #### Example JSON Structure
 ```json
@@ -572,8 +572,8 @@ Name: uploadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parentId | Parent Folder ID | STRING | `ID of the Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.` | false |
-| file | File | FILE_ENTRY | `File to upload.` | true |
+| parentId | Parent Folder ID | STRING | ID of the Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder. | false |
+| file | File | FILE_ENTRY | File to upload. | true |
 
 #### Example JSON Structure
 ```json
@@ -665,7 +665,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parentId | Parent Folder ID | STRING | `If no folder is specified, the root folder will be used.` | false |
+| parentId | Parent Folder ID | STRING | If no folder is specified, the root folder will be used. | false |
 
 
 #### Output

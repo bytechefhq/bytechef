@@ -46,8 +46,8 @@ Name: createBoard
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `The new name for the board.` | true |
-| desc | Description | STRING | `A new description for the board.` | false |
+| name | Name | STRING | The new name for the board. | true |
+| desc | Description | STRING | A new description for the board. | false |
 
 #### Example JSON Structure
 ```json
@@ -78,10 +78,10 @@ Name: createCard
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| idBoard | Board ID | STRING | `ID of the board.` | true |
-| idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> | `ID of the list where the card should be created in.` | true |
-| name | Name | STRING | `The name for the card.` | false |
-| desc | Description | STRING | `The description for the card.` | false |
+| idBoard | Board ID | STRING | ID of the board. | true |
+| idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> | ID of the list where the card should be created in. | true |
+| name | Name | STRING | The name for the card. | false |
+| desc | Description | STRING | The description for the card. | false |
 
 #### Example JSON Structure
 ```json
@@ -139,7 +139,7 @@ Name: getCard
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| idBoard | Board ID | STRING | `ID of the board where card is located.` | true |
+| idBoard | Board ID | STRING | ID of the board where card is located. | true |
 | id | Card ID | STRING <details> <summary> Depends On </summary> idBoard </details> |  | true |
 
 #### Example JSON Structure

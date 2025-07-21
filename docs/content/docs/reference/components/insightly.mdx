@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| pod | Pod | STRING | `Your instances pod can be found under your API URL, e.g. https://api.{pod}.insightly.com/v3.1` | true |
+| pod | Pod | STRING | Your instances pod can be found under your API URL, e.g. https://api.&#123;pod&#125;.insightly.com/v3.1 | true |
 | username | API Key | STRING |  | true |
 
 
@@ -46,11 +46,11 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| FIRST_NAME | First Name | STRING | `The first name of the contact.` | true |
-| LAST_NAME | Last Name | STRING | `The last name of the contact.` | false |
-| EMAIL_ADDRESS | Email Address | STRING | `Email address of the contact.` | false |
-| PHONE | Phone | STRING | `Phone number of the contact.` | false |
-| TITLE | Title | STRING | `The contact's title in company.` | false |
+| FIRST_NAME | First Name | STRING | The first name of the contact. | true |
+| LAST_NAME | Last Name | STRING | The last name of the contact. | false |
+| EMAIL_ADDRESS | Email Address | STRING | Email address of the contact. | false |
+| PHONE | Phone | STRING | Phone number of the contact. | false |
+| TITLE | Title | STRING | The contact's title in company. | false |
 
 #### Example JSON Structure
 ```json
@@ -111,9 +111,9 @@ Name: createOrganization
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| ORGANISATION_NAME | Organization Name | STRING | `The name of the organization.` | true |
-| PHONE | Phone | STRING | `A contact phone number for the organization.` | false |
-| WEBSITE | Website | STRING | `The organization's website.` | false |
+| ORGANISATION_NAME | Organization Name | STRING | The name of the organization. | true |
+| PHONE | Phone | STRING | A contact phone number for the organization. | false |
+| WEBSITE | Website | STRING | The organization's website. | false |
 
 #### Example JSON Structure
 ```json
@@ -169,7 +169,7 @@ Name: createTask
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | TITLE | Title | STRING |  | true |
-| STATUS | Status | STRING <details> <summary> Options </summary> Not Started, In Progress, Completed, Deferred, Waiting </details> | `Task status` | false |
+| STATUS | Status | STRING <details> <summary> Options </summary> Not Started, In Progress, Completed, Deferred, Waiting </details> | Task status | false |
 
 #### Example JSON Structure
 ```json

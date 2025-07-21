@@ -45,7 +45,7 @@ Name: getLists
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| listFields | List Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | `List of fields to include for each related list object.` | true |
+| listFields | List Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of fields to include for each related list object. | true |
 
 #### Example JSON Structure
 ```json
@@ -140,8 +140,8 @@ Name: subscribeProfiles
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| profileId | Profile ID | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The IDs of the profile to subscribe.` | true |
-| subscription | Subscription | ARRAY <details> <summary> Items </summary> [STRING] </details> | `The subscription parameters to subscribe to on the email or sms channel.` | true |
+| profileId | Profile ID | ARRAY <details> <summary> Items </summary> [STRING] </details> | The IDs of the profile to subscribe. | true |
+| subscription | Subscription | ARRAY <details> <summary> Items </summary> [STRING] </details> | The subscription parameters to subscribe to on the email or sms channel. | true |
 
 #### Example JSON Structure
 ```json
@@ -172,23 +172,23 @@ Name: updateProfile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| profileId | Profile ID | STRING | `Primary key that uniquely identifies this profile.` | true |
-| email | Email | STRING | `Individual's email address.` | false |
-| phone_number | Phone Number | STRING | `Individual's phone number in E.164 format.` | false |
-| first_name | First Name | STRING | `Individual's first name.` | false |
-| last_name | Last Name | STRING | `Individual's last name.` | false |
-| organization | Organization | STRING | `Name of the company or organization within the company for whom the individual works.` | false |
-| locale | Locale | STRING | `The locale of the profile, in the IETF BCP 47 language tag format like (ISO 639-1/2)-(ISO 3166 alpha-2).` | false |
-| title | Title | STRING | `Individual's job title.` | false |
-| image | Image | STRING | `URL pointing to the location of a profile image.` | false |
-| address1 | Address1 | STRING | `First line of street address.` | false |
-| address2 | Address2 | STRING | `Second line of street address.` | false |
-| city | City | STRING | `City name.` | false |
-| country | Country | STRING | `Country name.` | false |
-| region | Region | STRING | `Region within a country, such as state or province.` | false |
-| zip | Zip | STRING | `Zip code.` | false |
-| timezone | Timezone | STRING | `Time zone name. We recommend using time zones from the IANA Time Zone Database..` | false |
-| ip | IP | STRING | `IP address.` | false |
+| profileId | Profile ID | STRING | Primary key that uniquely identifies this profile. | true |
+| email | Email | STRING | Individual's email address. | false |
+| phone_number | Phone Number | STRING | Individual's phone number in E.164 format. | false |
+| first_name | First Name | STRING | Individual's first name. | false |
+| last_name | Last Name | STRING | Individual's last name. | false |
+| organization | Organization | STRING | Name of the company or organization within the company for whom the individual works. | false |
+| locale | Locale | STRING | The locale of the profile, in the IETF BCP 47 language tag format like (ISO 639-1/2)-(ISO 3166 alpha-2). | false |
+| title | Title | STRING | Individual's job title. | false |
+| image | Image | STRING | URL pointing to the location of a profile image. | false |
+| address1 | Address1 | STRING | First line of street address. | false |
+| address2 | Address2 | STRING | Second line of street address. | false |
+| city | City | STRING | City name. | false |
+| country | Country | STRING | Country name. | false |
+| region | Region | STRING | Region within a country, such as state or province. | false |
+| zip | Zip | STRING | Zip code. | false |
+| timezone | Timezone | STRING | Time zone name. We recommend using time zones from the IANA Time Zone Database.. | false |
+| ip | IP | STRING | IP address. | false |
 
 #### Example JSON Structure
 ```json

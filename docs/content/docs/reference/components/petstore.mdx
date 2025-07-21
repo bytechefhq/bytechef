@@ -60,7 +60,7 @@ Name: addPet
 | category | Category | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> |  | false |
 | photoUrls | Photo Urls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
 | tags | Tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> |  | false |
-| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | `pet status in the store` | false |
+| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store | false |
 
 #### Example JSON Structure
 ```json
@@ -139,7 +139,7 @@ Name: updatePet
 | category | Category | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> |  | false |
 | photoUrls | Photo Urls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
 | tags | Tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> |  | false |
-| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | `pet status in the store` | false |
+| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store | false |
 
 #### Example JSON Structure
 ```json
@@ -213,7 +213,7 @@ Name: findPetsByStatus
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | `Status values that need to be considered for filter` | false |
+| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | Status values that need to be considered for filter | false |
 
 #### Example JSON Structure
 ```json
@@ -279,7 +279,7 @@ Name: findPetsByTags
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Tags to filter by` | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags to filter by | false |
 
 #### Example JSON Structure
 ```json
@@ -345,8 +345,8 @@ Name: deletePet
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| api_key | Api Key | STRING | `` | false |
-| petId | Pet Id | INTEGER | `Pet id to delete` | true |
+| api_key | Api Key | STRING |  | false |
+| petId | Pet Id | INTEGER | Pet id to delete | true |
 
 #### Example JSON Structure
 ```json
@@ -377,7 +377,7 @@ Name: getPetById
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| petId | Pet Id | INTEGER | `ID of pet to return` | true |
+| petId | Pet Id | INTEGER | ID of pet to return | true |
 
 #### Example JSON Structure
 ```json
@@ -440,9 +440,9 @@ Name: updatePetWithForm
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| petId | Pet Id | INTEGER | `ID of pet that needs to be updated` | true |
-| name | Name | STRING | `Name of pet that needs to be updated` | false |
-| status | Status | STRING | `Status of pet that needs to be updated` | false |
+| petId | Pet Id | INTEGER | ID of pet that needs to be updated | true |
+| name | Name | STRING | Name of pet that needs to be updated | false |
+| status | Status | STRING | Status of pet that needs to be updated | false |
 
 #### Example JSON Structure
 ```json
@@ -474,8 +474,8 @@ Name: uploadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| petId | Pet Id | INTEGER | `ID of pet to update` | true |
-| additionalMetadata | Additional Metadata | STRING | `Additional Metadata` | false |
+| petId | Pet Id | INTEGER | ID of pet to update | true |
+| additionalMetadata | Additional Metadata | STRING | Additional Metadata | false |
 | fileEntry | | FILE_ENTRY |  | null |
 
 #### Example JSON Structure
@@ -565,7 +565,7 @@ Name: placeOrder
 | petId | Pet Id | INTEGER |  | false |
 | quantity | Quantity | INTEGER |  | false |
 | shipDate | Ship Date | DATE_TIME |  | false |
-| status | Status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | `Order Status` | false |
+| status | Status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status | false |
 | complete | Complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
 
 #### Example JSON Structure
@@ -628,7 +628,7 @@ Name: deleteOrder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| orderId | Order Id | INTEGER | `ID of the order that needs to be deleted` | true |
+| orderId | Order Id | INTEGER | ID of the order that needs to be deleted | true |
 
 #### Example JSON Structure
 ```json
@@ -658,7 +658,7 @@ Name: getOrderById
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| orderId | Order Id | INTEGER | `ID of order that needs to be fetched` | true |
+| orderId | Order Id | INTEGER | ID of order that needs to be fetched | true |
 
 #### Example JSON Structure
 ```json
@@ -722,7 +722,7 @@ Name: createUser
 | email | Email | STRING |  | false |
 | password | Password | STRING |  | false |
 | phone | Phone | STRING |  | false |
-| userStatus | User Status | INTEGER | `User Status` | false |
+| userStatus | User Status | INTEGER | User Status | false |
 
 #### Example JSON Structure
 ```json
@@ -863,7 +863,7 @@ Name: deleteUser
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| username | Username | STRING | `The name that needs to be deleted` | true |
+| username | Username | STRING | The name that needs to be deleted | true |
 
 #### Example JSON Structure
 ```json
@@ -893,7 +893,7 @@ Name: getUserByName
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| username | Username | STRING | `The name that needs to be fetched. Use user1 for testing. ` | true |
+| username | Username | STRING | The name that needs to be fetched. Use user1 for testing.  | true |
 
 #### Example JSON Structure
 ```json
@@ -954,7 +954,7 @@ Name: updateUser
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| username | Username | STRING | `name that need to be deleted` | true |
+| username | Username | STRING | name that need to be deleted | true |
 | id | Id | INTEGER |  | false |
 | username | Username | STRING |  | false |
 | firstName | First Name | STRING |  | false |
@@ -962,7 +962,7 @@ Name: updateUser
 | email | Email | STRING |  | false |
 | password | Password | STRING |  | false |
 | phone | Phone | STRING |  | false |
-| userStatus | User Status | INTEGER | `User Status` | false |
+| userStatus | User Status | INTEGER | User Status | false |
 
 #### Example JSON Structure
 ```json

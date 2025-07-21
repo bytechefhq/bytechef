@@ -26,8 +26,8 @@ Name: compressImage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | image | Image | FILE_ENTRY |  | true |
-| quality | Quality | NUMBER | `Compression quality of the image.` | true |
-| resultFileName | Result File Name | STRING | `Specifies the output file name for the result image.` | true |
+| quality | Quality | NUMBER | Compression quality of the image. | true |
+| resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
 
 #### Example JSON Structure
 ```json
@@ -88,11 +88,11 @@ Name: cropImage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | image | Image | FILE_ENTRY |  | true |
-| x | X Coordinate | INTEGER | `The horizontal starting point of the crop area` | true |
-| y | Y Coordinate | INTEGER | `The vertical starting point of the crop area` | true |
-| width | Width | INTEGER | `Width of the crop area` | true |
-| height | Height | INTEGER | `Height of the crop area` | true |
-| resultFileName | Result File Name | STRING | `Specifies the output file name for the result image.` | true |
+| x | X Coordinate | INTEGER | The horizontal starting point of the crop area | true |
+| y | Y Coordinate | INTEGER | The vertical starting point of the crop area | true |
+| width | Width | INTEGER | Width of the crop area | true |
+| height | Height | INTEGER | Height of the crop area | true |
+| resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
 
 #### Example JSON Structure
 ```json
@@ -156,7 +156,7 @@ Name: getImageMetadata
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | image | Image | FILE_ENTRY |  | true |
-| resultFileName | Result File Name | STRING | `Specifies the output file name for the result image.` | true |
+| resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
 
 #### Example JSON Structure
 ```json
@@ -234,9 +234,9 @@ Name: resizeImage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | image | Image | FILE_ENTRY |  | true |
-| width | Width | INTEGER | `Width in pixels` | true |
-| height | Height | INTEGER | `Height in pixels` | true |
-| resultFileName | Result File Name | STRING | `Specifies the output file name for the result image.` | true |
+| width | Width | INTEGER | Width in pixels | true |
+| height | Height | INTEGER | Height in pixels | true |
+| resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
 
 #### Example JSON Structure
 ```json
@@ -298,8 +298,8 @@ Name: rotateImage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | image | Image | FILE_ENTRY |  | true |
-| degree | Degree | INTEGER <details> <summary> Options </summary> 90, 180, 270 </details> | `Specifies the degree of clockwise rotation applied to the image.` | true |
-| resultFileName | Result File Name | STRING | `Specifies the output file name for the result image.` | true |
+| degree | Degree | INTEGER <details> <summary> Options </summary> 90, 180, 270 </details> | Specifies the degree of clockwise rotation applied to the image. | true |
+| resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
 
 #### Example JSON Structure
 ```json

@@ -24,9 +24,9 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| account_identifier | Account Identifier | STRING | `Account identifier of your account.` | true |
-| clientId | Client ID | STRING | `Snowflake OAuth Client ID.` | true |
-| clientSecret | Client Secret | STRING | `Snowflake OAuth Client Secret.` | true |
+| account_identifier | Account Identifier | STRING | Account identifier of your account. | true |
+| clientId | Client ID | STRING | Snowflake OAuth Client ID. | true |
+| clientSecret | Client Secret | STRING | Snowflake OAuth Client Secret. | true |
 
 
 
@@ -50,7 +50,7 @@ Name: deleteRow
 | database | Database | STRING |  | true |
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
 | table | Table | STRING <details> <summary> Depends On </summary> schema, database </details> |  | true |
-| condition | Condition | STRING | `Condition that will be checked in the column. Example: column1=5` | true |
+| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
 
 #### Example JSON Structure
 ```json
@@ -121,7 +121,7 @@ Name: executeSql
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| statement | Statement | STRING | `SQL statement that will be executed.` | true |
+| statement | Statement | STRING | SQL statement that will be executed. | true |
 
 #### Example JSON Structure
 ```json
@@ -266,7 +266,7 @@ Name: updateRow
 | database | Database | STRING |  | true |
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
 | table | Table | STRING <details> <summary> Depends On </summary> schema, database </details> |  | true |
-| condition | Condition | STRING | `Condition that will be checked in the column. Example: column1=5` | true |
+| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
 | values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
 
 #### Example JSON Structure

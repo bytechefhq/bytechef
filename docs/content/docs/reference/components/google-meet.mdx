@@ -46,7 +46,7 @@ Name: createMeetingSpace
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| accessType | Access Type | STRING <details> <summary> Options </summary> ACCESS_TYPE_UNSPECIFIED, OPEN, TRUSTED, RESTRICTED </details> | `Access type of the meeting space that determines who can join without knocking.` | false |
+| accessType | Access Type | STRING <details> <summary> Options </summary> ACCESS_TYPE_UNSPECIFIED, OPEN, TRUSTED, RESTRICTED </details> | Access type of the meeting space that determines who can join without knocking. | false |
 
 #### Example JSON Structure
 ```json
@@ -102,7 +102,7 @@ Name: getMeetingSpace
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `The name of the meeting space or meeting code in format spaces/{meetingCode}.` | true |
+| name | Name | STRING | The name of the meeting space or meeting code in format spaces/&#123;meetingCode&#125;. | true |
 
 #### Example JSON Structure
 ```json
@@ -158,7 +158,7 @@ Name: listParticipants
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| conferenceRecords | Conference Records | STRING | `Conference Records` | true |
+| conferenceRecords | Conference Records | STRING | Conference Records | true |
 
 #### Example JSON Structure
 ```json

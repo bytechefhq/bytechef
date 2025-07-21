@@ -26,13 +26,13 @@ Name: addTime
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | inputDate | Date | DATE_TIME |  | true |
-| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | `Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).` | true |
-| year | Year | INTEGER | `Years to add.` | false |
-| month | Month | INTEGER | `Months to add.` | false |
-| day | Day | INTEGER | `Days to add.` | false |
-| hour | Hour | INTEGER | `Hours to add.` | false |
-| minute | Minute | INTEGER | `Minutes to add.` | false |
-| second | Second | INTEGER | `Seconds to add.` | false |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
+| year | Year | INTEGER | Years to add. | false |
+| month | Month | INTEGER | Months to add. | false |
+| day | Day | INTEGER | Days to add. | false |
+| hour | Hour | INTEGER | Hours to add. | false |
+| minute | Minute | INTEGER | Minutes to add. | false |
+| second | Second | INTEGER | Seconds to add. | false |
 
 #### Example JSON Structure
 ```json
@@ -75,8 +75,8 @@ Name: convertUnixTimestampToIso8601
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| dateTimestamp | UNIX Timestamp | NUMBER | `UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits)` | true |
-| dateFormat | Date Format | STRING <details> <summary> Options </summary> yyyy-MM-dd'T'HH:mm:ss.SSSZ, yyyy-MM-dd </details> | `Formatting that should be applied the text representation of date.` | true |
+| dateTimestamp | UNIX Timestamp | NUMBER | UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits) | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> yyyy-MM-dd'T'HH:mm:ss.SSSZ, yyyy-MM-dd </details> | Formatting that should be applied the text representation of date. | true |
 
 #### Example JSON Structure
 ```json
@@ -115,7 +115,7 @@ Name: dateDifference
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | startDate | Start Date | DATE_TIME |  | true |
 | endDate | End Date | DATE_TIME |  | true |
-| unit | Unit | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second </details> | `The unit of difference between the two dates.` | true |
+| unit | Unit | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second </details> | The unit of difference between the two dates. | true |
 
 #### Example JSON Structure
 ```json
@@ -153,8 +153,8 @@ Name: extractDateUnits
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputDate | Date | DATE_TIME | `The date from which to extract the specified unit.` | true |
-| unit | Unit to Extract | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second, dayOfWeek, monthName, date, time </details> | `Unit to extract from the input date.` | true |
+| inputDate | Date | DATE_TIME | The date from which to extract the specified unit. | true |
+| unit | Unit to Extract | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second, dayOfWeek, monthName, date, time </details> | Unit to extract from the input date. | true |
 
 #### Example JSON Structure
 ```json
@@ -185,8 +185,8 @@ Name: getCurrentDate
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| timeZone | Time Zone | STRING | `Time zone to use when formatting date.` | true |
-| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | `Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).` | true |
+| timeZone | Time Zone | STRING | Time zone to use when formatting date. | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
 
 #### Example JSON Structure
 ```json
@@ -223,12 +223,12 @@ Name: isBusinessHours
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputDate | Date | DATE_TIME | `Date to check to see if it is business hours.` | true |
-| businessWeekStart | Business Week Start | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4, 5, 6, 7 </details> | `First day of the business week.` | true |
-| businessWeekEnd | Business Week End | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4, 5, 6, 7 </details> | `Last day of the business week.` | true |
-| businessHoursStart | Business Hours Start | TIME | `Time of the day that business hours start.` | true |
-| businessHoursEnd | Business Hours End | TIME | `Time of the day that business hours end.` | true |
-| timeZone | Time Zone | STRING | `Time zone to check business hours for.` | true |
+| inputDate | Date | DATE_TIME | Date to check to see if it is business hours. | true |
+| businessWeekStart | Business Week Start | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4, 5, 6, 7 </details> | First day of the business week. | true |
+| businessWeekEnd | Business Week End | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4, 5, 6, 7 </details> | Last day of the business week. | true |
+| businessHoursStart | Business Hours Start | TIME | Time of the day that business hours start. | true |
+| businessHoursEnd | Business Hours End | TIME | Time of the day that business hours end. | true |
+| timeZone | Time Zone | STRING | Time zone to check business hours for. | true |
 
 #### Example JSON Structure
 ```json
@@ -269,8 +269,8 @@ Name: isWeekend
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputDate | Date | DATE_TIME | `Date to check to see if it is a weekend.` | true |
-| timeZone | Time Zone | STRING | `Time zone you are in.` | true |
+| inputDate | Date | DATE_TIME | Date to check to see if it is a weekend. | true |
+| timeZone | Time Zone | STRING | Time zone you are in. | true |
 
 #### Example JSON Structure
 ```json
@@ -308,13 +308,13 @@ Name: subtractTime
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | inputDate | Date | DATE_TIME |  | true |
-| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | `Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).` | true |
-| year | Year | INTEGER | `Years to subtract.` | false |
-| month | Month | INTEGER | `Months to subtract.` | false |
-| day | Day | INTEGER | `Days to subtract.` | false |
-| hour | Hour | INTEGER | `Hours to subtract.` | false |
-| minute | Minute | INTEGER | `Minutes to subtract.` | false |
-| second | Second | INTEGER | `Seconds to subtract.` | false |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
+| year | Year | INTEGER | Years to subtract. | false |
+| month | Month | INTEGER | Months to subtract. | false |
+| day | Day | INTEGER | Days to subtract. | false |
+| hour | Hour | INTEGER | Hours to subtract. | false |
+| minute | Minute | INTEGER | Minutes to subtract. | false |
+| second | Second | INTEGER | Seconds to subtract. | false |
 
 #### Example JSON Structure
 ```json

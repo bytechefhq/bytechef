@@ -46,9 +46,9 @@ Name: sendChannelMessage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | guildId | Guild ID | STRING |  | true |
-| channelId | Channel ID | STRING <details> <summary> Depends On </summary> guildId </details> | `ID of the channel where to send the message.` | true |
-| content | Message Text | STRING | `Message contents (up to 2000 characters)` | true |
-| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | `True if this is a TTS message` | false |
+| channelId | Channel ID | STRING <details> <summary> Depends On </summary> guildId </details> | ID of the channel where to send the message. | true |
+| content | Message Text | STRING | Message contents (up to 2000 characters) | true |
+| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | True if this is a TTS message | false |
 
 #### Example JSON Structure
 ```json
@@ -143,7 +143,7 @@ Name: createChannel
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | guildId | Guild ID | STRING |  | true |
-| name | Name | STRING | `The name of the new channel` | true |
+| name | Name | STRING | The name of the new channel | true |
 | type | Type | INTEGER <details> <summary> Options </summary> 0, 2, 4 </details> |  | false |
 
 #### Example JSON Structure
@@ -221,9 +221,9 @@ Name: sendDirectMessage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | guildId | Guild ID | STRING |  | true |
-| recipient_id | Recipient | STRING <details> <summary> Depends On </summary> guildId </details> | `The recipient to open a DM channel with.` | true |
-| content | Message Text | STRING | `Message contents (up to 2000 characters)` | true |
-| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | `True if this is a TTS message` | false |
+| recipient_id | Recipient | STRING <details> <summary> Depends On </summary> guildId </details> | The recipient to open a DM channel with. | true |
+| content | Message Text | STRING | Message contents (up to 2000 characters) | true |
+| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | True if this is a TTS message | false |
 
 #### Example JSON Structure
 ```json

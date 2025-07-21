@@ -45,9 +45,9 @@ Name: listDocs
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| isOwner | Is Owner | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Show only docs owned by the user.` | false |
-| isPublished | Is Published | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Show only published docs.` | false |
-| limit | Limit | INTEGER | `Maximum number of results to return in this query.` | false |
+| isOwner | Is Owner | BOOLEAN <details> <summary> Options </summary> true, false </details> | Show only docs owned by the user. | false |
+| isPublished | Is Published | BOOLEAN <details> <summary> Options </summary> true, false </details> | Show only published docs. | false |
+| limit | Limit | INTEGER | Maximum number of results to return in this query. | false |
 
 #### Example JSON Structure
 ```json
@@ -139,8 +139,8 @@ Name: copyDoc
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Title | STRING | `Title of the new doc.` | true |
-| sourceDoc | Source Doc | STRING | `A doc ID from which to create a copy.` | true |
+| title | Title | STRING | Title of the new doc. | true |
+| sourceDoc | Source Doc | STRING | A doc ID from which to create a copy. | true |
 
 #### Example JSON Structure
 ```json
@@ -237,10 +237,10 @@ Name: updateRow
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| docId | Doc ID | STRING | `ID of the doc.` | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> docId </details> | `ID or name of the table.` | true |
-| rowId | Row ID | STRING <details> <summary> Depends On </summary> docId, tableId </details> | `ID or name of the row.` | true |
-| row | Row | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(column), STRING\(value)&#125;]\(cells)&#125; </details> | `An edit made to a particular row.` | true |
+| docId | Doc ID | STRING | ID of the doc. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> docId </details> | ID or name of the table. | true |
+| rowId | Row ID | STRING <details> <summary> Depends On </summary> docId, tableId </details> | ID or name of the row. | true |
+| row | Row | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(column), STRING\(value)&#125;]\(cells)&#125; </details> | An edit made to a particular row. | true |
 
 #### Example JSON Structure
 ```json
@@ -297,8 +297,8 @@ Name: insertRow
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| docId | Doc ID | STRING | `ID of the doc.` | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> docId </details> | `ID of the table.` | true |
+| docId | Doc ID | STRING | ID of the doc. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> docId </details> | ID of the table. | true |
 | rowValues | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> docId, tableId </details> |  | false |
 
 #### Example JSON Structure

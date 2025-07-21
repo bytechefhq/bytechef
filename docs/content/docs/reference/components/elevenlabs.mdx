@@ -46,7 +46,7 @@ Name: createSoundEffect
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | `The text that will get converted into a sound effect.` | true |
+| text | Text | STRING | The text that will get converted into a sound effect. | true |
 
 #### Example JSON Structure
 ```json
@@ -99,8 +99,8 @@ Name: createSpeech
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| voiceId | Voice | STRING | `Voice you want to use for converting the text into speech.` | true |
-| text | Text | STRING | `Text you want to convert into speech.` | true |
+| voiceId | Voice | STRING | Voice you want to use for converting the text into speech. | true |
+| text | Text | STRING | Text you want to convert into speech. | true |
 
 #### Example JSON Structure
 ```json
@@ -154,8 +154,8 @@ Name: createSpeechWithTiming
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| voiceId | Voice | STRING | `Voice you want to use for converting the text into speech.` | true |
-| text | Text | STRING | `Text you want to convert into speech.` | true |
+| voiceId | Voice | STRING | Voice you want to use for converting the text into speech. | true |
+| text | Text | STRING | Text you want to convert into speech. | true |
 
 #### Example JSON Structure
 ```json
@@ -215,8 +215,8 @@ Name: createTranscript
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model_id | Model | STRING | `The ID of the model to use for transcription, currently only ‘scribe_v1’ is available.` | true |
-| file | File | FILE_ENTRY | `The file to transcribe. All major audio and video formats are supported. The file size must be less than 1GB.` | true |
+| model_id | Model | STRING | The ID of the model to use for transcription, currently only ‘scribe_v1’ is available. | true |
+| file | File | FILE_ENTRY | The file to transcribe. All major audio and video formats are supported. The file size must be less than 1GB. | true |
 
 #### Example JSON Structure
 ```json

@@ -47,11 +47,11 @@ Name: addUser
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| first_name | First Name | STRING | `First name of the user.` | true |
-| last_name | Last Name | STRING | `Last name of the user.` | false |
-| email | Email | STRING | `User's email. An invitation will be sent to this email address` | true |
-| role | Role ID | STRING | `ID of the role you want to assign the user with.` | true |
-| profile | Profile ID | STRING | `ID of the profile you want to assign the user with.` | true |
+| first_name | First Name | STRING | First name of the user. | true |
+| last_name | Last Name | STRING | Last name of the user. | false |
+| email | Email | STRING | User's email. An invitation will be sent to this email address | true |
+| role | Role ID | STRING | ID of the role you want to assign the user with. | true |
+| profile | Profile ID | STRING | ID of the profile you want to assign the user with. | true |
 
 #### Example JSON Structure
 ```json
@@ -163,7 +163,7 @@ Name: listUsers
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| type | Type | STRING <details> <summary> Options </summary> AllUsers, ActiveUsers, DeactiveUsers, ConfirmedUsers, NotConfirmedUsers, DeletedUsers, ActiveConfirmedUsers, AdminUsers, ActiveConfirmedAdmins, CurrentUser </details> | `What type of user to return in list.` | true |
+| type | Type | STRING <details> <summary> Options </summary> AllUsers, ActiveUsers, DeactiveUsers, ConfirmedUsers, NotConfirmedUsers, DeletedUsers, ActiveConfirmedUsers, AdminUsers, ActiveConfirmedAdmins, CurrentUser </details> | What type of user to return in list. | true |
 
 #### Example JSON Structure
 ```json

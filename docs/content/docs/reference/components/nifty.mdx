@@ -46,9 +46,9 @@ Name: createProject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Name of the project.` | true |
-| description | Description | STRING | `Description of the project's purpose, goals, or any other relevent information.` | false |
-| template_id | Template ID | STRING | `ID of template that can be used to pre-configure the project.` | false |
+| name | Name | STRING | Name of the project. | true |
+| description | Description | STRING | Description of the project's purpose, goals, or any other relevent information. | false |
+| template_id | Template ID | STRING | ID of template that can be used to pre-configure the project. | false |
 
 #### Example JSON Structure
 ```json
@@ -103,11 +103,11 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | `ID of the project within which the task will be created.` | true |
+| project | Project ID | STRING | ID of the project within which the task will be created. | true |
 | task_group_id | Status | STRING <details> <summary> Depends On </summary> project </details> |  | true |
-| name | Name | STRING | `Name of the task.` | true |
-| description | Description | STRING | `Description of the task.` | false |
-| due_date | Due Date | DATE_TIME | `Due date for the task.` | false |
+| name | Name | STRING | Name of the task. | true |
+| description | Description | STRING | Description of the task. | false |
+| due_date | Due Date | DATE_TIME | Due date for the task. | false |
 
 #### Example JSON Structure
 ```json
@@ -166,7 +166,7 @@ Name: getTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| taskId | Task ID | STRING | `ID of the task to get details for.` | true |
+| taskId | Task ID | STRING | ID of the task to get details for. | true |
 
 #### Example JSON Structure
 ```json
@@ -219,8 +219,8 @@ Name: createStatus
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Name of the status.` | true |
-| project_id | Project ID | STRING | `Project ID that the status belongs to.` | true |
+| name | Name | STRING | Name of the status. | true |
+| project_id | Project ID | STRING | Project ID that the status belongs to. | true |
 
 #### Example JSON Structure
 ```json
@@ -277,9 +277,9 @@ Name: getTrackedTimeReport
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project_id | Project ID | STRING | `Id of the project to get the report for.` | true |
-| start_date | Start Date | DATE_TIME | `Start date for the report.` | false |
-| end_date | End Date | DATE_TIME | `Start date for the report.` | false |
+| project_id | Project ID | STRING | Id of the project to get the report for. | true |
+| start_date | Start Date | DATE_TIME | Start date for the report. | false |
+| end_date | End Date | DATE_TIME | Start date for the report. | false |
 
 #### Example JSON Structure
 ```json
@@ -344,7 +344,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| app_id | Application | STRING | `Application to be used for the trigger.` | true |
+| app_id | Application | STRING | Application to be used for the trigger. | true |
 
 
 #### Output

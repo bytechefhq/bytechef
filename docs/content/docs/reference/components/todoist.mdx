@@ -46,10 +46,10 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| content | Content | STRING | `Task content. It may contain some markdown-formatted text and hyperlinks.` | true |
-| description | Description | STRING | `A description for the task. This value may contain some markdown-formatted text and hyperlinks.` | false |
-| project_id | Project ID | STRING | `Task project ID. If not set, task is put to user's Inbox.` | false |
-| priority | Priority | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | `Task priority from 1 (normal) to 4 (urgent).` | false |
+| content | Content | STRING | Task content. It may contain some markdown-formatted text and hyperlinks. | true |
+| description | Description | STRING | A description for the task. This value may contain some markdown-formatted text and hyperlinks. | false |
+| project_id | Project ID | STRING | Task project ID. If not set, task is put to user's Inbox. | false |
+| priority | Priority | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | Task priority from 1 (normal) to 4 (urgent). | false |
 
 #### Example JSON Structure
 ```json
@@ -107,7 +107,7 @@ Name: markTaskCompleted
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| taskId | Task ID | STRING | `ID of the task to be closed.` | true |
+| taskId | Task ID | STRING | ID of the task to be closed. | true |
 
 #### Example JSON Structure
 ```json
@@ -137,9 +137,9 @@ Name: createProject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `Name of the project.` | true |
+| name | Name | STRING | Name of the project. | true |
 | color | Color | STRING <details> <summary> Options </summary> beryy_red, red, orange, yellow, olive_green, lime_green, green, mint_green, teal, sky_blue, light_blue, blue, grape, violet, lavender, magenta, salmon, charcoal, grey, taupe </details> |  | false |
-| is_favorite | Is Project a Favorite? | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether the project is a favorite.` | false |
+| is_favorite | Is Project a Favorite? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the project is a favorite. | false |
 
 #### Example JSON Structure
 ```json

@@ -46,13 +46,13 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| givenName | First Name | STRING | `The first name of the contact.` | true |
-| middleName | Middle Name | STRING | `The middle name of the contact.` | false |
-| familyName | Last Name | STRING | `The last name of the contact.` | true |
-| title | Job Title | STRING | `The job title of the contact.` | false |
-| name | Company | STRING | `The company of the contact.` | false |
-| email | Email | STRING | `The email addresses of the contact.` | false |
-| phoneNumber | Phone Number | STRING | `The phone numbers of the contact.` | false |
+| givenName | First Name | STRING | The first name of the contact. | true |
+| middleName | Middle Name | STRING | The middle name of the contact. | false |
+| familyName | Last Name | STRING | The last name of the contact. | true |
+| title | Job Title | STRING | The job title of the contact. | false |
+| name | Company | STRING | The company of the contact. | false |
+| email | Email | STRING | The email addresses of the contact. | false |
+| phoneNumber | Phone Number | STRING | The phone numbers of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -122,7 +122,7 @@ Name: createGroup
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Group Name | STRING | `The name of the group.` | true |
+| name | Group Name | STRING | The name of the group. | true |
 
 #### Example JSON Structure
 ```json
@@ -169,14 +169,14 @@ Name: updateContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| resourceName | Resource Name | STRING | `Resource name of the contact to be updated.` | true |
-| givenName | First Name | STRING | `New first name of the contact.` | true |
-| middleName | Middle Name | STRING | `New middle name of the contact.` | false |
-| familyName | Last Name | STRING | `Updated last name of the contact.` | true |
-| title | Job Title | STRING | `Updated job title of the contact.` | false |
-| name | Company | STRING | `Updated name of the company where the contact is employed.` | false |
-| email | Email Address | STRING | `Updated email address of the contact.` | false |
-| phoneNumber | Phone Number | STRING | `Updated phone number of the contact.` | false |
+| resourceName | Resource Name | STRING | Resource name of the contact to be updated. | true |
+| givenName | First Name | STRING | New first name of the contact. | true |
+| middleName | Middle Name | STRING | New middle name of the contact. | false |
+| familyName | Last Name | STRING | Updated last name of the contact. | true |
+| title | Job Title | STRING | Updated job title of the contact. | false |
+| name | Company | STRING | Updated name of the company where the contact is employed. | false |
+| email | Email Address | STRING | Updated email address of the contact. | false |
+| phoneNumber | Phone Number | STRING | Updated phone number of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -247,9 +247,9 @@ Name: searchContacts
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| query | Query | STRING | `The plain-text query for the request.The query is used to match prefix phrases of the fields on a person. For example, a person with name "foo name" matches queries such as "f", "fo", "foo", "foo n", "nam", etc., but not "oo n".` | true |
-| readMask | Read Mask | ARRAY <details> <summary> Items </summary> [STRING] </details> | `A field mask to restrict which fields on each person are returned.` | true |
-| pageSize | Page Size | INTEGER | `The number of results to return per page.` | true |
+| query | Query | STRING | The plain-text query for the request.The query is used to match prefix phrases of the fields on a person. For example, a person with name "foo name" matches queries such as "f", "fo", "foo", "foo n", "nam", etc., but not "oo n". | true |
+| readMask | Read Mask | ARRAY <details> <summary> Items </summary> [STRING] </details> | A field mask to restrict which fields on each person are returned. | true |
+| pageSize | Page Size | INTEGER | The number of results to return per page. | true |
 
 #### Example JSON Structure
 ```json

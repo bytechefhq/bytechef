@@ -45,13 +45,13 @@ Name: search
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| query | Query | STRING | `The search query to execute.` | true |
-| topic | Topic | STRING <details> <summary> Options </summary> general, news </details> | `The category of the search.` | false |
-| search_depth | Search Depth | STRING <details> <summary> Options </summary> basic, advanced </details> | `The depth of the search.` | false |
-| time_range | Time Range | STRING <details> <summary> Options </summary> day, week, month, year </details> | `The time range back from the current date to filter results.` | false |
-| max_results | Max Results | INTEGER | `The maximum number of search results to return.` | false |
-| include_answer | Include Answer | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Include an LLM-generated answer to the provided query.` | false |
-| include_images | Include Images | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Perform an image search and include the results in the response.` | false |
+| query | Query | STRING | The search query to execute. | true |
+| topic | Topic | STRING <details> <summary> Options </summary> general, news </details> | The category of the search. | false |
+| search_depth | Search Depth | STRING <details> <summary> Options </summary> basic, advanced </details> | The depth of the search. | false |
+| time_range | Time Range | STRING <details> <summary> Options </summary> day, week, month, year </details> | The time range back from the current date to filter results. | false |
+| max_results | Max Results | INTEGER | The maximum number of search results to return. | false |
+| include_answer | Include Answer | BOOLEAN <details> <summary> Options </summary> true, false </details> | Include an LLM-generated answer to the provided query. | false |
+| include_images | Include Images | BOOLEAN <details> <summary> Options </summary> true, false </details> | Perform an image search and include the results in the response. | false |
 
 #### Example JSON Structure
 ```json
@@ -117,9 +117,9 @@ Name: extract
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| urls | URLs | ARRAY <details> <summary> Items </summary> [STRING] </details> | `A list of URLs to extract content from.` | true |
-| include_images | Include Images | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Include a list of images extracted from the URLs in the response.` | false |
-| extract_depth | Extract Depth | STRING <details> <summary> Options </summary> basic, advanced </details> | `The depth of the extraction process.` | false |
+| urls | URLs | ARRAY <details> <summary> Items </summary> [STRING] </details> | A list of URLs to extract content from. | true |
+| include_images | Include Images | BOOLEAN <details> <summary> Options </summary> true, false </details> | Include a list of images extracted from the URLs in the response. | false |
+| extract_depth | Extract Depth | STRING <details> <summary> Options </summary> basic, advanced </details> | The depth of the extraction process. | false |
 
 #### Example JSON Structure
 ```json

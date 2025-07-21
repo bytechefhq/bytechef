@@ -46,9 +46,9 @@ Name: copy
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| filename | Filename | STRING | `Name of the file with the extension. Don't fill in if you want a folder.` | false |
-| from_path | Source Path | STRING | `The path which the file or folder should be copied from.  Root is /.` | true |
-| to_path | Destination Path | STRING | `The path which the file or folder should be copied to.  Root is /.` | true |
+| filename | Filename | STRING | Name of the file with the extension. Don't fill in if you want a folder. | false |
+| from_path | Source Path | STRING | The path which the file or folder should be copied from.  Root is /. | true |
+| to_path | Destination Path | STRING | The path which the file or folder should be copied to.  Root is /. | true |
 
 #### Example JSON Structure
 ```json
@@ -102,7 +102,7 @@ Name: createFolder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| path | Folder Path/Name | STRING | `The path of the new folder. Root is /.` | true |
+| path | Folder Path/Name | STRING | The path of the new folder. Root is /. | true |
 
 #### Example JSON Structure
 ```json
@@ -154,12 +154,12 @@ Name: createTextFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| path | Path | STRING | `The path of the new paper file. Root is /.` | true |
-| filename | Filename | STRING | `Name of the paper file` | true |
-| text | Text | STRING | `The text to write into the file.` | true |
-| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict.` | false |
-| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification.` | false |
-| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted.` | false |
+| path | Path | STRING | The path of the new paper file. Root is /. | true |
+| filename | Filename | STRING | Name of the paper file | true |
+| text | Text | STRING | The text to write into the file. | true |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
+| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
+| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
 
 #### Example JSON Structure
 ```json
@@ -223,8 +223,8 @@ Name: delete
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| path | Path | STRING | `Path of the file or folder. Root is /.` | true |
-| filename | Filename | STRING | `Name of the file. Leave empty if you want to delete a folder.` | false |
+| path | Path | STRING | Path of the file or folder. Root is /. | true |
+| filename | Filename | STRING | Name of the file. Leave empty if you want to delete a folder. | false |
 
 #### Example JSON Structure
 ```json
@@ -277,8 +277,8 @@ Name: getFileLink
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| path | Namepath to the File | STRING | `The path to the file you want a temporary link to.  Root is /.` | true |
-| filename | Filename | STRING | `Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect)` | true |
+| path | Namepath to the File | STRING | The path to the file you want a temporary link to.  Root is /. | true |
+| filename | Filename | STRING | Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect) | true |
 
 #### Example JSON Structure
 ```json
@@ -333,7 +333,7 @@ Name: listFolder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| path | Path | STRING | `Path of the filename. Inputting nothing searches root.` | false |
+| path | Path | STRING | Path of the filename. Inputting nothing searches root. | false |
 
 #### Example JSON Structure
 ```json
@@ -385,9 +385,9 @@ Name: move
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| filename | Filename | STRING | `Name of the file with the extension. Don't fill in if you want a folder.` | false |
-| from_path | Source Path | STRING | `Path in the user's Dropbox to be moved.  Root is /.` | true |
-| to_path | Destination Path | STRING | `Path in the user's Dropbox that is the destination. Root is /.` | true |
+| filename | Filename | STRING | Name of the file with the extension. Don't fill in if you want a folder. | false |
+| from_path | Source Path | STRING | Path in the user's Dropbox to be moved.  Root is /. | true |
+| to_path | Destination Path | STRING | Path in the user's Dropbox that is the destination. Root is /. | true |
 
 #### Example JSON Structure
 ```json
@@ -441,7 +441,7 @@ Name: search
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| query | Search String | STRING | `The string to search for. May match across multiple fields based on the request arguments.` | true |
+| query | Search String | STRING | The string to search for. May match across multiple fields based on the request arguments. | true |
 
 #### Example JSON Structure
 ```json
@@ -495,12 +495,12 @@ Name: uploadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileEntry | File | FILE_ENTRY | `The object property which contains a reference to the file to be written.` | true |
-| path | Destination Path | STRING | `The path to which the file should be written.` | true |
-| filename | Filename | STRING | `Name of the file. Needs to have the appropriate extension.` | true |
-| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict.` | false |
-| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification.` | false |
-| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted.` | false |
+| fileEntry | File | FILE_ENTRY | The object property which contains a reference to the file to be written. | true |
+| path | Destination Path | STRING | The path to which the file should be written. | true |
+| filename | Filename | STRING | Name of the file. Needs to have the appropriate extension. | true |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
+| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
+| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
 
 #### Example JSON Structure
 ```json

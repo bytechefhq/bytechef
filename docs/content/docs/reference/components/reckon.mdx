@@ -46,8 +46,8 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| bookId | Book ID | STRING | `ID of the book where new contact will be created.` | true |
-| name | Name | STRING | `The name of the contact.` | true |
+| bookId | Book ID | STRING | ID of the book where new contact will be created. | true |
+| name | Name | STRING | The name of the contact. | true |
 
 #### Example JSON Structure
 ```json
@@ -95,11 +95,11 @@ Name: createInvoice
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| bookId | Book ID | STRING | `ID of the book where new invoice will be created.` | true |
-| customer | Customer | STRING | `The customer that is being invoiced.` | true |
-| invoiceDate | Invoice Date | DATE | `The date of the invoice.` | true |
-| amountTaxStatus | Amount Tax Status | STRING <details> <summary> Options </summary> NonTaxed, Inclusive, Exclusive </details> | `The amount tax status of the amounts in the invoice.` | true |
-| lineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(lineNumber)&#125;] </details> | `The individual items that make up the invoice.` | true |
+| bookId | Book ID | STRING | ID of the book where new invoice will be created. | true |
+| customer | Customer | STRING | The customer that is being invoiced. | true |
+| invoiceDate | Invoice Date | DATE | The date of the invoice. | true |
+| amountTaxStatus | Amount Tax Status | STRING <details> <summary> Options </summary> NonTaxed, Inclusive, Exclusive </details> | The amount tax status of the amounts in the invoice. | true |
+| lineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(lineNumber)&#125;] </details> | The individual items that make up the invoice. | true |
 
 #### Example JSON Structure
 ```json
@@ -152,10 +152,10 @@ Name: createPayment
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| bookId | Book ID | STRING | `ID of the book where new payment will be created.` | true |
-| supplier | Supplier | STRING | `The supplier that is being paid.` | true |
-| paymentDate | Payment Date | DATE | `The date of the payment.` | true |
-| totalAmount | Total Amount | NUMBER | `The total amount of the payment applied.` | true |
+| bookId | Book ID | STRING | ID of the book where new payment will be created. | true |
+| supplier | Supplier | STRING | The supplier that is being paid. | true |
+| paymentDate | Payment Date | DATE | The date of the payment. | true |
+| totalAmount | Total Amount | NUMBER | The total amount of the payment applied. | true |
 
 #### Example JSON Structure
 ```json

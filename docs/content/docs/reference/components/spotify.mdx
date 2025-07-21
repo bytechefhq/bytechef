@@ -45,9 +45,9 @@ Name: startResumePlayback
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | deviceId | Device ID | STRING |  | false |
-| context_uri | Context Uri | STRING | `Spotify URI of the context to play (album, artist, playlist).` | false |
-| uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Spotify track URIs to play.` | false |
-| position_ms | Position | INTEGER | `The position in milliseconds to start playback from.` | false |
+| context_uri | Context Uri | STRING | Spotify URI of the context to play (album, artist, playlist). | false |
+| uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> | Spotify track URIs to play. | false |
+| position_ms | Position | INTEGER | The position in milliseconds to start playback from. | false |
 
 #### Example JSON Structure
 ```json
@@ -82,7 +82,7 @@ Name: addItemsToPlaylist
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | playlist_id | Playlist ID | STRING |  | true |
 | uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
-| position | Position | INTEGER | `Position to insert the items, a zero-based index.` | false |
+| position | Position | INTEGER | Position to insert the items, a zero-based index. | false |
 
 #### Example JSON Structure
 ```json
@@ -131,10 +131,10 @@ Name: createPlaylist
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | `The name for the new playlist.` | true |
-| description | Description | STRING | `The description for the new playlist.` | false |
-| public | Public | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The public status for the new playlist.` | true |
-| collaborative | Collaborative | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If the playlist is collaborative or not.` | true |
+| name | Name | STRING | The name for the new playlist. | true |
+| description | Description | STRING | The description for the new playlist. | false |
+| public | Public | BOOLEAN <details> <summary> Options </summary> true, false </details> | The public status for the new playlist. | true |
+| collaborative | Collaborative | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the playlist is collaborative or not. | true |
 
 #### Example JSON Structure
 ```json

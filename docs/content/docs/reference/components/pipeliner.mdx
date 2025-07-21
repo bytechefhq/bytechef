@@ -24,7 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spaceId | Space Id | STRING | `Your Space ID` | true |
+| spaceId | Space Id | STRING | Your Space ID | true |
 | serverUrl | Server URL | STRING <details> <summary> Options </summary> https://us-east.api.pipelinersales.com/api/v100/rest/spaces/, https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/ </details> |  | true |
 | username | Username | STRING |  | true |
 | password | Password | STRING |  | true |
@@ -48,8 +48,8 @@ Name: createAccount
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| owner_id | Owner ID | STRING | `Id of the user in Pipeliner Application that will become the owner of the newly created account.` | true |
-| name | Name | STRING | `Account name` | true |
+| owner_id | Owner ID | STRING | Id of the user in Pipeliner Application that will become the owner of the newly created account. | true |
+| name | Name | STRING | Account name | true |
 
 #### Example JSON Structure
 ```json
@@ -103,9 +103,9 @@ Name: createContact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| owner_id | Owner ID | STRING | `ID of the user in Pipeliner Application that will become the owner of the newly created Contact.` | true |
-| first_name | First Name | STRING | `The firstname of the contact.` | false |
-| last_name | Last Name | STRING | `The lastname of the contact.` | true |
+| owner_id | Owner ID | STRING | ID of the user in Pipeliner Application that will become the owner of the newly created Contact. | true |
+| first_name | First Name | STRING | The firstname of the contact. | false |
+| last_name | Last Name | STRING | The lastname of the contact. | true |
 
 #### Example JSON Structure
 ```json
@@ -161,9 +161,9 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| subject | Subject | STRING | `Name of the entity and its default text representation.` | true |
-| activity_type_id | Activity Type ID | STRING | `Id of the activity type of task.` | true |
-| unit_id | Unit ID | STRING | `Sales Unit ID` | true |
+| subject | Subject | STRING | Name of the entity and its default text representation. | true |
+| activity_type_id | Activity Type ID | STRING | Id of the activity type of task. | true |
+| unit_id | Unit ID | STRING | Sales Unit ID | true |
 | owner_id | Owner ID | STRING |  | true |
 
 #### Example JSON Structure
