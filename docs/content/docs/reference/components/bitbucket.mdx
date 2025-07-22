@@ -1,0 +1,532 @@
+---
+title: "Bitbucket"
+description: "Elevate your software delivery from planning to production and beyond, with built-in AI, CI/CD, and a best-in-class Jira integration."
+---
+
+
+Categories: Project Management
+
+
+Type: bitbucket/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key Authorization
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING | `Email address of your Bitbucket account.` | true |
+| password | API Key | STRING | `API key creation steps in documentation.` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Repository
+Name: createRepository
+
+`Creates a repository in a selected workspace.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace | Workspace | STRING | `Workspace in which repository will be created.` | true |
+| repo_slug | Repository Slug | STRING | `Repository slug that is used as identifier for the repository.` | true |
+| name | Name | STRING | `The name of the repository.` | true |
+| scm | Source Control Management. | STRING <details> <summary> Options </summary> git </details> | `Specifies the version control system that your repository will use.` | true |
+| project | Project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(key)&#125; </details> | `Parent project of the repository.` | true |
+| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether the repository is private or not.` | false |
+| description | Description | STRING | `The description of repository.` | false |
+| fork_policy | Fork Policy | STRING <details> <summary> Options </summary> allow_forks, no_public_forks, no_forks </details> | `Specifies the fork policy for the repository.` | false |
+| language | Language | STRING | `Main programming language of the repository` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Repository",
+  "name" : "createRepository",
+  "parameters" : {
+    "workspace" : "",
+    "repo_slug" : "",
+    "name" : "",
+    "scm" : "",
+    "project" : {
+      "key" : ""
+    },
+    "is_private" : false,
+    "description" : "",
+    "fork_policy" : "",
+    "language" : ""
+  },
+  "type" : "bitbucket/v1/createRepository"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The type of the object (usually "repository"). |
+| links | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(href), STRING\(name)&#125;\(self), &#123;STRING\(href), STRING\(name)&#125;\(html), &#123;STRING\(href), STRING\(name)&#125;\(avatar), &#123;STRING\(href), STRING\(name)&#125;\(pullrequests), &#123;STRING\(href), STRING\(name)&#125;\(commits), &#123;STRING\(href), STRING\(name)&#125;\(forks), &#123;STRING\(href), STRING\(name)&#125;\(watchers), &#123;STRING\(href), STRING\(name)&#125;\(downloads), [&#123;STRING\(href), STRING\(name)&#125;]\(clone), &#123;STRING\(href), STRING\(name)&#125;\(hooks)&#125; </details> | A collection of relevant resource links. |
+| uuid | STRING | The globally unique identifier for the repository. |
+| full_name | STRING | The full name of the repository (workspace/repo_slug). |
+| is_private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the repository is private. |
+| scm | STRING | The source control system (only "git" is supported). |
+| owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The user or team that owns the repository. |
+| name | STRING | The display name of the repository. |
+| description | STRING | A short description of the repository. |
+| created_on | STRING | Timestamp of when the repository was created. |
+| updated_on | STRING | Timestamp of the last repository update. |
+| size | INTEGER | Total size of the repository in bytes. |
+| language | STRING | The primary programming language of the repository. |
+| has_issues | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the issue tracker is enabled. |
+| has_wiki | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the wiki is enabled. |
+| fork_policy | STRING | Repository fork policy. |
+| project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | Project that the repository belongs to. |
+| mainbranch | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The default branch of the repository. |
+
+
+
+
+#### Output Example
+```json
+{
+  "type" : "",
+  "links" : {
+    "self" : {
+      "href" : "",
+      "name" : ""
+    },
+    "html" : {
+      "href" : "",
+      "name" : ""
+    },
+    "avatar" : {
+      "href" : "",
+      "name" : ""
+    },
+    "pullrequests" : {
+      "href" : "",
+      "name" : ""
+    },
+    "commits" : {
+      "href" : "",
+      "name" : ""
+    },
+    "forks" : {
+      "href" : "",
+      "name" : ""
+    },
+    "watchers" : {
+      "href" : "",
+      "name" : ""
+    },
+    "downloads" : {
+      "href" : "",
+      "name" : ""
+    },
+    "clone" : [ {
+      "href" : "",
+      "name" : ""
+    } ],
+    "hooks" : {
+      "href" : "",
+      "name" : ""
+    }
+  },
+  "uuid" : "",
+  "full_name" : "",
+  "is_private" : false,
+  "scm" : "",
+  "owner" : {
+    "type" : ""
+  },
+  "name" : "",
+  "description" : "",
+  "created_on" : "",
+  "updated_on" : "",
+  "size" : 1,
+  "language" : "",
+  "has_issues" : false,
+  "has_wiki" : false,
+  "fork_policy" : "",
+  "project" : {
+    "type" : ""
+  },
+  "mainbranch" : {
+    "type" : ""
+  }
+}
+```
+
+
+### Create Project
+Name: createProject
+
+`Creates a project in selected workspace.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace | Workspace | STRING | `Workspace where the project will be added.` | true |
+| name | Name | STRING | `The name of the project.` | true |
+| key | Key | STRING | `Key of the project (eg. AT, for a project named Atlassian). Project keys must start with a letter and may only consist of ASCII letters, numbers and underscores (A-Z, a-z, 0-9, _).` | true |
+| description | Description | STRING | `The description of project.` | false |
+| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether the project is private or not.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Project",
+  "name" : "createProject",
+  "parameters" : {
+    "workspace" : "",
+    "name" : "",
+    "key" : "",
+    "description" : "",
+    "is_private" : false
+  },
+  "type" : "bitbucket/v1/createProject"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metrics | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(org_keywords)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "metrics" : {
+    "org_keywords" : 1
+  }
+}
+```
+
+
+### List Projects
+Name: listProjects
+
+`Returns list of projects from workspace.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace | Workspace | STRING | `Workspace from which projects are to be listed.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Projects",
+  "name" : "listProjects",
+  "parameters" : {
+    "workspace" : ""
+  },
+  "type" : "bitbucket/v1/listProjects"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The type of the object (typically 'project'). |
+| links | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(href), STRING\(name)&#125;\(html), &#123;STRING\(href), STRING\(name)&#125;\(avatar)&#125; </details> | Relevant links for the project. |
+| uuid | STRING | Globally unique identifier for the project. |
+| key | STRING | Unique key identifying the project within the workspace. |
+| owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The workspace or user who owns the project. |
+| name | STRING | Human-readable name of the project. |
+| description | STRING | Description of the project. |
+| is_private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the project is private. |
+| created_on | DATE_TIME | Timestamp of when the project was created. |
+| updated_on | DATE_TIME | Timestamp of the last update to the project. |
+| has_publicly_visible_repos | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the project contains any public repositories. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "type" : "",
+  "links" : {
+    "html" : {
+      "href" : "",
+      "name" : ""
+    },
+    "avatar" : {
+      "href" : "",
+      "name" : ""
+    }
+  },
+  "uuid" : "",
+  "key" : "",
+  "owner" : {
+    "type" : ""
+  },
+  "name" : "",
+  "description" : "",
+  "is_private" : false,
+  "created_on" : "2021-01-01T00:00:00",
+  "updated_on" : "2021-01-01T00:00:00",
+  "has_publicly_visible_repos" : false
+} ]
+```
+
+
+### List Repositories
+Name: listRepositories
+
+`Returns list of repositories from workspace.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace | Workspace | STRING | `Workspace from which repositories are to be listed.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Repositories",
+  "name" : "listRepositories",
+  "parameters" : {
+    "workspace" : ""
+  },
+  "type" : "bitbucket/v1/listRepositories"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The type of the object (usually "repository"). |
+| links | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(href), STRING\(name)&#125;\(self), &#123;STRING\(href), STRING\(name)&#125;\(html), &#123;STRING\(href), STRING\(name)&#125;\(avatar), &#123;STRING\(href), STRING\(name)&#125;\(pullrequests), &#123;STRING\(href), STRING\(name)&#125;\(commits), &#123;STRING\(href), STRING\(name)&#125;\(forks), &#123;STRING\(href), STRING\(name)&#125;\(watchers), &#123;STRING\(href), STRING\(name)&#125;\(downloads), [&#123;STRING\(href), STRING\(name)&#125;]\(clone), &#123;STRING\(href), STRING\(name)&#125;\(hooks)&#125; </details> | A collection of relevant resource links. |
+| uuid | STRING | The globally unique identifier for the repository. |
+| full_name | STRING | The full name of the repository (workspace/repo_slug). |
+| is_private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the repository is private. |
+| scm | STRING | The source control system (only "git" is supported). |
+| owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The user or team that owns the repository. |
+| name | STRING | The display name of the repository. |
+| description | STRING | A short description of the repository. |
+| created_on | STRING | Timestamp of when the repository was created. |
+| updated_on | STRING | Timestamp of the last repository update. |
+| size | INTEGER | Total size of the repository in bytes. |
+| language | STRING | The primary programming language of the repository. |
+| has_issues | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the issue tracker is enabled. |
+| has_wiki | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the wiki is enabled. |
+| fork_policy | STRING | Repository fork policy. |
+| project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | Project that the repository belongs to. |
+| mainbranch | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The default branch of the repository. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "type" : "",
+  "links" : {
+    "self" : {
+      "href" : "",
+      "name" : ""
+    },
+    "html" : {
+      "href" : "",
+      "name" : ""
+    },
+    "avatar" : {
+      "href" : "",
+      "name" : ""
+    },
+    "pullrequests" : {
+      "href" : "",
+      "name" : ""
+    },
+    "commits" : {
+      "href" : "",
+      "name" : ""
+    },
+    "forks" : {
+      "href" : "",
+      "name" : ""
+    },
+    "watchers" : {
+      "href" : "",
+      "name" : ""
+    },
+    "downloads" : {
+      "href" : "",
+      "name" : ""
+    },
+    "clone" : [ {
+      "href" : "",
+      "name" : ""
+    } ],
+    "hooks" : {
+      "href" : "",
+      "name" : ""
+    }
+  },
+  "uuid" : "",
+  "full_name" : "",
+  "is_private" : false,
+  "scm" : "",
+  "owner" : {
+    "type" : ""
+  },
+  "name" : "",
+  "description" : "",
+  "created_on" : "",
+  "updated_on" : "",
+  "size" : 1,
+  "language" : "",
+  "has_issues" : false,
+  "has_wiki" : false,
+  "fork_policy" : "",
+  "project" : {
+    "type" : ""
+  },
+  "mainbranch" : {
+    "type" : ""
+  }
+} ]
+```
+
+
+
+
+## Triggers
+
+
+### Repository Push
+Name: repositoryPush
+
+`Triggers whenever a repository push occurs.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace | Workspace | STRING | `Workspace where the repository is located.` | true |
+| repository | Repository | STRING <details> <summary> Depends On </summary> workspace </details> | `Repository that will be connected to the trigger.` | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "Repository Push",
+  "name" : "repositoryPush",
+  "parameters" : {
+    "workspace" : "",
+    "repository" : ""
+  },
+  "type" : "bitbucket/v1/repositoryPush"
+}
+```
+
+
+<hr />
+
+<hr />
+
+# Additional instructions
+<hr />
+
+## Connection Setup
+
+### Bitbucket API Token Creation
+
+1. Go to the [Bitbucket website](https://bitbucket.org).
+2. Click **Settings**.
+3. Click **Atlassian account settings**.
+4. Click **Security**.
+5. Click **Create and manage API tokens**.
+6. Click **Create API token with scopes**.
+7. Enter name of your API token.
+8. Choose expiry date of your API token.
+9. Click **Next**.
+10. Select **Bitbucket**.
+11. Click **Next**.
+12. Find and select these scopes:
+  -   admin:project:bitbucket
+  -   admin:repository:bitbucket
+  -   read:project:bitbucket
+  -   read:repository:bitbucket
+  -   read:user:bitbucket
+  -   read:webhook:bitbucket
+  -   read:workspace:bitbucket
+  -   write:webhook:bitbucket
+13. After you have selected scopes click **Next**.
+14. Click **Create token**.
+15. Click on **Copy**. Make sure to save your newly created API token because after this step you won’t be able to view it again.
+16. Click **Close**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/007d698d-c90e-4083-b1c7-2e4fa0ec1415?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowfullscreen frameborder="0"></iframe>
+</div>
