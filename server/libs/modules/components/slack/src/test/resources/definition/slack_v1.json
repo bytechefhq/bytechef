@@ -4276,7 +4276,36 @@
   "resources" : null,
   "tags" : null,
   "title" : "Slack",
-  "triggers" : null,
+  "triggers" : [ {
+    "batch" : null,
+    "deduplicate" : null,
+    "deprecated" : null,
+    "description" : "Triggers when any user subscribed event happens.",
+    "dynamicWebhookRefresh" : null,
+    "help" : null,
+    "listenerDisable" : null,
+    "listenerEnable" : null,
+    "name" : "anyEvent",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "poll" : null,
+    "processErrorResponse" : null,
+    "properties" : null,
+    "title" : "Any Event",
+    "type" : "STATIC_WEBHOOK",
+    "webhookDisable" : null,
+    "webhookEnable" : null,
+    "webhookRawBody" : null,
+    "webhookRequest" : { },
+    "webhookValidate" : { },
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "workflowSyncExecution" : null
+  } ],
   "unifiedApi" : null,
   "version" : 1
 }
