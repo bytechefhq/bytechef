@@ -68,6 +68,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -76,6 +79,8 @@ import org.springframework.stereotype.Service;
  */
 @Service("connectionDefinitionService")
 public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionDefinitionServiceImpl.class);
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
@@ -122,6 +127,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public AuthorizationCallbackResponse executeAuthorizationCallback(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context, String redirectUri) {
+
+        logger.info("Executing with {} authorization type.", authorizationType);
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
@@ -190,6 +197,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public RefreshTokenResponse executeRefresh(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context) {
+
+        logger.info("Executing with {} authorization type.", authorizationType);
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
@@ -304,6 +313,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Map<String, ?> connectionParameters,
         Context context) {
 
+        logger.info("Executing with {} authorization type.", authorizationType);
+
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
 
@@ -325,6 +336,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Parameters parameters = ParametersFactory.createParameters(connectionParameters);
 
         try {
+            logger.info("Executing with parameters {}", parameters);
+
             return new OAuth2AuthorizationParameters(
                 authorizationUrlFunction.apply(parameters, context),
                 clientIdFunction.apply(parameters, context),
@@ -405,6 +418,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     private static AuthorizationCallbackFunction getDefaultAuthorizationCallbackFunction(
         ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
         TokenUrlFunction tokenUrlFunction) {
+
+        logger.info("Executing with clientId, clientSecret, tokenUrl");
 
         return (connectionParameters, code, redirectUri, codeVerifier, context) -> {
             FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
