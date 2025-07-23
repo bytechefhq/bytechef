@@ -181,6 +181,12 @@ public class ComponentInitOpenApiGenerator {
         writeComponentSchemaSources(schemas, sourceMainJavaDirPath);
         writeComponentHandlerSource(sourceMainJavaDirPath);
 
+        // Utils must be generated before Test classes
+        if (!dynamicOptionsMap.isEmpty() || !dynamicProperties.isEmpty()) {
+            writeAbstractUtils(sourceMainJavaDirPath);
+            writeUtils(sourceMainJavaDirPath);
+        }
+
         if (internalComponent) {
             Path sourceTestJavaDirPath = Files.createDirectories(
                 Paths.get(getAbsolutePathname("src" + File.separator + "test" + File.separator + "java")));
@@ -188,11 +194,6 @@ public class ComponentInitOpenApiGenerator {
             writeAbstractComponentHandlerTest(sourceTestJavaDirPath);
             writeComponentHandlerTest(sourceTestJavaDirPath);
             writeComponentHandlerDefinition(componentHandlerSourcePath, getPackageName(), version);
-        }
-
-        if (!dynamicOptionsMap.isEmpty() || !dynamicProperties.isEmpty()) {
-            writeAbstractUtils(sourceMainJavaDirPath);
-            writeUtils(sourceMainJavaDirPath);
         }
     }
 
