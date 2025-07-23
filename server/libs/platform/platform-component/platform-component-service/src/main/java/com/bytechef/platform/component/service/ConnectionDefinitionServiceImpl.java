@@ -203,6 +203,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
 
+        logger.info("Executing with persisted refresh token {}", authorization.getRefreshToken());
+
         RefreshFunction refreshFunction = OptionalUtils.orElse(
             authorization.getRefresh(),
             getDefaultRefreshFunction(
@@ -366,6 +368,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     private static ApplyFunction getDefaultApplyFunction(AuthorizationType type) {
+        logger.info("Resolving applyFunction for {} authorization type.", type);
+
         return switch (type) {
             case API_KEY -> (Parameters connectionParameters, Context context) -> {
                 String addTo = MapUtils.getString(
@@ -472,6 +476,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     private static RefreshFunction getDefaultRefreshFunction(
         ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
         RefreshTokenFunction refreshTokenFunction, RefreshUrlFunction refreshUrlFunction) {
+
+        logger.info("Default refresh function using refresh token function {}", refreshTokenFunction);
 
         return (connectionParameters, context) -> {
             FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
