@@ -1450,7 +1450,7 @@ public final class ComponentDsl {
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
 
         private List<? extends ModifiableAuthorization> authorizations;
-        private BaseUriFunction baseUriFunction;
+        private ParameterValueGetter baseUriParameterValueGetter;
         private List<? extends Property> properties;
         private TestConsumer testConsumer;
         private int version = 1;
@@ -1486,8 +1486,8 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableConnectionDefinition baseUri(BaseUriFunction baseUri) {
-            this.baseUriFunction = Objects.requireNonNull(baseUri);
+        public ModifiableConnectionDefinition baseUri(ParameterValueGetter baseUriParameterValueGetter) {
+            this.baseUriParameterValueGetter = Objects.requireNonNull(baseUriParameterValueGetter);
 
             return this;
         }
@@ -1525,14 +1525,15 @@ public final class ComponentDsl {
 
             return Objects.equals(authorizationRequired, that.authorizationRequired)
                 && Objects.equals(authorizations, that.authorizations)
-                && Objects.equals(baseUriFunction, that.baseUriFunction) && Objects.equals(properties, that.properties)
+                && Objects.equals(baseUriParameterValueGetter, that.baseUriParameterValueGetter)
+                && Objects.equals(properties, that.properties)
                 && Objects.equals(testConsumer, that.testConsumer) && version == that.version;
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(
-                authorizationRequired, authorizations, baseUriFunction, properties, testConsumer, version);
+                authorizationRequired, authorizations, baseUriParameterValueGetter, properties, testConsumer, version);
         }
 
         @Override
@@ -1546,8 +1547,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<BaseUriFunction> getBaseUri() {
-            return Optional.ofNullable(baseUriFunction);
+        public Optional<ParameterValueGetter> getBaseUriParameterValueGetter() {
+            return Optional.ofNullable(baseUriParameterValueGetter);
         }
 
         @Override

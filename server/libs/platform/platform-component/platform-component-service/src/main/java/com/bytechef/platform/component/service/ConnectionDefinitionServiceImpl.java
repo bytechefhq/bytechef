@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.service;
 
 import static com.bytechef.component.definition.Authorization.CODE;
-import static com.bytechef.component.definition.ConnectionDefinition.BaseUriFunction;
+import static com.bytechef.component.definition.ConnectionDefinition.ParameterValueGetter;
 import static com.bytechef.platform.component.domain.Authorization.DEFAULT_REFRESH_ON;
 
 import com.bytechef.commons.util.EncodingUtils;
@@ -68,7 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -178,19 +177,19 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Optional<String> executeBaseUri(
+    public Optional<String> getBaseUri(
         String componentName, ComponentConnection connection, Context context) {
 
         com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
             componentDefinitionRegistry.getConnectionDefinition(componentName, connection.getVersion());
 
-        BaseUriFunction baseUriFunction =
+        ParameterValueGetter baseUriParameterValueGetter =
             OptionalUtils.orElse(
-                connectionDefinition.getBaseUri(),
+                connectionDefinition.getBaseUriParameterValueGetter(),
                 (connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
 
         return Optional.ofNullable(
-            baseUriFunction.apply(ParametersFactory.createParameters(connection.parameters()), context));
+            baseUriParameterValueGetter.from(ParametersFactory.createParameters(connection.parameters()), context));
     }
 
     @Override

@@ -332,7 +332,7 @@ public class ConnectionFacadeIntTest {
         }
 
         @Override
-        public Optional<BaseUriFunction> getBaseUri() {
+        public Optional<ParameterValueGetter> getBaseUriParameterValueGetter() {
             return Optional.empty();
         }
 
