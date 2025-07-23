@@ -473,7 +473,7 @@ public class ComponentInitOpenApiGenerator {
 
         if (!dynamicOptionsMap.isEmpty()) {
             javacOpts.add(
-                sourcePath.getParent() + "/utils/" + "Abstract" + getComponentClassName(componentName) + "Utils.java");
+                sourcePath.getParent() + "/util/" + "Abstract" + getComponentClassName(componentName) + "Utils.java");
         }
 
         javaCompiler.run(null, null, null, javacOpts.toArray(new String[0]));
