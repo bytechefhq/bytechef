@@ -31,7 +31,6 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TypeReference;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,7 @@ class SlackAnyEventTriggerTest {
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
 
     @Test
-    void testWebhookRequest() throws IOException {
+    void testWebhookRequest() {
         Map<String, Object> responseMap = new HashMap<>();
 
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
