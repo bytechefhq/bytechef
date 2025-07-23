@@ -40,6 +40,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
@@ -51,6 +53,7 @@ import org.springframework.stereotype.Component;
 public class TokenRefreshHelper {
 
     private static final String CACHE = TokenRefreshHelper.class.getName() + ".reentrantLock";
+    private static final Logger logger = LoggerFactory.getLogger(TokenRefreshHelper.class);
 
     private final CacheManager cacheManager;
     private final ConnectionDefinitionService connectionDefinitionService;
@@ -112,6 +115,10 @@ public class TokenRefreshHelper {
         Map<String, ?> parameters;
 
         try {
+            logger.info(
+                "Getting refreshed credentials with oAuth2AuthorizationCode set to {}",
+                componentConnection.isAuthorizationOauth2AuthorizationCode());
+
             if (componentConnection.isAuthorizationOauth2AuthorizationCode()) {
                 Authorization.RefreshTokenResponse refreshTokenResponse =
                     connectionDefinitionService.executeRefresh(
@@ -132,12 +139,18 @@ public class TokenRefreshHelper {
                         }
                     }
                 };
+
+                logger.info("Refresh token execution executed");
             } else {
                 parameters = connectionDefinitionService.executeAcquire(
                     componentConnection.componentName(), componentConnection.version(),
                     Objects.requireNonNull(componentConnection.authorizationType()),
                     componentConnection.getParameters(), context);
+
+                logger.info("Acquire executed");
             }
+
+            logger.info("Refresh token execution executed");
 
             Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
 
@@ -154,11 +167,13 @@ public class TokenRefreshHelper {
             } finally {
                 reentrantLock.unlock();
             }
-        } catch (Exception e) {
+        } catch (Exception exception) {
             connectionService.updateConnectionCredentialStatus(
                 componentConnection.connectionId(), Connection.CredentialStatus.INVALID);
 
-            throw e;
+            logger.error("Unable to complete refresh token procedure", exception);
+
+            throw exception;
         }
 
         return new ComponentConnection(

@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,8 @@ import org.springframework.util.Assert;
 @Service("connectionService")
 @Transactional
 public class ConnectionServiceImpl implements ConnectionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionServiceImpl.class);
 
     private final ConnectionRepository connectionRepository;
 
@@ -79,6 +83,8 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setName(name);
         connection.setParameters(parameters);
         connection.setType(type);
+
+        logger.info("Saved..: {}", toString(parameters));
 
         return create(connection);
     }
@@ -194,12 +200,30 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         Connection connection = getConnection(connectionId);
 
+        logger.info("New....: {}", toString(parameters));
+
         Map<String, Object> curParameters = new HashMap<>(connection.getParameters());
+
+        logger.info("Current: {}", curParameters);
 
         curParameters.putAll(parameters);
 
         connection.setParameters(curParameters);
 
+        logger.info("Saved..: {}", curParameters);
+
         return connectionRepository.save(connection);
+    }
+
+    private String toString(Map<String, ?> parameters) {
+        StringBuffer stringBuffer = new StringBuffer();
+
+        parameters.forEach((key, value) -> stringBuffer.append("[")
+            .append(key)
+            .append(":")
+            .append(value)
+            .append("]"));
+
+        return "{" + stringBuffer.toString() + "}";
     }
 }
