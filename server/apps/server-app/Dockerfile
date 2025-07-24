@@ -10,7 +10,7 @@ RUN mkdir ${ARG_APPLICATION_HOME}/server/logs
 
 WORKDIR /opt/bytechef
 
-COPY build/libs/server-app.jar server/
+COPY build/libs/server-app*.jar server/server-app.jar
 
 ENTRYPOINT exec \
      java \

@@ -20,8 +20,8 @@ FROM ghcr.io/graalvm/graalvm-community:21.0.2
 
 WORKDIR /opt
 
-COPY --from=build /build/server/apps/server-app/build/libs/*app.jar application.jar
+COPY --from=build /build/server/apps/server-app/build/libs/server-app*.jar server-app.jar
 
 EXPOSE 9555
 
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar application.jar"]
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar server-app.jar"]
