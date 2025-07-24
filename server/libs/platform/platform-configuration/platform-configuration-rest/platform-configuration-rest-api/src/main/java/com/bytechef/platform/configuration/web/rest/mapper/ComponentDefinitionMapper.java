@@ -47,12 +47,6 @@ public class ComponentDefinitionMapper {
             ComponentDefinition componentDefinition,
             @MappingTarget ComponentDefinitionModel componentDefinitionModel) {
 
-            if (componentDefinitionModel.getClusterRoot() == null || !componentDefinitionModel.getClusterRoot()) {
-                componentDefinitionModel.actionClusterElementTypes(null);
-                componentDefinitionModel.setClusterElements(null);
-                componentDefinitionModel.clusterElementTypes(null);
-            }
-
             componentDefinitionModel.setIcon("/icons/%s.svg".formatted(componentDefinition.getName()));
         }
     }
