@@ -48,7 +48,10 @@ paths:
       responses:
         "200":
           description: "Successful operation"
-          x-dynamic-output: true
+          content:
+            application/json:
+              schema:
+                type: "object"
   /{baseId}/{tableId}/{recordId}:
     delete:
       summary: "Delete Record"
@@ -137,7 +140,10 @@ paths:
       responses:
         200:
           description: "Successful operation"
-          x-dynamic-output: true
+          content:
+            application/json:
+              schema:
+                type: "object"
 components:
   securitySchemes:
     api_key:
