@@ -349,7 +349,7 @@ class HttpClientExecutor {
         }
 
         return OptionalUtils.map(
-            connectionDefinitionService.getBaseUri(componentName, componentConnection, context),
+            connectionDefinitionService.executeBaseUri(componentName, componentConnection, context),
             baseUri -> baseUri + urlString);
 
     }
