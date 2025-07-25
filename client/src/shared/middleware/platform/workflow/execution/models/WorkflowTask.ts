@@ -29,6 +29,12 @@ import {
 export interface WorkflowTask {
     /**
      * 
+     * @type {boolean}
+     * @memberof WorkflowTask
+     */
+    readonly clusterRoot?: boolean;
+    /**
+     * 
      * @type {{ [key: string]: any; }}
      * @memberof WorkflowTask
      */
@@ -126,6 +132,7 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
+        'clusterRoot': json['clusterRoot'] == null ? undefined : json['clusterRoot'],
         'clusterElements': json['clusterElements'] == null ? undefined : json['clusterElements'],
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ComponentConnectionFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
@@ -146,7 +153,7 @@ export function WorkflowTaskToJSON(json: any): WorkflowTask {
     return WorkflowTaskToJSONTyped(json, false);
 }
 
-export function WorkflowTaskToJSONTyped(value?: Omit<WorkflowTask, 'clusterElements'|'connections'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowTaskToJSONTyped(value?: Omit<WorkflowTask, 'clusterRoot'|'clusterElements'|'connections'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
