@@ -18,7 +18,8 @@ package com.bytechef.ee.cloud.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Configuration class that sets up cross-origin resource sharing (CORS) for the application.
@@ -41,9 +42,18 @@ import org.springframework.web.bind.annotation.CrossOrigin;
  * @author Ivica Cardic
  */
 @Configuration
-@CrossOrigin(origins = {
-    "https://app.bytechef.io", "https://test.app.bytechef.io"
-})
 @Profile("cloud")
-public class CloudCrossOriginConfiguration {
+public class CloudCrossOriginConfiguration implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry
+            .addMapping("/**")
+            .allowedOrigins("https://app.bytechef.io", "https://test.app.bytechef.io", "http://app.igor.io")
+            //.allowedHeaders("Content-Type", "Authorization", "Access-Control-Request-Headers", "X-Xsrf-Token")//"Access-Control-Request-Headers"
+            .allowedHeaders("*")
+            .allowedMethods("*")
+            .allowCredentials(Boolean.TRUE);
+    }
+
 }
