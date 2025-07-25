@@ -47,7 +47,7 @@ public interface ConnectionDefinition {
      *
      * @return
      */
-    Optional<ParameterValueGetter> getBaseUriParameterValueGetter();
+    Optional<BaseUriFunction> getBaseUri();
 
     /**
      *
@@ -72,14 +72,14 @@ public interface ConnectionDefinition {
      *
      */
     @FunctionalInterface
-    interface ParameterValueGetter {
+    interface BaseUriFunction {
 
         /**
          * @param connectionParameters
          * @param context
          * @return
          */
-        String from(Parameters connectionParameters, Context context);
+        String apply(Parameters connectionParameters, Context context);
     }
 
     /**
