@@ -36,6 +36,7 @@ public class WorkflowTaskMapper {
     public interface WorkflowTaskToWorkflowTaskModelMapper extends Converter<WorkflowTask, WorkflowTaskModel> {
 
         @Named(value = "workflowTaskToWorkflowTaskModelMapper")
+        @Mapping(target = "clusterRoot", ignore = true)
         @Mapping(target = "clusterElements", ignore = true)
         @Mapping(target = "connections", ignore = true)
         WorkflowTaskModel convert(WorkflowTask workflowTask);
