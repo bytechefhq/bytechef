@@ -154,7 +154,7 @@ public class WorkflowApiControllerIntTest {
 
         return new ProjectWorkflowDTO(
             new com.bytechef.platform.configuration.dto.WorkflowDTO(
-                workflow, List.of(new WorkflowTaskDTO(tasks.getFirst(), null, List.of())), List.of()),
+                workflow, List.of(new WorkflowTaskDTO(tasks.getFirst(), false, null, List.of())), List.of()),
             new ProjectWorkflow(1));
     }
 }

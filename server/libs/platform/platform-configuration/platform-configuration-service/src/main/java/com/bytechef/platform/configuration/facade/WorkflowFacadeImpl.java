@@ -92,8 +92,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
 
             workflowTaskDTOs.add(
                 new WorkflowTaskDTO(
-                    workflowTask,
-                    clusterRoot ? ClusterElementMap.of(workflowTask.getExtensions()) : null,
+                    workflowTask, clusterRoot, ClusterElementMap.of(workflowTask.getExtensions()),
                     componentConnections));
         }
 

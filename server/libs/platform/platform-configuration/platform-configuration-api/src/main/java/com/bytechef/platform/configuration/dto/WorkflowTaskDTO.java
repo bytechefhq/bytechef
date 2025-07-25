@@ -32,6 +32,7 @@ public final class WorkflowTaskDTO {
 
     private final List<ComponentConnection> connections;
     private final ClusterElementMap clusterElements;
+    private final boolean clusterRoot;
     private final String description;
     private final List<WorkflowTask> finalize;
     private final String label;
@@ -48,12 +49,13 @@ public final class WorkflowTaskDTO {
 
     @SuppressFBWarnings("EI")
     public WorkflowTaskDTO(
-        ClusterElementMap clusterElements, List<ComponentConnection> connections, String description,
-        List<WorkflowTask> finalize, String label, int maxRetries, Map<String, ?> metadata, String name, String node,
-        Map<String, ?> parameters, List<WorkflowTask> post, List<WorkflowTask> pre, int taskNumber, String timeout,
-        String type) {
+        ClusterElementMap clusterElements, boolean clusterRoot, List<ComponentConnection> connections,
+        String description, List<WorkflowTask> finalize, String label, int maxRetries, Map<String, ?> metadata,
+        String name, String node, Map<String, ?> parameters, List<WorkflowTask> post, List<WorkflowTask> pre,
+        int taskNumber, String timeout, String type) {
 
         this.clusterElements = clusterElements;
+        this.clusterRoot = clusterRoot;
         this.connections = Collections.unmodifiableList(connections);
         this.description = description;
         this.finalize = Collections.unmodifiableList(finalize);
@@ -72,10 +74,11 @@ public final class WorkflowTaskDTO {
 
     @SuppressFBWarnings("EI")
     public WorkflowTaskDTO(
-        WorkflowTask workflowTask, ClusterElementMap clusterElements, List<ComponentConnection> connections) {
+        WorkflowTask workflowTask, boolean clusterRoot, ClusterElementMap clusterElements,
+        List<ComponentConnection> connections) {
 
         this(
-            clusterElements, connections, workflowTask.getDescription(), workflowTask.getFinalize(),
+            clusterElements, clusterRoot, connections, workflowTask.getDescription(), workflowTask.getFinalize(),
             workflowTask.getLabel(), workflowTask.getMaxRetries(), workflowTask.getMetadata(), workflowTask.getName(),
             workflowTask.getNode(), workflowTask.getParameters(), workflowTask.getPost(), workflowTask.getPre(),
             workflowTask.getTaskNumber(), workflowTask.getTimeout(), workflowTask.getType());
@@ -84,6 +87,10 @@ public final class WorkflowTaskDTO {
     @SuppressFBWarnings("EI")
     public ClusterElementMap getClusterElements() {
         return clusterElements;
+    }
+
+    public boolean isClusterRoot() {
+        return clusterRoot;
     }
 
     public List<ComponentConnection> getConnections() {
@@ -154,7 +161,7 @@ public final class WorkflowTaskDTO {
 
         WorkflowTaskDTO that = (WorkflowTaskDTO) obj;
 
-        return Objects.equals(this.clusterElements, that.clusterElements) &&
+        return Objects.equals(this.clusterElements, that.clusterElements) && clusterRoot == that.clusterRoot &&
             Objects.equals(this.connections, that.connections) && Objects.equals(this.description, that.description) &&
             Objects.equals(this.finalize, that.finalize) && Objects.equals(this.label, that.label) &&
             this.maxRetries == that.maxRetries && Objects.equals(this.name, that.name) &&
@@ -167,8 +174,8 @@ public final class WorkflowTaskDTO {
     @Override
     public int hashCode() {
         return Objects.hash(
-            connections, description, finalize, label, maxRetries, metadata, name, node, parameters, post, pre,
-            taskNumber, timeout, type);
+            clusterElements, clusterRoot, connections, description, finalize, label, maxRetries, metadata, name, node,
+            parameters, post, pre, taskNumber, timeout, type);
     }
 
     @Override
@@ -182,6 +189,8 @@ public final class WorkflowTaskDTO {
             "name=" + name + ", " +
             "node=" + node + ", " +
             "parameters=" + parameters + ", " +
+            "clusterRoot=" + clusterRoot + ", " +
+            "clusterElements=" + clusterElements + ", " +
             "post=" + post + ", " +
             "pre=" + pre + ", " +
             "taskNumber=" + taskNumber + ", " +
