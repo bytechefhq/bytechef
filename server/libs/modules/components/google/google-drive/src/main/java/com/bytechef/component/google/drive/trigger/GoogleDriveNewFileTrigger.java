@@ -61,6 +61,6 @@ public class GoogleDriveNewFileTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) throws IOException {
 
-        return getPollOutput(inputParameters, connectionParameters, closureParameters, true);
+        return getPollOutput(inputParameters, connectionParameters, closureParameters, context, true);
     }
 }
