@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -158,7 +159,8 @@ public class SecurityConfiguration {
                 .ignoringRequestMatchers("/sse")
                 .ignoringRequestMatchers(regexMatcher("^/(automation|embedded)/sse"))
                 // For internal calls from the embedded workflow builder
-                .ignoringRequestMatchers(request -> request.getHeader("Authorization") != null));
+                .ignoringRequestMatchers(request -> request.getHeader("Authorization") != null)
+                .ignoringRequestMatchers(request -> request.getMethod().equalsIgnoreCase(HttpMethod.OPTIONS.name())));
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
             http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
@@ -198,7 +200,10 @@ public class SecurityConfiguration {
                 .requestMatchers(mvc.matcher("/sse"))
                 .permitAll()
                 .requestMatchers(mvc.matcher("/*/sse"))
-                .permitAll())
+                .permitAll()
+                .requestMatchers(mvc.matcher(HttpMethod.OPTIONS, "/**"))
+                .permitAll()
+            )
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
                 .rememberMeParameter("remember-me")
