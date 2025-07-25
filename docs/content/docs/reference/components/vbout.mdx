@@ -1,0 +1,287 @@
+---
+title: "Vbout"
+description: "VBOUT is an AI-enabled marketing platform that helps businesses manage and streamline their digital marketing efforts."
+---
+
+
+Categories: Marketing Automation
+
+
+Type: vbout/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | API key | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Add Contact To List
+Name: addContactToList
+
+`Adds a contact to a selected email list.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| listid | List ID | INTEGER | The ID of the list to assign this contact to. | true |
+| email | Email | STRING | The email of the contact. | true |
+| status | Status | STRING <details> <summary> Options </summary> active, disactive </details> | The status of the contact. | true |
+| ipaddress | IP Address | STRING | The IP address of the contact. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Contact To List",
+  "name" : "addContactToList",
+  "parameters" : {
+    "listid" : 1,
+    "email" : "",
+    "status" : "",
+    "ipaddress" : ""
+  },
+  "type" : "vbout/v1/addContactToList"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Update Contact
+Name: updateContact
+
+`Updates a contact in a selected email list.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| listid | List ID | STRING | The ID of the list with contact. | true |
+| id | Contact ID | STRING <details> <summary> Depends On </summary> listid </details> | The ID of the contact. | true |
+| email | Email | STRING | The updated email of the contact. | false |
+| status | Status | STRING <details> <summary> Options </summary> active, disactive </details> | The updated status of the contact. | false |
+| ipaddress | IP Address | STRING | The updated IP address of the contact. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Contact",
+  "name" : "updateContact",
+  "parameters" : {
+    "listid" : "",
+    "id" : "",
+    "email" : "",
+    "status" : "",
+    "ipaddress" : ""
+  },
+  "type" : "vbout/v1/updateContact"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Create Email Marketing Campaign
+Name: createEmailMarketingCampaign
+
+`Creates a new email campaign for specific list.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The name of the campaign. | true |
+| subject | Subject | STRING | The subject line for the campaign. | true |
+| fromemail | From Mail | STRING | The from email of the campaign. | true |
+| from_name | From Name | STRING | The from name of the campaign. | true |
+| reply_to | Reply To | STRING | The reply to email of the campaign. | true |
+| body | Body | STRING | Message body. | true |
+| type | Type | STRING <details> <summary> Options </summary> standard, automated </details> | The type of the campaign. | false |
+| isscheduled | Is Scheduled | BOOLEAN <details> <summary> Options </summary> true, false </details> | The flag to schedule the campaign for the future. | false |
+| scheduled_datetime | Scheduled Date | DATE | The date to schedule the campaign. | false |
+| isdraft | Is Draft | BOOLEAN <details> <summary> Options </summary> true, false </details> | The flag to set the campaign to draft. | false |
+| lists | Lists | ARRAY <details> <summary> Items </summary> [STRING] </details> | IDs of list campaign recipients. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Email Marketing Campaign",
+  "name" : "createEmailMarketingCampaign",
+  "parameters" : {
+    "name" : "",
+    "subject" : "",
+    "fromemail" : "",
+    "from_name" : "",
+    "reply_to" : "",
+    "body" : "",
+    "type" : "",
+    "isscheduled" : false,
+    "scheduled_datetime" : "2021-01-01",
+    "isdraft" : false,
+    "lists" : [ "" ]
+  },
+  "type" : "vbout/v1/createEmailMarketingCampaign"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Add Tag To Contact
+Name: addTagToContact
+
+`Adds the tag to the contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| email | Email | STRING | The email of the contact. | true |
+| tagname | Tag Name | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tag(s) to be added. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Tag To Contact",
+  "name" : "addTagToContact",
+  "parameters" : {
+    "email" : "",
+    "tagname" : [ "" ]
+  },
+  "type" : "vbout/v1/addTagToContact"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Create Email List
+Name: createEmailList
+
+`Creates a new email list.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The name of the list. | true |
+| email_subject | Email Subject | STRING | The default subscription subject. | false |
+| reply_to | Reply To | STRING | The reply to email of the list. | false |
+| fromemail | From Mail | STRING | The from email of the list. | false |
+| from_name | From Name | STRING | The from name of the list. | false |
+| notify_email | Notify Email | STRING | Notification email. | false |
+| success_email | Success Email | STRING | Subscription success email. | false |
+| success_message | Success Message | STRING | Subscription success message. | false |
+| error_message | Error Message | STRING | Subscription error message. | false |
+| confirmation_email | Confirmation Email | STRING | Confirmation email. | false |
+| confirmation_message | Confirmation Message | STRING | Confirmation message. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Email List",
+  "name" : "createEmailList",
+  "parameters" : {
+    "name" : "",
+    "email_subject" : "",
+    "reply_to" : "",
+    "fromemail" : "",
+    "from_name" : "",
+    "notify_email" : "",
+    "success_email" : "",
+    "success_message" : "",
+    "error_message" : "",
+    "confirmation_email" : "",
+    "confirmation_message" : ""
+  },
+  "type" : "vbout/v1/createEmailList"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Create Social Media Message
+Name: createSocialMediaMessage
+
+`Post a message to one of your social media channel.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| message | Message | STRING | The post message to be sent. | true |
+| channel | Channel | STRING <details> <summary> Options </summary> facebook, twitter, linkedin </details> | The channel which the post will be sent to. | true |
+| channel_id | Social Media Account | STRING <details> <summary> Depends On </summary> channel </details> | The social media account which will create the post. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Social Media Message",
+  "name" : "createSocialMediaMessage",
+  "parameters" : {
+    "message" : "",
+    "channel" : "",
+    "channel_id" : ""
+  },
+  "type" : "vbout/v1/createSocialMediaMessage"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
