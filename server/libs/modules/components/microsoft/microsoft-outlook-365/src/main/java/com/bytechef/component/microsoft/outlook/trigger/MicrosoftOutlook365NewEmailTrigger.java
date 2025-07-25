@@ -68,7 +68,8 @@ public class MicrosoftOutlook365NewEmailTrigger {
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+        LocalDateTime startDate = closureParameters.getLocalDateTime(
+            LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
 
         List<Map<?, ?>> maps = new ArrayList<>();
 

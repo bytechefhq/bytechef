@@ -119,7 +119,8 @@ public class YoutubeNewVideoTrigger {
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+        LocalDateTime startDate = closureParameters.getLocalDateTime(
+            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment() ? now.minusHours(3) : now);
 
         ZonedDateTime startZonedDate = startDate.atZone(zoneId);
 

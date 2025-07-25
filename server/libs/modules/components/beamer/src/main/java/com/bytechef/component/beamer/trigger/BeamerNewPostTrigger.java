@@ -117,7 +117,8 @@ public class BeamerNewPostTrigger {
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+        LocalDateTime startDate = closureParameters.getLocalDateTime(
+            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment() ? now.minusHours(3) : now);
 
         List<Map<String, Object>> posts = triggerContext.http(http -> http.get("/posts"))
             .queryParameter(DATE_FROM, startDate.toString())
