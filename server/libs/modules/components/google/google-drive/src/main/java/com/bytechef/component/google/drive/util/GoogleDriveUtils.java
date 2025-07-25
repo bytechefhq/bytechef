@@ -21,6 +21,7 @@ import static com.bytechef.google.commons.GoogleUtils.fetchAllFiles;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
@@ -46,14 +47,16 @@ public class GoogleDriveUtils {
     }
 
     public static PollOutput getPollOutput(
-        Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters, boolean newFile)
+        Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
+        TriggerContext triggerContext, boolean newFile)
         throws IOException {
 
         ZoneId zoneId = ZoneId.systemDefault();
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+        LocalDateTime startDate = closureParameters.getLocalDateTime(
+            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment() ? now.minusHours(3) : now);
 
         String mimeType = newFile
             ? "mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'"
