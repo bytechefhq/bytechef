@@ -20,8 +20,11 @@ import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
@@ -211,7 +214,9 @@ public class WolframAlphaFullResultsGetFullResultAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .output();
+        .output(outputSchema(object().metadata(
+            Map.of(
+                "responseType", ResponseType.XML))));
 
     private WolframAlphaFullResultsGetFullResultAction() {
     }

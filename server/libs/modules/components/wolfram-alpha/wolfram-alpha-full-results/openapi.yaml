@@ -234,7 +234,10 @@ paths:
       responses:
         200:
           description: "Full result."
-          x-dynamic-output: true
+          content:
+            application/xml:
+              schema:
+                type: "object"
 components:
   securitySchemes:
     ApiKeyQuery:

@@ -18,7 +18,10 @@ package com.bytechef.component.airtable.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDsl;
@@ -63,7 +66,9 @@ public class AirtableGetRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))
-        .output();
+        .output(outputSchema(object().metadata(
+            Map.of(
+                "responseType", ResponseType.JSON))));
 
     private AirtableGetRecordAction() {
     }
