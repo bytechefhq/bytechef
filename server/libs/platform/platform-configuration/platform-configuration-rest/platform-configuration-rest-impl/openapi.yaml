@@ -3003,6 +3003,10 @@ components:
         - "name"
         - "type"
       properties:
+        clusterRoot:
+          type: boolean
+          default: false
+          readOnly: true
         clusterElements:
           type: object
           additionalProperties: true
