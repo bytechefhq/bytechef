@@ -34,7 +34,7 @@ public final class IntegrationWorkflowDTO extends WorkflowDTO {
             workflow.getSourceType(), workflow.getMaxRetries(),
             workflow.getTasks(true)
                 .stream()
-                .map(workflowTask -> new WorkflowTaskDTO(workflowTask, null, List.of()))
+                .map(workflowTask -> new WorkflowTaskDTO(workflowTask, false, null, List.of()))
                 .toList(),
             List.of(), workflow.getVersion(), workflow);
 
