@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-15T08:55:37.379478+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-25T11:11:24.735623+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class ComponentDefinitionBasicModel {
 
   private @Nullable Integer actionsCount;

@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "CustomComponent", description = "An custom component.")
 @JsonTypeName("CustomComponent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-15T08:55:41.634415+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-25T11:11:29.172156+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class CustomComponentModel {
 
   private @Nullable Integer componentVersion;

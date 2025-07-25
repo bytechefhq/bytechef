@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeTestOutput", description = "Contains test output of a workflow node.")
 @JsonTypeName("WorkflowNodeTestOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-15T08:55:38.299003+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-25T11:11:25.895904+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class WorkflowNodeTestOutputModel {
 
   private @Nullable Long id;
