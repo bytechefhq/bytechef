@@ -28,8 +28,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-15T08:55:38.299003+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-25T11:11:25.895904+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class WorkflowTaskModel {
+
+  private Boolean clusterRoot = false;
 
   @Valid
   private Map<String, Object> clusterElements = new HashMap<>();
@@ -74,6 +76,26 @@ public class WorkflowTaskModel {
   public WorkflowTaskModel(String name, String type) {
     this.name = name;
     this.type = type;
+  }
+
+  public WorkflowTaskModel clusterRoot(Boolean clusterRoot) {
+    this.clusterRoot = clusterRoot;
+    return this;
+  }
+
+  /**
+   * Get clusterRoot
+   * @return clusterRoot
+   */
+  
+  @Schema(name = "clusterRoot", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterRoot")
+  public Boolean getClusterRoot() {
+    return clusterRoot;
+  }
+
+  public void setClusterRoot(Boolean clusterRoot) {
+    this.clusterRoot = clusterRoot;
   }
 
   public WorkflowTaskModel clusterElements(Map<String, Object> clusterElements) {
@@ -401,7 +423,8 @@ public class WorkflowTaskModel {
       return false;
     }
     WorkflowTaskModel workflowTask = (WorkflowTaskModel) o;
-    return Objects.equals(this.clusterElements, workflowTask.clusterElements) &&
+    return Objects.equals(this.clusterRoot, workflowTask.clusterRoot) &&
+        Objects.equals(this.clusterElements, workflowTask.clusterElements) &&
         Objects.equals(this.connections, workflowTask.connections) &&
         Objects.equals(this.description, workflowTask.description) &&
         Objects.equals(this.finalize, workflowTask.finalize) &&
@@ -418,13 +441,14 @@ public class WorkflowTaskModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(clusterElements, connections, description, finalize, label, metadata, name, node, parameters, post, pre, timeout, type);
+    return Objects.hash(clusterRoot, clusterElements, connections, description, finalize, label, metadata, name, node, parameters, post, pre, timeout, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowTaskModel {\n");
+    sb.append("    clusterRoot: ").append(toIndentedString(clusterRoot)).append("\n");
     sb.append("    clusterElements: ").append(toIndentedString(clusterElements)).append("\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
