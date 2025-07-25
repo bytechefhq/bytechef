@@ -296,6 +296,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                 ParametersFactory.createParameters(outputParameters), workflowExecutionId, context);
         } catch (Exception e) {
+            if (e instanceof ProviderException pe) {
+                throw pe;
+            }
+
             throw new ExecutionException(
                 e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_DISABLE_FAILED);
         }
@@ -320,6 +324,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
                 webhookUrl, workflowExecutionId, context);
         } catch (Exception e) {
+            if (e instanceof ProviderException pe) {
+                throw pe;
+            }
+
             throw new ExecutionException(
                 e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_ENABLE_FAILED);
         }
@@ -441,6 +449,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 ParametersFactory.createParameters(inputParameters), connectionParameters,
                 ParametersFactory.createParameters(closureParameters), triggerContext);
         } catch (Exception e) {
+            if (e instanceof ProviderException pe) {
+                throw pe;
+            }
+
             throw new ExecutionException(
                 e, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
         }
@@ -454,6 +466,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     ParametersFactory.createParameters(inputParameters), connectionParameters,
                     ParametersFactory.createParameters(pollOutput.closureParameters()), triggerContext);
             } catch (Exception e) {
+                if (e instanceof ProviderException pe) {
+                    throw pe;
+                }
+
                 throw new ExecutionException(
                     e, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
             }
@@ -481,6 +497,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 output, triggerContext);
         } catch (Exception e) {
+            if (e instanceof ProviderException pe) {
+                throw pe;
+            }
+
             throw new ExecutionException(
                 e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_TRIGGER_FAILED);
         }
