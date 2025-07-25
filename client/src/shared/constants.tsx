@@ -87,7 +87,7 @@ export const ROOT_CLUSTER_WIDTH = 280;
 export const ROOT_CLUSTER_HANDLE_STEP = 180;
 export const DIRECTION = 'TB';
 export const DEFAULT_NODE_POSITION = {x: 0, y: 0};
-export const DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM = 0.9;
+export const DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM = 0.8;
 
 export const TASK_DISPATCHER_NAMES = [
     'branch',
