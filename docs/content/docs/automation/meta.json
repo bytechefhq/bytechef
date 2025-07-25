@@ -13,6 +13,7 @@
     "...build",
     "---Deploy---",
     "deploy/index",
+    "...deploy",
     "---Monitor---",
     "monitor/index"
   ]
