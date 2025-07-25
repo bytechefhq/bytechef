@@ -158,7 +158,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, jobPrincipalId, workflowReferenceCode,
-            componentConnection, true);
+            componentConnection, editorEnvironment);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext, null,
@@ -167,7 +167,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
                 componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
                 componentName, componentVersion, triggerName, null, jobPrincipalId, workflowReferenceCode,
-                componentConnection1, true));
+                componentConnection1, editorEnvironment));
     }
 
     @Override

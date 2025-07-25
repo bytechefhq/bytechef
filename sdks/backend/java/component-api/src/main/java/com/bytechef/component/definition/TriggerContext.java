@@ -76,4 +76,6 @@ public interface TriggerContext extends Context {
          */
         Void remove(Data.Scope scope, String key);
     }
+
+    boolean isEditorEnvironment();
 }
