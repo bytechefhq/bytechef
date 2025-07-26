@@ -133,7 +133,7 @@ public class GoogleCalendarEventTrigger {
         Optional<Object> lastTimeCheckedOptional = context.data(data -> data.fetch(WORKFLOW, "lastTimeChecked"));
 
         LocalDateTime currentRowNum = lastTimeCheckedOptional.map(o -> LocalDateTime.parse(o.toString()))
-            .orElse(now.minusHours(3));
+            .orElse(context.isEditorEnvironment() ? now.minusHours(3) : now);
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 

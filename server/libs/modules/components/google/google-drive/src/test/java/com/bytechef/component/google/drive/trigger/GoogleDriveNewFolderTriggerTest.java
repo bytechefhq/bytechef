@@ -37,12 +37,14 @@ class GoogleDriveNewFolderTriggerTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
     private final PollOutput mockedPollPOutput = mock(PollOutput.class);
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
     @Test
     void testPool() throws IOException {
         try (MockedStatic<GoogleDriveUtils> googleDriveUtilsMockedStatic = mockStatic(GoogleDriveUtils.class)) {
             googleDriveUtilsMockedStatic
-                .when(() -> GoogleDriveUtils.getPollOutput(mockedParameters, mockedParameters, mockedParameters, false))
+                .when(() -> GoogleDriveUtils.getPollOutput(
+                    mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext, false))
                 .thenReturn(mockedPollPOutput);
 
             PollOutput pollOutput = GoogleDriveNewFolderTrigger.poll(mockedParameters, mockedParameters,

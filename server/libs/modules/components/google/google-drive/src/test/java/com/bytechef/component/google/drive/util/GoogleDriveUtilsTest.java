@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
@@ -53,6 +54,7 @@ class GoogleDriveUtilsTest {
     private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FOLDER_ID, "parent", LAST_TIME_CHECKED, LocalDateTime.of(2000, 1, 1, 1, 1, 1)));
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
@@ -81,7 +83,7 @@ class GoogleDriveUtilsTest {
                 .thenReturn(new FileList().setFiles(files));
 
             PollOutput pollOutput = GoogleDriveUtils.getPollOutput(
-                mockedParameters, mockedParameters, mockedParameters, false);
+                mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext, false);
 
             assertEquals(files, pollOutput.records());
             assertFalse(pollOutput.pollImmediately());

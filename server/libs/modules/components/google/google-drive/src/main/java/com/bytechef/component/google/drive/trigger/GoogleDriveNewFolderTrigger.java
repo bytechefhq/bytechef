@@ -61,6 +61,6 @@ public class GoogleDriveNewFolderTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) throws IOException {
 
-        return getPollOutput(inputParameters, connectionParameters, closureParameters, false);
+        return getPollOutput(inputParameters, connectionParameters, closureParameters, context, false);
     }
 }
