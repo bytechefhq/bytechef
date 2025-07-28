@@ -63,16 +63,14 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
             return;
         }
 
-        if (currentNode.clusterElementType) {
+        if (currentNode.clusterElementType || currentNode.rootClusterElement) {
             saveClusterElementFieldChange({
-                currentClusterElementName: currentNode.name,
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
                 fieldUpdate: {
                     field: 'label',
                     value: event.target.value,
                 },
                 invalidateWorkflowQueries,
-                queryClient,
                 updateWorkflowMutation,
             });
 
@@ -132,16 +130,14 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
             return;
         }
 
-        if (currentNode.clusterElementType) {
+        if (currentNode.clusterElementType || currentNode.rootClusterElement) {
             saveClusterElementFieldChange({
-                currentClusterElementName: currentNode.name,
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
                 fieldUpdate: {
                     field: 'description',
                     value: event.target.value,
                 },
                 invalidateWorkflowQueries,
-                queryClient,
                 updateWorkflowMutation,
             });
 
