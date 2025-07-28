@@ -15,6 +15,7 @@
     "deploy/index",
     "...deploy",
     "---Monitor---",
-    "monitor/index"
+    "monitor/index",
+    "...monitor"
   ]
 }
