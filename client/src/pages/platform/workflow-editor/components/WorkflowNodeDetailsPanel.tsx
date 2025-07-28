@@ -50,6 +50,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/shallow';
 
 import {
     extractClusterElementComponentOperations,
@@ -123,11 +124,32 @@ const WorkflowNodeDetailsPanel = ({
         setCurrentComponent,
         setCurrentNode,
         workflowNodeDetailsPanelOpen,
-    } = useWorkflowNodeDetailsPanelStore();
+    } = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            activeTab: state.activeTab,
+            currentComponent: state.currentComponent,
+            currentNode: state.currentNode,
+            setActiveTab: state.setActiveTab,
+            setCurrentComponent: state.setCurrentComponent,
+            setCurrentNode: state.setCurrentNode,
+            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+        }))
+    );
 
-    const {setDataPills, workflow, workflowNodes} = useWorkflowDataStore();
+    const {setDataPills, workflow, workflowNodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            setDataPills: state.setDataPills,
+            workflow: state.workflow,
+            workflowNodes: state.workflowNodes,
+        }))
+    );
 
-    const {clusterElementsCanvasOpen, rootClusterElementNodeData} = useWorkflowEditorStore();
+    const {clusterElementsCanvasOpen, rootClusterElementNodeData} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+        }))
+    );
 
     const queryClient = useQueryClient();
 
@@ -619,10 +641,14 @@ const WorkflowNodeDetailsPanel = ({
     useEffect(() => {
         if (activeTab === 'connection' && currentWorkflowNodeConnections.length === 0) {
             setActiveTab('description');
+
+            return;
         }
 
         if (currentComponentDefinition?.name === 'manual') {
             setActiveTab('description');
+
+            return;
         }
 
         if (
@@ -631,14 +657,20 @@ const WorkflowNodeDetailsPanel = ({
             !currentOperationProperties
         ) {
             setActiveTab('description');
+
+            return;
         }
 
         if (activeTab === 'output' && !hasOutputData) {
             setActiveTab('description');
+
+            return;
         }
 
         if (activeTab === 'properties' && !operationDataMissing && !currentOperationProperties?.length) {
             setActiveTab('description');
+
+            return;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
