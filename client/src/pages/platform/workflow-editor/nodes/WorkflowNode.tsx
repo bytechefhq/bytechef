@@ -14,6 +14,7 @@ import {ArrowLeftRightIcon, ComponentIcon, TrashIcon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import {
     calculateNodeWidth,
@@ -31,10 +32,28 @@ import styles from './NodeTypes.module.css';
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
-    const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {workflow} = useWorkflowDataStore();
+    const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentNode: state.currentNode,
+            setCurrentNode: state.setCurrentNode,
+            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+        }))
+    );
+
+    const {workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            workflow: state.workflow,
+        }))
+    );
+
     const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
-        useWorkflowEditorStore();
+        useWorkflowEditorStore(
+            useShallow((state) => ({
+                clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+                rootClusterElementNodeData: state.rootClusterElementNodeData,
+                setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+            }))
+        );
 
     const {invalidateWorkflowQueries} = useWorkflowEditor();
 
@@ -233,7 +252,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             isMainRootClusterElement && 'nodrag',
                             (isMainRootClusterElement || isNestedClusterRoot) && `min-w-[${ROOT_CLUSTER_WIDTH}px]`
                         )}
-                        onClick={handleNodeClick}
+                        onClick={() => handleNodeClick()}
                         style={
                             isMainRootClusterElement || isNestedClusterRoot ? {minWidth: `${nodeWidth}px`} : undefined
                         }
