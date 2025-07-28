@@ -105,7 +105,9 @@ public class JsonSchemaGeneratorUtils {
             case com.bytechef.component.definition.Property.Type.INTEGER -> Integer.class;
             case com.bytechef.component.definition.Property.Type.NUMBER -> Double.class;
             case com.bytechef.component.definition.Property.Type.STRING -> String.class;
-            case com.bytechef.component.definition.Property.Type.OBJECT -> Object.class;
+            case com.bytechef.component.definition.Property.Type.DYNAMIC_PROPERTIES,
+                com.bytechef.component.definition.Property.Type.FILE_ENTRY,
+                com.bytechef.component.definition.Property.Type.OBJECT -> Object.class;
             case com.bytechef.component.definition.Property.Type.TIME -> LocalTime.class;
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
