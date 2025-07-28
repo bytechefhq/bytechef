@@ -1,6 +1,6 @@
 import {ROOT_CLUSTER_HANDLE_STEP, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
-import {ClusterElementItemType, ClusterElementsType} from '@/shared/types';
+import {ClusterElementItemType, ClusterElementsType, WorkflowNodeType} from '@/shared/types';
 
 export function initializeClusterElementsObject(
     clusterElementsData: ClusterElementsType,
@@ -77,6 +77,62 @@ export function addElementToClusterRoot({
             [clusterElementTypeLabel]: clusterElementValue,
         };
     }
+}
+
+function getTypeSegments(type: string = ''): {componentName: string; version: number; operationName: string} {
+    const segments = type.split('/');
+
+    return {
+        componentName: segments[0] || '',
+        operationName: segments[2] || '',
+        version: +(segments[1] || '').replace('v', '') || 1,
+    };
+}
+
+export function extractClusterElementComponentOperations(
+    clusterElements: ClusterElementsType,
+    existingClusterElementsOperations: WorkflowNodeType[] = []
+): WorkflowNodeType[] {
+    if (!clusterElements) {
+        return existingClusterElementsOperations;
+    }
+
+    const processClusterElement = (
+        collectedOperations: WorkflowNodeType[],
+        element: ClusterElementItemType
+    ): WorkflowNodeType[] => {
+        if (!element) {
+            return collectedOperations;
+        }
+
+        const {componentName, operationName, version} = getTypeSegments(element.type);
+
+        // Add the current element's operation to the collectedOperations
+        collectedOperations.push({
+            name: componentName,
+            operationName,
+            version,
+            workflowNodeName: element.name || '',
+        });
+
+        // Process nested cluster elements
+        if (element.clusterElements) {
+            return extractClusterElementComponentOperations(element.clusterElements, collectedOperations);
+        }
+
+        return collectedOperations;
+    };
+
+    // Process all elements in the clusterElements object
+    return Object.values(clusterElements).reduce((collectedOperations, element) => {
+        if (Array.isArray(element)) {
+            return element.reduce(processClusterElement, collectedOperations);
+        } else if (element && isPlainObject(element)) {
+            return processClusterElement(collectedOperations, element);
+        }
+
+        return collectedOperations;
+    }, existingClusterElementsOperations);
 }
 
 export function calculateNodeWidth(handleCount: number): number {

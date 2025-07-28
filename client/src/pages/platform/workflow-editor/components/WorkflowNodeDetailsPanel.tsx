@@ -51,7 +51,10 @@ import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
-import {getClusterElementsLabel} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {
+    extractClusterElementComponentOperations,
+    getClusterElementsLabel,
+} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -428,7 +431,6 @@ const WorkflowNodeDetailsPanel = ({
 
             if (isClusterElement) {
                 saveClusterElementFieldChange({
-                    currentClusterElementName: currentNode.name,
                     currentComponentDefinition,
                     currentOperationProperties,
                     fieldUpdate: {
@@ -436,7 +438,6 @@ const WorkflowNodeDetailsPanel = ({
                         value: newOperationName,
                     },
                     invalidateWorkflowQueries,
-                    queryClient,
                     updateWorkflowMutation,
                 });
 
@@ -700,41 +701,26 @@ const WorkflowNodeDetailsPanel = ({
 
     // Find cluster element component operations
     useEffect(() => {
-        if (!clusterElementsCanvasOpen) {
+        if (!clusterElementsCanvasOpen || !workflow.definition) {
             return;
         }
 
-        const currentRootClusterTask = workflow?.tasks?.find(
-            (task) => task.name === rootClusterElementNodeData?.workflowNodeName
+        const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+
+        const mainClusterRootTask = workflowDefinitionTasks?.find(
+            (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
         );
 
-        const currentRootClusterTaskClusterElements = currentRootClusterTask?.clusterElements;
+        if (!mainClusterRootTask) {
+            return;
+        }
+
+        const currentRootClusterTaskClusterElements = mainClusterRootTask?.clusterElements;
 
         if (currentRootClusterTaskClusterElements) {
-            let clusterElementsWorkflowNodeTypes: WorkflowNodeType[] = [];
-
-            Object.entries(currentRootClusterTaskClusterElements).forEach(([, value]) => {
-                if (Array.isArray(value)) {
-                    const multipleClusterElements = value.map((clusterElement) => ({
-                        name: clusterElement.componentName || '',
-                        operationName: clusterElement.type ? clusterElement.type.split('/')[2] : '',
-                        version: +clusterElement.type!.split('/')[1].replace('v', ''),
-                        workflowNodeName: clusterElement.workflowNodeName || '',
-                    }));
-
-                    clusterElementsWorkflowNodeTypes = [
-                        ...clusterElementsWorkflowNodeTypes,
-                        ...multipleClusterElements,
-                    ];
-                } else {
-                    clusterElementsWorkflowNodeTypes.push({
-                        name: value.componentName || '',
-                        operationName: value.type ? value.type.split('/')[2] : '',
-                        version: +value.type!.split('/')[1].replace('v', ''),
-                        workflowNodeName: value.workflowNodeName || '',
-                    });
-                }
-            });
+            const clusterElementsWorkflowNodeTypes = extractClusterElementComponentOperations(
+                currentRootClusterTaskClusterElements
+            );
 
             if (clusterElementsWorkflowNodeTypes.length > 0) {
                 setClusterElementComponentOperations(clusterElementsWorkflowNodeTypes);
