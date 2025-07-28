@@ -1,10 +1,11 @@
 import {ComponentDefinition, Workflow} from '@/shared/middleware/platform/configuration';
-import {PropertyAllType} from '@/shared/types';
-import {QueryClient, UseMutationResult} from '@tanstack/react-query';
+import {ClusterElementsType, NodeDataType, PropertyAllType} from '@/shared/types';
+import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import {updateClusterRootElementField, updateNestedClusterElementField} from './clusterElementsFieldChangeUtils';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
@@ -15,16 +16,13 @@ type FieldUpdateType = {
 
 interface SaveClusterElementFieldChangeProps {
     currentComponentDefinition: ComponentDefinition;
-    currentClusterElementName: string;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
     invalidateWorkflowQueries: () => void;
-    queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, {id: string; workflow: Workflow}, unknown>;
 }
 
 export default function saveClusterElementFieldChange({
-    currentClusterElementName,
     currentComponentDefinition,
     currentOperationProperties,
     fieldUpdate,
@@ -35,116 +33,99 @@ export default function saveClusterElementFieldChange({
     const {rootClusterElementNodeData, setRootClusterElementNodeData} = useWorkflowEditorStore.getState();
     const {workflow} = useWorkflowDataStore.getState();
 
-    if (!currentNode || !currentNode?.clusterElementType || !workflow.definition) {
+    if (!currentNode || !workflow.definition) {
         return;
     }
 
     const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-    const currentParentTask = workflowDefinitionTasks?.find(
+    const mainClusterRootTask = workflowDefinitionTasks?.find(
         (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
     );
-    const existingClusterElements = currentParentTask?.clusterElements;
 
-    const clusterElementType = currentNode.clusterElementType;
-
-    const objectKey = clusterElementType;
-
-    const clusterElements = {...existingClusterElements};
-
-    if (Array.isArray(clusterElements[objectKey])) {
-        clusterElements[objectKey] = clusterElements[objectKey].map((element) => {
-            if (element.name === currentClusterElementName) {
-                switch (fieldUpdate.field) {
-                    case 'operation':
-                        return {
-                            label: element.label,
-                            name: element.name,
-                            operationName: fieldUpdate.value,
-                            parameters: getParametersWithDefaultValues({
-                                properties: currentOperationProperties as Array<PropertyAllType>,
-                            }),
-                            type: `${currentComponentDefinition.name}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
-                        };
-
-                    case 'label':
-                        return {...element, label: fieldUpdate.value};
-
-                    case 'description':
-                        return {...element, description: fieldUpdate.value};
-
-                    default:
-                        return element;
-                }
-            }
-            return element;
-        });
-    } else if (clusterElements[objectKey]) {
-        if (clusterElements[objectKey].name === currentClusterElementName) {
-            switch (fieldUpdate.field) {
-                case 'operation': {
-                    clusterElements[objectKey] = {
-                        label: clusterElements[objectKey].label,
-                        name: clusterElements[objectKey].name,
-                        operationName: fieldUpdate.value,
-                        parameters: getParametersWithDefaultValues({
-                            properties: currentOperationProperties as Array<PropertyAllType>,
-                        }),
-                        type: `${currentComponentDefinition.name}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
-                    };
-
-                    break;
-                }
-
-                case 'label':
-                    clusterElements[objectKey] = {
-                        ...clusterElements[objectKey],
-                        label: fieldUpdate.value,
-                    };
-
-                    break;
-
-                case 'description':
-                    clusterElements[objectKey] = {
-                        ...clusterElements[objectKey],
-                        description: fieldUpdate.value,
-                    };
-
-                    break;
-            }
-        }
+    if (!mainClusterRootTask) {
+        return;
     }
 
-    const updatedNodeData = {
-        ...currentParentTask,
-        clusterElements,
-    };
+    let updatedMainRootData: NodeDataType;
+    let updatedClusterElements: ClusterElementsType;
 
-    if (rootClusterElementNodeData) {
-        setRootClusterElementNodeData({
-            ...rootClusterElementNodeData,
-            clusterElements,
+    if (
+        currentNode.rootClusterElement &&
+        currentNode.workflowNodeName === rootClusterElementNodeData?.workflowNodeName
+    ) {
+        updatedMainRootData = updateClusterRootElementField({
+            currentComponentDefinition,
+            currentOperationProperties,
+            fieldUpdate,
+            mainRootElement: mainClusterRootTask,
         });
+    } else if (
+        currentNode.clusterElementType &&
+        currentNode.workflowNodeName !== rootClusterElementNodeData?.workflowNodeName
+    ) {
+        const clusterElements = mainClusterRootTask?.clusterElements;
+
+        if (!clusterElements || Object.keys(clusterElements).length === 0) {
+            return;
+        }
+
+        updatedClusterElements = updateNestedClusterElementField({
+            clusterElements,
+            currentComponentDefinition,
+            currentOperationProperties,
+            elementName: currentNode.workflowNodeName,
+            fieldUpdate,
+        });
+
+        updatedMainRootData = {
+            ...mainClusterRootTask,
+            clusterElements: updatedClusterElements,
+        };
+    } else {
+        console.error('Unknown cluster element type or root element mismatch');
+
+        return;
     }
 
     saveWorkflowDefinition({
+        decorative: true,
         invalidateWorkflowQueries,
-        nodeData: updatedNodeData,
+        nodeData: updatedMainRootData,
         onSuccess: () => {
+            let updatedStateData = {};
+
             if (fieldUpdate.field === 'operation') {
-                setCurrentNode({
-                    ...currentNode,
+                updatedStateData = {
                     operationName: fieldUpdate.value,
                     parameters: getParametersWithDefaultValues({
                         properties: currentOperationProperties as Array<PropertyAllType>,
                     }),
                     type: `${currentComponentDefinition.name}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
-                });
+                };
             } else {
-                setCurrentNode({
-                    ...currentNode,
+                updatedStateData = {
                     [fieldUpdate.field]: fieldUpdate.value,
-                });
+                };
+            }
+
+            setCurrentNode({
+                ...currentNode,
+                ...updatedStateData,
+            });
+
+            if (rootClusterElementNodeData) {
+                if (currentNode.rootClusterElement) {
+                    setRootClusterElementNodeData({
+                        ...rootClusterElementNodeData,
+                        ...updatedStateData,
+                    });
+                } else {
+                    setRootClusterElementNodeData({
+                        ...rootClusterElementNodeData,
+                        clusterElements: updatedClusterElements,
+                    });
+                }
             }
         },
         updateWorkflowMutation,
