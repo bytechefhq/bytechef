@@ -15,37 +15,15 @@ import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetail
 
 const LoadingSkeleton = () => (
     <ul className="flex flex-col">
-        <li className="flex items-center space-x-4 border-b border-border/50 p-4">
-            <Skeleton className="size-6" />
+        {Array.from({length: 4}).map((_, index) => (
+            <li className="flex items-center space-x-4 border-b border-border/50 p-4" key={index}>
+                <Skeleton className="size-6" />
 
-            <Skeleton className="h-6 w-2/3" />
+                <Skeleton className="h-6 w-2/3" />
 
-            <Skeleton className="h-6 w-1/5" />
-        </li>
-
-        <li className="flex items-center space-x-4 border-b border-border/50 p-4">
-            <Skeleton className="size-6" />
-
-            <Skeleton className="h-6 w-2/3" />
-
-            <Skeleton className="h-6 w-1/5" />
-        </li>
-
-        <li className="flex items-center space-x-4 border-b border-border/50 p-4">
-            <Skeleton className="size-6" />
-
-            <Skeleton className="h-6 w-2/3" />
-
-            <Skeleton className="h-6 w-1/5" />
-        </li>
-
-        <li className="flex items-center space-x-4 border-b border-border/50 p-4">
-            <Skeleton className="size-6" />
-
-            <Skeleton className="h-6 w-2/3" />
-
-            <Skeleton className="h-6 w-1/5" />
-        </li>
+                <Skeleton className="h-6 w-1/5" />
+            </li>
+        ))}
     </ul>
 );
 
