@@ -62,6 +62,7 @@ const useClusterElementsLayout = () => {
                     x: node.position.x,
                     y: node.position.y,
                 };
+
                 return accumulator;
             }, {}),
         [nodes]
