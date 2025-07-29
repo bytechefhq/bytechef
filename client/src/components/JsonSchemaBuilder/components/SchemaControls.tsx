@@ -52,6 +52,7 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, s
             <div className={twMerge('flex gap-2', root ? 'mr-1' : 'flex-1')}>
                 <SchemaTypesSelect
                     onChange={(translation) => onChange(setSchemaTypeAndRemoveWrongFields(translation, schema))}
+                    root={root}
                     type={getSchemaType(schema)}
                 />
 
