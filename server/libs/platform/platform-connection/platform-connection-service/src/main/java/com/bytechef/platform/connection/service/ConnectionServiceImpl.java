@@ -17,6 +17,7 @@
 package com.bytechef.platform.connection.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.FormatUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
@@ -84,7 +85,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setParameters(parameters);
         connection.setType(type);
 
-        logger.info("Saved..: {}", toString(parameters));
+        logger.info("Saved..: {}", FormatUtils.toString(parameters));
 
         return create(connection);
     }
@@ -200,30 +201,19 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         Connection connection = getConnection(connectionId);
 
-        logger.info("New....: {}", toString(parameters));
+        logger.info("New....: {}", FormatUtils.toString(parameters));
 
         Map<String, Object> curParameters = new HashMap<>(connection.getParameters());
 
-        logger.info("Current: {}", curParameters);
+        logger.info("Current: {}", FormatUtils.toString(curParameters));
 
         curParameters.putAll(parameters);
 
         connection.setParameters(curParameters);
 
-        logger.info("Saved..: {}", curParameters);
+        logger.info("Saved..: {}", FormatUtils.toString(curParameters));
 
         return connectionRepository.save(connection);
     }
 
-    private String toString(Map<String, ?> parameters) {
-        StringBuffer stringBuffer = new StringBuffer();
-
-        parameters.forEach((key, value) -> stringBuffer.append("[")
-            .append(key)
-            .append(":")
-            .append(value)
-            .append("]"));
-
-        return "{" + stringBuffer.toString() + "}";
-    }
 }

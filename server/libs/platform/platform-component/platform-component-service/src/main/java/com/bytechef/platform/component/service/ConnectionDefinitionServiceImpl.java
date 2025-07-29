@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ConnectionDefinition.BaseUriFunc
 import static com.bytechef.platform.component.domain.Authorization.DEFAULT_REFRESH_ON;
 
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.commons.util.FormatUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -226,6 +227,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                         context1))));
 
         try {
+            logger.info("Refreshing using {}", FormatUtils.toString(connectionParameters));
+
             return refreshFunction.apply(ParametersFactory.createParameters(connectionParameters), context);
 
         } catch (Exception exception) {
