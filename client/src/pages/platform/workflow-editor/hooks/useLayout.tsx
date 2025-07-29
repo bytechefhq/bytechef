@@ -5,6 +5,7 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
+import {WIDTHS} from '@/shared/theme/constants';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
@@ -401,7 +402,6 @@ export default function useLayout({
             }));
 
             const lastEdge = edges[edges.length - 1];
-
             if (lastEdge && lastEdge.target === FINAL_PLACEHOLDER_NODE_ID) {
                 edges.pop();
             }
@@ -409,7 +409,24 @@ export default function useLayout({
 
         const elements = getLayoutedElements({canvasWidth, edges, nodes: layoutNodes});
 
-        setNodes(elements.nodes);
+        if (readOnlyWorkflow) {
+            const SHEET_WIDTH = WIDTHS.WORKFLOW_READ_ONLY_SHEET_WIDTH;
+
+            const centeringOffsetX = (canvasWidth - SHEET_WIDTH) / 2;
+
+            const centeredNodes = elements.nodes.map((node) => ({
+                ...node,
+                position: {
+                    x: node.position.x - centeringOffsetX,
+                    y: node.position.y,
+                },
+            }));
+
+            setNodes(centeredNodes);
+        } else {
+            setNodes(elements.nodes);
+        }
+
         setEdges(elements.edges);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
