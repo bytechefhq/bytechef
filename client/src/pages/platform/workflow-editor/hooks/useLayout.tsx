@@ -400,7 +400,11 @@ export default function useLayout({
                 type: 'smoothstep',
             }));
 
-            edges.pop();
+            const lastEdge = edges[edges.length - 1];
+
+            if (lastEdge && lastEdge.target === FINAL_PLACEHOLDER_NODE_ID) {
+                edges.pop();
+            }
         }
 
         const elements = getLayoutedElements({canvasWidth, edges, nodes: layoutNodes});
