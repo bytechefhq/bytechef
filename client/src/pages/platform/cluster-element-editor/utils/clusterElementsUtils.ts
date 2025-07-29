@@ -147,8 +147,8 @@ export function calculateNodeWidth(handleCount: number): number {
 }
 
 interface GetHandlePositionProps {
-    index: number;
     handlesCount: number;
+    index: number;
     nodeWidth: number;
 }
 
