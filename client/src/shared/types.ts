@@ -2,6 +2,7 @@ import {UpdateWorkflowRequestI} from '@/shared//mutations/platform/workflows.mut
 import {
     ArrayProperty,
     BooleanProperty,
+    ClusterElementDefinitionBasic,
     ComponentConnection,
     ComponentDefinition,
     ComponentDefinitionBasic,
@@ -160,7 +161,7 @@ export type ClusterElementsType = {
 export type NodeDataType = {
     branchData?: BranchDataType;
     branchId?: string;
-    clusterElements?: ClusterElementsType;
+    clusterElements?: ClusterElementsType | Array<ClusterElementDefinitionBasic>;
     clusterElementName?: string;
     clusterElementType?: string;
     componentName: string;
