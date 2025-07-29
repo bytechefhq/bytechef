@@ -14,6 +14,7 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
+import {TYPE_ICONS} from '@/shared/typeIcons';
 import {DataPillType} from '@/shared/types';
 import Document from '@tiptap/extension-document';
 import {Mention} from '@tiptap/extension-mention';
@@ -26,6 +27,7 @@ import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
 import {EditorView} from 'prosemirror-view';
 import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
 import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -87,6 +89,16 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 if (componentName === 'trigger') {
                     componentName = workflow.workflowTriggerComponentNames?.[0] || '';
+                }
+
+                const upperCaseComponentName = componentName.toUpperCase();
+
+                if (Object.keys(TYPE_ICONS).includes(upperCaseComponentName)) {
+                    const reactIcon = TYPE_ICONS[upperCaseComponentName as keyof typeof TYPE_ICONS];
+
+                    const svgString = renderToStaticMarkup(reactIcon);
+
+                    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
                 }
 
                 if (TASK_DISPATCHER_NAMES.includes(componentName)) {
