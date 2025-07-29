@@ -302,12 +302,14 @@ const WorkflowEditor = ({
                 zoomOnDoubleClick={false}
                 zoomOnScroll={false}
             >
-                <MiniMap
-                    className={twMerge('mb-3 mr-16', rightSidebarOpen && 'absolute right-minimap-placement')}
-                    maskColor={MINIMAP_MASK_COLOR}
-                    nodeBorderRadius={24}
-                    nodeColor={MINIMAP_NODE_COLOR}
-                />
+                {!readOnlyWorkflow && (
+                    <MiniMap
+                        className={twMerge('mb-3 mr-16', rightSidebarOpen && 'absolute right-minimap-placement')}
+                        maskColor={MINIMAP_MASK_COLOR}
+                        nodeBorderRadius={24}
+                        nodeColor={MINIMAP_NODE_COLOR}
+                    />
+                )}
 
                 <Background color="#ccc" size={2} variant={BackgroundVariant.Dots} />
 
