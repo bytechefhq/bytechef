@@ -33,10 +33,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.function.Supplier;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -68,7 +71,6 @@ import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -141,7 +143,7 @@ public class SecurityConfiguration {
     @Order(3)
     public SecurityFilterChain apiFilterChain(
         HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
-        List<AuthenticationProviderContributor> authenticationProviderContributors,
+        List<AuthenticationProviderContributor> authenticationProviderContributors, Environment environment,
         List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors)
         throws Exception {
 
@@ -158,7 +160,10 @@ public class SecurityConfiguration {
                 .ignoringRequestMatchers("/sse")
                 .ignoringRequestMatchers(regexMatcher("^/(automation|embedded)/sse"))
                 // For internal calls from the embedded workflow builder
-                .ignoringRequestMatchers(request -> request.getHeader("Authorization") != null));
+                .ignoringRequestMatchers(request -> request.getHeader("Authorization") != null)
+                // For internal calls from the swagger UI in the dev profile
+                .ignoringRequestMatchers(request -> environment.acceptsProfiles(Profiles.of("dev")) &&
+                    StringUtils.contains(request.getHeader("Referer"), "/swagger-ui/")));
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
             http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
@@ -354,7 +359,7 @@ public class SecurityConfiguration {
              * This applies when a single-page application includes the header value automatically, which was obtained
              * via a cookie containing the raw CsrfToken.
              */
-            if (StringUtils.hasText(request.getHeader(csrfToken.getHeaderName()))) {
+            if (org.springframework.util.StringUtils.hasText(request.getHeader(csrfToken.getHeaderName()))) {
                 return super.resolveCsrfTokenValue(request, csrfToken);
             }
             /*
