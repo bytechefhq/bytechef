@@ -17,6 +17,8 @@
 package com.bytechef.component.urlscan;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -24,4 +26,12 @@ import com.google.auto.service.AutoService;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class UrlscanComponentHandler extends AbstractUrlscanComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .icon("path:assets/urlscan.svg")
+            .categories(ComponentCategory.HELPERS)
+            .customAction(true);
+    }
 }
