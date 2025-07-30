@@ -28,7 +28,7 @@ const PropertyDynamicProperties = ({
     parameterValue,
     path,
 }: PropertyDynamicPropertiesProps) => {
-    const [subProperties, setSubProperties] = useState<PropertyModel[]>();
+    const [subProperties, setSubProperties] = useState<PropertyModel[]>([]);
     const [lastProcessedKey, setLastProcessedKey] = useState('');
 
     const {workflow} = useWorkflowDataStore();
@@ -64,6 +64,8 @@ const PropertyDynamicProperties = ({
             setSubProperties(properties);
 
             setLastProcessedKey(lookupDependsOnValuesKey);
+        } else {
+            setSubProperties([]);
         }
     }, [properties, lookupDependsOnValuesKey]);
 
@@ -72,23 +74,13 @@ const PropertyDynamicProperties = ({
     if ((isLoading || isPending) && queryEnabled) {
         return (
             <ul className="flex flex-col gap-4">
-                <li className="flex flex-col space-y-1">
-                    <Skeleton className="h-5 w-1/4" />
+                {Array.from({length: 3}).map((_, index) => (
+                    <li className="flex flex-col space-y-1" key={index}>
+                        <Skeleton className="h-5 w-1/4" />
 
-                    <Skeleton className="h-9 w-full" />
-                </li>
-
-                <li className="flex flex-col space-y-1">
-                    <Skeleton className="h-5 w-1/4" />
-
-                    <Skeleton className="h-9 w-full" />
-                </li>
-
-                <li className="flex flex-col space-y-1">
-                    <Skeleton className="h-5 w-1/4" />
-
-                    <Skeleton className="h-9 w-full" />
-                </li>
+                        <Skeleton className="h-9 w-full" />
+                    </li>
+                ))}
             </ul>
         );
     }
