@@ -232,7 +232,8 @@ public class WordPressNewPostTrigger {
 
         LocalDateTime now = LocalDateTime.now();
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+        LocalDateTime startDate = closureParameters.getLocalDateTime(
+            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment() ? now.minusHours(3) : now);
 
         List<Map<String, Object>> newPosts = triggerContext.http(http -> http.get("/wp/v2/posts"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

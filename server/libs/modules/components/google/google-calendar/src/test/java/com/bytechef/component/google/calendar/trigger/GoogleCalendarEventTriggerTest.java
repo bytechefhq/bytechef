@@ -160,7 +160,6 @@ class GoogleCalendarEventTriggerTest {
     @Test
     void testWebhookRequest() throws IOException {
         LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
-        LocalDateTime minusedHours = localDateTime.minusHours(3);
         String timezone = "Europe/Zagreb";
 
         Event event = new Event();
@@ -181,7 +180,7 @@ class GoogleCalendarEventTriggerTest {
             googleServicesMockedStatic
                 .when(() -> GoogleCalendarUtils.convertLocalDateTimeToDateInTimezone(
                     localDateTimeArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(java.sql.Timestamp.valueOf(minusedHours));
+                .thenReturn(java.sql.Timestamp.valueOf(localDateTime));
             googleServicesMockedStatic
                 .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedCalendar);
@@ -214,8 +213,8 @@ class GoogleCalendarEventTriggerTest {
             assertEquals(java.util.List.of("calendar_id", "updated", timezone, timezone),
                 stringArgumentCaptor.getAllValues());
             assertEquals(true, booleanArgumentCaptor.getValue());
-            assertEquals(new DateTime(java.sql.Timestamp.valueOf(minusedHours)), dateTimeArgumentCaptor.getValue());
-            assertEquals(minusedHours, localDateTimeArgumentCaptor.getValue());
+            assertEquals(new DateTime(java.sql.Timestamp.valueOf(localDateTime)), dateTimeArgumentCaptor.getValue());
+            assertEquals(localDateTime, localDateTimeArgumentCaptor.getValue());
         }
     }
 }
