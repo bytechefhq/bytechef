@@ -156,6 +156,7 @@ const Property = ({
         minLength,
         minValue,
         name = property.name?.replace(/\s/g, '_'),
+        numberPrecision,
         options,
         optionsDataSource,
         placeholder = '',
@@ -298,6 +299,13 @@ const Property = ({
             const valueTooLow = minValue ? numericValue < minValue : numericValue < Number.MIN_SAFE_INTEGER;
             const valueTooHigh = maxValue ? numericValue > maxValue : numericValue > Number.MAX_SAFE_INTEGER;
 
+            const hasDecimalPoint = value.includes('.');
+
+            const exceedsDecimalPrecision =
+                hasDecimalPoint &&
+                numberPrecision !== undefined &&
+                (numberPrecision === 0 || value.split('.')[1]?.length > numberPrecision);
+
             if (valueTooLow || valueTooHigh) {
                 setHasError(true);
 
@@ -310,6 +318,14 @@ const Property = ({
                 setHasError(true);
 
                 setErrorMessage('Value must be a valid number');
+            } else if (exceedsDecimalPrecision) {
+                setHasError(true);
+
+                if (numberPrecision === 0) {
+                    setErrorMessage('Decimal points are not allowed');
+                } else {
+                    setErrorMessage(`Maximum ${numberPrecision} decimal places allowed`);
+                }
             } else {
                 setHasError(false);
             }
