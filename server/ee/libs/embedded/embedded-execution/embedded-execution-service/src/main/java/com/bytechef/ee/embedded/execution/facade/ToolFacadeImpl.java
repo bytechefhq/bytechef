@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
  *
  * @author Ivica Cardic
  */
-@Service
+@Service("embeddedToolFacade")
 public class ToolFacadeImpl implements ToolFacade {
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;

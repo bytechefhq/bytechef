@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    implementation(project(":server:libs:automation:automation-mcp-server"))
     implementation(project(":server:libs:automation:automation-security-web:automation-security-web-impl"))
     implementation(project(":server:libs:automation:automation-swagger"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
