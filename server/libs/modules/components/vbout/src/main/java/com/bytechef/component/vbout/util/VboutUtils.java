@@ -19,6 +19,8 @@ package com.bytechef.component.vbout.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.vbout.constant.VboutConstants.CHANNEL;
+import static com.bytechef.component.vbout.constant.VboutConstants.ID;
+import static com.bytechef.component.vbout.constant.VboutConstants.NAME;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
@@ -37,23 +39,32 @@ public class VboutUtils {
     private VboutUtils() {
     }
 
-    public static List<Option<String>> getListsIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+    public static List<Option<String>> getChannelIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         Map<String, Map<String, ?>> body = context
-            .http(http -> http.get("/emailmarketing/getlists"))
+            .http(http -> http.get("/socialMedia/Channels"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
+        Map<String, ?> channels = body.get("channels");
 
-        if (body.get("lists")
-            .get("items") instanceof List<?> list) {
+        String channel = inputParameters.getRequiredString(CHANNEL);
+
+        if (channels.get(channel) instanceof Map<?, ?> platformMap) {
+            List<?> list = switch (channel) {
+                case "Facebook" -> (List<?>) platformMap.get("pages");
+                case "Twitter", "Linkedin" -> (List<?>) platformMap.get("profiles");
+                default -> new ArrayList<>();
+            };
+
             for (Object o : list) {
                 if (o instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
         }
@@ -62,8 +73,10 @@ public class VboutUtils {
     }
 
     public static List<Option<String>> getContactIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         Map<String, Map<String, ?>> body = context
             .http(http -> http.get("/emailmarketing/getcontacts"))
@@ -71,13 +84,11 @@ public class VboutUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get("contacts")
-            .get("items") instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("email"), (String) map.get("id")));
+        Map<String, ?> contacts = body.get("contacts");
+        if (contacts.get("items") instanceof List<?> items) {
+            for (Object item : items) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("email"), (String) map.get(ID)));
                 }
             }
         }
@@ -85,35 +96,23 @@ public class VboutUtils {
         return options;
     }
 
-    public static List<Option<String>> getChannelIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+    public static List<Option<String>> getListIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         Map<String, Map<String, ?>> body = context
-            .http(http -> http.get("/socialMedia/Channels"))
+            .http(http -> http.get("/emailmarketing/getlists"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        Map<String, ?> channels = body.get("channels");
-
-        String platform = inputParameters.getRequiredString(CHANNEL);
-
-        if (channels.get(platform) instanceof Map<?, ?> platformMap) {
-
-            List<?> list = switch (platform) {
-                case "Facebook" -> (List<?>) platformMap.get("pages");
-                case "Twitter", "Linkedin" -> (List<?>) platformMap.get("profiles");
-                default -> null;
-            };
-
-            if (list != null) {
-                for (Object o : list) {
-                    if (o instanceof Map<?, ?> map) {
-                        options.add(option((String) map.get("name"), (String) map.get("id")));
-                    }
+        Map<String, ?> lists = body.get("lists");
+        if (lists.get("items") instanceof List<?> items) {
+            for (Object item : items) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
         }

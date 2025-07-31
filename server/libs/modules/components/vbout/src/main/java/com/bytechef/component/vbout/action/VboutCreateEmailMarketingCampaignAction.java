@@ -99,7 +99,7 @@ public class VboutCreateEmailMarketingCampaignAction {
                 .label("Lists")
                 .description("IDs of list campaign recipients.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) VboutUtils::getListsIdOptions)
+                .options((ActionOptionsFunction<String>) VboutUtils::getListIdOptions)
                 .required(false))
         .perform(VboutCreateEmailMarketingCampaignAction::perform);
 
@@ -107,9 +107,7 @@ public class VboutCreateEmailMarketingCampaignAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        context
-            .http(http -> http.post("/emailMarketing/AddCampaign"))
+        context.http(http -> http.post("/emailMarketing/AddCampaign"))
             .configuration(responseType(ResponseType.JSON))
             .queryParameters(
                 NAME, inputParameters.getRequiredString(NAME),

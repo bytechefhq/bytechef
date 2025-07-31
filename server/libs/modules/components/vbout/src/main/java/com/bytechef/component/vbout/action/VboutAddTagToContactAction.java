@@ -52,9 +52,7 @@ public class VboutAddTagToContactAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        context
-            .http(http -> http.post("/emailMarketing/AddTag"))
+        context.http(http -> http.post("/emailMarketing/AddTag"))
             .configuration(responseType(ResponseType.JSON))
             .queryParameters(
                 EMAIL, inputParameters.getRequiredString(EMAIL),

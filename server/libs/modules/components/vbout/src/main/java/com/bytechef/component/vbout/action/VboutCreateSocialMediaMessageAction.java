@@ -64,9 +64,7 @@ public class VboutCreateSocialMediaMessageAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        context
-            .http(http -> http.post("/socialMedia/AddPost"))
+        context.http(http -> http.post("/socialMedia/AddPost"))
             .configuration(responseType(ResponseType.JSON))
             .queryParameters(
                 MESSAGE, inputParameters.getRequiredString(MESSAGE),
