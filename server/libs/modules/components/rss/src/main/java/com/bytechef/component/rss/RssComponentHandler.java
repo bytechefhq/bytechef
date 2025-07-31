@@ -53,8 +53,8 @@ public class RssComponentHandler extends AbstractRssComponentHandler {
     }
 
     @Override
-    public ModifiableConnectionDefinition
-        modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://api.rss.app/v1")

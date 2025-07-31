@@ -45,6 +45,5 @@ public class RssConstants {
                 .description("Date when the item was published."),
             array("authors")
                 .description("Authors of the item.")
-                .items(
-                    string("author")));
+                .items(string("author")));
 }
