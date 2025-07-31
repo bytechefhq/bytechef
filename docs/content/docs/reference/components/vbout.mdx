@@ -24,8 +24,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| key | Key | STRING |  | true |
-| value | API key | STRING |  | true |
+| value | API Key | STRING |  | true |
 
 
 
@@ -49,7 +48,6 @@ Name: addContactToList
 | listid | List ID | INTEGER | The ID of the list to assign this contact to. | true |
 | email | Email | STRING | The email of the contact. | true |
 | status | Status | STRING <details> <summary> Options </summary> active, disactive </details> | The status of the contact. | true |
-| ipaddress | IP Address | STRING | The IP address of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -59,8 +57,7 @@ Name: addContactToList
   "parameters" : {
     "listid" : 1,
     "email" : "",
-    "status" : "",
-    "ipaddress" : ""
+    "status" : ""
   },
   "type" : "vbout/v1/addContactToList"
 }
@@ -86,7 +83,6 @@ Name: updateContact
 | id | Contact ID | STRING <details> <summary> Depends On </summary> listid </details> | The ID of the contact. | true |
 | email | Email | STRING | The updated email of the contact. | false |
 | status | Status | STRING <details> <summary> Options </summary> active, disactive </details> | The updated status of the contact. | false |
-| ipaddress | IP Address | STRING | The updated IP address of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -97,8 +93,7 @@ Name: updateContact
     "listid" : "",
     "id" : "",
     "email" : "",
-    "status" : "",
-    "ipaddress" : ""
+    "status" : ""
   },
   "type" : "vbout/v1/updateContact"
 }
