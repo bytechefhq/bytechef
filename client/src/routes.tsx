@@ -1,61 +1,86 @@
 import App from '@/App';
-import ApiClients from '@/ee/pages/automation/api-platform/api-clients/ApiClients';
-import ApiCollections from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
-import AppEvents from '@/ee/pages/embedded/app-events/AppEvents';
-import AutomationWorkflows from '@/ee/pages/embedded/automation-workflows/AutomationWorkflows';
-import ConnectedUsers from '@/ee/pages/embedded/connected-users/ConnectedUsers';
-import {Connections as EmbeddedConnections} from '@/ee/pages/embedded/connections/Connections';
-import IntegrationInstanceConfigurations from '@/ee/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations';
-import Integration from '@/ee/pages/embedded/integration/Integration';
-import Integrations from '@/ee/pages/embedded/integrations/Integrations';
-import {WorkflowExecutions as EmbeddedIntegrationWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/WorkflowExecutions';
-import SigningKeys from '@/ee/pages/settings/embedded/signing-keys/SigningKeys';
-import ApiConnectors from '@/ee/pages/settings/platform/api-connectors/ApiConnectors';
-import CustomComponents from '@/ee/pages/settings/platform/custom-components/CustomComponents';
 import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
-import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
-import Login from '@/pages/account/public/Login';
-import PasswordResetEmailSent from '@/pages/account/public/PasswordResetEmailSent';
-import PasswordResetFinish from '@/pages/account/public/PasswordResetFinish';
-import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
-import Register from '@/pages/account/public/Register';
-import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
-import VerifyEmail from '@/pages/account/public/VerifyEmail';
-import AccountProfile from '@/pages/account/settings/AccountProfile';
-import Appearance from '@/pages/account/settings/Appearance';
-import Sessions from '@/pages/account/settings/Sessions';
-import {Connections as AutomationConnections} from '@/pages/automation/connections/Connections';
-import McpServers from '@/pages/automation/mcp-servers/McpServers';
-import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
-import Project from '@/pages/automation/project/Project';
-import Projects from '@/pages/automation/projects/Projects';
-import WorkflowChat from '@/pages/automation/workflow-chat/WorkflowChat';
-import {WorkflowExecutions as AutomationWorkflowExecutions} from '@/pages/automation/workflow-executions/WorkflowExecutions';
-import Home from '@/pages/home/Home';
-import AiProviders from '@/pages/platform/settings/ai-providers/AiProviders';
-import ApiKeys from '@/pages/platform/settings/api-keys/ApiKeys';
-import GitConfiguration from '@/pages/platform/settings/git-configuration/GitConfiguration';
-import Notifications from '@/pages/platform/settings/notifications/Notifications';
-import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
 import ErrorPage from '@/shared/error/ErrorPage';
+import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
 import PageNotFound from '@/shared/error/PageNotFound';
 import Settings from '@/shared/layout/Settings';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {QueryClient} from '@tanstack/react-query';
+import {lazy} from 'react';
 import {createBrowserRouter, redirect} from 'react-router-dom';
+
+const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
+const ApiCollections = lazy(() => import('@/ee/pages/automation/api-platform/api-collections/ApiCollections'));
+
+const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
+const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
+const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
+const EmbeddedConnections = lazy(() =>
+    import('@/ee/pages/embedded/connections/Connections').then((module) => ({default: module.Connections}))
+);
+const IntegrationInstanceConfigurations = lazy(
+    () => import('@/ee/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations')
+);
+const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integration'));
+const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
+const EmbeddedIntegrationWorkflowExecutions = lazy(() =>
+    import('@/ee/pages/embedded/workflow-executions/WorkflowExecutions').then((module) => ({
+        default: module.WorkflowExecutions,
+    }))
+);
+
+const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
+const ApiConnectors = lazy(() => import('@/ee/pages/settings/platform/api-connectors/ApiConnectors'));
+const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
+
+const AccountErrorPage = lazy(() => import('@/pages/account/public/AccountErrorPage'));
+const Login = lazy(() => import('@/pages/account/public/Login'));
+const PasswordResetEmailSent = lazy(() => import('@/pages/account/public/PasswordResetEmailSent'));
+const PasswordResetFinish = lazy(() => import('@/pages/account/public/PasswordResetFinish'));
+const PasswordResetInit = lazy(() => import('@/pages/account/public/PasswordResetInit'));
+const Register = lazy(() => import('@/pages/account/public/Register'));
+const RegisterSuccess = lazy(() => import('@/pages/account/public/RegisterSuccess'));
+const VerifyEmail = lazy(() => import('@/pages/account/public/VerifyEmail'));
+
+const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
+const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
+const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
+
+const AutomationConnections = lazy(() =>
+    import('@/pages/automation/connections/Connections').then((module) => ({default: module.Connections}))
+);
+const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
+const ProjectDeployments = lazy(() => import('@/pages/automation/project-deployments/ProjectDeployments'));
+const Project = lazy(() => import('@/pages/automation/project/Project'));
+const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
+const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
+const AutomationWorkflowExecutions = lazy(() =>
+    import('@/pages/automation/workflow-executions/WorkflowExecutions').then((module) => ({
+        default: module.WorkflowExecutions,
+    }))
+);
+
+const Home = lazy(() => import('@/pages/home/Home'));
+const AiProviders = lazy(() => import('@/pages/platform/settings/ai-providers/AiProviders'));
+const ApiKeys = lazy(() => import('@/pages/platform/settings/api-keys/ApiKeys'));
+const GitConfiguration = lazy(() => import('@/pages/platform/settings/git-configuration/GitConfiguration'));
+const Notifications = lazy(() => import('@/pages/platform/settings/notifications/Notifications'));
+const Workspaces = lazy(() => import('@/pages/settings/automation/workspaces/Workspaces'));
 
 const getAccountRoutes = (path: string) => ({
     children: [
         {
             element: (
                 <PrivateRoute>
-                    <AccountProfile />
+                    <LazyLoadWrapper>
+                        <AccountProfile />
+                    </LazyLoadWrapper>
                 </PrivateRoute>
             ),
             index: true,
@@ -63,7 +88,9 @@ const getAccountRoutes = (path: string) => ({
         {
             element: (
                 <PrivateRoute>
-                    <Appearance />
+                    <LazyLoadWrapper>
+                        <Appearance />
+                    </LazyLoadWrapper>
                 </PrivateRoute>
             ),
             path: 'appearance',
@@ -71,7 +98,9 @@ const getAccountRoutes = (path: string) => ({
         {
             element: (
                 <PrivateRoute>
-                    <Sessions />
+                    <LazyLoadWrapper>
+                        <Sessions />
+                    </LazyLoadWrapper>
                 </PrivateRoute>
             ),
             path: 'sessions',
@@ -99,13 +128,16 @@ const getAccountRoutes = (path: string) => ({
     path: 'account',
 });
 
+// Current workspace settings routes
 const currentWorkspaceSettingsRoutes = {
     children: [
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
-                        <GitConfiguration />
+                        <LazyLoadWrapper>
+                            <GitConfiguration />
+                        </LazyLoadWrapper>
                     </EEVersion>
                 </PrivateRoute>
             ),
@@ -123,13 +155,16 @@ const currentWorkspaceSettingsRoutes = {
     ],
 };
 
+// Platform settings routes
 const platformSettingsRoutes = {
     children: [
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
-                        <AiProviders />
+                        <LazyLoadWrapper>
+                            <AiProviders />
+                        </LazyLoadWrapper>
                     </EEVersion>
                 </PrivateRoute>
             ),
@@ -139,7 +174,9 @@ const platformSettingsRoutes = {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <EEVersion>
-                        <CustomComponents />
+                        <LazyLoadWrapper>
+                            <CustomComponents />
+                        </LazyLoadWrapper>
                     </EEVersion>
                 </PrivateRoute>
             ),
@@ -149,7 +186,9 @@ const platformSettingsRoutes = {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <EEVersion>
-                        <ApiConnectors />
+                        <LazyLoadWrapper>
+                            <ApiConnectors />
+                        </LazyLoadWrapper>
                     </EEVersion>
                 </PrivateRoute>
             ),
@@ -158,7 +197,9 @@ const platformSettingsRoutes = {
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                    <ApiKeys />
+                    <LazyLoadWrapper>
+                        <ApiKeys />
+                    </LazyLoadWrapper>
                 </PrivateRoute>
             ),
             path: 'api-keys',
@@ -166,7 +207,9 @@ const platformSettingsRoutes = {
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                    <Notifications />
+                    <LazyLoadWrapper>
+                        <Notifications />
+                    </LazyLoadWrapper>
                 </PrivateRoute>
             ),
             path: 'notifications',
@@ -216,21 +259,35 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             children: [
                 {
-                    element: <Login />,
+                    element: (
+                        <LazyLoadWrapper>
+                            <Login />
+                        </LazyLoadWrapper>
+                    ),
                     path: '/login',
                 },
                 {
-                    element: <Register />,
+                    element: (
+                        <LazyLoadWrapper>
+                            <Register />
+                        </LazyLoadWrapper>
+                    ),
                     path: '/register',
                 },
                 {
-                    element: <PasswordResetInit />,
+                    element: (
+                        <LazyLoadWrapper>
+                            <PasswordResetInit />
+                        </LazyLoadWrapper>
+                    ),
                     path: '/password-reset/init',
                 },
                 {
                     element: (
                         <AccessControl requiresFlow requiresKey>
-                            <RegisterSuccess />
+                            <LazyLoadWrapper>
+                                <RegisterSuccess />
+                            </LazyLoadWrapper>
                         </AccessControl>
                     ),
                     path: '/activate',
@@ -238,7 +295,9 @@ export const getRouter = (queryClient: QueryClient) =>
                 {
                     element: (
                         <AccessControl requiresKey>
-                            <PasswordResetFinish />
+                            <LazyLoadWrapper>
+                                <PasswordResetFinish />
+                            </LazyLoadWrapper>
                         </AccessControl>
                     ),
                     path: '/password-reset/finish',
@@ -246,7 +305,9 @@ export const getRouter = (queryClient: QueryClient) =>
                 {
                     element: (
                         <AccessControl requiresFlow>
-                            <PasswordResetEmailSent />
+                            <LazyLoadWrapper>
+                                <PasswordResetEmailSent />
+                            </LazyLoadWrapper>
                         </AccessControl>
                     ),
                     path: '/password-reset/email',
@@ -254,7 +315,9 @@ export const getRouter = (queryClient: QueryClient) =>
                 {
                     element: (
                         <AccessControl requiresFlow>
-                            <VerifyEmail />
+                            <LazyLoadWrapper>
+                                <VerifyEmail />
+                            </LazyLoadWrapper>
                         </AccessControl>
                     ),
                     path: '/verify-email',
@@ -262,7 +325,9 @@ export const getRouter = (queryClient: QueryClient) =>
                 {
                     element: (
                         <AccessControl requiresFlow>
-                            <AccountErrorPage />
+                            <LazyLoadWrapper>
+                                <AccountErrorPage />
+                            </LazyLoadWrapper>
                         </AccessControl>
                     ),
                     path: '/account-error',
@@ -270,7 +335,11 @@ export const getRouter = (queryClient: QueryClient) =>
                 {
                     children: [
                         {
-                            element: <Home />,
+                            element: (
+                                <LazyLoadWrapper>
+                                    <Home />
+                                </LazyLoadWrapper>
+                            ),
                             index: true,
                         },
                         {
@@ -286,7 +355,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                     children: [],
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <Projects />
+                                            <LazyLoadWrapper>
+                                                <Projects />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'projects',
@@ -294,7 +365,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <Project />
+                                            <LazyLoadWrapper>
+                                                <Project />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     loader: async ({params}) =>
@@ -310,7 +383,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <ProjectDeployments />
+                                            <LazyLoadWrapper>
+                                                <ProjectDeployments />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'deployments',
@@ -327,7 +402,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <EEVersion>
-                                                        <ApiCollections />
+                                                        <LazyLoadWrapper>
+                                                            <ApiCollections />
+                                                        </LazyLoadWrapper>
                                                     </EEVersion>
                                                 </PrivateRoute>
                                             ),
@@ -337,7 +414,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <EEVersion>
-                                                        <ApiClients />
+                                                        <LazyLoadWrapper>
+                                                            <ApiClients />
+                                                        </LazyLoadWrapper>
                                                     </EEVersion>
                                                 </PrivateRoute>
                                             ),
@@ -349,7 +428,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <McpServers />
+                                            <LazyLoadWrapper>
+                                                <McpServers />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'mcp-servers',
@@ -357,7 +438,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <AutomationWorkflowExecutions />
+                                            <LazyLoadWrapper>
+                                                <AutomationWorkflowExecutions />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'executions',
@@ -365,7 +448,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <AutomationConnections />
+                                            <LazyLoadWrapper>
+                                                <AutomationConnections />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'connections',
@@ -382,7 +467,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                                     <EEVersion>
-                                                        <Workspaces />
+                                                        <LazyLoadWrapper>
+                                                            <Workspaces />
+                                                        </LazyLoadWrapper>
                                                     </EEVersion>
                                                 </PrivateRoute>
                                             ),
@@ -421,7 +508,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <Integrations />
+                                            <LazyLoadWrapper>
+                                                <Integrations />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'integrations',
@@ -429,7 +518,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <Integration />
+                                            <LazyLoadWrapper>
+                                                <Integration />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     loader: async ({params}) =>
@@ -445,7 +536,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <IntegrationInstanceConfigurations />
+                                            <LazyLoadWrapper>
+                                                <IntegrationInstanceConfigurations />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'configurations',
@@ -453,7 +546,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <AutomationWorkflows />
+                                            <LazyLoadWrapper>
+                                                <AutomationWorkflows />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'automation-workflows',
@@ -461,7 +556,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <ConnectedUsers />
+                                            <LazyLoadWrapper>
+                                                <ConnectedUsers />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'connected-users',
@@ -469,7 +566,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <AppEvents />
+                                            <LazyLoadWrapper>
+                                                <AppEvents />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'app-events',
@@ -477,7 +576,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <EmbeddedIntegrationWorkflowExecutions />
+                                            <LazyLoadWrapper>
+                                                <EmbeddedIntegrationWorkflowExecutions />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'executions',
@@ -485,7 +586,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <EmbeddedConnections />
+                                            <LazyLoadWrapper>
+                                                <EmbeddedConnections />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'connections',
@@ -501,7 +604,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                         {
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                                                    <SigningKeys />
+                                                    <LazyLoadWrapper>
+                                                        <SigningKeys />
+                                                    </LazyLoadWrapper>
                                                 </PrivateRoute>
                                             ),
                                             path: 'signing-keys',
