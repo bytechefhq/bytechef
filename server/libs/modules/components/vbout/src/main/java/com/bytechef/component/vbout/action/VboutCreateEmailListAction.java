@@ -95,9 +95,7 @@ public class VboutCreateEmailListAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        context
-            .http(http -> http.post("/emailMarketing/AddList"))
+        context.http(http -> http.post("/emailMarketing/AddList"))
             .configuration(responseType(ResponseType.JSON))
             .queryParameters(
                 NAME, inputParameters.getRequiredString(NAME),

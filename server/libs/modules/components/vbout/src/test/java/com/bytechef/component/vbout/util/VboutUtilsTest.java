@@ -56,7 +56,7 @@ class VboutUtilsTest {
     }
 
     @Test
-    void testGetListsIdOptions() {
+    void testGetListIdOptions() {
         Map<String, Object> mockResponse = Map.of(
             "lists",
             Map.of("items",
@@ -67,7 +67,7 @@ class VboutUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockResponse);
 
-        List<Option<String>> result = VboutUtils.getListsIdOptions(
+        List<Option<String>> result = VboutUtils.getListIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(expectedOptions, result);

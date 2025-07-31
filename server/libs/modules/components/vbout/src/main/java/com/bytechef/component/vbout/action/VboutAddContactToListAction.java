@@ -44,7 +44,7 @@ public class VboutAddContactToListAction {
             integer(LIST_ID)
                 .label("List ID")
                 .description("The ID of the list to assign this contact to.")
-                .options((ActionOptionsFunction<String>) VboutUtils::getListsIdOptions)
+                .options((ActionOptionsFunction<String>) VboutUtils::getListIdOptions)
                 .required(true),
             string(EMAIL)
                 .label("Email")
@@ -63,9 +63,7 @@ public class VboutAddContactToListAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        context
-            .http(http -> http.post("/emailMarketing/AddContact"))
+        context.http(http -> http.post("/emailMarketing/AddContact"))
             .configuration(responseType(ResponseType.JSON))
             .queryParameters(
                 LIST_ID, inputParameters.getRequiredInteger(LIST_ID),

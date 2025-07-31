@@ -40,7 +40,8 @@ public class VboutComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("vbout")
         .title("Vbout")
         .description(
-            "VBOUT is an AI-enabled marketing platform that helps businesses manage and streamline their digital marketing efforts.")
+            "VBOUT is an AI-enabled marketing platform that helps businesses manage and streamline their digital " +
+                "marketing efforts.")
         .icon("path:assets/vbout.svg")
         .customAction(true)
         .categories(ComponentCategory.MARKETING_AUTOMATION)

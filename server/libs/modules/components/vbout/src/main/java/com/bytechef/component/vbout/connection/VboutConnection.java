@@ -39,17 +39,11 @@ public class VboutConnection {
             authorization(AuthorizationType.API_KEY)
                 .title("API Key")
                 .properties(
-                    string(KEY)
-                        .label("Key")
-                        .required(true)
-                        .defaultValue("key")
-                        .hidden(true),
                     string(VALUE)
-                        .label("API key")
+                        .label("API Key")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofQueryParameters(
-                    Map.of(
-                        "key", List.of(connectionParameters.getRequiredString(VALUE))))));
+                    Map.of(KEY, List.of(connectionParameters.getRequiredString(VALUE))))));
 
     private VboutConnection() {
     }

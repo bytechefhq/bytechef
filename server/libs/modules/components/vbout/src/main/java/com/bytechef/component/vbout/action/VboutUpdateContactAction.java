@@ -44,7 +44,7 @@ public class VboutUpdateContactAction {
             string(LIST_ID)
                 .label("List ID")
                 .description("The ID of the list with contact.")
-                .options((ActionOptionsFunction<String>) VboutUtils::getListsIdOptions)
+                .options((ActionOptionsFunction<String>) VboutUtils::getListIdOptions)
                 .required(true),
             string(ID)
                 .label("Contact ID")
@@ -69,9 +69,7 @@ public class VboutUpdateContactAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        context
-            .http(http -> http.post("/emailMarketing/EditContact"))
+        context.http(http -> http.post("/emailMarketing/EditContact"))
             .configuration(responseType(ResponseType.JSON))
             .queryParameters(
                 ID, inputParameters.getRequiredString(ID),
