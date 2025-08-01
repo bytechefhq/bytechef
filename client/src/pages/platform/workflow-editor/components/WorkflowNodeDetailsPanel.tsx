@@ -4,7 +4,6 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
 import {
     ActionDefinition,
@@ -46,7 +45,7 @@ import {
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, XIcon} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {Suspense, lazy, useCallback, useEffect, useMemo, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -65,10 +64,18 @@ import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChang
 import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
-import CurrentOperationSelect from './CurrentOperationSelect';
-import DescriptionTab from './node-details-tabs/DescriptionTab';
-import ConnectionTab from './node-details-tabs/connection-tab/ConnectionTab';
-import OutputTab from './node-details-tabs/output-tab/OutputTab';
+import {
+    ConnectionTabSkeleton,
+    DescriptionTabSkeleton,
+    FieldsetSkeleton,
+    PropertiesTabSkeleton,
+} from './WorkflowEditorSkeletons';
+
+const Properties = lazy(() => import('@/pages/platform/workflow-editor/components/properties/Properties'));
+const DescriptionTab = lazy(() => import('./node-details-tabs/DescriptionTab'));
+const ConnectionTab = lazy(() => import('./node-details-tabs/connection-tab/ConnectionTab'));
+const OutputTab = lazy(() => import('./node-details-tabs/output-tab/OutputTab'));
+const CurrentOperationSelect = lazy(() => import('./CurrentOperationSelect'));
 
 const TABS: Array<{label: string; name: TabNameType}> = [
     {
@@ -942,37 +949,35 @@ const WorkflowNodeDetailsPanel = ({
 
                     <main className="flex h-full flex-col overflow-hidden">
                         {!!currentWorkflowNodeOperations?.length && operationDataMissing && (
-                            <div className="flex flex-col border-b border-muted p-4">
-                                <span className="text-sm leading-6">Actions</span>
-
-                                <Skeleton className="h-9 w-full" />
-                            </div>
+                            <FieldsetSkeleton bottomBorder label="Actions" />
                         )}
 
                         {currentWorkflowNodeOperations && !operationDataMissing && (
-                            <CurrentOperationSelect
-                                clusterElementLabel={
-                                    currentNode.clusterElementType &&
-                                    getClusterElementsLabel(currentNode.clusterElementType)
-                                }
-                                description={
-                                    currentNode?.trigger
-                                        ? currentTriggerDefinition?.description
-                                        : clusterElementsCanvasOpen && currentComponentDefinition?.clusterElement
-                                          ? currentComponentDefinition?.description
-                                          : currentActionDefinition?.description
-                                }
-                                handleValueChange={handleOperationSelectChange}
-                                operations={
-                                    (currentNode?.trigger
-                                        ? currentComponentDefinition?.triggers
-                                        : clusterElementsCanvasOpen && currentComponentDefinition?.clusterElement
-                                          ? currentComponentDefinition?.clusterElements
-                                          : currentComponentDefinition?.actions)!
-                                }
-                                triggerSelect={currentNode?.trigger}
-                                value={currentOperationName}
-                            />
+                            <Suspense fallback={<FieldsetSkeleton bottomBorder label="Actions" />}>
+                                <CurrentOperationSelect
+                                    clusterElementLabel={
+                                        currentNode.clusterElementType &&
+                                        getClusterElementsLabel(currentNode.clusterElementType)
+                                    }
+                                    description={
+                                        currentNode?.trigger
+                                            ? currentTriggerDefinition?.description
+                                            : clusterElementsCanvasOpen && currentComponentDefinition?.clusterElement
+                                              ? currentComponentDefinition?.description
+                                              : currentActionDefinition?.description
+                                    }
+                                    handleValueChange={handleOperationSelectChange}
+                                    operations={
+                                        (currentNode?.trigger
+                                            ? currentComponentDefinition?.triggers
+                                            : clusterElementsCanvasOpen && currentComponentDefinition?.clusterElement
+                                              ? currentComponentDefinition?.clusterElements
+                                              : currentComponentDefinition?.actions)!
+                                    }
+                                    triggerSelect={currentNode?.trigger}
+                                    value={currentOperationName}
+                                />
+                            </Suspense>
                         )}
 
                         {tabDataExists && (
@@ -1011,54 +1016,48 @@ const WorkflowNodeDetailsPanel = ({
                             <div className="size-full max-w-workflow-node-details-panel-width">
                                 {activeTab === 'description' &&
                                     (nodeDefinition ? (
-                                        <DescriptionTab
-                                            invalidateWorkflowQueries={invalidateWorkflowQueries}
-                                            key={`${currentNode?.componentName}-${currentNode?.type}_description`}
-                                            nodeDefinition={nodeDefinition}
-                                            updateWorkflowMutation={updateWorkflowMutation}
-                                        />
+                                        <Suspense fallback={<DescriptionTabSkeleton />}>
+                                            <DescriptionTab
+                                                invalidateWorkflowQueries={invalidateWorkflowQueries}
+                                                key={`${currentNode?.componentName}-${currentNode?.type}_description`}
+                                                nodeDefinition={nodeDefinition}
+                                                updateWorkflowMutation={updateWorkflowMutation}
+                                            />
+                                        </Suspense>
                                     ) : (
-                                        <div className="flex flex-col gap-y-4 p-4">
-                                            <div className="flex flex-col gap-y-2">
-                                                <Skeleton className="h-6 w-1/4" />
-
-                                                <Skeleton className="h-8 w-full" />
-                                            </div>
-
-                                            <div className="flex flex-col gap-y-2">
-                                                <Skeleton className="h-6 w-1/4" />
-
-                                                <Skeleton className="h-24 w-full" />
-                                            </div>
-                                        </div>
+                                        <DescriptionTabSkeleton />
                                     ))}
 
                                 {activeTab === 'connection' &&
                                     currentWorkflowNodeConnections.length > 0 &&
                                     currentNode &&
                                     currentComponentDefinition && (
-                                        <ConnectionTab
-                                            componentConnections={currentWorkflowNodeConnections}
-                                            key={`${currentNode?.componentName}-${currentNode?.type}_connection`}
-                                            workflowId={workflow.id!}
-                                            workflowNodeName={currentNode?.workflowNodeName}
-                                            workflowTestConfigurationConnections={workflowTestConfigurationConnections}
-                                        />
+                                        <Suspense fallback={<ConnectionTabSkeleton />}>
+                                            <ConnectionTab
+                                                componentConnections={currentWorkflowNodeConnections}
+                                                key={`${currentNode?.componentName}-${currentNode?.type}_connection`}
+                                                workflowId={workflow.id!}
+                                                workflowNodeName={currentNode?.workflowNodeName}
+                                                workflowTestConfigurationConnections={
+                                                    workflowTestConfigurationConnections
+                                                }
+                                            />
+                                        </Suspense>
                                     )}
 
                                 {activeTab === 'properties' &&
                                     (!operationDataMissing && currentOperationProperties?.length ? (
-                                        <Properties
-                                            customClassName="p-4"
-                                            displayConditionsQuery={displayConditionsQuery}
-                                            key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
-                                            operationName={currentOperationName}
-                                            properties={currentOperationProperties}
-                                        />
+                                        <Suspense fallback={<PropertiesTabSkeleton />}>
+                                            <Properties
+                                                customClassName="p-4"
+                                                displayConditionsQuery={displayConditionsQuery}
+                                                key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
+                                                operationName={currentOperationName}
+                                                properties={currentOperationProperties}
+                                            />
+                                        </Suspense>
                                     ) : (
-                                        <div className="flex size-full items-center justify-center">
-                                            <LoadingIcon /> Loading...
-                                        </div>
+                                        <PropertiesTabSkeleton />
                                     ))}
 
                                 {activeTab === 'output' && (

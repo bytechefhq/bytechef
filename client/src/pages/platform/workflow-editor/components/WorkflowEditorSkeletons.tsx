@@ -1,21 +1,27 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import {twMerge} from 'tailwind-merge';
 
-export const PanelSkeleton = () => (
-    <div className="flex w-full max-w-workflow-node-details-panel-width flex-col gap-2 p-4">
-        <Skeleton className="h-7 w-1/2" />
+export const WorkflowNodeDetailsPanelSkeleton = () => (
+    <div
+        className={twMerge(
+            'absolute bottom-6 right-[69px] top-2 z-10 flex w-screen max-w-workflow-node-details-panel-width flex-col gap-2 overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background p-4'
+        )}
+    >
+        <Skeleton className="h-8 w-3/4" />
 
-        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="mt-2 h-12 w-full" />
 
-        <Skeleton className="h-5 w-full" />
+        <div className="my-4 flex space-x-4">
+            {Array.from({length: 4}).map((_, index) => (
+                <Skeleton className="h-6 w-1/4" key={index} />
+            ))}
+        </div>
 
-        <Skeleton className="h-5 w-1/2" />
-
-        <Skeleton className="h-5 w-3/4" />
-
-        <Skeleton className="h-5 w-full" />
-
-        <Skeleton className="h-5 w-1/2" />
+        <div className="flex flex-col gap-8">
+            {Array.from({length: 4}).map((_, index) => (
+                <PropertySkeleton key={index} />
+            ))}
+        </div>
     </div>
 );
 
@@ -74,15 +80,31 @@ export const DescriptionTabSkeleton = () => (
 );
 
 export const DataPillPanelSkeleton = () => (
-    <ul className="flex flex-col">
+    <div className="absolute bottom-6 right-data-pill-panel-placement top-2 z-10 w-screen max-w-data-pill-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background">
+        <ul className="flex flex-col">
+            {Array.from({length: 12}).map((_, index) => (
+                <li className="flex items-center space-x-4 border-b border-border/50 p-4" key={index}>
+                    <Skeleton className="size-6" />
+
+                    <Skeleton className="h-6 w-2/3" />
+
+                    <Skeleton className="h-6 w-1/5" />
+                </li>
+            ))}
+        </ul>
+    </div>
+);
+
+export const ConnectionTabSkeleton = () => (
+    <div className="p-4">
+        <FieldsetSkeleton label="Connection" />
+    </div>
+);
+
+export const PropertiesTabSkeleton = () => (
+    <div className="flex flex-col gap-4 p-4">
         {Array.from({length: 4}).map((_, index) => (
-            <li className="flex items-center space-x-4 border-b border-border/50 p-4" key={index}>
-                <Skeleton className="size-6" />
-
-                <Skeleton className="h-6 w-2/3" />
-
-                <Skeleton className="h-6 w-1/5" />
-            </li>
+            <PropertySkeleton key={index} />
         ))}
-    </ul>
+    </div>
 );

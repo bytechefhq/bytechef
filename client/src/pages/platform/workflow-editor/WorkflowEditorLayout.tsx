@@ -1,7 +1,5 @@
 import {ReactFlowProvider} from '@xyflow/react';
 
-import WorkflowNodeDetailsPanel from './components/WorkflowNodeDetailsPanel';
-
 import '@xyflow/react/dist/base.css';
 
 import './WorkflowEditorLayout.css';
@@ -10,11 +8,6 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
-import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
-import WorkflowNodesSidebar from '@/pages/platform/workflow-editor/components/WorkflowNodesSidebar';
-import WorkflowOutputsSheet from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheet';
-import WorkflowRightSidebar from '@/pages/platform/workflow-editor/components/WorkflowRightSidebar';
-import WorkflowInputsSheet from '@/pages/platform/workflow-editor/components/workflow-inputs/WorkflowInputsSheet';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -28,14 +21,25 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
 import ClusterElementsWorkflowEditor from '../cluster-element-editor/components/ClusterElementsWorkflowEditor';
-import WorkflowEditor from './components/WorkflowEditor';
-import {PanelSkeleton} from './components/WorkflowEditorSkeletons';
+import {
+    DataPillPanelSkeleton,
+    RightSidebarSkeleton,
+    SheetSkeleton,
+    WorkflowNodeDetailsPanelSkeleton,
+} from './components/WorkflowEditorSkeletons';
 import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
 import saveClusterElementNodesPosition from './utils/saveClusterElementNodesPosition';
 
+const WorkflowNodeDetailsPanel = lazy(() => import('./components/WorkflowNodeDetailsPanel'));
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
+const WorkflowOutputsSheet = lazy(() => import('./components/WorkflowOutputsSheet'));
+const WorkflowInputsSheet = lazy(() => import('./components/workflow-inputs/WorkflowInputsSheet'));
+const WorkflowCodeEditorSheet = lazy(() => import('./components/WorkflowCodeEditorSheet'));
+const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
+const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSidebar'));
+const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSidebar'));
 
 interface WorkflowEditorLayoutProps {
     includeComponents?: string[];
@@ -78,7 +82,6 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
         handleWorkflowCodeEditorClick,
         handleWorkflowInputsClick,
         handleWorkflowOutputsClick,
-        isWorkflowNodeOutputsPending,
         previousComponentDefinitions,
         taskDispatcherDefinitions,
         taskDispatcherDefinitionsError,
@@ -105,43 +108,51 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
             >
                 <div className={twMerge('relative mx-3 mb-3 flex w-full', projectLeftSidebarOpen && 'ml-0')}>
                     {componentDefinitions && taskDispatcherDefinitions && (
-                        <WorkflowEditor
-                            componentDefinitions={componentDefinitions}
-                            invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                            projectLeftSidebarOpen={projectLeftSidebarOpen}
-                            taskDispatcherDefinitions={taskDispatcherDefinitions}
-                        />
+                        <Suspense>
+                            <WorkflowEditor
+                                componentDefinitions={componentDefinitions}
+                                invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                                projectLeftSidebarOpen={projectLeftSidebarOpen}
+                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            />
+                        </Suspense>
                     )}
 
                     {rightSidebarOpen && componentDefinitions && taskDispatcherDefinitions && (
-                        <WorkflowNodesSidebar
-                            data={{
-                                componentDefinitions,
-                                taskDispatcherDefinitions,
-                            }}
-                        />
+                        <Suspense fallback={<RightSidebarSkeleton />}>
+                            <WorkflowNodesSidebar
+                                data={{
+                                    componentDefinitions,
+                                    taskDispatcherDefinitions,
+                                }}
+                            />
+                        </Suspense>
                     )}
 
-                    <WorkflowRightSidebar
-                        copilotPanelOpen={copilotPanelOpen}
-                        onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
-                        onCopilotClick={handleCopilotClick}
-                        onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
-                        onWorkflowInputsClick={handleWorkflowInputsClick}
-                        onWorkflowOutputsClick={handleWorkflowOutputsClick}
-                        rightSidebarOpen={rightSidebarOpen}
-                        showWorkflowInputs={showWorkflowInputs}
-                    />
+                    <Suspense fallback={<RightSidebarSkeleton />}>
+                        <WorkflowRightSidebar
+                            copilotPanelOpen={copilotPanelOpen}
+                            onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
+                            onCopilotClick={handleCopilotClick}
+                            onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
+                            onWorkflowInputsClick={handleWorkflowInputsClick}
+                            onWorkflowOutputsClick={handleWorkflowOutputsClick}
+                            rightSidebarOpen={rightSidebarOpen}
+                            showWorkflowInputs={showWorkflowInputs}
+                        />
+                    </Suspense>
                 </div>
             </PageLoader>
 
             {currentComponent && !isRootClusterElement && (
-                <WorkflowNodeDetailsPanel
-                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                    previousComponentDefinitions={previousComponentDefinitions}
-                    updateWorkflowMutation={updateWorkflowMutation!}
-                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                />
+                <Suspense fallback={<WorkflowNodeDetailsPanelSkeleton />}>
+                    <WorkflowNodeDetailsPanel
+                        invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                        previousComponentDefinitions={previousComponentDefinitions}
+                        updateWorkflowMutation={updateWorkflowMutation!}
+                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                    />
+                </Suspense>
             )}
 
             <Dialog
@@ -172,19 +183,20 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
                     {currentComponent && (
                         <>
-                            <WorkflowNodeDetailsPanel
-                                className="fixed inset-y-0 right-0 rounded-l-none border-none"
-                                invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                                previousComponentDefinitions={previousComponentDefinitions}
-                                updateWorkflowMutation={updateWorkflowMutation!}
-                                workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                            />
+                            <Suspense fallback={<WorkflowNodeDetailsPanelSkeleton />}>
+                                <WorkflowNodeDetailsPanel
+                                    className="fixed inset-y-0 right-0 rounded-l-none border-none"
+                                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                                    previousComponentDefinitions={previousComponentDefinitions}
+                                    updateWorkflowMutation={updateWorkflowMutation!}
+                                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                                />
+                            </Suspense>
 
                             {dataPillPanelOpen && (
-                                <Suspense fallback={<PanelSkeleton />}>
+                                <Suspense fallback={<DataPillPanelSkeleton />}>
                                     <DataPillPanel
                                         className="fixed inset-y-0 right-[465px] rounded-none"
-                                        isLoading={isWorkflowNodeOutputsPending}
                                         previousComponentDefinitions={previousComponentDefinitions}
                                         workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                                     />
@@ -208,7 +220,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
             {workflow.id && <WorkflowTestChatPanel />}
 
             {currentComponent && !isRootClusterElement && dataPillPanelOpen && (
-                <Suspense fallback={<PanelSkeleton />}>
+                <Suspense fallback={<DataPillPanelSkeleton />}>
                     <DataPillPanel
                         previousComponentDefinitions={previousComponentDefinitions}
                         workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
@@ -216,28 +228,34 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                 </Suspense>
             )}
 
-            <WorkflowInputsSheet
-                invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                onSheetOpenChange={setShowWorkflowInputsSheet}
-                sheetOpen={showWorkflowInputsSheet}
-                workflowTestConfiguration={workflowTestConfiguration}
-            />
+            <Suspense fallback={<SheetSkeleton />}>
+                <WorkflowInputsSheet
+                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                    onSheetOpenChange={setShowWorkflowInputsSheet}
+                    sheetOpen={showWorkflowInputsSheet}
+                    workflowTestConfiguration={workflowTestConfiguration}
+                />
+            </Suspense>
 
-            <WorkflowOutputsSheet
-                onSheetOpenChange={setShowWorkflowOutputsSheet}
-                sheetOpen={showWorkflowOutputsSheet}
-                workflow={workflow}
-            />
+            <Suspense fallback={<SheetSkeleton />}>
+                <WorkflowOutputsSheet
+                    onSheetOpenChange={setShowWorkflowOutputsSheet}
+                    sheetOpen={showWorkflowOutputsSheet}
+                    workflow={workflow}
+                />
+            </Suspense>
 
-            <WorkflowCodeEditorSheet
-                invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                onSheetOpenClose={setShowWorkflowCodeEditorSheet}
-                runDisabled={runDisabled}
-                sheetOpen={showWorkflowCodeEditorSheet}
-                testConfigurationDisabled={testConfigurationDisabled}
-                workflow={workflow}
-                workflowTestConfiguration={workflowTestConfiguration}
-            />
+            <Suspense fallback={<SheetSkeleton />}>
+                <WorkflowCodeEditorSheet
+                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                    onSheetOpenClose={setShowWorkflowCodeEditorSheet}
+                    runDisabled={runDisabled}
+                    sheetOpen={showWorkflowCodeEditorSheet}
+                    testConfigurationDisabled={testConfigurationDisabled}
+                    workflow={workflow}
+                    workflowTestConfiguration={workflowTestConfiguration}
+                />
+            </Suspense>
         </ReactFlowProvider>
     );
 };
