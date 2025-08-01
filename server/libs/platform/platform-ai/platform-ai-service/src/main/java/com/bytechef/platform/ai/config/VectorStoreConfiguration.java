@@ -24,8 +24,6 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
-import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.knuddels.jtokkit.api.EncodingType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -65,6 +63,7 @@ public class VectorStoreConfiguration {
     private static final String COMPONENTS = "components";
     private static final int MAX_TOKENS = 1536;
     private static final String NAME = "name";
+    private static final String COMPONENT_NAME = "componentName";
     private static final String TYPE = "type";
     private static final String WORKFLOWS = "workflows";
 
@@ -72,21 +71,18 @@ public class VectorStoreConfiguration {
     private final VectorStore vectorStore;
     private final VectorStoreService vectorStoreService;
     private final ComponentDefinitionService componentDefinitionService;
-    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
     @SuppressFBWarnings("EI")
     @Autowired
     public VectorStoreConfiguration(
         VectorStore vectorStore, VectorStoreService vectorStoreService,
-        ComponentDefinitionService componentDefinitionService,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
+        ComponentDefinitionService componentDefinitionService) {
 
         this.vectorStore = vectorStore;
         this.vectorStoreService = vectorStoreService;
         this.strategy = new TokenCountBatchingStrategy(
             EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
         this.componentDefinitionService = componentDefinitionService;
-        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
     }
 
     @EventListener(ApplicationStartedEvent.class)
@@ -122,18 +118,17 @@ public class VectorStoreConfiguration {
     }
 
     private static void addToDocuments(
-        List<Map<String, Object>> vectorStores, String name, String json, List<Document> documents, String type) {
+        String name, String componentName, String json, List<Document> documents, String type) {
 
-        if (!containsFile(vectorStores, name, COMPONENTS)) {
-            String cleanedDocument = preprocessDocument(json);
+        String cleanedDocument = preprocessDocument(json);
 
-            if (!cleanedDocument.isEmpty()) {
-                // Split the document into chunks
-                List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
+        if (!cleanedDocument.isEmpty()) {
+            // Split the document into chunks
+            List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
 
-                for (String chunk : chunks) {
-                    documents.add(new Document(chunk, Map.of(CATEGORY, COMPONENTS, NAME, name, TYPE, type)));
-                }
+            for (String chunk : chunks) {
+                documents.add(new Document(chunk,
+                    Map.of(CATEGORY, COMPONENTS, NAME, name, TYPE, type, COMPONENT_NAME, componentName)));
             }
         }
     }
@@ -197,38 +192,6 @@ public class VectorStoreConfiguration {
             json.append("\"parameters\": ")
                 .append(getObjectValue(properties));
         }
-        return json.append("}")
-            .toString();
-    }
-
-    private String createJsonExample(TaskDispatcherDefinition taskDispatcherDefinition) {
-        StringBuilder json = new StringBuilder();
-
-        json.append("{")
-            .append("\n")
-            .append("\"label\": \"")
-            .append(taskDispatcherDefinition.getTitle())
-            .append("\",")
-            .append("\n")
-            .append("\"name\": \"")
-            .append(taskDispatcherDefinition.getName())
-            .append("\",")
-            .append("\n")
-            .append("\"type\": \"")
-            .append(taskDispatcherDefinition.getName())
-            .append("/v")
-            .append(taskDispatcherDefinition.getVersion())
-            .append("/")
-            .append("\",\n");
-
-        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecorators(
-            taskDispatcherDefinition.getProperties());
-
-        if (!properties.isEmpty()) {
-            json.append("\"parameters\": ")
-                .append(getObjectValue(properties));
-        }
-
         return json.append("}")
             .toString();
     }
@@ -356,7 +319,6 @@ public class VectorStoreConfiguration {
     }
 
     // Function to split a document into chunks based on a maximum token limit
-
     private static List<String> splitDocument(String[] tokens) {
         List<String> chunks = new ArrayList<>();
         StringBuilder currentChunk = new StringBuilder();
@@ -449,56 +411,25 @@ public class VectorStoreConfiguration {
         return definitionText.toString();
     }
 
-    private String toString(TaskDispatcherDefinition taskDispatcherDefinition) {
-        StringBuilder definitionText = new StringBuilder();
-
-        definitionText.append("Flow Name: ")
-            .append(taskDispatcherDefinition.getName())
-            .append(",\n")
-            .append("Description: ")
-            .append(taskDispatcherDefinition.getDescription())
-            .append(",\n")
-            .append("Example JSON Structure: \n")
-            .append(createJsonExample(taskDispatcherDefinition))
-            .append(";\n");
-
-        OutputResponse outputResponse = taskDispatcherDefinition.getOutputResponse();
-        if (taskDispatcherDefinition.isOutputDefined() && outputResponse != null) {
-            definitionText.append("Output JSON: \n")
-                .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
-                .append(";\n");
-        }
-
-        return definitionText.toString();
-    }
-
     private void storeDocuments(
         TokenCountBatchingStrategy batchingStrategy, List<Map<String, Object>> vectorStores, VectorStore vectorStore) {
 
         List<Document> documentList = new ArrayList<>();
 
-        for (TaskDispatcherDefinition taskDispatcherDefinition : taskDispatcherDefinitionService
-            .getTaskDispatcherDefinitions()) {
-
-            String name = taskDispatcherDefinition.getName();
-
-            if (name.equals("condition") || name.equals("loop")) {
-                String json = toString(taskDispatcherDefinition);
-
-                addToDocuments(vectorStores, name, json, documentList, "flow");
-            }
-        }
-
         for (ComponentDefinition componentDefinition : componentDefinitionService.getComponentDefinitions()) {
             String json = toString(componentDefinition);
+            String componentName = componentDefinition.getName();
 
             List<TriggerDefinition> triggers = componentDefinition.getTriggers();
 
             if (!triggers.isEmpty()) {
                 for (TriggerDefinition triggerDefinition : triggers) {
-                    String triggerJson = json + toString(triggerDefinition);
+                    if (!containsFile(vectorStores, triggerDefinition.getName(), componentName, COMPONENTS)) {
+                        String triggerJson = json + toString(triggerDefinition);
 
-                    addToDocuments(vectorStores, triggerDefinition.getName(), triggerJson, documentList, "trigger");
+                        addToDocuments(triggerDefinition.getName(), componentName, triggerJson, documentList,
+                            "trigger");
+                    }
                 }
             }
 
@@ -506,9 +437,11 @@ public class VectorStoreConfiguration {
 
             if (!actions.isEmpty()) {
                 for (ActionDefinition actionDefinition : actions) {
-                    String actionJson = json + toString(actionDefinition);
+                    if (!containsFile(vectorStores, actionDefinition.getName(), componentName, COMPONENTS)) {
+                        String actionJson = json + toString(actionDefinition);
 
-                    addToDocuments(vectorStores, actionDefinition.getName(), actionJson, documentList, "action");
+                        addToDocuments(actionDefinition.getName(), componentName, actionJson, documentList, "action");
+                    }
                 }
             }
         }
@@ -523,6 +456,14 @@ public class VectorStoreConfiguration {
 
         return !vectorStoreList.isEmpty() && vectorStoreList.stream()
             .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
+    }
+
+    private static boolean containsFile(
+        List<Map<String, Object>> vectorStoreList, String fileName, String componentName, String categoryName) {
+
+        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
+            .anyMatch(map -> fileName.equals(map.get(NAME)) && componentName.equals(map.get(COMPONENT_NAME))
+                && categoryName.equals(map.get(CATEGORY)));
     }
 
     private static void storeDocumentsFromPath(
