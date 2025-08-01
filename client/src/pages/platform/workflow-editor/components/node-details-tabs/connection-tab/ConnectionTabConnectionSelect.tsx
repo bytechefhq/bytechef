@@ -22,6 +22,8 @@ import {PlusIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
+
 type ConnectionTabConnectionSelectPropsType = {
     componentConnection: ComponentConnection;
     componentConnectionsCount: number;
@@ -53,6 +55,8 @@ const ConnectionTabConnectionSelect = ({
         useGetConnectionTagsQuery,
         useGetConnectionsQuery,
     } = useWorkflowEditor();
+
+    const {rootClusterElementNodeData, setRootClusterElementNodeData} = useWorkflowEditorStore();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
@@ -88,7 +92,7 @@ const ConnectionTabConnectionSelect = ({
     });
 
     const handleValueChange = useCallback(
-        (connectionId: number, workflowConnectionKey: string) => {
+        (connectionId: number, workflowConnectionKey: string, rootClusterElementNodeDataWorkflowNodeName?: string) => {
             if (!connectionId) {
                 return;
             }
@@ -99,13 +103,44 @@ const ConnectionTabConnectionSelect = ({
                 },
                 workflowConnectionKey,
                 workflowId,
-                workflowNodeName,
+                workflowNodeName: rootClusterElementNodeDataWorkflowNodeName || workflowNodeName,
             });
 
             setConnectionId(connectionId);
 
             if (currentNode) {
-                setCurrentNode({...currentNode, connectionId});
+                if (rootClusterElementNodeData && currentNode.clusterElementType) {
+                    const rootConnectionIds = Array.isArray(rootClusterElementNodeData.connectionId)
+                        ? [...rootClusterElementNodeData.connectionId]
+                        : [];
+
+                    if (currentNode.connectionId !== undefined && typeof currentNode.connectionId === 'number') {
+                        const connectionToReplace = rootConnectionIds.indexOf(currentNode.connectionId);
+
+                        if (connectionToReplace > -1) {
+                            rootConnectionIds.splice(connectionToReplace, 1);
+                        }
+                    }
+
+                    if (!rootConnectionIds.includes(connectionId)) {
+                        rootConnectionIds.push(connectionId);
+                    }
+
+                    setRootClusterElementNodeData({
+                        ...rootClusterElementNodeData,
+                        connectionId: rootConnectionIds,
+                    });
+
+                    setCurrentNode({
+                        ...currentNode,
+                        connectionId,
+                    });
+                } else {
+                    setCurrentNode({
+                        ...currentNode,
+                        connectionId,
+                    });
+                }
             }
 
             if (currentComponent) {
@@ -119,14 +154,20 @@ const ConnectionTabConnectionSelect = ({
             queryClient.removeQueries({
                 queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, workflowId],
             });
+
+            queryClient.removeQueries({
+                queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions, workflowId],
+            });
         },
         [
             currentComponent,
             currentNode,
             queryClient,
+            rootClusterElementNodeData,
             saveWorkflowTestConfigurationConnectionMutation,
             setCurrentComponent,
             setCurrentNode,
+            setRootClusterElementNodeData,
             workflowId,
             workflowNodeName,
         ]
@@ -160,7 +201,9 @@ const ConnectionTabConnectionSelect = ({
                 </div>
 
                 <Select
-                    onValueChange={(value) => handleValueChange(+value, key)}
+                    onValueChange={(value) => {
+                        handleValueChange(+value, key, rootClusterElementNodeData?.workflowNodeName);
+                    }}
                     required={required}
                     value={connectionId ? connectionId.toString() : undefined}
                 >
@@ -223,7 +266,7 @@ const ConnectionTabConnectionSelect = ({
                     connectionsQueryKey={ConnectionKeys!.connections}
                     onClose={() => setShowConnectionDialog(false)}
                     onConnectionCreate={(newConnectionId) => {
-                        handleValueChange(newConnectionId, key);
+                        handleValueChange(newConnectionId, key, rootClusterElementNodeData?.workflowNodeName);
 
                         setConnectionId(newConnectionId);
                     }}

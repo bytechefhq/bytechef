@@ -1,6 +1,8 @@
+import {isPlainObject} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {
     encodeParameters,
@@ -129,7 +131,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             ]
         );
 
-        const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
+        const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
+        const {rootClusterElementNodeData} = useWorkflowEditorStore();
 
         const memoizedWorkflowTask = useMemo(() => {
             return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
@@ -137,12 +140,46 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             );
         }, [workflow.triggers, workflow.tasks, currentNode?.name]);
 
+        const memoizedClusterElementTask = useMemo(() => {
+            if (!currentNode?.name || !workflow) {
+                return undefined;
+            }
+
+            if (currentNode.clusterElementType && rootClusterElementNodeData?.workflowNodeName) {
+                const parentRoot = [...(workflow.tasks ?? [])].find(
+                    (task) => task.name === rootClusterElementNodeData?.workflowNodeName
+                );
+
+                if (parentRoot?.clusterElements) {
+                    const clusterElementType = currentNode.clusterElementType;
+
+                    const elementsOfType = parentRoot.clusterElements[clusterElementType];
+
+                    if (Array.isArray(elementsOfType)) {
+                        return elementsOfType.find(
+                            (element) => element.workflowNodeName === currentNode.workflowNodeName
+                        );
+                    }
+
+                    if (elementsOfType && isPlainObject(elementsOfType)) {
+                        return elementsOfType;
+                    }
+                }
+
+                return undefined;
+            }
+        }, [workflow, currentNode, rootClusterElementNodeData?.workflowNodeName]);
+
         const extensions = useMemo(() => {
             const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
                 FormulaMode.configure({
                     saveNullValue: () => {
-                        if (!workflow.id || !updateWorkflowNodeParameterMutation || !path) {
+                        if (
+                            !workflow.id ||
+                            !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
+                            !path
+                        ) {
                             return;
                         }
 
@@ -150,6 +187,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             includeInMetadata: true,
                             path,
                             type,
+                            updateClusterElementParameterMutation,
                             updateWorkflowNodeParameterMutation,
                             value: null,
                             workflowId: workflow.id,
@@ -219,12 +257,17 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             placeholder,
             setIsFormulaMode,
             type,
+            updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
             workflow.id,
         ]);
 
         const saveMentionInputValue = useDebouncedCallback(() => {
-            if (!workflow.id || !updateWorkflowNodeParameterMutation || !path) {
+            if (
+                !workflow.id ||
+                !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
+                !path
+            ) {
                 return;
             }
 
@@ -257,6 +300,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 includeInMetadata: true,
                 path,
                 type,
+                updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
                 value: value || null,
                 workflowId: workflow.id,
@@ -405,7 +449,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 return;
             }
 
-            const encodedParameters = encodeParameters(memoizedWorkflowTask?.parameters ?? {});
+            const encodedParameters = encodeParameters(
+                (memoizedWorkflowTask?.parameters || memoizedClusterElementTask?.parameters) ?? {}
+            );
             const encodedPath = encodePath(path);
 
             const propertyValue = resolvePath(encodedParameters, encodedPath);
@@ -415,7 +461,13 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             } else {
                 setEditorValue(propertyValue);
             }
-        }, [currentNode?.name, memoizedWorkflowTask?.parameters, path, workflow.definition]);
+        }, [
+            currentNode?.name,
+            memoizedClusterElementTask?.parameters,
+            memoizedWorkflowTask?.parameters,
+            path,
+            workflow.definition,
+        ]);
 
         // Set formula mode based on value and sync with editor storage
         useEffect(() => {

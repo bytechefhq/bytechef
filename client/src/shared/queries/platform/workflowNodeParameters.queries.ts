@@ -1,4 +1,5 @@
 import {
+    GetClusterElementParameterDisplayConditionsRequest,
     type GetClusterElementParameterDisplayConditions200Response,
     GetWorkflowNodeParameterDisplayConditionsRequest,
     WorkflowNodeParameterApi,
@@ -16,6 +17,15 @@ export const WorkflowNodeParameterKeys = {
         'displayConditions',
     ],
     workflowNodeParameters: ['workflowNodeParameters'] as const,
+
+    propertyClusterElementParameterDisplayConditions: (request: GetClusterElementParameterDisplayConditionsRequest) => [
+        ...WorkflowNodeParameterKeys.clusterElementParameters,
+        request.id,
+        request.workflowNodeName,
+        request.clusterElementType,
+        request.clusterElementWorkflowNodeName,
+    ],
+    clusterElementParameters: ['clusterElementParameters'] as const,
 };
 
 export const useGetWorkflowNodeParameterDisplayConditionsQuery = (
@@ -25,5 +35,15 @@ export const useGetWorkflowNodeParameterDisplayConditionsQuery = (
     useQuery<GetClusterElementParameterDisplayConditions200Response, Error>({
         queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions(request),
         queryFn: () => new WorkflowNodeParameterApi().getWorkflowNodeParameterDisplayConditions(request),
+        enabled: enabled === undefined ? true : enabled,
+    });
+
+export const useGetClusterElementParameterDisplayConditionsQuery = (
+    request: GetClusterElementParameterDisplayConditionsRequest,
+    enabled?: boolean
+) =>
+    useQuery<GetWorkflowNodeParameterDisplayConditions200Response, Error>({
+        queryKey: WorkflowNodeParameterKeys.propertyClusterElementParameterDisplayConditions(request),
+        queryFn: () => new WorkflowNodeParameterApi().getClusterElementParameterDisplayConditions(request),
         enabled: enabled === undefined ? true : enabled,
     });
