@@ -278,7 +278,7 @@ public interface Context {
 
             public static final ResponseType BINARY = new ResponseType("application/octet-stream", Type.BINARY);
             public static final ResponseType JSON = new ResponseType("application/json", Type.JSON);
-            public static final ResponseType TEXT = new ResponseType("ext/plain", Type.TEXT);
+            public static final ResponseType TEXT = new ResponseType("text/plain", Type.TEXT);
             public static final ResponseType XML = new ResponseType("application/xml", Type.XML);
 
             private String contentType;
