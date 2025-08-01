@@ -32,25 +32,32 @@ import org.springframework.util.Assert;
 public class OrchestratorWorkersWorkflow {
 
     private static final String DEFAULT_ORCHESTRATOR_SYSTEM_PROMPT = """
-        Analyze this task and break it down into subtasks so that the first subtask is always a single Trigger, and
-        each subsequent subtask is either an Action or a Flow. Use the 'condition' flow for the 'if' function and
-        'loop' flow for the 'for each' function.
+        Analyze this task and break it down into subtasks so that the first subtask is always a single Trigger, and each subsequent subtask is either an Action or a Flow.
+
+        Use the 'condition' flow for the 'if' function and 'loop' flow for the 'for each' function.
+        If the component is contained by another flow component, the parent's name will be written in parentTaskName along with optional extra metadata.
 
         Return your response in this JSON format:
         \\{
             "analysis": "Explain your understanding of the task broken down into subtasks.",
             "tasks": [
                 \\{
-                "type": "trigger",
+                "task_type": "trigger",
+                "name": "triggerComponentName1",
                 "description": "The function of the trigger",
+                "parentTaskName": "null"
                 \\},
                 \\{
-                "type": "flow",
+                "task_type": "flow",
+                "name": "flowComponentName1",
                 "description": "The function of the flow",
+                "parentTaskName": "null"
                 \\},
                 \\{
-                "type": "action",
+                "task_type": "action",
+                "name": "actionComponentName",
                 "description": "The function of the action",
+                "parentTaskName": "flowComponentName1, optional metadata (ex. when condition = true)"
                 \\}
             ]
         \\}
@@ -73,7 +80,8 @@ public class OrchestratorWorkersWorkflow {
             "type": "componentType",
             "parameters": \\{\\}
           \\},
-          "type": "action|trigger|flow",
+          "task_type": "action|trigger|flow",
+          "parentTaskName": "Parent Flow Task Name",
           "output": \\{\\}
         \\}
 
@@ -85,7 +93,8 @@ public class OrchestratorWorkersWorkflow {
             "type": "missing/v1/missing",
             "parameters": \\{\\}
           \\},
-          "type": "action",
+          "task_type": "action",
+          "parentTaskName": "null",
           "output": \\{\\}
         \\}
 
@@ -103,11 +112,12 @@ public class OrchestratorWorkersWorkflow {
             "parameters": \\{
               "rawExpression": true,
               "expression": "condition_expression",
-              "caseTrue": [\\{ "label": "Component when true", "name": "component1", "type": "taskType" \\}],
-              "caseFalse": [\\{ "label": "Component when false", "name": "component2", "type": "taskType" \\}]
+              "caseTrue": [],
+              "caseFalse": []
             \\}
           \\},
-          "type": "flow",
+          "task_type": "flow",
+          "parentTaskName": "Parent Flow Task Name",
           "output": \\{\\}
         \\}
 
@@ -119,10 +129,11 @@ public class OrchestratorWorkersWorkflow {
             "type": "loop/v1",
             "parameters": \\{
               "items": "array_or_collection_reference",
-              "iteratee": [\\{ "label": "Component for each item", "name": "component1", "type": "taskType" \\}]
+              "iteratee": []
             \\}
           \\},
-          "type": "flow",
+          "task_type": "flow",
+          "parentTaskName": "Parent Flow Task Name",
           "output": \\{"item": \\{\\}\\}
         \\}
 
@@ -134,7 +145,9 @@ public class OrchestratorWorkersWorkflow {
     private static final String DEFAULT_WORKER_USER_PROMPT = """
         Search the context for an existing Component that best matches the task description. Generate content based on:
         - Task Type: {task_type}
+        - Task Name: {task_name}
         - Task Description: {task_description}
+        - Parent Flow Task Name: {parent_task_name}
         """;
 
     private final ChatClient chatClient;
@@ -181,15 +194,21 @@ public class OrchestratorWorkersWorkflow {
                 .system(DEFAULT_WORKER_SYSTEM_PROMPT)
                 .user(u -> u.text(DEFAULT_WORKER_USER_PROMPT)
 //                    .param("original_task", orchestratorResponse.analysis())
-                    .param("task_type", task.type())
+                    .param("task_type", task.task_type())
+                    .param("task_name", task.name())
                     .param("task_description", task.description())
+                    .param("parent_task_name", task.parentTaskName())
                 )
                 .call()
                 .content())
             .toList();
 
-        System.out.println(orchestratorResponse.analysis());
-        System.out.println(workerResponses);
+//        System.out.println("Orchestrator tasks:");
+//        System.out.println(orchestratorResponse.tasks());
+//        System.out.println("Orchestrator response analysis:");
+//        System.out.println(orchestratorResponse.analysis());
+//        System.out.println("Orchestrator worker response:");
+//        System.out.println(workerResponses);
 
         // 3. Results are combined into the final response
         return new WorkerResponse(orchestratorResponse.analysis(), workerResponses);
@@ -210,10 +229,10 @@ public class OrchestratorWorkersWorkflow {
     /**
      * Represents a subtask identified by the orchestrator that needs to be executed by a worker.
      *
-     * @param type        The type or category of the task (e.g., "formal", "conversational")
+     * @param task_type        The type or category of the task (e.g., "formal", "conversational")
      * @param description Detailed description of what the worker should accomplish
      */
-    private record OrchestratorTask(String type, String description) {
+    private record OrchestratorTask(String task_type, String name, String description, String parentTaskName) {
     }
 
     /**
