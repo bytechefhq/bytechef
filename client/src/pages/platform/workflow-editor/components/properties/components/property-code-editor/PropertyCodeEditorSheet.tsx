@@ -3,14 +3,16 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorSheetRightPanel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanel';
+import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ScriptTestExecution, Workflow, WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
-import Editor from '@monaco-editor/react';
 import {PlayIcon, RefreshCwIcon, SquareIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {Suspense, lazy, useEffect, useState} from 'react';
 import ReactJson from 'react-json-view';
 import {twMerge} from 'tailwind-merge';
+
+const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 const workflowNodeScriptApi: WorkflowNodeScriptApi = new WorkflowNodeScriptApi();
 
@@ -119,15 +121,20 @@ const PropertyCodeEditorSheet = ({
                     <div className="flex h-full">
                         <ResizablePanelGroup className="flex-1" direction="vertical">
                             <ResizablePanel defaultSize={75}>
-                                <Editor
-                                    defaultLanguage={language}
-                                    onChange={(value) => {
-                                        setNewValue(value);
-
-                                        onChange(value);
-                                    }}
-                                    value={newValue}
-                                />
+                                <Suspense fallback={<MonacoEditorLoader />}>
+                                    <MonacoEditor
+                                        className="size-full"
+                                        defaultLanguage={language}
+                                        onChange={(value) => {
+                                            setNewValue(value);
+                                            onChange(value);
+                                        }}
+                                        onMount={(editor) => {
+                                            editor.focus();
+                                        }}
+                                        value={newValue}
+                                    />
+                                </Suspense>
                             </ResizablePanel>
 
                             <ResizableHandle className="bg-muted" />
