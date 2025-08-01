@@ -35,7 +35,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
     const {workflow} = useWorkflowDataStore();
-    const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
+    const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
     const {additionalProperties, name} = property;
 
@@ -79,11 +79,12 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
         setArrayItems([...arrayItems, newItem]);
 
-        if (updateWorkflowNodeParameterMutation) {
+        if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
             saveProperty({
                 includeInMetadata: true,
                 path: newItemPath,
                 type: newItemType,
+                updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
                 workflowId: workflow.id!,
             });
@@ -95,6 +96,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         name,
         newPropertyType,
         path,
+        updateClusterElementParameterMutation,
         updateWorkflowNodeParameterMutation,
         workflow.id,
     ]);

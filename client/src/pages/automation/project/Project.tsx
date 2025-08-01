@@ -23,12 +23,14 @@ const Project = () => {
 
     const {
         bottomResizablePanelRef,
+        deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         handleProjectClick,
         handleWorkflowExecutionsTestOutputCloseClick,
         projectId,
         projectWorkflowId,
         projects,
+        updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
@@ -71,6 +73,7 @@ const Project = () => {
                         <WorkflowEditorProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,
+                                deleteClusterElementParameterMutation,
                                 deleteWorkflowNodeParameterMutation,
                                 invalidateWorkflowQueries: () => {
                                     queryClient.invalidateQueries({
@@ -78,6 +81,7 @@ const Project = () => {
                                     });
                                     // queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
                                 },
+                                updateClusterElementParameterMutation,
                                 updateWorkflowMutation: updateWorkflowEditorMutation,
                                 updateWorkflowNodeParameterMutation,
                                 useCreateConnectionMutation: useCreateConnectionMutation,

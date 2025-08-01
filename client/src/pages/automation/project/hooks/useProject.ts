@@ -11,7 +11,9 @@ import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/us
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
+    useDeleteClusterElementParameterMutation,
     useDeleteWorkflowNodeParameterMutation,
+    useUpdateClusterElementParameterMutation,
     useUpdateWorkflowNodeParameterMutation,
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
@@ -97,6 +99,18 @@ export const useProject = () => {
         },
     });
 
+    const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(+projectId!),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
+        },
+    });
+
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
         useUpdateWorkflowMutation,
         workflowId: workflow.id!,
@@ -121,6 +135,14 @@ export const useProject = () => {
     });
 
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
+            });
+        },
+    });
+
+    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
@@ -184,6 +206,7 @@ export const useProject = () => {
     return {
         bottomResizablePanelRef,
         categories,
+        deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         filterData,
         handleProjectClick,
@@ -192,6 +215,7 @@ export const useProject = () => {
         projectWorkflowId: parseInt(projectWorkflowId!),
         projects,
         tags,
+        updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,

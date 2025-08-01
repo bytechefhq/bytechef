@@ -10,7 +10,9 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
+    useDeleteClusterElementParameterMutation,
     useDeleteWorkflowNodeParameterMutation,
+    useUpdateClusterElementParameterMutation,
     useUpdateWorkflowNodeParameterMutation,
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
@@ -51,6 +53,14 @@ export const useWorkflowBuilder = () => {
         },
     });
 
+    const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
+        },
+    });
+
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             if (workflowReferenceCode) {
@@ -80,6 +90,16 @@ export const useWorkflowBuilder = () => {
     });
 
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
+        onSuccess: () => {
+            if (workflowReferenceCode) {
+                queryClient.invalidateQueries({
+                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowReferenceCode),
+                });
+            }
+        },
+    });
+
+    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation({
         onSuccess: () => {
             if (workflowReferenceCode) {
                 queryClient.invalidateQueries({
@@ -158,11 +178,13 @@ export const useWorkflowBuilder = () => {
     return {
         bottomResizablePanelRef,
         connectedUserProjectWorkflow,
+        deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
         includeComponents,
         projectId: connectedUserProjectWorkflow?.projectId,
         sharedConnectionIds,
+        updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
