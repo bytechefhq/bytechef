@@ -1477,19 +1477,6 @@ public class ComponentInitOpenApiGenerator {
 
         builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI, false));
 
-        String responseType;
-
-        if (Objects.equals(schema.getType(), "string") && Objects.equals(schema.getFormat(), "binary")) {
-            responseType = "BINARY";
-        } else {
-            responseType = switch (mimeType) {
-                case "application/json" -> "JSON";
-                case "application/xml" -> "XML";
-                case "application/octet-stream" -> "BINARY";
-                default -> "TEXT";
-            };
-        }
-
         builder.add(
             """
                 .metadata(
@@ -1499,9 +1486,26 @@ public class ComponentInitOpenApiGenerator {
                 )
                 """,
             Map.class,
-            responseType);
+            getResponseType(mimeType, schema));
 
         return builder.build();
+    }
+
+    private static String getResponseType(String mimeType, Schema<?> schema) {
+        String responseType;
+
+        if (Objects.equals(schema.getType(), "string") && Objects.equals(schema.getFormat(), "binary")) {
+            responseType = (mimeType == null) ? "BINARY" : "binary(\"" + mimeType + "\")";
+        } else {
+            responseType = switch (mimeType) {
+                case "application/json" -> "JSON";
+                case "application/xml" -> "XML";
+                case "application/octet-stream" -> "BINARY";
+                default -> "TEXT";
+            };
+        }
+
+        return responseType;
     }
 
     private String getPackageName() {
@@ -2022,8 +2026,14 @@ public class ComponentInitOpenApiGenerator {
                         switch (schema.getFormat()) {
                             case "date" -> builder.add("date($S)", propertyName);
                             case "date-time" -> builder.add("dateTime($S)", propertyName);
-                            case "binary" -> builder.add("fileEntry($S)",
-                                StringUtils.isEmpty(propertyName) ? "fileEntry" : propertyName);
+                            case "binary" -> {
+                                if (outputSchema) {
+                                    builder.add("fileEntry()");
+                                } else {
+                                    builder.add("fileEntry($S)",
+                                        (StringUtils.isEmpty(propertyName) ? "fileEntry" : propertyName));
+                                }
+                            }
                             case null, default -> {
                                 if (StringUtils.isEmpty(propertyName)) {
                                     builder.add("string()");
