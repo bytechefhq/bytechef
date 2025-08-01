@@ -31,37 +31,38 @@ import org.springframework.util.Assert;
  */
 public class OrchestratorWorkersWorkflow {
 
-    private static final String DEFAULT_ORCHESTRATOR_SYSTEM_PROMPT = """
-        Analyze this task and break it down into subtasks so that the first subtask is always a single Trigger, and each subsequent subtask is either an Action or a Flow.
+    private static final String DEFAULT_ORCHESTRATOR_SYSTEM_PROMPT =
+        """
+            Analyze this task and break it down into subtasks so that the first subtask is always a single Trigger, and each subsequent subtask is either an Action or a Flow.
 
-        Use the 'condition' flow for the 'if' function and 'loop' flow for the 'for each' function.
-        If the component is contained by another flow component, the parent's name will be written in parentTaskName along with optional extra metadata.
+            Use the 'condition' flow for the 'if' function and 'loop' flow for the 'for each' function.
+            If the component is contained by another flow component, the parent's name will be written in parentTaskName along with optional extra metadata.
 
-        Return your response in this JSON format:
-        \\{
-            "analysis": "Explain your understanding of the task broken down into subtasks.",
-            "tasks": [
-                \\{
-                "task_type": "trigger",
-                "name": "triggerComponentName1",
-                "description": "The function of the trigger",
-                "parentTaskName": "null"
-                \\},
-                \\{
-                "task_type": "flow",
-                "name": "flowComponentName1",
-                "description": "The function of the flow",
-                "parentTaskName": "null"
-                \\},
-                \\{
-                "task_type": "action",
-                "name": "actionComponentName",
-                "description": "The function of the action",
-                "parentTaskName": "flowComponentName1, optional metadata (ex. when condition = true)"
-                \\}
-            ]
-        \\}
-        """;
+            Return your response in this JSON format:
+            \\{
+                "analysis": "Explain your understanding of the task broken down into subtasks.",
+                "tasks": [
+                    \\{
+                    "task_type": "trigger",
+                    "name": "triggerComponentName1",
+                    "description": "The function of the trigger",
+                    "parentTaskName": "null"
+                    \\},
+                    \\{
+                    "task_type": "flow",
+                    "name": "flowComponentName1",
+                    "description": "The function of the flow",
+                    "parentTaskName": "null"
+                    \\},
+                    \\{
+                    "task_type": "action",
+                    "name": "actionComponentName",
+                    "description": "The function of the action",
+                    "parentTaskName": "flowComponentName1, optional metadata (ex. when condition = true)"
+                    \\}
+                ]
+            \\}
+            """;
 
     private static final String DEFAULT_ORCHESTRATOR_USER_PROMPT = """
         Current workflow:
@@ -71,76 +72,77 @@ public class OrchestratorWorkersWorkflow {
         {task}
         """;
 
-    private static final String DEFAULT_WORKER_SYSTEM_PROMPT = """
-        Return your response in this JSON format:
-        \\{
-          "structure": \\{
-            "label": "Name of action, trigger, or flow",
-            "name": "componentName",
-            "type": "componentType",
-            "parameters": \\{\\}
-          \\},
-          "task_type": "action|trigger|flow",
-          "parentTaskName": "Parent Flow Task Name",
-          "output": \\{\\}
-        \\}
-
-        If no matching component exists, return the missing component:
-        \\{
-          "structure": \\{
-            "label": "Name of missing component",
-            "name": "missingComponentName",
-            "type": "missing/v1/missing",
-            "parameters": \\{\\}
-          \\},
-          "task_type": "action",
-          "parentTaskName": "null",
-          "output": \\{\\}
-        \\}
-
-        For Flow Types:
-        - If task involves conditional logic, use condition/v1 flow
-        - If task involves iteration/looping, use loop/v1 flow
-
-        Flow Templates:
-        Condition Flow:
-        \\{
-          "structure": \\{
-            "label": "Condition description",
-            "name": "condition1",
-            "type": "condition/v1",
-            "parameters": \\{
-              "rawExpression": true,
-              "expression": "condition_expression",
-              "caseTrue": [],
-              "caseFalse": []
+    private static final String DEFAULT_WORKER_SYSTEM_PROMPT =
+        """
+            Return your response in this JSON format:
+            \\{
+              "structure": \\{
+                "label": "Name of action, trigger, or flow",
+                "name": "componentName",
+                "type": "componentType",
+                "parameters": \\{\\}
+              \\},
+              "task_type": "action|trigger|flow",
+              "parentTaskName": "Parent Flow Task Name",
+              "output": \\{\\}
             \\}
-          \\},
-          "task_type": "flow",
-          "parentTaskName": "Parent Flow Task Name",
-          "output": \\{\\}
-        \\}
 
-        Loop Flow:
-        \\{
-          "structure": \\{
-            "label": "Loop description",
-            "name": "loop1",
-            "type": "loop/v1",
-            "parameters": \\{
-              "items": "array_or_collection_reference",
-              "iteratee": []
+            If no matching component exists, return the missing component:
+            \\{
+              "structure": \\{
+                "label": "Name of missing component",
+                "name": "missingComponentName",
+                "type": "missing/v1/missing",
+                "parameters": \\{\\}
+              \\},
+              "task_type": "action",
+              "parentTaskName": "null",
+              "output": \\{\\}
             \\}
-          \\},
-          "task_type": "flow",
-          "parentTaskName": "Parent Flow Task Name",
-          "output": \\{"item": \\{\\}\\}
-        \\}
 
-        Output Rules:
-        - If the component exists in context and has example output, paste the exact output structure in the "output" key
-        - If the component exists but has no example output, use empty object \\{\\} for "output" (dynamic output)
-        """;
+            For Flow Types:
+            - If task involves conditional logic, use condition/v1 flow
+            - If task involves iteration/looping, use loop/v1 flow
+
+            Flow Templates:
+            Condition Flow:
+            \\{
+              "structure": \\{
+                "label": "Condition description",
+                "name": "condition1",
+                "type": "condition/v1",
+                "parameters": \\{
+                  "rawExpression": true,
+                  "expression": "condition_expression",
+                  "caseTrue": [],
+                  "caseFalse": []
+                \\}
+              \\},
+              "task_type": "flow",
+              "parentTaskName": "Parent Flow Task Name",
+              "output": \\{\\}
+            \\}
+
+            Loop Flow:
+            \\{
+              "structure": \\{
+                "label": "Loop description",
+                "name": "loop1",
+                "type": "loop/v1",
+                "parameters": \\{
+                  "items": "array_or_collection_reference",
+                  "iteratee": []
+                \\}
+              \\},
+              "task_type": "flow",
+              "parentTaskName": "Parent Flow Task Name",
+              "output": \\{"item": \\{\\}\\}
+            \\}
+
+            Output Rules:
+            - If the component exists in context and has example output, paste the exact output structure in the "output" key
+            - If the component exists but has no example output, use empty object \\{\\} for "output" (dynamic output)
+            """;
 
     private static final String DEFAULT_WORKER_USER_PROMPT = """
         Search the context for an existing Component that best matches the task description. Generate content based on:
@@ -197,18 +199,10 @@ public class OrchestratorWorkersWorkflow {
                     .param("task_type", task.task_type())
                     .param("task_name", task.name())
                     .param("task_description", task.description())
-                    .param("parent_task_name", task.parentTaskName())
-                )
+                    .param("parent_task_name", task.parentTaskName()))
                 .call()
                 .content())
             .toList();
-
-//        System.out.println("Orchestrator tasks:");
-//        System.out.println(orchestratorResponse.tasks());
-//        System.out.println("Orchestrator response analysis:");
-//        System.out.println(orchestratorResponse.analysis());
-//        System.out.println("Orchestrator worker response:");
-//        System.out.println(workerResponses);
 
         // 3. Results are combined into the final response
         return new WorkerResponse(orchestratorResponse.analysis(), workerResponses);
@@ -229,7 +223,7 @@ public class OrchestratorWorkersWorkflow {
     /**
      * Represents a subtask identified by the orchestrator that needs to be executed by a worker.
      *
-     * @param task_type        The type or category of the task (e.g., "formal", "conversational")
+     * @param task_type   The type or category of the task (e.g., "formal", "conversational")
      * @param description Detailed description of what the worker should accomplish
      */
     private record OrchestratorTask(String task_type, String name, String description, String parentTaskName) {
