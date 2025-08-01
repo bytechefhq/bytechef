@@ -23,29 +23,33 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {XIcon} from 'lucide-react';
-import {useEffect} from 'react';
+import {Suspense, lazy, useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/shallow';
 
 import ClusterElementsWorkflowEditor from '../cluster-element-editor/components/ClusterElementsWorkflowEditor';
 import WorkflowEditor from './components/WorkflowEditor';
-import DataPillPanel from './components/datapills/DataPillPanel';
+import {PanelSkeleton} from './components/WorkflowEditorSkeletons';
+import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
 import saveClusterElementNodesPosition from './utils/saveClusterElementNodesPosition';
 
-const WorkflowEditorLayout = ({
-    includeComponents,
-    runDisabled,
-    showWorkflowInputs,
-}: {
+const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
+
+interface WorkflowEditorLayoutProps {
     includeComponents?: string[];
     runDisabled: boolean;
     showWorkflowInputs: boolean;
-}) => {
+}
+
+const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInputs}: WorkflowEditorLayoutProps) => {
     const {copilotPanelOpen} = useCopilotStore();
     const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {rightSidebarOpen} = useRightSidebarStore();
     const {workflow} = useWorkflowDataStore();
+    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore();
+
     const {
         clusterElementsCanvasOpen,
         setClusterElementsCanvasOpen,
@@ -57,7 +61,12 @@ const WorkflowEditorLayout = ({
         showWorkflowInputsSheet,
         showWorkflowOutputsSheet,
     } = useWorkflowEditorStore();
-    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore();
+
+    const {dataPillPanelOpen} = useDataPillPanelStore(
+        useShallow((state) => ({
+            dataPillPanelOpen: state.dataPillPanelOpen,
+        }))
+    );
 
     const {
         componentDefinitions,
@@ -171,12 +180,16 @@ const WorkflowEditorLayout = ({
                                 workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                             />
 
-                            <DataPillPanel
-                                className="fixed inset-y-0 right-[465px] rounded-none"
-                                isLoading={isWorkflowNodeOutputsPending}
-                                previousComponentDefinitions={previousComponentDefinitions}
-                                workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                            />
+                            {dataPillPanelOpen && (
+                                <Suspense fallback={<PanelSkeleton />}>
+                                    <DataPillPanel
+                                        className="fixed inset-y-0 right-[465px] rounded-none"
+                                        isLoading={isWorkflowNodeOutputsPending}
+                                        previousComponentDefinitions={previousComponentDefinitions}
+                                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                                    />
+                                </Suspense>
+                            )}
                         </>
                     )}
 
@@ -194,12 +207,13 @@ const WorkflowEditorLayout = ({
 
             {workflow.id && <WorkflowTestChatPanel />}
 
-            {currentComponent && !isRootClusterElement && (
-                <DataPillPanel
-                    isLoading={isWorkflowNodeOutputsPending}
-                    previousComponentDefinitions={previousComponentDefinitions}
-                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                />
+            {currentComponent && !isRootClusterElement && dataPillPanelOpen && (
+                <Suspense fallback={<PanelSkeleton />}>
+                    <DataPillPanel
+                        previousComponentDefinitions={previousComponentDefinitions}
+                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                    />
+                </Suspense>
             )}
 
             <WorkflowInputsSheet
