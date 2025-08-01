@@ -24,15 +24,14 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| username | Username | STRING | `Email address of your Bitbucket account.` | true |
-| password | API Key | STRING | `API key creation steps in documentation.` | true |
+| username | Username | STRING | Email address of your Bitbucket account. | true |
+| password | API Key | STRING | API key creation steps in documentation. | true |
 
 
 
 
 
 <hr />
-
 
 
 ## Actions
@@ -47,15 +46,15 @@ Name: createRepository
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace | Workspace | STRING | `Workspace in which repository will be created.` | true |
-| repo_slug | Repository Slug | STRING | `Repository slug that is used as identifier for the repository.` | true |
-| name | Name | STRING | `The name of the repository.` | true |
-| scm | Source Control Management. | STRING <details> <summary> Options </summary> git </details> | `Specifies the version control system that your repository will use.` | true |
-| project | Project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(key)&#125; </details> | `Parent project of the repository.` | true |
-| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether the repository is private or not.` | false |
-| description | Description | STRING | `The description of repository.` | false |
-| fork_policy | Fork Policy | STRING <details> <summary> Options </summary> allow_forks, no_public_forks, no_forks </details> | `Specifies the fork policy for the repository.` | false |
-| language | Language | STRING | `Main programming language of the repository` | false |
+| workspace | Workspace | STRING | Workspace in which repository will be created. | true |
+| repo_slug | Repository Slug | STRING | Repository slug that is used as identifier for the repository. | true |
+| name | Name | STRING | The name of the repository. | true |
+| scm | Source Control Management. | STRING <details> <summary> Options </summary> git </details> | Specifies the version control system that your repository will use. | true |
+| project | Project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(key)&#125; </details> | Parent project of the repository. | true |
+| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the repository is private or not. | false |
+| description | Description | STRING | The description of repository. | false |
+| fork_policy | Fork Policy | STRING <details> <summary> Options </summary> allow_forks, no_public_forks, no_forks </details> | Specifies the fork policy for the repository. | false |
+| language | Language | STRING | Main programming language of the repository | false |
 
 #### Example JSON Structure
 ```json
@@ -193,11 +192,11 @@ Name: createProject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace | Workspace | STRING | `Workspace where the project will be added.` | true |
-| name | Name | STRING | `The name of the project.` | true |
-| key | Key | STRING | `Key of the project (eg. AT, for a project named Atlassian). Project keys must start with a letter and may only consist of ASCII letters, numbers and underscores (A-Z, a-z, 0-9, _).` | true |
-| description | Description | STRING | `The description of project.` | false |
-| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> true, false </details> | `Whether the project is private or not.` | false |
+| workspace | Workspace | STRING | Workspace where the project will be added. | true |
+| name | Name | STRING | The name of the project. | true |
+| key | Key | STRING | Key of the project (eg. AT, for a project named Atlassian). Project keys must start with a letter and may only consist of ASCII letters, numbers and underscores (A-Z, a-z, 0-9, _). | true |
+| description | Description | STRING | The description of project. | false |
+| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the project is private or not. | false |
 
 #### Example JSON Structure
 ```json
@@ -250,7 +249,7 @@ Name: listProjects
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace | Workspace | STRING | `Workspace from which projects are to be listed.` | true |
+| workspace | Workspace | STRING | Workspace from which projects are to be listed. | true |
 
 #### Example JSON Structure
 ```json
@@ -331,7 +330,7 @@ Name: listRepositories
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace | Workspace | STRING | `Workspace from which repositories are to be listed.` | true |
+| workspace | Workspace | STRING | Workspace from which repositories are to be listed. | true |
 
 #### Example JSON Structure
 ```json
@@ -454,7 +453,6 @@ Items Type: OBJECT
 
 
 
-
 ## Triggers
 
 
@@ -469,8 +467,8 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace | Workspace | STRING | `Workspace where the repository is located.` | true |
-| repository | Repository | STRING <details> <summary> Depends On </summary> workspace </details> | `Repository that will be connected to the trigger.` | true |
+| workspace | Workspace | STRING | Workspace where the repository is located. | true |
+| repository | Repository | STRING <details> <summary> Depends On </summary> workspace </details> | Repository that will be connected to the trigger. | true |
 
 
 #### Output
@@ -493,10 +491,16 @@ The output for this action is dynamic and may vary depending on the input parame
 
 <hr />
 
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
 <hr />
 
-# Additional instructions
-<hr />
+# Additional Instructions
 
 ## Connection Setup
 
