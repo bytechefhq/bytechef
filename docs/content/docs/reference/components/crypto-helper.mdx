@@ -104,7 +104,7 @@ Name: pgpDecrypt
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | privateKey | Private PGP Key | STRING | Private PGP key that will decrypt the file. Make sure there is a new line after the PGP header. | true |
-| file | File | FILE_ENTRY | File that will be decrypted. | true |
+| file | File Entry | FILE_ENTRY | File object with content that will be decrypted. | true |
 | passphrase | Passphrase | STRING | Passphrase that was used for encryption. | true |
 
 #### Example JSON Structure
@@ -166,7 +166,7 @@ Name: pgpEncrypt
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | publicKey | Public PGP Key | STRING | Public PGP key of the recipient of the encrypted file. Make sure there is a new line after the PGP header. | true |
-| file | File | FILE_ENTRY | File that will be encrypted. | true |
+| file | File Entry | FILE_ENTRY | File object with content that will be encrypted. | true |
 
 #### Example JSON Structure
 ```json
@@ -226,7 +226,7 @@ Name: rsaDecrypt
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | privateKey | Private RSA Key | STRING | Private RSA key that will decrypt the file. | true |
-| file | File | FILE_ENTRY | File that will be decrypted. | true |
+| file | File Entry | FILE_ENTRY | File object with content that will be decrypted. | true |
 
 #### Example JSON Structure
 ```json
@@ -286,7 +286,7 @@ Name: rsaEncrypt
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | publicKey | Public RSA Key | STRING | Public RSA key of the recipient of the encrypted file. | true |
-| file | File | FILE_ENTRY | File that will be encrypted. | true |
+| file | File Entry | FILE_ENTRY | File object with content that will be encrypted. | true |
 
 #### Example JSON Structure
 ```json
@@ -346,7 +346,7 @@ Name: sign
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | privateKey | Private RSA Key | STRING | Private RSA key that will be used to sign the file. | true |
-| file | File | FILE_ENTRY | File that will be signed | true |
+| file | File Entry | FILE_ENTRY | File object with content that will be signed | true |
 
 #### Example JSON Structure
 ```json
@@ -406,7 +406,7 @@ Name: verify
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | publicKey | Public RSA Key | STRING | Public RSA key that will verify the signature. | true |
-| file | File | FILE_ENTRY | File whose signature will be verified. | true |
+| file | File Entry | FILE_ENTRY | File object whose signature will be verified. | true |
 | signature | Signature | FILE_ENTRY | Signature that will be verified. | true |
 
 #### Example JSON Structure
@@ -450,7 +450,7 @@ Type: BOOLEAN
 
 <hr />
 
-# Additional instructions
+# Additional Instructions
 
 How to generate RSA key pair:
 
