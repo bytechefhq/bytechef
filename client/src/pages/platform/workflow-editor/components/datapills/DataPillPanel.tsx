@@ -1,5 +1,4 @@
 import {Input} from '@/components/ui/input';
-import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import DataPillPanelBody, {
     OperationType,
@@ -13,36 +12,16 @@ import {twMerge} from 'tailwind-merge';
 import useDataPillPanelStore from '../../stores/useDataPillPanelStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 
-const LoadingSkeleton = () => (
-    <ul className="flex flex-col">
-        {Array.from({length: 4}).map((_, index) => (
-            <li className="flex items-center space-x-4 border-b border-border/50 p-4" key={index}>
-                <Skeleton className="size-6" />
-
-                <Skeleton className="h-6 w-2/3" />
-
-                <Skeleton className="h-6 w-1/5" />
-            </li>
-        ))}
-    </ul>
-);
-
 interface DataPillPanelProps {
     className?: string;
-    isLoading: boolean;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     workflowNodeOutputs: Array<WorkflowNodeOutput>;
 }
 
-const DataPillPanel = ({
-    className,
-    isLoading,
-    previousComponentDefinitions,
-    workflowNodeOutputs,
-}: DataPillPanelProps) => {
+const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOutputs}: DataPillPanelProps) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
-    const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
+    const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {workflow} = useWorkflowDataStore();
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
@@ -91,13 +70,6 @@ const DataPillPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowNodeDetailsPanelOpen]);
 
-    if (!dataPillPanelOpen) {
-        return <></>;
-    }
-
-    const hasAvailableDataPills =
-        (operations && operations.length > 0) || (workflow.inputs && workflow.inputs.length > 0);
-
     return (
         <div
             className={twMerge(
@@ -138,12 +110,6 @@ const DataPillPanel = ({
                             value={dataPillFilterQuery}
                         />
                     </div>
-
-                    {(!isLoading || currentNode?.trigger) && !hasAvailableDataPills && (
-                        <span className="p-4 text-sm text-muted-foreground">No available data pills.</span>
-                    )}
-
-                    {!currentNode?.trigger && isLoading && <LoadingSkeleton />}
 
                     <DataPillPanelBody
                         dataPillFilterQuery={dataPillFilterQuery}
