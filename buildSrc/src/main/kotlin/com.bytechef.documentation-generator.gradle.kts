@@ -683,7 +683,7 @@ ${getCustomActionString()}
                 mdFile.writeText(json)
 
                 if (readmeFile.exists()) {
-                    mdFile.appendText("<hr />\n\n# Additional instructions\n\n")
+                    mdFile.appendText("<hr />\n\n# Additional Instructions\n\n")
                     mdFile.appendText(readmeFile.readText())
                 }
             }
