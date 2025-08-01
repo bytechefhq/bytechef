@@ -3,10 +3,12 @@ import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {Note} from '@/components/Note';
 import {Sheet, SheetCloseButton, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
 import {SPACE} from '@/shared/constants';
-import Editor from '@monaco-editor/react';
 import {MessageCircleQuestionIcon} from 'lucide-react';
-import React from 'react';
+import {Suspense, lazy} from 'react';
+
+const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 interface PropertyJsonSchemaBuilderSheetProps {
     locale?: string;
@@ -64,15 +66,25 @@ const PropertyJsonSchemaBuilderSheet = ({
                         </TabsContent>
 
                         <TabsContent className="h-full" value="editor">
-                            <Editor
-                                defaultLanguage="json"
-                                onChange={(value) => {
-                                    if (value && onChange) {
-                                        onChange(JSON.parse(value));
-                                    }
-                                }}
-                                value={JSON.stringify(schema, null, SPACE)}
-                            />
+                            <Suspense fallback={<MonacoEditorLoader />}>
+                                <MonacoEditor
+                                    className="size-full"
+                                    defaultLanguage="json"
+                                    onChange={(value) => {
+                                        if (value && onChange) {
+                                            try {
+                                                onChange(JSON.parse(value));
+                                            } catch (e) {
+                                                console.error('Invalid JSON:', e);
+                                            }
+                                        }
+                                    }}
+                                    onMount={(editor) => {
+                                        editor.focus();
+                                    }}
+                                    value={JSON.stringify(schema, null, SPACE)}
+                                />
+                            </Suspense>
                         </TabsContent>
                     </div>
                 </Tabs>

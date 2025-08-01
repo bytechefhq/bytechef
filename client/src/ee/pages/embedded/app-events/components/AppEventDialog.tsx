@@ -15,10 +15,12 @@ import {Input} from '@/components/ui/input';
 import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateAppEventMutation, useUpdateAppEventMutation} from '@/ee/shared/mutations/embedded/appEvents.mutations';
 import {AppEventKeys} from '@/ee/shared/queries/embedded/appEvents.queries';
-import Editor from '@monaco-editor/react';
+import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {ReactNode, useState} from 'react';
+import {ReactNode, Suspense, lazy, useState} from 'react';
 import {useForm} from 'react-hook-form';
+
+const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 interface AppEventDialogProps {
     appEvent?: AppEvent;
@@ -128,17 +130,19 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
                                     <FormLabel>Schema</FormLabel>
 
                                     <FormControl>
-                                        <Editor
-                                            className="rounded-md border border-input shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                            defaultLanguage="json"
-                                            defaultValue={field.value || '{}'}
-                                            height={200}
-                                            onChange={(value) => {
-                                                if (value) {
-                                                    form.setValue('schema', value);
-                                                }
-                                            }}
-                                        />
+                                        <Suspense fallback={<MonacoEditorLoader />}>
+                                            <MonacoEditor
+                                                className="rounded-md border border-input shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                                defaultLanguage="json"
+                                                onChange={(value) => {
+                                                    if (value) {
+                                                        form.setValue('schema', value);
+                                                    }
+                                                }}
+                                                onMount={() => {}}
+                                                value={field.value || '{}'}
+                                            />
+                                        </Suspense>
                                     </FormControl>
 
                                     <FormDescription>

@@ -10,13 +10,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import {MonacoEditorLoader, StandaloneCodeEditorType} from '@/shared/components/MonacoEditorWrapper';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
 import {getCookie} from '@/shared/util/cookie-utils';
-import Editor from '@monaco-editor/react';
-import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
+import {Suspense, lazy, useState} from 'react';
 
-import {editor} from 'monaco-editor';
-import React, {useState} from 'react';
+const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 const fetchGenerateSchema = async (data: string): Promise<Response> => {
     return await fetch('/api/platform/internal/generate-schema', {
@@ -70,7 +69,7 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
         }
     };
 
-    const handleEditorOnMount = (editor: IStandaloneCodeEditor) => {
+    const handleEditorOnMount = (editor: StandaloneCodeEditorType) => {
         const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
 
         if (!placeholder) {
@@ -109,13 +108,15 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
 
                 <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
                     <div className="absolute inset-0">
-                        <Editor
-                            className="bg-transparent"
-                            defaultLanguage="json"
-                            onChange={handleEditorOnChange}
-                            onMount={handleEditorOnMount}
-                            value={JSON.stringify(curSchema, null, SPACE)}
-                        />
+                        <Suspense fallback={<MonacoEditorLoader />}>
+                            <MonacoEditor
+                                className="bg-transparent"
+                                defaultLanguage="json"
+                                onChange={handleEditorOnChange}
+                                onMount={handleEditorOnMount}
+                                value={JSON.stringify(curSchema, null, SPACE)}
+                            />
+                        </Suspense>
 
                         <div
                             className="absolute left-[70px] top-[-2px] h-full text-sm text-muted-foreground"

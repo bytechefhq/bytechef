@@ -5,11 +5,13 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import Editor from '@monaco-editor/react';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
-import {useState} from 'react';
+import {Suspense, lazy, useState} from 'react';
+
+const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -184,23 +186,25 @@ const WorkflowCodeEditorSheet = ({
 
                     <ResizablePanelGroup className="flex-1" direction="vertical">
                         <ResizablePanel defaultSize={75}>
-                            <Editor
-                                defaultLanguage={workflow.format?.toLowerCase()}
-                                onChange={(value) => {
-                                    setDefinition(value as string);
+                            <Suspense fallback={<MonacoEditorLoader />}>
+                                <MonacoEditor
+                                    className="size-full"
+                                    defaultLanguage={workflow.format?.toLowerCase() ?? 'json'}
+                                    onChange={(value) => {
+                                        setDefinition(value as string);
 
-                                    if (value === workflow.definition) {
-                                        setDirty(false);
-                                    } else {
-                                        setDirty(true);
-                                    }
-                                }}
-                                options={{
-                                    folding: true,
-                                    foldingStrategy: 'indentation',
-                                }}
-                                value={workflow.definition!}
-                            />
+                                        if (value === workflow.definition) {
+                                            setDirty(false);
+                                        } else {
+                                            setDirty(true);
+                                        }
+                                    }}
+                                    onMount={(editor) => {
+                                        editor.focus();
+                                    }}
+                                    value={workflow.definition!}
+                                />
+                            </Suspense>
                         </ResizablePanel>
 
                         <ResizableHandle className="bg-muted" />

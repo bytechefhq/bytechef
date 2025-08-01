@@ -8,24 +8,20 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {MonacoEditorLoader, StandaloneCodeEditorType} from '@/shared/components/MonacoEditorWrapper';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
-import Editor from '@monaco-editor/react';
-import {editor} from 'monaco-editor';
-import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
+import {Suspense, lazy, useEffect, useState} from 'react';
 
-import React, {useEffect, useState} from 'react';
+const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
-const OutputTabSampleDataDialog = ({
-    onClose,
-    onUpload,
-    open,
-    placeholder,
-}: {
+interface OutputTabSampleDataDialogProps {
     onClose: () => void;
     onUpload: (value: string) => void;
     open: boolean;
     placeholder?: object;
-}) => {
+}
+
+const OutputTabSampleDataDialog = ({onClose, onUpload, open, placeholder}: OutputTabSampleDataDialogProps) => {
     const [value, setValue] = useState<object | undefined>();
 
     const handleEditorOnChange = (value: string | undefined) => {
@@ -40,15 +36,13 @@ const OutputTabSampleDataDialog = ({
         if (value != null) {
             try {
                 setValue(JSON.parse(value));
-
-                /* eslint-disable @typescript-eslint/no-unused-vars */
-            } catch (e) {
-                // thrown if value is not valid JSON
+            } catch (error) {
+                console.error('Invalid JSON:', error);
             }
         }
     };
 
-    const handleEditorOnMount = (editor: IStandaloneCodeEditor) => {
+    const handleEditorOnMount = (editor: StandaloneCodeEditorType) => {
         const monacoPlaceholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
 
         if (!monacoPlaceholder) {
@@ -88,13 +82,15 @@ const OutputTabSampleDataDialog = ({
 
                 <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
                     <div className="absolute inset-0">
-                        <Editor
-                            className="bg-transparent"
-                            defaultLanguage="json"
-                            onChange={handleEditorOnChange}
-                            onMount={handleEditorOnMount}
-                            value={JSON.stringify(value, null, SPACE)}
-                        />
+                        <Suspense fallback={<MonacoEditorLoader />}>
+                            <MonacoEditor
+                                className="bg-transparent"
+                                defaultLanguage="json"
+                                onChange={handleEditorOnChange}
+                                onMount={handleEditorOnMount}
+                                value={JSON.stringify(value, null, SPACE)}
+                            />
+                        </Suspense>
 
                         <div
                             className="absolute left-[70px] top-[-2px] h-full text-sm text-muted-foreground"
