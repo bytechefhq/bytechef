@@ -13,8 +13,62 @@
     "name" : "createRecord",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "additionalProperties" : null,
+          "advancedOption" : null,
+          "controlType" : "OBJECT_BUILDER",
+          "defaultValue" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : {
+            "responseType" : {
+              "contentType" : "application/json",
+              "type" : "JSON"
+            }
+          },
+          "multipleValues" : null,
+          "name" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "placeholder" : null,
+          "properties" : null,
+          "required" : null,
+          "type" : "OBJECT"
+        },
+        "placeholder" : null,
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "additionalProperties" : null,
+        "advancedOption" : null,
+        "controlType" : "OBJECT_BUILDER",
+        "defaultValue" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "exampleValue" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "label" : null,
+        "metadata" : {
+          "responseType" : {
+            "contentType" : "application/json",
+            "type" : "JSON"
+          }
+        },
+        "multipleValues" : null,
+        "name" : null,
+        "options" : null,
+        "optionsDataSource" : null,
+        "placeholder" : null,
+        "properties" : null,
+        "required" : null,
+        "type" : "OBJECT"
+      },
       "sampleOutput" : null
     },
     "perform" : null,
@@ -346,8 +400,62 @@
     "name" : "getRecord",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "additionalProperties" : null,
+          "advancedOption" : null,
+          "controlType" : "OBJECT_BUILDER",
+          "defaultValue" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : {
+            "responseType" : {
+              "contentType" : "application/json",
+              "type" : "JSON"
+            }
+          },
+          "multipleValues" : null,
+          "name" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "placeholder" : null,
+          "properties" : null,
+          "required" : null,
+          "type" : "OBJECT"
+        },
+        "placeholder" : null,
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "additionalProperties" : null,
+        "advancedOption" : null,
+        "controlType" : "OBJECT_BUILDER",
+        "defaultValue" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "exampleValue" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "label" : null,
+        "metadata" : {
+          "responseType" : {
+            "contentType" : "application/json",
+            "type" : "JSON"
+          }
+        },
+        "multipleValues" : null,
+        "name" : null,
+        "options" : null,
+        "optionsDataSource" : null,
+        "placeholder" : null,
+        "properties" : null,
+        "required" : null,
+        "type" : "OBJECT"
+      },
       "sampleOutput" : null
     },
     "perform" : null,
@@ -441,8 +549,62 @@
     "name" : "createRecord",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "additionalProperties" : null,
+          "advancedOption" : null,
+          "controlType" : "OBJECT_BUILDER",
+          "defaultValue" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : {
+            "responseType" : {
+              "contentType" : "application/json",
+              "type" : "JSON"
+            }
+          },
+          "multipleValues" : null,
+          "name" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "placeholder" : null,
+          "properties" : null,
+          "required" : null,
+          "type" : "OBJECT"
+        },
+        "placeholder" : null,
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "additionalProperties" : null,
+        "advancedOption" : null,
+        "controlType" : "OBJECT_BUILDER",
+        "defaultValue" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "exampleValue" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "label" : null,
+        "metadata" : {
+          "responseType" : {
+            "contentType" : "application/json",
+            "type" : "JSON"
+          }
+        },
+        "multipleValues" : null,
+        "name" : null,
+        "options" : null,
+        "optionsDataSource" : null,
+        "placeholder" : null,
+        "properties" : null,
+        "required" : null,
+        "type" : "OBJECT"
+      },
       "sampleOutput" : null
     },
     "properties" : [ {
@@ -772,8 +934,62 @@
     "name" : "getRecord",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "additionalProperties" : null,
+          "advancedOption" : null,
+          "controlType" : "OBJECT_BUILDER",
+          "defaultValue" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "exampleValue" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "label" : null,
+          "metadata" : {
+            "responseType" : {
+              "contentType" : "application/json",
+              "type" : "JSON"
+            }
+          },
+          "multipleValues" : null,
+          "name" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "placeholder" : null,
+          "properties" : null,
+          "required" : null,
+          "type" : "OBJECT"
+        },
+        "placeholder" : null,
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "additionalProperties" : null,
+        "advancedOption" : null,
+        "controlType" : "OBJECT_BUILDER",
+        "defaultValue" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "exampleValue" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "label" : null,
+        "metadata" : {
+          "responseType" : {
+            "contentType" : "application/json",
+            "type" : "JSON"
+          }
+        },
+        "multipleValues" : null,
+        "name" : null,
+        "options" : null,
+        "optionsDataSource" : null,
+        "placeholder" : null,
+        "properties" : null,
+        "required" : null,
+        "type" : "OBJECT"
+      },
       "sampleOutput" : null
     },
     "properties" : [ {

@@ -706,8 +706,6 @@ public class ComponentInitOpenApiGenerator {
                 builder.add(".output(outputSchema($L), sampleOutput($L))", outputSchemaCodeBlock,
                     sampleOutputCodeBlock);
             }
-        } else if (outputEntry != null && outputEntry.isDynamic()) {
-            builder.add(".output()");
         }
 
         return builder.build();
@@ -1438,32 +1436,19 @@ public class ComponentInitOpenApiGenerator {
             }
         }
 
-        if (apiResponse != null) {
-            if (apiResponse.getContent() != null) {
-                Content content = apiResponse.getContent();
+        if (apiResponse != null && apiResponse.getContent() != null) {
+            Content content = apiResponse.getContent();
 
-                Set<Map.Entry<String, MediaType>> entries = content.entrySet();
+            Set<Map.Entry<String, MediaType>> entries = content.entrySet();
 
-                if (!entries.isEmpty()) {
-                    String mimeType = getMimeType(entries);
+            if (!entries.isEmpty()) {
+                String mimeType = getMimeType(entries);
 
-                    MediaType mediaType = content.get(mimeType);
+                MediaType mediaType = content.get(mimeType);
 
-                    outputEntry = new OutputEntry(
-                        getOutputSchemaCodeBlock(mimeType, mediaType),
-                        getSampleOutputCodeBlock(mediaType.getExample()),
-                        false);
-                }
-            } else if (apiResponse.getContent() == null && apiResponse.getExtensions() != null) {
-                Map<String, Object> extensions = apiResponse.getExtensions();
-
-                if (extensions != null) {
-                    Object dynamicOutput = extensions.get("x-dynamic-output");
-
-                    if (dynamicOutput.equals(true)) {
-                        outputEntry = new OutputEntry(null, null, true);
-                    }
-                }
+                outputEntry = new OutputEntry(
+                    getOutputSchemaCodeBlock(mimeType, mediaType),
+                    getSampleOutputCodeBlock(mediaType.getExample()));
             }
         }
 
@@ -2442,7 +2427,7 @@ public class ComponentInitOpenApiGenerator {
         }
     }
 
-    private record OutputEntry(CodeBlock outputSchemaCodeBlock, CodeBlock sampleOutputCodeBlock, boolean isDynamic) {
+    private record OutputEntry(CodeBlock outputSchemaCodeBlock, CodeBlock sampleOutputCodeBlock) {
     }
 
     private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType, String mimeType) {
