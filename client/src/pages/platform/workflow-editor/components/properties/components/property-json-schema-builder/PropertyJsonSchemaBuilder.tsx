@@ -6,7 +6,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import PropertyJsonSchemaBuilderSheet from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilderSheet';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import React, {ReactNode, forwardRef, useState} from 'react';
+import {ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyJsonSchemaBuilderProps {
