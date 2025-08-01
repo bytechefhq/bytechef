@@ -44,7 +44,7 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class AiCopilotImpl implements AiCopilot {
 
-    private static final String MESSAGE_ROUTE = "message";
+    private static final String MESSAGE_ROUTE = "other";
     private static final Map<String, String> ROUTES = Map.of(
         "workflow",
         "The prompt contains some kind of workflow or the user asks you to create, add or modify something.",
@@ -54,12 +54,15 @@ public class AiCopilotImpl implements AiCopilot {
         Return your response in a JSON format in a similar structure to the Workflows in the context.
 
         Workflow Building Rules:
-        - Use the "structure" to build the workflow according to instructions
-        - Use the "output" to understand available variables from previous components
+        - Use the structure inside "structure" to build the workflow according to the Workflow Prompt
+        - Use the attributes inside "output" to understand available variables from previous components
+        - Put tasks where "parentTaskName" is not null into a component with "task_type"=flow, according to their "parentTaskName" and according to the given Workflow Prompt
+        - Do not put "parentTaskName" or "task_type" as attributes into the workflow
 
-        Using Flows:
+        Using Flow Task Type Components:
         - If task involves conditional logic, use condition/v1 flow
         - If task involves iteration/looping, use loop/v1 flow
+        - If a flow task type component already exists in components that matches this task's requirements, do NOT create a new one
 
         Using References:
         - When referencing previous component outputs in parameters, use the format: $\\{componentName.outputProperty\\}
@@ -67,18 +70,43 @@ public class AiCopilotImpl implements AiCopilot {
         - For nested objects, use: $\\{componentName.outputProperty.nestedProperty\\}
 
         Handling Missing Components:
-        - If task.type is "trigger" and task.structure.type is "missing/v1/missing", don't put any trigger
-        - If task.type is "action" and task.structure.type is "missing/v1/missing", pass the missing Component
+        - If component.type is "trigger" and component.structure.type is "missing/v1/missing", don't put any trigger
+        - If component.type is "action" and component.structure.type is "missing/v1/missing", pass the missing Component
+
+        Return your response in this JSON format:
+        \\{
+          "label": "Workflow label",
+          "description": "Workflow description",
+          "inputs": [],
+          "triggers": [],
+          "tasks": []
+        \\}
         """;
-    private static final String WORKFLOW_EDITOR_PROMPT = """
-        Merge all the component.structure according to instructions. Only use components that are provided in this prompt.
-
-        instructions:
-        {task_analysis}
-
+    private static final String WORKFLOW_EDITOR_USER_PROMPT = """
         components:
         {task_list}
+
+        Workflow Prompt:
+        {task_analysis}
+
+        Build a workflow using component.structure using the instructions from the Workflow Prompt and component.parentTaskName.
+        Provide it in a JSON format similar structure to the Workflows in the context.
+        Only use components that are provided in this prompt.
         """;
+    private static final String WORKFLOW_CHECKER_USER_PROMPT = """
+        Workflow:
+        {workflow}
+        Prompt:
+        {message}
+
+        Check the provided workflow and correct any mistakes:
+        1. Check if the Workflow displays what the prompt describes
+        2. Check if the Workflow has the correct structure (similar to the one in the context)
+
+        If the Workflow correctly follows these guidelines, return it unmodified. If it doesn't, modify it.
+        Return only the JSON.
+    """;
+
     private static final String WORKFLOW_ROUTE = "workflow";
     private static final String USER_PROMPT = """
         Current workflow:
@@ -123,6 +151,7 @@ public class AiCopilotImpl implements AiCopilot {
             .searchRequest(
                 SearchRequest.builder()
                     .filterExpression("category == 'workflows'")
+                    .topK(6)
                     .build())
             .build();
 
@@ -186,11 +215,11 @@ public class AiCopilotImpl implements AiCopilot {
                     String definition = chatClientWorkflow.prompt()
                         .system(WORKFLOW_EDITOR_SYSTEM_PROMPT)
                         .user(user -> user
-                            .text(WORKFLOW_EDITOR_PROMPT)
+                            .text(WORKFLOW_EDITOR_USER_PROMPT)
                             .param("task_analysis", process.analysis())
                             .param("task_list", process.workerResponses()))
                         .advisors(advisor -> advisor.param(
-                            ChatMemory.CONVERSATION_ID, conversationId))
+                            ChatMemory.CONVERSATION_ID, workflow.getId())) //conversationId
                         .call()
                         .content();
 
@@ -205,6 +234,21 @@ public class AiCopilotImpl implements AiCopilot {
                             .replace("```json", "")
                             .replace("```", "");
 
+                        String finalDefinition = definition;
+
+                        definition = chatClientWorkflow.prompt()
+                            .system(WORKFLOW_EDITOR_SYSTEM_PROMPT)
+                            .user(user -> user
+                                .text(WORKFLOW_CHECKER_USER_PROMPT)
+                                .param("message", process.analysis())
+                                .param("workflow", finalDefinition))
+                            .call()
+                            .content();
+
+//                        System.out.println("Before:");
+//                        System.out.println(finalDefinition);
+//                        System.out.println("After:");
+//                        System.out.println(definition);
                         workflowService.update(workflow.getId(), definition, workflow.getVersion());
 
                         result = Map.of(
