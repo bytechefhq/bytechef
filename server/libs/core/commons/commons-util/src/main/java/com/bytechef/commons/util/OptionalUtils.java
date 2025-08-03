@@ -24,8 +24,12 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.Validate;
 
 /**
+ * This class is marked as {@code @Deprecated}, and its usage is discouraged in favor of native {@code Optional} methods
+ * and best practices.
+ *
  * @author Ivica Cardic
  */
+@Deprecated
 public final class OptionalUtils {
 
     private OptionalUtils() {
