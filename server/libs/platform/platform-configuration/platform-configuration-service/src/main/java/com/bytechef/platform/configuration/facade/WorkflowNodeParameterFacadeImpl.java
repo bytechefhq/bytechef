@@ -682,32 +682,53 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, ?> getClusterElementMap(
         String clusterElementTypeName, String clusterElementWorkflowNodeName, Map<String, ?> taskMap) {
 
-        Map<String, ?> clusterElementsMap = (Map<String, ?>) taskMap.get(WorkflowExtConstants.CLUSTER_ELEMENTS);
-        clusterElementTypeName = clusterElementTypeName.toLowerCase();
+        return getClusterElementMap(clusterElementTypeName, clusterElementWorkflowNodeName, taskMap, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, ?> getClusterElementMap(
+        String clusterElementTypeName, String clusterElementWorkflowNodeName, Map<String, ?> taskMap,
+        boolean nullCheck) {
 
         Map<String, ?> clusterElementMap = null;
+        Map<String, Map<String, ?>> clusterElementsMap =
+            (Map<String, Map<String, ?>>) taskMap.get(WorkflowExtConstants.CLUSTER_ELEMENTS);
 
-        if (clusterElementsMap.get(clusterElementTypeName) instanceof Map<?, ?> map) {
-            clusterElementMap = (Map<String, ?>) map;
-        } else if (clusterElementsMap.get(clusterElementTypeName) instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    String name = (String) map.get(WorkflowConstants.NAME);
+        for (Map.Entry<String, ?> entry : clusterElementsMap.entrySet()) {
+            if (clusterElementTypeName.equalsIgnoreCase(entry.getKey())) {
+                if (entry.getValue() instanceof Map<?, ?> map) {
+                    clusterElementMap = (Map<String, ?>) map;
+                } else if (entry.getValue() instanceof List<?> list) {
+                    for (Object item : list) {
+                        if (item instanceof Map<?, ?> map) {
+                            String name = (String) map.get(WorkflowConstants.NAME);
 
-                    if (name.equals(clusterElementWorkflowNodeName)) {
-                        clusterElementMap = (Map<String, ?>) map;
+                            if (name.equals(clusterElementWorkflowNodeName)) {
+                                clusterElementMap = (Map<String, ?>) map;
 
-                        break;
+                                break;
+                            }
+                        }
                     }
                 }
+            } else {
+                Map<String, ?> map = (Map<String, ?>) entry.getValue();
+
+                if (map != null && map.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
+                    clusterElementMap = getClusterElementMap(
+                        clusterElementTypeName, clusterElementWorkflowNodeName, map, false);
+                }
+            }
+
+            if (clusterElementMap != null) {
+                break;
             }
         }
 
-        if (clusterElementMap == null) {
+        if (nullCheck && clusterElementMap == null) {
             throw new ConfigurationException(
                 "Cluster element with name: %s does not exist".formatted(clusterElementWorkflowNodeName),
                 WorkflowErrorType.CLUSTER_ELEMENT_NOT_FOUND);
