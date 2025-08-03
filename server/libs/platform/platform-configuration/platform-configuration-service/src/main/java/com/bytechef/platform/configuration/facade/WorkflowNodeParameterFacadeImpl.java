@@ -150,8 +150,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     public DisplayConditionResultDTO getClusterElementDisplayConditions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName) {
-        Map<String, Boolean> displayConditionMap = new HashMap<>();
 
+        Map<String, Boolean> displayConditionMap = new HashMap<>();
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
