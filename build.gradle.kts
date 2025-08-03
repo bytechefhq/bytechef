@@ -4,6 +4,18 @@ plugins {
     id("jacoco-report-aggregation")
     id("jvm-test-suite")
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
+    id("io.spring.dependency-management")
+}
+
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    }
 }
 
 versionCatalogUpdate {
