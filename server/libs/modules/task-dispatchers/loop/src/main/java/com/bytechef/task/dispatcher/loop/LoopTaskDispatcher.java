@@ -78,16 +78,16 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @Override
     public void dispatch(TaskExecution taskExecution) {
         boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
-        List<WorkflowTask> iterateeWorkflowTasks =
-            MapUtils.getRequiredList(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
-        List<?> list = MapUtils.getList(taskExecution.getParameters(), ITEMS, Collections.emptyList());
+        List<WorkflowTask> iterateeWorkflowTasks = MapUtils.getRequiredList(
+            taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
+        List<?> items = MapUtils.getList(taskExecution.getParameters(), ITEMS, Collections.emptyList());
 
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (loopForever || !list.isEmpty()) {
+        if (loopForever || !items.isEmpty()) {
             TaskExecution subTaskExecution = TaskExecution.builder()
                 .jobId(taskExecution.getJobId())
                 .parentId(taskExecution.getId())
@@ -103,8 +103,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             Map<String, Object> workflowTaskNameMap = new HashMap<>();
 
-            if (!list.isEmpty()) {
-                workflowTaskNameMap.put(ITEM, list.getFirst());
+            if (!items.isEmpty()) {
+                workflowTaskNameMap.put(ITEM, items.getFirst());
             }
 
             workflowTaskNameMap.put(INDEX, 0);
