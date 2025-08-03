@@ -687,6 +687,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String clusterElementTypeName, String clusterElementWorkflowNodeName, Map<String, ?> taskMap) {
 
         Map<String, ?> clusterElementsMap = (Map<String, ?>) taskMap.get(WorkflowExtConstants.CLUSTER_ELEMENTS);
+        clusterElementTypeName = clusterElementTypeName.toLowerCase();
 
         Map<String, ?> clusterElementMap = null;
 
