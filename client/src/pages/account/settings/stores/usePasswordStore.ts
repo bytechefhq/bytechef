@@ -1,5 +1,6 @@
 /* eslint-disable sort-keys */
 
+import {getCookie} from '@/shared/util/cookie-utils';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -16,6 +17,7 @@ const fetchChangePassword = async (data: string): Promise<Response> => {
         body: data,
         headers: {
             'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
         },
         method: 'POST',
     }).then((response) => response);
