@@ -170,6 +170,82 @@ public class ExampleComponentHandler implements ComponentHandler {
 ### Method Chaining
 - Avoid method chaining except when the builder pattern is applicable
 
+### Spring Boot Best Practices
+
+1. **Prefer Constructor Injection over Field/Setter Injection**
+   - Declare all mandatory dependencies as `final` fields and inject them through the constructor
+   - Spring will auto-detect if there is only one constructor, no need to add `@Autowired`
+   - Constructor injection ensures proper initialization and enables easier unit testing
+
+2. **Prefer package-private over public for Spring components**
+   - Declare Controllers, `@Configuration` classes and `@Bean` methods with default (package-private) visibility whenever possible
+   - Reinforces encapsulation while still allowing Spring's classpath scanning to work
+
+3. **Organize Configuration with Typed Properties**
+   - Group application-specific configuration properties with a common prefix
+   - Bind them to `@ConfigurationProperties` classes with validation annotations
+   - Prefer environment variables instead of profiles for different environments
+
+4. **Define Clear Transaction Boundaries**
+   - Define each Service-layer method as a transactional unit
+   - Annotate query-only methods with `@Transactional(readOnly = true)`
+   - Annotate data-modifying methods with `@Transactional`
+   - Keep transactions as brief as possible
+
+5. **Disable Open Session in View Pattern**
+   - Set `spring.jpa.open-in-view=false` in application properties
+   - Prevents N+1 select problems and forces explicit fetching strategies
+
+6. **Separate Web Layer from Persistence Layer**
+   - Don't expose entities directly as responses in controllers
+   - Define explicit request and response record (DTO) classes
+   - Apply Jakarta Validation annotations on request records
+
+7. **Follow REST API Design Principles**
+   - Use versioned, resource-oriented URLs: `/api/v{version}/resources`
+   - Consistent patterns for collections and sub-resources
+   - Use `ResponseEntity<T>` for explicit HTTP status codes
+   - Use pagination for unbounded collections
+   - Use snake_case or camelCase consistently in JSON
+
+8. **Use Command Objects for Business Operations**
+   - Create purpose-built command records (e.g., `CreateOrderCommand`) to wrap input data
+   - Clearly communicates expected input data to callers
+
+9. **Centralize Exception Handling**
+   - Use `@ControllerAdvice` or `@RestControllerAdvice` with `@ExceptionHandler` methods
+   - Return consistent error responses using ProblemDetails format (RFC 9457)
+
+10. **Actuator Security**
+    - Expose only essential actuator endpoints (`/health`, `/info`, `/metrics`) without authentication
+    - Secure all other actuator endpoints
+
+11. **Internationalization with ResourceBundles**
+    - Externalize all user-facing text into ResourceBundles rather than embedding in code
+    - Enables proper localization support
+
+12. **Use Testcontainers for Integration Tests**
+    - Spin up real services (databases, message brokers) in integration tests
+    - Use specific Docker image versions, not `latest` tag
+
+13. **Use Random Port for Integration Tests**
+    - Annotate test classes with `@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)`
+    - Avoids port conflicts in CI/CD environments
+
+14. **Integration Test Naming Convention**
+    - All integration test classes must end with "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`)
+    - Ensures consistency and clarity between unit tests and integration tests
+
+15. **Logging Best Practices**
+    - Use SLF4J logging framework, never `System.out.println()`
+    - Protect sensitive data - no credentials or personal information in logs
+    - Guard expensive log calls with level checks or suppliers:
+    ```java
+    if (logger.isDebugEnabled()) {
+        logger.debug("Detailed state: {}", computeExpensiveDetails());
+    }
+    ```
+
 ## Access and Authentication
 
 ### Development Login Credentials
