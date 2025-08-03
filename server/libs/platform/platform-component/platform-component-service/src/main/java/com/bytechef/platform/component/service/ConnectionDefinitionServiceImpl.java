@@ -468,12 +468,21 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     /**
+     * Constructs the default refresh function for OAuth token refresh handling. This function generates a POST request
+     * to the OAuth provider's token endpoint using the provided client ID, client secret, refresh token, and grant
+     * type. The response is processed to retrieve the new access token, refresh token, and expiration time if
+     * available. If the token refresh attempt fails, appropriate exceptions are thrown to handle errors.
      *
-     * @param clientIdFunction
-     * @param clientSecretFunction
-     * @param refreshTokenFunction
-     * @param refreshUrlFunction
-     * @return
+     * @param clientIdFunction     a function that retrieves the client ID using the connection parameters and context
+     * @param clientSecretFunction a function that retrieves the client secret using the connection parameters and
+     *                             context
+     * @param refreshTokenFunction a function that retrieves the refresh token using the connection parameters and
+     *                             context
+     * @param refreshUrlFunction   a function that retrieves the refresh token URL using the connection parameters and
+     *                             context
+     * @return a {@code RefreshFunction} that executes the defined behavior for refreshing an OAuth token
+     * @throws ConfigurationException if the token refresh attempt fails due to HTTP errors or unexpected response
+     *                                content
      */
     private static RefreshFunction getDefaultRefreshFunction(
         ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
