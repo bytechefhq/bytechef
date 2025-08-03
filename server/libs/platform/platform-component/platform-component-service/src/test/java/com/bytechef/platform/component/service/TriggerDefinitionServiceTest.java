@@ -16,13 +16,109 @@
 
 package com.bytechef.platform.component.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.PollFunction;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.exception.ProviderException;
+import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.trigger.TriggerOutput;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(MockitoExtension.class)
 public class TriggerDefinitionServiceTest {
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private ComponentDefinitionRegistry componentDefinitionRegistry;
+
+    @Test
+    public void testExecutePollingTrigger() {
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
+
+        PollFunction mockPollFunction =
+            (inputParameters, connectionParameters, closureParameters, context) -> new PollOutput(
+                List.of("Test Record"), Map.of("lastPolledAt", System.currentTimeMillis()), false);
+
+        when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
+        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            eventPublisher, componentDefinitionRegistry);
+
+        TriggerContext mockContext = mock(TriggerContext.class);
+
+        TriggerOutput output = triggerDefinitionService.executeTrigger(
+            "testComponent", 1, "testTrigger", Collections.emptyMap(), null, null, null, mockContext);
+
+        assertNotNull(output, "TriggerOutput should not be null");
+        assertNotNull(output.value(), "Output should not be null");
+        assertInstanceOf(List.class, output.value(), "Output should be a List");
+
+        List<?> records = (List<?>) output.value();
+
+        assertTrue(records.contains("Test Record"), "Output should contain the test record");
+
+        assertNotNull(output.state(), "Closure parameters should not be null");
+        assertTrue(((Map<?, ?>) output.state()).containsKey(
+            "lastPolledAt"), "Closure parameters should contain lastPolledAt");
+    }
+
+    @Test
+    public void testExecutePollingTriggerWithProviderException() {
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
+
+        ProviderException providerException = new ProviderException("Test provider exception");
+
+        PollFunction mockPollFunction = (inputParameters, connectionParameters, closureParameters, context) -> {
+            throw providerException;
+        };
+
+        when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
+
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            eventPublisher, componentDefinitionRegistry);
+
+        TriggerContext mockContext = mock(TriggerContext.class);
+
+        ProviderException thrownException = assertThrows(ProviderException.class, () -> {
+            triggerDefinitionService.executeTrigger(
+                "testComponent", 1, "testTrigger", Collections.emptyMap(), null, null, null, mockContext);
+        });
+
+        assertSame(
+            providerException, thrownException,
+            "The thrown exception should be the same instance as the original ProviderException");
+    }
 
     @Disabled
     @Test
