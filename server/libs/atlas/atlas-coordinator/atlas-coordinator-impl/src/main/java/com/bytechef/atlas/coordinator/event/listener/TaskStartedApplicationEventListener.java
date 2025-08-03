@@ -72,8 +72,10 @@ public class TaskStartedApplicationEventListener implements ApplicationEventList
             Job job = jobService.getTaskExecutionJob(taskExecutionId);
 
             if (taskExecution.getStatus() == Status.CANCELLED || job.getStatus() != Job.Status.STARTED) {
-                taskDispatcher.dispatch(new CancelControlTask(
-                    Validate.notNull(taskExecution.getJobId(), "id"), Validate.notNull(taskExecution.getId(), "id")));
+                taskDispatcher.dispatch(
+                    new CancelControlTask(
+                        Validate.notNull(taskExecution.getJobId(), "jobId"),
+                        Validate.notNull(taskExecution.getId(), "id")));
             } else {
                 if (taskExecution.getStartDate() == null && taskExecution.getStatus() != Status.STARTED) {
                     taskExecution.setStartDate(taskStartedApplicationEvent.getCreateDate());
