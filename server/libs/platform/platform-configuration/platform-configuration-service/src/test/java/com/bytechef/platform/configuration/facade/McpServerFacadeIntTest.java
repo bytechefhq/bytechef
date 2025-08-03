@@ -99,9 +99,7 @@ public class McpServerFacadeIntTest {
     @Test
     public void testCreateMcpComponentWithTools() {
         McpComponent mcpComponent = getMcpComponent();
-        List<McpTool> mcpTools = List.of(
-            getMcpTool("tool1"),
-            getMcpTool("tool2"));
+        List<McpTool> mcpTools = List.of(getMcpTool("tool1"), getMcpTool("tool2"));
 
         McpComponent createdComponent = mcpServerFacade.create(mcpComponent, mcpTools);
 
@@ -142,17 +140,17 @@ public class McpServerFacadeIntTest {
 
         mcpToolRepository.save(originalTool);
 
-        List<McpTool> newTools = List.of(
-            getMcpTool("new-tool1"),
-            getMcpTool("new-tool2"));
+        List<McpTool> newTools = List.of(getMcpTool("new-tool1"), getMcpTool("new-tool2"));
 
         mcpComponent.setComponentName("updated-component");
+
         McpComponent updatedComponent = mcpServerFacade.update(mcpComponent, newTools);
 
         assertThat(updatedComponent).isNotNull();
         assertThat(updatedComponent.getComponentName()).isEqualTo("test-component");
 
         List<McpTool> savedTools = mcpToolRepository.findAllByMcpComponentId(updatedComponent.getId());
+
         assertThat(savedTools).hasSize(2);
         assertThat(savedTools).extracting("name")
             .containsExactlyInAnyOrder("new-tool1", "new-tool2");
@@ -162,7 +160,9 @@ public class McpServerFacadeIntTest {
     public void testDeleteMcpComponent() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
         McpTool mcpTool = getMcpTool("test-tool");
+
         mcpTool.setMcpComponentId(mcpComponent.getId());
+
         mcpToolRepository.save(mcpTool);
 
         mcpServerFacade.deleteMcpComponent(Validate.notNull(mcpComponent.getId(), "id"));
@@ -222,9 +222,7 @@ public class McpServerFacadeIntTest {
 
     @Test
     public void testUpdateMcpServerTags() {
-        List<Tag> tags = List.of(
-            new Tag("tag1"),
-            new Tag("tag2"));
+        List<Tag> tags = List.of(new Tag("tag1"), new Tag("tag2"));
 
         List<Tag> savedTags = mcpServerFacade.updateMcpServerTags(mcpServer.getId(), tags);
 
