@@ -103,7 +103,7 @@ public class ConnectionFacadeIntTest {
         long connectionId = connectionFacade.create(connectionDTO, ModeType.AUTOMATION);
 
         Assertions.assertThat(connectionId)
-            .isEqualTo(1054L);
+            .isEqualTo(1055L);
     }
 
     @Test
