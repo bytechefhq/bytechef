@@ -269,9 +269,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public ConnectionDefinition getConnectionConnectionDefinition(
-        String componentName, int connectionVersion) {
-
+    public ConnectionDefinition getConnectionConnectionDefinition(String componentName, int connectionVersion) {
         return toConnectionDefinition(
             componentDefinitionRegistry.getComponentDefinitions(componentName)
                 .stream()
@@ -283,7 +281,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     return connectionDefinition.getVersion() == connectionVersion;
                 })
                 .findFirst()
-                .orElseThrow());
+                .orElseThrow(() -> new IllegalArgumentException(
+                    String.format(
+                        "Could not find connection definition for component=%s, version=%d",
+                        componentName, connectionVersion))));
     }
 
     @Override
@@ -555,8 +556,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     private static PkceFunction getDefaultPkceFunction() {
-        return (verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(verifier, challenge,
-            challengeMethod);
+        return (verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(
+            verifier, challenge, challengeMethod);
     }
 
     @SuppressWarnings("PMD.UnusedPrivateMethod")
