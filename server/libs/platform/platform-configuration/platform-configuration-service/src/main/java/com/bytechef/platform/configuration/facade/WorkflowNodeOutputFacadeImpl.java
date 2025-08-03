@@ -159,65 +159,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     @Override
     @Cacheable(value = PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE)
     public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName) {
-        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
-
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-
-        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-            if (lastWorkflowNodeName != null && Objects.equals(workflowTrigger.getName(), lastWorkflowNodeName)) {
-                break;
-            }
-
-            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTrigger));
-        }
-
-        List<WorkflowTask> workflowTasks = workflow.getTasks(lastWorkflowNodeName);
-
-        for (WorkflowTask workflowTask : workflowTasks) {
-            if (lastWorkflowNodeName != null && Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {
-                break;
-            }
-
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-            if (Objects.equals(workflowNodeType.name(), "loop")) {
-                List<WorkflowTask> childWorkflowTasks = MapUtils
-                    .getList(
-                        workflowTask.getParameters(), "iteratee", new TypeReference<Map<String, ?>>() {}, List.of())
-                    .stream()
-                    .map(WorkflowTask::new)
-                    .toList();
-
-                if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
-                    workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, false));
-                }
-            } else {
-                workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, true));
-            }
-        }
-
-        return workflowNodeOutputDTOs;
+        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName);
     }
 
     @Override
     @Cacheable(value = PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE)
     public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
-        return getPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
-            .stream()
-            .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.getSampleOutput() != null ||
-                workflowNodeOutputDTO.getVariableSampleOutput() != null)
-            .collect(
-                Collectors.toMap(
-                    WorkflowNodeOutputDTO::workflowNodeName,
-                    workflowNodeOutputDTO -> {
-                        if (workflowNodeOutputDTO.getSampleOutput() != null) {
-                            return workflowNodeOutputDTO.getSampleOutput();
-                        }
-
-                        return workflowNodeOutputDTO.getVariableSampleOutput();
-                    }));
+        return doGetPreviousWorkflowNodeSampleOutputs(workflowId, lastWorkflowNodeName);
     }
 
     @Override
@@ -301,6 +249,68 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .anyMatch(workflowTask -> Objects.equals(workflowTask.getName(), workflowNodeName));
     }
 
+    private List<WorkflowNodeOutputDTO> doGetPreviousWorkflowNodeOutputs(
+        String workflowId, String lastWorkflowNodeName) {
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
+        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            if (lastWorkflowNodeName != null && Objects.equals(workflowTrigger.getName(), lastWorkflowNodeName)) {
+                break;
+            }
+
+            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTrigger));
+        }
+
+        List<WorkflowTask> workflowTasks = workflow.getTasks(lastWorkflowNodeName);
+
+        for (WorkflowTask workflowTask : workflowTasks) {
+            if (lastWorkflowNodeName != null && Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {
+                break;
+            }
+
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+            if (Objects.equals(workflowNodeType.name(), "loop")) {
+                List<WorkflowTask> childWorkflowTasks = MapUtils
+                    .getList(
+                        workflowTask.getParameters(), "iteratee", new TypeReference<Map<String, ?>>() {}, List.of())
+                    .stream()
+                    .map(WorkflowTask::new)
+                    .toList();
+
+                if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
+                    workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, false));
+                }
+            } else {
+                workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, true));
+            }
+        }
+
+        return workflowNodeOutputDTOs;
+    }
+
+    private Map<String, ?> doGetPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
+        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
+            .stream()
+            .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.getSampleOutput() != null ||
+                workflowNodeOutputDTO.getVariableSampleOutput() != null)
+            .collect(
+                Collectors.toMap(
+                    WorkflowNodeOutputDTO::workflowNodeName,
+                    workflowNodeOutputDTO -> {
+                        if (workflowNodeOutputDTO.getSampleOutput() != null) {
+                            return workflowNodeOutputDTO.getSampleOutput();
+                        }
+
+                        return workflowNodeOutputDTO.getVariableSampleOutput();
+                    }));
+    }
+
     private ClusterElementOutputDTO getClusterElementOutputDTO(
         String workflowId, WorkflowTask workflowTask, String clusterElementTypeName,
         String clusterElementWorkflowNodeName) {
@@ -352,7 +362,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
-        Map<String, ?> outputs = getPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
+        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
@@ -473,7 +483,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             return null;
         }
 
-        Map<String, ?> outputs = getPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
+        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
@@ -507,7 +517,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             return null;
         }
 
-        Map<String, ?> outputs = getPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
+        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
