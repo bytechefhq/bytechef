@@ -308,8 +308,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId,
-        ComponentConnection connection, TriggerContext context) {
+        Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId, ComponentConnection connection,
+        TriggerContext context) {
 
         WebhookEnableFunction webhookEnableFunction = getWebhookEnableFunction(
             componentName, componentVersion, triggerName);
