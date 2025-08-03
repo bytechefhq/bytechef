@@ -24,7 +24,7 @@
     "metadata" : { },
     "minItems" : null,
     "multipleValues" : null,
-    "name" : "list",
+    "name" : "items",
     "options" : null,
     "placeholder" : null,
     "required" : null,

@@ -77,7 +77,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                         NAME, "map1",
                         TYPE, "type",
                         PARAMETERS, Map.of(
-                            "list", List.of(1, 2, 3),
+                            "items", List.of(1, 2, 3),
                             "iteratee",
                             Map.of(
                                 NAME, "name",
@@ -172,7 +172,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                                 TYPE, "map",
                                 PARAMETERS,
                                 Map.of(
-                                    "list", Arrays.asList(1, 2, 3),
+                                    "items", Arrays.asList(1, 2, 3),
                                     "iteratee",
                                     Map.of(
                                         NAME, "var",
@@ -184,7 +184,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                                 TYPE, "map",
                                 PARAMETERS,
                                 Map.of(
-                                    "list", Arrays.asList(1, 2, 3),
+                                    "items", Arrays.asList(1, 2, 3),
                                     "iteratee",
                                     Map.of(
                                         NAME, "var",
@@ -195,7 +195,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                             TYPE, "map",
                             PARAMETERS,
                             Map.of(
-                                "list", Arrays.asList(1, 2, 3),
+                                "items", Arrays.asList(1, 2, 3),
                                 "iteratee",
                                 Map.of(
                                     NAME, "var",
