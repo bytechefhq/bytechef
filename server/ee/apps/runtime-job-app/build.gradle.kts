@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-config"))

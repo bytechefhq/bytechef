@@ -16,14 +16,111 @@
 
 package com.bytechef.task.dispatcher.map;
 
-import org.junit.jupiter.api.Disabled;
+import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
+/**
+ * @author Ivica Cardic
+ */
+@TaskDispatcherIntTest
 public class MapTaskDispatcherIntTest {
 
-    @Disabled
+    private TestVarTaskHandler<List<Object>, Object> testVarTaskHandler;
+
+    @Autowired
+    protected ContextService contextService;
+
+    @Autowired
+    protected TaskExecutionService taskExecutionService;
+
+    @Autowired
+    private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
+
+    @Autowired
+    private TaskFileStorage taskFileStorage;
+
+    @BeforeEach
+    void beforeEach() {
+        testVarTaskHandler = new TestVarTaskHandler<>(
+            (valueMap, name, value) -> valueMap.computeIfAbsent(name, key -> new ArrayList<>())
+                .add(value));
+    }
+
     @Test
-    public void testDispatch() {
-        // TODO
+    public void testDispatch1() {
+        Job job = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("map_v1_1"),
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals(
+            IntStream.rangeClosed(2, 11)
+                .boxed()
+                .collect(Collectors.toList()),
+            outputs.get("map"));
+    }
+
+    @Test
+    public void testDispatch2() {
+        Job job = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("map_v1_2"),
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals(
+            IntStream.rangeClosed(1, 10)
+                .boxed()
+                .map(item1 -> IntStream.rangeClosed(1, item1)
+                    .mapToObj(item2 -> item1 + "_" + item2)
+                    .collect(Collectors.toList()))
+                .collect(Collectors.toList()),
+            outputs.get("map"));
+    }
+
+    @SuppressWarnings("PMD")
+    private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
+        CounterService counterService, TaskExecutionService taskExecutionService) {
+
+        return List.of(
+            (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
+                counterService, taskCompletionHandler, taskExecutionService, taskFileStorage));
+    }
+
+    @SuppressWarnings("PMD")
+    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
+        ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
+        TaskExecutionService taskExecutionService) {
+
+        return List.of(
+            (taskDispatcher) -> new MapTaskDispatcher(
+                contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+                taskExecutionService, taskFileStorage));
+    }
+
+    private TaskDispatcherJobTestExecutor.TaskHandlerMapSupplier getTaskHandlerMap() {
+        return () -> Map.of("var/v1/set", testVarTaskHandler);
     }
 }

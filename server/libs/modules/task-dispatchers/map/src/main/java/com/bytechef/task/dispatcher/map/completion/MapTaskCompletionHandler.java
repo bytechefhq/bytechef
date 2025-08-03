@@ -44,8 +44,8 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public MapTaskCompletionHandler(
-        TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
-        CounterService counterService, TaskFileStorage taskFileStorage) {
+        CounterService counterService, TaskCompletionHandler taskCompletionHandler,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
@@ -76,8 +76,8 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
         long subtasksLeft = counterService.decrement(Validate.notNull(taskExecution.getParentId(), "parentId"));
 
         if (subtasksLeft == 0) {
-            List<TaskExecution> childTaskExecutions = taskExecutionService
-                .getParentTaskExecutions(taskExecution.getParentId());
+            List<TaskExecution> childTaskExecutions = taskExecutionService.getParentTaskExecutions(
+                taskExecution.getParentId());
             TaskExecution mapTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
             mapTaskExecution.setEndDate(Instant.now());

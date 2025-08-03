@@ -58,8 +58,8 @@ public class MapTaskDispatcherConfiguration {
 
     @Bean("mapTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory mapTaskCompletionHandlerFactory() {
-        return (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(taskExecutionService,
-            taskCompletionHandler, counterService, taskFileStorage);
+        return (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
+            counterService, taskCompletionHandler, taskExecutionService, taskFileStorage);
     }
 
     @Bean("mapTaskDispatcherFactory_v1")

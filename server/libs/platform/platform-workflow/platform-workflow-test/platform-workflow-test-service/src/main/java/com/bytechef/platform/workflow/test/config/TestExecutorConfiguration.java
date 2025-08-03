@@ -133,8 +133,8 @@ public class TestExecutorConfiguration {
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
                 contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage),
-            (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(taskExecutionService,
-                taskCompletionHandler, counterService, taskFileStorage),
+            (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
+                counterService, taskCompletionHandler, taskExecutionService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
                 taskCompletionHandler, taskExecutionService));
     }

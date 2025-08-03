@@ -41,8 +41,10 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     private static final String TASK_EXECUTION_CACHE =
         InMemoryTaskExecutionRepository.class.getName() + ".taskExecution";
-    private static final String TASK_EXECUTIONS_CACHE =
-        InMemoryTaskExecutionRepository.class.getName() + ".taskExecutions";
+    private static final String JOB_TASK_EXECUTIONS_CACHE =
+        InMemoryTaskExecutionRepository.class.getName() + ".jobTaskExecutions";
+    private static final String PARENT_TASK_EXECUTIONS_CACHE =
+        InMemoryTaskExecutionRepository.class.getName() + ".parentTaskExecutions";
 
     private final CacheManager cacheManager;
 
@@ -51,10 +53,15 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
+    public void deleteById(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<TaskExecution> findAllByJobIdOrderByTaskNumber(long jobId) {
         Comparator<Object> comparable = Comparators.comparable();
 
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTIONS_CACHE));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
 
         return Objects
             .requireNonNull(cache.get(TenantCacheKeyUtils.getKey(jobId), () -> new ArrayList<TaskExecution>()))
@@ -64,25 +71,15 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
-    public List<TaskExecution> findAllByParentId(long parentId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void deleteById(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTIONS_CACHE));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
 
         return cache.get(TenantCacheKeyUtils.getKey(jobId), ArrayList::new);
     }
 
     @Override
     public List<TaskExecution> findAllByJobIdOrderByIdDesc(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTIONS_CACHE));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
 
         return Objects
             .requireNonNull(cache.get(TenantCacheKeyUtils.getKey(jobId), () -> new ArrayList<TaskExecution>()))
@@ -93,6 +90,16 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
                 return diff > 0 ? 1 : diff < 0 ? -1 : 0;
             })
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllByParentId(long parentId) {
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(PARENT_TASK_EXECUTIONS_CACHE));
+
+        return Objects
+            .requireNonNull(cache.get(TenantCacheKeyUtils.getKey(parentId), () -> new ArrayList<TaskExecution>()))
+            .stream()
             .toList();
     }
 
@@ -112,7 +119,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     @Override
     public Optional<TaskExecution> findLastByJobId(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTIONS_CACHE));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
 
         List<TaskExecution> taskExecutions = Validate.notNull(
             cache.get(TenantCacheKeyUtils.getKey(jobId), ArrayList::new), "taskExecutions");
@@ -138,7 +145,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             cache.put(TenantCacheKeyUtils.getKey(taskExecution.getId()), clonedTaskExecution);
 
             synchronized (cacheManager) {
-                cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTIONS_CACHE));
+                cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
                 String key = TenantCacheKeyUtils.getKey(taskExecution.getJobId());
 
                 List<TaskExecution> taskExecutions = Objects.requireNonNull(cache.get(key, ArrayList::new));
@@ -152,6 +159,23 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
                 }
 
                 cache.put(key, taskExecutions);
+
+                if (taskExecution.getParentId() != null) {
+                    cache = Objects.requireNonNull(cacheManager.getCache(PARENT_TASK_EXECUTIONS_CACHE));
+                    key = TenantCacheKeyUtils.getKey(taskExecution.getParentId());
+
+                    taskExecutions = Objects.requireNonNull(cache.get(key, ArrayList::new));
+
+                    index = taskExecutions.indexOf(clonedTaskExecution);
+
+                    if (index == -1) {
+                        taskExecutions.add(clonedTaskExecution);
+                    } else {
+                        taskExecutions.set(index, clonedTaskExecution);
+                    }
+
+                    cache.put(key, taskExecutions);
+                }
             }
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);

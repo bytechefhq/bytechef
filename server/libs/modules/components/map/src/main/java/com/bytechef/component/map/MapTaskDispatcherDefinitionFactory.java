@@ -23,8 +23,8 @@ import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDisp
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEMS;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.commons.util.MapUtils;
@@ -50,7 +50,7 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
             "Produces a new collection of values by mapping each value in list through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source list.")
         .icon("path:assets/map.svg")
         .properties(
-            array(LIST)
+            array(ITEMS)
                 .label("List of items")
                 .description("List of items to iterate over."))
         .output(MapTaskDispatcherDefinitionFactory::output)
@@ -69,7 +69,7 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
     protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
         ObjectProperty variableProperties;
 
-        List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
+        List<?> list = MapUtils.getRequiredList(inputParameters, ITEMS);
 
         if (list.isEmpty()) {
             variableProperties = object();

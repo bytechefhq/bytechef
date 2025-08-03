@@ -20,8 +20,8 @@ package com.bytechef.task.dispatcher.map;
 
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEMS;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.atlas.configuration.domain.Task;
@@ -39,10 +39,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -77,7 +74,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
+        List<?> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
         Map<String, ?> iteratee = MapUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
 
         taskExecution.setStartDate(Instant.now());
@@ -85,17 +82,17 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (list.isEmpty()) {
+        if (items.isEmpty()) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
-            counterService.set(Validate.notNull(taskExecution.getId(), "id"), list.size());
+            counterService.set(Validate.notNull(taskExecution.getId(), "id"), items.size());
 
-            for (int i = 0; i < list.size(); i++) {
-                Object item = list.get(i);
+            for (int i = 0; i < items.size(); i++) {
+                Object item = items.get(i);
                 TaskExecution iterateeTaskExecution = TaskExecution.builder()
                     .jobId(taskExecution.getJobId())
                     .parentId(taskExecution.getId())

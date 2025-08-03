@@ -1,0 +1,15 @@
+---
+label: "Map 1"
+outputs:
+- name: "map"
+  value: "${map_1}"
+tasks:
+- name: "map_1"
+  type: "map/v1"
+  parameters:
+    items: "=range(1,10)"
+    iteratee:
+      name: "sumVar1"
+      type: "var/v1/set"
+      parameters:
+        value: "=1 + map_1.item"
