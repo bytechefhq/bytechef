@@ -17,6 +17,7 @@
 package com.bytechef.mcp.server;
 
 import com.bytechef.mcp.tool.ProjectTools;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -29,6 +30,7 @@ public class McpServerConfiguration {
 
     private final ProjectTools projectTools;
 
+    @SuppressFBWarnings("EI")
     public McpServerConfiguration(ProjectTools projectTools) {
         this.projectTools = projectTools;
     }
