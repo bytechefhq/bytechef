@@ -187,15 +187,30 @@ public class ConnectionFacadeIntTest {
         List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
             null, null, List.of(), null, null, ModeType.AUTOMATION);
 
-        Assertions.assertThat(
-            CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
+        Assertions.assertThat(CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
             .isEqualTo(List.of(connection));
 
-        ConnectionDTO connectionDTO = connectionDTOs.get(0);
+        ConnectionDTO connectionDTO = connectionDTOs.getFirst();
 
         Assertions.assertThat(connectionFacade.getConnection(connection.getId()))
             .isEqualTo(connectionDTO)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
+
+        when(connectionDefinitionService.getConnectionConnectionDefinition(eq("componentName2"), eq(1)))
+            .thenThrow(new IllegalArgumentException("componentName2 not found"));
+
+        Connection connection2 = new Connection();
+
+        connection2.setComponentName("componentName2");
+        connection2.setName("name");
+        connection2.setType(ModeType.AUTOMATION);
+
+        connectionRepository.save(connection2);
+
+        connectionDTOs = connectionFacade.getConnections(null, null, List.of(), null, null, ModeType.AUTOMATION);
+
+        Assertions.assertThat(CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
+            .isEqualTo(List.of(connection));
     }
 
     @Test
