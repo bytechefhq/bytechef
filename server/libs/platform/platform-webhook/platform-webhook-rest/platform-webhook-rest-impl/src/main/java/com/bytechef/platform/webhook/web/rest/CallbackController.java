@@ -49,6 +49,7 @@ public class CallbackController {
 
         if (!parameterMap.isEmpty()) {
             sb.append('?');
+
             boolean first = true;
 
             for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
