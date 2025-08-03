@@ -16,7 +16,11 @@
 
 package com.bytechef.automation.mcp.server;
 
+import com.bytechef.platform.ai.mcp.ToolDTO;
+import com.bytechef.platform.ai.mcp.ToolFacade;
+import com.bytechef.platform.constant.Environment;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.server.transport.WebMvcSseServerTransportProvider;
@@ -24,8 +28,13 @@ import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpServerTransportProvider;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.function.RouterFunction;
@@ -37,12 +46,12 @@ import org.springframework.web.servlet.function.ServerResponse;
 @Configuration
 public class AutomationMcpServerConfiguration {
 
-//    private final ToolFacade toolFacade;
+    private final ToolFacade toolFacade;
 
-//    @SuppressFBWarnings("EI")
-//    public McpServerConfiguration(ToolFacade toolFacade) {
-//        this.toolFacade = toolFacade;
-//    }
+    @SuppressFBWarnings("EI")
+    public AutomationMcpServerConfiguration(@Qualifier("automationToolFacade") ToolFacade toolFacade) {
+        this.toolFacade = toolFacade;
+    }
 
     @Bean
     WebMvcSseServerTransportProvider webMvcSseServerTransportProvider(ObjectMapper objectMapper) {
@@ -73,26 +82,25 @@ public class AutomationMcpServerConfiguration {
     public List<ToolCallback> getToolCallbacks() {
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
-//        List<ToolDTO> toolDTOs = toolFacade.getTools();
-//
-//        for (ToolDTO toolDTO : toolDTOs) {
-//            FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
-//                .builder(toolDTO.name(), getToolCallbackFunction(toolDTO.name()))
-//                .inputType(Map.class)
-//                .inputSchema(toolDTO.parameters());
-//
-//            if (toolDTO.description() != null) {
-//                builder.description(toolDTO.description());
-//            }
-//
-//            toolCallbacks.add(builder.build());
-//        }
+        List<ToolDTO> toolDTOs = toolFacade.getTools();
+
+        for (ToolDTO toolDTO : toolDTOs) {
+            FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
+                .builder(toolDTO.name(), getToolCallbackFunction(toolDTO.name()))
+                .inputType(Map.class)
+                .inputSchema(toolDTO.parameters());
+
+            if (toolDTO.description() != null) {
+                builder.description(toolDTO.description());
+            }
+
+            toolCallbacks.add(builder.build());
+        }
 
         return toolCallbacks;
     }
 
-//    private Function<Map<String, Object>, Object> getToolCallbackFunction(String toolName) {
-//        return null;
-//        return request -> toolFacade.executeTool(toolName, request, Environment.PRODUCTION, null);
-//    }
+    private Function<Map<String, Object>, Object> getToolCallbackFunction(String toolName) {
+        return inputParameters -> toolFacade.executeTool(toolName, inputParameters, Environment.PRODUCTION);
+    }
 }
