@@ -324,7 +324,8 @@ public class ComponentDefinitionRegistry {
                 return items.getFirst();
             } else {
                 return CollectionUtils.getFirst(
-                    properties, property -> Objects.equals(propertyName, property.getName()));
+                    properties, property -> Objects.equals(propertyName, property.getName()),
+                    "Property '%s' not found in component properties".formatted(propertyName));
             }
         } else {
             String firstSubPropertyName = getFirstSubPropertyName(subProperties);

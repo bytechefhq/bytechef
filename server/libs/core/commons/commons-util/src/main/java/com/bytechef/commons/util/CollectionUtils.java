@@ -171,6 +171,17 @@ public final class CollectionUtils {
                 .findFirst());
     }
 
+    public static <T> T getFirst(Collection<T> collection, Predicate<? super T> filter, String exceptionMessage) {
+        Validate.notNull(collection, "'collection' must not be null");
+        Validate.notNull(filter, "'filter' must not be null");
+        Validate.notNull(exceptionMessage, "'exceptionMessage' must not be null");
+
+        return collection.stream()
+            .filter(filter)
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(exceptionMessage));
+    }
+
     public static <T, U> U getFirstFilter(
         Collection<T> collection, Predicate<? super T> filter, Function<? super T, ? extends U> mapper) {
 
