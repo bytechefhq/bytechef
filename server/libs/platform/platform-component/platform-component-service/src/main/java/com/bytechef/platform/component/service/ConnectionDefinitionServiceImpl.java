@@ -544,15 +544,15 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     private static String getDefaultClientId(Parameters connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.CLIENT_ID);
+        return MapUtils.getRequiredString(connectionParameters, Authorization.CLIENT_ID);
     }
 
     private static String getDefaultClientSecret(Parameters connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.CLIENT_SECRET);
+        return MapUtils.getRequiredString(connectionParameters, Authorization.CLIENT_SECRET);
     }
 
     private static String getDefaultRefreshToken(Parameters connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.REFRESH_TOKEN);
+        return MapUtils.getRequiredString(connectionParameters, Authorization.REFRESH_TOKEN);
     }
 
     private static PkceFunction getDefaultPkceFunction() {
