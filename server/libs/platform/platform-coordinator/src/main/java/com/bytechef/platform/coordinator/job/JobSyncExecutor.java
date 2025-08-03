@@ -112,8 +112,7 @@ public class JobSyncExecutor {
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
-        TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = createEventPublisher(syncMessageBroker);

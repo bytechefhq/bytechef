@@ -67,8 +67,8 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         ContextService contextService, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
-        this.evaluator = evaluator;
 
+        this.evaluator = evaluator;
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.taskDispatcher = taskDispatcher;

@@ -90,8 +90,7 @@ public class WebhookConfiguration {
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, jobService, syncMessageBroker, taskExecutionService,
                     taskFileStorage),
-                taskExecutionService, taskHandlerRegistry, taskFileStorage,
-                workflowService),
+                taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
             triggerSyncExecutor, taskFileStorage);
     }
 
@@ -120,8 +119,8 @@ public class WebhookConfiguration {
                 taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
                 counterService, taskCompletionHandler, taskExecutionService, taskFileStorage),
-            (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
-                taskCompletionHandler, taskExecutionService));
+            (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(
+                counterService, taskCompletionHandler, taskExecutionService));
     }
 
     private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(
@@ -152,8 +151,7 @@ public class WebhookConfiguration {
         return List.of(
             (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
-                contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
-                taskFileStorage),
+                contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new EachTaskDispatcher(

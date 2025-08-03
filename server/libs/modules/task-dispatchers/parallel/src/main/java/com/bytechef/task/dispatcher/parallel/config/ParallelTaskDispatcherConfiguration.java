@@ -52,14 +52,13 @@ public class ParallelTaskDispatcherConfiguration {
 
     @Bean("parallelTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory parallelTaskCompletionHandlerFactory() {
-        return (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
-            taskCompletionHandler, taskExecutionService);
+        return (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(
+            counterService, taskCompletionHandler, taskExecutionService);
     }
 
     @Bean("parallelTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory parallelTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ParallelTaskDispatcher(
-            contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
-            taskFileStorage);
+            contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage);
     }
 }
