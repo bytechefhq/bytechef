@@ -93,8 +93,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     public ClusterElementDefinition getClusterElementDefinition(
         String componentName, int componentVersion, String clusterElementName) {
 
-        ComponentClusterElementDefinitionResult result =
-            getComponentClusterElementDefinition(componentName, componentVersion, clusterElementName);
+        ComponentClusterElementDefinitionResult result = getComponentClusterElementDefinition(
+            componentName, componentVersion, clusterElementName);
 
         return new ClusterElementDefinition(
             result.clusterElementDefinition, result.componentDefinition.getName(), componentVersion,
