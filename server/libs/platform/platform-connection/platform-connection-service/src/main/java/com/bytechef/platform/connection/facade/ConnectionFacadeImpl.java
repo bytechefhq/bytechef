@@ -46,6 +46,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +57,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ConnectionFacadeImpl implements ConnectionFacade {
+
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionFacadeImpl.class);
 
     private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
@@ -89,8 +93,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
 
             AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
-                connection.getComponentName(), connection.getConnectionVersion(),
-                connection.getAuthorizationType());
+                connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationType());
 
             if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
                 authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
@@ -104,6 +107,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                         oAuth2Service.getRedirectUri());
 
                 connection.putAllParameters(authorizationCallbackResponse.result());
+
+                if (logger.isWarnEnabled() && !connection.containsParameter(Authorization.REFRESH_TOKEN)) {
+                    logger.warn(
+                        "OAuth2 authorization code connection for component {} does not contain refresh token",
+                        connection.getComponentName());
+                }
             }
         }
 
