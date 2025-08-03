@@ -275,7 +275,15 @@ Access the application at http://localhost:8080
     **Explanation:**
     - **Avoid conflicts in CI/CD:** In your CI/CD environment, there can be multiple builds running in parallel on the same server/agent. In such cases, it is better to run the integration tests using a random available port rather than a fixed port to avoid port conflicts.
 
-14. **Logging**
+14. **Integration Test Class Naming Convention**
+    - All integration test classes must end with the "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`, `ConnectionServiceIntTest.java`).
+
+    **Explanation:**
+    - **Consistency and clarity:** Using a standard suffix makes it immediately clear which tests are integration tests versus unit tests.
+    - **Build configuration:** Many build tools and CI/CD pipelines can be configured to run specific test types based on naming patterns, making it easier to separate integration tests from unit tests during the build process.
+    - **Developer experience:** Consistent naming helps developers quickly identify the purpose and scope of test classes.
+
+15. **Logging**
     - **Use a proper logging framework.**  
       Never use `System.out.println()` for application logging. Rely on SLF4J (or a compatible abstraction) and your chosen backend (Logback, Log4j2, etc.).
 
