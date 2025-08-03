@@ -84,35 +84,6 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar1"));
     }
 
-    private void assertNoTaskErrors(Job job) {
-        if (job.getId() == null) {
-            Assertions.fail("Job must not be null");
-
-            return;
-        }
-
-        List<ExecutionError> executionErrors = taskDispatcherJobTestExecutor.getExecutionErrors(
-            Validate.notNull(job.getId(), "id"));
-
-        if (!executionErrors.isEmpty()) {
-            StringBuilder stringBuilder = new StringBuilder();
-
-            executionErrors.stream()
-                .forEachOrdered(executionError -> {
-                    stringBuilder.append(executionError.getMessage());
-                    stringBuilder.append(System.lineSeparator());
-
-                    executionError.getStackTrace()
-                        .forEach(s -> {
-                            stringBuilder.append(s);
-                            stringBuilder.append(System.lineSeparator());
-                        });
-                });
-
-            Assertions.fail(stringBuilder.toString());
-        }
-    }
-
     @Test
     public void testDispatch2() {
         taskDispatcherJobTestExecutor.execute(
@@ -182,6 +153,35 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar2"));
     }
 
+    private void assertNoTaskErrors(Job job) {
+        if (job.getId() == null) {
+            Assertions.fail("Job must not be null");
+
+            return;
+        }
+
+        List<ExecutionError> executionErrors = taskDispatcherJobTestExecutor.getExecutionErrors(
+            Validate.notNull(job.getId(), "id"));
+
+        if (!executionErrors.isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            executionErrors
+                .forEach(executionError -> {
+                    stringBuilder.append(executionError.getMessage());
+                    stringBuilder.append(System.lineSeparator());
+
+                    executionError.getStackTrace()
+                        .forEach(s -> {
+                            stringBuilder.append(s);
+                            stringBuilder.append(System.lineSeparator());
+                        });
+                });
+
+            Assertions.fail(stringBuilder.toString());
+        }
+    }
+
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         CounterService counterService, TaskExecutionService taskExecutionService) {
@@ -197,8 +197,8 @@ public class LoopTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ApplicationEventPublisher eventPublisher, ContextService contextService,
-        CounterService counterService, TaskExecutionService taskExecutionService) {
+        ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
+        TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(

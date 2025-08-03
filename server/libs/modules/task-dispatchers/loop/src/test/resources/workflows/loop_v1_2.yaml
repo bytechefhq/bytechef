@@ -1,8 +1,5 @@
 ---
 label: "loop 2"
-outputs:
-- name: "sumResult"
-  value: "${sumResult}"
 tasks:
 - name: "loop_1"
   type: "loop/v1"
