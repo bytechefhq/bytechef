@@ -28,7 +28,9 @@ export default defineConfig({
             external: ['react', 'react-dom', 'react/jsx-runtime'],
             // https://rollupjs.org/configuration-options/#input
             input: Object.fromEntries(
-                globSync(['src/components/**/index.tsx', 'src/main.ts']).map((file) => {
+                globSync(['src/components/**/index.{ts,tsx}', 'src/main.ts'])
+                    .filter((file) => !file.includes('.test.'))
+                    .map((file) => {
                     // This remove `src/` as well as the file extension from each
                     // file, so e.g. src/nested/foo.js becomes nested/foo
                     const entryName = path.relative('src', file.slice(0, file.length - path.extname(file).length));
@@ -43,8 +45,7 @@ export default defineConfig({
                 assetFileNames: 'assets/[name][extname]',
                 globals: {
                     react: 'React',
-                    'react-dom': 'React-dom',
-                    'react/jsx-runtime': 'react/jsx-runtime',
+                    'react-dom': 'ReactDOM',
                 },
             },
         },
