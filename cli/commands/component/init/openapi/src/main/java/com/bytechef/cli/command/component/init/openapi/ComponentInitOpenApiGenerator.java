@@ -677,6 +677,10 @@ public class ComponentInitOpenApiGenerator {
 
         CodeBlock.Builder metadataBuilder = getMetadataBuilder(operationItem, method, propertiesEntry);
 
+        if (outputEntry != null && outputEntry.isDynamic) {
+            metadataBuilder.add(outputEntry.outputSchemaCodeBlock());
+        }
+
         builder.add(
             """
                 action($S)
@@ -699,15 +703,15 @@ public class ComponentInitOpenApiGenerator {
         CodeBlock outputSchemaCodeBlock = outputEntry == null ? null : outputEntry.outputSchemaCodeBlock();
         CodeBlock sampleOutputCodeBlock = outputEntry == null ? null : outputEntry.sampleOutputCodeBlock();
 
-        if (outputSchemaCodeBlock != null && !outputSchemaCodeBlock.isEmpty()) {
+        if (outputEntry != null && outputEntry.isDynamic) {
+            builder.add(".output()");
+        } else if (outputSchemaCodeBlock != null && !outputSchemaCodeBlock.isEmpty()) {
             if (sampleOutputCodeBlock == null || sampleOutputCodeBlock.isEmpty()) {
                 builder.add(".output(outputSchema($L))", outputSchemaCodeBlock);
             } else {
                 builder.add(".output(outputSchema($L), sampleOutput($L))", outputSchemaCodeBlock,
                     sampleOutputCodeBlock);
             }
-        } else if (outputEntry != null && outputEntry.isDynamic()) {
-            builder.add(".output()");
         }
 
         return builder.build();
@@ -1358,6 +1362,7 @@ public class ComponentInitOpenApiGenerator {
                 propertiesEntry.bodyContentType,
                 propertiesEntry.mimeType);
         }
+
         return metadataBuilder;
     }
 
@@ -1439,7 +1444,40 @@ public class ComponentInitOpenApiGenerator {
         }
 
         if (apiResponse != null) {
-            if (apiResponse.getContent() != null) {
+            if (apiResponse.getExtensions() != null) {
+                Map<String, Object> extensions = apiResponse.getExtensions();
+
+                if (extensions != null) {
+                    Object dynamicOutput = extensions.get("x-dynamic-output");
+
+                    if (dynamicOutput.equals(true)) {
+
+                        Content content = apiResponse.getContent();
+
+                        Set<Map.Entry<String, MediaType>> entries = content.entrySet();
+
+                        if (!entries.isEmpty()) {
+                            String mimeType = getMimeType(entries);
+                            String responseType = switch (mimeType) {
+                                case "application/json" -> "JSON";
+                                case "application/xml" -> "XML";
+                                case "application/octet-stream" -> "BINARY";
+                                default -> "TEXT";
+                            };
+
+                            CodeBlock.Builder codeBlock = CodeBlock.builder();
+
+                            codeBlock.add(
+                                """
+                                    ,"responseType", ResponseType.$L
+                                    """,
+                                responseType);
+
+                            outputEntry = new OutputEntry(codeBlock.build(), null, true);
+                        }
+                    }
+                }
+            } else if (apiResponse.getExtensions() == null && apiResponse.getContent() != null) {
                 Content content = apiResponse.getContent();
 
                 Set<Map.Entry<String, MediaType>> entries = content.entrySet();
@@ -1453,16 +1491,6 @@ public class ComponentInitOpenApiGenerator {
                         getOutputSchemaCodeBlock(mimeType, mediaType),
                         getSampleOutputCodeBlock(mediaType.getExample()),
                         false);
-                }
-            } else if (apiResponse.getContent() == null && apiResponse.getExtensions() != null) {
-                Map<String, Object> extensions = apiResponse.getExtensions();
-
-                if (extensions != null) {
-                    Object dynamicOutput = extensions.get("x-dynamic-output");
-
-                    if (dynamicOutput.equals(true)) {
-                        outputEntry = new OutputEntry(null, null, true);
-                    }
                 }
             }
         }
