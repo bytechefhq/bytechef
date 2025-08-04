@@ -1,0 +1,166 @@
+---
+title: "Jenkins"
+description: "Jenkins is leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project."
+---
+
+
+Categories: Developer Tools
+
+
+Type: jenkins/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### basic_auth
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING | Jenkins username. | true |
+| password | API Token | STRING | Jenkins API token. | true |
+| baseUri | Base URI | STRING | Complete base URI of your jenkins server. | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Job
+Name: createJob
+
+`Creates a new job.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | Name of the job. | true |
+| configXml | Config XML | STRING | Content of the config.xml file. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Job",
+  "name" : "createJob",
+  "parameters" : {
+    "name" : "",
+    "configXml" : ""
+  },
+  "type" : "jenkins/v1/createJob"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+## Triggers
+
+
+### New Job Status Notification
+Name: newJobStatusNotification
+
+`Triggers when job statuses are changed.`
+
+Type: STATIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | Name of the Jenkins job. |
+| display_name | STRING | Display name of the Jenkins job. |
+| url | STRING | URL of the Jenkins job. |
+| build | OBJECT <details> <summary> Properties </summary> &#123;STRING\(full_url), INTEGER\(number), INTEGER\(queue_id), NUMBER\(timestamp), INTEGER\(duration), STRING\(phase), STRING\(url), &#123;[]\(changes), []\(culprits)&#125;\(scm), STRING\(log), STRING\(notes), &#123;&#125;\(artifacts)&#125; </details> | Jenkins job build. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Job Status Notification",
+  "name" : "newJobStatusNotification",
+  "type" : "jenkins/v1/newJobStatusNotification"
+}
+```
+
+
+<hr />
+
+
+<hr />
+
+# Additional instructions
+
+## Connection Setup
+
+### Create Jenkins API Token
+
+1. Click on **Manage Jenkins** icon.
+2. Click on **Users**.
+3. Click this icon on the user you want to create the API token for.
+4. Click on **Security**.
+5. Click on **Add new token**.
+6. Enter name of the token and then click on **Generate**.
+7. Copy token, you will not be able to see the whole token again.
+8. Click on **Done**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/152dd033-4f42-4501-88cc-e6a5a4a2d4e2?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowfullscreen frameborder="0"></iframe>
+</div>
+
+## Trigger Setup
+
+### Enable Notification Plugin
+
+1. Click this icon.
+2. Click on **Plugins**.
+3. Click on **Available plugins**.
+4. Search for **notification**.
+5. Click on **Notification** from **Tikal Knowledge**. [Notification plugin link](https://plugins.jenkins.io/notification/)
+6. Click here.
+7. Click on **Install**.
+8. Wait for everything to finish downloading.
+9. Click on **Go back to the top page**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/ef274d47-9a11-4394-afde-2b93679f73b2?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowfullscreen frameborder="0"></iframe>
+</div>
+
+### Trigger URL Setup
+
+1. Select Jenkins job to which you want to connect the trigger to.
+2. Click this **Configure**.
+3. Click on **Add Endpoint**.
+4. Paste Webhook URL. See [Deploy documentation](https://docs.bytechef.io/automation/deploy) on how to get Webhook URL.
+5. Click on **Save**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/41f291bd-ac7c-4cec-af6b-c5922be20ac0?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowfullscreen frameborder="0"></iframe>
+</div>
