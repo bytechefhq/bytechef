@@ -3,9 +3,9 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Input} from '@/components/ui/input';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import DialogLoader from '@/shared/components/DialogLoader';
 import {TriggerType} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
@@ -17,17 +17,16 @@ import {
     useGetWorkflowNodeOutputQuery,
 } from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useCheckWorkflowNodeTestOutputExistsQuery} from '@/shared/queries/platform/workflowNodeTestOutputs.queries';
-import {NodeDataType, PropertyAllType} from '@/shared/types';
-import {CaretDownIcon} from '@radix-ui/react-icons';
+import {NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {AlertCircleIcon, ClipboardIcon, PenIcon} from 'lucide-react';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {AlertCircleIcon, ClipboardIcon} from 'lucide-react';
+import {Suspense, lazy, useCallback, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import PropertyField from '../../PropertyField';
-import SchemaProperties from '../../SchemaProperties';
-import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
+const OutputTabSampleDataDialog = lazy(() => import('./OutputTabSampleDataDialog'));
+const OutputSchemaCreationControls = lazy(() => import('./OutputSchemaCreationControls'));
+const OutputSchemaDisplay = lazy(() => import('./OutputSchemaDisplay'));
 
 interface OutputTabProps {
     connectionMissing: boolean;
@@ -36,7 +35,7 @@ interface OutputTabProps {
     workflowId: string;
 }
 
-const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined, workflowId}: OutputTabProps) => {
+const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = false, workflowId}: OutputTabProps) => {
     const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
@@ -188,9 +187,6 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined, w
 
     const testing = saveWorkflowNodeTestOutputMutation.isPending || startWebhookTest;
 
-    const hasProperties = Boolean(outputSchema && 'properties' in outputSchema && outputSchema.properties);
-    const hasItems = Boolean(outputSchema && 'items' in outputSchema && outputSchema.items);
-
     useEffect(() => {
         return () => {
             setStartWebhookTest(false);
@@ -211,209 +207,128 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined, w
             {!testing && (
                 <div className="h-full">
                     {outputSchema && (
-                        <div className="h-full">
-                            <div className="mb-2 flex items-center justify-between">
-                                <h3 className="text-sm text-gray-500">Output Schema</h3>
-
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                            size="sm"
-                                            variant="outline"
-                                        >
-                                            <PenIcon /> Define <CaretDownIcon className="ml-0.5" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-
-                                    <DropdownMenuContent align="end" className="w-60 cursor-pointer">
-                                        {!variablePropertiesDefined && (
-                                            <DropdownMenuItem
-                                                className="cursor-pointer"
-                                                disabled={connectionMissing}
-                                                onClick={handleTestOperationClick}
-                                            >
-                                                {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
-                                            </DropdownMenuItem>
-                                        )}
-
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onClick={() => setShowUploadDialog(true)}
-                                        >
-                                            Upload Sample Output Data
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onClick={handlePredefinedOutputSchemaClick}
-                                        >
-                                            Reset
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-
-                            <PropertyField
-                                copiedValue={copiedValue}
-                                copyToClipboard={copyToClipboard}
-                                label={currentNode.name}
-                                property={outputSchema}
-                                sampleOutput={sampleOutput}
-                                valueToCopy={`$\{${currentNode.name}}`}
-                                workflowNodeName={currentNode.name}
-                            />
-
-                            {hasProperties && sampleOutput && (
-                                <SchemaProperties
-                                    copiedValue={copiedValue}
-                                    copyToClipboard={copyToClipboard}
-                                    properties={(outputSchema as PropertyAllType).properties!}
-                                    sampleOutput={sampleOutput}
-                                    workflowNodeName={currentNode.name}
-                                />
-                            )}
-
-                            {hasItems && sampleOutput && (
-                                <div className="ml-3 flex flex-col overflow-y-auto border-l border-l-border/50 pl-1">
-                                    <SchemaProperties
-                                        copiedValue={copiedValue}
-                                        copyToClipboard={copyToClipboard}
-                                        properties={(outputSchema as PropertyAllType).items!}
-                                        sampleOutput={sampleOutput}
-                                        workflowNodeName={currentNode.name}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                        <OutputSchemaDisplay
+                            connectionMissing={connectionMissing}
+                            copiedValue={copiedValue}
+                            copyToClipboard={copyToClipboard}
+                            currentNode={currentNode}
+                            handlePredefinedOutputSchemaClick={handlePredefinedOutputSchemaClick}
+                            handleTestOperationClick={handleTestOperationClick}
+                            outputSchema={outputSchema}
+                            sampleOutput={sampleOutput}
+                            saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
+                            setShowUploadDialog={setShowUploadDialog}
+                            variablePropertiesDefined={variablePropertiesDefined}
+                        />
                     )}
 
                     {!outputSchema && (
-                        <div className="flex size-full items-center justify-center">
-                            <div className="flex flex-col items-center gap-8">
-                                <div className="flex w-full flex-col gap-1">
-                                    <div className="self-center">Define Output Schema</div>
-
-                                    <p className="text-sm text-muted-foreground">
-                                        {!variablePropertiesDefined
-                                            ? 'Define the expected output schema with one of the methods'
-                                            : 'Define the expected output schema by uploading sample data'}
-                                    </p>
-                                </div>
-
-                                <div className="flex flex-col gap-4">
-                                    {!variablePropertiesDefined && (
-                                        <div className="flex w-full flex-col gap-3">
-                                            <Button
-                                                disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                                onClick={handleTestOperationClick}
-                                                type="button"
-                                            >
-                                                {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
-                                            </Button>
-
-                                            <span className="text-center">or</span>
-                                        </div>
-                                    )}
-
-                                    <Button
-                                        disabled={uploadSampleOutputRequestMutation.isPending}
-                                        onClick={() => setShowUploadDialog(true)}
-                                        type="button"
-                                    >
-                                        {uploadSampleOutputRequestMutation.isPending && (
-                                            <>
-                                                <LoadingIcon />
-
-                                                <span>Uploading...</span>
-                                            </>
-                                        )}
-
-                                        {!uploadSampleOutputRequestMutation.isPending && (
-                                            <span>Upload Sample Output Data</span>
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
+                        <OutputSchemaCreationControls
+                            handleTestOperationClick={handleTestOperationClick}
+                            saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutation.isPending}
+                            setShowUploadDialog={setShowUploadDialog}
+                            trigger={currentNode.trigger}
+                            uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutation.isPending}
+                            variablePropertiesDefined={variablePropertiesDefined}
+                        />
                     )}
                 </div>
             )}
 
             {testing && (
-                <div className="flex size-full flex-col items-center justify-center gap-6">
-                    <div
-                        className={twMerge(
-                            'flex',
-                            currentNode.triggerType !== TriggerType.Polling &&
-                                currentNode.triggerType !== TriggerType.Hybrid &&
-                                'w-full justify-between pl-2',
-                            (currentNode.triggerType === TriggerType.Polling ||
-                                currentNode.triggerType === TriggerType.Hybrid) &&
-                                'flex-col gap-2'
-                        )}
-                    >
-                        <div className={twMerge('flex items-center justify-center', !currentNode.trigger && 'w-full')}>
+                <Suspense
+                    fallback={
+                        <div className="flex items-center justify-center p-4">
                             <LoadingIcon />
 
-                            <span className="text-lg">{`Testing ${currentNode.trigger ? 'Trigger' : 'Action'}`}</span>
+                            <span>Loading Testing UI...</span>
+                        </div>
+                    }
+                >
+                    <div className="flex size-full flex-col items-center justify-center gap-6">
+                        <div
+                            className={twMerge(
+                                'flex',
+                                currentNode.triggerType !== TriggerType.Polling &&
+                                    currentNode.triggerType !== TriggerType.Hybrid &&
+                                    'w-full justify-between pl-2',
+                                (currentNode.triggerType === TriggerType.Polling ||
+                                    currentNode.triggerType === TriggerType.Hybrid) &&
+                                    'flex-col gap-2'
+                            )}
+                        >
+                            <div
+                                className={twMerge(
+                                    'flex items-center justify-center',
+                                    !currentNode.trigger && 'w-full'
+                                )}
+                            >
+                                <LoadingIcon />
+
+                                <span className="text-lg">{`Testing ${currentNode.trigger ? 'Trigger' : 'Action'}`}</span>
+                            </div>
+
+                            {currentNode.trigger &&
+                                currentNode.triggerType !== TriggerType.Polling &&
+                                currentNode.triggerType !== TriggerType.Hybrid && (
+                                    <Button
+                                        className="flex items-center gap-2"
+                                        disabled={!webhookTestCancelEnabled}
+                                        onClick={handleTestCancelClick}
+                                        size="sm"
+                                        variant="outline"
+                                    >
+                                        Cancel
+                                    </Button>
+                                )}
                         </div>
 
                         {currentNode.trigger &&
                             currentNode.triggerType !== TriggerType.Polling &&
                             currentNode.triggerType !== TriggerType.Hybrid && (
-                                <Button
-                                    className="flex items-center gap-2"
-                                    disabled={!webhookTestCancelEnabled}
-                                    onClick={handleTestCancelClick}
-                                    size="sm"
-                                    variant="outline"
-                                >
-                                    Cancel
-                                </Button>
+                                <Alert>
+                                    <AlertCircleIcon className="size-4" />
+
+                                    <AlertTitle>Action Required</AlertTitle>
+
+                                    <AlertDescription className="flex flex-col gap-1">
+                                        {currentNode.triggerType === TriggerType.StaticWebhook ? (
+                                            <>
+                                                <div>Please call the following webhook test URL</div>
+                                                <div className="relative">
+                                                    <Input className="pr-8" disabled value={webhookTestUrl} />
+
+                                                    <ClipboardIcon
+                                                        aria-hidden="true"
+                                                        className="absolute right-0 top-2.5 mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
+                                                        onClick={() => copyToClipboard(webhookTestUrl!)}
+                                                    />
+                                                </div>
+                                                <div>by sending sample data</div>{' '}
+                                            </>
+                                        ) : (
+                                            <div>
+                                                Please go to your service and make an action that will activate this
+                                                trigger
+                                            </div>
+                                        )}
+                                    </AlertDescription>
+                                </Alert>
                             )}
                     </div>
-
-                    {currentNode.trigger &&
-                        currentNode.triggerType !== TriggerType.Polling &&
-                        currentNode.triggerType !== TriggerType.Hybrid && (
-                            <Alert>
-                                <AlertCircleIcon className="size-4" />
-
-                                <AlertTitle>Action Required</AlertTitle>
-
-                                <AlertDescription className="flex flex-col gap-1">
-                                    {currentNode.triggerType === TriggerType.StaticWebhook ? (
-                                        <>
-                                            <div>Please call the following webhook test URL</div>
-                                            <div className="relative">
-                                                <Input className="pr-8" disabled value={webhookTestUrl} />
-
-                                                <ClipboardIcon
-                                                    aria-hidden="true"
-                                                    className="absolute right-0 top-2.5 mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
-                                                    onClick={() => copyToClipboard(webhookTestUrl!)}
-                                                />
-                                            </div>
-                                            <div>by sending sample data</div>{' '}
-                                        </>
-                                    ) : (
-                                        <div>
-                                            Please go to your service and make an action that will activate this trigger
-                                        </div>
-                                    )}
-                                </AlertDescription>
-                            </Alert>
-                        )}
-                </div>
+                </Suspense>
             )}
 
-            <OutputTabSampleDataDialog
-                onClose={() => setShowUploadDialog(false)}
-                onUpload={handleSampleDataDialogUpload}
-                open={showUploadDialog}
-                placeholder={placeholder || sampleOutput}
-            />
+            {showUploadDialog && (
+                <Suspense fallback={<DialogLoader />}>
+                    <OutputTabSampleDataDialog
+                        onClose={() => setShowUploadDialog(false)}
+                        onUpload={handleSampleDataDialogUpload}
+                        open={showUploadDialog}
+                        placeholder={placeholder || sampleOutput}
+                    />
+                </Suspense>
+            )}
         </div>
     );
 };
