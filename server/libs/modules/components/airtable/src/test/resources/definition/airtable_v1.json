@@ -6,6 +6,10 @@
     "help" : null,
     "metadata" : {
       "path" : "/{baseId}/{tableId}",
+      "responseType" : {
+        "contentType" : "application/json",
+        "type" : "JSON"
+      },
       "mimeType" : "application/json",
       "method" : "POST",
       "bodyContentType" : "JSON"
@@ -341,7 +345,11 @@
     "help" : null,
     "metadata" : {
       "method" : "GET",
-      "path" : "/{baseId}/{tableId}/{recordId}"
+      "path" : "/{baseId}/{tableId}/{recordId}",
+      "responseType" : {
+        "contentType" : "application/json",
+        "type" : "JSON"
+      }
     },
     "name" : "getRecord",
     "outputDefinition" : {

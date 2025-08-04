@@ -6,7 +6,11 @@
     "help" : null,
     "metadata" : {
       "method" : "GET",
-      "path" : "/query"
+      "path" : "/query",
+      "responseType" : {
+        "contentType" : "application/xml",
+        "type" : "XML"
+      }
     },
     "name" : "getFullResult",
     "outputDefinition" : {
