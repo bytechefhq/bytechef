@@ -60,7 +60,7 @@ public class OpenApiClientUtils {
         BaseValueProperty<?> outputSchema = outputDefinition == null ? null : outputDefinition.getOutputSchema();
 
         ResponseType responseType = outputSchema == null
-            ? null
+            ? MapUtils.get(metadata, "responseType", ResponseType.class)
             : MapUtils.get(outputSchema.getMetadata(), "responseType", ResponseType.class);
 
         Response response = context
