@@ -45,8 +45,7 @@ public class VboutUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        Map<String, Map<String, ?>> body = context
-            .http(http -> http.get("/socialMedia/Channels"))
+        Map<String, Map<String, ?>> body = context.http(http -> http.get("/socialMedia/Channels"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -78,13 +77,13 @@ public class VboutUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        Map<String, Map<String, ?>> body = context
-            .http(http -> http.get("/emailmarketing/getcontacts"))
+        Map<String, Map<String, ?>> body = context.http(http -> http.get("/emailmarketing/getcontacts"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         Map<String, ?> contacts = body.get("contacts");
+
         if (contacts.get("items") instanceof List<?> items) {
             for (Object item : items) {
                 if (item instanceof Map<?, ?> map) {
@@ -102,13 +101,13 @@ public class VboutUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        Map<String, Map<String, ?>> body = context
-            .http(http -> http.get("/emailmarketing/getlists"))
+        Map<String, Map<String, ?>> body = context.http(http -> http.get("/emailmarketing/getlists"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         Map<String, ?> lists = body.get("lists");
+
         if (lists.get("items") instanceof List<?> items) {
             for (Object item : items) {
                 if (item instanceof Map<?, ?> map) {
