@@ -68,6 +68,7 @@ import {
     ConnectionTabSkeleton,
     DescriptionTabSkeleton,
     FieldsetSkeleton,
+    OutputTabSkeleton,
     PropertiesTabSkeleton,
 } from './WorkflowEditorSkeletons';
 
@@ -1061,18 +1062,20 @@ const WorkflowNodeDetailsPanel = ({
                                     ))}
 
                                 {activeTab === 'output' && (
-                                    <OutputTab
-                                        connectionMissing={
-                                            (currentComponentDefinition?.connectionRequired ?? false) &&
-                                            !workflowTestConfigurationConnections?.length
-                                        }
-                                        currentNode={currentNode}
-                                        key={`${currentNode?.componentName}-${currentNode?.type}_output`}
-                                        variablePropertiesDefined={
-                                            currentTaskDispatcherDefinition?.variablePropertiesDefined
-                                        }
-                                        workflowId={workflow.id!}
-                                    />
+                                    <Suspense fallback={<OutputTabSkeleton />}>
+                                        <OutputTab
+                                            connectionMissing={
+                                                (currentComponentDefinition?.connectionRequired ?? false) &&
+                                                !workflowTestConfigurationConnections?.length
+                                            }
+                                            currentNode={currentNode}
+                                            key={`${currentNode?.componentName}-${currentNode?.type}_output`}
+                                            variablePropertiesDefined={
+                                                currentTaskDispatcherDefinition?.variablePropertiesDefined
+                                            }
+                                            workflowId={workflow.id!}
+                                        />
+                                    </Suspense>
                                 )}
                             </div>
                         </ScrollArea>
