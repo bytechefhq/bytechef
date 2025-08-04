@@ -27,7 +27,6 @@ import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
 import {EditorView} from 'prosemirror-view';
 import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
-import {renderToStaticMarkup} from 'react-dom/server';
 import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -80,6 +79,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
+        const [renderToStaticMarkup, setRenderToStaticMarkup] = useState<
+            ((element: React.ReactElement) => string) | null
+        >(null);
 
         const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
@@ -96,7 +98,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 if (Object.keys(TYPE_ICONS).includes(upperCaseComponentName)) {
                     const reactIcon = TYPE_ICONS[upperCaseComponentName as keyof typeof TYPE_ICONS];
 
-                    const svgString = renderToStaticMarkup(reactIcon);
+                    const svgString = renderToStaticMarkup ? renderToStaticMarkup(reactIcon) : '';
 
                     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
                 }
@@ -110,7 +112,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 return componentDefinitions.find((component) => component.name === componentName)?.icon || defaultIcon;
             },
-            [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
+            [
+                componentDefinitions,
+                renderToStaticMarkup,
+                taskDispatcherDefinitions,
+                workflow.workflowTriggerComponentNames,
+            ]
         );
 
         const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
@@ -361,6 +368,13 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         if (ref) {
             (ref as MutableRefObject<Editor | null>).current = editor;
         }
+
+        // Load the function when component mounts
+        useEffect(() => {
+            import('react-dom/server').then(({renderToStaticMarkup}) => {
+                setRenderToStaticMarkup(() => renderToStaticMarkup);
+            });
+        }, []);
 
         useEffect(() => {
             if (editor) {

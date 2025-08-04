@@ -1,14 +1,24 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getRandomId} from '@/shared/util/random-utils';
-import {ForwardedRef, ReactNode, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+    ForwardedRef,
+    ReactNode,
+    Suspense,
+    forwardRef,
+    lazy,
+    memo,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 
 import './PropertyMentionsInput.css';
 
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
-import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
-import PropertyMentionsInputEditorSheet from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSheet';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -17,6 +27,22 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Editor} from '@tiptap/react';
 import {EqualIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
+
+import PropertyMentionsInputEditorFacade from './PropertyMentionsInputEditorFacade';
+
+const PropertyMentionsInputEditorSheet = lazy(
+    () =>
+        import(
+            '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSheet'
+        )
+);
+
+const PropertyMentionsInputEditor = lazy(
+    () =>
+        import(
+            '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor'
+        )
+);
 
 interface PropertyMentionsInputProps {
     className?: string;
@@ -148,18 +174,20 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                         <div className="flex items-center gap-1">
                             {(controlType === 'RICH_TEXT' || controlType === 'TEXT_AREA') && (
-                                <PropertyMentionsInputEditorSheet
-                                    componentDefinitions={componentDefinitions}
-                                    controlType={controlType}
-                                    dataPills={dataPills}
-                                    path={path}
-                                    placeholder={placeholder}
-                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                    title={label ?? ''}
-                                    type={type}
-                                    value={value}
-                                    workflow={workflow}
-                                />
+                                <Suspense fallback={<h1>Loading PropertyMentionsInputEditorSheet...</h1>}>
+                                    <PropertyMentionsInputEditorSheet
+                                        componentDefinitions={componentDefinitions}
+                                        controlType={controlType}
+                                        dataPills={dataPills}
+                                        path={path}
+                                        placeholder={placeholder}
+                                        taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                        title={label ?? ''}
+                                        type={type}
+                                        value={value}
+                                        workflow={workflow}
+                                    />
+                                </Suspense>
                             )}
 
                             {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
@@ -193,24 +221,34 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             className
                         )}
                     >
-                        <PropertyMentionsInputEditor
-                            className="px-2 py-[0.44rem]"
-                            componentDefinitions={componentDefinitions}
-                            controlType={controlType}
-                            dataPills={dataPills}
-                            elementId={elementId}
-                            isFormulaMode={isFormulaMode}
-                            onChange={(value) => handleEditorValueChange(value)}
-                            onFocus={onFocus}
-                            path={path}
-                            placeholder={placeholder}
-                            ref={ref}
-                            setIsFormulaMode={setIsFormulaMode}
-                            taskDispatcherDefinitions={taskDispatcherDefinitions}
-                            type={type}
-                            value={value || defaultValue}
-                            workflow={workflow}
-                        />
+                        <Suspense
+                            fallback={
+                                <PropertyMentionsInputEditorFacade
+                                    className="px-2 py-[0.44rem]"
+                                    placeholder={placeholder}
+                                    ref={ref}
+                                />
+                            }
+                        >
+                            <PropertyMentionsInputEditor
+                                className="px-2 py-[0.44rem]"
+                                componentDefinitions={componentDefinitions}
+                                controlType={controlType}
+                                dataPills={dataPills}
+                                elementId={elementId}
+                                isFormulaMode={isFormulaMode}
+                                onChange={(value) => handleEditorValueChange(value)}
+                                onFocus={onFocus}
+                                path={path}
+                                placeholder={placeholder}
+                                ref={ref}
+                                setIsFormulaMode={setIsFormulaMode}
+                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                type={type}
+                                value={value || defaultValue}
+                                workflow={workflow}
+                            />
+                        </Suspense>
                     </div>
                 </div>
             </fieldset>
