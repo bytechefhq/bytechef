@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class WolframAlphaFullResultsGetFullResultAction {
         .metadata(
             Map.of(
                 "method", "GET",
-                "path", "/query"
+                "path", "/query", "responseType", ResponseType.XML
 
             ))
         .properties(string("input").label("Query")

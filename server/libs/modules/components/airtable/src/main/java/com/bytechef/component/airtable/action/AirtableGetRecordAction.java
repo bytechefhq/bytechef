@@ -19,6 +19,7 @@ package com.bytechef.component.airtable.action;
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDsl;
@@ -37,7 +38,7 @@ public class AirtableGetRecordAction {
         .metadata(
             Map.of(
                 "method", "GET",
-                "path", "/{baseId}/{tableId}/{recordId}"
+                "path", "/{baseId}/{tableId}/{recordId}", "responseType", ResponseType.JSON
 
             ))
         .properties(string("baseId").label("Base ID")
