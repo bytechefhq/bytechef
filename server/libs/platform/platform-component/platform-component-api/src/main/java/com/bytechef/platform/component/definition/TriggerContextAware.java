@@ -30,7 +30,5 @@ public interface TriggerContextAware extends TriggerContext {
 
     ModeType getType();
 
-    boolean isEditorEnvironment();
-
     String getWorkflowReferenceCode();
 }

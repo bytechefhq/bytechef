@@ -30,6 +30,13 @@ public interface TriggerContext extends Context {
      */
     <R> R data(ContextFunction<Data, R> dataFunction);
 
+    /**
+     * Determines whether the current environment is the editor environment.
+     *
+     * @return true if the current environment is an editor environment, false otherwise.
+     */
+    boolean isEditorEnvironment();
+
     interface Data {
 
         enum Scope {
@@ -76,6 +83,4 @@ public interface TriggerContext extends Context {
          */
         Void remove(Data.Scope scope, String key);
     }
-
-    boolean isEditorEnvironment();
 }
