@@ -31,6 +31,9 @@ include("cli:commands:component:init:openapi")
 
 include("server:apps:server-app")
 
+include("server:libs:ai:mcp:mcp-server")
+include("server:libs:ai:mcp:mcp-tool")
+
 include("server:libs:atlas:atlas-configuration:atlas-configuration-api")
 include("server:libs:atlas:atlas-configuration:atlas-configuration-config")
 include("server:libs:atlas:atlas-configuration:atlas-configuration-converter")
@@ -110,9 +113,6 @@ include("server:libs:core:rest:rest-api")
 include("server:libs:core:rest:rest-impl")
 include("server:libs:core:tenant:tenant-api")
 include("server:libs:core:tenant:tenant-single-service")
-
-include("server:libs:mcp:mcp-server")
-include("server:libs:mcp:mcp-tool")
 
 include("server:libs:platform:platform-api")
 include("server:libs:platform:platform-category:platform-category-api")

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.mcp.tool;
+package com.bytechef.ai.mcp.tool;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;

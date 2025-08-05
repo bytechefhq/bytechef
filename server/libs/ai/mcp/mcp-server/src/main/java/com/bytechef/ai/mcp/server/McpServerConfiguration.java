@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.mcp.server;
+package com.bytechef.ai.mcp.server;
 
-import com.bytechef.mcp.tool.ProjectTools;
+import com.bytechef.ai.mcp.tool.ProjectTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
