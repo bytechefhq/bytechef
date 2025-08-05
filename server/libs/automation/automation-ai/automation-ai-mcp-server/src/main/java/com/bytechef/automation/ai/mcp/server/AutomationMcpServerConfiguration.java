@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.mcp.server;
+package com.bytechef.automation.ai.mcp.server;
 
 import com.bytechef.automation.execution.dto.ToolDTO;
 import com.bytechef.automation.execution.facade.ToolFacade;
