@@ -16,8 +16,8 @@
 
 package com.bytechef.automation.mcp.server;
 
-import com.bytechef.platform.ai.mcp.ToolDTO;
-import com.bytechef.platform.ai.mcp.ToolFacade;
+import com.bytechef.automation.execution.dto.ToolDTO;
+import com.bytechef.automation.execution.facade.ToolFacade;
 import com.bytechef.platform.constant.Environment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,7 +33,6 @@ import java.util.function.Function;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.function.RouterFunction;
@@ -48,7 +47,7 @@ public class AutomationMcpServerConfiguration {
     private final ToolFacade toolFacade;
 
     @SuppressFBWarnings("EI")
-    public AutomationMcpServerConfiguration(@Qualifier("automationToolFacade") ToolFacade toolFacade) {
+    public AutomationMcpServerConfiguration(ToolFacade toolFacade) {
         this.toolFacade = toolFacade;
     }
 
