@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.embedded.mcp.server.config;
+package com.bytechef.embedded.ai.mcp.server.config;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.execution.facade.ToolFacade;
