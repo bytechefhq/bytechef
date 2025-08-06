@@ -21,9 +21,9 @@ package com.bytechef.task.dispatcher.map.constant;
  */
 public class MapTaskDispatcherConstants {
 
-    public static final String MAP = "map";
     public static final String INDEX = "index";
+    public static final String MAP = "map";
+    public static final String ITEM = "item";
     public static final String ITEMS = "items";
     public static final String ITERATEE = "iteratee";
-    public static final String ITEM = "item";
 }

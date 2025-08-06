@@ -216,8 +216,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         long parentTaskExecutionId = Objects.requireNonNull(parentTaskExecution.getId());
 
         Map<String, Object> contextValue = new HashMap<>(
-            taskFileStorage.readContextValue(
-                contextService.peek(parentTaskExecutionId, Classname.TASK_EXECUTION)));
+            taskFileStorage.readContextValue(contextService.peek(parentTaskExecutionId, Classname.TASK_EXECUTION)));
 
         if (taskExecution.getName() != null) {
             if (taskExecution.getOutput() != null) {
@@ -229,8 +228,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
             contextService.push(
                 parentTaskExecutionId, Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(
-                    parentTaskExecutionId, Classname.TASK_EXECUTION, contextValue));
+                taskFileStorage.storeContextValue(parentTaskExecutionId, Classname.TASK_EXECUTION, contextValue));
         }
 
         return contextValue;
