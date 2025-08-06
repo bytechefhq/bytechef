@@ -2059,7 +2059,7 @@ public class ComponentInitOpenApiGenerator {
                                     builder.add("fileEntry()");
                                 } else {
                                     builder.add("fileEntry($S)",
-                                        (StringUtils.isEmpty(propertyName) ? "fileEntry" : propertyName));
+                                        StringUtils.isEmpty(propertyName) ? "fileEntry" : propertyName);
                                 }
                             }
                             case null, default -> {
