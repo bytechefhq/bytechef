@@ -81,7 +81,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @Override
     @Transactional(readOnly = true)
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
-        return taskExecutionRepository.findAllByParentId(parentId);
+        return taskExecutionRepository.findAllByParentIdOrderByTaskNumber(parentId);
     }
 
     @Override

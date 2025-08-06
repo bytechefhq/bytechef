@@ -94,12 +94,14 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
-    public List<TaskExecution> findAllByParentId(long parentId) {
+    public List<TaskExecution> findAllByParentIdOrderByTaskNumber(long parentId) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(PARENT_TASK_EXECUTIONS_CACHE));
 
         return Objects
             .requireNonNull(cache.get(TenantCacheKeyUtils.getKey(parentId), () -> new ArrayList<TaskExecution>()))
             .stream()
+            .sorted((o1, o2) -> Comparators.comparable()
+                .compare(o1.getTaskNumber(), o2.getTaskNumber()))
             .toList();
     }
 

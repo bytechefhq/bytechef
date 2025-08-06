@@ -60,7 +60,7 @@ public interface TaskExecutionRepository {
      * @param parentId
      * @return
      */
-    List<TaskExecution> findAllByParentId(long parentId);
+    List<TaskExecution> findAllByParentIdOrderByTaskNumber(long parentId);
 
     /**
      * Find a single {@link TaskExecution} instance by its id.

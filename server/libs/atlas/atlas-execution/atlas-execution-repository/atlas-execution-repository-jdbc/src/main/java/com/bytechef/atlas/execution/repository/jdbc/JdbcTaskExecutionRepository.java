@@ -44,7 +44,7 @@ public interface JdbcTaskExecutionRepository
     List<TaskExecution> findAllByJobIdOrderByTaskNumber(long jobId);
 
     @Override
-    List<TaskExecution> findAllByParentId(long parentId);
+    List<TaskExecution> findAllByParentIdOrderByTaskNumber(long parentId);
 
     @Override
     @Query("SELECT * FROM task_execution WHERE id = :id FOR UPDATE")
