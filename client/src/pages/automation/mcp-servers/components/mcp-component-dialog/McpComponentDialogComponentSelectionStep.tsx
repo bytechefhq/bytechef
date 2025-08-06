@@ -3,7 +3,7 @@ import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {Package} from 'lucide-react';
-import React, {useState} from 'react';
+import {useState} from 'react';
 
 interface ComponentSelectionStepProps {
     open: boolean;

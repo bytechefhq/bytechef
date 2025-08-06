@@ -21,12 +21,21 @@ import {Mention} from '@tiptap/extension-mention';
 import Paragraph from '@tiptap/extension-paragraph';
 import Placeholder from '@tiptap/extension-placeholder';
 import Text from '@tiptap/extension-text';
+import {EditorView} from '@tiptap/pm/view';
 import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
-import {EditorView} from 'prosemirror-view';
-import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
+import {
+    ForwardedRef,
+    MutableRefObject,
+    ReactElement,
+    forwardRef,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -79,9 +88,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
-        const [renderToStaticMarkup, setRenderToStaticMarkup] = useState<
-            ((element: React.ReactElement) => string) | null
-        >(null);
+        const [renderToStaticMarkup, setRenderToStaticMarkup] = useState<((element: ReactElement) => string) | null>(
+            null
+        );
 
         const {currentNode} = useWorkflowNodeDetailsPanelStore();
 

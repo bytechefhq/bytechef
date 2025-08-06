@@ -5,7 +5,7 @@ import {Popover, PopoverTrigger} from '@/components/ui/popover';
 import {cn} from '@/shared/util/cn-utils';
 import {CaretSortIcon, CheckIcon} from '@radix-ui/react-icons';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
-import {FocusEventHandler, ReactNode, useState} from 'react';
+import {FC, FocusEventHandler, ReactNode, useState} from 'react';
 
 export type ComboBoxItemType = {
     icon?: string;
@@ -27,15 +27,7 @@ export interface ComboBoxProps {
     value?: any;
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({
-    disabled,
-    emptyMessage,
-    items,
-    name,
-    onBlur,
-    onChange,
-    value,
-}: ComboBoxProps) => {
+const ComboBox: FC<ComboBoxProps> = ({disabled, emptyMessage, items, name, onBlur, onChange, value}: ComboBoxProps) => {
     const [open, setOpen] = useState(false);
 
     const commandItems = items.map((comboBoxItem) => (

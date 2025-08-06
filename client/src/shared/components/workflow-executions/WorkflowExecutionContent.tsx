@@ -9,7 +9,6 @@ import {
 import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {ExpandIcon} from 'lucide-react';
-import React from 'react';
 import ReactJson from 'react-json-view';
 
 interface WorkflowExecutionContentProps {

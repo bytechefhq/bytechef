@@ -1,4 +1,4 @@
-import React from 'react';
+import {FunctionComponent} from 'react';
 
 import {SchemaFieldOptionValueType, SchemaMenuOptionType, SchemaRecordType} from '../utils/types';
 import {
@@ -11,7 +11,7 @@ import {
 } from './SchemaMenuItem';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const typeToItem: Record<SchemaFieldOptionValueType, React.FunctionComponent<any>> = {
+const typeToItem: Record<SchemaFieldOptionValueType, FunctionComponent<any>> = {
     boolean: (props) => <BoolItem {...props} />,
     multi_creatable: (props) => <CreatableMultiSelectItem {...props} />,
     number: (props) => <NumberItem {...props} />,

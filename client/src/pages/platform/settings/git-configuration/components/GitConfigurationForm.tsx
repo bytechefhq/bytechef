@@ -8,7 +8,7 @@ import {useToast} from '@/hooks/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 

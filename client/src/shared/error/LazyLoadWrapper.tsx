@@ -1,4 +1,4 @@
-import React, {ReactNode, Suspense} from 'react';
+import {FC, ReactNode, Suspense} from 'react';
 
 import ErrorBoundary from './ErrorBoundary';
 
@@ -13,7 +13,7 @@ interface LazyLoadWrapperProps {
  * A component that combines ErrorBoundary and Suspense to handle both
  * lazy loading states and errors in one wrapper.
  */
-const LazyLoadWrapper: React.FC<LazyLoadWrapperProps> = ({children, errorFallback, fallback, onReset}) => {
+const LazyLoadWrapper: FC<LazyLoadWrapperProps> = ({children, errorFallback, fallback, onReset}) => {
     const defaultFallback = (
         <div className="flex h-full items-center justify-center p-8">
             <div className="flex animate-pulse space-x-2">

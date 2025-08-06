@@ -5,7 +5,7 @@ import './DesktopSidebar.css';
 
 import reactLogo from '@/assets/logo.svg';
 import DesktopSidebarBottomMenu from '@/shared/layout/desktop-sidebar/DesktopSidebarBottomMenu';
-import React from 'react';
+import {ForwardRefExoticComponent, SVGProps} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 export function DesktopSidebar({
@@ -16,7 +16,7 @@ export function DesktopSidebar({
     navigation: {
         name: string;
         href: string;
-        icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
+        icon: ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, 'ref'>>;
     }[];
 }) {
     const {pathname} = useLocation();

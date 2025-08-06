@@ -13,7 +13,7 @@ import {
 import {Label} from '@/components/ui/label';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {BotIcon, CodeIcon} from 'lucide-react';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 

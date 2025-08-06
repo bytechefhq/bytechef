@@ -20,7 +20,7 @@ import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
-import {useState} from 'react';
+import {MouseEvent, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const projectDeploymentApi = new ProjectDeploymentApi();
@@ -77,7 +77,7 @@ const ProjectDeploymentWorkflowListItem = ({
         }
     };
 
-    const handleRunWorkflowClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleRunWorkflowClick = (event: MouseEvent<HTMLButtonElement>) => {
         event?.stopPropagation();
 
         projectDeploymentApi

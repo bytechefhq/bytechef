@@ -5,7 +5,7 @@ import {Input} from '@/components/ui/input';
 import {usePasswordResetStore} from '@/pages/account/public/stores/usePasswordResetStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {zodResolver} from '@hookform/resolvers/zod';
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, useNavigate} from 'react-router-dom';
 import {z} from 'zod';

@@ -1,5 +1,5 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import * as React from 'react';
+import {ForwardRefExoticComponent, SVGProps} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 export function RightSidebar({
@@ -9,7 +9,7 @@ export function RightSidebar({
     className?: string;
     navigation: {
         name?: string;
-        icon?: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
+        icon?: ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, 'ref'>>;
         onClick?: () => void;
         separator?: boolean;
     }[];

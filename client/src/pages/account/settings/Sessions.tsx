@@ -8,7 +8,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {ShellIcon} from 'lucide-react';
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 
 const Sessions = () => {
     const {account} = useAuthenticationStore();

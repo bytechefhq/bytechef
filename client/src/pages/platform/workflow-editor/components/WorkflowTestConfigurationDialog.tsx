@@ -31,7 +31,7 @@ import {PropertyAllType} from '@/shared/types';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
-import React, {Dispatch, SetStateAction, useState} from 'react';
+import {Dispatch, SetStateAction, useState} from 'react';
 import {UseFormReturn, useForm} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 

@@ -1,5 +1,6 @@
 import DeletePropertyButton from '@/pages/platform/workflow-editor/components/properties/components/DeletePropertyButton';
 import {ArrayPropertyType, ComponentType} from '@/shared/types';
+import {Dispatch, SetStateAction} from 'react';
 
 import Property from '../Property';
 
@@ -11,7 +12,7 @@ interface ArrayPropertyItemProps {
     onDeleteClick: (path: string) => void;
     parentArrayItems?: Array<ArrayPropertyType>;
     path: string;
-    setArrayItems: React.Dispatch<React.SetStateAction<Array<ArrayPropertyType | Array<ArrayPropertyType>>>>;
+    setArrayItems: Dispatch<SetStateAction<Array<ArrayPropertyType | Array<ArrayPropertyType>>>>;
 }
 
 const ArrayPropertyItem = ({

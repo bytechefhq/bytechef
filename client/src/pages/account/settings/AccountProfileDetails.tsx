@@ -5,7 +5,7 @@ import {useToast} from '@/hooks/use-toast';
 import {useAccountStore} from '@/pages/account/settings/stores/useAccountStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {zodResolver} from '@hookform/resolvers/zod';
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 

@@ -34,7 +34,7 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';

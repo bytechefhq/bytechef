@@ -6,6 +6,7 @@ import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/wo
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
+import {RefObject} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useNavigate} from 'react-router-dom';
 
@@ -13,7 +14,7 @@ export const useProjectsLeftSidebar = ({
     bottomResizablePanelRef,
     projectId,
 }: {
-    bottomResizablePanelRef: React.RefObject<ImperativePanelHandle>;
+    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
     projectId: number;
 }) => {
     const {setShowBottomPanelOpen} = useWorkflowEditorStore();

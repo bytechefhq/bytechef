@@ -15,7 +15,7 @@ import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries
 import {useToast} from '@/hooks/use-toast';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {useState} from 'react';
+import {useState} from 'react';
 
 const IntegrationPublishDialog = ({integration, onClose}: {integration: Integration; onClose: () => void}) => {
     const [description, setDescription] = useState<string | undefined>(undefined);

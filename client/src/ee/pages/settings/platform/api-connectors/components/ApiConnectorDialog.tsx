@@ -18,7 +18,7 @@ import IconField from '@/ee/pages/settings/platform/api-connectors/components/Ic
 import {ApiConnectorKeys} from '@/ee/queries/apiConnectors.queries';
 import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {ReactNode, useState} from 'react';
+import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface ApiConnectorDialogProps {

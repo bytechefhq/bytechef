@@ -4,7 +4,7 @@ import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {XIcon} from 'lucide-react';
-import {lazy} from 'react';
+import {ChangeEvent, lazy} from 'react';
 
 const PropertyInput = lazy(
     () => import('@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput')
@@ -37,7 +37,7 @@ const SubPropertyPopover = ({
     setNewPropertyName,
     setNewPropertyType,
 }: SubPropertyPopoverProps) => {
-    const handleNewPropertyNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNewPropertyNameChange = (event: ChangeEvent<HTMLInputElement>) => {
         let {value} = event.target;
 
         if (value.match(/^\d/)) {

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {ReactElement, useEffect, useState} from 'react';
 
 import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
 import {queryToObject} from './tools';
@@ -9,7 +9,7 @@ const checkState = (receivedState: string) => {
 };
 
 interface OAuthPopupProps {
-    Component?: React.ReactElement;
+    Component?: ReactElement;
 }
 
 const OAuthPopup = (props: OAuthPopupProps) => {

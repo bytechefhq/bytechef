@@ -30,7 +30,7 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import React, {ReactNode, useState} from 'react';
+import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface IntegrationDialogProps {

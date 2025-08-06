@@ -7,7 +7,7 @@ import {McpComponent, McpTool, McpToolsByComponentIdQuery} from '@/shared/middle
 import {ClusterElementDefinitionBasic, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
-import React, {useEffect, useMemo, useRef} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 
 interface SelectedToolI {
     name: string;

@@ -22,7 +22,7 @@ import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {ReactNode, useState} from 'react';
+import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
