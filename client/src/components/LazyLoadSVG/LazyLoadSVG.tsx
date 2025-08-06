@@ -1,10 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
+import {FC, ReactNode, useEffect, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 interface LazyLoadSVGProps {
     src: string;
     className?: string;
-    preloader?: React.ReactNode;
+    preloader?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     [key: string]: any;
 }
@@ -13,7 +13,7 @@ interface LazyLoadSVGProps {
  * A component that lazy loads SVGs only when they are in the viewport
  * using the Intersection Observer API.
  */
-const LazyLoadSVG: React.FC<LazyLoadSVGProps> = ({className, preloader, src, ...props}) => {
+const LazyLoadSVG: FC<LazyLoadSVGProps> = ({className, preloader, src, ...props}) => {
     const [isVisible, setIsVisible] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 

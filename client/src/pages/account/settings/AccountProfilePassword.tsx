@@ -4,7 +4,7 @@ import {Input} from '@/components/ui/input';
 import {useToast} from '@/hooks/use-toast';
 import {usePasswordStore} from '@/pages/account/settings/stores/usePasswordStore';
 import {zodResolver} from '@hookform/resolvers/zod';
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 

@@ -10,7 +10,7 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {BotIcon, CircleMinusIcon, ListFilterIcon, SearchIcon, XIcon} from 'lucide-react';
-import {useCallback} from 'react';
+import {ReactNode, useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface ActionComponentsFilterProps {
@@ -22,7 +22,7 @@ interface ActionComponentsFilterProps {
         searchValue: string;
         filteredCount: number;
     };
-    filteredCategories: {label: string; icon?: React.ReactNode}[];
+    filteredCategories: {label: string; icon?: ReactNode}[];
     filteredComponents: ComponentDefinitionBasic[];
     setActiveView: (view: 'all' | 'filtered') => void;
     setSearchValue: (value: string) => void;

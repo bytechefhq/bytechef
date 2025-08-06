@@ -6,10 +6,10 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {cn} from '@/shared/util/cn-utils';
 import {format} from 'date-fns';
 import {CalendarIcon} from 'lucide-react';
-import * as React from 'react';
+import {useState} from 'react';
 
 export default function DatePicker({onChange, value}: {onChange: (date: Date | undefined) => void; value?: Date}) {
-    const [date, setDate] = React.useState<Date | undefined>(value);
+    const [date, setDate] = useState<Date | undefined>(value);
 
     return (
         <Popover>

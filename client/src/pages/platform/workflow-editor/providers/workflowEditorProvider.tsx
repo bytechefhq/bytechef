@@ -12,7 +12,7 @@ import {
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
-import {createContext, useContext} from 'react';
+import {ReactNode, createContext, useContext} from 'react';
 
 export interface CreateConnectionMutationProps {
     onSuccess?: (result: number, variables: ConnectionI) => void;
@@ -107,16 +107,16 @@ export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
 }
 
 export interface WorkflowMockProviderProps {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 export interface WorkflowReadOnlyProviderProps {
-    children: React.ReactNode;
+    children: ReactNode;
     value: WorkflowReadOnlyStateI;
 }
 
 export interface WorkflowEditorProviderProps {
-    children: React.ReactNode;
+    children: ReactNode;
     value: WorkflowEditorStateI;
 }
 

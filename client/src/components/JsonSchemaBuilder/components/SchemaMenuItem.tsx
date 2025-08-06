@@ -1,6 +1,6 @@
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import {Label} from '@/components/ui/label';
-import React, {useMemo} from 'react';
+import {FormEvent, FunctionComponent, ReactNode, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
@@ -28,7 +28,7 @@ import {TrashIcon} from 'lucide-react';
 
 interface ItemProps {
     onDelete: () => void;
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 const Item = ({children, onDelete}: ItemProps) => (
@@ -121,7 +121,7 @@ export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
 
     const option = getSchemaField(schema, field.value);
 
-    const selected = React.useMemo(() => findOption(option as string)(options), [options, option]);
+    const selected = useMemo(() => findOption(option as string)(options), [options, option]);
 
     return (
         <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
@@ -144,11 +144,7 @@ export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
     );
 };
 
-export const RequiredMultiSelectItem: React.FunctionComponent<ItemTypeProps> = ({
-    field,
-    onChange,
-    schema,
-}: ItemTypeProps) => {
+export const RequiredMultiSelectItem: FunctionComponent<ItemTypeProps> = ({field, onChange, schema}: ItemTypeProps) => {
     if (!isSchemaObject(schema) || !hasSchemaProperties(schema)) {
         return null;
     }
@@ -189,7 +185,7 @@ interface SchemaCheckboxProps {
 const SchemaCheckbox = ({autoFocus, label, onChange, value}: SchemaCheckboxProps) => {
     const handleChange =
         (handler: (value: boolean) => void) =>
-        (event: React.FormEvent<HTMLElement>): void => {
+        (event: FormEvent<HTMLElement>): void => {
             handler((event.target as HTMLInputElement).checked);
         };
 

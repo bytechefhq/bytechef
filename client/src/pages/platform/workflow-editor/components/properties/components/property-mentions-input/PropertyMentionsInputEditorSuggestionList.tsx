@@ -2,7 +2,7 @@ import './PropertyMentionsInputEditorSuggestionList.css';
 
 import {DataPillType} from '@/shared/types';
 import {SuggestionKeyDownProps, SuggestionProps} from '@tiptap/suggestion';
-import React, {forwardRef, useEffect, useImperativeHandle, useState} from 'react';
+import {forwardRef, useEffect, useImperativeHandle, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 

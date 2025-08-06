@@ -20,7 +20,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {ReactNode, useState} from 'react';
+import {ReactNode, useState} from 'react';
 
 import McpComponentDialogComponentSelectionStep from './McpComponentDialogComponentSelectionStep';
 import McpComponentDialogToolSelectionStep from './McpComponentDialogToolSelectionStep';

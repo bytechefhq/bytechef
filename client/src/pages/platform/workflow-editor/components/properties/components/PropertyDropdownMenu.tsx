@@ -6,7 +6,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {EllipsisVerticalIcon} from 'lucide-react';
-import {ReactNode} from 'react';
+import {MouseEvent, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 export type DropdownMenuItemType = {
@@ -14,7 +14,7 @@ export type DropdownMenuItemType = {
     icon?: ReactNode;
     integrationId?: number;
     label?: string;
-    onClick?: (id: number, event: React.MouseEvent) => void;
+    onClick?: (id: number, event: MouseEvent) => void;
     separator?: boolean;
     shortcut?: string;
 };

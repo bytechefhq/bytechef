@@ -4,11 +4,11 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {cn} from '@/shared/util/cn-utils';
 import {addDays, format} from 'date-fns';
 import {CalendarIcon} from 'lucide-react';
-import * as React from 'react';
+import {HTMLAttributes, useState} from 'react';
 import {type DateRange} from 'react-day-picker';
 
-export default function DateRangePicker({className}: React.HTMLAttributes<HTMLDivElement>) {
-    const [date, setDate] = React.useState<DateRange | undefined>({
+export default function DateRangePicker({className}: HTMLAttributes<HTMLDivElement>) {
+    const [date, setDate] = useState<DateRange | undefined>({
         from: addDays(new Date(), -20),
         to: new Date(),
     });

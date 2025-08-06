@@ -1,4 +1,5 @@
 import {Dialog, DialogContent} from '@/components/ui/dialog';
+import {ForwardRefExoticComponent, SVGProps} from 'react';
 
 import reactLogo from '../../assets/logo.svg';
 
@@ -7,7 +8,7 @@ interface MobileSidebarProps {
     navigation: {
         name: string;
         href: string;
-        icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
+        icon: ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, 'ref'>>;
     }[];
     mobileMenuOpen: boolean;
     setMobileMenuOpen: (value: boolean) => void;

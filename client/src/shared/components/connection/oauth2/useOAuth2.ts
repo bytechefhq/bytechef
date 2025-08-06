@@ -1,4 +1,4 @@
-import {useCallback, useRef, useState} from 'react';
+import {MutableRefObject, useCallback, useRef, useState} from 'react';
 
 import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
 import {objectToQuery} from './tools';
@@ -39,7 +39,7 @@ const enhanceAuthorizationUrl = (
     scope: string,
     state: string,
     responseType: Oauth2Props['responseType'],
-    extraQueryParametersRef: React.MutableRefObject<Oauth2Props['extraQueryParameters']>
+    extraQueryParametersRef: MutableRefObject<Oauth2Props['extraQueryParameters']>
 ) => {
     const query = objectToQuery({
         client_id: clientId,
@@ -89,14 +89,14 @@ const openPopup = (url: string) => {
     return window.open(url, 'OAuth2 Popup', `height=${POPUP_HEIGHT},width=${POPUP_WIDTH},top=${top},left=${left}`);
 };
 
-const closePopup = (popupRef: React.MutableRefObject<Window | null | undefined>) => {
+const closePopup = (popupRef: MutableRefObject<Window | null | undefined>) => {
     popupRef.current?.close();
 };
 
 const cleanup = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    intervalRef: React.MutableRefObject<any>,
-    popupRef: React.MutableRefObject<Window | null | undefined>,
+    intervalRef: MutableRefObject<any>,
+    popupRef: MutableRefObject<Window | null | undefined>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleMessageListener: any
 ) => {

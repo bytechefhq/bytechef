@@ -1,9 +1,9 @@
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import React, {useEffect, useState} from 'react';
+import {KeyboardEvent, useEffect, useState} from 'react';
 
 const handleEnterPress = (handler: () => void) => {
-    return (event: React.KeyboardEvent<HTMLInputElement>): void => {
+    return (event: KeyboardEvent<HTMLInputElement>): void => {
         if (event.key === 'Enter') {
             handler();
         }

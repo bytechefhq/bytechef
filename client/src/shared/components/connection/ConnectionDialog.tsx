@@ -44,7 +44,7 @@ import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tans
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ClipboardIcon} from 'lucide-react';
-import React, {ReactNode, useEffect, useMemo, useState} from 'react';
+import {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 import ComponentSelectionInput from './ComponentSelectionInput';

@@ -22,7 +22,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {BlendIcon, DiamondIcon, HelpCircleIcon, SettingsIcon, User2Icon, UserRoundCogIcon} from 'lucide-react';
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 
 const DesktopSidebarBottomMenu = () => {

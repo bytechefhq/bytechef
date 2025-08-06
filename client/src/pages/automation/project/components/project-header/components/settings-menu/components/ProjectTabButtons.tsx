@@ -12,7 +12,7 @@ import {
     HistoryIcon,
     Trash2Icon,
 } from 'lucide-react';
-import {RefObject} from 'react';
+import {MouseEvent, RefObject} from 'react';
 
 const ProjectTabButtons = ({
     hiddenFileInputRef,
@@ -37,7 +37,7 @@ const ProjectTabButtons = ({
 }) => {
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
 
-    const handleButtonClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
             onCloseDropdownMenuClick();
         }

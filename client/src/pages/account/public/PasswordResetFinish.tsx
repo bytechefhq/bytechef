@@ -6,7 +6,7 @@ import {usePasswordResetStore} from '@/pages/account/public/stores/usePasswordRe
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {CheckIcon, Eye, EyeOff, XIcon} from 'lucide-react';
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';

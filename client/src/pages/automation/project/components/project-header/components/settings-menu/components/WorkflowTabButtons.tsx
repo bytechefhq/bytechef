@@ -2,6 +2,7 @@ import '@/shared/styles/dropdownMenu.css';
 import {Button} from '@/components/ui/button';
 import {Separator} from '@/components/ui/separator';
 import {CopyIcon, EditIcon, Trash2Icon, UploadIcon} from 'lucide-react';
+import {MouseEvent} from 'react';
 
 const WorkflowTabButtons = ({
     onCloseDropdownMenu,
@@ -16,7 +17,7 @@ const WorkflowTabButtons = ({
     onShowDeleteWorkflowAlertDialog: () => void;
     workflowId: string;
 }) => {
-    const handleButtonClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
             onCloseDropdownMenu();
         }
