@@ -20,8 +20,8 @@ package com.bytechef.task.dispatcher.each;
 
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEMS;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -81,24 +81,24 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @Override
     public void dispatch(TaskExecution taskExecution) {
         WorkflowTask iteratee = MapUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
-        List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
+        List<Object> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
 
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (list.isEmpty()) {
+        if (items.isEmpty()) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
-            counterService.set(Validate.notNull(taskExecution.getId(), "id"), list.size());
+            counterService.set(Validate.notNull(taskExecution.getId(), "id"), items.size());
 
-            for (int i = 0; i < list.size(); i++) {
-                Object item = list.get(i);
+            for (int i = 0; i < items.size(); i++) {
+                Object item = items.get(i);
                 TaskExecution iterateeTaskExecution = TaskExecution.builder()
                     .jobId(taskExecution.getJobId())
                     .parentId(taskExecution.getId())

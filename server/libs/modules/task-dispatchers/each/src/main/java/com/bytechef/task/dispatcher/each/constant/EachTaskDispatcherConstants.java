@@ -22,8 +22,8 @@ package com.bytechef.task.dispatcher.each.constant;
 public class EachTaskDispatcherConstants {
 
     public static final String EACH = "each";
-    public static final String LIST = "list";
-    public static final String ITEM = "item";
     public static final String INDEX = "index";
+    public static final String ITEM = "item";
+    public static final String ITEMS = "items";
     public static final String ITERATEE = "iteratee";
 }

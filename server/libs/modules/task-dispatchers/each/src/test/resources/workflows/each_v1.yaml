@@ -4,12 +4,12 @@ tasks:
 - name: "each_1"
   type: "each/v1"
   parameters:
-    list: "=range(1,25)"
+    items: "=range(1,25)"
     iteratee:
       name: "each_2"
       type: "each/v1"
       parameters:
-        list: "=range(1,25)"
+        items: "=range(1,25)"
         iteratee:
           name: "var1"
           type: "var/v1/set"

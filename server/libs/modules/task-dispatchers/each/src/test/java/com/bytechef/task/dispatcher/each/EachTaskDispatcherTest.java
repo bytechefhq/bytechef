@@ -104,7 +104,7 @@ public class EachTaskDispatcherTest {
                         WorkflowConstants.TYPE, "type",
                         WorkflowConstants.PARAMETERS,
                         Map.of(
-                            "list", Arrays.asList(1, 2, 3),
+                            "items", Arrays.asList(1, 2, 3),
                             "iteratee", new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))))
             .build();
 
@@ -135,7 +135,7 @@ public class EachTaskDispatcherTest {
                         WorkflowConstants.TYPE, "type",
                         WorkflowConstants.PARAMETERS,
                         Map.of(
-                            "list", List.of(),
+                            "items", List.of(),
                             "iteratee", new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))))
             .build();
 

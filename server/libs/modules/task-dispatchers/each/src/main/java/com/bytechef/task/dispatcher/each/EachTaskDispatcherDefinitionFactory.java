@@ -24,8 +24,8 @@ import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDisp
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.EACH;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEMS;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
@@ -51,7 +51,7 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
             "Iterates over each item in list, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order.")
         .icon("path:assets/each.svg")
         .properties(
-            array(LIST)
+            array(ITEMS)
                 .label("List of items")
                 .description("List of items to iterate over."))
         .taskProperties(task(ITERATEE))
@@ -65,7 +65,7 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
     protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
         ObjectProperty variableProperties;
 
-        List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
+        List<?> list = MapUtils.getRequiredList(inputParameters, ITEMS);
 
         if (list.isEmpty()) {
             variableProperties = object();
