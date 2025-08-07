@@ -27,9 +27,7 @@ import com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.component.definition.Parameters;
 
 public class ClickupCreateTaskCommentAction {
 
@@ -57,15 +55,8 @@ public class ClickupCreateTaskCommentAction {
                             "Flag indicating whether notifications should be sent to all participants, including the creator of the comment ")
                             .required(true).metadata(Map.of("type", PropertyType.BODY)))
 
-            .output(outputSchema(string()))
-            .perform(ClickupCreateTaskCommentAction::perform);
+            .output(outputSchema(string()));
 
     private ClickupCreateTaskCommentAction() {
-    }
-
-    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        // TODO
-
-        return null;
     }
 }
