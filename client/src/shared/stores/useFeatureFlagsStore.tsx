@@ -67,9 +67,9 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
                 .then((posthog) => {
                     posthog.default.onFeatureFlags(function () {
                         if (posthog.default.isFeatureEnabled(featureFlag)) {
-                            setFeatureFlag(featureFlag, true);
+                            setTimeout(() => setFeatureFlag(featureFlag, true), 0);
                         } else {
-                            setFeatureFlag(featureFlag, false);
+                            setTimeout(() => setFeatureFlag(featureFlag, false), 0);
                         }
 
                         loadingRef.current = false;
@@ -77,13 +77,13 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
                 })
                 .catch(() => {
                     // If PostHog fails to load, default to false
-                    setFeatureFlag(featureFlag, false);
+                    setTimeout(() => setFeatureFlag(featureFlag, false), 0);
 
                     loadingRef.current = false;
                 });
         } else {
             // If analytics are disabled, default to false
-            setFeatureFlag(featureFlag, false);
+            setTimeout(() => setFeatureFlag(featureFlag, false), 0);
 
             loadingRef.current = false;
         }
