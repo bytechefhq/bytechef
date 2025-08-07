@@ -2,17 +2,26 @@ import {useToast} from '@/hooks/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getCookie} from '@/shared/util/cookie-utils';
-import fetchIntercept from 'fetch-intercept';
+import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 export default function useFetchInterceptor() {
     const {clearAuthentication} = useAuthenticationStore();
     const {clearCurrentWorkspaceId} = useWorkspaceStore();
+    const [fetchIntercept, setFetchIntercept] = useState<typeof import('fetch-intercept') | null>(null);
 
     const navigate = useNavigate();
     const {toast} = useToast();
 
     const apiBasePath = import.meta.env.VITE_API_BASE_PATH;
+
+    useEffect(() => {
+        import('fetch-intercept').then((module) => setFetchIntercept(module));
+    }, []);
+
+    if (!fetchIntercept) {
+        return {unregister: () => {}};
+    }
 
     const unregister = fetchIntercept.register({
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -37,7 +46,8 @@ export default function useFetchInterceptor() {
             }
         },
 
-        response: function (response) {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        response: function (response: any) {
             if (response.status === 403 || response.status === 401) {
                 clearAuthentication();
                 clearCurrentWorkspaceId();
@@ -54,7 +64,7 @@ export default function useFetchInterceptor() {
 
                 clonedResponse
                     .json()
-                    .then((data) => {
+                    .then((data: {entityClass?: string; errorKey?: number; detail?: string; title?: string}) => {
                         if (data.entityClass === 'AdminUserDTO' && data.errorKey === 100) {
                             return;
                         }
