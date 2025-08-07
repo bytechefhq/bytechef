@@ -26,6 +26,7 @@ import java.util.Map;
 import com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
@@ -35,6 +36,8 @@ public class ClickupCreateTaskCommentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTaskComment")
             .title("Create Task Comment")
             .description("Create a new comment for specified class")
+            .metadata(Map.of("method", "POST", "path", "/task/{task_id}/comment", "bodyContentType",
+                    BodyContentType.JSON, "mimeType", "application/json"))
             .properties(
                     string("listId").label("List ID")
                             .description("ID of the list containing the task")
