@@ -407,27 +407,27 @@ export default function useLayout({
             }
         }
 
-        const elements = getLayoutedElements({canvasWidth, edges, nodes: layoutNodes});
+        getLayoutedElements({canvasWidth, edges, nodes: layoutNodes}).then((elements) => {
+            if (readOnlyWorkflow) {
+                const SHEET_WIDTH = WIDTHS.WORKFLOW_READ_ONLY_SHEET_WIDTH;
 
-        if (readOnlyWorkflow) {
-            const SHEET_WIDTH = WIDTHS.WORKFLOW_READ_ONLY_SHEET_WIDTH;
+                const centeringOffsetX = (canvasWidth - SHEET_WIDTH) / 2;
 
-            const centeringOffsetX = (canvasWidth - SHEET_WIDTH) / 2;
+                const centeredNodes = elements.nodes.map((node) => ({
+                    ...node,
+                    position: {
+                        x: node.position.x - centeringOffsetX,
+                        y: node.position.y,
+                    },
+                }));
 
-            const centeredNodes = elements.nodes.map((node) => ({
-                ...node,
-                position: {
-                    x: node.position.x - centeringOffsetX,
-                    y: node.position.y,
-                },
-            }));
+                setNodes(centeredNodes);
+            } else {
+                setNodes(elements.nodes);
+            }
 
-            setNodes(centeredNodes);
-        } else {
-            setNodes(elements.nodes);
-        }
-
-        setEdges(elements.edges);
+            setEdges(elements.edges);
+        });
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canvasWidth, tasks, triggers]);
