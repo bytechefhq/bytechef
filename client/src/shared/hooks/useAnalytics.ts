@@ -1,6 +1,6 @@
 import {UserI} from '@/shared/models/user.model';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {usePostHog} from 'posthog-js/react';
+import {PostHog} from 'posthog-js';
 import {useRef} from 'react';
 
 export interface AnalyticsI {
@@ -28,91 +28,96 @@ export interface AnalyticsI {
 export const useAnalytics = (): AnalyticsI => {
     const initRef = useRef(false);
     const identifyRef = useRef(false);
+    const posthogRef = useRef<PostHog | null>(null);
 
     const {analytics, application} = useApplicationInfoStore();
 
-    const posthog = usePostHog();
+    const getPostHog = async () => {
+        if (!posthogRef.current) {
+            try {
+                const posthogModule = await import('posthog-js');
+
+                posthogRef.current = posthogModule.default;
+            } catch (error) {
+                console.warn('PostHog failed to load:', error);
+
+                return null;
+            }
+        }
+
+        return posthogRef.current;
+    };
+
+    const captureEvent = async (eventName: string, properties?: Record<string, unknown>) => {
+        const posthog = await getPostHog();
+
+        if (posthog) {
+            posthog.capture(eventName, properties);
+        }
+    };
 
     return {
-        captureComponentUsed: (componentName: string, actionName?: string, triggerName?: string) => {
-            posthog.capture('component_used', {actionName, componentName, triggerName});
-        },
-        captureIntegrationCreated: () => {
-            posthog.capture('integration_created');
-        },
-        captureIntegrationInstanceConfigurationCreated: () => {
-            posthog.capture('integration_instance_configuration_created');
-        },
-        captureIntegrationInstanceConfigurationEnabled: () => {
-            posthog.capture('integration_instance_configuration_enabled');
-        },
-        captureIntegrationPublished: () => {
-            posthog.capture('integration_published');
-        },
-        captureIntegrationWorkflowCreated: () => {
-            posthog.capture('integration_workflow_created');
-        },
-        captureIntegrationWorkflowImported: () => {
-            posthog.capture('integration_workflow_created', {imported: true});
-        },
-        captureIntegrationWorkflowTested: () => {
-            posthog.capture('integration_workflow_tested');
-        },
-        captureProjectCreated: () => {
-            posthog.capture('project_created');
-        },
-        captureProjectDeploymentCreated: () => {
-            posthog.capture('project_deployment_created');
-        },
-        captureProjectDeploymentEnabled: () => {
-            posthog.capture('project_deployment_enabled');
-        },
-        captureProjectPublished: () => {
-            posthog.capture('project_published');
-        },
-        captureProjectWorkflowCreated: () => {
-            posthog.capture('project_workflow_created');
-        },
-        captureProjectWorkflowImported: () => {
-            posthog.capture('project_workflow_created', {imported: true});
-        },
-        captureProjectWorkflowTested: () => {
-            posthog.capture('project_workflow_tested');
-        },
-        captureUserSignedUp(email: string): void {
-            posthog.capture('user_signed_up', {email});
-        },
-        identify: (account: UserI) => {
+        captureComponentUsed: (componentName: string, actionName?: string, triggerName?: string) =>
+            captureEvent('component_used', {actionName, componentName, triggerName}),
+        captureIntegrationCreated: () => captureEvent('integration_created'),
+        captureIntegrationInstanceConfigurationCreated: () =>
+            captureEvent('integration_instance_configuration_created'),
+        captureIntegrationInstanceConfigurationEnabled: () =>
+            captureEvent('integration_instance_configuration_enabled'),
+        captureIntegrationPublished: () => captureEvent('integration_published'),
+        captureIntegrationWorkflowCreated: () => captureEvent('integration_workflow_created'),
+        captureIntegrationWorkflowImported: () => captureEvent('integration_workflow_created', {imported: true}),
+        captureIntegrationWorkflowTested: () => captureEvent('integration_workflow_tested'),
+        captureProjectCreated: () => captureEvent('project_created'),
+        captureProjectDeploymentCreated: () => captureEvent('project_deployment_created'),
+        captureProjectDeploymentEnabled: () => captureEvent('project_deployment_enabled'),
+        captureProjectPublished: () => captureEvent('project_published'),
+        captureProjectWorkflowCreated: () => captureEvent('project_workflow_created'),
+        captureProjectWorkflowImported: () => captureEvent('project_workflow_created', {imported: true}),
+        captureProjectWorkflowTested: () => captureEvent('project_workflow_tested'),
+        captureUserSignedUp: (email: string) => captureEvent('user_signed_up', {email}),
+        identify: async (account: UserI) => {
             if (identifyRef.current) {
                 return;
             }
 
             identifyRef.current = true;
 
-            posthog?.identify(account.uuid, {
-                edition: application?.edition,
-                email: account.email,
-                name: `${account.firstName} ${account.lastName}`,
-            });
-            // posthog?.group('company', account);
+            const posthog = await getPostHog();
+
+            if (posthog) {
+                posthog.identify(account.uuid, {
+                    edition: application?.edition,
+                    email: account.email,
+                    name: `${account.firstName} ${account.lastName}`,
+                });
+            }
         },
-        init: () => {
+        init: async () => {
             if (initRef.current) {
                 return;
             }
 
             if (analytics.enabled && analytics.postHog.apiKey && analytics.postHog.host) {
-                posthog.init(analytics.postHog.apiKey, {
-                    api_host: analytics.postHog.host,
-                    capture_pageview: false,
-                    person_profiles: 'identified_only',
-                });
+                const posthog = await getPostHog();
 
-                initRef.current = true;
+                if (posthog) {
+                    posthog.init(analytics.postHog.apiKey, {
+                        api_host: analytics.postHog.host,
+                        capture_pageview: false,
+                        person_profiles: 'identified_only',
+                    });
+
+                    initRef.current = true;
+                }
             }
         },
-        reset: () => {
-            posthog.reset();
+        reset: async () => {
+            const posthog = await getPostHog();
+
+            if (posthog) {
+                posthog.reset();
+            }
 
             identifyRef.current = false;
         },

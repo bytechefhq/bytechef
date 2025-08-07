@@ -1,4 +1,3 @@
-import React from 'react';
 import {createRoot} from 'react-dom/client';
 
 import {worker} from './mocks/server';
@@ -9,6 +8,7 @@ import './styles/components.css';
 
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {getRouter as getEmbeddedRouter} from '@/embeddedWorkflowBuilderRoutes';
+import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog-provider';
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
@@ -16,8 +16,7 @@ import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import YamlWorker from 'monaco-yaml/yaml.worker?worker';
-import posthog from 'posthog-js';
-import {PostHogProvider} from 'posthog-js/react';
+import {StrictMode} from 'react';
 import {RouterProvider} from 'react-router-dom';
 
 import {getRouter as getMainRouter} from './routes';
@@ -55,18 +54,18 @@ function renderApp() {
     const router = isEmbeddedWorkflowBuilder ? getEmbeddedRouter() : getMainRouter(queryClient);
 
     root.render(
-        <React.StrictMode>
+        <StrictMode>
             <ThemeProvider defaultTheme="light">
                 <QueryClientProvider client={queryClient}>
-                    <PostHogProvider client={posthog}>
+                    <ConditionalPostHogProvider>
                         <TooltipProvider>
                             <RouterProvider router={router} />
                         </TooltipProvider>
-                    </PostHogProvider>
+                    </ConditionalPostHogProvider>
 
                     <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
                 </QueryClientProvider>
             </ThemeProvider>
-        </React.StrictMode>
+        </StrictMode>
     );
 }
