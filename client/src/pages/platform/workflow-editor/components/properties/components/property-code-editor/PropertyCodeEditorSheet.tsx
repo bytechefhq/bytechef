@@ -9,17 +9,17 @@ import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCop
 import {ScriptTestExecution, Workflow, WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
 import {PlayIcon, RefreshCwIcon, SquareIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useState} from 'react';
-import ReactJson from 'react-json-view';
 import {twMerge} from 'tailwind-merge';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
+const ReactJson = lazy(() => import('react-json-view'));
 
 const workflowNodeScriptApi: WorkflowNodeScriptApi = new WorkflowNodeScriptApi();
 
 interface PropertyCodeEditorSheetProps {
     language: string;
-    onClose?: () => void;
     onChange: (value: string | undefined) => void;
+    onClose?: () => void;
     value?: string;
     workflow: Workflow;
     workflowNodeName: string;
@@ -145,11 +145,19 @@ const PropertyCodeEditorSheet = ({
                                         scriptTestExecution ? (
                                             scriptTestExecution.output ? (
                                                 typeof scriptTestExecution.output === 'object' ? (
-                                                    <ReactJson
-                                                        enableClipboard={false}
-                                                        sortKeys={true}
-                                                        src={scriptTestExecution.output as object}
-                                                    />
+                                                    <Suspense
+                                                        fallback={
+                                                            <div className="p-4 text-sm text-muted-foreground">
+                                                                Loading...
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <ReactJson
+                                                            enableClipboard={false}
+                                                            sortKeys={true}
+                                                            src={scriptTestExecution.output as object}
+                                                        />
+                                                    </Suspense>
                                                 ) : (
                                                     <pre className="mt-2 text-xs">{scriptTestExecution.output}</pre>
                                                 )

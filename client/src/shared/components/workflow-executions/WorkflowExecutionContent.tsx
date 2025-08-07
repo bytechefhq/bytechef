@@ -9,7 +9,9 @@ import {
 import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {ExpandIcon} from 'lucide-react';
-import ReactJson from 'react-json-view';
+import {Suspense, lazy} from 'react';
+
+const ReactJson = lazy(() => import('react-json-view'));
 
 interface WorkflowExecutionContentProps {
     endDate?: Date;
@@ -47,7 +49,17 @@ const WorkflowExecutionContent = ({endDate, error, input, output, startDate}: Wo
                             <div className="max-h-workflow-execution-content-height overflow-y-auto">
                                 {input && (typeof input !== 'object' || Object.keys(input).length > 0) ? (
                                     typeof input === 'object' ? (
-                                        <ReactJson collapsed={false} enableClipboard={false} src={input as object} />
+                                        <Suspense
+                                            fallback={
+                                                <div className="p-4 text-sm text-muted-foreground">Loading...</div>
+                                            }
+                                        >
+                                            <ReactJson
+                                                collapsed={false}
+                                                enableClipboard={false}
+                                                src={input as object}
+                                            />
+                                        </Suspense>
                                     ) : (
                                         input
                                     )
@@ -65,7 +77,9 @@ const WorkflowExecutionContent = ({endDate, error, input, output, startDate}: Wo
             <div className="overflow-x-auto text-nowrap">
                 {input && (typeof input !== 'object' || Object.keys(input).length > 0) ? (
                     typeof input === 'object' ? (
-                        <ReactJson collapsed={false} enableClipboard={false} src={input as object} />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Loading...</div>}>
+                            <ReactJson collapsed={false} enableClipboard={false} src={input as object} />
+                        </Suspense>
                     ) : (
                         <span className="text-sm">{input}</span>
                     )
@@ -103,7 +117,13 @@ const WorkflowExecutionContent = ({endDate, error, input, output, startDate}: Wo
                                     {output === undefined ? (
                                         <span className="text-sm">No output data.</span>
                                     ) : output && typeof output === 'object' ? (
-                                        <ReactJson enableClipboard={false} src={output as object} />
+                                        <Suspense
+                                            fallback={
+                                                <div className="p-4 text-sm text-muted-foreground">Loading...</div>
+                                            }
+                                        >
+                                            <ReactJson enableClipboard={false} src={output as object} />
+                                        </Suspense>
                                     ) : (
                                         <span className="text-sm">{output}</span>
                                     )}
@@ -120,7 +140,9 @@ const WorkflowExecutionContent = ({endDate, error, input, output, startDate}: Wo
 
                     {output !== undefined &&
                         (typeof output === 'object' ? (
-                            <ReactJson enableClipboard={false} src={output as object} />
+                            <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Loading...</div>}>
+                                <ReactJson enableClipboard={false} src={output as object} />
+                            </Suspense>
                         ) : (
                             <span className="text-sm">{(output as boolean).toString()}</span>
                         ))}
@@ -133,7 +155,7 @@ const WorkflowExecutionContent = ({endDate, error, input, output, startDate}: Wo
                 <header className="flex items-center justify-between">
                     <span className="text-sm font-semibold uppercase text-destructive">Error</span>
 
-                    <div className="flex space-x-1">
+                    <div className="flex items-center space-x-1">
                         <span className="text-xs">{endDate?.toLocaleString()}</span>
 
                         <Dialog>
