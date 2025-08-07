@@ -23,6 +23,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.clickup.action.ClickupCreateFolderAction;
 import com.bytechef.component.clickup.action.ClickupCreateListAction;
 import com.bytechef.component.clickup.action.ClickupCreateTaskAction;
+import com.bytechef.component.clickup.action.ClickupCreateTaskCommentAction;
 import com.bytechef.component.clickup.connection.ClickupConnection;
 import com.bytechef.component.definition.ComponentDefinition;
 
@@ -38,11 +39,12 @@ public abstract class AbstractClickupComponentHandler implements OpenApiComponen
             .description(
                 "ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams."))
                     .actions(modifyActions(ClickupCreateListAction.ACTION_DEFINITION,
-                        ClickupCreateTaskAction.ACTION_DEFINITION, ClickupCreateFolderAction.ACTION_DEFINITION))
+                        ClickupCreateTaskAction.ACTION_DEFINITION, ClickupCreateFolderAction.ACTION_DEFINITION, ClickupCreateTaskCommentAction.ACTION_DEFINITION))
                     .connection(modifyConnection(ClickupConnection.CONNECTION_DEFINITION))
                     .clusterElements(modifyClusterElements(tool(ClickupCreateListAction.ACTION_DEFINITION),
                         tool(ClickupCreateTaskAction.ACTION_DEFINITION),
-                        tool(ClickupCreateFolderAction.ACTION_DEFINITION)))
+                        tool(ClickupCreateFolderAction.ACTION_DEFINITION),
+                        tool(ClickupCreateTaskCommentAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override
