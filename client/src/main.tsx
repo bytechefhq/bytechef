@@ -1,7 +1,5 @@
 import {createRoot} from 'react-dom/client';
 
-import {worker} from './mocks/server';
-
 import './styles/index.css';
 
 import './styles/components.css';
@@ -39,7 +37,9 @@ window.MonacoEnvironment = {
 };
 
 if (process.env.NODE_ENV === 'mock') {
-    worker.start().then(() => renderApp());
+    import('./mocks/server').then(({worker}) => {
+        worker.start().then(() => renderApp());
+    });
 } else {
     renderApp();
 }
