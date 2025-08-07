@@ -1,9 +1,9 @@
+import basicSsl from '@vitejs/plugin-basic-ssl';
 import react from '@vitejs/plugin-react';
+import * as path from 'node:path';
 import {defineConfig, loadEnv} from 'vite';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import basicSsl from '@vitejs/plugin-basic-ssl';
-import * as path from "node:path";
 
 // https://vitejs.dev/config/
 export default ({mode}) => {
@@ -14,6 +14,23 @@ export default ({mode}) => {
     const isHttps = () => process.env.VITE_HTTPS === 'true';
 
     return defineConfig({
+        build: {
+            rollupOptions: {
+                output: {
+                    manualChunks: {
+                        'vendor-analytics': ['posthog-js'],
+                        'vendor-d3': ['d3-hierarchy', 'd3-timer'],
+                        'vendor-dagre': ['@dagrejs/dagre'],
+                        'vendor-editor': ['monaco-editor', '@monaco-editor/react'],
+                        'vendor-flow': ['@xyflow/react'],
+                        'vendor-json': ['react-json-view'],
+                        'vendor-query': ['@tanstack/react-query'],
+                        'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+                        'vendor-ui': ['@radix-ui/react-icons', 'lucide-react'],
+                    },
+                },
+            },
+        },
         esbuild: {
             // https://github.com/vitejs/vite/issues/8644#issuecomment-1159308803
             logOverride: {'this-is-undefined-in-esm': 'silent'},
@@ -26,7 +43,7 @@ export default ({mode}) => {
         plugins: [react(), tsconfigPaths(), svgr(), isHttps() && basicSsl()],
         resolve: {
             alias: {
-                "@": path.resolve(__dirname, "./src"),
+                '@': path.resolve(__dirname, './src'),
             },
         },
         server: {
@@ -56,13 +73,13 @@ export default ({mode}) => {
                     target: 'http://localhost:9555',
                     // rewrite: (path) => path.replace(/^\/api/, ""),
                 },
-                '/icons': {
+                '/graphql': {
                     changeOrigin: true,
                     secure: false,
                     target: 'http://localhost:9555',
                     // rewrite: (path) => path.replace(/^\/api/, ""),
                 },
-                '/graphql': {
+                '/icons': {
                     changeOrigin: true,
                     secure: false,
                     target: 'http://localhost:9555',
@@ -75,15 +92,6 @@ export default ({mode}) => {
                     // rewrite: (path) => path.replace(/^\/api/, ""),
                 },
             },
-        },
-        test: {
-            coverage: {
-                exclude: ['.vitest/', 'node_modules/', 'src/middleware', '**/*.test.tsx'],
-                reporter: ['html', 'lcov', 'text'],
-            },
-            environment: 'jsdom',
-            globals: true,
-            setupFiles: '.vitest/setup.ts',
         },
     });
 };
