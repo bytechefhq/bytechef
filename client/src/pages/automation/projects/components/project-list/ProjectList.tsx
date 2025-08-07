@@ -1,7 +1,7 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
+import ProjectListItem from '@/pages/automation/projects/components/project-list/ProjectListItem';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
-import ProjectListItem from 'pages/automation/projects/components/project-list/ProjectListItem';
 
 import ProjectWorkflowList from '../project-workflow-list/ProjectWorkflowList';
 
