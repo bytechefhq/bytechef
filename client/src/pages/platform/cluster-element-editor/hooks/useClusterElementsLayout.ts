@@ -222,10 +222,12 @@ const useClusterElementsLayout = () => {
         const layoutNodes = allNodes;
         const edges: Edge[] = taskEdges;
 
-        const elements = getLayoutedElements({canvasWidth, edges, isClusterElementsCanvas: true, nodes: layoutNodes});
-
-        setNodes(elements.nodes);
-        setEdges(elements.edges);
+        getLayoutedElements({canvasWidth, edges, isClusterElementsCanvas: true, nodes: layoutNodes}).then(
+            (elements) => {
+                setNodes(elements.nodes);
+                setEdges(elements.edges);
+            }
+        );
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canvasWidth, rootClusterElementNodeData, allNodes]);

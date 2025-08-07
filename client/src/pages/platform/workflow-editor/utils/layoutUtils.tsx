@@ -26,13 +26,22 @@ import {
     NodeDataType,
     ParallelChildTasksType,
 } from '@/shared/types';
-import dagre from '@dagrejs/dagre';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 import {getConditionBranchSide} from './createConditionEdges';
 import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatcherConfig';
+
+let dagre: typeof import('@dagrejs/dagre') | null = null;
+
+const loadDagre = async () => {
+    if (!dagre) {
+        dagre = await import('@dagrejs/dagre');
+    }
+
+    return dagre;
+};
 
 export const calculateNodeHeight = (node: Node) => {
     const isTopGhostNode = node.type === 'taskDispatcherTopGhostNode';
@@ -102,8 +111,15 @@ interface GetLayoutedElementsProps {
     nodes: Node[];
 }
 
-export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas, nodes}: GetLayoutedElementsProps) => {
-    const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+export const getLayoutedElements = async ({
+    canvasWidth,
+    edges,
+    isClusterElementsCanvas,
+    nodes,
+}: GetLayoutedElementsProps) => {
+    const dagreModule = await loadDagre();
+
+    const dagreGraph = new dagreModule.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
     dagreGraph.setGraph({rankdir: DIRECTION});
 
@@ -151,7 +167,7 @@ export const getLayoutedElements = ({canvasWidth, edges, isClusterElementsCanvas
         }
     });
 
-    dagre.layout(dagreGraph);
+    dagreModule.layout(dagreGraph);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function containsNodePosition(metadata: any): metadata is {ui: {nodePosition: {x: number; y: number}}} {
