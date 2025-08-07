@@ -7,12 +7,10 @@ import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import {libInjectCss} from 'vite-plugin-lib-inject-css';
-import {analyzer} from 'vite-bundle-analyzer';
 
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
-        analyzer(),
         react(),
         // https://github.com/vitejs/vite/issues/1579#issuecomment-1483756199
         libInjectCss(),
@@ -27,45 +25,7 @@ export default defineConfig({
             formats: ['es'],
         },
         rollupOptions: {
-            external: [
-                'react',
-                'react-dom',
-                'react/jsx-runtime',
-                // Routing
-                'react-router-dom',
-
-                // State management
-                'zustand',
-                'zustand/middleware',
-                '@tanstack/react-query',
-
-                // UI frameworks and icons
-                'lucide-react',
-                '@radix-ui/react-icons',
-                '@radix-ui/react-dialog',
-                '@radix-ui/react-dropdown-menu',
-
-                // Forms handling
-                'react-hook-form',
-                '@hookform/resolvers/zod',
-                'zod',
-
-                // Utilities
-                'tailwind-merge',
-
-                // Flow/visualization
-                '@xyflow/react',
-
-                // Specific heavy components
-                'monaco-editor',
-                'react-json-view',
-
-                // Analytics
-                'posthog-js',
-
-                // Assistant UI
-                '@assistant-ui/react',
-            ],
+            external: ['react', 'react-dom', 'react/jsx-runtime'],
             // https://rollupjs.org/configuration-options/#input
             input: Object.fromEntries(
                 globSync(['src/components/**/index.tsx', 'src/main.ts']).map((file) => {
@@ -75,7 +35,6 @@ export default defineConfig({
                     // This expands the relative paths to absolute paths, so e.g.
                     // src/nested/foo becomes /project/src/nested/foo.js
                     const entryUrl = fileURLToPath(new URL(file, import.meta.url));
-
                     return [entryName, entryUrl];
                 })
             ),
