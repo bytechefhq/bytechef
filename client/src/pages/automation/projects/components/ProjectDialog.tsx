@@ -1,3 +1,4 @@
+import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
@@ -21,7 +22,6 @@ import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/shared/querie
 import {ProjectTagKeys, useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 

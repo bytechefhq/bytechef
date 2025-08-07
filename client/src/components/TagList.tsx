@@ -1,8 +1,8 @@
+import CreatableSelect, {SelectOptionType} from '@/components/CreatableSelect/CreatableSelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ChevronDownIcon, Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
-import CreatableSelect, {SelectOptionType} from 'components/CreatableSelect/CreatableSelect';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 
