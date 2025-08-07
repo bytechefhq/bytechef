@@ -1,5 +1,4 @@
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {posthog} from 'posthog-js';
 import {useRef} from 'react';
 import {createStore, useStore} from 'zustand';
 import {devtools} from 'zustand/middleware';
@@ -38,7 +37,7 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
 
     const {featureFlags, setFeatureFlag} = useStore(featureFlagsStore, (state) => state);
 
-    const {featureFlags: localFeatureFlags} = useApplicationInfoStore();
+    const {analytics, featureFlags: localFeatureFlags} = useApplicationInfoStore();
 
     return (featureFlag: string): boolean => {
         if (loadingRef.current) {
@@ -47,27 +46,47 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
 
         loadingRef.current = true;
 
+        // First check local feature flags from server
         if (localFeatureFlags[featureFlag] !== undefined) {
             loadingRef.current = false;
 
             return localFeatureFlags[featureFlag];
         }
 
+        // Then check cached feature flags
         if (featureFlags[featureFlag] !== undefined) {
             loadingRef.current = false;
 
             return featureFlags[featureFlag];
         }
 
-        posthog.onFeatureFlags(function () {
-            if (posthog.isFeatureEnabled(featureFlag)) {
-                setFeatureFlag(featureFlag, true);
-            } else {
-                setFeatureFlag(featureFlag, false);
-            }
+        // Only try to use PostHog if analytics are enabled
+        if (analytics.enabled && analytics.postHog.apiKey && analytics.postHog.host) {
+            // Dynamically import PostHog only when needed
+            import('posthog-js')
+                .then((posthog) => {
+                    posthog.default.onFeatureFlags(function () {
+                        if (posthog.default.isFeatureEnabled(featureFlag)) {
+                            setFeatureFlag(featureFlag, true);
+                        } else {
+                            setFeatureFlag(featureFlag, false);
+                        }
+
+                        loadingRef.current = false;
+                    });
+                })
+                .catch(() => {
+                    // If PostHog fails to load, default to false
+                    setFeatureFlag(featureFlag, false);
+
+                    loadingRef.current = false;
+                });
+        } else {
+            // If analytics are disabled, default to false
+            setFeatureFlag(featureFlag, false);
 
             loadingRef.current = false;
-        });
+        }
 
         return featureFlags[featureFlag] ?? false;
     };
