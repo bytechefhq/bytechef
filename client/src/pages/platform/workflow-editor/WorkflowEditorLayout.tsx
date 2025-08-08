@@ -25,9 +25,9 @@ import WorkflowCodeEditorSheet from './components/WorkflowCodeEditorSheet';
 import {
     DataPillPanelSkeleton,
     RightSidebarSkeleton,
-    SheetSkeleton,
     WorkflowNodeDetailsPanelSkeleton,
 } from './components/WorkflowEditorSkeletons';
+import WorkflowOutputsSheet from './components/WorkflowOutputsSheet';
 import WorkflowInputsSheet from './components/workflow-inputs/WorkflowInputsSheet';
 import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
@@ -36,8 +36,6 @@ import saveClusterElementNodesPosition from './utils/saveClusterElementNodesPosi
 
 const WorkflowNodeDetailsPanel = lazy(() => import('./components/WorkflowNodeDetailsPanel'));
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
-const WorkflowOutputsSheet = lazy(() => import('./components/WorkflowOutputsSheet'));
-const WorkflowInputsSheet = lazy(() => import('./components/workflow-inputs/WorkflowInputsSheet'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
 const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSidebar'));
 const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSidebar'));
@@ -237,6 +235,14 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                     onSheetOpenChange={setShowWorkflowInputsSheet}
                     sheetOpen={showWorkflowInputsSheet}
                     workflowTestConfiguration={workflowTestConfiguration}
+                />
+            )}
+
+            {showWorkflowOutputsSheet && (
+                <WorkflowOutputsSheet
+                    onSheetOpenChange={setShowWorkflowOutputsSheet}
+                    sheetOpen={showWorkflowOutputsSheet}
+                    workflow={workflow}
                 />
             )}
 

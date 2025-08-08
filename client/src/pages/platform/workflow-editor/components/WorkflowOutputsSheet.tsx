@@ -1,8 +1,10 @@
-import {Button} from '@/components/ui/button';
-import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
-import WorkflowOutputsSheetTable from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetTable';
+import {Sheet, SheetContent} from '@/components/ui/sheet';
 import {Workflow} from '@/shared/middleware/platform/configuration';
+import {Suspense, lazy} from 'react';
+
+import {WorkflowSheetSkeleton} from './WorkflowEditorSkeletons';
+
+const WorkflowOutputsSheetContent = lazy(() => import('./WorkflowOutputsSheetContent'));
 
 interface WorkflowOutputsSheetProps {
     onSheetOpenChange: (open: boolean) => void;
@@ -17,22 +19,9 @@ const WorkflowOutputsSheet = ({onSheetOpenChange, sheetOpen, workflow}: Workflow
             onFocusOutside={(event) => event.preventDefault()}
             onPointerDownOutside={(event) => event.preventDefault()}
         >
-            <SheetHeader className="flex flex-row items-center justify-between">
-                <SheetTitle>Workflow Outputs</SheetTitle>
-
-                <div className="flex items-center gap-1">
-                    {!!workflow.outputs?.length && (
-                        <WorkflowOutputsSheetDialog
-                            triggerNode={<Button size="sm">New Output</Button>}
-                            workflow={workflow}
-                        />
-                    )}
-
-                    <SheetCloseButton />
-                </div>
-            </SheetHeader>
-
-            <WorkflowOutputsSheetTable workflow={workflow} />
+            <Suspense fallback={<WorkflowSheetSkeleton title="Workflow Outputs" />}>
+                <WorkflowOutputsSheetContent workflow={workflow} />
+            </Suspense>
         </SheetContent>
     </Sheet>
 );

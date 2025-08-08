@@ -38,22 +38,6 @@ export const RightSidebarSkeleton = () => (
     </div>
 );
 
-export const SheetSkeleton = () => (
-    <div className="w-workflow-outputs-sheet-dialog-width">
-        <div className="flex items-center justify-between">
-            <Skeleton className="h-6 w-1/2" />
-
-            <Skeleton className="h-6 w-8" />
-        </div>
-
-        <div className="mt-4 space-y-2">
-            <Skeleton className="h-4 w-full" />
-
-            <Skeleton className="h-4 w-3/4" />
-        </div>
-    </div>
-);
-
 export const FieldsetSkeleton = ({bottomBorder = false, label}: {bottomBorder?: boolean; label: string}) => (
     <div className={twMerge('flex flex-col', bottomBorder && 'border-b border-muted p-4')}>
         <span className="text-sm font-medium leading-6">{label}</span>
@@ -142,10 +126,10 @@ export const WorkflowCodeEditorSheetSkeleton = () => (
     </div>
 );
 
-export const WorkflowInputsSheetSkeleton = () => (
+export const WorkflowSheetSkeleton = ({title}: {title: string}) => (
     <div className="flex size-full flex-col">
         <header className="flex w-full items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Workflow Inputs</h2>
+            <h2 className="text-lg font-semibold text-foreground">{title}</h2>
 
             <Skeleton className="size-9" />
         </header>
