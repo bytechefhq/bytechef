@@ -141,3 +141,17 @@ export const WorkflowCodeEditorSheetSkeleton = () => (
         <div className="h-2/5 w-full" />
     </div>
 );
+
+export const WorkflowInputsSheetSkeleton = () => (
+    <div className="flex size-full flex-col">
+        <header className="flex w-full items-center justify-between">
+            <h2 className="text-lg font-semibold text-foreground">Workflow Inputs</h2>
+
+            <Skeleton className="size-9" />
+        </header>
+
+        <div className="flex size-full flex-col items-center justify-center p-4">
+            <LoadingDots />
+        </div>
+    </div>
+);

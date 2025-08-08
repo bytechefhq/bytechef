@@ -28,6 +28,7 @@ import {
     SheetSkeleton,
     WorkflowNodeDetailsPanelSkeleton,
 } from './components/WorkflowEditorSkeletons';
+import WorkflowInputsSheet from './components/workflow-inputs/WorkflowInputsSheet';
 import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
@@ -230,22 +231,14 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                 </Suspense>
             )}
 
-            <Suspense fallback={<SheetSkeleton />}>
+            {showWorkflowInputsSheet && (
                 <WorkflowInputsSheet
                     invalidateWorkflowQueries={invalidateWorkflowQueries!}
                     onSheetOpenChange={setShowWorkflowInputsSheet}
                     sheetOpen={showWorkflowInputsSheet}
                     workflowTestConfiguration={workflowTestConfiguration}
                 />
-            </Suspense>
-
-            <Suspense fallback={<SheetSkeleton />}>
-                <WorkflowOutputsSheet
-                    onSheetOpenChange={setShowWorkflowOutputsSheet}
-                    sheetOpen={showWorkflowOutputsSheet}
-                    workflow={workflow}
-                />
-            </Suspense>
+            )}
 
             {showWorkflowCodeEditorSheet && (
                 <WorkflowCodeEditorSheet
