@@ -26,15 +26,11 @@ export const WorkflowNodeDetailsPanelSkeleton = () => (
     </div>
 );
 
-export const RightSidebarSkeleton = () => (
-    <div className="flex w-sidebar-width flex-col gap-4 p-4">
-        <Skeleton className="h-8 w-3/4" />
-
-        <Skeleton className="h-6 w-full" />
-
-        <Skeleton className="h-6 w-1/2" />
-
-        <Skeleton className="h-6 w-3/4" />
+export const WorkflowRightSidebarSkeleton = () => (
+    <div className="absolute right-0 m-2 flex flex-col items-center gap-1 rounded-md border border-stroke-neutral-secondary bg-background p-1">
+        {Array.from({length: 4}).map((_, index) => (
+            <Skeleton className="size-9" key={index} />
+        ))}
     </div>
 );
 
@@ -138,4 +134,28 @@ export const WorkflowSheetSkeleton = ({title}: {title: string}) => (
             <LoadingDots />
         </div>
     </div>
+);
+
+export const WorkflowNodesSidebarSkeleton = () => (
+    <aside className="absolute inset-y-2 right-14 flex w-96 flex-col gap-2 overflow-hidden rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary p-4">
+        <Skeleton className="h-9 w-full" />
+
+        <div className="flex space-x-2">
+            {Array.from({length: 3}).map((_, index) => (
+                <Skeleton className="h-7 w-1/3" key={index} />
+            ))}
+        </div>
+
+        <div className="flex justify-between">
+            <Skeleton className="h-9 w-1/6" />
+
+            <Skeleton className="size-9" />
+        </div>
+
+        <div className="flex flex-col space-y-2">
+            {Array.from({length: 12}).map((_, index) => (
+                <Skeleton className="h-12 w-full" key={index} />
+            ))}
+        </div>
+    </aside>
 );
