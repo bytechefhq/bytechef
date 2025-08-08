@@ -2,6 +2,8 @@ import {CrossCircledIcon} from '@radix-ui/react-icons';
 import {PropsWithChildren} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import LoadingDots from './LoadingDots';
+
 type TErrorType = Error | null;
 
 const PageLoader = ({
@@ -29,15 +31,7 @@ const PageLoader = ({
                             <h1>Some error occurred.</h1>
                         </div>
                     ) : (
-                        <div className="flex animate-pulse space-x-2">
-                            <div className="size-4 rounded-full bg-gray-400"></div>
-
-                            <div className="size-4 rounded-full bg-gray-400"></div>
-
-                            <div className="size-4 rounded-full bg-gray-400"></div>
-
-                            <div className="size-4 rounded-full bg-gray-400"></div>
-                        </div>
+                        <LoadingDots />
                     )}
                 </div>
             ) : (
