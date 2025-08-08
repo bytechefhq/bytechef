@@ -21,6 +21,7 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
 import ClusterElementsWorkflowEditor from '../cluster-element-editor/components/ClusterElementsWorkflowEditor';
+import WorkflowCodeEditorSheet from './components/WorkflowCodeEditorSheet';
 import {
     DataPillPanelSkeleton,
     RightSidebarSkeleton,
@@ -36,7 +37,6 @@ const WorkflowNodeDetailsPanel = lazy(() => import('./components/WorkflowNodeDet
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
 const WorkflowOutputsSheet = lazy(() => import('./components/WorkflowOutputsSheet'));
 const WorkflowInputsSheet = lazy(() => import('./components/workflow-inputs/WorkflowInputsSheet'));
-const WorkflowCodeEditorSheet = lazy(() => import('./components/WorkflowCodeEditorSheet'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
 const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSidebar'));
 const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSidebar'));
@@ -129,18 +129,20 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                         </Suspense>
                     )}
 
-                    <Suspense fallback={<RightSidebarSkeleton />}>
-                        <WorkflowRightSidebar
-                            copilotPanelOpen={copilotPanelOpen}
-                            onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
-                            onCopilotClick={handleCopilotClick}
-                            onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
-                            onWorkflowInputsClick={handleWorkflowInputsClick}
-                            onWorkflowOutputsClick={handleWorkflowOutputsClick}
-                            rightSidebarOpen={rightSidebarOpen}
-                            showWorkflowInputs={showWorkflowInputs}
-                        />
-                    </Suspense>
+                    {componentDefinitions && taskDispatcherDefinitions && (
+                        <Suspense fallback={<RightSidebarSkeleton />}>
+                            <WorkflowRightSidebar
+                                copilotPanelOpen={copilotPanelOpen}
+                                onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
+                                onCopilotClick={handleCopilotClick}
+                                onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
+                                onWorkflowInputsClick={handleWorkflowInputsClick}
+                                onWorkflowOutputsClick={handleWorkflowOutputsClick}
+                                rightSidebarOpen={rightSidebarOpen}
+                                showWorkflowInputs={showWorkflowInputs}
+                            />
+                        </Suspense>
+                    )}
                 </div>
             </PageLoader>
 
@@ -245,7 +247,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                 />
             </Suspense>
 
-            <Suspense fallback={<SheetSkeleton />}>
+            {showWorkflowCodeEditorSheet && (
                 <WorkflowCodeEditorSheet
                     invalidateWorkflowQueries={invalidateWorkflowQueries!}
                     onSheetOpenClose={setShowWorkflowCodeEditorSheet}
@@ -255,7 +257,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                     workflow={workflow}
                     workflowTestConfiguration={workflowTestConfiguration}
                 />
-            </Suspense>
+            )}
         </ReactFlowProvider>
     );
 };

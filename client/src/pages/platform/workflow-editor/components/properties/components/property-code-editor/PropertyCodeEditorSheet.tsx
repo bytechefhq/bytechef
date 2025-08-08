@@ -1,3 +1,4 @@
+import LoadingDots from '@/components/LoadingDots';
 import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
@@ -145,13 +146,7 @@ const PropertyCodeEditorSheet = ({
                                         scriptTestExecution ? (
                                             scriptTestExecution.output ? (
                                                 typeof scriptTestExecution.output === 'object' ? (
-                                                    <Suspense
-                                                        fallback={
-                                                            <div className="p-4 text-sm text-muted-foreground">
-                                                                Loading...
-                                                            </div>
-                                                        }
-                                                    >
+                                                    <Suspense fallback={<LoadingDots />}>
                                                         <ReactJson
                                                             enableClipboard={false}
                                                             sortKeys={true}

@@ -1,8 +1,7 @@
-import LoadingIcon from '@/components/LoadingIcon';
+import LoadingDots from '@/components/LoadingDots';
 import {editor} from 'monaco-editor';
 import {Suspense, lazy} from 'react';
 
-// Lazy load the actual Monaco Editor
 const Editor = lazy(() => import('@monaco-editor/react'));
 
 export type StandaloneCodeEditorType = editor.IStandaloneCodeEditor;
@@ -16,20 +15,15 @@ interface MonacoEditorProps {
     value?: string;
 }
 
-// Wrap the Editor with Suspense
 const MonacoEditorWrapper = (props: MonacoEditorProps) => (
     <Suspense fallback={<MonacoEditorLoader />}>
-        <Editor {...props} />
+        <Editor {...props} loading={<MonacoEditorLoader />} />
     </Suspense>
 );
 
 export const MonacoEditorLoader = () => (
-    <div className="flex h-full items-center justify-center p-4">
-        <div className="flex items-center gap-2">
-            <LoadingIcon className="size-4 animate-spin text-muted-foreground" />
-
-            <span className="text-muted-foreground">Loading editor...</span>
-        </div>
+    <div className="flex size-full items-center justify-center p-4">
+        <LoadingDots />
     </div>
 );
 
