@@ -4,7 +4,6 @@ import '@xyflow/react/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
-import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
@@ -24,8 +23,9 @@ import ClusterElementsWorkflowEditor from '../cluster-element-editor/components/
 import WorkflowCodeEditorSheet from './components/WorkflowCodeEditorSheet';
 import {
     DataPillPanelSkeleton,
-    RightSidebarSkeleton,
     WorkflowNodeDetailsPanelSkeleton,
+    WorkflowNodesSidebarSkeleton,
+    WorkflowRightSidebarSkeleton,
 } from './components/WorkflowEditorSkeletons';
 import WorkflowOutputsSheet from './components/WorkflowOutputsSheet';
 import WorkflowInputsSheet from './components/workflow-inputs/WorkflowInputsSheet';
@@ -73,8 +73,6 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
     const {
         componentDefinitions,
-        componentsError,
-        componentsIsLoading,
         filteredWorkflowNodeOutputs,
         handleComponentsAndFlowControlsClick,
         handleCopilotClick,
@@ -83,8 +81,6 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
         handleWorkflowOutputsClick,
         previousComponentDefinitions,
         taskDispatcherDefinitions,
-        taskDispatcherDefinitionsError,
-        taskDispatcherDefinitionsLoading,
         testConfigurationDisabled,
         workflowTestConfiguration,
     } = useWorkflowLayout(includeComponents);
@@ -101,49 +97,44 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
     return (
         <ReactFlowProvider>
-            <PageLoader
-                errors={[componentsError, taskDispatcherDefinitionsError]}
-                loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
-            >
-                <div className={twMerge('relative mx-3 mb-3 flex w-full', projectLeftSidebarOpen && 'ml-0')}>
-                    {componentDefinitions && taskDispatcherDefinitions && (
-                        <Suspense>
-                            <WorkflowEditor
-                                componentDefinitions={componentDefinitions}
-                                invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                                projectLeftSidebarOpen={projectLeftSidebarOpen}
-                                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                            />
-                        </Suspense>
-                    )}
+            <div className={twMerge('relative mx-3 mb-3 flex w-full', projectLeftSidebarOpen && 'ml-0')}>
+                {componentDefinitions && taskDispatcherDefinitions && (
+                    <Suspense>
+                        <WorkflowEditor
+                            componentDefinitions={componentDefinitions}
+                            invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                            projectLeftSidebarOpen={projectLeftSidebarOpen}
+                            taskDispatcherDefinitions={taskDispatcherDefinitions}
+                        />
+                    </Suspense>
+                )}
 
-                    {rightSidebarOpen && componentDefinitions && taskDispatcherDefinitions && (
-                        <Suspense fallback={<RightSidebarSkeleton />}>
-                            <WorkflowNodesSidebar
-                                data={{
-                                    componentDefinitions,
-                                    taskDispatcherDefinitions,
-                                }}
-                            />
-                        </Suspense>
-                    )}
+                {rightSidebarOpen && componentDefinitions && taskDispatcherDefinitions && (
+                    <Suspense fallback={<WorkflowNodesSidebarSkeleton />}>
+                        <WorkflowNodesSidebar
+                            data={{
+                                componentDefinitions,
+                                taskDispatcherDefinitions,
+                            }}
+                        />
+                    </Suspense>
+                )}
 
-                    {componentDefinitions && taskDispatcherDefinitions && (
-                        <Suspense fallback={<RightSidebarSkeleton />}>
-                            <WorkflowRightSidebar
-                                copilotPanelOpen={copilotPanelOpen}
-                                onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
-                                onCopilotClick={handleCopilotClick}
-                                onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
-                                onWorkflowInputsClick={handleWorkflowInputsClick}
-                                onWorkflowOutputsClick={handleWorkflowOutputsClick}
-                                rightSidebarOpen={rightSidebarOpen}
-                                showWorkflowInputs={showWorkflowInputs}
-                            />
-                        </Suspense>
-                    )}
-                </div>
-            </PageLoader>
+                {componentDefinitions && taskDispatcherDefinitions && (
+                    <Suspense fallback={<WorkflowRightSidebarSkeleton />}>
+                        <WorkflowRightSidebar
+                            copilotPanelOpen={copilotPanelOpen}
+                            onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
+                            onCopilotClick={handleCopilotClick}
+                            onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
+                            onWorkflowInputsClick={handleWorkflowInputsClick}
+                            onWorkflowOutputsClick={handleWorkflowOutputsClick}
+                            rightSidebarOpen={rightSidebarOpen}
+                            showWorkflowInputs={showWorkflowInputs}
+                        />
+                    </Suspense>
+                )}
+            </div>
 
             {currentComponent && !isRootClusterElement && (
                 <Suspense fallback={<WorkflowNodeDetailsPanelSkeleton />}>
