@@ -1,3 +1,4 @@
+import LoadingDots from '@/components/LoadingDots';
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
@@ -223,7 +224,11 @@ function App() {
     }, [currentType, location, setCurrentType]);
 
     if (loading || !sessionHasBeenFetched) {
-        return <></>;
+        return (
+            <div className="flex min-h-screen min-w-full items-center justify-center p-5">
+                <LoadingDots />
+            </div>
+        );
     }
 
     return authenticated ? (
