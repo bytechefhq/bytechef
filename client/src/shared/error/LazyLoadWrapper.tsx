@@ -15,7 +15,7 @@ interface LazyLoadWrapperProps {
  */
 const LazyLoadWrapper: FC<LazyLoadWrapperProps> = ({children, errorFallback, fallback, onReset}) => {
     const defaultFallback = (
-        <div className="flex h-full items-center justify-center p-8">
+        <div className="flex size-full items-center justify-center p-8">
             <div className="flex animate-pulse space-x-2">
                 <div className="size-4 rounded-full bg-gray-400"></div>
 
