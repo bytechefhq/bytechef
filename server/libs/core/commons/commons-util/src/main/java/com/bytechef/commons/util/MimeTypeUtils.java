@@ -18,10 +18,10 @@ package com.bytechef.commons.util;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
-//import org.springframework.util.MimeType;
 
 /**
- * Map file extensions to MIME types. Based on the Apache mime.types file. http://www.iana.org/assignments/media-types/
+ * Map file extensions to MIME types. Based on the Apache mime.types file.
+ * <a href="http://www.iana.org/assignments/media-types/">...</a>
  */
 @SuppressFBWarnings("CT")
 public class MimeTypeUtils {
@@ -123,7 +123,6 @@ public class MimeTypeUtils {
     public static final String MIME_MODEL_IGES = "model/iges";
     public static final String MIME_MODEL_MESH = "model/mesh";
     public static final String MIME_MODEL_VRLM = "model/vrml";
-    public static final String MIME_MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String MIME_TEXT_PLAIN = "text/plain";
     public static final String MIME_TEXT_RICHTEXT = "text/richtext";
     public static final String MIME_TEXT_RTF = "text/rtf";
