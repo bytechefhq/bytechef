@@ -61,6 +61,14 @@
         "description" : null,
         "label" : "claude-3-sonnet-20240229",
         "value" : "claude-3-sonnet-20240229"
+      }, {
+        "description" : null,
+        "label" : "claude-opus-4-0",
+        "value" : "claude-opus-4-0"
+      }, {
+        "description" : null,
+        "label" : "claude-sonnet-4-0",
+        "value" : "claude-sonnet-4-0"
       } ],
       "optionsDataSource" : null,
       "placeholder" : null,
@@ -534,6 +542,14 @@
         "description" : null,
         "label" : "claude-3-sonnet-20240229",
         "value" : "claude-3-sonnet-20240229"
+      }, {
+        "description" : null,
+        "label" : "claude-opus-4-0",
+        "value" : "claude-opus-4-0"
+      }, {
+        "description" : null,
+        "label" : "claude-sonnet-4-0",
+        "value" : "claude-sonnet-4-0"
       } ],
       "optionsDataSource" : null,
       "placeholder" : null,

@@ -1306,6 +1306,10 @@
       "name" : "model",
       "options" : [ {
         "description" : null,
+        "label" : "gpt-4o-mini-tts",
+        "value" : "gpt-4o-mini-tts"
+      }, {
+        "description" : null,
         "label" : "tts-1",
         "value" : "tts-1"
       }, {
@@ -1364,6 +1368,10 @@
         "value" : "ASH"
       }, {
         "description" : null,
+        "label" : "ballad",
+        "value" : "BALLAD"
+      }, {
+        "description" : null,
         "label" : "coral",
         "value" : "CORAL"
       }, {
@@ -1390,6 +1398,10 @@
         "description" : null,
         "label" : "shimmer",
         "value" : "SHIMMER"
+      }, {
+        "description" : null,
+        "label" : "verse",
+        "value" : "VERSE"
       } ],
       "optionsDataSource" : null,
       "placeholder" : null,

@@ -35,6 +35,18 @@
         "value" : "codestral-latest"
       }, {
         "description" : null,
+        "label" : "devstral-small-latest",
+        "value" : "devstral-small-latest"
+      }, {
+        "description" : null,
+        "label" : "magistral-medium-latest",
+        "value" : "magistral-medium-latest"
+      }, {
+        "description" : null,
+        "label" : "magistral-small-latest",
+        "value" : "magistral-small-latest"
+      }, {
+        "description" : null,
         "label" : "ministral-3b-latest",
         "value" : "ministral-3b-latest"
       }, {
@@ -45,6 +57,10 @@
         "description" : null,
         "label" : "mistral-large-latest",
         "value" : "mistral-large-latest"
+      }, {
+        "description" : null,
+        "label" : "mistral-medium-latest",
+        "value" : "mistral-medium-latest"
       }, {
         "description" : null,
         "label" : "mistral-small-latest",
@@ -1480,6 +1496,18 @@
         "value" : "codestral-latest"
       }, {
         "description" : null,
+        "label" : "devstral-small-latest",
+        "value" : "devstral-small-latest"
+      }, {
+        "description" : null,
+        "label" : "magistral-medium-latest",
+        "value" : "magistral-medium-latest"
+      }, {
+        "description" : null,
+        "label" : "magistral-small-latest",
+        "value" : "magistral-small-latest"
+      }, {
+        "description" : null,
         "label" : "ministral-3b-latest",
         "value" : "ministral-3b-latest"
       }, {
@@ -1490,6 +1518,10 @@
         "description" : null,
         "label" : "mistral-large-latest",
         "value" : "mistral-large-latest"
+      }, {
+        "description" : null,
+        "label" : "mistral-medium-latest",
+        "value" : "mistral-medium-latest"
       }, {
         "description" : null,
         "label" : "mistral-small-latest",
