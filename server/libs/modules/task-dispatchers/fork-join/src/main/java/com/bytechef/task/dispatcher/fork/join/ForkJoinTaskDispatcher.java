@@ -30,7 +30,6 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants;
@@ -108,12 +107,8 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
+        List<List<WorkflowTask>> branchesWorkflowTasks = MapUtils.getRequiredList(
             taskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCHES, new TypeReference<>() {});
-
-        List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(source -> CollectionUtils.map(source, WorkflowTask::new))
-            .toList();
 
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
@@ -127,19 +122,22 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
-            counterService.set(Validate.notNull(taskExecution.getId(), "id"), branchesWorkflowTasks.size());
+            long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
+
+            counterService.set(taskExecutionId, branchesWorkflowTasks.size());
+
+            long taskExecutionJobId = Validate.notNull(
+                taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
 
             for (int i = 0; i < branchesWorkflowTasks.size(); i++) {
                 List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(i);
 
                 Validate.isTrue(!branchWorkflowTasks.isEmpty(), "branch " + i + " does not contain any tasks");
 
-                WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(0);
-
-                Validate.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
+                WorkflowTask branchWorkflowTask = branchWorkflowTasks.getFirst();
 
                 TaskExecution branchTaskExecution = TaskExecution.builder()
-                    .jobId(taskExecution.getJobId())
+                    .jobId(taskExecutionJobId)
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(1)
@@ -151,23 +149,21 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                     .build();
 
                 Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION));
+                    contextService.peek(taskExecutionId, Classname.TASK_EXECUTION));
 
                 branchTaskExecution.evaluate(context, evaluator);
 
                 branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 
-                contextService.push(
-                    Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                    taskFileStorage.storeContextValue(
-                        Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                        context));
-                contextService.push(
-                    Validate.notNull(taskExecution.getId(), "id"), i, Classname.TASK_EXECUTION,
-                    taskFileStorage.storeContextValue(Validate.notNull(taskExecution.getId(), "id"), i,
-                        Classname.TASK_EXECUTION,
-                        context));
+                long branchTaskExecutionId = Validate.notNull(branchTaskExecution.getId(), "id");
 
+                contextService.push(
+                    branchTaskExecutionId, Classname.TASK_EXECUTION,
+                    taskFileStorage.storeContextValue(branchTaskExecutionId, Classname.TASK_EXECUTION, context));
+
+                contextService.push(
+                    taskExecutionId, i, Classname.TASK_EXECUTION,
+                    taskFileStorage.storeContextValue(taskExecutionId, i, Classname.TASK_EXECUTION, context));
                 taskDispatcher.dispatch(branchTaskExecution);
             }
         }

@@ -195,8 +195,7 @@ public class TaskWorker {
 
             if (output != null) {
                 taskExecution.setOutput(
-                    taskFileStorage.storeTaskExecutionOutput(
-                        Validate.notNull(taskExecution.getId(), "id"), output));
+                    taskFileStorage.storeTaskExecutionOutput(Validate.notNull(taskExecution.getId(), "id"), output));
             }
 
             taskExecution.setEndDate(Instant.now());

@@ -18,6 +18,9 @@
 
 package com.bytechef.task.dispatcher.fork.join.completion;
 
+import static com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants.BRANCH;
+import static com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants.FORK_JOIN;
+
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -29,7 +32,6 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants;
@@ -79,8 +81,17 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        return taskExecution.getParentId() != null
-            && MapUtils.get(taskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCH) != null;
+        Long parentId = taskExecution.getParentId();
+
+        if (parentId != null) {
+            TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
+
+            String type = parentExecution.getType();
+
+            return type.equals(FORK_JOIN + "/v1") && MapUtils.get(taskExecution.getParameters(), BRANCH) != null;
+        }
+
+        return false;
     }
 
     @Override
@@ -92,7 +103,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
         long taskExecutionParentId = Objects.requireNonNull(taskExecution.getParentId());
 
         if (taskExecution.getName() != null) {
-            int branch = MapUtils.getInteger(taskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCH);
+            int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
 
             Map<String, Object> newContext = new HashMap<>(
                 taskFileStorage.readContextValue(
@@ -112,18 +123,15 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
         }
 
         TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecutionParentId);
-        List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
+
+        List<List<WorkflowTask>> branchesWorkflowTasks = MapUtils.getRequiredList(
             forkJoinTaskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCHES, new TypeReference<>() {});
 
-        List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(curList -> CollectionUtils.map(curList, WorkflowTask::new))
-            .toList();
-
         List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(
-            MapUtils.getInteger(taskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCH));
+            MapUtils.getInteger(taskExecution.getParameters(), BRANCH));
 
         if (taskExecution.getTaskNumber() < branchWorkflowTasks.size()) {
-            int branch = MapUtils.getInteger(taskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCH);
+            int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
 
             WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(taskExecution.getTaskNumber());
 
@@ -137,8 +145,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 .workflowTask(
                     new WorkflowTask(
                         MapUtils.append(
-                            branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS,
-                            Map.of(ForkJoinTaskDispatcherConstants.BRANCH, branch))))
+                            branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS, Map.of(BRANCH, branch))))
                 .build();
 
             Map<String, ?> context = taskFileStorage.readContextValue(
