@@ -76,7 +76,7 @@ public class MapTaskDispatcherIntTest {
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         Assertions.assertEquals(
-            IntStream.rangeClosed(2, 11)
+            IntStream.rangeClosed(3, 12)
                 .boxed()
                 .collect(Collectors.toList()),
             outputs.get("map"));
@@ -94,7 +94,7 @@ public class MapTaskDispatcherIntTest {
             IntStream.rangeClosed(1, 10)
                 .boxed()
                 .map(item1 -> IntStream.rangeClosed(1, item1)
-                    .mapToObj(item2 -> item1 + "_" + item2)
+                    .mapToObj(item2 -> item1 + "_" + item2 + 1)
                     .collect(Collectors.toList()))
                 .collect(Collectors.toList()),
             outputs.get("map"));
@@ -106,7 +106,8 @@ public class MapTaskDispatcherIntTest {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
-                counterService, taskCompletionHandler, taskExecutionService, taskFileStorage));
+                contextService, counterService, SpelEvaluator.create(), taskDispatcher, taskCompletionHandler,
+                taskExecutionService, taskFileStorage));
     }
 
     @SuppressWarnings("PMD")

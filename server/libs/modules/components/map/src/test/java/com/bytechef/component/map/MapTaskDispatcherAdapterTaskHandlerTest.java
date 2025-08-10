@@ -79,10 +79,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                         PARAMETERS, Map.of(
                             "items", List.of(1, 2, 3),
                             "iteratee",
-                            Map.of(
-                                NAME, "name",
-                                TYPE, "var",
-                                PARAMETERS, Map.of("value", "${map1.item}"))))))
+                            List.of(
+                                Map.of(
+                                    NAME, "name",
+                                    TYPE, "var",
+                                    PARAMETERS, Map.of("value", "${map1.item}")))))))
             .build();
 
         taskExecution.setJobId(4567L);
@@ -106,7 +107,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                     new WorkflowTask(
                         Map.of(
                             PARAMETERS,
-                            Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "rogue")))))
+                            Map.of("list", List.of(1, 2, 3), "iteratee", List.of(Map.of("type", "rogue"))))))
                 .build();
 
             taskExecution.setJobId(4567L);
@@ -174,10 +175,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                                 Map.of(
                                     "items", Arrays.asList(1, 2, 3),
                                     "iteratee",
-                                    Map.of(
-                                        NAME, "var",
-                                        TYPE, "var",
-                                        PARAMETERS, Map.of("value", "${item}"))))),
+                                    List.of(
+                                        Map.of(
+                                            NAME, "var",
+                                            TYPE, "var",
+                                            PARAMETERS, Map.of("value", "${item}")))))),
                         POST, List.of(
                             Map.of(
                                 NAME, "output",
@@ -186,10 +188,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                                 Map.of(
                                     "items", Arrays.asList(1, 2, 3),
                                     "iteratee",
-                                    Map.of(
-                                        NAME, "var",
-                                        TYPE, "var",
-                                        PARAMETERS, Map.of("value", "${item}"))))),
+                                    List.of(
+                                        Map.of(
+                                            NAME, "var",
+                                            TYPE, "var",
+                                            PARAMETERS, Map.of("value", "${item}")))))),
                         FINALIZE, List.of(Map.of(
                             NAME, "output",
                             TYPE, "map",
@@ -197,10 +200,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                             Map.of(
                                 "items", Arrays.asList(1, 2, 3),
                                 "iteratee",
-                                Map.of(
-                                    NAME, "var",
-                                    TYPE, "var",
-                                    PARAMETERS, Map.of("value", "${item}"))))))))
+                                List.of(
+                                    Map.of(
+                                        NAME, "var",
+                                        TYPE, "var",
+                                        PARAMETERS, Map.of("value", "${item}")))))))))
             .build();
 
         taskExecution.setId(1234L);

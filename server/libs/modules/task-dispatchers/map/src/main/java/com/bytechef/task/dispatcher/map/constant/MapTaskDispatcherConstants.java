@@ -26,4 +26,5 @@ public class MapTaskDispatcherConstants {
     public static final String ITEM = "item";
     public static final String ITEMS = "items";
     public static final String ITERATEE = "iteratee";
+    public static final String ITERATION = "__iteration";
 }

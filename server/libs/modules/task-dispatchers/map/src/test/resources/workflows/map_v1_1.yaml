@@ -9,7 +9,11 @@ tasks:
   parameters:
     items: "=range(1,10)"
     iteratee:
-      name: "sumVar1"
+    - name: "sumVar1"
       type: "var/v1/set"
       parameters:
         value: "=1 + map_1.item"
+    - name: "sumVar2"
+      type: "var/v1/set"
+      parameters:
+        value: "=1 + sumVar1"

@@ -134,7 +134,8 @@ public class TestExecutorConfiguration {
                 contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
-                counterService, taskCompletionHandler, taskExecutionService, taskFileStorage),
+                contextService, counterService, evaluator, taskDispatcher, taskCompletionHandler, taskExecutionService,
+                taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(
                 counterService, taskCompletionHandler, taskExecutionService));
     }
