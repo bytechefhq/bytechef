@@ -65,14 +65,14 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
     protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
         ObjectProperty variableProperties;
 
-        List<?> list = MapUtils.getRequiredList(inputParameters, ITEMS);
+        List<?> items = MapUtils.getList(inputParameters, ITEMS, List.of());
 
-        if (list.isEmpty()) {
+        if (items.isEmpty()) {
             variableProperties = object();
         } else {
             variableProperties = object().properties(
                 (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                    ITEM, list.getFirst(), PropertyFactory.PROPERTY_FACTORY),
+                    ITEM, items.getFirst(), PropertyFactory.PROPERTY_FACTORY),
                 integer(INDEX));
         }
 
