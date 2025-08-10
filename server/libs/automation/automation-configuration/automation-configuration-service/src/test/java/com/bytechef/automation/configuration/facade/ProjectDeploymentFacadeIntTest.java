@@ -161,19 +161,15 @@ public class ProjectDeploymentFacadeIntTest {
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
             workspace.getId(), projectDTO);
 
-        // Enable the project deployment
         projectDeploymentFacade.enableProjectDeployment(projectDeploymentDTO.id(), true);
 
-        // Get the workflow ID from the deployment
         String workflowId = projectDeploymentDTO.projectDeploymentWorkflows()
             .getFirst()
             .workflowId();
 
-        // Enable a workflow initially
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, true);
 
         // When - Update the same workflow (enabled to enabled transition)
-        // This should trigger the disable-then-enable logic from the commit
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, true);
 
         // Then - Verify the workflow is still enabled
@@ -197,10 +193,8 @@ public class ProjectDeploymentFacadeIntTest {
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
             workspace.getId(), projectDTO);
 
-        // Enable the project deployment
         projectDeploymentFacade.enableProjectDeployment(projectDeploymentDTO.id(), true);
 
-        // Get the workflow ID from the deployment and ensure it starts disabled
         String workflowId = projectDeploymentDTO.projectDeploymentWorkflows()
             .getFirst()
             .workflowId();
@@ -208,7 +202,6 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, false);
 
         // When - Enable the workflow (disabled to enabled transition)
-        // This should trigger the simple enable logic from the commit
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, true);
 
         // Then - Verify the workflow is enabled
@@ -232,10 +225,8 @@ public class ProjectDeploymentFacadeIntTest {
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
             workspace.getId(), projectDTO);
 
-        // Enable the project deployment
         projectDeploymentFacade.enableProjectDeployment(projectDeploymentDTO.id(), true);
 
-        // Get the workflow ID and enable it initially
         String workflowId = projectDeploymentDTO.projectDeploymentWorkflows()
             .getFirst()
             .workflowId();
@@ -266,10 +257,8 @@ public class ProjectDeploymentFacadeIntTest {
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
             workspace.getId(), projectDTO);
 
-        // Keep the project deployment disabled
         projectDeploymentFacade.enableProjectDeployment(projectDeploymentDTO.id(), false);
 
-        // Get the workflow ID from the deployment
         String workflowId = projectDeploymentDTO.projectDeploymentWorkflows()
             .getFirst()
             .workflowId();
@@ -278,7 +267,6 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, true);
 
         // Then - Verify the workflow is enabled but triggers should not be affected
-        // (since project deployment is disabled)
         ProjectDeploymentDTO updatedDeployment = projectDeploymentFacade.getProjectDeployment(
             projectDeploymentDTO.id());
 
