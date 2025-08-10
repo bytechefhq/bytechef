@@ -73,8 +73,27 @@ public class WorkflowTaskUtils {
 
                                 returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
                             }
+                            // Fork/join support
+                        } else if (firstItem instanceof List<?> list && !list.isEmpty() &&
+                            list.getFirst() instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.PARAMETERS)) {
+
+                            for (Object curItem : curList) {
+                                List<?> curSubList = (List<?>) curItem;
+
+                                List<WorkflowTask> curWorkflowTasks = curSubList.stream()
+                                    .map(item -> new WorkflowTask((Map<String, ?>) item))
+                                    .toList();
+
+                                returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
+                            }
                         }
                     }
+                    // Each support
+                } else if (entry.getValue() instanceof Map<?, ?> curMap &&
+                    curMap.containsKey(WorkflowConstants.PARAMETERS)) {
+
+                    returnedWorkflowTasks.addAll(
+                        getTasks(List.of(new WorkflowTask((Map<String, ?>) curMap)), lastWorkflowNodeName));
                 } else if (entry.getValue() instanceof Map<?, ?> curMap) {
                     for (Map.Entry<?, ?> curMapEntry : curMap.entrySet()) {
                         if (curMapEntry.getValue() instanceof WorkflowTask curWorkflowTask) {
