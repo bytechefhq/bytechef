@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.server;
+package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.tool.ProjectTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
