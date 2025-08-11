@@ -34,7 +34,6 @@ import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -100,7 +99,7 @@ public class AutomationMcpServerConfiguration {
     }
 
     private Function<Map<String, Object>, Object> getToolCallbackFunction(String toolName, Long connectionId) {
-        return inputParameters ->
-            toolFacade.executeTool(toolName, inputParameters, connectionId, Environment.PRODUCTION);
+        return inputParameters -> toolFacade.executeTool(toolName, inputParameters, connectionId,
+            Environment.PRODUCTION);
     }
 }
