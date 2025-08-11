@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.mcp.server;
+package com.bytechef.automation.ai.mcp.server.config;
 
 import com.bytechef.automation.execution.dto.ToolDTO;
 import com.bytechef.automation.execution.facade.ToolFacade;
@@ -53,7 +53,8 @@ public class AutomationMcpServerConfiguration {
 
     @Bean
     WebMvcSseServerTransportProvider webMvcSseServerTransportProvider(ObjectMapper objectMapper) {
-        return new WebMvcSseServerTransportProvider(objectMapper, "/api/automation/v1/mcp/message", "/automation/sse");
+        return new WebMvcSseServerTransportProvider(
+            objectMapper, "/api/automation/v1/mcp/message", "/api/automation/sse");
     }
 
     @Bean
@@ -84,7 +85,7 @@ public class AutomationMcpServerConfiguration {
 
         for (ToolDTO toolDTO : toolDTOs) {
             FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
-                .builder(toolDTO.name(), getToolCallbackFunction(toolDTO.name()))
+                .builder(toolDTO.name(), getToolCallbackFunction(toolDTO.name(), toolDTO.connectionId()))
                 .inputType(Map.class)
                 .inputSchema(toolDTO.parameters());
 
@@ -98,7 +99,8 @@ public class AutomationMcpServerConfiguration {
         return toolCallbacks;
     }
 
-    private Function<Map<String, Object>, Object> getToolCallbackFunction(String toolName) {
-        return inputParameters -> toolFacade.executeTool(toolName, inputParameters, Environment.PRODUCTION);
+    private Function<Map<String, Object>, Object> getToolCallbackFunction(String toolName, Long connectionId) {
+        return inputParameters ->
+            toolFacade.executeTool(toolName, inputParameters, connectionId, Environment.PRODUCTION);
     }
 }
