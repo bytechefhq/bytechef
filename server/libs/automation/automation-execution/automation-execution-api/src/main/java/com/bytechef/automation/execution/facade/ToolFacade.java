@@ -18,6 +18,7 @@ package com.bytechef.automation.execution.facade;
 
 import com.bytechef.automation.execution.dto.ToolDTO;
 import com.bytechef.platform.constant.Environment;
+
 import java.util.List;
 import java.util.Map;
 
@@ -28,5 +29,7 @@ public interface ToolFacade {
 
     List<ToolDTO> getTools();
 
-    Object executeTool(String toolName, Map<String, Object> inputParameters, Environment environment);
+    public Object executeTool(
+        String toolName, Map<String, Object> inputParameters, Long connectionId, Environment environment);
+
 }
