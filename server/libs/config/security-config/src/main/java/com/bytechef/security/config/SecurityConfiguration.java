@@ -205,8 +205,7 @@ public class SecurityConfiguration {
                 .requestMatchers(mvc.matcher("/api/**"))
                 .authenticated()
                 .requestMatchers(mvc.matcher("/graphql"))
-                .authenticated()
-            )
+                .authenticated())
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
                 .rememberMeParameter("remember-me")

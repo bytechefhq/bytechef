@@ -21,16 +21,14 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
-
 import com.bytechef.platform.configuration.domain.McpComponent;
 import com.bytechef.platform.configuration.service.McpComponentService;
 import com.bytechef.platform.configuration.service.McpToolService;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Matija Petanjek
@@ -42,7 +40,6 @@ public class ToolFacadeImpl implements ToolFacade {
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final McpComponentService mcpComponentService;
     private final McpToolService mcpToolService;
-
 
     @SuppressFBWarnings("EI")
     public ToolFacadeImpl(
@@ -71,8 +68,7 @@ public class ToolFacadeImpl implements ToolFacade {
                     getToolName(mcpComponent.getComponentName(), clusterElementDefinition.getName()),
                     clusterElementDefinition.getDescription(),
                     JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()),
-                    mcpComponent.getConnectionId()
-                );
+                    mcpComponent.getConnectionId());
             })
             .toList();
     }
