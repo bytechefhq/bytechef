@@ -28,7 +28,7 @@ public interface ToolFacade {
 
     List<ToolDTO> getTools();
 
-    public Object executeTool(
+    Object executeTool(
         String toolName, Map<String, Object> inputParameters, Long connectionId, Environment environment);
 
 }
