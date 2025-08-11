@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.mcp.server.security.web.filter;
+package com.bytechef.automation.ai.mcp.server.security.web.filter;
 
 import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
