@@ -41,7 +41,7 @@ import org.springframework.web.servlet.function.ServerResponse;
 /**
  * @author Ivica Cardic
  */
-@Configuration
+// @Configuration TODO remove comment once Spring supports multiple MCP servers
 public class AutomationMcpServerConfiguration {
 
     private final ToolFacade toolFacade;
