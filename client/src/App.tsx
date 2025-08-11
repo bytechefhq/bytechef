@@ -133,6 +133,10 @@ function App() {
 
     const queryClient = useQueryClient();
 
+    useEffect(() => {
+        getApplicationInfo();
+    }, [getApplicationInfo]);
+
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
@@ -194,10 +198,6 @@ function App() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionHasBeenFetched]);
-
-    useEffect(() => {
-        getApplicationInfo();
-    }, [getApplicationInfo]);
 
     useEffect(() => {
         if (!authenticated) {
