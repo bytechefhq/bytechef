@@ -355,7 +355,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                     children: [],
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
+                                            <LazyLoadWrapper hasLeftSidebar>
                                                 <Projects />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
@@ -383,7 +383,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
+                                            <LazyLoadWrapper hasLeftSidebar>
                                                 <ProjectDeployments />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
@@ -402,7 +402,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <EEVersion>
-                                                        <LazyLoadWrapper>
+                                                        <LazyLoadWrapper hasLeftSidebar>
                                                             <ApiCollections />
                                                         </LazyLoadWrapper>
                                                     </EEVersion>
@@ -414,7 +414,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <EEVersion>
-                                                        <LazyLoadWrapper>
+                                                        <LazyLoadWrapper hasLeftSidebar>
                                                             <ApiClients />
                                                         </LazyLoadWrapper>
                                                     </EEVersion>
@@ -438,7 +438,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
+                                            <LazyLoadWrapper hasLeftSidebar>
                                                 <AutomationWorkflowExecutions />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
@@ -448,7 +448,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
+                                            <LazyLoadWrapper hasLeftSidebar>
                                                 <AutomationConnections />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
@@ -467,7 +467,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                                     <EEVersion>
-                                                        <LazyLoadWrapper>
+                                                        <LazyLoadWrapper hasLeftSidebar>
                                                             <Workspaces />
                                                         </LazyLoadWrapper>
                                                     </EEVersion>
