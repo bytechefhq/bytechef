@@ -17,16 +17,20 @@
 package com.bytechef.automation.execution.facade;
 
 import com.bytechef.automation.execution.dto.ToolDTO;
-import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
+
+import com.bytechef.platform.configuration.domain.McpComponent;
+import com.bytechef.platform.configuration.service.McpComponentService;
+import com.bytechef.platform.configuration.service.McpToolService;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
 
 /**
  * @author Matija Petanjek
@@ -36,31 +40,46 @@ public class ToolFacadeImpl implements ToolFacade {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
+    private final McpComponentService mcpComponentService;
+    private final McpToolService mcpToolService;
+
 
     @SuppressFBWarnings("EI")
     public ToolFacadeImpl(
         ClusterElementDefinitionService clusterElementDefinitionService,
-        ClusterElementDefinitionFacade clusterElementDefinitionFacade) {
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
+        McpComponentService mcpComponentService, McpToolService mcpToolService) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
+        this.mcpComponentService = mcpComponentService;
+        this.mcpToolService = mcpToolService;
     }
 
     @Override
     public List<ToolDTO> getTools() {
-        return clusterElementDefinitionService.getClusterElementDefinitions(ToolFunction.TOOLS)
+        return mcpToolService.getMcpTools()
             .stream()
-            .map(clusterElementDefinition -> new ToolDTO(
-                getToolName(
-                    clusterElementDefinition.getComponentName(), clusterElementDefinition.getName()),
-                clusterElementDefinition.getDescription(),
-                JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties())))
+            .map(mcpTool -> {
+                McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
+
+                ClusterElementDefinition clusterElementDefinition =
+                    clusterElementDefinitionService.getClusterElementDefinition(
+                        mcpComponent.getComponentName(), mcpTool.getName());
+
+                return new ToolDTO(
+                    getToolName(mcpComponent.getComponentName(), clusterElementDefinition.getName()),
+                    clusterElementDefinition.getDescription(),
+                    JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()),
+                    mcpComponent.getConnectionId()
+                );
+            })
             .toList();
     }
 
     @Override
     public Object executeTool(
-        String toolName, Map<String, Object> inputParameters, Environment environment) {
+        String toolName, Map<String, Object> inputParameters, Long connectionId, Environment environment) {
 
         ComponentClusterElementNameResult result = getComponentClusterElementNames(toolName);
 
@@ -69,12 +88,9 @@ public class ToolFacadeImpl implements ToolFacade {
 
         String componentName = clusterElementDefinition.getComponentName();
 
-//        Long connectionId = connectionIdHelper.getConnectionId(
-//            externalUserId, componentName, instanceId, environment);
-
         return clusterElementDefinitionFacade.executeTool(
             componentName, clusterElementDefinition.getComponentVersion(), clusterElementDefinition.getName(),
-            inputParameters, null);
+            inputParameters, connectionId);
     }
 
     private String getToolName(String componentName, String clusterElementName) {
