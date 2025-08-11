@@ -148,7 +148,7 @@ public class SecurityConfiguration {
         throws Exception {
 
         http
-            .securityMatcher("/api/**", "/graphql", "/sse")
+            .securityMatcher("/api/**", "/graphql")
             .cors(withDefaults())
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -157,8 +157,8 @@ public class SecurityConfiguration {
                 .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
                 .ignoringRequestMatchers(regexMatcher("^/api/v[0-9]+/mcp/.+"))
                 .ignoringRequestMatchers("/api/o/**")
-                .ignoringRequestMatchers("/sse")
-                .ignoringRequestMatchers(regexMatcher("^/(automation|embedded)/sse"))
+                .ignoringRequestMatchers("/api/sse")
+                .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded)/sse"))
                 // For internal calls from the embedded workflow builder
                 .ignoringRequestMatchers(request -> request.getHeader("Authorization") != null)
                 // For internal calls from the swagger UI in the dev profile
@@ -186,24 +186,27 @@ public class SecurityConfiguration {
                     .policy(
                         "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
             .authorizeHttpRequests(authz -> authz
+                .requestMatchers(mvc.matcher("/api/activate"))
+                .permitAll()
                 .requestMatchers(mvc.matcher("/api/authenticate"))
                 .permitAll()
-                .requestMatchers(mvc.matcher("/api/register"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/activate"))
+                .requestMatchers(mvc.matcher("/api/account/reset-password/finish"))
                 .permitAll()
                 .requestMatchers(mvc.matcher("/api/account/reset-password/init"))
                 .permitAll()
-                .requestMatchers(mvc.matcher("/api/account/reset-password/finish"))
+                .requestMatchers(mvc.matcher("/api/automation/sse"))
+                .permitAll()
+                .requestMatchers(mvc.matcher("/api/embedded/sse"))
+                .permitAll()
+                .requestMatchers(mvc.matcher("/api/register"))
+                .permitAll()
+                .requestMatchers(mvc.matcher("/api/sse"))
                 .permitAll()
                 .requestMatchers(mvc.matcher("/api/**"))
                 .authenticated()
                 .requestMatchers(mvc.matcher("/graphql"))
                 .authenticated()
-                .requestMatchers(mvc.matcher("/sse"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/*/sse"))
-                .permitAll())
+            )
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
                 .rememberMeParameter("remember-me")
