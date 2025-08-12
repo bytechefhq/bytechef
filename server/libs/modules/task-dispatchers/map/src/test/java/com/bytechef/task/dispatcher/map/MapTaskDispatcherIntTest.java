@@ -28,6 +28,8 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
+import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,11 +102,25 @@ public class MapTaskDispatcherIntTest {
             outputs.get("map"));
     }
 
+    @Test
+    public void testDispatch3() {
+        Job job = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("map_v1_3"),
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals(null, outputs.get("map"));
+    }
+
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
+            (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
+                contextService, SpelEvaluator.create(), taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
                 contextService, counterService, SpelEvaluator.create(), taskDispatcher, taskCompletionHandler,
                 taskExecutionService, taskFileStorage));
@@ -116,6 +132,9 @@ public class MapTaskDispatcherIntTest {
         TaskExecutionService taskExecutionService) {
 
         return List.of(
+            (taskDispatcher) -> new ConditionTaskDispatcher(
+                contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
+                taskFileStorage),
             (taskDispatcher) -> new MapTaskDispatcher(
                 contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
                 taskExecutionService, taskFileStorage));
