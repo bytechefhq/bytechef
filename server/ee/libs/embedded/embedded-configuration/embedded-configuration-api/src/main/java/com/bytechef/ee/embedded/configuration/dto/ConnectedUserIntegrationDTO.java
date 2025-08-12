@@ -19,6 +19,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.Nullable;
 
 /**
  * @version ee
@@ -48,11 +49,12 @@ public record ConnectedUserIntegrationDTO(
         Authorization authorization, List<Connection> connections,
         IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
         List<IntegrationInstance> integrationInstances, List<IntegrationInstanceWorkflow> integrationInstanceWorkflows,
-        OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
+        @Nullable OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
 
         this(
             new ConnectionConfig(
-                authorization.getType(), new OAuth2(oAuth2AuthorizationParameters, redirectUri),
+                authorization.getType(),
+                oAuth2AuthorizationParameters == null ? null : new OAuth2(oAuth2AuthorizationParameters, redirectUri),
                 authorization.getProperties()),
             integrationInstanceConfiguration,
             toIntegrationInstances(

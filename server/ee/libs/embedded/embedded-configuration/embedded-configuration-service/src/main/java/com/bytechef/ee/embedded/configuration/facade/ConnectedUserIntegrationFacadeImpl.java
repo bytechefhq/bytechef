@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -35,6 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -142,11 +144,6 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         ConnectionDefinition connectionDefinition = Objects.requireNonNull(componentDefinition.getConnection());
 
-        OAuth2AuthorizationParameters oAuth2AuthorizationParameters = oAuth2ParametersFacade
-            .getOAuth2AuthorizationParameters(integrationDTO.componentName(), connectionDefinition.getVersion(),
-                integrationInstanceConfigurationDTO.connectionParameters(),
-                integrationInstanceConfigurationDTO.authorizationType());
-
         Authorization authorization = Objects.requireNonNull(connectionDefinition)
             .getAuthorizations()
             .stream()
@@ -165,6 +162,17 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                 integrationInstances.stream()
                     .map(IntegrationInstance::getId)
                     .toList());
+
+        OAuth2AuthorizationParameters oAuth2AuthorizationParameters = null;
+
+        AuthorizationType type = authorization.getType();
+
+        if (StringUtils.startsWith(type.name(), "OAUTH2")) {
+            oAuth2AuthorizationParameters = oAuth2ParametersFacade
+                .getOAuth2AuthorizationParameters(integrationDTO.componentName(), connectionDefinition.getVersion(),
+                    integrationInstanceConfigurationDTO.connectionParameters(),
+                    integrationInstanceConfigurationDTO.authorizationType());
+        }
 
         return new ConnectedUserIntegrationDTO(
             authorization, connections, integrationInstanceConfigurationDTO, integrationInstances,
