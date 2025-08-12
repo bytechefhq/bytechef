@@ -152,16 +152,19 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
             taskDispatcher.dispatch(iterationTaskExecution);
         } else {
-            List<Object> outputs = new ArrayList<>(iterateeWorkflowTasks.size());
+            if (taskExecution.getOutput() != null) {
+                List<Object> outputs = new ArrayList<>(iterateeWorkflowTasks.size());
 
-            if (mapTaskExecution.getOutput() != null) {
-                outputs.addAll((List<?>) taskFileStorage.readTaskExecutionOutput(mapTaskExecution.getOutput()));
+                if (mapTaskExecution.getOutput() != null) {
+                    outputs.addAll((List<?>) taskFileStorage.readTaskExecutionOutput(mapTaskExecution.getOutput()));
+                }
+
+                outputs.add(iterationIndex, taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+
+                mapTaskExecution.setOutput(
+                    taskFileStorage.storeTaskExecutionOutput(
+                        Validate.notNull(mapTaskExecution.getId(), "id"), outputs));
             }
-
-            outputs.add(iterationIndex, taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
-
-            mapTaskExecution.setOutput(
-                taskFileStorage.storeTaskExecutionOutput(Validate.notNull(mapTaskExecution.getId(), "id"), outputs));
 
             long iterationsLeft = counterService.decrement(taskExecutionParentId);
 

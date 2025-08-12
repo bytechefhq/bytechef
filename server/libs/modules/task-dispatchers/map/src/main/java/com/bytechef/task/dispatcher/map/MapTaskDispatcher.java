@@ -141,36 +141,6 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             }
 
             counterService.set(Validate.notNull(taskExecution.getId(), "id"), items.size());
-
-//            for (int i = 0; i < items.size(); i++) {
-//                Object item = items.get(i);
-//                TaskExecution iterateeTaskExecution = TaskExecution.builder()
-//                    .jobId(taskExecutionJobId)
-//                    .parentId(taskExecution.getId())
-//                    .priority(taskExecution.getPriority())
-//                    .taskNumber(i + 1)
-//                    .workflowTask(new WorkflowTask(iteratee))
-//                    .build();
-//
-//                Map<String, Object> newContext = new HashMap<>(
-//                    taskFileStorage.readContextValue(
-//                        contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION)));
-//
-//                WorkflowTask workflowTask = taskExecution.getWorkflowTask();
-//
-//                newContext.put(workflowTask.getName(), Map.of(ITEM, item, INDEX, i));
-//
-//                iterateeTaskExecution.evaluate(newContext, evaluator);
-//
-//                iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
-//
-//                contextService.push(
-//                    Validate.notNull(iterateeTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-//                    taskFileStorage.storeTaskExecutionOutput(
-//                        Validate.notNull(iterateeTaskExecution.getId(), "id"), newContext));
-//
-//                taskDispatcher.dispatch(iterateeTaskExecution);
-//            }
         }
     }
 
