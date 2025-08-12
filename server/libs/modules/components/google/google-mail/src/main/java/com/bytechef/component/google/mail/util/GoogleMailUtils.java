@@ -356,7 +356,7 @@ public class GoogleMailUtils {
     public static OutputResponse getMessageOutput(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return OutputResponse.of(getMessageOutputProperty(inputParameters.getRequired(FORMAT, Format.class)));
+        return OutputResponse.of(getMessageOutputProperty(inputParameters.get(FORMAT, Format.class, SIMPLE)));
     }
 
     public static ModifiableObjectProperty getMessageOutputProperty(Format format) {
