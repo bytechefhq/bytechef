@@ -32,23 +32,25 @@ public class ClickupConstants {
     public static final String NAME = "name";
     public static final String SPACE_ID = "spaceId";
     public static final String WORKSPACE_ID = "workspaceId";
+    public static final String LIST_ID = "listId";
+    public static final String TASK_ID = "taskId";
 
     public static final ModifiableStringProperty FOLDER_ID_PROPERTY = string(FOLDER_ID)
-        .label("Folder ID")
-        .options((ActionOptionsFunction<String>) ClickupUtils::getFolderIdOptions)
-        .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID)
-        .required(false);
+            .label("Folder ID")
+            .options((ActionOptionsFunction<String>) ClickupUtils::getFolderIdOptions)
+            .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID)
+            .required(false);
 
     public static final ModifiableStringProperty SPACE_ID_PROPERTY = string(SPACE_ID)
-        .label("Space ID")
-        .options((ActionOptionsFunction<String>) ClickupUtils::getSpaceIdOptions)
-        .optionsLookupDependsOn(WORKSPACE_ID)
-        .required(true);
+            .label("Space ID")
+            .options((ActionOptionsFunction<String>) ClickupUtils::getSpaceIdOptions)
+            .optionsLookupDependsOn(WORKSPACE_ID)
+            .required(true);
 
     public static final ModifiableStringProperty WORKSPACE_ID_PROPERTY = string(WORKSPACE_ID)
-        .label("Workspace ID")
-        .options((ActionOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
-        .required(true);
+            .label("Workspace ID")
+            .options((ActionOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
+            .required(true);
 
     private ClickupConstants() {
     }

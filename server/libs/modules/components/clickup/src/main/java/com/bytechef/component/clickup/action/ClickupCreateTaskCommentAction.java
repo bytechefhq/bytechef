@@ -16,6 +16,8 @@
 
 package com.bytechef.component.clickup.action;
 
+import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID;
+import static com.bytechef.component.clickup.constant.ClickupConstants.TASK_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -30,21 +32,22 @@ import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.OptionsDataSource;
 
 public class ClickupCreateTaskCommentAction {
+    public static final String ACTION_NAME = "createTaskComment";
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTaskComment")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ACTION_NAME)
             .title("Create Task Comment")
             .description("Create a new comment for specified class")
             .metadata(Map.of("method", "POST", "path", "/task/{task_id}/comment", "bodyContentType",
                     BodyContentType.JSON, "mimeType", "application/json"))
             .properties(
-                    string("listId").label("List ID")
+                    string(LIST_ID).label("List ID")
                             .description("ID of the list containing the task")
                             .required(true)
                             .options(
                                     (OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getListIdOptions)
 
                             .metadata(Map.of("type", PropertyType.BODY)),
-                    string("taskId").label("Task ID").description("ID of the task to which the comment will be added")
+                    string(TASK_ID).label("Task ID").description("ID of the task to which the comment will be added")
                             .required(true)
                             .options((OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getListIdOptions)
                             .metadata(Map.of("type", PropertyType.PATH)),
