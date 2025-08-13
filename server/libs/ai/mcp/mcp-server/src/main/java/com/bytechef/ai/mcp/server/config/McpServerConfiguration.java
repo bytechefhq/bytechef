@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.tool.ProjectTools;
+import com.bytechef.ai.mcp.tool.ProjectWorkflowTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -32,14 +33,16 @@ import org.springframework.context.annotation.Configuration;
 public class McpServerConfiguration {
 
     private final ProjectTools projectTools;
+    private final ProjectWorkflowTools projectWorkflowTools;
 
     @SuppressFBWarnings("EI")
-    public McpServerConfiguration(ProjectTools projectTools) {
+    public McpServerConfiguration(ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools) {
         this.projectTools = projectTools;
+        this.projectWorkflowTools = projectWorkflowTools;
     }
 
     @Bean
     ToolCallbackProvider toolCallbackProvider() {
-        return ToolCallbackProvider.from(ToolCallbacks.from(projectTools));
+        return ToolCallbackProvider.from(ToolCallbacks.from(projectTools, projectWorkflowTools));
     }
 }
