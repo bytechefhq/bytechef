@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.platform.constant.Environment;
@@ -155,6 +156,9 @@ public class ProjectTools {
 
             if (workspaceId != null) {
                 projectBuilder.workspaceId(workspaceId);
+            }
+            else {
+                projectBuilder.workspaceId(Workspace.DEFAULT_WORKSPACE_ID);
             }
 
             if (tagIds != null && !tagIds.isEmpty()) {
@@ -357,20 +361,6 @@ public class ProjectTools {
             logger.error("Failed to publish project {}", projectId, e);
             throw new RuntimeException("Failed to publish project: " + e.getMessage(), e);
         }
-    }
-
-    /**
-     * Project workflow information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record ProjectWorkflowInfo(
-        @JsonProperty("id") @JsonPropertyDescription("The unique identifier of the project workflow") Long id,
-        @JsonProperty("project_id") @JsonPropertyDescription("The ID of the project this workflow belongs to") long projectId,
-        @JsonProperty("project_version") @JsonPropertyDescription("The version of the project") int projectVersion,
-        @JsonProperty("workflow_id") @JsonPropertyDescription("The unique identifier of the workflow") String workflowId,
-        @JsonProperty("workflow_reference_code") @JsonPropertyDescription("The reference code of the workflow") String workflowReferenceCode,
-        @JsonProperty("created_date") @JsonPropertyDescription("When the workflow was created") Instant createdDate,
-        @JsonProperty("last_modified_date") @JsonPropertyDescription("When the workflow was last modified") Instant lastModifiedDate) {
     }
 
     /**
