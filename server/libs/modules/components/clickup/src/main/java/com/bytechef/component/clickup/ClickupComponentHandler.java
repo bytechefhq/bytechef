@@ -23,6 +23,13 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID_
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID_PROPERTY;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.clickup.trigger.ClickupNewListTrigger;
 import com.bytechef.component.clickup.trigger.ClickupNewTaskTrigger;
@@ -35,11 +42,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -50,8 +52,8 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
         return List.of(
-            ClickupNewListTrigger.TRIGGER_DEFINITION,
-            ClickupNewTaskTrigger.TRIGGER_DEFINITION);
+                ClickupNewListTrigger.TRIGGER_DEFINITION,
+                ClickupNewTaskTrigger.TRIGGER_DEFINITION);
     }
 
     @Override
@@ -59,10 +61,12 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
             Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
             List<Property> properties = new ArrayList<>(propertiesOptional.orElse(Collections.emptyList()));
+            List<String> WorkspaceSpaceFolderIdActions = new ArrayList<>(
+                    Arrays.asList("createTask", "createTaskComment"));
 
             if (Objects.equals(modifiableActionDefinition.getName(), "createList")) {
                 properties.addAll(0, List.of(WORKSPACE_ID_PROPERTY, SPACE_ID_PROPERTY));
-            } else if (Objects.equals(modifiableActionDefinition.getName(), "createTask")) {
+            } else if (WorkspaceSpaceFolderIdActions.contains(modifiableActionDefinition.getName())) {
                 properties.addAll(0, List.of(WORKSPACE_ID_PROPERTY, SPACE_ID_PROPERTY, FOLDER_ID_PROPERTY));
             } else if (Objects.equals(modifiableActionDefinition.getName(), "createFolder")) {
                 properties.addFirst(WORKSPACE_ID_PROPERTY);
@@ -77,24 +81,24 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
-            .customAction(true)
-            .icon("path:assets/clickup.svg")
-            .categories(ComponentCategory.PROJECT_MANAGEMENT);
+                .customAction(true)
+                .icon("path:assets/clickup.svg")
+                .categories(ComponentCategory.PROJECT_MANAGEMENT);
     }
 
     @Override
     public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
+            ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
         if (Objects.equals(modifiableProperty.getName(), "listId")) {
             ((ModifiableStringProperty) modifiableProperty)
-                .optionsLookupDependsOn(FOLDER_ID, SPACE_ID, WORKSPACE_ID);
+                    .optionsLookupDependsOn(FOLDER_ID, SPACE_ID, WORKSPACE_ID);
         } else if (Objects.equals(modifiableProperty.getName(), FOLDER_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
-                .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID);
+                    .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID);
         } else if (Objects.equals(modifiableProperty.getName(), SPACE_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
-                .optionsLookupDependsOn(WORKSPACE_ID);
+                    .optionsLookupDependsOn(WORKSPACE_ID);
         }
 
         return modifiableProperty;
