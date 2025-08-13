@@ -316,35 +316,33 @@ const WorkflowNodeDetailsPanel = ({
         [currentWorkflowTask, currentWorkflowTrigger]
     );
 
-    const nodeTabs = useMemo(() => {
-        return TABS.filter(({name}) => {
-            if (name === 'connection') {
-                return currentWorkflowNodeConnections.length > 0;
-            }
+    const nodeTabs = useMemo(
+        () =>
+            TABS.filter(({name}) => {
+                if (name === 'connection') {
+                    return currentWorkflowNodeConnections.length > 0;
+                }
 
-            // if (name === 'clusterElements') {
-            //     return currentComponentDefinition?.clusterRoot;
-            // }
+                if (name === 'output') {
+                    return hasOutputData;
+                }
 
-            if (name === 'output') {
-                return hasOutputData;
-            }
+                if (name === 'properties') {
+                    return currentNode?.taskDispatcher
+                        ? currentTaskDispatcherDefinition?.properties?.length
+                        : currentOperationProperties?.length;
+                }
 
-            if (name === 'properties') {
-                return currentNode?.taskDispatcher
-                    ? currentTaskDispatcherDefinition?.properties?.length
-                    : currentOperationProperties?.length;
-            }
-
-            return true;
-        });
-    }, [
-        currentWorkflowNodeConnections,
-        hasOutputData,
-        currentNode,
-        currentTaskDispatcherDefinition,
-        currentOperationProperties,
-    ]);
+                return true;
+            }),
+        [
+            currentWorkflowNodeConnections,
+            hasOutputData,
+            currentNode,
+            currentTaskDispatcherDefinition,
+            currentOperationProperties,
+        ]
+    );
 
     const currentWorkflowNode = useMemo(
         () => currentComponentDefinition || currentTaskDispatcherDefinition || currentClusterElementDefinition,
@@ -906,7 +904,7 @@ const WorkflowNodeDetailsPanel = ({
                 'absolute bottom-6 right-[69px] top-2 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
                 className
             )}
-            key={currentNode?.workflowNodeName}
+            key={`${currentNode?.workflowNodeName}-${currentOperationName}`}
         >
             {currentNode?.workflowNodeName && currentWorkflowNode && (
                 <div className="flex h-full flex-col divide-y divide-muted bg-background">
@@ -1003,13 +1001,9 @@ const WorkflowNodeDetailsPanel = ({
 
                         {currentNode.componentName !== 'manual' && !tabDataExists && (
                             <div className="flex justify-center space-x-2 border-b border-border p-2">
-                                <Skeleton className="h-6 w-1/4" />
-
-                                <Skeleton className="h-6 w-1/4" />
-
-                                <Skeleton className="h-6 w-1/4" />
-
-                                <Skeleton className="h-6 w-1/4" />
+                                {Array.from({length: 4}).map((_, index) => (
+                                    <Skeleton className="h-6 w-1/4" key={index} />
+                                ))}
                             </div>
                         )}
 
