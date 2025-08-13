@@ -37,30 +37,30 @@ public class ClickupCreateTaskCommentAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ACTION_NAME)
             .title("Create Task Comment")
-            .description("Create a new comment for specified class")
+            .description("Create a new comment for specified class.")
             .metadata(Map.of("method", "POST", "path", "/task/{task_id}/comment", "bodyContentType",
                     BodyContentType.JSON, "mimeType", "application/json"))
             .properties(
                     string(LIST_ID).label("List ID")
-                            .description("ID of the list containing the task")
+                            .description("ID of the list containing the task.")
                             .required(true)
                             .options(
                                     (OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getListIdOptions)
 
                             .metadata(Map.of("type", PropertyType.BODY)),
-                    string(TASK_ID).label("Task ID").description("ID of the task to which the comment will be added")
+                    string(TASK_ID).label("Task ID").description("ID of the task to which the comment will be added.")
                             .required(true)
                             .options((OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getListIdOptions)
                             .metadata(Map.of("type", PropertyType.PATH)),
                     string("commentText").label("Comment Text")
-                            .description("Text of the comment to be added to the task")
+                            .description("Text of the comment to be added to the task.")
                             .required(true).metadata(Map.of("type", PropertyType.BODY)),
                     bool("notifyAll").label("Notify All").description(
-                            "Flag indicating whether notifications should be sent to all participants, including the creator of the comment ")
+                            "Flag indicating whether notifications should be sent to all participants, including the creator of the comment.")
                             .required(true).metadata(Map.of("type", PropertyType.BODY)))
 
             .output(outputSchema(
-                    object().properties(string("id").description("The ID of newly created comment").required(true))));
+                    object().properties(string("id").description("The ID of newly created comment.").required(true))));
 
     private ClickupCreateTaskCommentAction() {
     }
