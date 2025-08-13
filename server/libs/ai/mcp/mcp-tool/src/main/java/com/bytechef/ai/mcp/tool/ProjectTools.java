@@ -156,8 +156,7 @@ public class ProjectTools {
 
             if (workspaceId != null) {
                 projectBuilder.workspaceId(workspaceId);
-            }
-            else {
+            } else {
                 projectBuilder.workspaceId(Workspace.DEFAULT_WORKSPACE_ID);
             }
 
