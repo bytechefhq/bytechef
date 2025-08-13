@@ -96,6 +96,13 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    FilterAfterContributorConfigurer<HttpSecurity> filterAfterContributorConfigurer(
+        List<FilterAfterContributor> filterAfterContributors) {
+
+        return new FilterAfterContributorConfigurer<>(filterAfterContributors);
+    }
+
+    @Bean
     FilterBeforeContributorConfigurer<HttpSecurity> filterBeforeContributorConfigurer(
         List<FilterBeforeContributor> filterBeforeContributors) {
 
@@ -172,10 +179,6 @@ public class SecurityConfiguration {
         http.addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
             .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class);
 
-        for (FilterAfterContributor filterAfterContributor : filterAfterContributors) {
-            http.addFilterAfter(filterAfterContributor.getFilter(), filterAfterContributor.getAfterFilter());
-        }
-
         http
             .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp.policyDirectives(security.getContentSecurityPolicy()))
@@ -225,6 +228,7 @@ public class SecurityConfiguration {
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .permitAll());
 
+        http.with(filterAfterContributorConfigurer(filterAfterContributors), withDefaults());
         http.with(filterBeforeContributorConfigurer(filterBeforeContributors), withDefaults());
 
         return http.build();
@@ -370,6 +374,25 @@ public class SecurityConfiguration {
              * form includes the _csrf request parameter as a hidden input.
              */
             return this.delegate.resolveCsrfTokenValue(request, csrfToken);
+        }
+    }
+
+    static class FilterAfterContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
+        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
+
+        private final List<FilterAfterContributor> filterAfterContributors;
+
+        FilterAfterContributorConfigurer(List<FilterAfterContributor> filterAfterContributors) {
+            this.filterAfterContributors = filterAfterContributors;
+        }
+
+        @Override
+        public void configure(HttpSecurity http) {
+            for (FilterAfterContributor filterAfterContributor : filterAfterContributors) {
+                http.addFilterAfter(
+                    filterAfterContributor.getFilter(),
+                    filterAfterContributor.getAfterFilter());
+            }
         }
     }
 
