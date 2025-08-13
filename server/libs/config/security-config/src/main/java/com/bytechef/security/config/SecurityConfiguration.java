@@ -151,7 +151,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain apiFilterChain(
         HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
         List<AuthenticationProviderContributor> authenticationProviderContributors, Environment environment,
-        List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors)
+        FilterAfterContributorConfigurer<HttpSecurity> filterAfterContributorConfigurer,
+        FilterBeforeContributorConfigurer<HttpSecurity> filterBeforeContributorConfigurer)
         throws Exception {
 
         http
@@ -228,8 +229,8 @@ public class SecurityConfiguration {
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .permitAll());
 
-        http.with(filterAfterContributorConfigurer(filterAfterContributors), withDefaults());
-        http.with(filterBeforeContributorConfigurer(filterBeforeContributors), withDefaults());
+        http.with(filterAfterContributorConfigurer, withDefaults());
+        http.with(filterBeforeContributorConfigurer, withDefaults());
 
         return http.build();
     }
@@ -377,7 +378,7 @@ public class SecurityConfiguration {
         }
     }
 
-    static class FilterAfterContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
+    public static class FilterAfterContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
         extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
 
         private final List<FilterAfterContributor> filterAfterContributors;
@@ -396,7 +397,7 @@ public class SecurityConfiguration {
         }
     }
 
-    static class FilterBeforeContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
+    public static class FilterBeforeContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
         extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
 
         private final List<FilterBeforeContributor> filterBeforeContributors;
