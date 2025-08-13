@@ -20,6 +20,7 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.TASK_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -58,7 +59,8 @@ public class ClickupCreateTaskCommentAction {
                             "Flag indicating whether notifications should be sent to all participants, including the creator of the comment ")
                             .required(true).metadata(Map.of("type", PropertyType.BODY)))
 
-            .output(outputSchema(string()));
+            .output(outputSchema(
+                    object().properties(string("id").description("The ID of newly created comment").required(true))));
 
     private ClickupCreateTaskCommentAction() {
     }
