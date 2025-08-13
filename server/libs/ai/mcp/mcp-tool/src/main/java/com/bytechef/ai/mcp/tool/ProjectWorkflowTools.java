@@ -22,14 +22,13 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.util.List;
 
 /**
  * The ProjectWorkflowTools class provides utility methods and components to facilitate the management and execution of
@@ -47,12 +46,11 @@ public class ProjectWorkflowTools {
 
     private static final String DEFAULT_DEFINITION = """
         {
-            "label": "projectName",
-            "description": "projectDescription",
+            "label": "workflowName",
+            "description": "workflowDescription",
             "inputs": [],
             "triggers": [
                 {
-                    "description": "",
                     "label": "Manual",
                     "name": "trigger_1",
                     "type": "manual/v1/manual"
@@ -71,7 +69,9 @@ public class ProjectWorkflowTools {
         description = "Create a new workflow in a ByteChef project. Returns the created workflow information including id, project id, workflow id, and reference code.")
     public ProjectWorkflowInfo createProjectWorkflow(
         @ToolParam(description = "The ID of the project to add the workflow to") long projectId,
-        @ToolParam(description = "The definition for the workflow. Needs to be in JSON format similar to " + DEFAULT_DEFINITION) String definition) {
+        @ToolParam(
+            description = "The definition for the workflow. Needs to be in JSON format similar to "
+                + DEFAULT_DEFINITION) String definition) {
 
         try {
             ProjectWorkflow projectWorkflow = projectFacade.addWorkflow(projectId, definition);
@@ -102,12 +102,12 @@ public class ProjectWorkflowTools {
             List<ProjectWorkflowDTO> workflows = projectFacade.getProjectWorkflows(projectId);
 
             List<WorkflowInfo> workflowInfos = workflows.stream()
-                .map(workflow ->
-                    new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowReferenceCode(),
-                        workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
-                        workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
-                        workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null)
-                ).toList();
+                .map(workflow -> new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
+                    workflow.getWorkflowReferenceCode(),
+                    workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
+                    workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
+                    workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
+                .toList();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Found {} projects", workflowInfos.size());
@@ -133,7 +133,8 @@ public class ProjectWorkflowTools {
                 logger.debug("Retrieved workflow {}", workflow.getProjectWorkflowId());
             }
 
-            return new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowReferenceCode(),
+            return new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
+                workflow.getWorkflowReferenceCode(),
                 workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
                 workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
                 workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null);
@@ -151,9 +152,11 @@ public class ProjectWorkflowTools {
         @ToolParam(description = "The ID of the project (optional)") Long projectId) {
 
         try {
-            List<ProjectWorkflowDTO> allWorkflows = projectId != null ? projectFacade.getProjectWorkflows(projectId) : projectFacade.getProjectWorkflows();
+            List<ProjectWorkflowDTO> allWorkflows =
+                projectId != null ? projectFacade.getProjectWorkflows(projectId) : projectFacade.getProjectWorkflows();
 
-            String lowerQuery = query.toLowerCase().trim();
+            String lowerQuery = query.toLowerCase()
+                .trim();
 
             List<WorkflowInfo> matchingWorkflow = allWorkflows.stream()
                 .filter(workflow -> {
@@ -167,12 +170,12 @@ public class ProjectWorkflowTools {
 
                     return name.contains(lowerQuery) || description.contains(lowerQuery);
                 })
-                .map(workflow ->
-                    new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowReferenceCode(),
-                        workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
-                        workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
-                        workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null)
-                ).toList();
+                .map(workflow -> new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
+                    workflow.getWorkflowReferenceCode(),
+                    workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
+                    workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
+                    workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
+                .toList();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Found {} workflows matching query '{}'", matchingWorkflow.size(), query);
@@ -212,7 +215,9 @@ public class ProjectWorkflowTools {
         description = "Update the workflow definition. Returns the updated workflow id, name and definition.")
     public WorkflowInfo updateWorkflow(
         @ToolParam(description = "The ID of the workflow to update") long workflowId,
-        @ToolParam(description = "The new definition of the workflow. Needs to be in JSON format similar to " + DEFAULT_DEFINITION) String definition) {
+        @ToolParam(
+            description = "The new definition of the workflow. Needs to be in JSON format similar to "
+                + DEFAULT_DEFINITION) String definition) {
 
         try {
             ProjectWorkflowDTO workflow = projectFacade.getProjectWorkflow(workflowId);
@@ -222,7 +227,8 @@ public class ProjectWorkflowTools {
                 logger.debug("Updated workflow {} with name '{}'", workflow.getId(), workflow.getLabel());
             }
 
-            return new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowReferenceCode(),
+            return new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
+                workflow.getWorkflowReferenceCode(),
                 workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
                 workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
                 workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null);
