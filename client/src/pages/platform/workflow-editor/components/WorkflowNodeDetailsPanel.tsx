@@ -243,7 +243,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {data: workflowNodeParameterDisplayConditions} = displayConditionsQuery;
 
-    const currentNodeDefinition = useMemo(() => {
+    const currentOperationDefinition = useMemo(() => {
         if (currentNode?.trigger) {
             return currentTriggerDefinition;
         }
@@ -296,9 +296,9 @@ const WorkflowNodeDetailsPanel = ({
 
     const hasOutputData = useMemo(
         () =>
-            currentNodeDefinition?.outputDefined ||
-            (currentNodeDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined,
-        [currentNodeDefinition]
+            currentOperationDefinition?.outputDefined ||
+            (currentOperationDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined,
+        [currentOperationDefinition]
     );
 
     const currentWorkflowTrigger = useMemo(
@@ -553,6 +553,10 @@ const WorkflowNodeDetailsPanel = ({
 
     // Set current node name
     useEffect(() => {
+        if (currentOperationDefinition?.properties) {
+            setCurrentOperationProperties(currentOperationDefinition?.properties);
+        }
+
         if (currentNode?.name) {
             setCurrentNodeName(currentNode.name);
 
@@ -564,14 +568,14 @@ const WorkflowNodeDetailsPanel = ({
         } else {
             setCurrentNodeName(undefined);
         }
-    }, [currentNode?.name, isClusterElement]);
+    }, [currentNode?.name, currentOperationDefinition?.properties, isClusterElement]);
 
     // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(() => {
-        if (currentNodeDefinition?.properties) {
-            setCurrentOperationProperties(currentNodeDefinition?.properties);
+        if (currentOperationDefinition?.properties) {
+            setCurrentOperationProperties(currentOperationDefinition?.properties);
         }
-    }, [currentNodeDefinition?.properties]);
+    }, [currentOperationDefinition?.properties]);
 
     // Set availableDataPills depending on previousComponentProperties
     useEffect(() => {
@@ -819,14 +823,13 @@ const WorkflowNodeDetailsPanel = ({
 
     // Fetch current action definition when operation changes
     useEffect(() => {
-        if (!currentOperationName || !currentComponentDefinition) {
-            setCurrentActionDefinition(undefined);
-
+        if (currentActionDefinition?.name === currentOperationName) {
             return;
         }
 
-        // Prevent duplicate fetch if already present
-        if (currentActionDefinition?.name === currentOperationName) {
+        if (!currentOperationName || !currentComponentDefinition) {
+            setCurrentActionDefinition(undefined);
+
             return;
         }
 
