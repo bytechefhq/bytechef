@@ -40,9 +40,16 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
+ * An abstract filter class for handling API authentication based on request headers and patterns. This class extends
+ * the {@link OncePerRequestFilter} and provides methods to authenticate requests against a defined path pattern.
+ *
+ * The filter supports tenant-based processing, allowing the execution of actions within a tenant's context. It
+ * integrates with an {@link AuthenticationManager} to authenticate user credentials and set up the security context for
+ * authenticated requests.
+ *
  * @author Ivica Cardic
  */
-public abstract class AbstractPublicApiAuthenticationFilter extends OncePerRequestFilter {
+public abstract class AbstractApiAuthenticationFilter extends OncePerRequestFilter {
 
     protected static final String AUTH_TOKEN_HEADER_NAME = "Authorization";
 
@@ -50,7 +57,7 @@ public abstract class AbstractPublicApiAuthenticationFilter extends OncePerReque
     private final RequestMatcher requestMatcher;
 
     @SuppressFBWarnings("EI")
-    public AbstractPublicApiAuthenticationFilter(String pathPatternRegex, AuthenticationManager authenticationManager) {
+    public AbstractApiAuthenticationFilter(String pathPatternRegex, AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         this.requestMatcher = new NegatedRequestMatcher(RegexRequestMatcher.regexMatcher(pathPatternRegex));
     }

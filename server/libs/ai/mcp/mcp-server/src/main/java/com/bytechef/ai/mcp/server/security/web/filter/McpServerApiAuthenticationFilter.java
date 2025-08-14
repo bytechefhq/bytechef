@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.security.web.filter;
+package com.bytechef.ai.mcp.server.security.web.filter;
 
-import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
+import com.bytechef.platform.security.web.filter.AbstractApiAuthenticationFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.authentication.AuthenticationManager;
 
 /**
  * @author Ivica Cardic
  */
-public class ApiKeyAuthenticationFilter extends AbstractPublicApiAuthenticationFilter {
+public class McpServerApiAuthenticationFilter extends AbstractApiAuthenticationFilter {
 
     @SuppressFBWarnings("EI")
-    public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager) {
-        super("^/api/automation/v[0-9]+/.+", authenticationManager);
+    public McpServerApiAuthenticationFilter(AuthenticationManager authenticationManager) {
+        super("^/api/v[0-9]+/mcp/.+", authenticationManager);
     }
 }

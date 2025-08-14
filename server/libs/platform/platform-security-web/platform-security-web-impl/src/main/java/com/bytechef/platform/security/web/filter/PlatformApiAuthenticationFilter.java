@@ -16,15 +16,16 @@
 
 package com.bytechef.platform.security.web.filter;
 
-import jakarta.servlet.Filter;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.authentication.AuthenticationManager;
 
 /**
  * @author Ivica Cardic
  */
-public interface FilterBeforeContributor {
+public class PlatformApiAuthenticationFilter extends AbstractApiAuthenticationFilter {
 
-    Filter getFilter(AuthenticationManager authenticationManager);
-
-    Class<? extends Filter> getBeforeFilter();
+    @SuppressFBWarnings("EI")
+    public PlatformApiAuthenticationFilter(AuthenticationManager authenticationManager) {
+        super("^/api/platform/v[0-9]+/.+", authenticationManager);
+    }
 }

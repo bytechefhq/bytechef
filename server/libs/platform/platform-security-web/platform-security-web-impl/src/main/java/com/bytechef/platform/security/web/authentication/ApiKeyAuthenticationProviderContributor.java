@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.authentication;
 
+import com.bytechef.platform.security.web.config.AuthenticationProviderContributor;
 import com.bytechef.platform.user.service.ApiKeyService;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;

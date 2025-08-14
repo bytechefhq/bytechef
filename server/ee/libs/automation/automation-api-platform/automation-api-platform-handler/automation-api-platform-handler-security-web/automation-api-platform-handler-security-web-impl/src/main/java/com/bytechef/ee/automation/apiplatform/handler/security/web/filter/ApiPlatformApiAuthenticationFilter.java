@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.automation.apiplatform.handler.security.web.filter;
 
-import com.bytechef.ee.automation.apiplatform.handler.security.web.authentication.ApiClientKeyAuthenticationToken;
-import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
+import com.bytechef.ee.automation.apiplatform.handler.security.web.authentication.ApiPlatformKeyAuthenticationToken;
+import com.bytechef.platform.security.web.filter.AbstractApiAuthenticationFilter;
 import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,10 +20,10 @@ import org.springframework.security.core.Authentication;
  *
  * @author Ivica Cardic
  */
-public class ApiClientAuthenticationFilter extends AbstractPublicApiAuthenticationFilter {
+public class ApiPlatformApiAuthenticationFilter extends AbstractApiAuthenticationFilter {
 
     @SuppressFBWarnings("EI")
-    public ApiClientAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public ApiPlatformApiAuthenticationFilter(AuthenticationManager authenticationManager) {
         super("^/api/o/.+", authenticationManager);
     }
 
@@ -32,6 +32,6 @@ public class ApiClientAuthenticationFilter extends AbstractPublicApiAuthenticati
 
         TenantKey tenantKey = TenantKey.parse(token);
 
-        return new ApiClientKeyAuthenticationToken(token, tenantKey.getTenantId());
+        return new ApiPlatformKeyAuthenticationToken(token, tenantKey.getTenantId());
     }
 }
