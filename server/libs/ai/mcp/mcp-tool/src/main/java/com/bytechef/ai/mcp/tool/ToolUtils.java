@@ -122,7 +122,8 @@ public final class ToolUtils {
 
         return new PropertyInfo(
             property.getName(),
-            decorator.getType().name(),
+            decorator.getType()
+                .name(),
             property.getDescription(),
             property.getRequired(),
             property.getExpressionEnabled(),

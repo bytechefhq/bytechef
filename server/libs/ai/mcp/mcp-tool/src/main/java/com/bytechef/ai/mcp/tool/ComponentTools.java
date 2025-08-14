@@ -16,8 +16,10 @@
 
 package com.bytechef.ai.mcp.tool;
 
-import com.bytechef.component.definition.Property.Type;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
@@ -75,6 +77,7 @@ public class ComponentTools {
             "parameters": {}
         }
         """;
+
     @SuppressFBWarnings("EI")
     public ComponentTools(ComponentDefinitionService componentDefinitionService) {
         this.componentDefinitionService = componentDefinitionService;
@@ -86,7 +89,6 @@ public class ComponentTools {
             ? componentDefinitionService.getComponentDefinition(componentName, version)
             : componentDefinitionService.getComponentDefinition(componentName, null);
     }
-
 
     @Tool(
         description = "List all components in a project. Returns a list of components with their basic information including name and description")
@@ -128,15 +130,15 @@ public class ComponentTools {
                 componentDefinition.getDescription(),
                 componentDefinition.getComponentCategories()
                     .stream()
-                    .map(category -> category.getName())
+                    .map(ComponentCategory::getName)
                     .toList(),
                 componentDefinition.getTriggers()
                     .stream()
-                    .map(trigger -> trigger.getName())
+                    .map(TriggerDefinition::getName)
                     .toList(),
                 componentDefinition.getActions()
                     .stream()
-                    .map(action -> action.getName())
+                    .map(ActionDefinition::getName)
                     .toList());
         } catch (Exception e) {
             logger.error("Failed to get component {}", componentName, e);
@@ -456,7 +458,6 @@ public class ComponentTools {
         }
     }
 
-
     @Tool(
         description = "Get the output property of a specific trigger or action. Returns the structure of the output property")
     public ToolUtils.PropertyInfo getOutputProperty(
@@ -512,7 +513,6 @@ public class ComponentTools {
         }
     }
 
-
     @Tool(
         description = "Get all properties of a specific trigger or action. Returns a hierarchical list of properties including nested properties")
     public List<ToolUtils.PropertyInfo> getProperties(
@@ -563,8 +563,6 @@ public class ComponentTools {
             throw ToolUtils.createOperationException(FAILED_TO_GET_PROPERTIES, e);
         }
     }
-
-
 
     /**
      * Minimal component information record for the response.
