@@ -16,12 +16,14 @@
 
 package com.bytechef.security.web.filter;
 
+import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -31,9 +33,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class SpaWebFilter extends OncePerRequestFilter {
 
-    private static final List<String> NON_SPA_PATH_PREFIXES = Arrays.asList(
-        "/actuator", "/api", "/approvals", "/callback", "/file-entries", "/graphql", "/graphiql", "/icons", "/oauth",
-        "/v3/api-docs", "/webhooks");
+    private final List<String> nonSpaPathPrefixes = new ArrayList<>();
+
+    public SpaWebFilter(List<SpaWebFilterContributor> spaWebFilterContributors) {
+        for (SpaWebFilterContributor spaWebFilterContributor : spaWebFilterContributors) {
+            nonSpaPathPrefixes.addAll(spaWebFilterContributor.getNonSpaPathPrefixes());
+        }
+
+        nonSpaPathPrefixes.addAll(
+            Arrays.asList("/actuator", "/api", "/graphql", "/graphiql", "/icons", "/v3/api-docs"));
+    }
 
     /**
      * Forwards any HTTP request with an unmapped path (i.e., not handled by other controllers or static resources),
@@ -79,8 +88,8 @@ public class SpaWebFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private static boolean isNonSpaPath(String path) {
-        return NON_SPA_PATH_PREFIXES.stream()
+    private boolean isNonSpaPath(String path) {
+        return nonSpaPathPrefixes.stream()
             .noneMatch(path::startsWith);
     }
 }
