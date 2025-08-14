@@ -96,20 +96,6 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    FilterAfterContributorConfigurer<HttpSecurity> filterAfterContributorConfigurer(
-        List<FilterAfterContributor> filterAfterContributors) {
-
-        return new FilterAfterContributorConfigurer<>(filterAfterContributors);
-    }
-
-    @Bean
-    FilterBeforeContributorConfigurer<HttpSecurity> filterBeforeContributorConfigurer(
-        List<FilterBeforeContributor> filterBeforeContributors) {
-
-        return new FilterBeforeContributorConfigurer<>(filterBeforeContributors);
-    }
-
-    @Bean
     @Order(2)
     public SecurityFilterChain actuatorFilterChain(
         HttpSecurity http, PathPatternRequestMatcher.Builder mvc) throws Exception {
@@ -151,8 +137,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain apiFilterChain(
         HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
         List<AuthenticationProviderContributor> authenticationProviderContributors, Environment environment,
-        FilterAfterContributorConfigurer<HttpSecurity> filterAfterContributorConfigurer,
-        FilterBeforeContributorConfigurer<HttpSecurity> filterBeforeContributorConfigurer)
+        List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors)
         throws Exception {
 
         http
@@ -229,8 +214,8 @@ public class SecurityConfiguration {
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .permitAll());
 
-        http.with(filterAfterContributorConfigurer, withDefaults());
-        http.with(filterBeforeContributorConfigurer, withDefaults());
+        http.with(new FilterAfterContributorConfigurer<>(filterAfterContributors), withDefaults());
+        http.with(new FilterBeforeContributorConfigurer<>(filterBeforeContributors), withDefaults());
 
         return http.build();
     }
@@ -336,6 +321,46 @@ public class SecurityConfiguration {
         return rememberMe.getKey();
     }
 
+    private static class FilterAfterContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
+        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
+
+        private final List<FilterAfterContributor> filterAfterContributors;
+
+        FilterAfterContributorConfigurer(List<FilterAfterContributor> filterAfterContributors) {
+            this.filterAfterContributors = filterAfterContributors;
+        }
+
+        @Override
+        public void configure(HttpSecurity http) {
+            for (FilterAfterContributor filterAfterContributor : filterAfterContributors) {
+                http.addFilterAfter(
+                    filterAfterContributor.getFilter(),
+                    filterAfterContributor.getAfterFilter());
+            }
+        }
+    }
+
+    private static class FilterBeforeContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
+        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
+
+        private final List<FilterBeforeContributor> filterBeforeContributors;
+
+        FilterBeforeContributorConfigurer(List<FilterBeforeContributor> filterBeforeContributors) {
+            this.filterBeforeContributors = filterBeforeContributors;
+        }
+
+        @Override
+        public void configure(HttpSecurity http) {
+            AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+
+            for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
+                http.addFilterBefore(
+                    filterBeforeContributor.getFilter(authenticationManager),
+                    filterBeforeContributor.getBeforeFilter());
+            }
+        }
+    }
+
     /**
      * Custom CSRF handler to provide BREACH protection.
      *
@@ -346,7 +371,7 @@ public class SecurityConfiguration {
      *      SpaCsrfTokenRequestHandler to handle CSRF token</a>
      * @see <a href="https://stackoverflow.com/q/74447118/65681">CSRF protection not working with Spring Security 6</a>
      */
-    static final class SpaCsrfTokenRequestHandler extends CsrfTokenRequestAttributeHandler {
+    private static final class SpaCsrfTokenRequestHandler extends CsrfTokenRequestAttributeHandler {
 
         private final CsrfTokenRequestHandler delegate = new XorCsrfTokenRequestAttributeHandler();
 
@@ -375,46 +400,6 @@ public class SecurityConfiguration {
              * form includes the _csrf request parameter as a hidden input.
              */
             return this.delegate.resolveCsrfTokenValue(request, csrfToken);
-        }
-    }
-
-    public static class FilterAfterContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
-        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
-
-        private final List<FilterAfterContributor> filterAfterContributors;
-
-        FilterAfterContributorConfigurer(List<FilterAfterContributor> filterAfterContributors) {
-            this.filterAfterContributors = filterAfterContributors;
-        }
-
-        @Override
-        public void configure(HttpSecurity http) {
-            for (FilterAfterContributor filterAfterContributor : filterAfterContributors) {
-                http.addFilterAfter(
-                    filterAfterContributor.getFilter(),
-                    filterAfterContributor.getAfterFilter());
-            }
-        }
-    }
-
-    public static class FilterBeforeContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
-        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
-
-        private final List<FilterBeforeContributor> filterBeforeContributors;
-
-        FilterBeforeContributorConfigurer(List<FilterBeforeContributor> filterBeforeContributors) {
-            this.filterBeforeContributors = filterBeforeContributors;
-        }
-
-        @Override
-        public void configure(HttpSecurity http) {
-            AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-
-            for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
-                http.addFilterBefore(
-                    filterBeforeContributor.getFilter(authenticationManager),
-                    filterBeforeContributor.getBeforeFilter());
-            }
         }
     }
 
