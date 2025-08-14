@@ -23,7 +23,6 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -66,12 +65,12 @@ public class FlowTools {
         return taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
     }
 
-
     @Tool(
         description = "List all flows in the project. Returns a list of flows with their basic information including name and description")
     public List<FlowMinimalInfo> listFlows() {
         try {
-            List<TaskDispatcherDefinition> taskDispatcherDefinitions = taskDispatcherDefinitionService.getTaskDispatcherDefinitions();
+            List<TaskDispatcherDefinition> taskDispatcherDefinitions =
+                taskDispatcherDefinitionService.getTaskDispatcherDefinitions();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Found {} flows", taskDispatcherDefinitions.size());
@@ -109,7 +108,8 @@ public class FlowTools {
             String outputPropertiesJson = null;
             OutputResponse outputResponse = taskDispatcherDefinition.getOutputResponse();
 
-            if (taskDispatcherDefinition.isOutputDefined() && outputResponse != null && outputResponse.outputSchema() != null) {
+            if (taskDispatcherDefinition.isOutputDefined() && outputResponse != null
+                && outputResponse.outputSchema() != null) {
                 outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
             }
 
@@ -133,8 +133,10 @@ public class FlowTools {
         @ToolParam(description = "The search query to match against flow names and descriptions") String query) {
 
         try {
-            List<TaskDispatcherDefinition> taskDispatcherDefinitions = taskDispatcherDefinitionService.getTaskDispatcherDefinitions();
-            String lowerQuery = query.toLowerCase().trim();
+            List<TaskDispatcherDefinition> taskDispatcherDefinitions =
+                taskDispatcherDefinitionService.getTaskDispatcherDefinitions();
+            String lowerQuery = query.toLowerCase()
+                .trim();
 
             List<FlowMinimalInfo> matchingFlows = taskDispatcherDefinitions.stream()
                 .filter(flow -> ToolUtils.matchesQuery(
@@ -175,7 +177,8 @@ public class FlowTools {
                 logger.debug("Retrieved {} task properties for flow '{}'", taskProperties.size(), name);
             }
 
-            List<ToolUtils.PropertyInfo> propertyInfos = new ArrayList<>(ToolUtils.convertToPropertyInfoList(properties));
+            List<ToolUtils.PropertyInfo> propertyInfos =
+                new ArrayList<>(ToolUtils.convertToPropertyInfoList(properties));
             propertyInfos.addAll(ToolUtils.convertToPropertyInfoList(taskProperties));
 
             return propertyInfos;
@@ -241,7 +244,6 @@ public class FlowTools {
             throw ToolUtils.createOperationException("Failed to get output properties", e);
         }
     }
-
 
     /**
      * Minimal flow information record for the response.
