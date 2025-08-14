@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.security.web.authentication;
+package com.bytechef.platform.security.web.config;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 
 /**
+ * Defines an interface for contributing custom {@link AuthenticationProvider} instances to the security configuration.
+ * Implementations of this interface provide a specific {@link AuthenticationProvider} that is used for handling
+ * authentication in a customized manner.
+ *
+ * This interface is useful for scenarios where multiple authentication mechanisms are required, allowing different
+ * implementations to contribute distinct {@link AuthenticationProvider}s to the security framework.
+ *
  * @author Ivica Cardic
  */
 public interface AuthenticationProviderContributor {
 
+    /**
+     * Retrieves the {@link AuthenticationProvider} instance contributed by this implementation.
+     *
+     * @return the {@link AuthenticationProvider} instance used for authentication purposes.
+     */
     AuthenticationProvider getAuthenticationProvider();
 }

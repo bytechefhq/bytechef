@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.security.web.filter;
 
 import com.bytechef.ee.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
-import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
+import com.bytechef.platform.security.web.filter.AbstractApiAuthenticationFilter;
 import com.bytechef.platform.user.service.SigningKeyService;
 import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.tenant.util.TenantUtils;
@@ -31,7 +31,7 @@ import org.springframework.security.core.Authentication;
  *
  * @author Ivica Cardic
  */
-public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenticationFilter {
+public class ConnectedUserApiAuthenticationFilter extends AbstractApiAuthenticationFilter {
 
     private static final Pattern EXTERNAL_USER_ID_PATTERN = Pattern.compile(".*/v\\d+/([^/]+)/.*");
     private static final Pattern JWT_TOKEN_PATTERN =
@@ -40,7 +40,7 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
     private final SigningKeyService signingKeyService;
 
     @SuppressFBWarnings("EI")
-    public ConnectedUserAuthenticationFilter(
+    public ConnectedUserApiAuthenticationFilter(
         AuthenticationManager authenticationManager, SigningKeyService signingKeyService) {
 
         super("^/api/embedded/v[0-9]+/.+|^/api/(?:automation|embedded|platform)/internal/.+", authenticationManager);
