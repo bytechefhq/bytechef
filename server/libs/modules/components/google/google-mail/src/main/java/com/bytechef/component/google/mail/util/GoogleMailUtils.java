@@ -342,7 +342,7 @@ public class GoogleMailUtils {
             messages.addAll(listMessagesResponse.getMessages());
 
             nextPageToken = listMessagesResponse.getNextPageToken();
-        } while (nextPageToken != null);
+        } while (nextPageToken != null && messages.size() < 500);
 
         for (Message message : messages) {
             String id = message.getId();
