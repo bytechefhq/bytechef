@@ -159,6 +159,9 @@ export default function saveTaskDispatcherSubtaskFieldChange({
                 case 'operation':
                     return {
                         ...subtask,
+                        parameters: getParametersWithDefaultValues({
+                            properties: currentOperationProperties as Array<PropertyAllType>,
+                        }),
                         type: `${currentNode.componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
                     };
                 case 'label':
