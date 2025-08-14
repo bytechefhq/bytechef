@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.tool.ComponentTools;
+import com.bytechef.ai.mcp.tool.FlowTools;
 import com.bytechef.ai.mcp.tool.ProjectTools;
 import com.bytechef.ai.mcp.tool.ProjectWorkflowTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,16 +37,21 @@ public class McpServerConfiguration {
     private final ProjectTools projectTools;
     private final ProjectWorkflowTools projectWorkflowTools;
     private final ComponentTools componentTools;
+    private final FlowTools flowTools;
 
     @SuppressFBWarnings("EI")
-    public McpServerConfiguration(ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, ComponentTools componentTools) {
+    public McpServerConfiguration(ProjectTools projectTools,
+                                  ProjectWorkflowTools projectWorkflowTools,
+                                  ComponentTools componentTools,
+                                  FlowTools flowTools) {
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
         this.componentTools = componentTools;
+        this.flowTools = flowTools;
     }
 
     @Bean
     ToolCallbackProvider toolCallbackProvider() {
-        return ToolCallbackProvider.from(ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools));
+        return ToolCallbackProvider.from(ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools, flowTools));
     }
 }
