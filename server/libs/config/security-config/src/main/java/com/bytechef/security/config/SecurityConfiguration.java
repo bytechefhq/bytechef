@@ -17,13 +17,15 @@
 package com.bytechef.security.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Security;
 import com.bytechef.config.ApplicationProperties.Security.RememberMe;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.authentication.AuthenticationProviderContributor;
+import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
+import com.bytechef.platform.security.web.config.CsrfContributor;
+import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import com.bytechef.platform.security.web.filter.FilterAfterContributor;
 import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
@@ -71,6 +73,7 @@ import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * @author Ivica Cardic
@@ -136,33 +139,40 @@ public class SecurityConfiguration {
     @Order(3)
     public SecurityFilterChain apiFilterChain(
         HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
-        List<AuthenticationProviderContributor> authenticationProviderContributors, Environment environment,
-        List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors)
+        List<AuthenticationProviderContributor> authenticationProviderContributors,
+        List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors, List<CsrfContributor> csrfContributors,
+        Environment environment, List<FilterAfterContributor> filterAfterContributors,
+        List<FilterBeforeContributor> filterBeforeContributors, List<SpaWebFilterContributor> spaWebFilterContributors)
         throws Exception {
 
         http
             .securityMatcher("/api/**", "/graphql")
             .cors(withDefaults())
-            .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                // See https://stackoverflow.com/q/74447118/65681
-                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-                .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
-                .ignoringRequestMatchers(regexMatcher("^/api/v[0-9]+/mcp/.+"))
-                .ignoringRequestMatchers("/api/o/**")
-                .ignoringRequestMatchers("/api/sse")
-                .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded)/sse"))
-                // For internal calls from the embedded workflow builder
-                .ignoringRequestMatchers(request -> request.getHeader("Authorization") != null)
-                // For internal calls from the swagger UI in the dev profile
-                .ignoringRequestMatchers(request -> environment.acceptsProfiles(Profiles.of("dev")) &&
-                    StringUtils.contains(request.getHeader("Referer"), "/swagger-ui/")));
+            .csrf(csrf -> {
+                csrf
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    // See https://stackoverflow.com/q/74447118/65681
+                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler());
+
+                for (CsrfContributor csrfContributor : csrfContributors) {
+                    for (RequestMatcher requestMatcher : csrfContributor.getIgnoringRequestMatchers()) {
+                        csrf.ignoringRequestMatchers(requestMatcher);
+                    }
+                }
+
+                csrf
+                    // For CORS requests
+                    .ignoringRequestMatchers(request -> Objects.equals(request.getMethod(), "OPTIONS"))
+                    // For internal calls from the swagger UI in the dev profile
+                    .ignoringRequestMatchers(request -> environment.acceptsProfiles(Profiles.of("dev")) &&
+                        StringUtils.contains(request.getHeader("Referer"), "/swagger-ui/"));
+            });
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
             http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
         }
 
-        http.addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
+        http.addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
             .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class);
 
         http
@@ -174,27 +184,21 @@ public class SecurityConfiguration {
                 .permissionsPolicyHeader(permissions -> permissions
                     .policy(
                         "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers(mvc.matcher("/api/activate"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/authenticate"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/account/reset-password/finish"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/account/reset-password/init"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/automation/sse"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/embedded/sse"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/register"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/sse"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/**"))
-                .authenticated()
-                .requestMatchers(mvc.matcher("/graphql"))
-                .authenticated())
+            .authorizeHttpRequests(authz -> {
+                for (AuthorizeHttpRequestContributor authorizeHttpRequestContributor : authorizeHttpRequestContributors) {
+                    for (String path : authorizeHttpRequestContributor.getApiPermitAllRequestMatcherPaths()) {
+                        authz
+                            .requestMatchers(mvc.matcher(path))
+                            .permitAll();
+                    }
+                }
+
+                authz
+                    .requestMatchers(mvc.matcher("/api/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.matcher("/graphql"))
+                    .authenticated();
+            })
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
                 .rememberMeParameter("remember-me")
@@ -222,40 +226,44 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(4)
-    public SecurityFilterChain filterChain(HttpSecurity http, PathPatternRequestMatcher.Builder mvc) throws Exception {
+    public SecurityFilterChain filterChain(
+        HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
+        List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors,
+        List<SpaWebFilterContributor> spaWebFilterContributors) throws Exception {
+
         http
-            .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
+            .addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers(mvc.matcher("/*.ico"), mvc.matcher("/*.png"), mvc.matcher("/*.svg"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/approvals/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/assets/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/callback"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/file-entries/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/i18n/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/icons/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/index.html"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/oauth.html"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/swagger-ui/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/swagger-ui.html"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/v3/api-docs/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/webhooks/**"))
-                .permitAll()
-                .anyRequest()
-                .denyAll());
+            .authorizeHttpRequests(authz -> {
+                for (AuthorizeHttpRequestContributor authorizeHttpRequestContributor : authorizeHttpRequestContributors) {
+                    for (String path : authorizeHttpRequestContributor.getPermitAllRequestMatcherPaths()) {
+                        authz
+                            .requestMatchers(mvc.matcher(path))
+                            .permitAll();
+                    }
+                }
+
+                authz
+                    .requestMatchers(mvc.matcher("/*.ico"), mvc.matcher("/*.png"), mvc.matcher("/*.svg"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/assets/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/i18n/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/icons/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/index.html"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/swagger-ui/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/swagger-ui.html"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/v3/api-docs/**"))
+                    .permitAll()
+                    .anyRequest()
+                    .denyAll();
+            });
 
         return http.build();
     }

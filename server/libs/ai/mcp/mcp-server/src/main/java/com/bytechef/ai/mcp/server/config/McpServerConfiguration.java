@@ -16,6 +16,8 @@
 
 package com.bytechef.ai.mcp.server.config;
 
+import com.bytechef.ai.mcp.server.security.web.config.McpServerAuthorizeHttpRequestContributor;
+import com.bytechef.ai.mcp.server.security.web.config.McpServerCsrfContributor;
 import com.bytechef.ai.mcp.tool.automation.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
@@ -52,7 +54,17 @@ public class McpServerConfiguration {
 
     @Bean
     ToolCallbackProvider toolCallbackProvider() {
-        return ToolCallbackProvider
-            .from(ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools, flowTools));
+        return ToolCallbackProvider.from(
+            ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools, flowTools));
+    }
+
+    @Bean
+    McpServerAuthorizeHttpRequestContributor mcpServerAuthorizeHttpRequestContributor() {
+        return new McpServerAuthorizeHttpRequestContributor();
+    }
+
+    @Bean
+    McpServerCsrfContributor mcpServerCsrfContributor() {
+        return new McpServerCsrfContributor();
     }
 }
