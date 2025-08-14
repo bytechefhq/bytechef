@@ -15,7 +15,10 @@ import {
     ComponentDefinitionBasic,
     GetComponentActionDefinitionRequest,
     GetComponentClusterElementDefinitionRequest,
+    GetComponentTriggerDefinitionRequest,
     TaskDispatcherDefinition,
+    TriggerDefinition,
+    TriggerDefinitionApi,
     WorkflowNodeOutput,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
@@ -27,7 +30,10 @@ import {
 } from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {useGetTriggerDefinitionQuery} from '@/shared/queries/platform/triggerDefinitions.queries';
+import {
+    TriggerDefinitionKeys,
+    useGetTriggerDefinitionQuery,
+} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -116,7 +122,7 @@ const WorkflowNodeDetailsPanel = ({
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
     const [currentActionDefinition, setCurrentActionDefinition] = useState<
-        ActionDefinition | ClusterElementDefinition | undefined
+        ActionDefinition | ClusterElementDefinition | TriggerDefinition | undefined
     >();
     const [currentActionFetched, setCurrentActionFetched] = useState(false);
     const [currentClusterElementName, setCurrentClusterElementName] = useState<string | undefined>();
@@ -223,6 +229,99 @@ const WorkflowNodeDetailsPanel = ({
             triggerName: getTriggerName(),
         },
         !!currentNode?.componentName && currentNode?.trigger && !!currentComponentDefinition
+    );
+
+    const fetchClusterElementDefinition = useCallback(
+        async (operationName?: string) => {
+            const clusterElementDefinitionRequest: GetComponentClusterElementDefinitionRequest = {
+                clusterElementName: operationName ?? currentOperationName ?? currentNode?.operationName,
+                componentName: currentComponentDefinition?.name as string,
+                componentVersion: currentComponentDefinition?.version as number,
+            };
+
+            const clusterElementDefinition = await queryClient.fetchQuery({
+                queryFn: () =>
+                    new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
+                        clusterElementDefinitionRequest
+                    ),
+                queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(clusterElementDefinitionRequest),
+            });
+
+            if (clusterElementDefinition) {
+                setCurrentActionDefinition(clusterElementDefinition);
+
+                setCurrentActionFetched(true);
+            }
+
+            return clusterElementDefinition;
+        },
+        [
+            currentComponentDefinition?.name,
+            currentComponentDefinition?.version,
+            currentNode?.operationName,
+            currentOperationName,
+            queryClient,
+        ]
+    );
+
+    const fetchActionDefinition = useCallback(
+        async (operationName?: string) => {
+            const actionDefinitionRequest: GetComponentActionDefinitionRequest = {
+                actionName: operationName ?? currentOperationName ?? currentNode?.operationName,
+                componentName: currentComponentDefinition?.name as string,
+                componentVersion: currentComponentDefinition?.version as number,
+            };
+
+            const actionDefinition = await queryClient.fetchQuery({
+                queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(actionDefinitionRequest),
+                queryKey: ActionDefinitionKeys.actionDefinition(actionDefinitionRequest),
+            });
+
+            if (actionDefinition) {
+                setCurrentActionDefinition(actionDefinition);
+
+                setCurrentActionFetched(true);
+            }
+
+            return actionDefinition;
+        },
+        [
+            currentComponentDefinition?.name,
+            currentComponentDefinition?.version,
+            currentNode?.operationName,
+            currentOperationName,
+            queryClient,
+        ]
+    );
+
+    const fetchTriggerDefinition = useCallback(
+        async (operationName?: string) => {
+            const triggerDefinitionRequest: GetComponentTriggerDefinitionRequest = {
+                componentName: currentComponentDefinition?.name as string,
+                componentVersion: currentComponentDefinition?.version as number,
+                triggerName: operationName ?? currentOperationName ?? currentNode?.operationName,
+            };
+
+            const triggerDefinition = await queryClient.fetchQuery({
+                queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(triggerDefinitionRequest),
+                queryKey: TriggerDefinitionKeys.triggerDefinition(triggerDefinitionRequest),
+            });
+
+            if (triggerDefinition) {
+                setCurrentActionDefinition(triggerDefinition);
+
+                setCurrentActionFetched(true);
+            }
+
+            return triggerDefinition;
+        },
+        [
+            currentComponentDefinition?.name,
+            currentComponentDefinition?.version,
+            currentNode?.operationName,
+            currentOperationName,
+            queryClient,
+        ]
     );
 
     const {data: currentTaskDispatcherDefinition} = useGetTaskDispatcherDefinitionQuery(
@@ -403,7 +502,23 @@ const WorkflowNodeDetailsPanel = ({
 
             setCurrentOperationName(newOperationName);
 
+            let newOperationDefinition: ActionDefinition | TriggerDefinition | ClusterElementDefinition | undefined;
+
             if (!currentComponentDefinition || !currentComponent) {
+                return;
+            }
+
+            if (currentNode?.trigger) {
+                newOperationDefinition = await fetchTriggerDefinition(newOperationName);
+            } else if (clusterElementsCanvasOpen && isClusterElement) {
+                newOperationDefinition = await fetchClusterElementDefinition(newOperationName);
+            } else {
+                newOperationDefinition = await fetchActionDefinition(newOperationName);
+            }
+
+            if (!newOperationDefinition) {
+                console.error(`newOperationDefinition not found for: ${newOperationName}`);
+
                 return;
             }
 
@@ -429,7 +544,7 @@ const WorkflowNodeDetailsPanel = ({
                 name: workflowNodeName || currentNode?.workflowNodeName || '',
                 operationName: newOperationName,
                 parameters: getParametersWithDefaultValues({
-                    properties: currentOperationProperties as Array<PropertyAllType>,
+                    properties: newOperationDefinition.properties as Array<PropertyAllType>,
                 }),
                 trigger: currentNode?.trigger,
                 type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
@@ -444,7 +559,7 @@ const WorkflowNodeDetailsPanel = ({
                 saveTaskDispatcherSubtaskFieldChange({
                     currentComponentDefinition,
                     currentNodeIndex: currentNodeIndex ?? 0,
-                    currentOperationProperties,
+                    currentOperationProperties: newOperationDefinition.properties as Array<PropertyAllType>,
                     fieldUpdate: {
                         field: 'operation',
                         value: newOperationName,
@@ -460,7 +575,7 @@ const WorkflowNodeDetailsPanel = ({
             if (isClusterElement) {
                 saveClusterElementFieldChange({
                     currentComponentDefinition,
-                    currentOperationProperties,
+                    currentOperationProperties: newOperationDefinition.properties as Array<PropertyAllType>,
                     fieldUpdate: {
                         field: 'operation',
                         value: newOperationName,
@@ -482,7 +597,7 @@ const WorkflowNodeDetailsPanel = ({
                         metadata: {},
                         operationName: newOperationName,
                         parameters: getParametersWithDefaultValues({
-                            properties: currentOperationProperties as Array<PropertyAllType>,
+                            properties: newOperationDefinition.properties as Array<PropertyAllType>,
                         }),
                         type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
                     });
@@ -495,7 +610,7 @@ const WorkflowNodeDetailsPanel = ({
                         name: workflowNodeName || currentNode?.workflowNodeName || '',
                         operationName: newOperationName,
                         parameters: getParametersWithDefaultValues({
-                            properties: currentOperationProperties as Array<PropertyAllType>,
+                            properties: newOperationDefinition.properties as Array<PropertyAllType>,
                         }),
                         type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
                         workflowNodeName,
@@ -508,14 +623,17 @@ const WorkflowNodeDetailsPanel = ({
             currentOperationName,
             currentComponentDefinition,
             currentComponent,
+            currentNode,
+            clusterElementsCanvasOpen,
+            isClusterElement,
             deleteWorkflowNodeTestOutputMutation,
             workflow.id,
-            currentNode,
             queryClient,
-            currentOperationProperties,
-            isClusterElement,
             invalidateWorkflowQueries,
             updateWorkflowMutation,
+            fetchTriggerDefinition,
+            fetchClusterElementDefinition,
+            fetchActionDefinition,
             currentNodeIndex,
             setCurrentComponent,
             setCurrentNode,
@@ -534,8 +652,7 @@ const WorkflowNodeDetailsPanel = ({
         useWorkflowNodeDetailsPanelStore.getState().reset();
     }, [clusterElementsCanvasOpen, invalidateWorkflowQueries, updateWorkflowMutation, workflow]);
 
-    // Get the node version for different definition types
-    function getNodeVersion(node: typeof currentWorkflowNode): string {
+    const getNodeVersion = useCallback((node: typeof currentWorkflowNode): string => {
         if (!node) {
             return '1';
         }
@@ -549,7 +666,7 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         return '1';
-    }
+    }, []);
 
     // Set current node name
     useEffect(() => {
@@ -834,53 +951,12 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         if (clusterElementsCanvasOpen && currentComponentDefinition?.clusterElement) {
-            const fetchClusterElementDefinition = async () => {
-                const clusterElementDefinitionRequest: GetComponentClusterElementDefinitionRequest = {
-                    clusterElementName: currentOperationName,
-                    componentName: currentComponentDefinition?.name as string,
-                    componentVersion: currentComponentDefinition?.version as number,
-                };
-
-                const clusterElementDefinition = await queryClient.fetchQuery({
-                    queryFn: () =>
-                        new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
-                            clusterElementDefinitionRequest
-                        ),
-                    queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(clusterElementDefinitionRequest),
-                });
-
-                if (clusterElementDefinition) {
-                    setCurrentActionDefinition(clusterElementDefinition);
-
-                    setCurrentActionFetched(true);
-                }
-            };
-
             if (!!currentComponentDefinition.clusterElements && !!matchingOperation) {
                 fetchClusterElementDefinition();
             } else {
                 setCurrentActionDefinition(undefined);
             }
         } else {
-            const fetchActionDefinition = async () => {
-                const actionDefinitionRequest: GetComponentActionDefinitionRequest = {
-                    actionName: currentOperationName ?? currentNode?.operationName,
-                    componentName: currentComponentDefinition?.name as string,
-                    componentVersion: currentComponentDefinition?.version as number,
-                };
-
-                const actionDefinition = await queryClient.fetchQuery({
-                    queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(actionDefinitionRequest),
-                    queryKey: ActionDefinitionKeys.actionDefinition(actionDefinitionRequest),
-                });
-
-                if (actionDefinition) {
-                    setCurrentActionDefinition(actionDefinition);
-
-                    setCurrentActionFetched(true);
-                }
-            };
-
             if (!!currentComponentDefinition?.actions && !currentNode?.trigger && !!matchingOperation) {
                 fetchActionDefinition();
             } else {
