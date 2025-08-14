@@ -75,7 +75,6 @@ public class ComponentTools {
             "parameters": {}
         }
         """;
-
     @SuppressFBWarnings("EI")
     public ComponentTools(ComponentDefinitionService componentDefinitionService) {
         this.componentDefinitionService = componentDefinitionService;
@@ -88,23 +87,6 @@ public class ComponentTools {
             : componentDefinitionService.getComponentDefinition(componentName, null);
     }
 
-    private RuntimeException createNotFoundException(String message, String... args) {
-        return new RuntimeException(String.format(message, (Object[]) args));
-    }
-
-    private RuntimeException createOperationException(String message, Exception cause) {
-        return new RuntimeException(message + ": " + cause.getMessage(), cause);
-    }
-
-    private String safeToLowerCase(String value) {
-        return value != null ? value.toLowerCase() : "";
-    }
-
-    private boolean matchesQuery(String name, String description, String query) {
-        String lowerName = safeToLowerCase(name);
-        String lowerDescription = safeToLowerCase(description);
-        return lowerName.contains(query) || lowerDescription.contains(query);
-    }
 
     @Tool(
         description = "List all components in a project. Returns a list of components with their basic information including name and description")
@@ -124,7 +106,7 @@ public class ComponentTools {
                 .toList();
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_COMPONENTS, e);
-            throw createOperationException(FAILED_TO_LIST_COMPONENTS, e);
+            throw ToolUtils.createOperationException(FAILED_TO_LIST_COMPONENTS, e);
         }
     }
 
@@ -158,7 +140,7 @@ public class ComponentTools {
                     .toList());
         } catch (Exception e) {
             logger.error("Failed to get component {}", componentName, e);
-            throw createOperationException(FAILED_TO_GET_COMPONENT, e);
+            throw ToolUtils.createOperationException(FAILED_TO_GET_COMPONENT, e);
         }
     }
 
@@ -173,7 +155,7 @@ public class ComponentTools {
                 .trim();
 
             List<ComponentMinimalInfo> matchingComponents = componentDefinitions.stream()
-                .filter(component -> matchesQuery(
+                .filter(component -> ToolUtils.matchesQuery(
                     component.getName(),
                     component.getDescription(),
                     lowerQuery))
@@ -190,7 +172,7 @@ public class ComponentTools {
             return matchingComponents;
         } catch (Exception e) {
             logger.error("Failed to search components with query '{}'", query, e);
-            throw createOperationException(FAILED_TO_SEARCH_COMPONENTS, e);
+            throw ToolUtils.createOperationException(FAILED_TO_SEARCH_COMPONENTS, e);
         }
     }
 
@@ -216,7 +198,7 @@ public class ComponentTools {
             return triggers;
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_TRIGGERS, e);
-            throw createOperationException(FAILED_TO_LIST_TRIGGERS, e);
+            throw ToolUtils.createOperationException(FAILED_TO_LIST_TRIGGERS, e);
         }
     }
 
@@ -241,7 +223,7 @@ public class ComponentTools {
                     OutputResponse outputResponse = trigger.getOutputResponse();
 
                     if (trigger.isOutputDefined() && outputResponse != null && outputResponse.outputSchema() != null) {
-                        outputPropertiesJson = getOutputPropertiesJson(outputResponse.outputSchema());
+                        outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
                     }
 
                     return new TriggerDetailedInfo(
@@ -251,14 +233,14 @@ public class ComponentTools {
                         componentDefinition.getName(),
                         trigger.getType()
                             .name(),
-                        getParametersJson(trigger.getProperties()),
+                        ToolUtils.generateParametersJson(trigger.getProperties()),
                         outputPropertiesJson);
                 })
-                .orElseThrow(() -> createNotFoundException(TRIGGER_NOT_FOUND, triggerName, componentName));
+                .orElseThrow(() -> ToolUtils.createNotFoundException(TRIGGER_NOT_FOUND, triggerName, componentName));
 
         } catch (Exception e) {
             logger.error("Failed to get trigger '{}' from component '{}'", triggerName, componentName, e);
-            throw createOperationException(FAILED_TO_GET_TRIGGER, e);
+            throw ToolUtils.createOperationException(FAILED_TO_GET_TRIGGER, e);
         }
     }
 
@@ -276,7 +258,7 @@ public class ComponentTools {
             List<TriggerMinimalInfo> matchingTriggers = componentDefinitions.stream()
                 .flatMap(component -> component.getTriggers()
                     .stream()
-                    .filter(trigger -> matchesQuery(
+                    .filter(trigger -> ToolUtils.matchesQuery(
                         trigger.getName(),
                         trigger.getDescription(),
                         lowerQuery))
@@ -293,7 +275,7 @@ public class ComponentTools {
             return matchingTriggers;
         } catch (Exception e) {
             logger.error("Failed to search triggers with query '{}'", query, e);
-            throw createOperationException(FAILED_TO_SEARCH_TRIGGERS, e);
+            throw ToolUtils.createOperationException(FAILED_TO_SEARCH_TRIGGERS, e);
         }
     }
 
@@ -314,8 +296,8 @@ public class ComponentTools {
                 .filter(t -> t.getName()
                     .equals(triggerName))
                 .findFirst()
-                .orElseThrow(() -> createNotFoundException(TRIGGER_NOT_FOUND, triggerName, componentName));
-            String parametersJson = getParametersJson(trigger.getProperties());
+                .orElseThrow(() -> ToolUtils.createNotFoundException(TRIGGER_NOT_FOUND, triggerName, componentName));
+            String parametersJson = ToolUtils.generateParametersJson(trigger.getProperties());
 
             // Generate the trigger definition using the template with actual parameters
             String triggerDefinition = DEFAULT_TRIGGER_DEFINITION
@@ -331,7 +313,7 @@ public class ComponentTools {
             return triggerDefinition;
         } catch (Exception e) {
             logger.error("Failed to generate trigger definition for '{}:{}'", componentName, triggerName, e);
-            throw createOperationException(FAILED_TO_GENERATE_TRIGGER_DEFINITION, e);
+            throw ToolUtils.createOperationException(FAILED_TO_GENERATE_TRIGGER_DEFINITION, e);
         }
     }
 
@@ -357,7 +339,7 @@ public class ComponentTools {
             return actions;
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_ACTIONS, e);
-            throw createOperationException(FAILED_TO_LIST_ACTIONS, e);
+            throw ToolUtils.createOperationException(FAILED_TO_LIST_ACTIONS, e);
         }
     }
 
@@ -382,7 +364,7 @@ public class ComponentTools {
                     OutputResponse outputResponse = action.getOutputResponse();
 
                     if (action.isOutputDefined() && outputResponse != null && outputResponse.outputSchema() != null) {
-                        outputPropertiesJson = getOutputPropertiesJson(outputResponse.outputSchema());
+                        outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
                     }
 
                     return new ActionDetailedInfo(
@@ -390,14 +372,14 @@ public class ComponentTools {
                         action.getTitle(),
                         action.getDescription(),
                         componentDefinition.getName(),
-                        getParametersJson(action.getProperties()),
+                        ToolUtils.generateParametersJson(action.getProperties()),
                         outputPropertiesJson);
                 })
-                .orElseThrow(() -> createNotFoundException(ACTION_NOT_FOUND, actionName, componentName));
+                .orElseThrow(() -> ToolUtils.createNotFoundException(ACTION_NOT_FOUND, actionName, componentName));
 
         } catch (Exception e) {
             logger.error("Failed to get action '{}' from component '{}'", actionName, componentName, e);
-            throw createOperationException(FAILED_TO_GET_ACTION, e);
+            throw ToolUtils.createOperationException(FAILED_TO_GET_ACTION, e);
         }
     }
 
@@ -415,7 +397,7 @@ public class ComponentTools {
             List<ActionMinimalInfo> matchingActions = componentDefinitions.stream()
                 .flatMap(component -> component.getActions()
                     .stream()
-                    .filter(action -> matchesQuery(
+                    .filter(action -> ToolUtils.matchesQuery(
                         action.getName(),
                         action.getDescription(),
                         lowerQuery))
@@ -432,7 +414,7 @@ public class ComponentTools {
             return matchingActions;
         } catch (Exception e) {
             logger.error("Failed to search actions with query '{}'", query, e);
-            throw createOperationException(FAILED_TO_SEARCH_ACTIONS, e);
+            throw ToolUtils.createOperationException(FAILED_TO_SEARCH_ACTIONS, e);
         }
     }
 
@@ -453,8 +435,8 @@ public class ComponentTools {
                 .filter(a -> a.getName()
                     .equals(actionName))
                 .findFirst()
-                .orElseThrow(() -> createNotFoundException(ACTION_NOT_FOUND, actionName, componentName));
-            String parametersJson = getParametersJson(action.getProperties());
+                .orElseThrow(() -> ToolUtils.createNotFoundException(ACTION_NOT_FOUND, actionName, componentName));
+            String parametersJson = ToolUtils.generateParametersJson(action.getProperties());
 
             // Generate the action definition using the template with actual parameters
             String actionDefinition = DEFAULT_ACTION_DEFINITION
@@ -470,31 +452,14 @@ public class ComponentTools {
             return actionDefinition;
         } catch (Exception e) {
             logger.error("Failed to generate action definition for '{}:{}'", componentName, actionName, e);
-            throw createOperationException(FAILED_TO_GENERATE_ACTION_DEFINITION, e);
+            throw ToolUtils.createOperationException(FAILED_TO_GENERATE_ACTION_DEFINITION, e);
         }
     }
 
-    private String getParametersJson(List<? extends BaseProperty> properties) {
-        if (properties.isEmpty()) {
-            return "{}";
-        }
-
-        List<PropertyDecorator> propertyDecorators = PropertyDecorator.toPropertyDecorators(properties);
-        return getObjectValue(propertyDecorators);
-    }
-
-    private String getOutputPropertiesJson(BaseProperty outputSchema) {
-        if (outputSchema == null) {
-            return "{}";
-        }
-
-        PropertyDecorator propertyDecorator = new PropertyDecorator(outputSchema);
-        return getSampleValue(propertyDecorator);
-    }
 
     @Tool(
         description = "Get the output property of a specific trigger or action. Returns the structure of the output property")
-    public PropertyInfo getOutputProperty(
+    public ToolUtils.PropertyInfo getOutputProperty(
         @ToolParam(
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(
@@ -528,7 +493,7 @@ public class ComponentTools {
                     var action = actionOptional.get();
                     outputResponse = action.isOutputDefined() ? action.getOutputResponse() : null;
                 } else {
-                    throw createNotFoundException(OPERATION_NOT_FOUND, operationName, componentName);
+                    throw ToolUtils.createNotFoundException(OPERATION_NOT_FOUND, operationName, componentName);
                 }
             }
 
@@ -540,73 +505,17 @@ public class ComponentTools {
                 logger.debug("Retrieved output properties for {}:{}", componentName, operationName);
             }
 
-            return convertToPropertyInfo(outputResponse.outputSchema());
+            return ToolUtils.convertToPropertyInfo(outputResponse.outputSchema());
         } catch (Exception e) {
             logger.error("Failed to get output properties for '{}:{}'", componentName, operationName, e);
-            throw createOperationException(FAILED_TO_GET_OUTPUT_PROPERTIES, e);
+            throw ToolUtils.createOperationException(FAILED_TO_GET_OUTPUT_PROPERTIES, e);
         }
     }
 
-    private String getArrayValue(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("[ ");
-
-        for (var property : properties) {
-            parameters.append(getSampleValue(property))
-                .append(", ");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append("]")
-            .toString();
-    }
-
-    private String getSampleValue(PropertyDecorator property) {
-        String required = property.required ? " (required)" : "";
-
-        return switch (property.getType()) {
-            case ARRAY -> getArrayValue(property.getItems());
-            case BOOLEAN -> "boolean" + required;
-            case DATE -> "date" + required;
-            case DATE_TIME -> "datetime" + required;
-            case DYNAMIC_PROPERTIES -> "{}" + required;
-            case INTEGER -> "integer" + required;
-            case NUMBER -> "float" + required;
-            case OBJECT -> getObjectValue(property.getObjectProperties());
-            case FILE_ENTRY -> getObjectValue(property.getFileEntryProperties());
-            case TIME -> "time" + required;
-            default -> "string" + required;
-        };
-    }
-
-    private String getObjectValue(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("{ ");
-
-        for (var property : properties) {
-            parameters.append("\"")
-                .append(property.getName())
-                .append("\": ")
-                .append(getSampleValue(property))
-                .append(", ");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append("}")
-            .toString();
-    }
 
     @Tool(
         description = "Get all properties of a specific trigger or action. Returns a hierarchical list of properties including nested properties")
-    public List<PropertyInfo> getProperties(
+    public List<ToolUtils.PropertyInfo> getProperties(
         @ToolParam(
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(
@@ -640,7 +549,7 @@ public class ComponentTools {
                     properties = actionOptional.get()
                         .getProperties();
                 } else {
-                    throw createNotFoundException(OPERATION_NOT_FOUND, operationName, componentName);
+                    throw ToolUtils.createNotFoundException(OPERATION_NOT_FOUND, operationName, componentName);
                 }
             }
 
@@ -648,65 +557,14 @@ public class ComponentTools {
                 logger.debug("Retrieved {} properties for {}:{}", properties.size(), componentName, operationName);
             }
 
-            return convertToPropertyInfoList(properties);
+            return ToolUtils.convertToPropertyInfoList(properties);
         } catch (Exception e) {
             logger.error("Failed to get properties for '{}:{}'", componentName, operationName, e);
-            throw createOperationException(FAILED_TO_GET_PROPERTIES, e);
+            throw ToolUtils.createOperationException(FAILED_TO_GET_PROPERTIES, e);
         }
     }
 
-    private List<PropertyInfo> convertToPropertyInfoList(List<? extends BaseProperty> properties) {
-        return properties.stream()
-            .map(this::convertToPropertyInfo)
-            .toList();
-    }
 
-    private PropertyInfo convertToPropertyInfo(BaseProperty property) {
-        PropertyDecorator decorator = new PropertyDecorator(property);
-
-        List<PropertyInfo> nestedProperties = null;
-
-        if (decorator.getType() == Type.OBJECT) {
-            nestedProperties = convertToPropertyInfoList(decorator.getObjectProperties()
-                .stream()
-                .map(pd -> pd.property)
-                .toList());
-        } else if (decorator.getType() == Type.ARRAY) {
-            nestedProperties = convertToPropertyInfoList(decorator.getItems()
-                .stream()
-                .map(pd -> pd.property)
-                .toList());
-        } else if (decorator.getType() == Type.FILE_ENTRY) {
-            nestedProperties = convertToPropertyInfoList(decorator.getFileEntryProperties()
-                .stream()
-                .map(pd -> pd.property)
-                .toList());
-        }
-
-        return new PropertyInfo(
-            property.getName(),
-            decorator.getType()
-                .name(),
-            property.getDescription(),
-            property.getRequired(),
-            property.getExpressionEnabled(),
-            property.getDisplayCondition(),
-            nestedProperties);
-    }
-
-    /**
-     * Property information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record PropertyInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the property") String name,
-        @JsonProperty("type") @JsonPropertyDescription("The type of the property") String type,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the property") String description,
-        @JsonProperty("required") @JsonPropertyDescription("Whether the property is required") boolean required,
-        @JsonProperty("expressionEnabled") @JsonPropertyDescription("Whether expressions are enabled for this property") boolean expressionEnabled,
-        @JsonProperty("displayCondition") @JsonPropertyDescription("The display condition for the property") String displayCondition,
-        @JsonProperty("nestedProperties") @JsonPropertyDescription("Nested properties for object/array/file_entry types") List<PropertyInfo> nestedProperties) {
-    }
 
     /**
      * Minimal component information record for the response.
@@ -777,180 +635,4 @@ public class ComponentTools {
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the action (if output is defined)") String outputProperties) {
     }
 
-    private static class PropertyDecorator {
-
-        enum Location {
-            COMPONENT,
-            TASK_DISPATCHER
-        }
-
-        private final BaseProperty property;
-        private final Type type;
-        private final Location location;
-        private final Boolean required;
-
-        public PropertyDecorator(BaseProperty property) {
-            this.property = property;
-
-            switch (property) {
-                case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty ignored -> {
-                    this.type = Type.ARRAY;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.ArrayProperty ignored -> {
-                    this.type = Type.ARRAY;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.BooleanProperty ignored -> {
-                    this.type = Type.BOOLEAN;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.BooleanProperty ignored -> {
-                    this.type = Type.BOOLEAN;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.DateProperty ignored -> {
-                    this.type = Type.DATE;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.DateProperty ignored -> {
-                    this.type = Type.DATE;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.DateTimeProperty ignored -> {
-                    this.type = Type.DATE_TIME;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.DateTimeProperty ignored -> {
-                    this.type = Type.DATE_TIME;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.DynamicPropertiesProperty ignored -> {
-                    this.type = Type.DYNAMIC_PROPERTIES;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.IntegerProperty ignored -> {
-                    this.type = Type.INTEGER;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.IntegerProperty ignored -> {
-                    this.type = Type.INTEGER;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty ignored -> {
-                    this.type = Type.FILE_ENTRY;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.FileEntryProperty ignored -> {
-                    this.type = Type.FILE_ENTRY;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.NullProperty ignored -> {
-                    this.type = Type.NULL;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty ignored -> {
-                    this.type = Type.NUMBER;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.NumberProperty ignored -> {
-                    this.type = Type.NUMBER;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty ignored -> {
-                    this.type = Type.OBJECT;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.ObjectProperty ignored -> {
-                    this.type = Type.OBJECT;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty ignored -> {
-                    this.type = Type.STRING;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.StringProperty ignored -> {
-                    this.type = Type.STRING;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.TimeProperty ignored -> {
-                    this.type = Type.TIME;
-                    this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
-                }
-                case com.bytechef.platform.component.domain.TimeProperty ignored -> {
-                    this.type = Type.TIME;
-                    this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
-                }
-                default -> {
-                    this.type = Type.NULL;
-                    this.location = Location.COMPONENT;
-                    this.required = false;
-                }
-            }
-        }
-
-        public List<PropertyDecorator> getItems() {
-            return switch (location) {
-                case TASK_DISPATCHER -> toPropertyDecorators(
-                    ((com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty) property).getItems());
-                case COMPONENT ->
-                    toPropertyDecorators(((com.bytechef.platform.component.domain.ArrayProperty) property).getItems());
-            };
-        }
-
-        public List<PropertyDecorator> getFileEntryProperties() {
-            return switch (location) {
-                case TASK_DISPATCHER -> toPropertyDecorators(
-                    ((com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty) property)
-                        .getProperties());
-                case COMPONENT -> toPropertyDecorators(
-                    ((com.bytechef.platform.component.domain.FileEntryProperty) property).getProperties());
-            };
-        }
-
-        public String getName() {
-            return property.getName();
-        }
-
-        public List<PropertyDecorator> getObjectProperties() {
-            return switch (location) {
-                case TASK_DISPATCHER -> toPropertyDecorators(
-                    ((com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty) property).getProperties());
-                case COMPONENT -> toPropertyDecorators(
-                    ((com.bytechef.platform.component.domain.ObjectProperty) property).getProperties());
-            };
-        }
-
-        public Type getType() {
-            return type;
-        }
-
-        public static List<PropertyDecorator> toPropertyDecorators(List<? extends BaseProperty> properties) {
-            return properties.stream()
-                .map(PropertyDecorator::new)
-                .toList();
-        }
-    }
 }
