@@ -34,6 +34,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
@@ -98,6 +99,15 @@ public class SecurityConfiguration {
         this.security = applicationProperties.getSecurity();
     }
 
+    /**
+     * Configures the security filter chain for the actuator endpoints, specifying authorization rules, authentication
+     * mechanisms, and exception handling.
+     *
+     * @param http the {@link HttpSecurity} object used to customize security settings for the actuator endpoints
+     * @param mvc  a {@link PathPatternRequestMatcher.Builder} used to create matchers for specific URI patterns
+     * @return a configured {@link SecurityFilterChain} to handle security for actuator endpoints
+     * @throws Exception if an error occurs while configuring the security filter chain
+     */
     @Bean
     @Order(2)
     public SecurityFilterChain actuatorFilterChain(
@@ -135,6 +145,32 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    /**
+     * Configures the security filter chain for API endpoints and GraphQL requests, defining authorization,
+     * authentication, CSRF settings, and headers for securing requests.
+     *
+     * @param http                               the {@link HttpSecurity} object used to customize the security settings
+     *                                           for the application.
+     * @param mvc                                a {@link PathPatternRequestMatcher.Builder} used to build request
+     *                                           matchers.
+     * @param authenticationProviderContributors a list of {@link AuthenticationProviderContributor} instances
+     *                                           contributing custom {@link AuthenticationProvider}s to handle
+     *                                           authentication.
+     * @param authorizeHttpRequestContributors   a list of {@link AuthorizeHttpRequestContributor} instances providing
+     *                                           paths to be configured as permit-all in the API security configuration.
+     * @param csrfContributors                   a list of {@link CsrfContributor} instances contributing request
+     *                                           matchers to be ignored for CSRF protection.
+     * @param environment                        the {@link Environment} object used to retrieve profiles and
+     *                                           environment properties.
+     * @param filterAfterContributors            a list of {@link FilterAfterContributor} instances allowing additional
+     *                                           filters to be added after default filters in the chain.
+     * @param filterBeforeContributors           a list of {@link FilterBeforeContributor} instances allowing additional
+     *                                           filters to be added before default filters in the chain.
+     * @param spaWebFilterContributors           a list of {@link SpaWebFilterContributor} instances contributing to the
+     *                                           customization of SPA-specific filters.
+     * @return a configured {@link SecurityFilterChain} for securing API and GraphQL endpoints.
+     * @throws Exception if an error occurs while configuring the security filter chain.
+     */
     @Bean
     @Order(3)
     public SecurityFilterChain apiFilterChain(
@@ -224,6 +260,22 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    /**
+     * Configures the security filter chain for the web application, defining authorization, authentication, and the
+     * integration of SPA-specific and permit-all contributors.
+     *
+     * @param http                             the {@link HttpSecurity} object used to customize security settings for
+     *                                         the application
+     * @param mvc                              a {@link PathPatternRequestMatcher.Builder} used to create request
+     *                                         matchers for specific URI patterns
+     * @param authorizeHttpRequestContributors a list of {@link AuthorizeHttpRequestContributor} instances providing
+     *                                         paths to be configured as permit-all in the security configuration
+     *
+     * @param spaWebFilterContributors         a list of {@link SpaWebFilterContributor} instances contributing to the
+     *                                         customization of SPA-specific filters
+     * @return a configured {@link SecurityFilterChain} for managing security in the application
+     * @throws Exception if an error occurs while configuring the security filter chain
+     */
     @Bean
     @Order(4)
     public SecurityFilterChain filterChain(
@@ -268,6 +320,15 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    /**
+     * Configures the security filter chain for GraphQL and GraphiQL endpoints in the development profile, defining
+     * authorization rules, authentication mechanisms, and exception handling.
+     *
+     * @param http the {@link HttpSecurity} object used to customize security settings for the GraphQL endpoints
+     * @param mvc  a {@link PathPatternRequestMatcher.Builder} used to create request matchers for specific URI patterns
+     * @return a configured {@link SecurityFilterChain} for securing GraphQL and GraphiQL endpoints
+     * @throws Exception if an error occurs while configuring the security filter chain
+     */
     @Bean
     @Profile("dev")
     @Order(1)
@@ -328,6 +389,12 @@ public class SecurityConfiguration {
         return rememberMe.getKey();
     }
 
+    /**
+     * A configuration class for adding custom filters to the security filter chain after specified filters. This class
+     * allows customization of the filter chain by applying a list of {@link FilterAfterContributor} instances.
+     *
+     * @param <H> the type of {@link HttpSecurityBuilder} used for configuring the security filter chain
+     */
     private static class FilterAfterContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
         extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
 
@@ -347,6 +414,13 @@ public class SecurityConfiguration {
         }
     }
 
+    /**
+     * A private configuration class for adding and positioning filters in the web security filter chain before a
+     * specific set of filters. This configurer uses a list of {@link FilterBeforeContributor} instances to determine
+     * which filters should be introduced into the chain and their corresponding positions.
+     *
+     * @param <H> the type of {@link HttpSecurityBuilder} used to configure the web security filter chain.
+     */
     private static class FilterBeforeContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
         extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
 
@@ -410,6 +484,21 @@ public class SecurityConfiguration {
         }
     }
 
+    /**
+     * A custom implementation of {@link BasicAuthenticationEntryPoint} used to handle unauthorized access attempts when
+     * basic authentication is required.
+     *
+     * This class extends the default functionality of {@link BasicAuthenticationEntryPoint} to customize the behavior
+     * for responding to unauthorized requests. It specifically defines the response headers and status code returned to
+     * the client upon an authentication failure.
+     *
+     * Key functionality: - Sets the "WWW-Authenticate" response header to indicate the required basic authentication
+     * with a realm. - Responds with the HTTP 401 (Unauthorized) status code to indicate that the request requires
+     * authentication.
+     *
+     * Method: {@link #commence(HttpServletRequest, HttpServletResponse, AuthenticationException)}: - Handles the
+     * response when an {@link AuthenticationException} occurs, customizing the headers and status code.
+     */
     private static class UnauthorizedBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
         @Override
