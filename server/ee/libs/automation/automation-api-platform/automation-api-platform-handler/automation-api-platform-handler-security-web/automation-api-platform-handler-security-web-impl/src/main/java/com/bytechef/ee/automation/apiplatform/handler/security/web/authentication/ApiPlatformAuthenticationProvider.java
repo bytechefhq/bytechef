@@ -22,22 +22,22 @@ import org.springframework.security.core.AuthenticationException;
  *
  * @author Ivica Cardic
  */
-public class ApiClientAuthenticationProvider implements AuthenticationProvider {
+public class ApiPlatformAuthenticationProvider implements AuthenticationProvider {
 
     private final ApiClientService apiClientService;
 
     @SuppressFBWarnings("EI")
-    public ApiClientAuthenticationProvider(ApiClientService apiClientService) {
+    public ApiPlatformAuthenticationProvider(ApiClientService apiClientService) {
         this.apiClientService = apiClientService;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        ApiClientKeyAuthenticationToken apiClientKeyAuthenticationToken =
-            (ApiClientKeyAuthenticationToken) authentication;
+        ApiPlatformKeyAuthenticationToken apiPlatformKeyAuthenticationToken =
+            (ApiPlatformKeyAuthenticationToken) authentication;
 
         Optional<ApiClient> apiClientOptional = apiClientService.fetchApiClient(
-            apiClientKeyAuthenticationToken.getSecretKey());
+            apiPlatformKeyAuthenticationToken.getSecretKey());
 
         if (apiClientOptional.isEmpty()) {
             throw new BadCredentialsException("Unknown API secret key");
@@ -45,12 +45,12 @@ public class ApiClientAuthenticationProvider implements AuthenticationProvider {
 
         ApiClient apiClient = apiClientOptional.get();
 
-        return new ApiClientKeyAuthenticationToken(createSpringSecurityUser(apiClient.getName()));
+        return new ApiPlatformKeyAuthenticationToken(createSpringSecurityUser(apiClient.getName()));
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(ApiClientKeyAuthenticationToken.class);
+        return authentication.equals(ApiPlatformKeyAuthenticationToken.class);
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String secretKey) {

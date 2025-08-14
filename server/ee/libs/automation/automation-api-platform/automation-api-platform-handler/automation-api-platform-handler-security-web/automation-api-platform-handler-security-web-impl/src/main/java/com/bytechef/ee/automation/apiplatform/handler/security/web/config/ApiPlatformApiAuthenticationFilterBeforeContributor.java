@@ -5,10 +5,10 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.security.web.filter;
+package com.bytechef.ee.automation.apiplatform.handler.security.web.config;
 
-import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
-import com.bytechef.platform.user.service.SigningKeyService;
+import com.bytechef.ee.automation.apiplatform.handler.security.web.filter.ApiPlatformApiAuthenticationFilter;
+import com.bytechef.platform.security.web.config.FilterBeforeContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.Filter;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,19 +21,12 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class ConnectedUserFilterBeforeContributor implements FilterBeforeContributor {
-
-    private final SigningKeyService signingKeyService;
-
-    @SuppressFBWarnings("EI")
-    public ConnectedUserFilterBeforeContributor(SigningKeyService signingKeyService) {
-        this.signingKeyService = signingKeyService;
-    }
+public class ApiPlatformApiAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
 
     @Override
     @SuppressFBWarnings("EI")
     public Filter getFilter(AuthenticationManager authenticationManager) {
-        return new ConnectedUserAuthenticationFilter(authenticationManager, signingKeyService);
+        return new ApiPlatformApiAuthenticationFilter(authenticationManager);
     }
 
     @Override

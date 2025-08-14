@@ -5,10 +5,11 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.security.web.authentication;
+package com.bytechef.ee.embedded.security.web.config;
 
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.platform.security.web.authentication.AuthenticationProviderContributor;
+import com.bytechef.ee.embedded.security.web.authentication.ConnectedUserAuthenticationProvider;
+import com.bytechef.platform.security.web.config.AuthenticationProviderContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.stereotype.Component;

@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.security.web.filter;
+package com.bytechef.automation.security.web.filter;
 
-import jakarta.servlet.Filter;
+import com.bytechef.platform.security.web.filter.AbstractApiAuthenticationFilter;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.authentication.AuthenticationManager;
 
 /**
  * @author Ivica Cardic
  */
-public interface FilterAfterContributor {
+public class AutomationApiAuthenticationFilter extends AbstractApiAuthenticationFilter {
 
-    Filter getFilter();
-
-    Class<? extends Filter> getAfterFilter();
+    @SuppressFBWarnings("EI")
+    public AutomationApiAuthenticationFilter(AuthenticationManager authenticationManager) {
+        super("^/api/automation/v[0-9]+/.+", authenticationManager);
+    }
 }

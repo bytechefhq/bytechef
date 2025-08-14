@@ -16,18 +16,18 @@ import org.springframework.security.core.userdetails.User;
  *
  * @author Ivica Cardic
  */
-public class ApiClientKeyAuthenticationToken extends AbstractPublicApiAuthenticationToken {
+public class ApiPlatformKeyAuthenticationToken extends AbstractPublicApiAuthenticationToken {
 
     private String secretKey;
 
-    public ApiClientKeyAuthenticationToken(String secretKey, String tenantId) {
+    public ApiPlatformKeyAuthenticationToken(String secretKey, String tenantId) {
         super(tenantId);
 
         this.secretKey = secretKey;
     }
 
     @SuppressFBWarnings("EI")
-    public ApiClientKeyAuthenticationToken(User user) {
+    public ApiPlatformKeyAuthenticationToken(User user) {
         super(user);
     }
 
