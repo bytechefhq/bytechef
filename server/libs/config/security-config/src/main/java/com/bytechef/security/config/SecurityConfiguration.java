@@ -299,8 +299,6 @@ public class SecurityConfiguration {
             return null;
         }
 
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-
         PasswordEncoder passwordEncoder = passwordEncoder();
 
         UserDetails user = User.withUsername(system.getUsername())
@@ -308,7 +306,8 @@ public class SecurityConfiguration {
             .authorities(AuthorityConstants.SYSTEM_ADMIN)
             .build();
 
-        daoAuthenticationProvider.setUserDetailsService(new InMemoryUserDetailsManager(user));
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(
+            new InMemoryUserDetailsManager(user));
 
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 
