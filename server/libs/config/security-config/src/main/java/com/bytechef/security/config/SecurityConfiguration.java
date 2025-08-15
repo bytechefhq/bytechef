@@ -17,21 +17,24 @@
 package com.bytechef.security.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Security;
 import com.bytechef.config.ApplicationProperties.Security.RememberMe;
 import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.security.web.authentication.AuthenticationProviderContributor;
-import com.bytechef.platform.security.web.filter.FilterAfterContributor;
-import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
+import com.bytechef.platform.security.web.config.AuthenticationProviderContributor;
+import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
+import com.bytechef.platform.security.web.config.CsrfContributor;
+import com.bytechef.platform.security.web.config.FilterAfterContributor;
+import com.bytechef.platform.security.web.config.FilterBeforeContributor;
+import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
@@ -71,6 +74,7 @@ import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * @author Ivica Cardic
@@ -95,13 +99,15 @@ public class SecurityConfiguration {
         this.security = applicationProperties.getSecurity();
     }
 
-    @Bean
-    FilterBeforeContributorConfigurer<HttpSecurity> filterBeforeContributorConfigurer(
-        List<FilterBeforeContributor> filterBeforeContributors) {
-
-        return new FilterBeforeContributorConfigurer<>(filterBeforeContributors);
-    }
-
+    /**
+     * Configures the security filter chain for the actuator endpoints, specifying authorization rules, authentication
+     * mechanisms, and exception handling.
+     *
+     * @param http the {@link HttpSecurity} object used to customize security settings for the actuator endpoints
+     * @param mvc  a {@link PathPatternRequestMatcher.Builder} used to create matchers for specific URI patterns
+     * @return a configured {@link SecurityFilterChain} to handle security for actuator endpoints
+     * @throws Exception if an error occurs while configuring the security filter chain
+     */
     @Bean
     @Order(2)
     public SecurityFilterChain actuatorFilterChain(
@@ -139,42 +145,71 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    /**
+     * Configures the security filter chain for API endpoints and GraphQL requests, defining authorization,
+     * authentication, CSRF settings, and headers for securing requests.
+     *
+     * @param http                               the {@link HttpSecurity} object used to customize the security settings
+     *                                           for the application.
+     * @param mvc                                a {@link PathPatternRequestMatcher.Builder} used to build request
+     *                                           matchers.
+     * @param authenticationProviderContributors a list of {@link AuthenticationProviderContributor} instances
+     *                                           contributing custom {@link AuthenticationProvider}s to handle
+     *                                           authentication.
+     * @param authorizeHttpRequestContributors   a list of {@link AuthorizeHttpRequestContributor} instances providing
+     *                                           paths to be configured as permit-all in the API security configuration.
+     * @param csrfContributors                   a list of {@link CsrfContributor} instances contributing request
+     *                                           matchers to be ignored for CSRF protection.
+     * @param environment                        the {@link Environment} object used to retrieve profiles and
+     *                                           environment properties.
+     * @param filterAfterContributors            a list of {@link FilterAfterContributor} instances allowing additional
+     *                                           filters to be added after default filters in the chain.
+     * @param filterBeforeContributors           a list of {@link FilterBeforeContributor} instances allowing additional
+     *                                           filters to be added before default filters in the chain.
+     * @param spaWebFilterContributors           a list of {@link SpaWebFilterContributor} instances contributing to the
+     *                                           customization of SPA-specific filters.
+     * @return a configured {@link SecurityFilterChain} for securing API and GraphQL endpoints.
+     * @throws Exception if an error occurs while configuring the security filter chain.
+     */
     @Bean
     @Order(3)
     public SecurityFilterChain apiFilterChain(
         HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
-        List<AuthenticationProviderContributor> authenticationProviderContributors, Environment environment,
-        List<FilterAfterContributor> filterAfterContributors, List<FilterBeforeContributor> filterBeforeContributors)
+        List<AuthenticationProviderContributor> authenticationProviderContributors,
+        List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors, List<CsrfContributor> csrfContributors,
+        Environment environment, List<FilterAfterContributor> filterAfterContributors,
+        List<FilterBeforeContributor> filterBeforeContributors, List<SpaWebFilterContributor> spaWebFilterContributors)
         throws Exception {
 
         http
             .securityMatcher("/api/**", "/graphql")
             .cors(withDefaults())
-            .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                // See https://stackoverflow.com/q/74447118/65681
-                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-                .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
-                .ignoringRequestMatchers(regexMatcher("^/api/v[0-9]+/mcp/.+"))
-                .ignoringRequestMatchers("/api/o/**")
-                .ignoringRequestMatchers("/api/sse")
-                .ignoringRequestMatchers(regexMatcher("^/api/(automation|embedded)/sse"))
-                // For internal calls from the embedded workflow builder
-                .ignoringRequestMatchers(request -> request.getHeader("Authorization") != null)
-                // For internal calls from the swagger UI in the dev profile
-                .ignoringRequestMatchers(request -> environment.acceptsProfiles(Profiles.of("dev")) &&
-                    StringUtils.contains(request.getHeader("Referer"), "/swagger-ui/")));
+            .csrf(csrf -> {
+                csrf
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    // See https://stackoverflow.com/q/74447118/65681
+                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler());
+
+                for (CsrfContributor csrfContributor : csrfContributors) {
+                    for (RequestMatcher requestMatcher : csrfContributor.getIgnoringRequestMatchers()) {
+                        csrf.ignoringRequestMatchers(requestMatcher);
+                    }
+                }
+
+                csrf
+                    // For CORS requests
+                    .ignoringRequestMatchers(request -> Objects.equals(request.getMethod(), "OPTIONS"))
+                    // For internal calls from the swagger UI in the dev profile
+                    .ignoringRequestMatchers(request -> environment.acceptsProfiles(Profiles.of("dev")) &&
+                        StringUtils.contains(request.getHeader("Referer"), "/swagger-ui/"));
+            });
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
             http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
         }
 
-        http.addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
+        http.addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
             .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class);
-
-        for (FilterAfterContributor filterAfterContributor : filterAfterContributors) {
-            http.addFilterAfter(filterAfterContributor.getFilter(), filterAfterContributor.getAfterFilter());
-        }
 
         http
             .headers(headers -> headers
@@ -185,27 +220,21 @@ public class SecurityConfiguration {
                 .permissionsPolicyHeader(permissions -> permissions
                     .policy(
                         "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers(mvc.matcher("/api/activate"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/authenticate"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/account/reset-password/finish"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/account/reset-password/init"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/automation/sse"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/embedded/sse"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/register"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/sse"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/api/**"))
-                .authenticated()
-                .requestMatchers(mvc.matcher("/graphql"))
-                .authenticated())
+            .authorizeHttpRequests(authz -> {
+                for (AuthorizeHttpRequestContributor authorizeHttpRequestContributor : authorizeHttpRequestContributors) {
+                    for (String path : authorizeHttpRequestContributor.getApiPermitAllRequestMatcherPaths()) {
+                        authz
+                            .requestMatchers(mvc.matcher(path))
+                            .permitAll();
+                    }
+                }
+
+                authz
+                    .requestMatchers(mvc.matcher("/api/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.matcher("/graphql"))
+                    .authenticated();
+            })
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
                 .rememberMeParameter("remember-me")
@@ -225,51 +254,81 @@ public class SecurityConfiguration {
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .permitAll());
 
-        http.with(filterBeforeContributorConfigurer(filterBeforeContributors), withDefaults());
+        http.with(new FilterAfterContributorConfigurer<>(filterAfterContributors), withDefaults());
+        http.with(new FilterBeforeContributorConfigurer<>(filterBeforeContributors), withDefaults());
 
         return http.build();
     }
 
+    /**
+     * Configures the security filter chain for the web application, defining authorization, authentication, and the
+     * integration of SPA-specific and permit-all contributors.
+     *
+     * @param http                             the {@link HttpSecurity} object used to customize security settings for
+     *                                         the application
+     * @param mvc                              a {@link PathPatternRequestMatcher.Builder} used to create request
+     *                                         matchers for specific URI patterns
+     * @param authorizeHttpRequestContributors a list of {@link AuthorizeHttpRequestContributor} instances providing
+     *                                         paths to be configured as permit-all in the security configuration
+     *
+     * @param spaWebFilterContributors         a list of {@link SpaWebFilterContributor} instances contributing to the
+     *                                         customization of SPA-specific filters
+     * @return a configured {@link SecurityFilterChain} for managing security in the application
+     * @throws Exception if an error occurs while configuring the security filter chain
+     */
     @Bean
     @Order(4)
-    public SecurityFilterChain filterChain(HttpSecurity http, PathPatternRequestMatcher.Builder mvc) throws Exception {
+    public SecurityFilterChain filterChain(
+        HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
+        List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors,
+        List<SpaWebFilterContributor> spaWebFilterContributors) throws Exception {
+
         http
-            .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
+            .addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers(mvc.matcher("/*.ico"), mvc.matcher("/*.png"), mvc.matcher("/*.svg"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/approvals/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/assets/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/callback"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/file-entries/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/i18n/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/icons/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/index.html"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/oauth.html"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/swagger-ui/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/swagger-ui.html"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/v3/api-docs/**"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/webhooks/**"))
-                .permitAll()
-                .anyRequest()
-                .denyAll());
+            .authorizeHttpRequests(authz -> {
+                for (AuthorizeHttpRequestContributor authorizeHttpRequestContributor : authorizeHttpRequestContributors) {
+                    for (String path : authorizeHttpRequestContributor.getPermitAllRequestMatcherPaths()) {
+                        authz
+                            .requestMatchers(mvc.matcher(path))
+                            .permitAll();
+                    }
+                }
+
+                authz
+                    .requestMatchers(mvc.matcher("/*.ico"), mvc.matcher("/*.png"), mvc.matcher("/*.svg"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/assets/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/i18n/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/icons/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/index.html"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/swagger-ui/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/swagger-ui.html"))
+                    .permitAll()
+                    .requestMatchers(mvc.matcher("/v3/api-docs/**"))
+                    .permitAll()
+                    .anyRequest()
+                    .denyAll();
+            });
 
         return http.build();
     }
 
+    /**
+     * Configures the security filter chain for GraphQL and GraphiQL endpoints in the development profile, defining
+     * authorization rules, authentication mechanisms, and exception handling.
+     *
+     * @param http the {@link HttpSecurity} object used to customize security settings for the GraphQL endpoints
+     * @param mvc  a {@link PathPatternRequestMatcher.Builder} used to create request matchers for specific URI patterns
+     * @return a configured {@link SecurityFilterChain} for securing GraphQL and GraphiQL endpoints
+     * @throws Exception if an error occurs while configuring the security filter chain
+     */
     @Bean
     @Profile("dev")
     @Order(1)
@@ -309,8 +368,6 @@ public class SecurityConfiguration {
             return null;
         }
 
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-
         PasswordEncoder passwordEncoder = passwordEncoder();
 
         UserDetails user = User.withUsername(system.getUsername())
@@ -318,7 +375,8 @@ public class SecurityConfiguration {
             .authorities(AuthorityConstants.SYSTEM_ADMIN)
             .build();
 
-        daoAuthenticationProvider.setUserDetailsService(new InMemoryUserDetailsManager(user));
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(
+            new InMemoryUserDetailsManager(user));
 
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 
@@ -332,6 +390,59 @@ public class SecurityConfiguration {
     }
 
     /**
+     * A configuration class for adding custom filters to the security filter chain after specified filters. This class
+     * allows customization of the filter chain by applying a list of {@link FilterAfterContributor} instances.
+     *
+     * @param <H> the type of {@link HttpSecurityBuilder} used for configuring the security filter chain
+     */
+    private static class FilterAfterContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
+        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
+
+        private final List<FilterAfterContributor> filterAfterContributors;
+
+        FilterAfterContributorConfigurer(List<FilterAfterContributor> filterAfterContributors) {
+            this.filterAfterContributors = filterAfterContributors;
+        }
+
+        @Override
+        public void configure(HttpSecurity http) {
+            for (FilterAfterContributor filterAfterContributor : filterAfterContributors) {
+                http.addFilterAfter(
+                    filterAfterContributor.getFilter(),
+                    filterAfterContributor.getAfterFilter());
+            }
+        }
+    }
+
+    /**
+     * A private configuration class for adding and positioning filters in the web security filter chain before a
+     * specific set of filters. This configurer uses a list of {@link FilterBeforeContributor} instances to determine
+     * which filters should be introduced into the chain and their corresponding positions.
+     *
+     * @param <H> the type of {@link HttpSecurityBuilder} used to configure the web security filter chain.
+     */
+    private static class FilterBeforeContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
+        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
+
+        private final List<FilterBeforeContributor> filterBeforeContributors;
+
+        FilterBeforeContributorConfigurer(List<FilterBeforeContributor> filterBeforeContributors) {
+            this.filterBeforeContributors = filterBeforeContributors;
+        }
+
+        @Override
+        public void configure(HttpSecurity http) {
+            AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+
+            for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
+                http.addFilterBefore(
+                    filterBeforeContributor.getFilter(authenticationManager),
+                    filterBeforeContributor.getBeforeFilter());
+            }
+        }
+    }
+
+    /**
      * Custom CSRF handler to provide BREACH protection.
      *
      * @see <a href=
@@ -341,7 +452,7 @@ public class SecurityConfiguration {
      *      SpaCsrfTokenRequestHandler to handle CSRF token</a>
      * @see <a href="https://stackoverflow.com/q/74447118/65681">CSRF protection not working with Spring Security 6</a>
      */
-    static final class SpaCsrfTokenRequestHandler extends CsrfTokenRequestAttributeHandler {
+    private static final class SpaCsrfTokenRequestHandler extends CsrfTokenRequestAttributeHandler {
 
         private final CsrfTokenRequestHandler delegate = new XorCsrfTokenRequestAttributeHandler();
 
@@ -373,27 +484,21 @@ public class SecurityConfiguration {
         }
     }
 
-    static class FilterBeforeContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
-        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
-
-        private final List<FilterBeforeContributor> filterBeforeContributors;
-
-        FilterBeforeContributorConfigurer(List<FilterBeforeContributor> filterBeforeContributors) {
-            this.filterBeforeContributors = filterBeforeContributors;
-        }
-
-        @Override
-        public void configure(HttpSecurity http) {
-            AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-
-            for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
-                http.addFilterBefore(
-                    filterBeforeContributor.getFilter(authenticationManager),
-                    filterBeforeContributor.getBeforeFilter());
-            }
-        }
-    }
-
+    /**
+     * A custom implementation of {@link BasicAuthenticationEntryPoint} used to handle unauthorized access attempts when
+     * basic authentication is required.
+     *
+     * This class extends the default functionality of {@link BasicAuthenticationEntryPoint} to customize the behavior
+     * for responding to unauthorized requests. It specifically defines the response headers and status code returned to
+     * the client upon an authentication failure.
+     *
+     * Key functionality: - Sets the "WWW-Authenticate" response header to indicate the required basic authentication
+     * with a realm. - Responds with the HTTP 401 (Unauthorized) status code to indicate that the request requires
+     * authentication.
+     *
+     * Method: {@link #commence(HttpServletRequest, HttpServletResponse, AuthenticationException)}: - Handles the
+     * response when an {@link AuthenticationException} occurs, customizing the headers and status code.
+     */
     private static class UnauthorizedBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
         @Override

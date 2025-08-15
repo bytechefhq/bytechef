@@ -16,6 +16,8 @@
 
 package com.bytechef.ai.mcp.server.config;
 
+import com.bytechef.ai.mcp.server.security.web.config.McpServerAuthorizeHttpRequestContributor;
+import com.bytechef.ai.mcp.server.security.web.config.McpServerCsrfContributor;
 import com.bytechef.ai.mcp.tool.ProjectTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.ai.support.ToolCallbacks;
@@ -41,5 +43,15 @@ public class McpServerConfiguration {
     @Bean
     ToolCallbackProvider toolCallbackProvider() {
         return ToolCallbackProvider.from(ToolCallbacks.from(projectTools));
+    }
+
+    @Bean
+    McpServerAuthorizeHttpRequestContributor mcpServerAuthorizeHttpRequestContributor() {
+        return new McpServerAuthorizeHttpRequestContributor();
+    }
+
+    @Bean
+    McpServerCsrfContributor mcpServerCsrfContributor() {
+        return new McpServerCsrfContributor();
     }
 }
