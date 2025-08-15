@@ -17,7 +17,7 @@ export function CopilotRuntimeProvider({
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
-    const {addMessage, context, conversationId, messages} = useCopilotStore();
+    const {addMessage, appendToLastAssistantMessage, context, conversationId, messages} = useCopilotStore();
     const {workflow} = useWorkflowDataStore();
 
     const {projectId, projectWorkflowId} = useParams();
@@ -43,28 +43,87 @@ export function CopilotRuntimeProvider({
                 message: input,
             }),
             headers: {
+                Accept: 'application/x-ndjson',
                 'Content-Type': 'application/json',
                 'X-Copilot-Conversation-Id': conversationId!,
             },
             method: 'POST',
-            // if the user hits the "cancel" button or escape keyboard key, cancel the request
-            // signal: abortSignal,
         });
 
-        const responses: {text: string; workflowUpdated: boolean}[] = await result.json();
+        if (!result.body) {
+            throw new Error('No response body');
+        }
 
-        addMessage({
-            content: responses.map((message) => message.text).join(''),
-            role: 'assistant',
-        });
+        // Prepare an empty assistant message to stream into
+        addMessage({content: '', role: 'assistant'});
+
+        let buffer = '';
+        const decoder = new TextDecoder('utf-8');
+        const reader = result.body.getReader();
+        let workflowUpdated = false;
+
+        /* eslint-disable no-constant-condition */
+        while (true) {
+            const {done, value} = await reader.read();
+
+            if (done) {
+                break;
+            }
+
+            buffer += decoder.decode(value, {stream: true});
+
+            let index;
+
+            while ((index = buffer.indexOf('\n')) !== -1) {
+                const line = buffer.slice(0, index).trim();
+
+                if (!line) {
+                    continue;
+                }
+
+                buffer = buffer.slice(index + 1);
+
+                try {
+                    const obj = JSON.parse(line) as {text?: string; workflowUpdated?: boolean};
+
+                    if (obj.text) {
+                        appendToLastAssistantMessage(obj.text);
+                    }
+
+                    if (obj.workflowUpdated) {
+                        workflowUpdated = true;
+                    }
+                    /* eslint-disable @typescript-eslint/no-unused-vars */
+                } catch (e) {
+                    // ignore malformed lines
+                }
+            }
+        }
+
+        // Flush the remaining buffer (in case the stream didn't end with a newline)
+        const remaining = buffer.trim();
+
+        if (remaining) {
+            try {
+                const obj = JSON.parse(remaining) as {text?: string; workflowUpdated?: boolean};
+
+                if (obj.text) {
+                    appendToLastAssistantMessage(obj.text);
+                }
+                if (obj.workflowUpdated) {
+                    workflowUpdated = true;
+                }
+            } catch {
+                // ignore
+            }
+        }
+
         setIsRunning(false);
 
-        for (const response of responses) {
-            if (response.workflowUpdated) {
-                queryClient.invalidateQueries({
-                    queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
-                });
-            }
+        if (workflowUpdated) {
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
+            });
         }
     };
 
