@@ -29,6 +29,7 @@ interface CopilotStateI {
 
     messages: ThreadMessageLike[];
     addMessage: (message: ThreadMessageLike) => void;
+    appendToLastAssistantMessage: (text: string) => void;
     resetMessages: () => void;
 }
 
@@ -72,6 +73,26 @@ export const useCopilotStore = create<CopilotStateI>()(
                     ...state,
                     messages: [...state.messages, message],
                 };
+            }),
+        appendToLastAssistantMessage: (text: string) =>
+            set((state) => {
+                const messages = [...state.messages];
+
+                // find last assistant message
+                for (let i = messages.length - 1; i >= 0; i--) {
+                    const message = messages[i] as ThreadMessageLike;
+
+                    if (message.role === 'assistant' && typeof message.content === 'string') {
+                        messages[i] = {...message, content: message.content + text} as ThreadMessageLike;
+
+                        return {...state, messages};
+                    }
+                }
+
+                // no assistant message yet; create one
+                messages.push({role: 'assistant', content: text} as ThreadMessageLike);
+
+                return {...state, messages};
             }),
         resetMessages: () => set({messages: []}),
     }))
