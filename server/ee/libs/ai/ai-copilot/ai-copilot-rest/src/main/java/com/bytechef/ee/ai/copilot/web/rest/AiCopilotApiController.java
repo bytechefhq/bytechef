@@ -13,6 +13,7 @@ import com.bytechef.ee.ai.copilot.dto.ContextDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -37,7 +38,7 @@ public class AiCopilotApiController {
         this.aiCopilot = aiCopilot;
     }
 
-    @PostMapping("/ai/chat")
+    @PostMapping(value = "/ai/chat", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<Map<String, ?>> chat(
         @RequestBody Request request, @RequestHeader("X-Copilot-Conversation-Id") String conversationId) {
 
