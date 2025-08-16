@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.service;
+package com.bytechef.ee.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.WorkspaceUser;
-import com.bytechef.automation.configuration.repository.WorkspaceUserRepository;
-import com.bytechef.platform.annotation.ConditionalOnCEVersion;
+import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-@ConditionalOnCEVersion
+@ConditionalOnEEVersion
+@SuppressFBWarnings("NM")
 public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
     private final WorkspaceUserRepository workspaceUserRepository;
@@ -38,7 +40,28 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     }
 
     @Override
+    public WorkspaceUser create(long userId, long workspaceId) {
+        return workspaceUserRepository.save(new WorkspaceUser(userId, workspaceId));
+    }
+
+    @Override
+    public void delete(long id) {
+        workspaceUserRepository.deleteById(id);
+    }
+
+    @Override
     public List<WorkspaceUser> getUserWorkspaceUsers(long userId) {
         return workspaceUserRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    public List<WorkspaceUser> getWorkspaceWorkspaceUsers(long workspaceId) {
+        return workspaceUserRepository.findAllByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    public void deleteWorkspaceUser(long userId) {
+        workspaceUserRepository.findByUserId(userId)
+            .ifPresent(workspaceUser -> workspaceUserRepository.deleteById(workspaceUser.getId()));
     }
 }
