@@ -508,9 +508,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
-                                                <Integrations />
-                                            </LazyLoadWrapper>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <Integrations />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
                                         </PrivateRoute>
                                     ),
                                     path: 'integrations',
@@ -519,7 +521,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <LazyLoadWrapper>
-                                                <Integration />
+                                                <EEVersion>
+                                                    <Integration />
+                                                </EEVersion>
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
@@ -536,9 +540,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
-                                                <IntegrationInstanceConfigurations />
-                                            </LazyLoadWrapper>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <IntegrationInstanceConfigurations />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
                                         </PrivateRoute>
                                     ),
                                     path: 'configurations',
@@ -546,9 +552,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
-                                                <AutomationWorkflows />
-                                            </LazyLoadWrapper>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <AutomationWorkflows />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
                                         </PrivateRoute>
                                     ),
                                     path: 'automation-workflows',
@@ -556,9 +564,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
-                                                <ConnectedUsers />
-                                            </LazyLoadWrapper>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <ConnectedUsers />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
                                         </PrivateRoute>
                                     ),
                                     path: 'connected-users',
@@ -566,9 +576,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
-                                                <AppEvents />
-                                            </LazyLoadWrapper>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <AppEvents />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
                                         </PrivateRoute>
                                     ),
                                     path: 'app-events',
@@ -576,9 +588,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
-                                                <EmbeddedIntegrationWorkflowExecutions />
-                                            </LazyLoadWrapper>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <EmbeddedIntegrationWorkflowExecutions />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
                                         </PrivateRoute>
                                     ),
                                     path: 'executions',
@@ -586,9 +600,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
-                                                <EmbeddedConnections />
-                                            </LazyLoadWrapper>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <EmbeddedConnections />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
                                         </PrivateRoute>
                                     ),
                                     path: 'connections',
@@ -604,9 +620,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                         {
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                                                    <LazyLoadWrapper>
-                                                        <SigningKeys />
-                                                    </LazyLoadWrapper>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <SigningKeys />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
                                                 </PrivateRoute>
                                             ),
                                             path: 'signing-keys',
