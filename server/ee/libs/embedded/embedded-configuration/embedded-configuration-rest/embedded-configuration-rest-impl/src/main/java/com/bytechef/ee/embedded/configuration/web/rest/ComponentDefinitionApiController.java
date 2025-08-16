@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ComponentDefinitionBasicModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.ModeType;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.ee.embedded.configuration.web.rest.ComponentDefinitionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ComponentDefinitionApiController implements ComponentDefinitionApi {
 
     private final ComponentDefinitionService componentDefinitionService;

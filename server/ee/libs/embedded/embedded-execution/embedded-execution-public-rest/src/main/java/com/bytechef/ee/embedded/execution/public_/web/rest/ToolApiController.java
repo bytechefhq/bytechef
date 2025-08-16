@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentMode
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecuteToolRequestModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.FunctionModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ToolApiController implements ToolApi {
 
     private final ToolFacade toolFacade;

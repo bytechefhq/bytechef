@@ -159,7 +159,6 @@ dependencies {
     implementation(project(":server:libs:modules:components:amplitude"))
     implementation(project(":server:libs:modules:components:apify"))
     implementation(project(":server:libs:modules:components:apollo"))
-    implementation(project(":server:libs:modules:components:app-event"))
     implementation(project(":server:libs:modules:components:approval-link"))
     implementation(project(":server:libs:modules:components:asana"))
     implementation(project(":server:libs:modules:components:attio"))
@@ -381,6 +380,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
 
     implementation(project(":server:ee:libs:modules:components:api-platform"))
+    implementation(project(":server:ee:libs:modules:components:app-event"))
     implementation(project(":server:ee:libs:modules:components:code-workflow"))
     implementation(project(":server:ee:libs:config:cloud-config"))
 

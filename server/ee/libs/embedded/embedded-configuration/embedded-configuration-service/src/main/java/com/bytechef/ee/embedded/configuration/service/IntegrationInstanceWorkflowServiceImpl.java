@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.service;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceWorkflowRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstanceWorkflowService {
 
     private final IntegrationInstanceWorkflowRepository integrationInstanceWorkflowRepository;

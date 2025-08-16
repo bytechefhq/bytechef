@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.connected.user.remote.client.service;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.time.LocalDate;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class RemoteConnectedUserServiceClient implements ConnectedUserService {
 
     @Override

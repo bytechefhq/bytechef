@@ -12,6 +12,7 @@ import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.ee.embedded.workflow.execution.facade.IntegrationWorkflowExecutionFacade;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.ee.embedded.workflow.execution.web.rest.WorkflowExecutionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class WorkflowExecutionApiController implements WorkflowExecutionApi {
 
     private final ConversionService conversionService;

@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.security.web.config;
 
 import com.bytechef.ee.embedded.security.web.filter.ConnectedUserApiAuthenticationFilter;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.FilterBeforeContributor;
 import com.bytechef.platform.user.service.SigningKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class ConnectedUserApiAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
 
     private final SigningKeyService signingKeyService;

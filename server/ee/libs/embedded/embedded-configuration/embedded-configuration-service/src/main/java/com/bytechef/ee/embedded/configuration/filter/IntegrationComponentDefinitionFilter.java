@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.filter;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
 import com.bytechef.platform.constant.ModeType;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class IntegrationComponentDefinitionFilter implements ComponentDefinitionFilter {
 
     private static final List<String> COMPONENT_NAMES = List.of("apiPlatform", "webhook");

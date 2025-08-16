@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationIns
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.util.SecurityUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.ee.embedded.configuration.public_.web.rest.IntegrationInstanceWorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class IntegrationInstanceWorkflowApiController implements IntegrationInstanceWorkflowApi {
 
     private final ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade;

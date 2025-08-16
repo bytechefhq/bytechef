@@ -20,6 +20,7 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
 import com.bytechef.ee.embedded.execution.util.ConnectionIdHelper;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service("embeddedToolFacade")
+@ConditionalOnEEVersion
 public class ToolFacadeImpl implements ToolFacade {
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;

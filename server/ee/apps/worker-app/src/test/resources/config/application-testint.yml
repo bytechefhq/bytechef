@@ -6,6 +6,7 @@ bytechef:
     provider: redis
   data-storage:
     provider: jdbc
+  edition: EE
   file-storage:
     provider: jdbc
   message-broker:

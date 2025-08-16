@@ -11,6 +11,7 @@ openapi:
 bytechef:
   data-storage:
     provider: jdbc
+  edition: EE
   file-storage:
     provider: jdbc
   message-broker:

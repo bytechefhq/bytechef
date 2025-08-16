@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.connected.user.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ConnectedUserGraphQlController {
 
     private final ConnectedUserService connectedUserService;

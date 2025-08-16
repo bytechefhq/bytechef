@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,7 @@ import org.springframework.util.Assert;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowService {
 
     private final IntegrationWorkflowRepository integrationWorkflowRepository;

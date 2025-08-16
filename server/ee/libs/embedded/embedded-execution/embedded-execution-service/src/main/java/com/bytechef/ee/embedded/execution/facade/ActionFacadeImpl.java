@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.execution.facade;
 
 import com.bytechef.ee.embedded.execution.util.ConnectionIdHelper;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 public class ActionFacadeImpl implements ActionFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;

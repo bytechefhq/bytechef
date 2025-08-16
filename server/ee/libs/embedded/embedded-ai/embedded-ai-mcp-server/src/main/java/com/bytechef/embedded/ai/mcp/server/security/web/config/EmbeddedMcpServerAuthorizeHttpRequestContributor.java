@@ -16,6 +16,7 @@
 
 package com.bytechef.embedded.ai.mcp.server.security.web.config;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class EmbeddedMcpServerAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
 
     @Override

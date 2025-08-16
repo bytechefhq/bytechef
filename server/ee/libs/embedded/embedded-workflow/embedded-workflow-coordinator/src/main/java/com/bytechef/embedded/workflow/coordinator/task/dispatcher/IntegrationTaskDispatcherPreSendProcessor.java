@@ -23,6 +23,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(3)
+@ConditionalOnEEVersion
 public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TaskDispatcherPreSendProcessor {
 

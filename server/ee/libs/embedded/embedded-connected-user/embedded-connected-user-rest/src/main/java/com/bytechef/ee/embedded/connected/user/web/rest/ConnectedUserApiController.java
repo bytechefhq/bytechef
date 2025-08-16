@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.connected.user.facade.ConnectedUserFacade;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.CredentialStatusModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ConnectedUserApiController implements ConnectedUserApi {
 
     private final ConnectedUserFacade connectedUserFacade;

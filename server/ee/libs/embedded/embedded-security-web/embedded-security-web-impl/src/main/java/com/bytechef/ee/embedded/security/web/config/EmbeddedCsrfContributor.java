@@ -18,6 +18,7 @@ package com.bytechef.ee.embedded.security.web.config;
 
 import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.CsrfContributor;
 import java.util.List;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class EmbeddedCsrfContributor implements CsrfContributor {
 
     @Override
