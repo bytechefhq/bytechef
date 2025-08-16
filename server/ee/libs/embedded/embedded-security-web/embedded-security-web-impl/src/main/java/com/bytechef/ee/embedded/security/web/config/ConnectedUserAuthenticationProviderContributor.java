@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.security.web.config;
 
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.ConnectedUserAuthenticationProvider;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.AuthenticationProviderContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class ConnectedUserAuthenticationProviderContributor implements AuthenticationProviderContributor {
 
     private final ConnectedUserService connectedUserService;

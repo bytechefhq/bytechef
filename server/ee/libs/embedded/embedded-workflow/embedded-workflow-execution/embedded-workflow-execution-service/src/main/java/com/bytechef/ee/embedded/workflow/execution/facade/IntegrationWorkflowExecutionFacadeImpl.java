@@ -41,6 +41,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -71,6 +72,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkflowExecutionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;

@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseIns
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationBasicModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.ee.embedded.configuration.public_.web.rest.IntegrationApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;

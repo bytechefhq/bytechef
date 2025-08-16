@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.connected.user.service;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.repository.ConnectedUserRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class ConnectedUserServiceImpl implements ConnectedUserService {
 
     private final ConnectedUserRepository connectedUserRepository;

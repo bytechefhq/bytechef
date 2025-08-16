@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class RemoteIntegrationInstanceServiceClient implements IntegrationInstanceService {
 
     @Override

@@ -19,6 +19,7 @@ import com.bytechef.ee.embedded.unified.web.rest.accounting.model.AccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreateUpdateAccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreatedModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.ListAccountsPageableParameterModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1/unified/accounting")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class AccountingAccountApiController implements AccountApi {
 
     private final ConversionService conversionService;

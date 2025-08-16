@@ -19,6 +19,7 @@ package com.bytechef.embedded.workflow.coordinator.trigger.dispatcher;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.embedded.workflow.coordinator.AbstractConnectedUserProjectDispatcherPreSendProcessor;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(2)
+@ConditionalOnEEVersion
 public class ConnecteduserProjectTriggerDispatcherPreSendProcessor
     extends AbstractConnectedUserProjectDispatcherPreSendProcessor implements TriggerDispatcherPreSendProcessor {
 

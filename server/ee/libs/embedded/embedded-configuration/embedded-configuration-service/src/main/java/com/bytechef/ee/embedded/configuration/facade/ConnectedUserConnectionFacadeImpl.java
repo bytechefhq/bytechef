@@ -19,6 +19,7 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkfl
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.ModeType;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectionFacade {
 
     private final ConnectedUserService connectedUserService;

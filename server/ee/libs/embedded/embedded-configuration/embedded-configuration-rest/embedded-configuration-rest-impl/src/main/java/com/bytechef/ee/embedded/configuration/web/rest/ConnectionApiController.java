@@ -13,6 +13,7 @@ import com.bytechef.commons.util.StringUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionRequestModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.ModeType;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.ee.embedded.configuration.web.rest.ConnectionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ConnectionApiController implements ConnectionApi {
 
     private final ConnectedUserConnectionFacade connectedUserConnectionFacade;

@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUs
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController(" com.bytechef.ee.embedded.configuration.public_.web.rest.WorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ConnectedUserProjectWorkflowApiController implements ConnectedUserProjectWorkflowApi {
 
     private final ConnectedUserProjectFacade connectedUserProjectFacade;

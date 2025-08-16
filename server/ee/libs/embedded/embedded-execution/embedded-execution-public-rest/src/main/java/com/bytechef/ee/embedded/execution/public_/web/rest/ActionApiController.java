@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.converter.CaseInsensi
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecuteActionRequestModel;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ActionApiController implements ActionApi {
 
     private static final String BODY_CONTENT = "bodyContent";

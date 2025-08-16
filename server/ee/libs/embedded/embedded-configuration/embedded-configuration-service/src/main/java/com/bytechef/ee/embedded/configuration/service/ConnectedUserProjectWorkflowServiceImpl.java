@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class ConnectedUserProjectWorkflowServiceImpl implements ConnectedUserProjectWorkflowService {
 
     private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;

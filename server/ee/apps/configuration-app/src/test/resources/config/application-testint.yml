@@ -15,6 +15,7 @@ spring:
 bytechef:
   encryption:
     provider: filesystem
+  edition: EE
   file-storage:
     provider: jdbc
   workflow:

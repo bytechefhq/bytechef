@@ -101,7 +101,6 @@ dependencies {
     implementation(project(":server:libs:modules:components:amplitude"))
     implementation(project(":server:libs:modules:components:apify"))
     implementation(project(":server:libs:modules:components:apollo"))
-    implementation(project(":server:libs:modules:components:app-event"))
     implementation(project(":server:libs:modules:components:approval-link"))
     implementation(project(":server:libs:modules:components:asana"))
     implementation(project(":server:libs:modules:components:attio"))
@@ -258,6 +257,8 @@ dependencies {
     implementation(project(":server:libs:modules:components:zoho:zoho-crm"))
     implementation(project(":server:libs:modules:components:zoho:zoho-invoice"))
     implementation(project(":server:libs:modules:components:zoom"))
+
+    implementation(project(":server:ee:libs:modules:components:app-event"))
 
     testImplementation(project(":server:libs:test:test-int-support"))
 }

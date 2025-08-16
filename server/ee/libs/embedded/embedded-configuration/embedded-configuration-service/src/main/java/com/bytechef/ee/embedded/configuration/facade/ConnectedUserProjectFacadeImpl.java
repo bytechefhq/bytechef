@@ -36,6 +36,7 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkfl
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
@@ -67,6 +68,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacade {
 
     private static final String DEFAULT_DEFINITION = """

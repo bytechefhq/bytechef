@@ -11,6 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class IntegrationInstanceConfigurationTagApiController implements IntegrationInstanceConfigurationTagApi {
 
     private final ConversionService conversionService;

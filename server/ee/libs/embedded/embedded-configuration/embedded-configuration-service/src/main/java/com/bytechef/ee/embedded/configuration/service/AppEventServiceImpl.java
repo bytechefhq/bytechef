@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
 import com.bytechef.ee.embedded.configuration.repository.AppEventRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
@@ -24,6 +25,7 @@ import org.springframework.util.Assert;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class AppEventServiceImpl implements AppEventService {
 
     private final AppEventRepository appEventRepository;

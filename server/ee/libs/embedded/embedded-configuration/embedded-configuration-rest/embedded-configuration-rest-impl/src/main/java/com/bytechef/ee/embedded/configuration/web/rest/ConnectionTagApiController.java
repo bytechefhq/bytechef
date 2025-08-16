@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.ee.embedded.configuration.web.rest.ConnectionTagApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ConnectionTagApiController implements ConnectionTagApi {
 
     private final ConnectionFacade connectionFacade;

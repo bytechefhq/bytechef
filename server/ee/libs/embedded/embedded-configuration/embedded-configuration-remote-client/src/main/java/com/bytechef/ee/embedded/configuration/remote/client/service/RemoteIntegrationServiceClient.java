@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class RemoteIntegrationServiceClient implements IntegrationService {
 
     private static final String CONFIGURATION_APP = "configuration-app";

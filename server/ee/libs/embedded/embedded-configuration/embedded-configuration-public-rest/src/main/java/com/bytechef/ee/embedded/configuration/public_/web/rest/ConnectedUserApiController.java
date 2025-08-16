@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.ee.embedded.configuration.public_.web.rest.ConnectedUserApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ConnectedUserApiController implements ConnectedUserApi {
 
     private final ConnectedUserService connectedUserService;

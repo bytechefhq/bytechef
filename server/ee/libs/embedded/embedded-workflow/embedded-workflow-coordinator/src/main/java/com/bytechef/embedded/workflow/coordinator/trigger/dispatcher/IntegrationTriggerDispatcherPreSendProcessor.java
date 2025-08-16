@@ -10,6 +10,7 @@ package com.bytechef.embedded.workflow.coordinator.trigger.dispatcher;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(3)
+@ConditionalOnEEVersion
 public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TriggerDispatcherPreSendProcessor {
 
