@@ -9,20 +9,18 @@ const SidebarSubtitle = ({title}: {title: string}) => (
 );
 
 export interface LeftSidebarNavProps {
-    body?: ReactNode;
+    body: ReactNode;
     title?: string;
     className?: string;
 }
 
 const LeftSidebarNav = ({body, className, title}: LeftSidebarNavProps) => (
     <div className={twMerge('mb-4 px-2', className)}>
-        {body && (
-            <div aria-label={title} className="flex space-x-2 lg:flex-col lg:space-x-0">
-                {title && <SidebarSubtitle title={title} />}
+        <div aria-label={title} className="flex space-x-2 lg:flex-col lg:space-x-0">
+            {title && <SidebarSubtitle title={title} />}
 
-                {body}
-            </div>
-        )}
+            {body}
+        </div>
     </div>
 );
 
