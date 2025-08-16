@@ -17,8 +17,8 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.WorkspaceUser;
+import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,11 +26,8 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
+@ConditionalOnCEVersion
 public interface WorkspaceUserRepository extends ListCrudRepository<WorkspaceUser, Long> {
 
     List<WorkspaceUser> findAllByUserId(long userId);
-
-    List<WorkspaceUser> findAllByWorkspaceId(long workspaceId);
-
-    Optional<WorkspaceUser> findByUserId(long userId);
 }

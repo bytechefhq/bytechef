@@ -24,13 +24,5 @@ import java.util.List;
  */
 public interface WorkspaceUserService {
 
-    WorkspaceUser create(long userId, long workspaceId);
-
-    void delete(long id);
-
     List<WorkspaceUser> getUserWorkspaceUsers(long userId);
-
-    List<WorkspaceUser> getWorkspaceWorkspaceUsers(long workspaceId);
-
-    void deleteWorkspaceUser(long userId);
 }
