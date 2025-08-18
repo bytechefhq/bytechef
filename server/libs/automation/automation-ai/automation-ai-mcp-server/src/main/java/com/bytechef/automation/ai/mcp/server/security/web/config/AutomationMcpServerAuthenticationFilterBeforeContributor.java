@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.mcp.server.security.web.filter;
+package com.bytechef.automation.ai.mcp.server.security.web.config;
 
-import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
+import com.bytechef.automation.ai.mcp.server.security.web.filter.AutomationMcpServerAuthenticationFilter;
+import com.bytechef.platform.annotation.ConditionalOnCEVersion;
+import com.bytechef.platform.security.web.config.FilterBeforeContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.Filter;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,13 +28,14 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component("com.bytechef.automation.mcp.server.security.web.filter.ApiKeyAuthenticationFilterBeforeContributor")
-public class ApiKeyAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
+@Component
+@ConditionalOnCEVersion
+public class AutomationMcpServerAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
 
     @Override
     @SuppressFBWarnings("EI")
     public Filter getFilter(AuthenticationManager authenticationManager) {
-        return new ApiKeyAuthenticationFilter(authenticationManager);
+        return new AutomationMcpServerAuthenticationFilter(authenticationManager);
     }
 
     @Override
