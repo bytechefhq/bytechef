@@ -23,13 +23,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.McpProject;
+import com.bytechef.automation.configuration.domain.McpProjectWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.McpProjectService;
 import com.bytechef.automation.configuration.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.platform.configuration.domain.McpProjectWorkflow;
 import com.bytechef.platform.configuration.domain.McpServer;
 import java.util.Arrays;
 import java.util.Collections;

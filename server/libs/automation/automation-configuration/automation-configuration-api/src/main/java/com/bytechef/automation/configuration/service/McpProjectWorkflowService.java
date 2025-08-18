@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.configuration.service;
 
-import com.bytechef.platform.configuration.domain.McpProjectWorkflow;
+import com.bytechef.automation.configuration.domain.McpProjectWorkflow;
 import java.util.List;
 import java.util.Optional;
 
