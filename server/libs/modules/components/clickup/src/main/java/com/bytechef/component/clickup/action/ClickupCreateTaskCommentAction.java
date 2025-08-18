@@ -38,7 +38,7 @@ public class ClickupCreateTaskCommentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ACTION_NAME)
             .title("Create Task Comment")
             .description("Create a new comment for specified class.")
-            .metadata(Map.of("method", "POST", "path", "/task/{task_id}/comment", "bodyContentType",
+            .metadata(Map.of("method", "POST", "path", "/task/{taskId}/comment", "bodyContentType",
                     BodyContentType.JSON, "mimeType", "application/json"))
             .properties(
                     string(LIST_ID).label("List ID")
@@ -50,7 +50,7 @@ public class ClickupCreateTaskCommentAction {
                             .metadata(Map.of("type", PropertyType.BODY)),
                     string(TASK_ID).label("Task ID").description("ID of the task to which the comment will be added.")
                             .required(true)
-                            .options((OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getListIdOptions)
+                            .options((OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getTaskIdOptions)
                             .metadata(Map.of("type", PropertyType.PATH)),
                     string("commentText").label("Comment Text")
                             .description("Text of the comment to be added to the task.")
