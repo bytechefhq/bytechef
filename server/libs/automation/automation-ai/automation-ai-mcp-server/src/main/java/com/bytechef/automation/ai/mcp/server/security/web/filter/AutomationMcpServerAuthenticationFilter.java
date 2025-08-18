@@ -16,17 +16,17 @@
 
 package com.bytechef.automation.ai.mcp.server.security.web.filter;
 
-import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
+import com.bytechef.platform.security.web.filter.AbstractApiAuthenticationFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.authentication.AuthenticationManager;
 
 /**
  * @author Ivica Cardic
  */
-public class ApiKeyAuthenticationFilter extends AbstractPublicApiAuthenticationFilter {
+public class AutomationMcpServerAuthenticationFilter extends AbstractApiAuthenticationFilter {
 
     @SuppressFBWarnings("EI")
-    public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public AutomationMcpServerAuthenticationFilter(AuthenticationManager authenticationManager) {
         super("^/api/automation/v[0-9]+/mcp/.+", authenticationManager);
     }
 }

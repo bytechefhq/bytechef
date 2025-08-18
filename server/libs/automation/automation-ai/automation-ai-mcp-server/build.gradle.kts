@@ -8,6 +8,5 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:automation:automation-execution:automation-execution-api"))
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 }
