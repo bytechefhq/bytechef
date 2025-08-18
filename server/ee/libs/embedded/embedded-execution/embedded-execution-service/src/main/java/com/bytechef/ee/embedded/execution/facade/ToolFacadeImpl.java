@@ -40,7 +40,7 @@ import org.springframework.stereotype.Service;
  *
  * @author Ivica Cardic
  */
-@Service("embeddedToolFacade")
+@Service("com.bytechef.ee.embedded.execution.facade.ToolFacade")
 @ConditionalOnEEVersion
 public class ToolFacadeImpl implements ToolFacade {
 

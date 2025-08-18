@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 /**
  * @author Matija Petanjek
  */
-@Service("automationToolFacade")
+@Service("com.bytechef.automation.execution.facade.ToolFacade")
 public class ToolFacadeImpl implements ToolFacade {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
