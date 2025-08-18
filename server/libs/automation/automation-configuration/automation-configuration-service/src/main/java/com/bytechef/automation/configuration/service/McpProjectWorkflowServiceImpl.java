@@ -16,9 +16,9 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.automation.configuration.domain.McpProjectWorkflow;
 import com.bytechef.automation.configuration.repository.McpProjectWorkflowRepository;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.configuration.domain.McpProjectWorkflow;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;

@@ -25,8 +25,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.domain.McpProjectWorkflow;
 import com.bytechef.automation.configuration.service.McpProjectWorkflowService;
-import com.bytechef.platform.configuration.domain.McpProjectWorkflow;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

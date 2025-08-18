@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.configuration.repository;
 
-import com.bytechef.platform.configuration.domain.McpProjectWorkflow;
+import com.bytechef.automation.configuration.domain.McpProjectWorkflow;
 import java.util.List;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;

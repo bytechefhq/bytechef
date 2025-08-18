@@ -18,13 +18,13 @@ package com.bytechef.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.McpProject;
+import com.bytechef.automation.configuration.domain.McpProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.McpProjectFacade;
 import com.bytechef.automation.configuration.service.McpProjectService;
 import com.bytechef.automation.configuration.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.platform.configuration.domain.McpProjectWorkflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
