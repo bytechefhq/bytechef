@@ -139,6 +139,7 @@ include("server:libs:platform:platform-data-storage:platform-data-storage-jdbc:p
 include("server:libs:platform:platform-feature-flags")
 include("server:libs:platform:platform-file-storage:platform-file-storage-api")
 include("server:libs:platform:platform-file-storage:platform-file-storage-impl")
+include("server:libs:platform:platform-mail")
 include("server:libs:platform:platform-oauth2:platform-oauth2-api")
 include("server:libs:platform:platform-oauth2:platform-oauth2-service")
 include("server:libs:platform:platform-scheduler:platform-scheduler-api")
@@ -524,4 +525,3 @@ include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:plat
 include("server:ee:libs:modules:components:api-platform")
 include("server:ee:libs:modules:components:app-event")
 include("server:ee:libs:modules:components:code-workflow")
-include("server:libs:platform:platform-mail")
