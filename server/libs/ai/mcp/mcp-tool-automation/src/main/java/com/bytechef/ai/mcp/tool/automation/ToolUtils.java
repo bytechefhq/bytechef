@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool;
+package com.bytechef.ai.mcp.tool.automation;
 
 import com.bytechef.component.definition.Property.Type;
 import com.bytechef.platform.domain.BaseProperty;
@@ -366,16 +366,16 @@ public final class ToolUtils {
         String required = property.getRequired() ? " (required)" : "";
 
         return switch (property.getType()) {
-            case ARRAY -> generateArrayValue(property.getItems());
-            case BOOLEAN -> "boolean" + required;
-            case DATE -> "date" + required;
-            case DATE_TIME -> "datetime" + required;
-            case DYNAMIC_PROPERTIES -> "{}" + required;
-            case INTEGER -> "integer" + required;
-            case NUMBER -> "float" + required;
-            case OBJECT -> generateObjectValue(property.getObjectProperties());
-            case FILE_ENTRY -> generateObjectValue(property.getFileEntryProperties());
-            case TIME -> "time" + required;
+            case Type.ARRAY -> generateArrayValue(property.getItems());
+            case Type.BOOLEAN -> "boolean" + required;
+            case Type.DATE -> "date" + required;
+            case Type.DATE_TIME -> "datetime" + required;
+            case Type.DYNAMIC_PROPERTIES -> "{}" + required;
+            case Type.INTEGER -> "integer" + required;
+            case Type.NUMBER -> "float" + required;
+            case Type.OBJECT -> generateObjectValue(property.getObjectProperties());
+            case Type.FILE_ENTRY -> generateObjectValue(property.getFileEntryProperties());
+            case Type.TIME -> "time" + required;
             default -> "string" + required;
         };
     }

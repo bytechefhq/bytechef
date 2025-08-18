@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool;
+package com.bytechef.ai.mcp.tool.automation;
 
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.platform.component.domain.ActionDefinition;
