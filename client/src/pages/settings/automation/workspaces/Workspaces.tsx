@@ -31,10 +31,10 @@ const Workspaces = () => {
                     <WorkspaceList workspaces={workspaces} />
                 ) : (
                     <EmptyList
-                        button={<WorkspaceDialog triggerNode={<Button>New App Event</Button>} />}
+                        button={<WorkspaceDialog triggerNode={<Button>New Workspace</Button>} />}
                         icon={<ZapIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new app event."
-                        title="No App Events"
+                        title="No Workspaces"
                     />
                 )}
             </LayoutContainer>
