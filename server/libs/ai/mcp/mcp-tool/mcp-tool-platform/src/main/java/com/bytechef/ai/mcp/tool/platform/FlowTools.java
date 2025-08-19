@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.platform;
 
+import com.bytechef.ai.mcp.tool.platform.model.PropertyInfo;
+import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -165,7 +167,7 @@ public class FlowTools {
 
     @Tool(
         description = "Get all properties of a specific flow. Returns a hierarchical list of properties including nested properties")
-    public List<ToolUtils.PropertyInfo> getFlowProperties(
+    public List<PropertyInfo> getFlowProperties(
         @ToolParam(description = "The name of the flow to retrieve properties for") String name,
         @ToolParam(description = "The version of the flow (optional)") Integer version) {
 
@@ -180,7 +182,7 @@ public class FlowTools {
                 logger.debug("Retrieved {} task properties for flow '{}'", taskProperties.size(), name);
             }
 
-            List<ToolUtils.PropertyInfo> propertyInfos = new ArrayList<>(
+            List<PropertyInfo> propertyInfos = new ArrayList<>(
                 ToolUtils.convertToPropertyInfoList(properties));
 
             propertyInfos.addAll(ToolUtils.convertToPropertyInfoList(taskProperties));
@@ -224,7 +226,7 @@ public class FlowTools {
 
     @Tool(
         description = "Get the output property of a specific flow. Returns the structure of the output property")
-    public ToolUtils.PropertyInfo getFlowOutput(
+    public PropertyInfo getFlowOutput(
         @ToolParam(description = "The name of the flow to retrieve output properties for") String name,
         @ToolParam(description = "The version of the flow (optional)") Integer version) {
 

@@ -16,10 +16,10 @@
 
 package com.bytechef.ai.mcp.server.config;
 
-import com.bytechef.ai.mcp.tool.automation.ComponentTools;
-import com.bytechef.ai.mcp.tool.automation.FlowTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools;
+import com.bytechef.ai.mcp.tool.platform.FlowTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;

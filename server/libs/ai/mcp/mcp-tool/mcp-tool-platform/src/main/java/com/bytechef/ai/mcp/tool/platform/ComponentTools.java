@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.platform;
 
+import com.bytechef.ai.mcp.tool.platform.model.PropertyInfo;
+import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -442,7 +444,7 @@ public class ComponentTools {
 
     @Tool(
         description = "Get the output property of a specific trigger or action. Returns the structure of the output property")
-    public ToolUtils.PropertyInfo getOutputProperty(
+    public PropertyInfo getOutputProperty(
         @ToolParam(
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(
@@ -497,7 +499,7 @@ public class ComponentTools {
 
     @Tool(
         description = "Get all properties of a specific trigger or action. Returns a hierarchical list of properties including nested properties")
-    public List<ToolUtils.PropertyInfo> getProperties(
+    public List<PropertyInfo> getProperties(
         @ToolParam(
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(

@@ -32,8 +32,8 @@ include("cli:commands:component:init:openapi")
 include("server:apps:server-app")
 
 include("server:libs:ai:mcp:mcp-server")
-include("server:libs:ai:mcp:mcp-tool")
-include("server:libs:ai:mcp:mcp-tool-automation")
+include("server:libs:ai:mcp:mcp-tool:mcp-tool-automation")
+include("server:libs:ai:mcp:mcp-tool:mcp-tool-platform")
 
 include("server:libs:atlas:atlas-configuration:atlas-configuration-api")
 include("server:libs:atlas:atlas-configuration:atlas-configuration-config")
