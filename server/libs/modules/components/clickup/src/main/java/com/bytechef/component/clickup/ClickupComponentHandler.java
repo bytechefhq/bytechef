@@ -22,6 +22,8 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID_PROPERTY;
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID_PROPERTY;
+import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID;
+import static com.bytechef.component.clickup.constant.ClickupConstants.TASK_ID;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,7 +92,10 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
     public ModifiableProperty<?> modifyProperty(
             ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(modifiableProperty.getName(), "listId")) {
+        if (Objects.equals(modifiableProperty.getName(), TASK_ID)) {
+            ((ModifiableStringProperty) modifiableProperty)
+                    .optionsLookupDependsOn(LIST_ID, FOLDER_ID, SPACE_ID, WORKSPACE_ID);
+        } else if (Objects.equals(modifiableProperty.getName(), LIST_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
                     .optionsLookupDependsOn(FOLDER_ID, SPACE_ID, WORKSPACE_ID);
         } else if (Objects.equals(modifiableProperty.getName(), FOLDER_ID)) {
