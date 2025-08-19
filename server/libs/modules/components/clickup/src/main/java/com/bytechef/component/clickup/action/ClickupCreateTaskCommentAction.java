@@ -52,10 +52,10 @@ public class ClickupCreateTaskCommentAction {
                             .required(true)
                             .options((OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getTaskIdOptions)
                             .metadata(Map.of("type", PropertyType.PATH)),
-                    string("commentText").label("Comment Text")
+                    string("comment_text").label("Comment Text")
                             .description("Text of the comment to be added to the task.")
                             .required(true).metadata(Map.of("type", PropertyType.BODY)),
-                    bool("notifyAll").label("Notify All").description(
+                    bool("notify_all").label("Notify All").description(
                             "Flag indicating whether notifications should be sent to all participants, including the creator of the comment.")
                             .required(true).metadata(Map.of("type", PropertyType.BODY)))
 
