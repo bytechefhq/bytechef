@@ -1,6 +1,6 @@
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
-import {Notification, NotificationEvent} from '@/shared/middleware/platform/configuration';
+import {Notification, NotificationEvent} from '@/shared/middleware/platform/notification';
 import {PenIcon, TrashIcon} from 'lucide-react';
 
 export const EventsCell = ({notificationEvents}: {notificationEvents: NotificationEvent[]}) => (

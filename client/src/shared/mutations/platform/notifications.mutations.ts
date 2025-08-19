@@ -1,4 +1,4 @@
-import {Notification, NotificationApi} from '@/shared/middleware/platform/configuration';
+import {Notification, NotificationApi} from '@/shared/middleware/platform/notification';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateNotificationMutationProps {

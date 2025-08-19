@@ -1,5 +1,5 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
-import {Notification} from '@/shared/middleware/platform/configuration';
+import {Notification} from '@/shared/middleware/platform/notification';
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {twMerge} from 'tailwind-merge';
 
