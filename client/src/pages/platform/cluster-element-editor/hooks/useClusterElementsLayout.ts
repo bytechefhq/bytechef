@@ -110,6 +110,7 @@ const useClusterElementsLayout = () => {
             clusterRootId: rootClusterElementNodeData.workflowNodeName,
             currentNodePositions: nodePositions,
             nestedClusterRootsDefinitions: nestedClusterRootsDefinitions || {},
+            operationName: rootClusterElementNodeData.operationName,
         });
 
         nodes.push(...clusterElementNodes);
