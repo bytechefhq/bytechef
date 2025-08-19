@@ -63,7 +63,7 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
             return;
         }
 
-        if (currentNode.clusterElementType || currentNode.rootClusterElement) {
+        if (currentNode.clusterElementType || currentNode.clusterRoot) {
             saveClusterElementFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
                 fieldUpdate: {
@@ -130,7 +130,7 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
             return;
         }
 
-        if (currentNode.clusterElementType || currentNode.rootClusterElement) {
+        if (currentNode.clusterElementType || currentNode.clusterRoot) {
             saveClusterElementFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
                 fieldUpdate: {

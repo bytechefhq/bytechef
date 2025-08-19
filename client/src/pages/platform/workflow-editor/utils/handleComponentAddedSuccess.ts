@@ -1,5 +1,4 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {NodeDataType} from '@/shared/types';
@@ -19,9 +18,7 @@ export default function handleComponentAddedSuccess({
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore.getState();
 
-    const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(nodeData.type?.split('/')[0] || '');
-
-    if (isRootClusterElement) {
+    if (nodeData.clusterElements) {
         return;
     }
 
@@ -37,7 +34,7 @@ export default function handleComponentAddedSuccess({
             setCurrentNode({...currentNode, ...nodeData});
             setCurrentComponent({...currentComponent, ...nodeData});
         }
-    } else if (!isRootClusterElement) {
+    } else if (!nodeData.clusterElements) {
         setCurrentNode({...nodeData, description: ''});
         setCurrentComponent({...nodeData, description: ''});
         setWorkflowNodeDetailsPanelOpen(true);

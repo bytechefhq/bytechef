@@ -13,7 +13,6 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {XIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -87,13 +86,13 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
-    const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(currentComponent?.componentName as string);
+    const isMainRootClusterElement = currentNode?.clusterRoot && !currentNode.isNestedClusterRoot;
 
     useEffect(() => {
-        if (currentNode?.rootClusterElement) {
+        if (isMainRootClusterElement) {
             setRootClusterElementNodeData(currentNode);
         }
-    }, [currentNode, setRootClusterElementNodeData]);
+    }, [isMainRootClusterElement, setRootClusterElementNodeData, currentNode]);
 
     return (
         <ReactFlowProvider>
@@ -136,7 +135,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                 )}
             </div>
 
-            {currentComponent && !isRootClusterElement && (
+            {currentComponent && !isMainRootClusterElement && (
                 <Suspense fallback={<WorkflowNodeDetailsPanelSkeleton />}>
                     <WorkflowNodeDetailsPanel
                         invalidateWorkflowQueries={invalidateWorkflowQueries!}
@@ -211,7 +210,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
             {workflow.id && <WorkflowTestChatPanel />}
 
-            {currentComponent && !isRootClusterElement && dataPillPanelOpen && (
+            {currentComponent && !isMainRootClusterElement && dataPillPanelOpen && (
                 <Suspense fallback={<DataPillPanelSkeleton />}>
                     <DataPillPanel
                         previousComponentDefinitions={previousComponentDefinitions}
