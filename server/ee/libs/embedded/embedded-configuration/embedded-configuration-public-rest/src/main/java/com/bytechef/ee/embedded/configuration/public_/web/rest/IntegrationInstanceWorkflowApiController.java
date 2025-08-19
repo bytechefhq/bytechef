@@ -98,7 +98,7 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     @CrossOrigin
     public ResponseEntity<Void> updateFrontendIntegrationInstanceWorkflow(
         Long id, String workflowReferenceCode,
-        @NonNull UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
+        UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
 
         String externalUserId = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
