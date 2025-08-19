@@ -34,6 +34,8 @@ public class ClickupConstants {
     public static final String WORKSPACE_ID = "workspaceId";
     public static final String LIST_ID = "listId";
     public static final String TASK_ID = "taskId";
+    public static final String NOTIFY_ALL = "notifty_all";
+    public static final String COMMENT_TEXT = "comment_text";
 
     public static final ModifiableStringProperty LIST_ID_PROPERTY = string(LIST_ID)
             .label("List ID")

@@ -16,14 +16,15 @@
 
 package com.bytechef.component.clickup.action;
 
-import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID;
-import static com.bytechef.component.clickup.constant.ClickupConstants.TASK_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.clickup.constant.ClickupConstants.COMMENT_TEXT;
+import static com.bytechef.component.clickup.constant.ClickupConstants.NOTIFY_ALL;
+import static com.bytechef.component.clickup.constant.ClickupConstants.TASK_ID;
 
 import java.util.Map;
 
@@ -40,24 +41,17 @@ public class ClickupCreateTaskCommentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ACTION_NAME)
             .title("Create Task Comment")
             .description("Create a new comment for specified class.")
-            .metadata(Map.of("method", "POST", "path", "/task/{taskId}/comment", "bodyContentType",
+            .metadata(Map.of("method", "POST", "path", "/task/{" + TASK_ID + "}/comment", "bodyContentType",
                     BodyContentType.JSON, "mimeType", "application/json"))
             .properties(
-                    string(LIST_ID).label("List ID")
-                            .description("ID of the list containing the task.")
-                            .required(true)
-                            .options(
-                                    (OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getListIdOptions)
-
-                            .metadata(Map.of("type", PropertyType.BODY)),
                     string(TASK_ID).label("Task ID").description("ID of the task to which the comment will be added.")
                             .required(true)
                             .options((OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getTaskIdOptions)
                             .metadata(Map.of("type", PropertyType.PATH)),
-                    string("comment_text").label("Comment Text")
+                    string(COMMENT_TEXT).label("Comment Text")
                             .description("Text of the comment to be added to the task.")
                             .required(true).metadata(Map.of("type", PropertyType.BODY)),
-                    bool("notify_all").label("Notify All").description(
+                    bool(NOTIFY_ALL).label("Notify All").description(
                             "Flag indicating whether notifications should be sent to all participants, including the creator of the comment.")
                             .required(true).metadata(Map.of("type", PropertyType.BODY)))
 
