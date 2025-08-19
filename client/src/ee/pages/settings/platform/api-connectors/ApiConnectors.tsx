@@ -3,7 +3,7 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ApiConnectorImportDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorImportDialog';
 import ApiConnectorList from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorList';
-import {useGetApiConnectorsQuery} from '@/ee/queries/apiConnectors.queries';
+import {useGetApiConnectorsQuery} from '@/ee/shared/queries/platform/apiConnectors.queries';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Link2Icon} from 'lucide-react';

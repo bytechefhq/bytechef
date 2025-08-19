@@ -1,8 +1,8 @@
 import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {useUpdateAiProviderMutation} from '@/ee/mutations/aiProvider.mutations';
-import {AiProviderKeys} from '@/ee/queries/aiProviders.queries';
+import {useUpdateAiProviderMutation} from '@/ee/shared/mutations/platform/aiProvider.mutations';
+import {AiProviderKeys} from '@/ee/shared/queries/platform/aiProviders.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';

@@ -13,12 +13,12 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {ApiCollectionEndpoint, HttpMethod} from '@/ee/shared/middleware/automation/api-platform';
 import {
     useCreateApiCollectionEndpointMutation,
     useUpdateApiCollectionEndpointMutation,
-} from '@/ee/mutations/apiCollectionEndpoints.mutations';
-import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
-import {ApiCollectionEndpoint, HttpMethod} from '@/ee/shared/middleware/automation/api-platform';
+} from '@/ee/shared/mutations/automation/apiCollectionEndpoints.mutations';
+import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';

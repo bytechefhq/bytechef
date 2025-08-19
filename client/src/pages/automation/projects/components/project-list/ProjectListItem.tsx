@@ -20,12 +20,12 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import {
     usePullProjectFromGitMutation,
     useUpdateProjectGitConfigurationMutation,
-} from '@/ee/mutations/projectGit.mutations';
-import {ProjectGitConfigurationKeys} from '@/ee/queries/projectGit.queries';
-import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
+} from '@/ee/shared/mutations/automation/projectGit.mutations';
+import {ProjectGitConfigurationKeys} from '@/ee/shared/mutations/automation/projectGit.queries';
 import {useToast} from '@/hooks/use-toast';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';

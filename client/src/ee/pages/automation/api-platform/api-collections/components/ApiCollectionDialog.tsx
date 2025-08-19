@@ -13,11 +13,14 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {useCreateApiCollectionMutation, useUpdateApiCollectionMutation} from '@/ee/mutations/apiCollections.mutations';
 import ApiCollectionDialogTagsSelect from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialogTagsSelect';
-import {ApiCollectionTagKeys} from '@/ee/queries/apiCollectionTags.queries';
-import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
 import {ApiCollection, Tag} from '@/ee/shared/middleware/automation/api-platform';
+import {ApiCollectionTagKeys} from '@/ee/shared/mutations/automation/apiCollectionTags.queries';
+import {
+    useCreateApiCollectionMutation,
+    useUpdateApiCollectionMutation,
+} from '@/ee/shared/mutations/automation/apiCollections.mutations';
+import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';

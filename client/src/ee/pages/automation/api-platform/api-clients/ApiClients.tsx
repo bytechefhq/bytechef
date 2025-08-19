@@ -4,7 +4,7 @@ import {Button} from '@/components/ui/button';
 import ApiPlatformLeftSidebarNav from '@/ee/pages/automation/api-platform/ApiPlatformLeftSidebarNav';
 import ApiClientDialog from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientDialog';
 import ApiClientTable from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientTable';
-import {useGetApiCollectionTagsQuery} from '@/ee/queries/apiCollectionTags.queries';
+import {useGetApiCollectionTagsQuery} from '@/ee/shared/mutations/automation/apiCollectionTags.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';

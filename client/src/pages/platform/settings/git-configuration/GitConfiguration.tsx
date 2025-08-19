@@ -1,4 +1,4 @@
-import {useGetWorkspaceGitConfigurationQuery} from '@/ee/queries/gitConfiguration.queries';
+import {useGetWorkspaceGitConfigurationQuery} from '@/ee/shared/queries/platform/gitConfiguration.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import GitConfigurationForm from '@/pages/platform/settings/git-configuration/components/GitConfigurationForm';
 import Header from '@/shared/layout/Header';
