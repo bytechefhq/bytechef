@@ -16,6 +16,9 @@
 
 package com.bytechef.ai.mcp.server.config;
 
+import com.bytechef.ai.mcp.tool.automation.ComponentTools;
+import com.bytechef.ai.mcp.tool.automation.FlowTools;
+import com.bytechef.ai.mcp.tool.automation.GenericTools;
 import com.bytechef.ai.mcp.server.security.web.config.McpServerAuthorizeHttpRequestContributor;
 import com.bytechef.ai.mcp.server.security.web.config.McpServerCsrfContributor;
 import com.bytechef.ai.mcp.tool.automation.ProjectTools;
@@ -38,17 +41,17 @@ public class McpServerConfiguration {
 
     private final ProjectTools projectTools;
     private final ProjectWorkflowTools projectWorkflowTools;
-    private final ComponentTools componentTools;
-    private final FlowTools flowTools;
+//    private final ComponentTools componentTools;
+//    private final FlowTools flowTools;
+    private final GenericTools genericTools;
 
     @SuppressFBWarnings("EI")
     public McpServerConfiguration(ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools, ComponentTools componentTools, FlowTools flowTools) {
-
+        ProjectWorkflowTools projectWorkflowTools,
+        GenericTools genericTools) {
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
-        this.componentTools = componentTools;
-        this.flowTools = flowTools;
+        this.genericTools = genericTools;
     }
 
     @Bean
