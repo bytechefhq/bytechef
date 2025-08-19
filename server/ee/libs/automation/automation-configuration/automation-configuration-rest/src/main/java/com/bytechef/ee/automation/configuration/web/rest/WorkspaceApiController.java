@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Ivica Cardic
  */
-@RestController
+@RestController("com.bytechef.ee.automation.configuration.web.rest.WorkspaceApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
 @ConditionalOnEEVersion
 @ConditionalOnCoordinator
