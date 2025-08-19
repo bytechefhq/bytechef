@@ -20,6 +20,7 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.TASK_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -30,6 +31,7 @@ import com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource;
 
 public class ClickupCreateTaskCommentAction {
@@ -60,7 +62,10 @@ public class ClickupCreateTaskCommentAction {
                             .required(true).metadata(Map.of("type", PropertyType.BODY)))
 
             .output(outputSchema(
-                    object().properties(string("id").description("The ID of newly created comment.").required(true))));
+                    object().properties(string("id").description("The ID of newly created comment.").required(true),
+                            string("hist_id").description("The hist ID of newly created comment.").required(true),
+                            integer("date").description("The date of the newly created comment.").required(true))
+                            .metadata(Map.of("responseType", ResponseType.JSON))));
 
     private ClickupCreateTaskCommentAction() {
     }
