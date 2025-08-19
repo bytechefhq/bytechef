@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.platform.util;
 
+import com.bytechef.ai.mcp.tool.platform.model.PropertyInfo;
 import com.bytechef.component.definition.Property.Type;
 import com.bytechef.platform.domain.BaseProperty;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -57,16 +55,6 @@ public final class ToolUtils {
     }
 
     /**
-     * Safely converts a string to lowercase, returning empty string if null.
-     *
-     * @param value the string to convert
-     * @return lowercase string or empty string if null
-     */
-    public static String safeToLowerCase(String value) {
-        return value != null ? value.toLowerCase() : "";
-    }
-
-    /**
      * Checks if the given name or description matches the search query.
      *
      * @param name        the name to search in
@@ -77,6 +65,7 @@ public final class ToolUtils {
     public static boolean matchesQuery(String name, String description, String query) {
         String lowerName = safeToLowerCase(name);
         String lowerDescription = safeToLowerCase(description);
+
         return lowerName.contains(query) || lowerDescription.contains(query);
     }
 
@@ -103,17 +92,19 @@ public final class ToolUtils {
 
         List<PropertyInfo> nestedProperties = null;
 
-        if (decorator.getType() == Type.OBJECT) {
+        Type type = decorator.getType();
+
+        if (type == Type.OBJECT) {
             nestedProperties = convertToPropertyInfoList(decorator.getObjectProperties()
                 .stream()
                 .map(pd -> pd.property)
                 .toList());
-        } else if (decorator.getType() == Type.ARRAY) {
+        } else if (type == Type.ARRAY) {
             nestedProperties = convertToPropertyInfoList(decorator.getItems()
                 .stream()
                 .map(pd -> pd.property)
                 .toList());
-        } else if (decorator.getType() == Type.FILE_ENTRY) {
+        } else if (type == Type.FILE_ENTRY) {
             nestedProperties = convertToPropertyInfoList(decorator.getFileEntryProperties()
                 .stream()
                 .map(pd -> pd.property)
@@ -121,31 +112,11 @@ public final class ToolUtils {
         }
 
         return new PropertyInfo(
-            property.getName(),
-            decorator.getType()
-                .name(),
-            property.getDescription(),
-            property.getRequired(),
-            property.getExpressionEnabled(),
-            property.getDisplayCondition(),
-            nestedProperties);
+            property.getName(), type.name(), property.getDescription(), property.getRequired(),
+            property.getExpressionEnabled(), property.getDisplayCondition(), nestedProperties);
     }
 
-    /**
-     * Property information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record PropertyInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the property") String name,
-        @JsonProperty("type") @JsonPropertyDescription("The type of the property") String type,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the property") String description,
-        @JsonProperty("required") @JsonPropertyDescription("Whether the property is required") boolean required,
-        @JsonProperty("expressionEnabled") @JsonPropertyDescription("Whether expressions are enabled for this property") boolean expressionEnabled,
-        @JsonProperty("displayCondition") @JsonPropertyDescription("The display condition for the property") String displayCondition,
-        @JsonProperty("nestedProperties") @JsonPropertyDescription("Nested properties for object/array/file_entry types") List<PropertyInfo> nestedProperties) {
-    }
-
-    public static class PropertyDecorator {
+    private static class PropertyDecorator {
 
         public enum Location {
             COMPONENT,
@@ -157,7 +128,7 @@ public final class ToolUtils {
         private final Location location;
         private final Boolean required;
 
-        public PropertyDecorator(BaseProperty property) {
+        private PropertyDecorator(BaseProperty property) {
             this.property = property;
 
             switch (property) {
@@ -279,7 +250,7 @@ public final class ToolUtils {
             }
         }
 
-        public List<PropertyDecorator> getItems() {
+        private List<PropertyDecorator> getItems() {
             return switch (location) {
                 case TASK_DISPATCHER -> toPropertyDecorators(
                     ((com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty) property).getItems());
@@ -288,7 +259,7 @@ public final class ToolUtils {
             };
         }
 
-        public List<PropertyDecorator> getFileEntryProperties() {
+        private List<PropertyDecorator> getFileEntryProperties() {
             return switch (location) {
                 case TASK_DISPATCHER -> toPropertyDecorators(
                     ((com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty) property)
@@ -298,11 +269,11 @@ public final class ToolUtils {
             };
         }
 
-        public String getName() {
+        private String getName() {
             return property.getName();
         }
 
-        public List<PropertyDecorator> getObjectProperties() {
+        private List<PropertyDecorator> getObjectProperties() {
             return switch (location) {
                 case TASK_DISPATCHER -> toPropertyDecorators(
                     ((com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty) property).getProperties());
@@ -311,15 +282,15 @@ public final class ToolUtils {
             };
         }
 
-        public Type getType() {
+        private Type getType() {
             return type;
         }
 
-        public Boolean getRequired() {
+        private Boolean getRequired() {
             return required;
         }
 
-        public static List<PropertyDecorator> toPropertyDecorators(List<? extends BaseProperty> properties) {
+        private static List<PropertyDecorator> toPropertyDecorators(List<? extends BaseProperty> properties) {
             return properties.stream()
                 .map(PropertyDecorator::new)
                 .toList();
@@ -338,7 +309,33 @@ public final class ToolUtils {
         }
 
         List<PropertyDecorator> propertyDecorators = PropertyDecorator.toPropertyDecorators(properties);
+
         return generateObjectValue(propertyDecorators);
+    }
+
+    /**
+     * Generates a JSON array representation from a list of property decorators.
+     *
+     * @param properties the list of property decorators
+     * @return JSON array string representation
+     */
+    private static String generateArrayValue(List<PropertyDecorator> properties) {
+        StringBuilder parameters = new StringBuilder();
+
+        parameters.append("[ ");
+
+        for (var property : properties) {
+            parameters.append(generateSampleValue(property))
+                .append(", ");
+        }
+
+        if (parameters.length() > 2) {
+            parameters.setLength(parameters.length() - 2);
+        }
+
+        parameters.append("]");
+
+        return parameters.toString();
     }
 
     /**
@@ -353,7 +350,36 @@ public final class ToolUtils {
         }
 
         PropertyDecorator propertyDecorator = new PropertyDecorator(outputSchema);
+
         return generateSampleValue(propertyDecorator);
+    }
+
+    /**
+     * Generates a JSON object representation from a list of property decorators.
+     *
+     * @param properties the list of property decorators
+     * @return JSON object string representation
+     */
+    private static String generateObjectValue(List<PropertyDecorator> properties) {
+        StringBuilder parameters = new StringBuilder();
+
+        parameters.append("{ ");
+
+        for (var property : properties) {
+            parameters.append("\"")
+                .append(property.getName())
+                .append("\": ")
+                .append(generateSampleValue(property))
+                .append(", ");
+        }
+
+        if (parameters.length() > 2) {
+            parameters.setLength(parameters.length() - 2);
+        }
+
+        parameters.append("}");
+
+        return parameters.toString();
     }
 
     /**
@@ -362,7 +388,7 @@ public final class ToolUtils {
      * @param property the property decorator
      * @return string representation of the sample value
      */
-    public static String generateSampleValue(PropertyDecorator property) {
+    private static String generateSampleValue(PropertyDecorator property) {
         String required = property.getRequired() ? " (required)" : "";
 
         return switch (property.getType()) {
@@ -381,53 +407,12 @@ public final class ToolUtils {
     }
 
     /**
-     * Generates a JSON array representation from a list of property decorators.
+     * Safely converts a string to lowercase, returning empty string if null.
      *
-     * @param properties the list of property decorators
-     * @return JSON array string representation
+     * @param value the string to convert
+     * @return lowercase string or empty string if null
      */
-    public static String generateArrayValue(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("[ ");
-
-        for (var property : properties) {
-            parameters.append(generateSampleValue(property))
-                .append(", ");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append("]")
-            .toString();
-    }
-
-    /**
-     * Generates a JSON object representation from a list of property decorators.
-     *
-     * @param properties the list of property decorators
-     * @return JSON object string representation
-     */
-    public static String generateObjectValue(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("{ ");
-
-        for (var property : properties) {
-            parameters.append("\"")
-                .append(property.getName())
-                .append("\": ")
-                .append(generateSampleValue(property))
-                .append(", ");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append("}")
-            .toString();
+    private static String safeToLowerCase(String value) {
+        return value != null ? value.toLowerCase() : "";
     }
 }
