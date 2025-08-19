@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
-@ConditionalOnCEVersion
 @ConditionalOnCoordinator
 public class WorkspaceApiController implements WorkspaceApi {
 

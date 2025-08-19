@@ -9,7 +9,6 @@ package com.bytechef.ee.automation.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Workspace;
-import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.web.rest.model.WorkspaceModel;
 import com.bytechef.ee.automation.configuration.service.WorkspaceService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -34,15 +33,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkspaceApiController implements WorkspaceApi {
 
     private final ConversionService conversionService;
-    private final WorkspaceFacade workspaceFacade;
     private final WorkspaceService workspaceService;
 
     @SuppressFBWarnings("EI")
-    public WorkspaceApiController(
-        ConversionService conversionService, WorkspaceFacade workspaceFacade, WorkspaceService workspaceService) {
-
+    public WorkspaceApiController(ConversionService conversionService, WorkspaceService workspaceService) {
         this.conversionService = conversionService;
-        this.workspaceFacade = workspaceFacade;
         this.workspaceService = workspaceService;
     }
 
@@ -62,15 +57,6 @@ public class WorkspaceApiController implements WorkspaceApi {
 
         return ResponseEntity.noContent()
             .build();
-    }
-
-    @Override
-    public ResponseEntity<List<WorkspaceModel>> getUserWorkspaces(Long id) {
-        return ResponseEntity.ok(
-            workspaceFacade.getUserWorkspaces(id)
-                .stream()
-                .map(workspace -> conversionService.convert(workspace, WorkspaceModel.class))
-                .toList());
     }
 
     @Override

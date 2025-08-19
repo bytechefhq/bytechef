@@ -17,8 +17,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import WorkspaceDialog from '@/ee/pages/settings/automation/workspaces/components/WorkspaceDialog';
 import {useDeleteWorkspaceMutation} from '@/ee/shared/mutations/automation/workspaces.mutations';
-import WorkspaceDialog from '@/pages/settings/automation/workspaces/components/WorkspaceDialog';
 import {Workspace} from '@/shared/middleware/automation/configuration';
 import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
