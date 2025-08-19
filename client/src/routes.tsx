@@ -71,7 +71,7 @@ const AiProviders = lazy(() => import('@/pages/platform/settings/ai-providers/Ai
 const ApiKeys = lazy(() => import('@/pages/platform/settings/api-keys/ApiKeys'));
 const GitConfiguration = lazy(() => import('@/pages/platform/settings/git-configuration/GitConfiguration'));
 const Notifications = lazy(() => import('@/pages/platform/settings/notifications/Notifications'));
-const Workspaces = lazy(() => import('@/pages/settings/automation/workspaces/Workspaces'));
+const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 
 const getAccountRoutes = (path: string) => ({
     children: [
