@@ -23,10 +23,11 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID_
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID_PROPERTY;
 import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID;
+import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID_PROPERTY;
 import static com.bytechef.component.clickup.constant.ClickupConstants.TASK_ID;
+import com.bytechef.component.clickup.action.ClickupCreateTaskCommentAction;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -63,12 +64,13 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
             Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
             List<Property> properties = new ArrayList<>(propertiesOptional.orElse(Collections.emptyList()));
-            List<String> WorkspaceSpaceFolderIdActions = new ArrayList<>(
-                    Arrays.asList("createTask", "createTaskComment"));
 
-            if (Objects.equals(modifiableActionDefinition.getName(), "createList")) {
+            if (Objects.equals(modifiableActionDefinition.getName(), ClickupCreateTaskCommentAction.ACTION_NAME)) {
+                properties.addAll(0,
+                        List.of(WORKSPACE_ID_PROPERTY, SPACE_ID_PROPERTY, FOLDER_ID_PROPERTY, LIST_ID_PROPERTY));
+            } else if (Objects.equals(modifiableActionDefinition.getName(), "createList")) {
                 properties.addAll(0, List.of(WORKSPACE_ID_PROPERTY, SPACE_ID_PROPERTY));
-            } else if (WorkspaceSpaceFolderIdActions.contains(modifiableActionDefinition.getName())) {
+            } else if (Objects.equals(modifiableActionDefinition.getName(), "createTask")) {
                 properties.addAll(0, List.of(WORKSPACE_ID_PROPERTY, SPACE_ID_PROPERTY, FOLDER_ID_PROPERTY));
             } else if (Objects.equals(modifiableActionDefinition.getName(), "createFolder")) {
                 properties.addFirst(WORKSPACE_ID_PROPERTY);

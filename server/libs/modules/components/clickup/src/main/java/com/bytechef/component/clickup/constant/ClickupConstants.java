@@ -35,6 +35,12 @@ public class ClickupConstants {
     public static final String LIST_ID = "listId";
     public static final String TASK_ID = "taskId";
 
+    public static final ModifiableStringProperty LIST_ID_PROPERTY = string(LIST_ID)
+            .label("List ID")
+            .options((ActionOptionsFunction<String>) ClickupUtils::getListIdOptions)
+            .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID, FOLDER_ID)
+            .required(true);
+
     public static final ModifiableStringProperty FOLDER_ID_PROPERTY = string(FOLDER_ID)
             .label("Folder ID")
             .options((ActionOptionsFunction<String>) ClickupUtils::getFolderIdOptions)
