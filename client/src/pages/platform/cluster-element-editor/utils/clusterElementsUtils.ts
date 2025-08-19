@@ -1,19 +1,49 @@
 import {ROOT_CLUSTER_HANDLE_STEP, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
-import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinition, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {ClusterElementItemType, ClusterElementsType, WorkflowNodeType} from '@/shared/types';
 
-export function initializeClusterElementsObject(
-    clusterElementsData: ClusterElementsType,
-    rootClusterElementDefinition: ComponentDefinition
-) {
+interface InitializeClusterElementsObjectProps {
+    clusterElementsData: ClusterElementsType;
+    mainClusterRootTask: WorkflowTask;
+    rootClusterElementDefinition: ComponentDefinition;
+}
+
+export function initializeClusterElementsObject({
+    clusterElementsData,
+    mainClusterRootTask,
+    rootClusterElementDefinition,
+}: InitializeClusterElementsObjectProps) {
     const clusterElements: ClusterElementsType = {};
 
     if (!rootClusterElementDefinition.clusterElementTypes) {
         return clusterElements;
     }
 
+    const mainClusterRootType = mainClusterRootTask.type?.split('/')[2];
+
+    const filteredClusterElementTypes = (() => {
+        if (
+            rootClusterElementDefinition.actionClusterElementTypes &&
+            Object.keys(rootClusterElementDefinition.actionClusterElementTypes).length > 0 &&
+            mainClusterRootType
+        ) {
+            return rootClusterElementDefinition.actionClusterElementTypes[mainClusterRootType] || [];
+        } else {
+            return rootClusterElementDefinition.clusterElementTypes.map((type) => type.name);
+        }
+    })();
+
     rootClusterElementDefinition.clusterElementTypes.forEach((elementType) => {
+        const matchingType = filteredClusterElementTypes.some((type) => {
+            return type === elementType.name;
+        });
+
+        if (!matchingType) {
+            return;
+        }
+
         const clusterElementType = convertNameToCamelCase(elementType.name || '');
+
         const elementData = clusterElementsData?.[clusterElementType];
 
         if (elementType.multipleElements) {
@@ -133,6 +163,42 @@ export function extractClusterElementComponentOperations(
 
         return collectedOperations;
     }, existingClusterElementsOperations);
+}
+
+interface GetClusterElementTypesCountProps {
+    clusterRootComponentDefinition: ComponentDefinition;
+    operationName?: string;
+}
+
+export function getClusterElementTypesCount({
+    clusterRootComponentDefinition,
+    operationName,
+}: GetClusterElementTypesCountProps): number {
+    if (!clusterRootComponentDefinition.clusterElementTypes) {
+        return 0;
+    }
+
+    if (!operationName) {
+        return clusterRootComponentDefinition.clusterElementTypes.length;
+    }
+
+    const actionTypes = clusterRootComponentDefinition.actionClusterElementTypes;
+
+    if (!actionTypes || Object.keys(actionTypes).length === 0) {
+        return clusterRootComponentDefinition.clusterElementTypes.length;
+    }
+
+    const operationElementTypes = actionTypes[operationName];
+
+    if (!operationElementTypes || operationElementTypes.length === 0) {
+        return clusterRootComponentDefinition.clusterElementTypes.length;
+    }
+
+    const filteredElementTypes = clusterRootComponentDefinition.clusterElementTypes.filter((elementType) =>
+        operationElementTypes.includes(elementType.name || '')
+    );
+
+    return filteredElementTypes.length;
 }
 
 export function calculateNodeWidth(handleCount: number): number {

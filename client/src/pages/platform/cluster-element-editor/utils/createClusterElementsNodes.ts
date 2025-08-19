@@ -3,7 +3,7 @@ import {ClusterElementsType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import {createMultipleElementsNode, createPlaceholderNode, createSingleElementsNode} from './clusterElementsNodesUtils';
-import {convertNameToCamelCase, isPlainObject} from './clusterElementsUtils';
+import {convertNameToCamelCase, getClusterElementTypesCount, isPlainObject} from './clusterElementsUtils';
 
 interface CreateClusterElementNodesProps {
     clusterElements: ClusterElementsType;
@@ -11,6 +11,7 @@ interface CreateClusterElementNodesProps {
     clusterRootId: string;
     currentNodePositions: Record<string, {x: number; y: number}>;
     nestedClusterRootsDefinitions: Record<string, ComponentDefinition>;
+    operationName?: string;
 }
 
 export default function createClusterElementNodes({
@@ -19,15 +20,42 @@ export default function createClusterElementNodes({
     clusterRootId,
     currentNodePositions = {},
     nestedClusterRootsDefinitions,
+    operationName = '',
 }: CreateClusterElementNodesProps) {
-    if (!clusterRootComponentDefinition?.clusterElementTypes || !clusterElements) {
+    if (!clusterRootComponentDefinition || !clusterRootComponentDefinition.clusterElementTypes || !clusterElements) {
         return [];
     }
 
     const createdNodes: Node[] = [];
-    const totalClusterElementTypeCount = clusterRootComponentDefinition.clusterElementTypes.length;
 
-    clusterRootComponentDefinition.clusterElementTypes.forEach((clusterElementType, clusterElementTypeIndex) => {
+    const totalClusterElementTypeCount = getClusterElementTypesCount({
+        clusterRootComponentDefinition,
+        operationName,
+    });
+
+    if (totalClusterElementTypeCount === 0) {
+        return [];
+    }
+
+    const elementTypesToUse = clusterRootComponentDefinition.clusterElementTypes!.filter((elementType) => {
+        if (!operationName) {
+            return true;
+        }
+
+        const actionTypes = clusterRootComponentDefinition.actionClusterElementTypes;
+        if (!actionTypes || Object.keys(actionTypes).length === 0) {
+            return true;
+        }
+
+        const operationElementTypes = actionTypes[operationName];
+        if (!operationElementTypes || operationElementTypes.length === 0) {
+            return true;
+        }
+
+        return operationElementTypes.includes(elementType.name || '');
+    });
+
+    elementTypesToUse.forEach((clusterElementType, clusterElementTypeIndex) => {
         const clusterElementTypeName = convertNameToCamelCase(clusterElementType.name || '');
         const clusterElementTypeLabel = clusterElementType.label || '';
         const isMultipleClusterElementsNode = clusterElementType.multipleElements;

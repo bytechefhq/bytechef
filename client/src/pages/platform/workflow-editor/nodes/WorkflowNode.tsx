@@ -19,6 +19,7 @@ import {useShallow} from 'zustand/react/shallow';
 import {
     calculateNodeWidth,
     convertNameToCamelCase,
+    getClusterElementTypesCount,
     getHandlePosition,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useNodeClickHandler from '../hooks/useNodeClick';
@@ -73,7 +74,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const isSelected = currentNode?.name === data.name;
 
-    const isMainRootClusterElement = data.rootClusterElement;
+    const isMainRootClusterElement = !!data.clusterRoot && !data.isNestedClusterRoot;
     const isClusterElement = !!data.clusterElementType;
     const isNestedClusterRoot = !!data.isNestedClusterRoot;
     const parentClusterRootId = data.parentClusterRootId || id.split('-')[0];
@@ -112,15 +113,20 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const clusterElementTypesCount = useMemo(
         () =>
-            (clusterElementsCanvasOpen &&
-                (isMainRootClusterElement || isNestedClusterRoot) &&
-                rootClusterElementDefinition?.clusterElementTypes?.length) ||
-            0,
+            clusterElementsCanvasOpen &&
+            (isMainRootClusterElement || isNestedClusterRoot) &&
+            rootClusterElementDefinition
+                ? getClusterElementTypesCount({
+                      clusterRootComponentDefinition: rootClusterElementDefinition,
+                      operationName: data.operationName,
+                  })
+                : 0,
         [
             clusterElementsCanvasOpen,
             isNestedClusterRoot,
             isMainRootClusterElement,
-            rootClusterElementDefinition?.clusterElementTypes?.length,
+            rootClusterElementDefinition,
+            data.operationName,
         ]
     );
 

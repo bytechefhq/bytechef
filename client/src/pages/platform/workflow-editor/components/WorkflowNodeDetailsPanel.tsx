@@ -58,6 +58,7 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
 import {
+    convertNameToSnakeCase,
     extractClusterElementComponentOperations,
     getClusterElementsLabel,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
@@ -494,6 +495,20 @@ const WorkflowNodeDetailsPanel = ({
         );
     }, [clusterElementsCanvasOpen, currentWorkflowNode, isClusterElement]);
 
+    const filteredClusterElementOperations = useMemo(() => {
+        if (currentComponentDefinition?.clusterElement && currentNode?.clusterElementType) {
+            return currentComponentDefinition?.clusterElements?.filter((clusterElement) => {
+                return clusterElement.type === convertNameToSnakeCase(currentNode.clusterElementType as string);
+            });
+        }
+
+        return currentComponentDefinition?.clusterElements;
+    }, [
+        currentComponentDefinition?.clusterElement,
+        currentComponentDefinition?.clusterElements,
+        currentNode?.clusterElementType,
+    ]);
+
     const handleOperationSelectChange = useCallback(
         async (newOperationName: string) => {
             if (currentOperationName === newOperationName) {
@@ -900,7 +915,7 @@ const WorkflowNodeDetailsPanel = ({
                 (workflowNode) => workflowNode.workflowNodeName === currentNode?.workflowNodeName
             );
         } else if (clusterElementsCanvasOpen) {
-            if (currentNode?.rootClusterElement) {
+            if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
                 currentWorkflowNode = workflowNodes.find(
                     (workflowNodeType) => workflowNodeType.workflowNodeName === currentNode?.workflowNodeName
                 );
@@ -950,8 +965,12 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
-        if (clusterElementsCanvasOpen && currentComponentDefinition?.clusterElement) {
-            if (!!currentComponentDefinition.clusterElements && !!matchingOperation) {
+        if (
+            clusterElementsCanvasOpen &&
+            currentComponentDefinition?.clusterElement &&
+            currentNode?.parentClusterRootId
+        ) {
+            if (matchingOperation) {
                 fetchClusterElementDefinition();
             } else {
                 setCurrentActionDefinition(undefined);
@@ -1049,7 +1068,7 @@ const WorkflowNodeDetailsPanel = ({
                                         (currentNode?.trigger
                                             ? currentComponentDefinition?.triggers
                                             : clusterElementsCanvasOpen && currentComponentDefinition?.clusterElement
-                                              ? currentComponentDefinition?.clusterElements
+                                              ? filteredClusterElementOperations
                                               : currentComponentDefinition?.actions)!
                                     }
                                     triggerSelect={currentNode?.trigger}
