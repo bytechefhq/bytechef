@@ -1,11 +1,11 @@
+import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {
     useCreateNotificationMutation,
     useDeleteNotificationMutation,
     useUpdateNotificationMutation,
-} from '@/ee/mutations/notifications.mutations';
-import {useGetNotificationEventsQuery} from '@/ee/queries/notificationEvents.queries';
-import {NotificationKeys, useGetNotificationsQuery} from '@/ee/queries/notifications.queries';
-import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/configuration';
+} from '@/shared/mutations/platform/notifications.mutations';
+import {useGetNotificationEventsQuery} from '@/shared/queries/platform/notificationEvents.queries';
+import {NotificationKeys, useGetNotificationsQuery} from '@/shared/queries/platform/notifications.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';

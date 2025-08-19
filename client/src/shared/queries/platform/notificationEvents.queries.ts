@@ -1,4 +1,4 @@
-import {NotificationEvent, NotificationEventApi} from '@/shared/middleware/platform/configuration';
+import {NotificationEvent, NotificationEventApi} from '@/shared/middleware/platform/notification';
 import {useQuery} from '@tanstack/react-query';
 
 export const NotificationEventKeys = ['notificationEvents'];

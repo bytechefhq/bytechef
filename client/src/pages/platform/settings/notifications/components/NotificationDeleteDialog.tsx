@@ -9,7 +9,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
-import {Notification} from '@/shared/middleware/platform/configuration';
+import {Notification} from '@/shared/middleware/platform/notification';
 import {XIcon} from 'lucide-react';
 
 interface NotificationDeleteDialogProps {
