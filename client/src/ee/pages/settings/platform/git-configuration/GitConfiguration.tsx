@@ -1,6 +1,6 @@
+import GitConfigurationForm from '@/ee/pages/settings/platform/git-configuration/components/GitConfigurationForm';
 import {useGetWorkspaceGitConfigurationQuery} from '@/ee/shared/queries/platform/gitConfiguration.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import GitConfigurationForm from '@/pages/platform/settings/git-configuration/components/GitConfigurationForm';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import React from 'react';

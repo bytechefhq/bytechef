@@ -69,7 +69,7 @@ const AutomationWorkflowExecutions = lazy(() =>
 const Home = lazy(() => import('@/pages/home/Home'));
 const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers/AiProviders'));
 const ApiKeys = lazy(() => import('@/pages/platform/settings/api-keys/ApiKeys'));
-const GitConfiguration = lazy(() => import('@/pages/platform/settings/git-configuration/GitConfiguration'));
+const GitConfiguration = lazy(() => import('@/ee/pages/settings/platform/git-configuration/GitConfiguration'));
 const Notifications = lazy(() => import('@/pages/platform/settings/notifications/Notifications'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 
