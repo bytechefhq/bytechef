@@ -164,6 +164,7 @@ export type NodeDataType = {
     clusterElements?: ClusterElementsType | Array<ClusterElementDefinitionBasic>;
     clusterElementName?: string;
     clusterElementType?: string;
+    clusterRoot?: boolean;
     componentName: string;
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionData?: ConditionDataType;
@@ -201,7 +202,6 @@ export type NodeDataType = {
         index: number;
     };
     parentClusterRootId?: string;
-    rootClusterElement?: boolean;
     taskDispatcher?: boolean;
     taskDispatcherId?: string;
     title?: string;

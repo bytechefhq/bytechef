@@ -51,8 +51,9 @@ export default function saveClusterElementFieldChange({
     let updatedClusterElements: ClusterElementsType;
 
     if (
-        currentNode.rootClusterElement &&
-        currentNode.workflowNodeName === rootClusterElementNodeData?.workflowNodeName
+        currentNode.clusterRoot &&
+        currentNode.workflowNodeName === rootClusterElementNodeData?.workflowNodeName &&
+        !currentNode.isNestedClusterRoot
     ) {
         updatedMainRootData = updateClusterRootElementField({
             currentComponentDefinition,
@@ -115,7 +116,7 @@ export default function saveClusterElementFieldChange({
             });
 
             if (rootClusterElementNodeData) {
-                if (currentNode.rootClusterElement) {
+                if (currentNode.clusterRoot && !currentNode.isNestedClusterRoot) {
                     setRootClusterElementNodeData({
                         ...rootClusterElementNodeData,
                         ...updatedStateData,

@@ -1,4 +1,3 @@
-import {ROOT_CLUSTER_ELEMENT_NAMES} from '@/shared/constants';
 import {Workflow, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -168,7 +167,7 @@ export default async function saveWorkflowDefinition({
                 combinedParameters = newTask.parameters ?? {};
             }
 
-            if (ROOT_CLUSTER_ELEMENT_NAMES.includes(existingWorkflowTask.type.split('/')[0])) {
+            if (existingWorkflowTask.clusterRoot) {
                 const rootClusterElementTask: WorkflowTask = {
                     ...newTask,
                     clusterElements: {

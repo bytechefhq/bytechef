@@ -77,7 +77,7 @@ export default function saveClusterElementNodesPosition({
         metadata,
     } as typeof rootClusterElementNodeData);
 
-    if (currentNode?.rootClusterElement) {
+    if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
         setCurrentNode({
             ...currentNode,
             clusterElements: updatedClusterElements,

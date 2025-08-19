@@ -101,8 +101,6 @@ export const TASK_DISPATCHER_NAMES = [
     'subflow',
 ];
 
-export const ROOT_CLUSTER_ELEMENT_NAMES = ['aiAgent'];
-
 export const SORT_OPTIONS = [
     {
         label: 'Last edited',

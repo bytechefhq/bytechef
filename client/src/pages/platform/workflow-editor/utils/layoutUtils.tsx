@@ -8,7 +8,6 @@ import {
     NODE_HEIGHT,
     NODE_WIDTH,
     PLACEHOLDER_NODE_HEIGHT,
-    ROOT_CLUSTER_ELEMENT_NAMES,
     ROOT_CLUSTER_WIDTH,
     TASK_DISPATCHER_NAMES,
 } from '@/shared/constants';
@@ -78,8 +77,6 @@ export const convertTaskToNode = (
 
     const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(componentName);
 
-    const isRootClusterElement = ROOT_CLUSTER_ELEMENT_NAMES.includes(componentName);
-
     return {
         data: {
             ...task,
@@ -92,7 +89,6 @@ export const convertTaskToNode = (
                 />
             ),
             operationName: task.type.split('/')[2],
-            rootClusterElement: isRootClusterElement,
             taskDispatcher: isTaskDispatcher,
             taskDispatcherId: isTaskDispatcher ? task.name : undefined,
             trigger: index === 0,
@@ -100,7 +96,7 @@ export const convertTaskToNode = (
         },
         id: task.name,
         position: {x: 0, y: 0},
-        type: componentName === 'aiAgent' ? 'aiAgentNode' : 'workflow',
+        type: task.clusterRoot ? 'aiAgentNode' : 'workflow',
     };
 };
 
@@ -134,7 +130,7 @@ export const getLayoutedElements = async ({
                 width = 15;
             }
 
-            if (node.data.rootClusterElement) {
+            if (node.data.clusterRoot) {
                 width = ROOT_CLUSTER_WIDTH;
             }
         } else {
@@ -147,7 +143,7 @@ export const getLayoutedElements = async ({
     edges.forEach((edge) => {
         if (edge.target.includes('bottom-ghost')) {
             dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
-        } else if (ROOT_CLUSTER_ELEMENT_NAMES.includes(edge.source.split('_')[0])) {
+        } else {
             const sourceNode = nodes.find((node) => node.id === edge.source);
 
             const hasValidClusterElements =
@@ -159,10 +155,8 @@ export const getLayoutedElements = async ({
 
             if (hasValidClusterElements) {
                 dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
-            } else {
-                dagreGraph.setEdge(edge.source, edge.target);
             }
-        } else {
+
             dagreGraph.setEdge(edge.source, edge.target);
         }
     });
@@ -214,7 +208,7 @@ export const getLayoutedElements = async ({
             ];
         }
 
-        positionedNodes = [...positionedNodes, ...placeholderNodes, ...centeredMainRootNode];
+        positionedNodes = [...positionedNodes, ...centeredMainRootNode, ...placeholderNodes];
 
         return {
             edges,
@@ -231,7 +225,7 @@ export const getLayoutedElements = async ({
                 ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
             );
 
-        if (hasValidClusterElements && ROOT_CLUSTER_ELEMENT_NAMES.includes(node.data.componentName as string)) {
+        if (hasValidClusterElements && node.data.clusterRoot) {
             positionX -= 85;
         }
 
@@ -289,7 +283,7 @@ export const getLayoutedElements = async ({
                 condition: sourceNode.type === 'taskDispatcherTopGhostNode',
             },
             {
-                condition: sourceNode.data.rootClusterElement,
+                condition: sourceNode.data.clusterRoot,
             },
             {
                 condition: sourceNode.data.componentName === 'branch',

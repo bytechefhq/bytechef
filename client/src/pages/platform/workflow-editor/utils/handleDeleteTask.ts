@@ -192,7 +192,7 @@ export default function handleDeleteTask({
             const updatedClusterElements = clusterElementRemovalResult.elements;
 
             if (setRootClusterElementNodeData && setCurrentNode) {
-                if (currentNode?.rootClusterElement) {
+                if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
                     setCurrentNode({
                         ...currentNode,
                         clusterElements: updatedClusterElements,
