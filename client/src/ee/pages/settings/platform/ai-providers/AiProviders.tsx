@@ -1,6 +1,6 @@
 import PageLoader from '@/components/PageLoader';
+import AiProviderList from '@/ee/pages/settings/platform/ai-providers/components/AiProviderList';
 import {useGetAiProvidersQuery} from '@/ee/shared/queries/platform/aiProviders.queries';
-import AiProviderList from '@/pages/platform/settings/ai-providers/components/AiProviderList';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import * as React from 'react';
