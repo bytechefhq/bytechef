@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.workflow.configuration.remote.client.facade;
+package com.bytechef.ee.platform.configuration.remote.client.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;

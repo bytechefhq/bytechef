@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.workflow.configuration.remote.client.service;
+package com.bytechef.ee.platform.configuration.remote.client.service;
 
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
