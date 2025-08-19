@@ -96,6 +96,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-service"))
     implementation(project(":server:libs:platform:platform-feature-flags"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
+    implementation(project(":server:libs:platform:platform-notification:platform-notification-rest"))
+    implementation(project(":server:libs:platform:platform-notification:platform-notification-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-impl"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
