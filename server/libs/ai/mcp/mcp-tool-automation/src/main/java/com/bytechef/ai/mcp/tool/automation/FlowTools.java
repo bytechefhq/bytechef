@@ -42,7 +42,7 @@ public class FlowTools {
     // Error message constants
     private static final String FAILED_TO_LIST_FLOWS = "Failed to list flows";
     private static final String FAILED_TO_GET_FLOW = "Failed to get flow";
-    private static final String FAILED_TO_SEARCH_FLOWS = "Failed to search flows";
+    private static final String FAILED_TO_SEARCH_FLOWS = "Failed to search flow";
 
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
@@ -66,7 +66,7 @@ public class FlowTools {
     }
 
     @Tool(
-        description = "List all flows in the project. Returns a list of flows with their basic information including name and description")
+        description = "List all flows. Returns a list of flows with their basic information including name and description")
     public List<FlowMinimalInfo> listFlows() {
         try {
             List<TaskDispatcherDefinition> taskDispatcherDefinitions =
@@ -84,6 +84,7 @@ public class FlowTools {
                 .toList();
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_FLOWS, e);
+
             throw ToolUtils.createOperationException(FAILED_TO_LIST_FLOWS, e);
         }
     }
@@ -123,6 +124,7 @@ public class FlowTools {
                 outputPropertiesJson);
         } catch (Exception e) {
             logger.error("Failed to get flow {}", name, e);
+
             throw ToolUtils.createOperationException(FAILED_TO_GET_FLOW, e);
         }
     }
@@ -156,6 +158,7 @@ public class FlowTools {
             return matchingFlows;
         } catch (Exception e) {
             logger.error("Failed to search flows with query '{}'", query, e);
+
             throw ToolUtils.createOperationException(FAILED_TO_SEARCH_FLOWS, e);
         }
     }
@@ -177,8 +180,9 @@ public class FlowTools {
                 logger.debug("Retrieved {} task properties for flow '{}'", taskProperties.size(), name);
             }
 
-            List<ToolUtils.PropertyInfo> propertyInfos =
-                new ArrayList<>(ToolUtils.convertToPropertyInfoList(properties));
+            List<ToolUtils.PropertyInfo> propertyInfos = new ArrayList<>(
+                ToolUtils.convertToPropertyInfoList(properties));
+
             propertyInfos.addAll(ToolUtils.convertToPropertyInfoList(taskProperties));
 
             return propertyInfos;
@@ -213,6 +217,7 @@ public class FlowTools {
             return flowDefinition;
         } catch (Exception e) {
             logger.error("Failed to generate flow definition for '{}'", name, e);
+
             throw ToolUtils.createOperationException("Failed to generate flow definition", e);
         }
     }
