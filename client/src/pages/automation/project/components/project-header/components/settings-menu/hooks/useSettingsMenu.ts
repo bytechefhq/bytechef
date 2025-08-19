@@ -1,8 +1,11 @@
 import {
     usePullProjectFromGitMutation,
     useUpdateProjectGitConfigurationMutation,
-} from '@/ee/mutations/projectGit.mutations';
-import {ProjectGitConfigurationKeys, useGetProjectGitConfigurationQuery} from '@/ee/queries/projectGit.queries';
+} from '@/ee/shared/mutations/automation/projectGit.mutations';
+import {
+    ProjectGitConfigurationKeys,
+    useGetProjectGitConfigurationQuery,
+} from '@/ee/shared/mutations/automation/projectGit.queries';
 import {useToast} from '@/hooks/use-toast';
 import {useProject} from '@/pages/automation/project/hooks/useProject';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';

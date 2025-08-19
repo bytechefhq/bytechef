@@ -9,11 +9,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useDeleteApiConnectorMutation, useEnableApiConnectorMutation} from '@/ee/mutations/apiConnector.mutations';
 import ApiConnectorDeleteAlertDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorDeleteAlertDialog';
 import ApiConnectorImportDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorImportDialog';
-import {ApiConnectorKeys} from '@/ee/queries/apiConnectors.queries';
 import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
+import {
+    useDeleteApiConnectorMutation,
+    useEnableApiConnectorMutation,
+} from '@/ee/shared/mutations/platform/apiConnector.mutations';
+import {ApiConnectorKeys} from '@/ee/shared/queries/platform/apiConnectors.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';

@@ -1,9 +1,9 @@
 import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {useUpdateWorkspaceGitConfigurationMutation} from '@/ee/mutations/gitConfiguration.mutations';
-import {GitConfigurationKeys} from '@/ee/queries/gitConfiguration.queries';
 import {GitConfiguration} from '@/ee/shared/middleware/platform/configuration';
+import {useUpdateWorkspaceGitConfigurationMutation} from '@/ee/shared/mutations/platform/gitConfiguration.mutations';
+import {GitConfigurationKeys} from '@/ee/shared/queries/platform/gitConfiguration.queries';
 import {useToast} from '@/hooks/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {zodResolver} from '@hookform/resolvers/zod';

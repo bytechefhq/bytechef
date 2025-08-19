@@ -1,6 +1,6 @@
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
-import {useGetApiCollectionTagsQuery} from '@/ee/queries/apiCollectionTags.queries';
 import {ApiCollection} from '@/ee/shared/middleware/automation/api-platform';
+import {useGetApiCollectionTagsQuery} from '@/ee/shared/mutations/automation/apiCollectionTags.queries';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 
 const ApiCollectionDialogTagsSelect = ({

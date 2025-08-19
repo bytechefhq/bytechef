@@ -9,10 +9,10 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
-import {useDeleteApiCollectionEndpointMutation} from '@/ee/mutations/apiCollectionEndpoints.mutations';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
-import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
+import {useDeleteApiCollectionEndpointMutation} from '@/ee/shared/mutations/automation/apiCollectionEndpoints.mutations';
+import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
