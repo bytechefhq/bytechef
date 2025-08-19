@@ -16,10 +16,10 @@
 
 package com.bytechef.platform.coordinator.notification;
 
-import com.bytechef.platform.configuration.domain.NotificationEvent.Type;
-import com.bytechef.platform.configuration.notification.EmailNotificationHandler;
-import com.bytechef.platform.configuration.notification.NotificationEventType;
-import com.bytechef.platform.configuration.notification.NotificationHandlerContext;
+import com.bytechef.platform.notification.domain.NotificationEvent.Type;
+import com.bytechef.platform.notification.handler.EmailNotificationHandler;
+import com.bytechef.platform.notification.handler.NotificationEventType;
+import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import java.util.Locale;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;

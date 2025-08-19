@@ -39,7 +39,6 @@ import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestMod
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.configuration.web.rest.mapper.NotificationMapperImpl;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.Iterator;
 import java.util.List;
@@ -72,9 +71,6 @@ public class ProjectApiControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockitoBean
-    private NotificationMapperImpl notificationMapper;
 
     @MockitoBean
     private ProjectDeploymentFacade projectDeploymentFacade;

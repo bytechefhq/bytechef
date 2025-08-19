@@ -1,0 +1,191 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Notification Internal API"
+  version: "1"
+servers:
+  - url: "/api/platform/internal"
+tags:
+  - name: "notification"
+    description: "The Platform Notification Internal API"
+  - name: "notification-event"
+    description: "The platform Notification Event Internal API"
+paths:
+  /notifications:
+    get:
+      description: "Get a list of notifications"
+      summary: "Get a list of notifications"
+      tags:
+        - "notification"
+      operationId: "getNotifications"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Notification"
+    post:
+      description: "Create a notification entry"
+      summary: "Create a notification entry"
+      tags:
+        - "notification"
+      operationId: "createNotification"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Notification"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+  /notifications/{notificationId}:
+    delete:
+      description: "Delete a notification."
+      summary: "Delete a notification"
+      tags:
+        - "notification"
+      operationId: "deleteNotification"
+      parameters:
+        - name: "notificationId"
+          description: "The id of a notification."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+    put:
+      description: "Update an existing notification."
+      summary: "Update an existing notification"
+      tags:
+        - "notification"
+      operationId: "updateNotification"
+      parameters:
+        - name: "notificationId"
+          description: "The id of a notification."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Notification"
+        required: true
+      responses:
+        "200":
+          description: "The updated Notification object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+  /notifications/events:
+    get:
+      description: "Get a list of possible notification events"
+      summary: "Get a list of possible notification events"
+      tags:
+        - "notification-event"
+      operationId: "getNotificationEvents"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/NotificationEvent"
+components:
+  schemas:
+    Notification:
+      description: "A Notification definition."
+      type: "object"
+      required:
+        - "name"
+        - "type"
+        - "settings"
+        - "events"
+      properties:
+        id:
+          description: "Notification Id"
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "Notification name"
+          type: "string"
+        type:
+          description: "Type of the notification"
+          type: "string"
+          enum:
+            - "EMAIL"
+            - "WEBHOOK"
+        settings:
+          description: "Notification type related settings"
+          type: "object"
+          additionalProperties:
+            type: "object"
+        notificationEvents:
+          description: "List of events for which notification will be triggered"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/NotificationEvent"
+          readOnly: true
+        notificationEventIds:
+          description: "List of event ids for which notification will be triggered"
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+          writeOnly: true
+        __version:
+          type: "integer"
+    NotificationEvent:
+      type: "object"
+      description: "A notification event definition."
+      required:
+        - "id"
+      properties:
+        id:
+          description: "Notification Id"
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        type:
+          type: "string"
+          enum:
+            - "JOB_CANCELLED"
+            - "JOB_CREATED"
+            - "JOB_COMPLETED"
+            - "JOB_FAILED"
+            - "JOB_STARTED"

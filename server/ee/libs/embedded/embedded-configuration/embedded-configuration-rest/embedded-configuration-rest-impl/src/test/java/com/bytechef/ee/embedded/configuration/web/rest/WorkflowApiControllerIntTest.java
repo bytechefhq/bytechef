@@ -37,7 +37,6 @@ import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.configuration.web.rest.mapper.NotificationMapper;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,9 +96,6 @@ public class WorkflowApiControllerIntTest {
 
     @MockitoBean
     private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
-
-    @MockitoBean
-    private NotificationMapper notificationMapper;
 
     private WebTestClient webTestClient;
 
