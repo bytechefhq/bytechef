@@ -1146,6 +1146,8 @@ components:
     IntegrationInstanceBasic:
       description: "The integration instance represents a configured integration for a specific user, containing connection and status information"
       type: "object"
+      required:
+        - "enabled"
       properties:
         id:
           description: "The id of an integration instance."

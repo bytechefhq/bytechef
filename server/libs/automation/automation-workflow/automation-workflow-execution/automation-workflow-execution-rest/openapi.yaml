@@ -23,12 +23,13 @@ paths:
         required: false
         schema:
           type: "boolean"
-      - name: "environment"
-        description: "The environment."
+      - name: "environmentId"
+        description: "The id of an environment."
         in: "query"
         required: false
         schema:
-          $ref: "#/components/schemas/Environment"
+          type: "integer"
+          format: "int64"
       - name: "jobStatus"
         description: "The status of an executed job"
         in: "query"
@@ -114,13 +115,17 @@ paths:
                 $ref: "#/components/schemas/WorkflowExecution"
 components:
   schemas:
-    Environment:
-      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Page:
       $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/page.yaml"
     WorkflowExecution:
       description: "Contains information about execution of a project workflow."
       type: "object"
+      required:
+        - "id"
+        - "project"
+        - "projectDeployment"
+        - "job"
+        - "workflow"
       properties:
         id:
           description: "The id of a workflow execution."
@@ -140,6 +145,12 @@ components:
     WorkflowExecutionBasic:
       description: "Contains information about execution of a Integration workflow."
       type: "object"
+      required:
+        - "id"
+        - "project"
+        - "projectDeployment"
+        - "job"
+        - "workflow"
       properties:
         id:
           description: "The id of a workflow execution."

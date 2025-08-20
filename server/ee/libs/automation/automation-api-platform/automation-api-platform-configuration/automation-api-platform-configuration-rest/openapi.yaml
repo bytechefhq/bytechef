@@ -346,12 +346,13 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "environment"
-          description: "The environment."
+        - name: "environmentId"
+          description: "The environment id."
           in: "query"
           required: false
           schema:
-            $ref: "#/components/schemas/Environment"
+            type: "integer"
+            format: "int64"
         - name: "projectId"
           description: "The project ids used for filtering project deployments."
           in: "query"
@@ -457,8 +458,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ApiCollectionEndpoint"
-        environment:
-          $ref: "#/components/schemas/Environment"
+        environmentId:
+          description: "The id of an environment."
+          type: "integer"
+          format: "int64"
         id:
           description: "The id of an API collection."
           type: "integer"
@@ -566,8 +569,6 @@ components:
         __version:
           type: "integer"
           format: "int32"
-    Environment:
-      $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     HttpMethod:
       description: "The endpoint HTTP method."
       type: "string"

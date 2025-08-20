@@ -190,12 +190,13 @@ paths:
           required: false
           schema:
             type: "integer"
-        - name: "environment"
-          description: "The environment."
+        - name: "environmentId"
+          description: "The environment id."
           in: "query"
           required: false
           schema:
-            $ref: "#/components/schemas/Environment"
+            type: "integer"
+            format: "int64"
         - name: "tagId"
           description: "The tag id of used for filtering connections."
           in: "query"
@@ -523,12 +524,13 @@ paths:
         - "integration-instance-configuration"
       operationId: "getIntegrationInstanceConfigurations"
       parameters:
-        - name: "environment"
-          description: "The environment."
+        - name: "environmentId"
+          description: "The environment id."
           in: "query"
           required: false
           schema:
-            $ref: '#/components/schemas/Environment'
+            type: "integer"
+            format: "int64"
         - name: "integrationId"
           description: "The integration id used for filtering integration instance configurations."
           in: "query"
@@ -1565,8 +1567,10 @@ components:
         enabled:
           description: "If an integration instance is enabled or not."
           type: "boolean"
-        environment:
-          $ref: '#/components/schemas/Environment'
+        environmentId:
+          description: "The id of an environment."
+          type: "integer"
+          format: "int64"
         id:
           description: "The id of an integration instance."
           type: "integer"
@@ -1650,8 +1654,10 @@ components:
         enabled:
           description: "If an integration instance configuration is enabled or not."
           type: "boolean"
-        environment:
-          $ref: '#/components/schemas/Environment'
+        environmentId:
+          description: "The id of an environment."
+          type: "integer"
+          format: "int64"
         id:
           description: "The id of an integration instance configuration."
           type: "integer"
