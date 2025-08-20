@@ -24,14 +24,18 @@ import com.bytechef.ai.mcp.tool.automation.FlowTools.FlowInfo;
 import com.bytechef.ai.mcp.tool.automation.FlowTools.FlowMinimalInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
+import utils.WorkflowValidator;
 
 /**
  * @author Marko Kriskovic
@@ -346,6 +350,53 @@ public class GenericTools {
         }
     }
 
+    @Tool(
+        description = "Validate a task configuration by checking both its structure and properties against the task definition. Returns validation results with any errors found")
+    public TaskValidationResult validateTask(
+        @ToolParam(description = "The JSON string of the task to validate") String task,
+        @ToolParam(description = "The type of task: 'action', 'trigger', or 'flow'") String type,
+        @ToolParam(description = "The name of the task for validation") String name,
+        @ToolParam(description = "For actions/triggers: the component name. Not used for flows") String componentName,
+        @ToolParam(description = "The version (optional)") Integer version) {
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            StringBuilder errors = new StringBuilder("[");
+            StringBuilder warnings = new StringBuilder("[");
+
+            // First validate the basic task structure
+            WorkflowValidator.validateTaskStructure(task, errors);
+
+            // Get the task definition for property validation
+            String taskDefinition = getTaskDefinition(type, name, componentName, version);
+
+            // Extract task properties from the provided task JSON
+            JsonNode taskNode = objectMapper.readTree(task);
+            String taskParameters = "";
+
+            if (taskNode.has("parameters") && taskNode.get("parameters").isObject()) {
+                taskParameters = objectMapper.writeValueAsString(taskNode.get("parameters"));
+            }
+
+            // Validate task properties against the definition (display condition processing happens inside)
+            WorkflowValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+
+            String errorMessages = errors.append("]").toString();
+            boolean isValid = errorMessages.equals("[]");
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Validated task '{}' of type '{}'. Valid: {}, Errors: {}",
+                    name, type, isValid, isValid ? "none" : errorMessages.trim());
+            }
+
+            return new TaskValidationResult(isValid, errorMessages.trim());
+
+        } catch (Exception e) {
+            logger.error("Failed to validate task '{}' of type '{}'", name, type, e);
+            throw ToolUtils.createOperationException("Failed to validate task", e);
+        }
+    }
+
     /**
      * Minimal task information record for the response.
      */
@@ -369,5 +420,14 @@ public class GenericTools {
         @JsonProperty("componentName") @JsonPropertyDescription("The name of the component (null for flows)") String componentName,
         @JsonProperty("properties") @JsonPropertyDescription("The properties of the task as JSON string") String properties,
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the task as JSON string") String outputProperties) {
+    }
+
+    /**
+     * Task validation result record for the response.
+     */
+    @SuppressFBWarnings("EI")
+    public record TaskValidationResult(
+        @JsonProperty("valid") @JsonPropertyDescription("Whether the task is valid") boolean valid,
+        @JsonProperty("errors") @JsonPropertyDescription("Error details") String errors) {
     }
 }

@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.platform;
+package com.bytechef.ai.mcp.tool.automation;
 
-import com.bytechef.ai.mcp.tool.platform.model.PropertyInfo;
-import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -29,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -94,7 +92,7 @@ public class ComponentTools {
     }
 
     @Tool(
-        description = "List all components. Returns a list of components with their basic information including name and description")
+        description = "List all components in a project. Returns a list of components with their basic information including name and description")
     public List<ComponentMinimalInfo> listComponents() {
         try {
             List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
@@ -105,11 +103,12 @@ public class ComponentTools {
 
             return componentDefinitions.stream()
                 .map(component -> new ComponentMinimalInfo(
-                    component.getName(), component.getDescription(), component.getVersion()))
+                    component.getName(),
+                    component.getDescription(),
+                    component.getVersion()))
                 .toList();
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_COMPONENTS, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_LIST_COMPONENTS, e);
         }
     }
@@ -144,7 +143,6 @@ public class ComponentTools {
                     .toList());
         } catch (Exception e) {
             logger.error("Failed to get component {}", componentName, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_GET_COMPONENT, e);
         }
     }
@@ -161,9 +159,13 @@ public class ComponentTools {
 
             List<ComponentMinimalInfo> matchingComponents = componentDefinitions.stream()
                 .filter(component -> ToolUtils.matchesQuery(
-                    component.getName(), component.getDescription(), lowerQuery))
+                    component.getName(),
+                    component.getDescription(),
+                    lowerQuery))
                 .map(component -> new ComponentMinimalInfo(
-                    component.getName(), component.getDescription(), component.getVersion()))
+                    component.getName(),
+                    component.getDescription(),
+                    component.getVersion()))
                 .toList();
 
             if (logger.isDebugEnabled()) {
@@ -173,7 +175,6 @@ public class ComponentTools {
             return matchingComponents;
         } catch (Exception e) {
             logger.error("Failed to search components with query '{}'", query, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_SEARCH_COMPONENTS, e);
         }
     }
@@ -200,7 +201,6 @@ public class ComponentTools {
             return triggers;
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_TRIGGERS, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_LIST_TRIGGERS, e);
         }
     }
@@ -218,7 +218,8 @@ public class ComponentTools {
 
             return componentDefinition.getTriggers()
                 .stream()
-                .filter(trigger -> Objects.equals(trigger.getName(), triggerName))
+                .filter(trigger -> trigger.getName()
+                    .equals(triggerName))
                 .findFirst()
                 .map(trigger -> {
                     String outputPropertiesJson = null;
@@ -228,18 +229,20 @@ public class ComponentTools {
                         outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
                     }
 
-                    com.bytechef.component.definition.TriggerDefinition.TriggerType triggerType = trigger.getType();
-
                     return new TriggerDetailedInfo(
-                        trigger.getName(), trigger.getTitle(), trigger.getDescription(), componentDefinition.getName(),
-                        triggerType.name(), ToolUtils.generateParametersJson(trigger.getProperties()),
+                        trigger.getName(),
+                        trigger.getTitle(),
+                        trigger.getDescription(),
+                        componentDefinition.getName(),
+                        trigger.getType()
+                            .name(),
+                        ToolUtils.generateParametersJson(trigger.getProperties()),
                         outputPropertiesJson);
                 })
                 .orElseThrow(() -> ToolUtils.createNotFoundException(TRIGGER_NOT_FOUND, triggerName, componentName));
 
         } catch (Exception e) {
             logger.error("Failed to get trigger '{}' from component '{}'", triggerName, componentName, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_GET_TRIGGER, e);
         }
     }
@@ -252,16 +255,20 @@ public class ComponentTools {
         try {
             List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
-            String lowerCase = query.toLowerCase();
-
-            String lowerQuery = lowerCase.trim();
+            String lowerQuery = query.toLowerCase()
+                .trim();
 
             List<TriggerMinimalInfo> matchingTriggers = componentDefinitions.stream()
                 .flatMap(component -> component.getTriggers()
                     .stream()
-                    .filter(trigger -> ToolUtils.matchesQuery(trigger.getName(), trigger.getDescription(), lowerQuery))
+                    .filter(trigger -> ToolUtils.matchesQuery(
+                        trigger.getName(),
+                        trigger.getDescription(),
+                        lowerQuery))
                     .map(trigger -> new TriggerMinimalInfo(
-                        trigger.getName(), trigger.getDescription(), component.getName())))
+                        trigger.getName(),
+                        trigger.getDescription(),
+                        component.getName())))
                 .toList();
 
             if (logger.isDebugEnabled()) {
@@ -276,7 +283,7 @@ public class ComponentTools {
     }
 
     @Tool(
-        description = "Get the trigger definition template for the specific trigger. Returns a JSON template that can be used to configure the trigger in workflows")
+        description = "Get the trigger definition template for the specific trigger. Returns a structured JSON with template and conditional parameters")
     public String getTriggerDefinition(
         @ToolParam(
             description = "The name of the component that contains the trigger in camel case") String componentName,
@@ -289,7 +296,8 @@ public class ComponentTools {
             // Get the actual trigger to extract its properties
             var trigger = componentDefinition.getTriggers()
                 .stream()
-                .filter(t -> Objects.equals(t.getName(), triggerName))
+                .filter(t -> t.getName()
+                    .equals(triggerName))
                 .findFirst()
                 .orElseThrow(() -> ToolUtils.createNotFoundException(TRIGGER_NOT_FOUND, triggerName, componentName));
             String parametersJson = ToolUtils.generateParametersJson(trigger.getProperties());
@@ -301,6 +309,10 @@ public class ComponentTools {
                 .replace("{componentVersion}", String.valueOf(componentDefinition.getVersion()))
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
 
+            // Extract conditional parameters
+//            Map<String, List<String>> conditionalParameters = ToolUtils.listDisplayConditions(
+//                ToolUtils.PropertyDecorator.toPropertyDecorators(trigger.getProperties()));
+
             if (logger.isDebugEnabled()) {
                 logger.debug("Generated trigger definition for {}:{}", componentName, triggerName);
             }
@@ -308,7 +320,6 @@ public class ComponentTools {
             return triggerDefinition;
         } catch (Exception e) {
             logger.error("Failed to generate trigger definition for '{}:{}'", componentName, triggerName, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_GENERATE_TRIGGER_DEFINITION, e);
         }
     }
@@ -323,7 +334,9 @@ public class ComponentTools {
                 .flatMap(component -> component.getActions()
                     .stream()
                     .map(action -> new ActionMinimalInfo(
-                        action.getName(), action.getDescription(), component.getName())))
+                        action.getName(),
+                        action.getDescription(),
+                        component.getName())))
                 .toList();
 
             if (logger.isDebugEnabled()) {
@@ -333,7 +346,6 @@ public class ComponentTools {
             return actions;
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_ACTIONS, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_LIST_ACTIONS, e);
         }
     }
@@ -351,7 +363,8 @@ public class ComponentTools {
 
             return componentDefinition.getActions()
                 .stream()
-                .filter(action -> Objects.equals(action.getName(), actionName))
+                .filter(action -> action.getName()
+                    .equals(actionName))
                 .findFirst()
                 .map(action -> {
                     String outputPropertiesJson = null;
@@ -362,8 +375,12 @@ public class ComponentTools {
                     }
 
                     return new ActionDetailedInfo(
-                        action.getName(), action.getTitle(), action.getDescription(), componentDefinition.getName(),
-                        ToolUtils.generateParametersJson(action.getProperties()), outputPropertiesJson);
+                        action.getName(),
+                        action.getTitle(),
+                        action.getDescription(),
+                        componentDefinition.getName(),
+                        ToolUtils.generateParametersJson(action.getProperties()),
+                        outputPropertiesJson);
                 })
                 .orElseThrow(() -> ToolUtils.createNotFoundException(ACTION_NOT_FOUND, actionName, componentName));
 
@@ -387,9 +404,14 @@ public class ComponentTools {
             List<ActionMinimalInfo> matchingActions = componentDefinitions.stream()
                 .flatMap(component -> component.getActions()
                     .stream()
-                    .filter(action -> ToolUtils.matchesQuery(action.getName(), action.getDescription(), lowerQuery))
+                    .filter(action -> ToolUtils.matchesQuery(
+                        action.getName(),
+                        action.getDescription(),
+                        lowerQuery))
                     .map(action -> new ActionMinimalInfo(
-                        action.getName(), action.getDescription(), component.getName())))
+                        action.getName(),
+                        action.getDescription(),
+                        component.getName())))
                 .toList();
 
             if (logger.isDebugEnabled()) {
@@ -399,13 +421,12 @@ public class ComponentTools {
             return matchingActions;
         } catch (Exception e) {
             logger.error("Failed to search actions with query '{}'", query, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_SEARCH_ACTIONS, e);
         }
     }
 
     @Tool(
-        description = "Get the action definition template for the specific action. Returns a JSON template that can be used to configure the action in workflows")
+        description = "Get the action definition template for the specific action. Returns a structured JSON with template and conditional parameters")
     public String getActionDefinition(
         @ToolParam(
             description = "The name of the component that contains the action in camel case") String componentName,
@@ -418,7 +439,8 @@ public class ComponentTools {
             // Get the actual action to extract its properties
             var action = componentDefinition.getActions()
                 .stream()
-                .filter(a -> Objects.equals(a.getName(), actionName))
+                .filter(a -> a.getName()
+                    .equals(actionName))
                 .findFirst()
                 .orElseThrow(() -> ToolUtils.createNotFoundException(ACTION_NOT_FOUND, actionName, componentName));
             String parametersJson = ToolUtils.generateParametersJson(action.getProperties());
@@ -430,6 +452,10 @@ public class ComponentTools {
                 .replace("{componentVersion}", String.valueOf(componentDefinition.getVersion()))
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
 
+//            // Extract conditional parameters
+//            Map<String, List<String>> conditionalParameters = ToolUtils.listDisplayConditions(
+//                ToolUtils.PropertyDecorator.toPropertyDecorators(action.getProperties()));
+
             if (logger.isDebugEnabled()) {
                 logger.debug("Generated action definition for {}:{}", componentName, actionName);
             }
@@ -437,14 +463,13 @@ public class ComponentTools {
             return actionDefinition;
         } catch (Exception e) {
             logger.error("Failed to generate action definition for '{}:{}'", componentName, actionName, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_GENERATE_ACTION_DEFINITION, e);
         }
     }
 
     @Tool(
         description = "Get the output property of a specific trigger or action. Returns the structure of the output property")
-    public PropertyInfo getOutputProperty(
+    public ToolUtils.PropertyInfo getOutputProperty(
         @ToolParam(
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(
@@ -459,18 +484,19 @@ public class ComponentTools {
             // First try to find in triggers
             var triggerOptional = componentDefinition.getTriggers()
                 .stream()
-                .filter(trigger -> Objects.equals(trigger.getName(), operationName))
+                .filter(trigger -> trigger.getName()
+                    .equals(operationName))
                 .findFirst();
 
             if (triggerOptional.isPresent()) {
                 var trigger = triggerOptional.get();
-
                 outputResponse = trigger.isOutputDefined() ? trigger.getOutputResponse() : null;
             } else {
                 // If not found in triggers, try actions
                 var actionOptional = componentDefinition.getActions()
                     .stream()
-                    .filter(action -> Objects.equals(action.getName(), operationName))
+                    .filter(action -> action.getName()
+                        .equals(operationName))
                     .findFirst();
 
                 if (actionOptional.isPresent()) {
@@ -492,14 +518,13 @@ public class ComponentTools {
             return ToolUtils.convertToPropertyInfo(outputResponse.outputSchema());
         } catch (Exception e) {
             logger.error("Failed to get output properties for '{}:{}'", componentName, operationName, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_GET_OUTPUT_PROPERTIES, e);
         }
     }
 
     @Tool(
         description = "Get all properties of a specific trigger or action. Returns a hierarchical list of properties including nested properties")
-    public List<PropertyInfo> getProperties(
+    public List<ToolUtils.PropertyInfo> getProperties(
         @ToolParam(
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(
@@ -514,7 +539,8 @@ public class ComponentTools {
             // First try to find in triggers
             var triggerOptional = componentDefinition.getTriggers()
                 .stream()
-                .filter(trigger -> Objects.equals(trigger.getName(), operationName))
+                .filter(trigger -> trigger.getName()
+                    .equals(operationName))
                 .findFirst();
 
             if (triggerOptional.isPresent()) {
@@ -524,13 +550,13 @@ public class ComponentTools {
                 // If not found in triggers, try actions
                 var actionOptional = componentDefinition.getActions()
                     .stream()
-                    .filter(action -> Objects.equals(action.getName(), operationName))
+                    .filter(action -> action.getName()
+                        .equals(operationName))
                     .findFirst();
 
                 if (actionOptional.isPresent()) {
-                    ActionDefinition actionDefinition = actionOptional.get();
-
-                    properties = actionDefinition.getProperties();
+                    properties = actionOptional.get()
+                        .getProperties();
                 } else {
                     throw ToolUtils.createNotFoundException(OPERATION_NOT_FOUND, operationName, componentName);
                 }
@@ -543,7 +569,6 @@ public class ComponentTools {
             return ToolUtils.convertToPropertyInfoList(properties);
         } catch (Exception e) {
             logger.error("Failed to get properties for '{}:{}'", componentName, operationName, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_GET_PROPERTIES, e);
         }
     }

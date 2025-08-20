@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -195,7 +196,7 @@ public class FlowTools {
     }
 
     @Tool(
-        description = "Get the flow definition template for a specific flow. Returns a JSON template that can be used to configure the flow in workflows")
+        description = "Get the flow definition template for a specific flow. Returns a structured JSON with template and conditional parameters")
     public String getFlowDefinition(
         @ToolParam(description = "The name of the flow to generate definition for") String name,
         @ToolParam(description = "The version of the flow (optional)") Integer version) {
@@ -211,6 +212,10 @@ public class FlowTools {
                 .replace("{flowName}", name)
                 .replace("{flowVersion}", String.valueOf(taskDispatcherDefinition.getVersion()))
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
+
+            // Extract conditional parameters from flow properties
+//            Map<String, List<String>> conditionalParameters = ToolUtils.listDisplayConditions(
+//                ToolUtils.PropertyDecorator.toPropertyDecorators(taskDispatcherDefinition.getProperties()));
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Generated flow definition for {}", name);
