@@ -43,8 +43,10 @@ properties:
     readOnly: true
   credentialStatus:
     $ref: "./credential_status.yaml"
-  environment:
-    $ref: '../../../../../../platform-rest/openapi/components/schemas/objects/environment.yaml'
+  environmentId:
+    description: "The id of an environment."
+    type: "integer"
+    format: "int64"
   id:
     description: "The id of a connection."
     type: "integer"

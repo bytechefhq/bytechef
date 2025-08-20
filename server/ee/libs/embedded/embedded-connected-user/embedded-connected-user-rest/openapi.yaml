@@ -17,12 +17,13 @@ paths:
         - "connected-user"
       operationId: "getConnectedUsers"
       parameters:
-        - name: "environment"
-          description: "The environment."
+        - name: "environmentId"
+          description: "The environment id."
           in: "query"
           required: false
           schema:
-            $ref: "#/components/schemas/Environment"
+            type: "integer"
+            format: "int64"
         - name: "credentialStatus"
           description: "The id of an integration instance."
           in: "query"
@@ -156,8 +157,10 @@ components:
         enabled:
           description: "If a connected user is enabled or not"
           type: "boolean"
-        environment:
-          $ref: "#/components/schemas/Environment"
+        environmentId:
+          description: "The id of an environment."
+          type: "integer"
+          format: "int64"
         externalId:
           description: "The connected user external id."
           type: "string"
@@ -227,7 +230,5 @@ components:
           $ref: "#/components/schemas/CredentialStatus"
     CredentialStatus:
       $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
-    Environment:
-      $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Page:
       $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/page.yaml"

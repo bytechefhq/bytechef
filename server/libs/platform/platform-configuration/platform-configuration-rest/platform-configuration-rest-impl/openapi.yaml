@@ -14,6 +14,8 @@ tags:
     description: "The Platform Component Definition Internal API"
   - name: "connection-definition"
     description: "The Platform Connection Definition Internal API"
+  - name: "environment"
+    description: "The Platform Environment Internal API"
   - name: "notification"
     description: "The Platform Notification Internal API"
   - name: "notification-event"
@@ -366,6 +368,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDefinition"
+  /environments:
+    get:
+      description: "Retrieves environments."
+      summary: "Retrieves oauth2 authorization parameters"
+      tags:
+        - "environment"
+      operationId: "getEnvironments"
+      responses:
+        "200":
+          description: "The list of Environment objects."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Environment"
   /notifications:
     get:
       description: "Get a list of notifications"
@@ -2090,7 +2108,18 @@ components:
           propertiesDataSource:
             $ref: "#/components/schemas/PropertiesDataSource"
     Environment:
-      $ref: "../../../platform-rest/openapi/components/schemas/objects/environment.yaml"
+      description: "The environment."
+      type: "object"
+      required:
+        - "name"
+      properties:
+        id:
+          description: "The environment id."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The environment name."
+          type: "string"
     ExecutionError:
       description: "Contains information about an error that happened during execution."
       type: "object"
