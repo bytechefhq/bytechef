@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.platform.util;
+package com.bytechef.ai.mcp.tool.automation;
 
-import com.bytechef.ai.mcp.tool.platform.model.PropertyInfo;
 import com.bytechef.component.definition.Property.Type;
 import com.bytechef.platform.domain.BaseProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utility class containing common helper methods for MCP tools.
@@ -55,6 +60,16 @@ public final class ToolUtils {
     }
 
     /**
+     * Safely converts a string to lowercase, returning empty string if null.
+     *
+     * @param value the string to convert
+     * @return lowercase string or empty string if null
+     */
+    public static String safeToLowerCase(String value) {
+        return value != null ? value.toLowerCase() : "";
+    }
+
+    /**
      * Checks if the given name or description matches the search query.
      *
      * @param name        the name to search in
@@ -65,7 +80,6 @@ public final class ToolUtils {
     public static boolean matchesQuery(String name, String description, String query) {
         String lowerName = safeToLowerCase(name);
         String lowerDescription = safeToLowerCase(description);
-
         return lowerName.contains(query) || lowerDescription.contains(query);
     }
 
@@ -92,19 +106,17 @@ public final class ToolUtils {
 
         List<PropertyInfo> nestedProperties = null;
 
-        Type type = decorator.getType();
-
-        if (type == Type.OBJECT) {
+        if (decorator.getType() == Type.OBJECT) {
             nestedProperties = convertToPropertyInfoList(decorator.getObjectProperties()
                 .stream()
                 .map(pd -> pd.property)
                 .toList());
-        } else if (type == Type.ARRAY) {
+        } else if (decorator.getType() == Type.ARRAY) {
             nestedProperties = convertToPropertyInfoList(decorator.getItems()
                 .stream()
                 .map(pd -> pd.property)
                 .toList());
-        } else if (type == Type.FILE_ENTRY) {
+        } else if (decorator.getType() == Type.FILE_ENTRY) {
             nestedProperties = convertToPropertyInfoList(decorator.getFileEntryProperties()
                 .stream()
                 .map(pd -> pd.property)
@@ -112,11 +124,31 @@ public final class ToolUtils {
         }
 
         return new PropertyInfo(
-            property.getName(), type.name(), property.getDescription(), property.getRequired(),
-            property.getExpressionEnabled(), property.getDisplayCondition(), nestedProperties);
+            property.getName(),
+            decorator.getType()
+                .name(),
+            property.getDescription(),
+            property.getRequired(),
+            property.getExpressionEnabled(),
+            property.getDisplayCondition(),
+            nestedProperties);
     }
 
-    private static class PropertyDecorator {
+    /**
+     * Property information record for the response.
+     */
+    @SuppressFBWarnings("EI")
+    public record PropertyInfo(
+        @JsonProperty("name") @JsonPropertyDescription("The name of the property") String name,
+        @JsonProperty("type") @JsonPropertyDescription("The type of the property") String type,
+        @JsonProperty("description") @JsonPropertyDescription("The description of the property") String description,
+        @JsonProperty("required") @JsonPropertyDescription("Whether the property is required") boolean required,
+        @JsonProperty("expressionEnabled") @JsonPropertyDescription("Whether expressions are enabled for this property") boolean expressionEnabled,
+        @JsonProperty("displayCondition") @JsonPropertyDescription("The display condition for the property") String displayCondition,
+        @JsonProperty("nestedProperties") @JsonPropertyDescription("Nested properties for object/array/file_entry types") List<PropertyInfo> nestedProperties) {
+    }
+
+    public static class PropertyDecorator {
 
         public enum Location {
             COMPONENT,
@@ -127,130 +159,110 @@ public final class ToolUtils {
         private final Type type;
         private final Location location;
         private final Boolean required;
+        private final String displayCondition;
 
-        private PropertyDecorator(BaseProperty property) {
+        public PropertyDecorator(BaseProperty property) {
             this.property = property;
+            this.required = property.getRequired();
+            this.displayCondition = property.getDisplayCondition();
 
             switch (property) {
                 case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty ignored -> {
                     this.type = Type.ARRAY;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.ArrayProperty ignored -> {
                     this.type = Type.ARRAY;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.BooleanProperty ignored -> {
                     this.type = Type.BOOLEAN;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.BooleanProperty ignored -> {
                     this.type = Type.BOOLEAN;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.DateProperty ignored -> {
                     this.type = Type.DATE;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.DateProperty ignored -> {
                     this.type = Type.DATE;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.DateTimeProperty ignored -> {
                     this.type = Type.DATE_TIME;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.DateTimeProperty ignored -> {
                     this.type = Type.DATE_TIME;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.DynamicPropertiesProperty ignored -> {
                     this.type = Type.DYNAMIC_PROPERTIES;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.IntegerProperty ignored -> {
                     this.type = Type.INTEGER;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.IntegerProperty ignored -> {
                     this.type = Type.INTEGER;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty ignored -> {
                     this.type = Type.FILE_ENTRY;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.FileEntryProperty ignored -> {
                     this.type = Type.FILE_ENTRY;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.NullProperty ignored -> {
                     this.type = Type.NULL;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty ignored -> {
                     this.type = Type.NUMBER;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.NumberProperty ignored -> {
                     this.type = Type.NUMBER;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty ignored -> {
                     this.type = Type.OBJECT;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.ObjectProperty ignored -> {
                     this.type = Type.OBJECT;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty ignored -> {
                     this.type = Type.STRING;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.StringProperty ignored -> {
                     this.type = Type.STRING;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.TimeProperty ignored -> {
                     this.type = Type.TIME;
                     this.location = Location.TASK_DISPATCHER;
-                    this.required = ignored.getRequired();
                 }
                 case com.bytechef.platform.component.domain.TimeProperty ignored -> {
                     this.type = Type.TIME;
                     this.location = Location.COMPONENT;
-                    this.required = ignored.getRequired();
                 }
                 default -> {
                     this.type = Type.NULL;
                     this.location = Location.COMPONENT;
-                    this.required = false;
                 }
             }
         }
 
-        private List<PropertyDecorator> getItems() {
+        public List<PropertyDecorator> getItems() {
             return switch (location) {
                 case TASK_DISPATCHER -> toPropertyDecorators(
                     ((com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty) property).getItems());
@@ -259,7 +271,7 @@ public final class ToolUtils {
             };
         }
 
-        private List<PropertyDecorator> getFileEntryProperties() {
+        public List<PropertyDecorator> getFileEntryProperties() {
             return switch (location) {
                 case TASK_DISPATCHER -> toPropertyDecorators(
                     ((com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty) property)
@@ -269,11 +281,11 @@ public final class ToolUtils {
             };
         }
 
-        private String getName() {
+        public String getName() {
             return property.getName();
         }
 
-        private List<PropertyDecorator> getObjectProperties() {
+        public List<PropertyDecorator> getObjectProperties() {
             return switch (location) {
                 case TASK_DISPATCHER -> toPropertyDecorators(
                     ((com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty) property).getProperties());
@@ -282,15 +294,19 @@ public final class ToolUtils {
             };
         }
 
-        private Type getType() {
+        public Type getType() {
             return type;
         }
 
-        private Boolean getRequired() {
+        public Boolean getRequired() {
             return required;
         }
 
-        private static List<PropertyDecorator> toPropertyDecorators(List<? extends BaseProperty> properties) {
+        public String getDisplayCondition() {
+            return displayCondition;
+        }
+
+        public static List<PropertyDecorator> toPropertyDecorators(List<? extends BaseProperty> properties) {
             return properties.stream()
                 .map(PropertyDecorator::new)
                 .toList();
@@ -309,33 +325,7 @@ public final class ToolUtils {
         }
 
         List<PropertyDecorator> propertyDecorators = PropertyDecorator.toPropertyDecorators(properties);
-
-        return generateObjectValue(propertyDecorators);
-    }
-
-    /**
-     * Generates a JSON array representation from a list of property decorators.
-     *
-     * @param properties the list of property decorators
-     * @return JSON array string representation
-     */
-    private static String generateArrayValue(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("[ ");
-
-        for (var property : properties) {
-            parameters.append(generateSampleValue(property))
-                .append(", ");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        parameters.append("]");
-
-        return parameters.toString();
+        return generateObjectValue(propertyDecorators, "", "\"");
     }
 
     /**
@@ -350,8 +340,56 @@ public final class ToolUtils {
         }
 
         PropertyDecorator propertyDecorator = new PropertyDecorator(outputSchema);
-
         return generateSampleValue(propertyDecorator);
+    }
+
+    /**
+     * Generates a sample value representation for a property decorator.
+     *
+     * @param property the property decorator
+     * @return string representation of the sample value
+     */
+    public static String generateSampleValue(PropertyDecorator property) {
+        String required = property.getRequired() ? " (required)\"" : "\"";
+        String displayCondition = property.getDisplayCondition() == null ? "" : " @" + property.displayCondition + "@";
+
+        return switch (property.getType()) {
+            case Type.ARRAY -> generateArrayValue(property.getItems());
+            case Type.BOOLEAN -> "\"boolean" + displayCondition + required;
+            case Type.DATE -> "\"date" + displayCondition + required;
+            case Type.DATE_TIME -> "\"datetime" + displayCondition + required;
+            case Type.DYNAMIC_PROPERTIES -> "{}" + displayCondition + required;
+            case Type.INTEGER -> "\"integer" + displayCondition + required;
+            case Type.NUMBER -> "\"float" + displayCondition + required;
+            case Type.OBJECT -> generateObjectValue(property.getObjectProperties(), displayCondition, required);
+            case Type.FILE_ENTRY -> generateObjectValue(property.getFileEntryProperties(), displayCondition, required);
+            case Type.TIME -> "\"time" + displayCondition + required;
+            default -> "\"string" + displayCondition + required;
+        };
+    }
+
+    /**
+     * Generates a JSON array representation from a list of property decorators.
+     *
+     * @param properties the list of property decorators
+     * @return JSON array string representation
+     */
+    public static String generateArrayValue(List<PropertyDecorator> properties) {
+        StringBuilder parameters = new StringBuilder();
+
+        parameters.append("[ ");
+
+        for (var property : properties) {
+            parameters.append(generateSampleValue(property))
+                .append(", ");
+        }
+
+        if (parameters.length() > 2) {
+            parameters.setLength(parameters.length() - 2);
+        }
+
+        return parameters.append(" ]")
+            .toString();
     }
 
     /**
@@ -360,10 +398,14 @@ public final class ToolUtils {
      * @param properties the list of property decorators
      * @return JSON object string representation
      */
-    private static String generateObjectValue(List<PropertyDecorator> properties) {
+    public static String generateObjectValue(List<PropertyDecorator> properties, String displayCondition, String required) {
         StringBuilder parameters = new StringBuilder();
 
-        parameters.append("{ ");
+        parameters.append("{ ")
+            .append("\"metadata\": \"")
+            .append(displayCondition.trim())
+            .append(required)
+            .append(", ");
 
         for (var property : properties) {
             parameters.append("\"")
@@ -377,42 +419,49 @@ public final class ToolUtils {
             parameters.setLength(parameters.length() - 2);
         }
 
-        parameters.append("}");
-
-        return parameters.toString();
+        return parameters.append(" }")
+            .toString();
     }
 
     /**
-     * Generates a sample value representation for a property decorator.
+     * Creates a map of display conditions to property names that have those conditions.
+     * Recursively searches through nested properties (objects, arrays, file entries).
      *
-     * @param property the property decorator
-     * @return string representation of the sample value
+     * @param properties the list of properties to analyze
+     * @return map where key is display condition and value is list of property names with that condition
      */
-    private static String generateSampleValue(PropertyDecorator property) {
-        String required = property.getRequired() ? " (required)" : "";
-
-        return switch (property.getType()) {
-            case Type.ARRAY -> generateArrayValue(property.getItems());
-            case Type.BOOLEAN -> "boolean" + required;
-            case Type.DATE -> "date" + required;
-            case Type.DATE_TIME -> "datetime" + required;
-            case Type.DYNAMIC_PROPERTIES -> "{}" + required;
-            case Type.INTEGER -> "integer" + required;
-            case Type.NUMBER -> "float" + required;
-            case Type.OBJECT -> generateObjectValue(property.getObjectProperties());
-            case Type.FILE_ENTRY -> generateObjectValue(property.getFileEntryProperties());
-            case Type.TIME -> "time" + required;
-            default -> "string" + required;
-        };
+    public static Map<String, List<String>> listDisplayConditions(List<PropertyDecorator> properties) {
+        Map<String, List<String>> displayConditionsMap = new HashMap<>();
+        collectDisplayConditions(properties, displayConditionsMap, "");
+        return displayConditionsMap;
     }
 
-    /**
-     * Safely converts a string to lowercase, returning empty string if null.
-     *
-     * @param value the string to convert
-     * @return lowercase string or empty string if null
-     */
-    private static String safeToLowerCase(String value) {
-        return value != null ? value.toLowerCase() : "";
+    private static void collectDisplayConditions(List<PropertyDecorator> properties,
+                                               Map<String, List<String>> displayConditionsMap,
+                                               String parentPath) {
+        for (PropertyDecorator property : properties) {
+            String propertyPath = parentPath.isEmpty() ? property.getName() : parentPath + "." + property.getName();
+            String displayCondition = property.property.getDisplayCondition();
+
+            if (displayCondition != null && !displayCondition.trim().isEmpty()) {
+                displayConditionsMap.computeIfAbsent(displayCondition, k -> new ArrayList<>()).add(propertyPath);
+            }
+
+            switch (property.getType()) {
+                case OBJECT -> collectDisplayConditions(property.getObjectProperties(), displayConditionsMap, propertyPath);
+                case ARRAY -> collectDisplayConditions(property.getItems(), displayConditionsMap, propertyPath);
+                case FILE_ENTRY -> collectDisplayConditions(property.getFileEntryProperties(), displayConditionsMap, propertyPath);
+                default -> { }
+            }
+        }
     }
+
+//    /**
+//     * Definition response record that contains both the structure and conditional parameters.
+//     */
+//    @SuppressFBWarnings("EI")
+//    public record DefinitionResponse(
+//        @JsonProperty("structure") @JsonPropertyDescription("The JSON structure/template for the flow definition") String structure,
+//        @JsonProperty("conditionalParameters") @JsonPropertyDescription("Map of display conditions to property paths that have those conditions") Map<String, List<String>> conditionalParameters) {
+//    }
 }
