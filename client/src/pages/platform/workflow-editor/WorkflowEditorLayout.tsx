@@ -14,7 +14,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {XIcon} from 'lucide-react';
-import {Suspense, lazy, useEffect} from 'react';
+import {Suspense, lazy, useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
@@ -86,7 +86,10 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
-    const isMainRootClusterElement = currentNode?.clusterRoot && !currentNode.isNestedClusterRoot;
+    const isMainRootClusterElement = useMemo(
+        () => currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot,
+        [currentNode?.clusterRoot, currentNode?.isNestedClusterRoot]
+    );
 
     useEffect(() => {
         if (isMainRootClusterElement) {

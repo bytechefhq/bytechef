@@ -111,24 +111,27 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         clusterElementsCanvasOpen && (!!isMainRootClusterElement || isNestedClusterRoot)
     );
 
-    const clusterElementTypesCount = useMemo(
-        () =>
+    const clusterElementTypesCount = useMemo(() => {
+        const clusterRootRequirementMet =
             clusterElementsCanvasOpen &&
             (isMainRootClusterElement || isNestedClusterRoot) &&
-            rootClusterElementDefinition
-                ? getClusterElementTypesCount({
-                      clusterRootComponentDefinition: rootClusterElementDefinition,
-                      operationName: data.operationName,
-                  })
-                : 0,
-        [
-            clusterElementsCanvasOpen,
-            isNestedClusterRoot,
-            isMainRootClusterElement,
-            rootClusterElementDefinition,
-            data.operationName,
-        ]
-    );
+            rootClusterElementDefinition;
+
+        if (!clusterRootRequirementMet) {
+            return 0;
+        }
+
+        return getClusterElementTypesCount({
+            clusterRootComponentDefinition: rootClusterElementDefinition,
+            operationName: data.operationName,
+        });
+    }, [
+        clusterElementsCanvasOpen,
+        isNestedClusterRoot,
+        isMainRootClusterElement,
+        rootClusterElementDefinition,
+        data.operationName,
+    ]);
 
     const nodeWidth = useMemo(
         () =>

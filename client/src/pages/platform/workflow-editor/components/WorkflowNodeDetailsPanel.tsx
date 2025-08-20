@@ -497,9 +497,10 @@ const WorkflowNodeDetailsPanel = ({
 
     const filteredClusterElementOperations = useMemo(() => {
         if (currentComponentDefinition?.clusterElement && currentNode?.clusterElementType) {
-            return currentComponentDefinition?.clusterElements?.filter((clusterElement) => {
-                return clusterElement.type === convertNameToSnakeCase(currentNode.clusterElementType as string);
-            });
+            return currentComponentDefinition?.clusterElements?.filter(
+                (clusterElement) =>
+                    clusterElement.type === convertNameToSnakeCase(currentNode.clusterElementType as string)
+            );
         }
 
         return currentComponentDefinition?.clusterElements;

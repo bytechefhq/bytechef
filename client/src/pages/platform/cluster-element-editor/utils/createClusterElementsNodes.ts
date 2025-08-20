@@ -43,11 +43,13 @@ export default function createClusterElementNodes({
         }
 
         const actionTypes = clusterRootComponentDefinition.actionClusterElementTypes;
+
         if (!actionTypes || Object.keys(actionTypes).length === 0) {
             return true;
         }
 
         const operationElementTypes = actionTypes[operationName];
+
         if (!operationElementTypes || operationElementTypes.length === 0) {
             return true;
         }
