@@ -593,7 +593,6 @@ $connection
 
 ${triggers?.joinToString("\n")}
 
-<hr />
 """
         }
 
