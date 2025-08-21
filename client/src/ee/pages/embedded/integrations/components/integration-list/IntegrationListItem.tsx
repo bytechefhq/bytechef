@@ -1,4 +1,3 @@
-import TagList from '@/components/TagList';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -32,6 +31,7 @@ import {IntegrationCategoryKeys} from '@/ee/shared/queries/embedded/integrationC
 import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useToast} from '@/hooks/use-toast';
+import TagList from '@/shared/components/TagList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
