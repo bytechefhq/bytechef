@@ -15,7 +15,6 @@ import IntegrationInstanceConfigurationDialogOauth2Step from '@/ee/pages/embedde
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {
     ComponentConnection,
-    Environment,
     IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationWorkflow,
     IntegrationInstanceConfigurationWorkflowConnection,
@@ -28,6 +27,7 @@ import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embed
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -63,6 +63,7 @@ const IntegrationInstanceConfigurationDialog = ({
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
+    const {currentEnvironmentId} = useEnvironmentStore();
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
     );
@@ -73,7 +74,6 @@ const IntegrationInstanceConfigurationDialog = ({
         defaultValues: {
             description: integrationInstanceConfiguration?.description || undefined,
             enabled: integrationInstanceConfiguration?.enabled || false,
-            environment: integrationInstanceConfiguration?.environment || Environment.Development,
             integrationId: integrationInstanceConfiguration?.integrationId || undefined,
             integrationInstanceConfigurationWorkflows: [],
             integrationVersion: integrationInstanceConfiguration?.integrationVersion || undefined,
@@ -199,7 +199,6 @@ const IntegrationInstanceConfigurationDialog = ({
 
         setTimeout(() => {
             reset({
-                environment: Environment.Development,
                 integrationInstanceConfigurationWorkflows: [],
             });
 
@@ -244,6 +243,7 @@ const IntegrationInstanceConfigurationDialog = ({
             createIntegrationInstanceConfigurationMutation.mutate({
                 ...formData,
                 authorizationType: oAuth2Authorization?.type || connectionDefinition?.authorizations?.[0].type,
+                environmentId: currentEnvironmentId,
                 integrationInstanceConfigurationWorkflows: formData.integrationInstanceConfigurationWorkflows?.map(
                     (integrationInstanceConfigurationWorkflow) => {
                         return {

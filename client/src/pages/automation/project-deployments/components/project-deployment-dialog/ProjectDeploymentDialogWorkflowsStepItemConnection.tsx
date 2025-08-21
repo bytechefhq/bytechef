@@ -1,8 +1,9 @@
-import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
@@ -34,6 +35,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
 }: ProjectDeploymentDialogWorkflowsStepItemConnectionProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
+    const {currentEnvironmentId} = useEnvironmentStore();
     const {currentWorkspaceId} = useWorkspaceStore();
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
@@ -47,6 +49,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
         {
             componentName: componentConnection.componentName,
             connectionVersion: componentDefinition?.connection?.version,
+            environmentId: currentEnvironmentId,
             id: currentWorkspaceId!,
         },
         !!componentDefinition
@@ -99,7 +102,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                                                     {connection?.tags?.map((tag) => tag.name).join(', ')}
                                                 </span>
 
-                                                <Badge variant="outline">{connection.environment}</Badge>
+                                                <EnvironmentBadge environmentId={connection.environmentId!} />
                                             </div>
                                         </SelectItem>
                                     ))}

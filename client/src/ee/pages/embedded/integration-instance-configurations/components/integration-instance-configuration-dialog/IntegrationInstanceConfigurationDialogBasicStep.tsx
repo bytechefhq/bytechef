@@ -1,12 +1,13 @@
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox';
 import IntegrationInstanceConfigurationDialogBasicStepTagsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {Dispatch, SetStateAction} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
@@ -34,6 +35,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
     setValue,
     updateIntegrationVersion = false,
 }: IntegrationInstanceConfigurationDialogBasicStepProps) => {
+    const {currentEnvironmentId} = useEnvironmentStore();
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
     return (
@@ -122,37 +124,21 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                 />
             )}
 
-            {!integrationInstanceConfiguration?.id && (
-                <FormField
-                    control={control}
-                    name="environment"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Environment</FormLabel>
+            <FormField
+                control={control}
+                name="environmentId"
+                render={() => (
+                    <FormItem className="space-x-2">
+                        <FormLabel>Environment</FormLabel>
 
-                            <FormControl>
-                                <Select defaultValue={field.value} onValueChange={(value) => field.onChange(value)}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select environment" />
-                                    </SelectTrigger>
+                        <FormControl>
+                            <EnvironmentBadge environmentId={currentEnvironmentId} />
+                        </FormControl>
 
-                                    <SelectContent>
-                                        <SelectItem value="DEVELOPMENT">Development</SelectItem>
-
-                                        <SelectItem value="STAGING">Staging</SelectItem>
-
-                                        <SelectItem value="PRODUCTION">Production</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                    rules={{required: true}}
-                    shouldUnregister={false}
-                />
-            )}
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
 
             {!updateIntegrationVersion && (
                 <FormField

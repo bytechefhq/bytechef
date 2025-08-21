@@ -1,6 +1,5 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import TagList from '@/components/TagList';
-import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -9,6 +8,7 @@ import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServer
 import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItemAlertDialog from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemAlertDialog';
 import McpServerListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {
     McpProjectWorkflow,
     McpServer,
@@ -155,7 +155,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                         <div className="flex min-w-28 justify-end">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Badge variant="secondary">{mcpServer.environment}</Badge>
+                                    <EnvironmentBadge environmentId={+mcpServer.environmentId!} />
                                 </TooltipTrigger>
 
                                 <TooltipContent>The environment</TooltipContent>

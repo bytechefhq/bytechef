@@ -1,20 +1,20 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectDeploymentWorkflowListItem from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItem';
-import {Environment, ProjectDeploymentWorkflow} from '@/shared/middleware/automation/configuration';
+import {ProjectDeploymentWorkflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 
 const ProjectDeploymentWorkflowList = ({
-    environment,
+    environmentId,
     projectDeploymentEnabled,
     projectDeploymentId,
     projectDeploymentWorkflows,
     projectId,
     projectVersion,
 }: {
-    environment?: Environment;
+    environmentId?: number;
     projectId: number;
     projectDeploymentId: number;
     projectDeploymentEnabled: boolean;
@@ -108,7 +108,7 @@ const ProjectDeploymentWorkflowList = ({
 
                             return (
                                 <ProjectDeploymentWorkflowListItem
-                                    environment={environment}
+                                    environmentId={environmentId}
                                     filteredComponentNames={filteredComponentNames}
                                     key={workflow.id}
                                     projectDeploymentEnabled={projectDeploymentEnabled}

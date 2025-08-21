@@ -27,6 +27,7 @@ import {
     useUpdateConnectionMutation,
 } from '@/ee/shared/mutations/embedded/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
@@ -136,7 +137,7 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                         <div className="flex items-center justify-end gap-x-6">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Badge variant="secondary">{connection.environment}</Badge>
+                                    <EnvironmentBadge environmentId={+connection.environmentId!} />
                                 </TooltipTrigger>
 
                                 <TooltipContent>The environment</TooltipContent>

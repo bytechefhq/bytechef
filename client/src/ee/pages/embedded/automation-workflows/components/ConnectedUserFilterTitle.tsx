@@ -1,13 +1,10 @@
 import {Badge} from '@/components/ui/badge';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
-import {EnvironmentEnum} from '@/shared/middleware/graphql';
 
 const ConnectedUserFilterTitle = ({
     connectedUsers,
-    environment,
     filterData,
 }: {
-    environment?: EnvironmentEnum;
     filterData: {id?: number};
     connectedUsers?: ConnectedUser[];
 }) => {
@@ -15,11 +12,7 @@ const ConnectedUserFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm uppercase text-muted-foreground">Filter by environment:</span>
-
-            <Badge variant="secondary">
-                <span className="text-sm">{environment ?? 'All Environments'}</span>
-            </Badge>
+            <span className="text-sm font-semibold uppercase text-muted-foreground">Filter by </span>
 
             <span className="text-sm uppercase text-muted-foreground">Connected User:</span>
 

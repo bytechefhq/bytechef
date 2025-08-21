@@ -18,8 +18,10 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {
@@ -27,7 +29,6 @@ import {
     AuthorizationType,
     ComponentDefinition,
     ComponentDefinitionBasic,
-    Environment,
     Tag,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -35,6 +36,7 @@ import {
     useGetConnectionDefinitionQuery,
     useGetConnectionDefinitionsQuery,
 } from '@/shared/queries/platform/connectionDefinitions.queries';
+import {useGetEnvironmentsQuery} from '@/shared/queries/platform/environments.queries';
 import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
@@ -52,8 +54,8 @@ import OAuth2Button from './OAuth2Button';
 
 export interface ConnectionDialogFormProps {
     authorizationType: string;
-    environment: Environment;
     componentName: string;
+    environmentId: number;
     id?: number;
     name: string;
     parameters: {[key: string]: object};
@@ -102,6 +104,8 @@ const ConnectionDialog = ({
     >(componentDefinition);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
+    const {currentEnvironmentId} = useEnvironmentStore();
+
     const {toast} = useToast();
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -111,7 +115,7 @@ const ConnectionDialog = ({
         defaultValues: {
             authorizationType: undefined,
             componentName: componentDefinition?.name,
-            environment: connection?.environment || Environment.Development,
+            environmentId: connection?.environmentId || currentEnvironmentId,
             id: connection?.id,
             name: connection?.name || componentDefinition?.title || '',
             tags:
@@ -123,6 +127,8 @@ const ConnectionDialog = ({
     });
 
     const {control, formState, getValues, handleSubmit, reset: formReset, setValue} = form;
+
+    const {data: environments} = useGetEnvironmentsQuery();
 
     const {
         data: connectionDefinition,
@@ -287,13 +293,13 @@ const ConnectionDialog = ({
     }
 
     function getNewConnection(additionalParameters?: object) {
-        const {componentName, environment, name, parameters, tags} = getValues();
+        const {componentName, name, parameters, tags} = getValues();
 
         return {
             authorizationType,
             componentName,
             connectionVersion: 1,
-            environment,
+            environmentId: currentEnvironmentId,
             name,
             parameters: {
                 ...parameters,
@@ -506,40 +512,21 @@ const ConnectionDialog = ({
                                     rules={{required: true}}
                                 />
 
-                                {!connection?.id && (
-                                    <FormField
-                                        control={control}
-                                        name="environment"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Environment</FormLabel>
+                                <FormField
+                                    control={control}
+                                    name="environmentId"
+                                    render={() => (
+                                        <FormItem className="space-x-2">
+                                            <FormLabel>Environment</FormLabel>
 
-                                                <FormControl>
-                                                    <Select
-                                                        defaultValue={field.value}
-                                                        onValueChange={(value) => field.onChange(value)}
-                                                    >
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Select environment" />
-                                                        </SelectTrigger>
+                                            <FormControl>
+                                                <EnvironmentBadge environmentId={currentEnvironmentId} />
+                                            </FormControl>
 
-                                                        <SelectContent>
-                                                            <SelectItem value="DEVELOPMENT">Development</SelectItem>
-
-                                                            <SelectItem value="STAGING">Staging</SelectItem>
-
-                                                            <SelectItem value="PRODUCTION">Production</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormControl>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                        rules={{required: true}}
-                                        shouldUnregister={false}
-                                    />
-                                )}
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
                                 {!connection?.id && showConnectionProperties && !!connectionDefinition.properties && (
                                     <WorkflowMockProvider>

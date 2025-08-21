@@ -14,6 +14,7 @@ import {ApiCollectionTagKeys} from '@/ee/queries/apiCollectionTags.queries';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
 import {ApiCollection, Tag} from '@/ee/shared/middleware/automation/api-platform';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/projectDeployments.mutations';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
@@ -160,7 +161,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                         <div className="flex min-w-28 justify-end">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Badge variant="secondary">{apiCollection.projectDeployment?.environment}</Badge>
+                                    <EnvironmentBadge environmentId={apiCollection.projectDeployment!.environmentId!} />
                                 </TooltipTrigger>
 
                                 <TooltipContent>The environment</TooltipContent>

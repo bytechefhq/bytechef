@@ -1,6 +1,6 @@
-import {Badge} from '@/components/ui/badge';
 import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {WorkflowExecution} from '@/ee/shared/middleware/embedded/workflow/execution';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 
 const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
     const {integration, integrationInstance, workflow} = workflowExecution;
@@ -13,7 +13,7 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
                         {integration?.name}/{workflow?.label}/
                     </span>
 
-                    <Badge variant="secondary">{integrationInstance?.environment}</Badge>
+                    <EnvironmentBadge environmentId={integrationInstance.environmentId!} />
                 </SheetTitle>
 
                 <SheetCloseButton />

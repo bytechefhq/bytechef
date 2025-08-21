@@ -15,10 +15,10 @@ import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserFromJSON, type CredentialStatus} from '@/ee/shared/middleware/embedded/connected-user';
 import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {Environment} from '@/shared/middleware/automation/configuration';
 import {cn} from '@/shared/util/cn-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {format} from 'date-fns';
@@ -32,7 +32,6 @@ import {z} from 'zod';
 const formSchema = z.object({
     createDateRange: z.any().optional(),
     credentialStatus: z.string().optional(),
-    environment: z.string().optional(),
     integrationId: z.number().optional(),
     search: z.string().optional(),
 });
@@ -106,6 +105,8 @@ const ConnectedUsers = () => {
         searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined
     );
 
+    const {currentEnvironmentId} = useEnvironmentStore();
+
     const navigate = useNavigate();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -117,7 +118,6 @@ const ConnectedUsers = () => {
             credentialStatus: searchParams.get('credentialStatus')
                 ? (searchParams.get('credentialStatus')! as CredentialStatus)
                 : undefined,
-            environment: searchParams.get('environment') ? searchParams.get('environment')! : '0',
             integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
             search: searchParams.get('search') ? searchParams.get('search')! : '',
         },
@@ -134,13 +134,7 @@ const ConnectedUsers = () => {
         credentialStatus: searchParams.get('credentialStatus')
             ? (searchParams.get('credentialStatus')! as CredentialStatus)
             : undefined,
-        environment: searchParams.get('environment')
-            ? +searchParams.get('environment')! === 1
-                ? Environment.Staging
-                : +searchParams.get('environment')! === 2
-                  ? Environment.Development
-                  : Environment.Production
-            : undefined,
+        environmentId: currentEnvironmentId,
         integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
         pageNumber: searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined,
         search: searchParams.get('search') ? searchParams.get('search')! : undefined,
@@ -153,7 +147,6 @@ const ConnectedUsers = () => {
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false});
 
     function filter(
-        environment?: number,
         search?: string,
         credentialStatus?: string,
         integrationIdId?: number,
@@ -161,26 +154,18 @@ const ConnectedUsers = () => {
         pageNumber?: number
     ) {
         navigate(
-            `/embedded/connected-users?environment=${environment ? environment : ''}&search=${search ? search : ''}&credentialStatus=${credentialStatus ? credentialStatus : ''}&integrationIdId=${integrationIdId ? integrationIdId : ''}&createDateFrom=${createDateRange?.from ? createDateRange.from?.getTime() : ''}&createDateTo=${createDateRange?.to ? createDateRange.to?.getTime() : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/embedded/connected-users?search=${search ? search : ''}&credentialStatus=${credentialStatus ? credentialStatus : ''}&integrationIdId=${integrationIdId ? integrationIdId : ''}&createDateFrom=${createDateRange?.from ? createDateRange.from?.getTime() : ''}&createDateTo=${createDateRange?.to ? createDateRange.to?.getTime() : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
     const handleFilterConnectedUsers = (values: z.infer<typeof formSchema>) => {
-        filter(
-            Number(values.environment),
-            values.search,
-            values.credentialStatus,
-            values.integrationId,
-            values.createDateRange,
-            pageNumber
-        );
+        filter(values.search, values.credentialStatus, values.integrationId, values.createDateRange, pageNumber);
     };
 
     const handlePaginationClick = (pageNumber: number) => {
         setPageNumber(pageNumber);
 
         filter(
-            Number(form.getValues().environment),
             form.getValues().search,
             form.getValues().credentialStatus,
             form.getValues().integrationId,
@@ -211,7 +196,6 @@ const ConnectedUsers = () => {
                     title={
                         <ConnectedUsersFilterTitle
                             filterData={{
-                                environment: +form.getValues('environment')!,
                                 status: form.getValues('credentialStatus')!,
                             }}
                         />
@@ -221,43 +205,6 @@ const ConnectedUsers = () => {
             leftSidebarBody={
                 <Form {...form}>
                     <form className="space-y-4 px-4" onSubmit={form.handleSubmit(handleFilterConnectedUsers)}>
-                        <FormField
-                            control={form.control}
-                            name="environment"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Environment</FormLabel>
-
-                                    <FormControl>
-                                        <Select
-                                            onValueChange={(value) => {
-                                                field.onChange(value);
-
-                                                form.handleSubmit(handleFilterConnectedUsers)();
-                                            }}
-                                            value={String(field.value)}
-                                        >
-                                            <SelectTrigger className="w-full bg-background">
-                                                <SelectValue placeholder="Select environment" />
-                                            </SelectTrigger>
-
-                                            <SelectContent>
-                                                <SelectItem value="0">All Environments</SelectItem>
-
-                                                <SelectItem value="1">Development</SelectItem>
-
-                                                <SelectItem value="2">Staging</SelectItem>
-
-                                                <SelectItem value="3">Production</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
                         <FormField
                             control={form.control}
                             name="search"

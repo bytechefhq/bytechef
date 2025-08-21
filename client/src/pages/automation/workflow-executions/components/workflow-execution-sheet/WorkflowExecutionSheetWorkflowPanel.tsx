@@ -1,8 +1,8 @@
 import PageLoader from '@/components/PageLoader';
-import {Badge} from '@/components/ui/badge';
 import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowEditor from '@/pages/platform/workflow-editor/components/WorkflowEditor';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {ReactFlowProvider} from '@xyflow/react';
@@ -56,7 +56,7 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
                         {project?.name}/{workflow?.label}/
                     </span>
 
-                    <Badge variant="secondary">{projectDeployment?.environment}</Badge>
+                    <EnvironmentBadge environmentId={projectDeployment.environmentId!} />
                 </SheetTitle>
 
                 <SheetCloseButton />

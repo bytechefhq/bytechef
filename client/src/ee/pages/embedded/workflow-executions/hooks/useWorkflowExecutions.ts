@@ -5,7 +5,6 @@ import {
 import {WorkflowExecutionKeys as EmbeddedWorkflowExecutionKeys} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import {WorkflowExecutionApi as AutomationWorkflowExecutionApi} from '@/shared/middleware/automation/workflow/execution';
 import {useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
-import {Environment} from '@/shared/middleware/platform/configuration';
 import {Page} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowExecutionKeys as AutomationWorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -14,7 +13,7 @@ import {useEffect, useState} from 'react';
 export const useWorkflowExecutions = (
     automations: number,
     request: {
-        environment?: Environment;
+        environmentId?: number;
         jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
         jobStartDate?: Date;
         jobEndDate?: Date;
@@ -31,7 +30,7 @@ export const useWorkflowExecutions = (
 
     const {data: connectedUserProjectsQuery} = useConnectedUserProjectsQuery({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        environment: request.environment as any,
+        environmentId: request.environmentId?.toString(),
     });
 
     const queryClient = useQueryClient();
@@ -77,7 +76,7 @@ export const useWorkflowExecutions = (
     }, [
         automations,
         queryClient,
-        request.environment,
+        request.environmentId,
         request.integrationId,
         request.integrationInstanceConfigurationId,
         request.jobEndDate,

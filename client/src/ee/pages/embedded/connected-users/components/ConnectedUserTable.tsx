@@ -14,6 +14,7 @@ import {ConnectedUser, CredentialStatus} from '@/ee/shared/middleware/embedded/c
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {EllipsisVerticalIcon} from 'lucide-react';
@@ -32,6 +33,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const {setConnectedUserId, setConnectedUserSheetOpen} = useConnectedUserSheetStore();
+    const {data: environmentsQuery} = useEnvironmentsQuery();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
@@ -103,8 +105,9 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                 },
                 header: 'Integrations',
             }),
-            columnHelper.accessor('environment', {
-                cell: (info) => info.getValue() ?? '',
+            columnHelper.accessor('environmentId', {
+                cell: (info) =>
+                    environmentsQuery?.environments?.find((environment) => +environment!.id! === info.getValue())?.name,
                 header: 'Environment',
             }),
             columnHelper.accessor('createdDate', {
@@ -148,7 +151,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                 id: 'actions',
             }),
         ],
-        [componentDefinitions, connectedUsers]
+        [componentDefinitions, connectedUsers, environmentsQuery?.environments]
     );
 
     const reactTable = useReactTable<ConnectedUser>({

@@ -1,37 +1,26 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import ConnectedUserFilterTitle from '@/ee/pages/embedded/automation-workflows/components/ConnectedUserFilterTitle';
-import EnvironmentLeftSidebarNav from '@/ee/pages/embedded/automation-workflows/components/EnvironmentLeftSidebarNav';
 import ConnectedUserProjectList from '@/ee/pages/embedded/automation-workflows/components/connected-user-project-list/ConnectedUserProjectList';
 import {ConnectedUser, ConnectedUserFromJSON} from '@/ee/shared/middleware/embedded/connected-user';
 import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {EnvironmentEnum, InputMaybe, useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
+import {useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {Workflow} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
 import ConnectedUsersLeftSidebarNav from './components/ConnectedUsersLeftSidebarNav';
 
-function getEnvironment(environment: number | undefined): EnvironmentEnum | undefined {
-    return environment === undefined
-        ? undefined
-        : environment === 1
-          ? EnvironmentEnum.Development
-          : environment === 2
-            ? EnvironmentEnum.Staging
-            : EnvironmentEnum.Production;
-}
-
 const AutomationWorkflows = () => {
+    const {currentEnvironmentId} = useEnvironmentStore();
+
     const [searchParams] = useSearchParams();
 
     const connectedUserId = searchParams.get('connectedUserId')
         ? parseInt(searchParams.get('connectedUserId')!)
         : undefined;
-    const environment = getEnvironment(
-        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined
-    );
 
     const {data: connectedUsersPage, isLoading: isConnectedUsersPageLoading} = useGetConnectedUsersQuery({
         pageNumber: 0,
@@ -39,7 +28,7 @@ const AutomationWorkflows = () => {
 
     const {data, isLoading: isConnectedUserProjectsLoading} = useConnectedUserProjectsQuery({
         connectedUserId: connectedUserId?.toString(),
-        environment: environment as InputMaybe<EnvironmentEnum> | undefined,
+        environmentId: currentEnvironmentId?.toString(),
     });
 
     const connectedUsers =
@@ -56,7 +45,6 @@ const AutomationWorkflows = () => {
                         title={
                             <ConnectedUserFilterTitle
                                 connectedUsers={connectedUsers as ConnectedUser[]}
-                                environment={environment}
                                 filterData={{id: connectedUserId}}
                             />
                         }
@@ -65,13 +53,7 @@ const AutomationWorkflows = () => {
             }
             leftSidebarBody={
                 <>
-                    <EnvironmentLeftSidebarNav connectedUserId={connectedUserId} environment={environment} />
-
-                    <ConnectedUsersLeftSidebarNav
-                        connectedUserId={connectedUserId}
-                        connectedUsers={connectedUsers}
-                        environment={environment}
-                    />
+                    <ConnectedUsersLeftSidebarNav connectedUserId={connectedUserId} connectedUsers={connectedUsers} />
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Automation Workflows" />}

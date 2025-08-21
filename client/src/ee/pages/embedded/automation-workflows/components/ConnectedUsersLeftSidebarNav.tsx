@@ -1,16 +1,13 @@
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {EnvironmentEnum} from '@/shared/middleware/graphql';
 import {UsersIcon} from 'lucide-react';
 
 const ConnectedUsersLeftSidebarNav = ({
     connectedUserId,
     connectedUsers,
-    environment,
 }: {
     connectedUserId?: number;
     connectedUsers: ConnectedUser[];
-    environment?: EnvironmentEnum;
 }) => {
     return (
         <LeftSidebarNav
@@ -25,7 +22,7 @@ const ConnectedUsersLeftSidebarNav = ({
                                 name: user.name || user.email || `User ${user.externalId}`,
                             }}
                             key={user.id}
-                            toLink={`?connectedUserId=${user.id ?? ''}&environment=${environment ?? ''}`}
+                            toLink={`?connectedUserId=${user.id ?? ''}`}
                         />
                     ))
                 ) : (

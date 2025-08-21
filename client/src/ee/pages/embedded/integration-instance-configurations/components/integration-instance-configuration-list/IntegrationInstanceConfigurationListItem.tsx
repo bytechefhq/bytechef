@@ -15,6 +15,7 @@ import {
 } from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -175,7 +176,7 @@ const IntegrationInstanceConfigurationListItem = ({
                         <div className="flex min-w-28 justify-end">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Badge variant="secondary">{integrationInstanceConfiguration.environment}</Badge>
+                                    <EnvironmentBadge environmentId={integrationInstanceConfiguration.environmentId!} />
                                 </TooltipTrigger>
 
                                 <TooltipContent>The environment</TooltipContent>

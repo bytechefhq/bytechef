@@ -2,6 +2,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {JobBasic, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
+import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
 const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>) => {
@@ -17,44 +18,47 @@ const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>)
 
 const columnHelper = createColumnHelper<WorkflowExecution>();
 
-const columns = [
-    columnHelper.accessor((row) => row.job, {
-        cell: (info) => <WorkflowExecutionBadge status={info?.getValue()?.status || ''} />,
-        header: 'Status',
-    }),
-    columnHelper.accessor('workflow', {
-        cell: (info) => info.getValue()?.label,
-        header: 'Workflow',
-    }),
-    columnHelper.accessor('project', {
-        cell: (info) => info.getValue()?.name.replace('__EMBEDDED__', ''),
-        header: 'Connected user',
-    }),
-
-    columnHelper.accessor('projectDeployment', {
-        cell: (info) => info.getValue()?.environment,
-        header: 'Environment',
-    }),
-    columnHelper.accessor((row) => row.job, {
-        cell: (info) => getDuration(info),
-        header: 'Duration',
-    }),
-    columnHelper.accessor((row) => row.job, {
-        cell: (info) => (
-            <>
-                {info.getValue()?.startDate &&
-                    `${info.getValue()?.startDate?.toLocaleDateString()} ${info
-                        .getValue()
-                        ?.startDate?.toLocaleTimeString()}`}
-            </>
-        ),
-        header: 'Execution date',
-    }),
-];
-
 const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
+    const {data: environmentsQuery} = useEnvironmentsQuery();
+
     const reactTable = useReactTable<WorkflowExecution>({
-        columns,
+        columns: [
+            columnHelper.accessor((row) => row.job, {
+                cell: (info) => <WorkflowExecutionBadge status={info?.getValue()?.status || ''} />,
+                header: 'Status',
+            }),
+            columnHelper.accessor('workflow', {
+                cell: (info) => info.getValue()?.label,
+                header: 'Workflow',
+            }),
+            columnHelper.accessor('project', {
+                cell: (info) => info.getValue()?.name.replace('__EMBEDDED__', ''),
+                header: 'Connected user',
+            }),
+
+            columnHelper.accessor('projectDeployment', {
+                cell: (info) =>
+                    environmentsQuery?.environments?.find(
+                        (environment) => +environment!.id! === info.getValue()?.environmentId
+                    )?.name,
+                header: 'Environment',
+            }),
+            columnHelper.accessor((row) => row.job, {
+                cell: (info) => getDuration(info),
+                header: 'Duration',
+            }),
+            columnHelper.accessor((row) => row.job, {
+                cell: (info) => (
+                    <>
+                        {info.getValue()?.startDate &&
+                            `${info.getValue()?.startDate?.toLocaleDateString()} ${info
+                                .getValue()
+                                ?.startDate?.toLocaleTimeString()}`}
+                    </>
+                ),
+                header: 'Execution date',
+            }),
+        ],
         data,
         getCoreRowModel: getCoreRowModel(),
     });

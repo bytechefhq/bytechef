@@ -2,13 +2,14 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {Environment, ProjectDeployment} from '@/shared/middleware/automation/configuration';
+import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
@@ -25,11 +26,11 @@ export enum Type {
 }
 
 const ProjectDeployments = () => {
+    const {currentEnvironmentId} = useEnvironmentStore();
     const {currentWorkspaceId} = useWorkspaceStore();
 
     const [searchParams] = useSearchParams();
 
-    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
     const projectId = searchParams.get('projectId');
     const tagId = searchParams.get('tagId');
 
@@ -54,14 +55,7 @@ const ProjectDeployments = () => {
         error: projectDeploymentsError,
         isLoading: projectDeploymentsIsLoading,
     } = useGetWorkspaceProjectDeploymentsQuery({
-        environment:
-            environment === undefined
-                ? undefined
-                : environment === 1
-                  ? Environment.Development
-                  : environment === 2
-                    ? Environment.Staging
-                    : Environment.Production,
+        environmentId: currentEnvironmentId,
         id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
@@ -101,27 +95,13 @@ const ProjectDeployments = () => {
                             <ProjectDeploymentDialog
                                 projectDeployment={
                                     {
-                                        environment:
-                                            environment === undefined
-                                                ? undefined
-                                                : environment === 1
-                                                  ? Environment.Development
-                                                  : environment === 2
-                                                    ? Environment.Staging
-                                                    : Environment.Production,
+                                        environmentId: currentEnvironmentId,
                                     } as ProjectDeployment
                                 }
                                 triggerNode={<Button>New Deployment</Button>}
                             />
                         }
-                        title={
-                            <ProjectDeploymentFilterTitle
-                                environment={environment}
-                                filterData={filterData}
-                                projects={projects}
-                                tags={tags}
-                            />
-                        }
+                        title={<ProjectDeploymentFilterTitle filterData={filterData} projects={projects} tags={tags} />}
                     />
                 )
             }
@@ -130,36 +110,12 @@ const ProjectDeployments = () => {
                     <LeftSidebarNav
                         body={
                             <>
-                                {[
-                                    {label: 'All Environments'},
-                                    {label: 'Development', value: 1},
-                                    {label: 'Staging', value: 2},
-                                    {label: 'Production', value: 3},
-                                ]?.map((item) => (
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current: environment === item.value,
-                                            id: item.value,
-                                            name: item.label,
-                                        }}
-                                        key={item.value ?? ''}
-                                        toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Project ? 'projectId' : 'tagId'}=${filterData.id}` : ''}`}
-                                    />
-                                ))}
-                            </>
-                        }
-                        title="Environments"
-                    />
-
-                    <LeftSidebarNav
-                        body={
-                            <>
                                 <LeftSidebarNavItem
                                     item={{
                                         current: !filterData?.id && filterData.type === Type.Project,
                                         name: 'All Projects',
                                     }}
-                                    toLink={`?environment=${environment ?? ''}`}
+                                    toLink=""
                                 />
 
                                 {projects &&
@@ -171,7 +127,7 @@ const ProjectDeployments = () => {
                                                 name: item.name,
                                             }}
                                             key={item.name}
-                                            toLink={`?projectId=${item.id}&environment=${environment ?? ''}`}
+                                            toLink={`?projectId=${item.id}`}
                                         />
                                     ))}
                             </>
@@ -193,7 +149,7 @@ const ProjectDeployments = () => {
                                                     name: item.name,
                                                 }}
                                                 key={item.id}
-                                                toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
+                                                toLink={`?tagId=${item.id}`}
                                             />
                                         ))
                                     ) : (
@@ -243,12 +199,7 @@ const ProjectDeployments = () => {
                             <ProjectDeploymentDialog
                                 projectDeployment={
                                     {
-                                        environment:
-                                            environment === 1
-                                                ? Environment.Development
-                                                : environment === 2
-                                                  ? Environment.Staging
-                                                  : Environment.Production,
+                                        environmentId: currentEnvironmentId,
                                     } as ProjectDeployment
                                 }
                                 triggerNode={<Button>Create Deployment</Button>}

@@ -9,19 +9,7 @@ const WorkflowExecutionsFilterTitle = ({
 }) => {
     return (
         <div className="space-x-1">
-            <span className="text-sm uppercase text-muted-foreground">Filter by environment:</span>
-
-            <Badge variant="secondary">
-                <span className="text-sm">
-                    {!filterData.environment
-                        ? 'All Environments'
-                        : filterData.environment === 1
-                          ? 'Development'
-                          : filterData.environment === 2
-                            ? 'Staging'
-                            : 'Production'}
-                </span>
-            </Badge>
+            <span className="text-sm font-semibold uppercase text-muted-foreground">Filter by </span>
 
             {filterData.status && (
                 <>

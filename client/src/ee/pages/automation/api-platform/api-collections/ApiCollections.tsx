@@ -6,7 +6,7 @@ import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collecti
 import ApiCollectionsFilterTitle from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionsFilterTitle';
 import {useGetApiCollectionTagsQuery} from '@/ee/queries/apiCollectionTags.queries';
 import {useGetApiCollectionsQuery} from '@/ee/queries/apiCollections.queries';
-import {Environment} from '@/ee/shared/middleware/automation/api-platform';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
@@ -26,12 +26,12 @@ export enum Type {
 }
 
 const ApiCollections = () => {
+    const {currentEnvironmentId} = useEnvironmentStore();
     const {currentWorkspaceId} = useWorkspaceStore();
 
     const location = useLocation();
     const [searchParams] = useSearchParams();
 
-    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
     const filterData = location.pathname.includes('api-keys')
         ? {
               type: Type.ApiKeys,
@@ -61,14 +61,7 @@ const ApiCollections = () => {
         error: apiCollectionsError,
         isLoading: apiCollectionsIsLoading,
     } = useGetApiCollectionsQuery({
-        environment:
-            environment === undefined
-                ? undefined
-                : environment === 1
-                  ? Environment.Development
-                  : environment === 2
-                    ? Environment.Staging
-                    : Environment.Production,
+        environmentId: currentEnvironmentId,
         id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
@@ -85,20 +78,13 @@ const ApiCollections = () => {
                         centerTitle={true}
                         position="main"
                         right={<ApiCollectionDialog triggerNode={<Button>New API Collection</Button>} />}
-                        title={
-                            <ApiCollectionsFilterTitle
-                                environment={environment}
-                                filterData={filterData}
-                                projects={projects}
-                                tags={tags}
-                            />
-                        }
+                        title={<ApiCollectionsFilterTitle filterData={filterData} projects={projects} tags={tags} />}
                     />
                 )
             }
             leftSidebarBody={
                 <ApiPlatformLeftSidebarNav
-                    environment={environment}
+                    environment={currentEnvironmentId}
                     filterData={filterData}
                     projects={projects}
                     tags={tags}

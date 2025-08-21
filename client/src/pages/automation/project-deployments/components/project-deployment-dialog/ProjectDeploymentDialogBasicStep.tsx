@@ -1,11 +1,12 @@
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
 import ProjectDeploymentDialogBasicStepTagsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useState} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
@@ -29,6 +30,7 @@ const ProjectDeploymentDialogBasicStep = ({
     const [curProjectId, setCurProjectId] = useState(getValues('projectId'));
     const [curProjectVersion, setCurProjectVersion] = useState<number | undefined>(getValues('projectVersion'));
 
+    const {currentEnvironmentId} = useEnvironmentStore();
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
     return (
@@ -70,6 +72,22 @@ const ProjectDeploymentDialogBasicStep = ({
                     shouldUnregister={false}
                 />
             )}
+
+            <FormField
+                control={control}
+                name="environmentId"
+                render={() => (
+                    <FormItem className="space-x-2">
+                        <FormLabel>Environment</FormLabel>
+
+                        <FormControl>
+                            <EnvironmentBadge environmentId={currentEnvironmentId} />
+                        </FormControl>
+
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
 
             {!updateProjectVersion && (
                 <FormField
@@ -114,38 +132,6 @@ const ProjectDeploymentDialogBasicStep = ({
                                     projectId={curProjectId}
                                     projectVersion={curProjectVersion}
                                 />
-                            </FormControl>
-
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                    rules={{required: true}}
-                    shouldUnregister={false}
-                />
-            )}
-
-            {!projectDeployment?.id && (
-                <FormField
-                    control={control}
-                    name="environment"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Environment</FormLabel>
-
-                            <FormControl>
-                                <Select defaultValue={field.value} onValueChange={(value) => field.onChange(value)}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select environment" />
-                                    </SelectTrigger>
-
-                                    <SelectContent>
-                                        <SelectItem value="DEVELOPMENT">Development</SelectItem>
-
-                                        <SelectItem value="STAGING">Staging</SelectItem>
-
-                                        <SelectItem value="PRODUCTION">Production</SelectItem>
-                                    </SelectContent>
-                                </Select>
                             </FormControl>
 
                             <FormMessage />

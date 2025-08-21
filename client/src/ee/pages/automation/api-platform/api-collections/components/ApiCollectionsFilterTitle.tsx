@@ -6,12 +6,10 @@ import {ReactNode} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 const ApiCollectionsFilterTitle = ({
-    environment,
     filterData,
     projects,
     tags,
 }: {
-    environment?: number;
     filterData: {id?: number; type: Type};
     projects: ProjectBasic[] | undefined;
     tags: Tag[] | undefined;
@@ -28,19 +26,7 @@ const ApiCollectionsFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm uppercase text-muted-foreground">Filter by environment:</span>
-
-            <Badge variant="secondary">
-                <span className="text-sm">
-                    {environment === undefined
-                        ? 'All Environments'
-                        : environment === 1
-                          ? 'Development'
-                          : environment === 2
-                            ? 'Staging'
-                            : 'Production'}
-                </span>
-            </Badge>
+            <span className="text-sm font-semibold uppercase text-muted-foreground">Filter by </span>
 
             <span className="text-sm uppercase text-muted-foreground">
                 {searchParams.get('tagId') ? 'tag' : 'project'}:
