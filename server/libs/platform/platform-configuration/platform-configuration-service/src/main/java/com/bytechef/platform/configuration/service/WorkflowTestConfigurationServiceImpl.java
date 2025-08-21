@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationConnectionRepository;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -146,8 +147,12 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs) {
+    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value) {
         WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId);
+
+        Map<String, String> inputs = new HashMap<>(workflowTestConfiguration.getInputs());
+
+        inputs.put(key, value);
 
         workflowTestConfiguration.setInputs(inputs);
 

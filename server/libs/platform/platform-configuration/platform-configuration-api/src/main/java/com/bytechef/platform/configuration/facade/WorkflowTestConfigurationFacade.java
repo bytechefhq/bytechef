@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -32,5 +31,5 @@ public interface WorkflowTestConfigurationFacade {
     void saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId);
 
-    void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs);
+    void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value);
 }

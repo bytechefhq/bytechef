@@ -701,12 +701,10 @@ paths:
             schema:
               type: "object"
               properties:
-                inputs:
-                  description: "The input parameters used as workflow\
-                    \ input values."
-                  type: "object"
-                  additionalProperties:
-                    type: "string"
+                key:
+                  type: "string"
+                value:
+                  type: "string"
         required: true
       responses:
         "204":

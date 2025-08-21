@@ -93,7 +93,7 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
     }
 
     @Override
-    public void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs) {
+    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value) {
         throw new UnsupportedOperationException();
     }
 
