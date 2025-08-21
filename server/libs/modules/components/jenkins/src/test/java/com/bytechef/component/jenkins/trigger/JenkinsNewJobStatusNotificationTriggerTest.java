@@ -37,13 +37,13 @@ import org.junit.jupiter.api.Test;
  */
 class JenkinsNewJobStatusNotificationTriggerTest {
 
-    protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
-    protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
-    protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
-    protected WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
-    protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
+    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
+    private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
+    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
     @Test
     void testWebhookRequest() {

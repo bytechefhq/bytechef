@@ -43,7 +43,8 @@ public class JenkinsComponentHandler implements ComponentHandler {
         .actions(JenkinsCreateJobAction.ACTION_DEFINITION)
         .clusterElements(tool(JenkinsCreateJobAction.ACTION_DEFINITION))
         .connection(JenkinsConnection.CONNECTION_DEFINITION)
-        .triggers(JenkinsNewJobStatusNotificationTrigger.TRIGGER_DEFINITION);
+        .triggers(JenkinsNewJobStatusNotificationTrigger.TRIGGER_DEFINITION)
+        .customAction(true);
 
     @Override
     public ComponentDefinition getDefinition() {
