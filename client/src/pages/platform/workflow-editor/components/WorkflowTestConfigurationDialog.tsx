@@ -1,4 +1,3 @@
-import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
@@ -16,6 +15,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {
     ComponentConnection,
@@ -126,7 +126,7 @@ const WorkflowTestConfigurationFormField = ({
                                                             {connection?.tags?.map((tag) => tag.name).join(', ')}
                                                         </span>
 
-                                                        <Badge variant="outline">{connection.environment}</Badge>
+                                                        <EnvironmentBadge environmentId={connection.environmentId!} />
                                                     </div>
                                                 </SelectItem>
                                             ))}

@@ -4,7 +4,6 @@ import {
     CredentialStatus,
     DeleteClusterElementParameter200Response,
     DeleteWorkflowNodeParameterRequest,
-    Environment,
     Tag,
     UpdateClusterElementParameter200Response,
     UpdateWorkflowNodeParameterRequest,
@@ -32,7 +31,7 @@ export interface ConnectionI {
     readonly createdBy?: string;
     readonly createdDate?: Date;
     credentialStatus?: CredentialStatus;
-    environment?: Environment;
+    environmentId?: number;
     readonly id?: number;
     readonly lastModifiedBy?: string;
     readonly lastModifiedDate?: Date;

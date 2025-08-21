@@ -1,6 +1,7 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {JobBasic, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
+import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
@@ -18,51 +19,54 @@ const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>)
 
 const columnHelper = createColumnHelper<WorkflowExecution>();
 
-const columns = [
-    columnHelper.accessor((row) => row.job, {
-        cell: (info) => <WorkflowExecutionBadge status={info?.getValue()?.status || ''} />,
-        header: 'Status',
-    }),
-    columnHelper.accessor('workflow', {
-        cell: (info) => info.getValue()?.label,
-        header: 'Workflow',
-    }),
-    columnHelper.accessor('project', {
-        cell: (info) => info.getValue()?.name,
-        header: 'Project',
-    }),
-    columnHelper.accessor('projectDeployment', {
-        cell: (info) => `${info.getValue()?.name}`,
-        header: 'Deployment',
-    }),
-    columnHelper.accessor('projectDeployment', {
-        cell: (info) => `V${info.getValue()?.projectVersion}`,
-        header: 'Version',
-    }),
-    columnHelper.accessor('projectDeployment', {
-        cell: (info) => info.getValue()?.environment,
-        header: 'Environment',
-    }),
-    columnHelper.accessor((row) => row.job, {
-        cell: (info) => getDuration(info),
-        header: 'Duration',
-    }),
-    columnHelper.accessor((row) => row.job, {
-        cell: (info) => (
-            <>
-                {info.getValue()?.startDate &&
-                    `${info.getValue()?.startDate?.toLocaleDateString()} ${info
-                        .getValue()
-                        ?.startDate?.toLocaleTimeString()}`}
-            </>
-        ),
-        header: 'Execution date',
-    }),
-];
-
 const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
+    const {data: environmentsQuery} = useEnvironmentsQuery();
+
     const reactTable = useReactTable<WorkflowExecution>({
-        columns,
+        columns: [
+            columnHelper.accessor((row) => row.job, {
+                cell: (info) => <WorkflowExecutionBadge status={info?.getValue()?.status || ''} />,
+                header: 'Status',
+            }),
+            columnHelper.accessor('workflow', {
+                cell: (info) => info.getValue()?.label,
+                header: 'Workflow',
+            }),
+            columnHelper.accessor('project', {
+                cell: (info) => info.getValue()?.name,
+                header: 'Project',
+            }),
+            columnHelper.accessor('projectDeployment', {
+                cell: (info) => `${info.getValue()?.name}`,
+                header: 'Deployment',
+            }),
+            columnHelper.accessor('projectDeployment', {
+                cell: (info) => `V${info.getValue()?.projectVersion}`,
+                header: 'Version',
+            }),
+            columnHelper.accessor('projectDeployment', {
+                cell: (info) =>
+                    environmentsQuery?.environments?.find(
+                        (environment) => +environment!.id! === info.getValue()?.environmentId
+                    )?.name,
+                header: 'Environment',
+            }),
+            columnHelper.accessor((row) => row.job, {
+                cell: (info) => getDuration(info),
+                header: 'Duration',
+            }),
+            columnHelper.accessor((row) => row.job, {
+                cell: (info) => (
+                    <>
+                        {info.getValue()?.startDate &&
+                            `${info.getValue()?.startDate?.toLocaleDateString()} ${info
+                                .getValue()
+                                ?.startDate?.toLocaleTimeString()}`}
+                    </>
+                ),
+                header: 'Execution date',
+            }),
+        ],
         data,
         getCoreRowModel: getCoreRowModel(),
     });

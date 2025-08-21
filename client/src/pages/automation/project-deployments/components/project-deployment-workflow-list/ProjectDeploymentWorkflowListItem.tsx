@@ -7,12 +7,7 @@ import {useToast} from '@/hooks/use-toast';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
-import {
-    Environment,
-    ProjectDeploymentApi,
-    ProjectDeploymentWorkflow,
-    Workflow,
-} from '@/shared/middleware/automation/configuration';
+import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
@@ -26,7 +21,7 @@ import {twMerge} from 'tailwind-merge';
 const projectDeploymentApi = new ProjectDeploymentApi();
 
 const ProjectDeploymentWorkflowListItem = ({
-    environment,
+    environmentId,
     filteredComponentNames,
     projectDeploymentEnabled,
     projectDeploymentId,
@@ -35,7 +30,7 @@ const ProjectDeploymentWorkflowListItem = ({
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
 }: {
-    environment?: Environment;
+    environmentId?: number;
     filteredComponentNames?: string[];
     projectDeploymentEnabled: boolean;
     projectDeploymentId: number;
@@ -204,7 +199,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                 disabled={!projectDeploymentWorkflow.enabled}
                                 onClick={() =>
                                     window.open(
-                                        `/chat/${environment === Environment.Production ? '' : environment === Environment.Staging ? 'staging/' : 'development/'}` +
+                                        `/chat/${environmentId === 2 ? '' : environmentId === 1 ? 'staging/' : 'development/'}` +
                                             projectDeploymentWorkflow.staticWebhookUrl?.substring(
                                                 projectDeploymentWorkflow.staticWebhookUrl?.lastIndexOf('/webhooks/') +
                                                     10,

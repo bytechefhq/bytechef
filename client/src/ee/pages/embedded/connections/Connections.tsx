@@ -2,7 +2,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ConnectionsFilterTitle from '@/ee/pages/embedded/connections/components/ConnectionsFilterTitle';
-import {Connection, Environment} from '@/ee/shared/middleware/embedded/configuration';
+import {Connection} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {
@@ -10,6 +10,7 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/ee/shared/queries/embedded/connections.queries';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -25,10 +26,11 @@ export enum Type {
 }
 
 export const Connections = () => {
+    const {currentEnvironmentId} = useEnvironmentStore();
+
     const [searchParams] = useSearchParams();
 
     const componentName = searchParams.get('componentName');
-    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
     const tagId = searchParams.get('tagId');
 
     const filterData = {
@@ -40,7 +42,9 @@ export const Connections = () => {
         data: allConnections,
         error: allConnectionsError,
         isLoading: allConnectionsIsLoading,
-    } = useGetConnectionsQuery({});
+    } = useGetConnectionsQuery({
+        environmentId: currentEnvironmentId,
+    });
 
     const allComponentNames = Array.from(new Set(allConnections?.map((connection) => connection.componentName)));
 
@@ -54,14 +58,7 @@ export const Connections = () => {
         isLoading: connectionsIsLoading,
     } = useGetConnectionsQuery({
         componentName: searchParams.get('componentName') ? searchParams.get('componentName')! : undefined,
-        environment:
-            environment === undefined
-                ? undefined
-                : environment === 1
-                  ? Environment.Development
-                  : environment === 2
-                    ? Environment.Staging
-                    : Environment.Production,
+        environmentId: currentEnvironmentId,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
@@ -81,14 +78,7 @@ export const Connections = () => {
                                 componentDefinitions={componentDefinitions}
                                 connection={
                                     {
-                                        environment:
-                                            environment === undefined
-                                                ? undefined
-                                                : environment === 1
-                                                  ? Environment.Development
-                                                  : environment === 2
-                                                    ? Environment.Staging
-                                                    : Environment.Production,
+                                        environmentId: currentEnvironmentId,
                                     } as Connection
                                 }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
@@ -101,7 +91,6 @@ export const Connections = () => {
                         title={
                             <ConnectionsFilterTitle
                                 componentDefinitions={componentDefinitions}
-                                environment={environment}
                                 filterData={filterData}
                                 tags={tags}
                             />
@@ -111,30 +100,6 @@ export const Connections = () => {
             }
             leftSidebarBody={
                 <>
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                {[
-                                    {label: 'All Environments'},
-                                    {label: 'Development', value: 1},
-                                    {label: 'Staging', value: 2},
-                                    {label: 'Production', value: 3},
-                                ]?.map((item) => (
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current: environment === item.value,
-                                            id: item.value,
-                                            name: item.label,
-                                        }}
-                                        key={item.value ?? ''}
-                                        toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Component ? 'componentName' : 'tagId'}=${filterData.id}` : ''}`}
-                                    />
-                                ))}
-                            </>
-                        }
-                        title="Environments"
-                    />
-
                     <LeftSidebarNav
                         body={
                             <>
@@ -160,7 +125,7 @@ export const Connections = () => {
                                                     name: item.title!,
                                                 }}
                                                 key={item.name}
-                                                toLink={`?componentName=${item.name}&environment=${environment ?? ''}`}
+                                                toLink={`?componentName=${item.name}`}
                                             />
                                         ))}
                             </>
@@ -184,7 +149,7 @@ export const Connections = () => {
                                                     name: item.name,
                                                 }}
                                                 key={item.id}
-                                                toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
+                                                toLink={`?tagId=${item.id}`}
                                             />
                                         ))
                                     ))}
@@ -218,12 +183,7 @@ export const Connections = () => {
                                     componentDefinitions={componentDefinitions}
                                     connection={
                                         {
-                                            environment:
-                                                environment === 1
-                                                    ? Environment.Development
-                                                    : environment === 2
-                                                      ? Environment.Staging
-                                                      : Environment.Production,
+                                            environmentId: currentEnvironmentId,
                                         } as Connection
                                     }
                                     connectionTagsQueryKey={ConnectionKeys.connectionTags}

@@ -8,9 +8,10 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
 import WorkflowExecutionsFilterTitle from '@/ee/pages/embedded/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
-import {Environment, Integration} from '@/ee/shared/middleware/embedded/configuration';
+import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
+    WorkflowExecution as EmbeddedWorkflowExecution,
     WorkflowExecutionFromJSON as EmbeddedWorkflowExecutionFromJSON,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
 import {
@@ -19,11 +20,15 @@ import {
 } from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {WorkflowExecutionFromJSON as AutomationWorkflowExecutionFromJSON} from '@/shared/middleware/automation/workflow/execution';
+import {
+    WorkflowExecution as AutomationWorkflowExecution,
+    WorkflowExecutionFromJSON as AutomationWorkflowExecutionFromJSON,
+} from '@/shared/middleware/automation/workflow/execution';
 import {ConnectedUserProject} from '@/shared/middleware/graphql';
 import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -31,16 +36,6 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import EmbeddedWorkflowExecutionsTable from './components/EmbeddedWorkflowExecutionsTable';
 import EmbeddedWorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
-
-function getEnvironment(filterEnvironment: number) {
-    return filterEnvironment === 0
-        ? undefined
-        : filterEnvironment === 1
-          ? Environment.Development
-          : filterEnvironment === 2
-            ? Environment.Staging
-            : Environment.Production;
-}
 
 const jobStatusOptions = [
     {
@@ -80,6 +75,8 @@ const IntegrationLabel = ({integration}: {integration: Integration}) => (
 );
 
 export const WorkflowExecutions = () => {
+    const {currentEnvironmentId} = useEnvironmentStore();
+
     const [searchParams] = useSearchParams();
 
     const [filterAutomations, setFilterAutomations] = useState<number>(
@@ -87,9 +84,6 @@ export const WorkflowExecutions = () => {
     );
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
         searchParams.get('endDate') ? new Date(+searchParams.get('endDate')!) : undefined
-    );
-    const [filterEnvironment, setFilterEnvironment] = useState<number>(
-        searchParams.get('environment') ? +searchParams.get('environment')! : 0
     );
     const [filterIntegrationId, setFilterIntegrationId] = useState<number | undefined>(
         searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined
@@ -123,7 +117,7 @@ export const WorkflowExecutions = () => {
     );
 
     const {data: integrationInstanceConfigurations} = useGetIntegrationInstanceConfigurationsQuery({
-        environment: getEnvironment(filterEnvironment),
+        environmentId: currentEnvironmentId,
         includeAllFields: false,
         integrationId: filterIntegrationId,
     });
@@ -132,7 +126,7 @@ export const WorkflowExecutions = () => {
 
     const {connectedUserProjects, workflowExecutionPage, workflowExecutionsError, workflowExecutionsIsLoading} =
         useWorkflowExecutions(filterAutomations, {
-            environment: getEnvironment(filterEnvironment),
+            environmentId: currentEnvironmentId,
             integrationId: filterIntegrationId,
             integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
             jobEndDate: filterEndDate,
@@ -170,7 +164,6 @@ export const WorkflowExecutions = () => {
 
     function filter(
         automations?: number,
-        environment?: number,
         status?: GetWorkflowExecutionsPageJobStatusEnum,
         startDate?: Date,
         endDate?: Date,
@@ -181,7 +174,7 @@ export const WorkflowExecutions = () => {
         pageNumber?: number
     ) {
         navigate(
-            `/embedded/executions?automations=${automations ?? ''}&environment=${environment ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&projectId=${projectId ? projectId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/embedded/executions?automations=${automations ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&projectId=${projectId ? projectId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
@@ -190,7 +183,6 @@ export const WorkflowExecutions = () => {
 
         filter(
             Number(automations),
-            filterAutomations,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -207,27 +199,9 @@ export const WorkflowExecutions = () => {
 
         filter(
             filterAutomations,
-            filterEnvironment,
             filterStatus,
             filterStartDate,
             date,
-            filterIntegrationId,
-            filterIntegrationInstanceConfigurationId,
-            filterProjectId,
-            filterWorkflowId,
-            filterPageNumber
-        );
-    };
-
-    const handleEnvironmentChange = (environment: string) => {
-        setFilterEnvironment(Number(environment));
-
-        filter(
-            filterAutomations,
-            Number(environment),
-            filterStatus,
-            filterStartDate,
-            filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
@@ -247,7 +221,6 @@ export const WorkflowExecutions = () => {
 
         filter(
             filterAutomations,
-            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -270,7 +243,6 @@ export const WorkflowExecutions = () => {
 
         filter(
             filterAutomations,
-            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -287,7 +259,6 @@ export const WorkflowExecutions = () => {
 
         filter(
             filterAutomations,
-            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -304,7 +275,6 @@ export const WorkflowExecutions = () => {
 
         filter(
             filterAutomations,
-            filterEnvironment,
             filterStatus,
             date,
             filterEndDate,
@@ -327,7 +297,6 @@ export const WorkflowExecutions = () => {
 
         filter(
             filterAutomations,
-            filterEnvironment,
             status,
             filterStartDate,
             filterEndDate,
@@ -350,7 +319,6 @@ export const WorkflowExecutions = () => {
 
         filter(
             filterAutomations,
-            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -373,7 +341,6 @@ export const WorkflowExecutions = () => {
 
         filter(
             filterAutomations,
-            filterEnvironment,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -408,7 +375,7 @@ export const WorkflowExecutions = () => {
                         position="main"
                         title={
                             <WorkflowExecutionsFilterTitle
-                                filterData={{environment: filterEnvironment, status: filterStatus}}
+                                filterData={{environment: currentEnvironmentId, status: filterStatus}}
                             />
                         }
                     />
@@ -428,26 +395,6 @@ export const WorkflowExecutions = () => {
                                 <SelectItem value="0">Integrations</SelectItem>
 
                                 <SelectItem value="1">Automations</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="flex flex-col space-y-2">
-                        <Label>Environment</Label>
-
-                        <Select onValueChange={handleEnvironmentChange} value={String(filterEnvironment)}>
-                            <SelectTrigger className="w-full bg-background">
-                                <SelectValue placeholder="Select environment" />
-                            </SelectTrigger>
-
-                            <SelectContent>
-                                <SelectItem value="0">All Environments</SelectItem>
-
-                                <SelectItem value="1">Development</SelectItem>
-
-                                <SelectItem value="2">Staging</SelectItem>
-
-                                <SelectItem value="3">Production</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -573,9 +520,9 @@ export const WorkflowExecutions = () => {
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
                 {workflowExecutions && workflowExecutions.length > 0 ? (
                     filterAutomations ? (
-                        <AutomationWorkflowExecutionsTable data={workflowExecutions} />
+                        <AutomationWorkflowExecutionsTable data={workflowExecutions as AutomationWorkflowExecution[]} />
                     ) : (
-                        <EmbeddedWorkflowExecutionsTable data={workflowExecutions} />
+                        <EmbeddedWorkflowExecutionsTable data={workflowExecutions as EmbeddedWorkflowExecution[]} />
                     )
                 ) : (
                     <EmptyList

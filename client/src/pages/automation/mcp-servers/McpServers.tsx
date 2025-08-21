@@ -2,9 +2,10 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {EnvironmentEnum, ModeType, Tag, useMcpServerTagsQuery, useMcpServersQuery} from '@/shared/middleware/graphql';
+import {ModeType, Tag, useMcpServerTagsQuery, useMcpServersQuery} from '@/shared/middleware/graphql';
 import {ServerIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -14,9 +15,10 @@ import McpServersLeftSidebarNav from './components/McpServersLeftSidebarNav';
 import McpServerList from './components/mcp-server-list/McpServerList';
 
 const McpServers = () => {
+    const {currentEnvironmentId} = useEnvironmentStore();
+
     const [searchParams] = useSearchParams();
 
-    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
     const tagId = searchParams.get('tagId');
 
     const filterData = {
@@ -46,17 +48,8 @@ const McpServers = () => {
     // Filter servers based on environment and/or tagId
     const filteredMcpServers = validMcpServers.filter((server) => {
         // Filter by environment if specified
-        if (environment !== undefined) {
-            const targetEnvironment =
-                environment === 1
-                    ? EnvironmentEnum.Development
-                    : environment === 2
-                      ? EnvironmentEnum.Staging
-                      : EnvironmentEnum.Production;
-
-            if (server.environment !== targetEnvironment) {
-                return false;
-            }
+        if (+server.environmentId !== currentEnvironmentId) {
+            return false;
         }
 
         // Filter by tagId if specified
@@ -78,7 +71,7 @@ const McpServers = () => {
                         centerTitle={true}
                         position="main"
                         right={<McpServerDialog mcpServer={undefined} triggerNode={<Button>New MCP Server</Button>} />}
-                        title={<McpServersFilterTitle environment={environment} filterData={filterData} tags={tags} />}
+                        title={<McpServersFilterTitle filterData={filterData} tags={tags} />}
                     />
                 )
             }

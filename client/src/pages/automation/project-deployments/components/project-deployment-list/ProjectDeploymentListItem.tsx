@@ -6,6 +6,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentListItemAlertDialog from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemAlertDialog';
 import ProjectDeploymentListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemDropdownMenu';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
@@ -152,7 +153,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                         <div className="flex min-w-28 justify-end">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Badge variant="secondary">{projectDeployment.environment}</Badge>
+                                    <EnvironmentBadge environmentId={projectDeployment.environmentId!} />
                                 </TooltipTrigger>
 
                                 <TooltipContent>The environment</TooltipContent>

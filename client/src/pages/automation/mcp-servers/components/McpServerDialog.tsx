@@ -12,14 +12,8 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {
-    EnvironmentEnum,
-    McpServer,
-    ModeType,
-    useCreateMcpServerMutation,
-    useUpdateMcpServerMutation,
-} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import {McpServer, ModeType, useCreateMcpServerMutation, useUpdateMcpServerMutation} from '@/shared/middleware/graphql';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
@@ -28,7 +22,6 @@ import {z} from 'zod';
 
 const formSchema = z.object({
     enabled: z.boolean(),
-    environment: z.string().min(1, {message: 'Environment is required'}),
     name: z.string().min(1, {message: 'Name is required'}),
 });
 
@@ -47,6 +40,8 @@ const McpServerDialog = ({
 }) => {
     const [internalOpen, setInternalOpen] = useState(false);
 
+    const {currentEnvironmentId} = useEnvironmentStore();
+
     // Use external state if provided, otherwise use internal state
     const open = externalOpen !== undefined ? externalOpen : internalOpen;
     const setOpen = externalOnOpenChange || setInternalOpen;
@@ -55,7 +50,6 @@ const McpServerDialog = ({
     const form = useForm<FormValuesType>({
         defaultValues: {
             enabled: mcpServer?.enabled !== undefined ? mcpServer.enabled : false,
-            environment: mcpServer?.environment || '',
             name: mcpServer?.name || '',
         },
         resolver: zodResolver(formSchema),
@@ -86,7 +80,7 @@ const McpServerDialog = ({
                 {
                     input: {
                         enabled: values.enabled,
-                        environment: values.environment as EnvironmentEnum,
+                        environmentId: currentEnvironmentId!.toString(),
                         name: values.name,
                         type: ModeType.Automation,
                     },
@@ -139,36 +133,6 @@ const McpServerDialog = ({
                                 </FormItem>
                             )}
                         />
-
-                        {!mcpServer?.id && (
-                            <FormField
-                                control={form.control}
-                                name="environment"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Environment</FormLabel>
-
-                                        <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select environment" />
-                                                </SelectTrigger>
-                                            </FormControl>
-
-                                            <SelectContent>
-                                                <SelectItem value="DEVELOPMENT">Development</SelectItem>
-
-                                                <SelectItem value="STAGING">Staging</SelectItem>
-
-                                                <SelectItem value="PRODUCTION">Production</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        )}
 
                         <DialogFooter>
                             <DialogClose asChild>

@@ -1,6 +1,6 @@
-import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {Tag} from '@/shared/middleware/automation/configuration';
 import {ConnectedUserProject} from '@/shared/middleware/graphql';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
@@ -47,7 +47,7 @@ const ConnectedUserProjectListItem = ({connectedUserProject}: ConnectedUserProje
                         <div className="flex min-w-28 justify-end">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Badge variant="secondary">{connectedUserProject.environment}</Badge>
+                                    <EnvironmentBadge environmentId={+connectedUserProject.environmentId} />
                                 </TooltipTrigger>
 
                                 <TooltipContent>The environment</TooltipContent>

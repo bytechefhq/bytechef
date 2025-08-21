@@ -12,12 +12,12 @@ import {
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ComponentConnection,
-    Environment,
     ProjectDeployment,
     ProjectDeploymentWorkflow,
     ProjectDeploymentWorkflowConnection,
@@ -56,6 +56,7 @@ const ProjectDeploymentDialog = ({
     const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
+    const {currentEnvironmentId} = useEnvironmentStore();
     const {currentWorkspaceId} = useWorkspaceStore();
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
@@ -67,7 +68,6 @@ const ProjectDeploymentDialog = ({
         defaultValues: {
             description: projectDeployment?.description || undefined,
             enabled: projectDeployment?.enabled || false,
-            environment: projectDeployment?.environment || Environment.Development,
             name: projectDeployment?.name || undefined,
             projectDeploymentWorkflows: [],
             projectId: projectDeployment?.projectId || undefined,
@@ -198,6 +198,7 @@ const ProjectDeploymentDialog = ({
         } else {
             createProjectDeploymentMutation.mutate({
                 ...formData,
+                environmentId: currentEnvironmentId,
                 projectDeploymentWorkflows: formData.projectDeploymentWorkflows?.map((projectDeploymentWorkflow) => {
                     return {
                         ...projectDeploymentWorkflow,

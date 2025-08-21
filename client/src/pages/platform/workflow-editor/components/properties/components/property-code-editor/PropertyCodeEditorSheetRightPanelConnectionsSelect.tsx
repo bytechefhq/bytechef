@@ -1,7 +1,7 @@
-import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
@@ -111,7 +111,7 @@ const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
                                         {connection?.tags?.map((tag) => tag.name).join(', ')}
                                     </span>
 
-                                    <Badge variant="outline">{connection.environment}</Badge>
+                                    <EnvironmentBadge environmentId={connection.environmentId!} />
                                 </div>
                             </SelectItem>
                         ))}

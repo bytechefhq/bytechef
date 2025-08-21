@@ -4,11 +4,12 @@ import {Button} from '@/components/ui/button';
 import IntegrationInstanceConfigurationsFilterTitle from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsFilterTitle';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
-import {Environment, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
+import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
@@ -25,9 +26,10 @@ export enum Type {
 }
 
 const IntegrationInstanceConfigurations = () => {
+    const {currentEnvironmentId} = useEnvironmentStore();
+
     const [searchParams] = useSearchParams();
 
-    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
     const integrationId = searchParams.get('integrationId');
     const tagId = searchParams.get('tagId');
 
@@ -60,14 +62,7 @@ const IntegrationInstanceConfigurations = () => {
         error: integrationInstanceConfigurationsError,
         isLoading: integrationInstanceConfigurationsLoading,
     } = useGetIntegrationInstanceConfigurationsQuery({
-        environment:
-            environment === undefined
-                ? undefined
-                : environment === 1
-                  ? Environment.Development
-                  : environment === 2
-                    ? Environment.Staging
-                    : Environment.Production,
+        environmentId: currentEnvironmentId,
         integrationId: searchParams.get('integrationId') ? parseInt(searchParams.get('integrationId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
@@ -116,14 +111,7 @@ const IntegrationInstanceConfigurations = () => {
                                 <IntegrationInstanceConfigurationDialog
                                     integrationInstanceConfiguration={
                                         {
-                                            environment:
-                                                environment === undefined
-                                                    ? undefined
-                                                    : environment === 1
-                                                      ? Environment.Development
-                                                      : environment === 2
-                                                        ? Environment.Staging
-                                                        : Environment.Production,
+                                            environmentId: currentEnvironmentId,
                                         } as IntegrationInstanceConfiguration
                                     }
                                     triggerNode={<Button>New Instance Configuration</Button>}
@@ -132,7 +120,6 @@ const IntegrationInstanceConfigurations = () => {
                         }
                         title={
                             <IntegrationInstanceConfigurationsFilterTitle
-                                environment={environment}
                                 filterData={filterData}
                                 integrations={integrations}
                                 tags={tags}
@@ -143,30 +130,6 @@ const IntegrationInstanceConfigurations = () => {
             }
             leftSidebarBody={
                 <>
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                {[
-                                    {label: 'All Environments'},
-                                    {label: 'Development', value: 1},
-                                    {label: 'Staging', value: 2},
-                                    {label: 'Production', value: 3},
-                                ]?.map((item) => (
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current: environment === item.value,
-                                            id: item.value,
-                                            name: item.label,
-                                        }}
-                                        key={item.value ?? ''}
-                                        toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Integration ? 'integrationId' : 'tagId'}=${filterData.id}` : ''}`}
-                                    />
-                                ))}
-                            </>
-                        }
-                        title="Environments"
-                    />
-
                     <LeftSidebarNav
                         body={
                             <>
@@ -192,7 +155,7 @@ const IntegrationInstanceConfigurations = () => {
                                                     )?.title ?? '',
                                             }}
                                             key={item.id}
-                                            toLink={`?integrationId=${item.id}&environment=${environment ?? ''}`}
+                                            toLink={`?integrationId=${item.id}`}
                                         />
                                     ))}
                             </>
@@ -214,7 +177,7 @@ const IntegrationInstanceConfigurations = () => {
                                                     name: item.name,
                                                 }}
                                                 key={item.id}
-                                                toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
+                                                toLink={`?tagId=${item.id}`}
                                             />
                                         ))
                                     ) : (
@@ -318,12 +281,7 @@ const IntegrationInstanceConfigurations = () => {
                             <IntegrationInstanceConfigurationDialog
                                 integrationInstanceConfiguration={
                                     {
-                                        environment:
-                                            environment === 1
-                                                ? Environment.Development
-                                                : environment === 2
-                                                  ? Environment.Staging
-                                                  : Environment.Production,
+                                        environmentId: currentEnvironmentId,
                                     } as IntegrationInstanceConfiguration
                                 }
                                 triggerNode={<Button>Create Instance Configuration</Button>}

@@ -1,7 +1,6 @@
 import {
     ApiCollection,
     ApiCollectionApi,
-    Environment,
     GetWorkspaceApiCollectionsRequest,
 } from '@/ee/shared/middleware/automation/api-platform';
 
@@ -11,7 +10,7 @@ import {useQuery} from '@tanstack/react-query';
 export const ApiCollectionKeys = {
     filteredProjectDeployments: (filters: {
         id?: number;
-        environment?: Environment;
+        environmentId?: number;
         projectId?: number;
         tagId?: number;
     }) => [...ApiCollectionKeys.apiCollections, filters],

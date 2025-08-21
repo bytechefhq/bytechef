@@ -7,7 +7,6 @@ import {useSearchParams} from 'react-router-dom';
 const McpServersLeftSidebarNav = () => {
     const [searchParams] = useSearchParams();
 
-    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
     const projectId = searchParams.get('projectId');
     const tagId = searchParams.get('tagId');
 
@@ -27,30 +26,6 @@ const McpServersLeftSidebarNav = () => {
             <LeftSidebarNav
                 body={
                     <>
-                        {[
-                            {label: 'All Environments'},
-                            {label: 'Development', value: 1},
-                            {label: 'Staging', value: 2},
-                            {label: 'Production', value: 3},
-                        ]?.map((item) => (
-                            <LeftSidebarNavItem
-                                item={{
-                                    current: environment === item.value,
-                                    id: item.value,
-                                    name: item.label,
-                                }}
-                                key={item.value ?? ''}
-                                toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Project ? 'projectId' : 'tagId'}=${filterData.id}` : ''}`}
-                            />
-                        ))}
-                    </>
-                }
-                title="Environments"
-            />
-
-            <LeftSidebarNav
-                body={
-                    <>
                         {!tagsIsLoading &&
                             (data.mcpServerTags.length ? (
                                 data.mcpServerTags.map((item) => (
@@ -62,7 +37,7 @@ const McpServersLeftSidebarNav = () => {
                                             name: item!.name,
                                         }}
                                         key={item!.id}
-                                        toLink={`?tagId=${item!.id}&environment=${environment ?? ''}`}
+                                        toLink={`?tagId=${item!.id}`}
                                     />
                                 ))
                             ) : (

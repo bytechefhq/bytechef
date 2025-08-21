@@ -1,6 +1,7 @@
 import {Checkbox} from '@/components/ui/checkbox';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {McpComponent, McpTool, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
@@ -38,7 +39,9 @@ const McpComponentDialogToolSelectionStep = ({
     selectedConnection,
     selectedTools,
 }: ToolSelectionStepProps) => {
+    const {currentEnvironmentId} = useEnvironmentStore();
     const {currentWorkspaceId} = useWorkspaceStore();
+
     const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
 
     const {data: componentDefinition, isLoading: isLoadingComponentDefinition} = useGetComponentDefinitionQuery(
@@ -53,6 +56,7 @@ const McpComponentDialogToolSelectionStep = ({
         {
             componentName: selectedComponent?.name,
             connectionVersion: selectedComponent?.version,
+            environmentId: currentEnvironmentId,
             id: currentWorkspaceId!,
         },
         open
