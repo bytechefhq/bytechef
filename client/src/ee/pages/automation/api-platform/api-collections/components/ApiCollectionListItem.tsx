@@ -1,5 +1,4 @@
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
-import TagList from '@/components/TagList';
 import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
@@ -15,6 +14,7 @@ import {useDeleteApiCollectionMutation} from '@/ee/shared/mutations/automation/a
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import TagList from '@/shared/components/TagList';
 import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/projectDeployments.mutations';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {ChevronDownIcon} from '@radix-ui/react-icons';

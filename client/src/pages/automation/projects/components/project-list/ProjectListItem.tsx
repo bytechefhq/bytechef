@@ -58,7 +58,7 @@ import {
 import {ChangeEvent, useRef, useState} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 
-import TagList from '../../../../../components/TagList';
+import TagList from '../../../../../shared/components/TagList';
 import ProjectDialog from '../ProjectDialog';
 
 interface ProjectItemProps {
