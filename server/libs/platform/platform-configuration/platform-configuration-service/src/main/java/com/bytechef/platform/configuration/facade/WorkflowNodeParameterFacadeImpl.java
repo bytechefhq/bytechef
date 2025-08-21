@@ -722,12 +722,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     }
                 } else if (entry.getValue() instanceof List<?> list) {
                     for (Object item : list) {
-                        if (item instanceof Map<?, ?> map) {
-                            if (map.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
-                                clusterElementMap = getClusterElementMap(
-                                    clusterElementTypeName, clusterElementWorkflowNodeName, (Map<String, ?>) map,
-                                    false);
-                            }
+                        if ((item instanceof Map<?, ?> map) && map.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
+                            clusterElementMap = getClusterElementMap(
+                                clusterElementTypeName, clusterElementWorkflowNodeName, (Map<String, ?>) map, false);
                         }
                     }
 
