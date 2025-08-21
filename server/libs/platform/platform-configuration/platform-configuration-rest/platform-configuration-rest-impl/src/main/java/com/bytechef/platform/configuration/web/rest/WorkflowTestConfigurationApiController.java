@@ -105,7 +105,8 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
         SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequestModel) {
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationInputs(
-            workflowId, saveWorkflowTestConfigurationInputsRequestModel.getInputs());
+            workflowId, saveWorkflowTestConfigurationInputsRequestModel.getKey(),
+            saveWorkflowTestConfigurationInputsRequestModel.getValue());
 
         return ResponseEntity.noContent()
             .build();

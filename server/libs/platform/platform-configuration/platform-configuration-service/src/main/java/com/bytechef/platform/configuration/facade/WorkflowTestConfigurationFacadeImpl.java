@@ -107,12 +107,10 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
-    public void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs) {
-        Workflow workflow = workflowService.getWorkflow(workflowId);
+    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value) {
+        Validate.notEmpty(key, "Missing required param: " + key);
 
-        validateInputs(inputs, workflow);
-
-        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(workflowId, inputs);
+        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(workflowId, key, value);
     }
 
     private static Map<String, String> getInputs(
