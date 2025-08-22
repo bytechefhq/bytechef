@@ -44,7 +44,6 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -252,7 +251,7 @@ public class BranchTaskDispatcherTest {
                                     "key", "k2",
                                     "tasks",
                                     List.of(Map.of(WorkflowConstants.NAME, "name", "type", "sleep")))),
-                            "default", Collections.singletonMap("value", "1234"),
+                            "default", List.of(Map.of(WorkflowConstants.NAME, "name", "type", "print")),
                             "expression", "k99"))))
             .build();
 

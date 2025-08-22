@@ -158,6 +158,6 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
             }
         }
 
-        return MapUtils.getMap(taskExecution.getParameters(), DEFAULT, Collections.emptyMap());
+        return Map.of(TASKS, MapUtils.get(taskExecution.getParameters(), DEFAULT, new TypeReference<>() {}, List.of()));
     }
 }
