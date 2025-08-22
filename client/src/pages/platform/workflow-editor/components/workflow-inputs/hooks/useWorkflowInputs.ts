@@ -207,10 +207,8 @@ export default function useWorkflowInputs({
 
                     saveWorkflowTestConfigurationInputsMutation.mutate({
                         saveWorkflowTestConfigurationInputsRequest: {
-                            inputs: {
-                                ...(workflowTestConfiguration ? workflowTestConfiguration.inputs : {}),
-                                [input.name]: getValues().testValue!,
-                            },
+                            key: input.name,
+                            value: getValues().testValue!,
                         },
                         workflowId: workflow.id!,
                     });
