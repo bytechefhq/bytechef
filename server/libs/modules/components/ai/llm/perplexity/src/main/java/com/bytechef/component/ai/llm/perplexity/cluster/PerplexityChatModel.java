@@ -19,7 +19,6 @@ package com.bytechef.component.ai.llm.perplexity.cluster;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
@@ -49,7 +48,6 @@ public class PerplexityChatModel {
             .object(() -> PerplexityChatModel::apply)
             .properties(
                 CHAT_MODEL_PROPERTY,
-                MESSAGES_PROPERTY,
                 RESPONSE_PROPERTY,
                 MAX_TOKENS_PROPERTY,
                 N_PROPERTY,
