@@ -17,6 +17,8 @@
 package com.bytechef.component.ai.llm.openai.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS;
@@ -29,9 +31,11 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
@@ -63,6 +67,10 @@ public class OpenAiChatAction {
         .description("Ask anything you want.")
         .properties(
             CHAT_MODEL_PROPERTY,
+            FORMAT_PROPERTY,
+            PROMPT_PROPERTY,
+            SYSTEM_PROMPT_PROPERTY,
+            ATTACHMENTS_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,

@@ -18,8 +18,12 @@ package com.bytechef.component.ai.agent.action;
 
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT;
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CONVERSATION_ID;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
@@ -81,6 +85,10 @@ public class AiAgentChatAction {
                 .title("Chat")
                 .description("Chat with the AI agent.")
                 .properties(
+                    FORMAT_PROPERTY,
+                    PROMPT_PROPERTY,
+                    SYSTEM_PROMPT_PROPERTY,
+                    ATTACHMENTS_PROPERTY,
                     MESSAGES_PROPERTY,
                     RESPONSE_PROPERTY,
                     string(CONVERSATION_ID)

@@ -18,15 +18,21 @@ package com.bytechef.component.ai.llm.util;
 
 import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.JSON;
 import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.TEXT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROMPT;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.Format;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
+import com.bytechef.component.ai.llm.ChatModel.Role;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -115,7 +121,28 @@ public class ModelUtils {
     }
 
     public static List<Message> getMessages(Parameters inputParameters, ActionContext actionContext) {
-        List<ChatModel.Message> chatModelMessages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
+        List<ChatModel.Message> chatModelMessages = new ArrayList<>();
+
+        String format = inputParameters.getRequiredString(FORMAT);
+
+        if (format.equals(Format.SIMPLE.name())) {
+            String userPrompt = inputParameters.getRequiredString(USER_PROMPT);
+
+            ChatModel.Message userMessage = new ChatModel.Message(
+                userPrompt, inputParameters.getList(ATTACHMENTS, FileEntry.class), Role.USER);
+
+            chatModelMessages.add(userMessage);
+
+            String systemPrompt = inputParameters.getString(SYSTEM_PROMPT);
+
+            if (systemPrompt != null && !systemPrompt.isEmpty()) {
+                ChatModel.Message systeMMessage = new ChatModel.Message(systemPrompt, null, Role.SYSTEM);
+
+                chatModelMessages.add(systeMMessage);
+            }
+        } else {
+            chatModelMessages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
+        }
 
         return new ArrayList<>(
             chatModelMessages.stream()

@@ -40,6 +40,10 @@ public interface ChatModel {
         ASSISTANT, SYSTEM, /* TOOL, */ USER
     }
 
+    enum Format {
+        SIMPLE, ADVANCED
+    }
+
     org.springframework.ai.chat.model.ChatModel createChatModel(
         Parameters inputParameters, Parameters connectionParameters);
 

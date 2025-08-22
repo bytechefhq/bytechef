@@ -33,6 +33,7 @@ import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.Format;
 import com.bytechef.component.ai.llm.ChatModel.Role;
 import com.bytechef.component.ai.llm.definition.Language;
 import com.bytechef.component.definition.ComponentDsl;
@@ -44,6 +45,7 @@ import java.util.Arrays;
 public class LLMConstants {
 
     public static final String ASK = "ask";
+    public static final String ATTACHMENTS = "attachments";
     public static final String CONTENT = "content";
     public static final String CREATE_IMAGE = "createImage";
     public static final String CREATE_SPEECH = "createSpeech";
@@ -51,6 +53,7 @@ public class LLMConstants {
     public static final String SIZE = "size";
     public static final String ENDPOINT = "endpoint";
     public static final String FILE = "file";
+    public static final String FORMAT = "format";
     public static final String FREQUENCY_PENALTY = "frequencyPenalty";
     public static final String INPUT = "input";
     public static final String LANGUAGE = "language";
@@ -69,15 +72,35 @@ public class LLMConstants {
     public static final String ROLE = "role";
     public static final String STOP = "stop";
     public static final String STYLE = "style";
+    public static final String SYSTEM_PROMPT = "systemPrompt";
     public static final String TEMPERATURE = "temperature";
     public static final String TOP_P = "topP";
     public static final String TOP_K = "topK";
     public static final String USER = "user";
+    public static final String USER_PROMPT = "userPrompt";
     public static final String URL = "url";
     public static final String SEED = "seed";
     public static final String VOICE = "voice";
     public static final String SPEED = "speed";
     public static final String WEIGHT = "weight";
+
+    public static final ModifiableArrayProperty ATTACHMENTS_PROPERTY = array(ATTACHMENTS)
+        .label("Attachments")
+        .description(
+            "Only text and image files are supported. Also, only certain models supports images. Please check the " +
+                "documentation.")
+        .displayCondition("%s == '%s'".formatted(FORMAT, Format.SIMPLE.name()))
+        .items(fileEntry())
+        .required(false);
+
+    public static final ModifiableStringProperty FORMAT_PROPERTY = string(FORMAT)
+        .label("Format")
+        .description("Format of providing the prompt to the model.")
+        .options(
+            option("Simple", Format.SIMPLE.name(), "User prompt and optional system prompt."),
+            option("Advanced", Format.ADVANCED.name(), "Full control over the messages sent to the model."))
+        .defaultValue(Format.SIMPLE.name())
+        .required(true);
 
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency Penalty")
@@ -128,6 +151,7 @@ public class LLMConstants {
         .label("Messages")
         .description("A list of messages comprising the conversation so far.")
         .placeholder("Add message")
+        .displayCondition("%s == '%s'".formatted(FORMAT, Format.ADVANCED.name()))
         .items(
             object()
                 .label("Message")
@@ -146,10 +170,11 @@ public class LLMConstants {
                         .description("The contents of the message.")
                         .controlType(TEXT_AREA)
                         .required(true),
-                    array("attachments")
+                    array(ATTACHMENTS)
                         .label("Attachments")
                         .description(
-                            "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.")
+                            "Only text and image files are supported. Also, only certain models supports images. " +
+                                "Please check the documentation.")
                         .displayCondition("%s == '%s'".formatted("messages[index].role", Role.USER.name()))
                         .items(fileEntry())
                         .required(false)))
@@ -176,6 +201,13 @@ public class LLMConstants {
         .minValue(-2)
         .maxValue(2)
         .advancedOption(true);
+
+    public static final ModifiableStringProperty PROMPT_PROPERTY = string(USER_PROMPT)
+        .label("Prompt")
+        .description("User prompt to the model.")
+        .controlType(TEXT_AREA)
+        .displayCondition("%s == '%s'".formatted(FORMAT, Format.SIMPLE.name()))
+        .required(true);
 
     public static final ModifiableObjectProperty RESPONSE_PROPERTY = object(RESPONSE)
         .label("Response")
@@ -209,6 +241,13 @@ public class LLMConstants {
         .description("Up to 4 sequences where the API will stop generating further tokens.")
         .items(string())
         .advancedOption(true);
+
+    public static final ModifiableStringProperty SYSTEM_PROMPT_PROPERTY = string(SYSTEM_PROMPT)
+        .label("System Prompt")
+        .description("System prompt to the model.")
+        .controlType(TEXT_AREA)
+        .displayCondition("%s == '%s'".formatted(FORMAT, Format.SIMPLE.name()))
+        .required(false);
 
     public static final ModifiableNumberProperty TEMPERATURE_PROPERTY = number(TEMPERATURE)
         .label("Temperature")
