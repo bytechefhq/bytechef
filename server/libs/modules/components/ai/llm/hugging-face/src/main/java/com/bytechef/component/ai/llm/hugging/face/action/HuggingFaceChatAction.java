@@ -17,8 +17,12 @@
 package com.bytechef.component.ai.llm.hugging.face.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.hugging.face.constant.HuggingFaceConstants.URL;
 import static com.bytechef.component.ai.llm.hugging.face.constant.HuggingFaceConstants.URL_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
@@ -41,6 +45,10 @@ public class HuggingFaceChatAction {
         .description("Ask anything you want.")
         .properties(
             URL_PROPERTY,
+            FORMAT_PROPERTY,
+            PROMPT_PROPERTY,
+            SYSTEM_PROMPT_PROPERTY,
+            ATTACHMENTS_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY)
         .output(ModelUtils::output)
