@@ -20,11 +20,17 @@ import { mapValues } from '../runtime';
  */
 export interface SaveWorkflowTestConfigurationInputsRequest {
     /**
-     * The input parameters used as workflow input values.
-     * @type {{ [key: string]: string; }}
+     * 
+     * @type {string}
      * @memberof SaveWorkflowTestConfigurationInputsRequest
      */
-    inputs?: { [key: string]: string; };
+    key?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SaveWorkflowTestConfigurationInputsRequest
+     */
+    value?: string;
 }
 
 /**
@@ -44,7 +50,8 @@ export function SaveWorkflowTestConfigurationInputsRequestFromJSONTyped(json: an
     }
     return {
         
-        'inputs': json['inputs'] == null ? undefined : json['inputs'],
+        'key': json['key'] == null ? undefined : json['key'],
+        'value': json['value'] == null ? undefined : json['value'],
     };
 }
 
@@ -59,7 +66,8 @@ export function SaveWorkflowTestConfigurationInputsRequestToJSONTyped(value?: Sa
 
     return {
         
-        'inputs': value['inputs'],
+        'key': value['key'],
+        'value': value['value'],
     };
 }
 

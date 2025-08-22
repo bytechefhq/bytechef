@@ -5,8 +5,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -23,38 +21,51 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("saveWorkflowTestConfigurationInputs_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-07-25T11:11:25.895904+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
 public class SaveWorkflowTestConfigurationInputsRequestModel {
 
-  @Valid
-  private Map<String, String> inputs = new HashMap<>();
+  private @Nullable String key;
 
-  public SaveWorkflowTestConfigurationInputsRequestModel inputs(Map<String, String> inputs) {
-    this.inputs = inputs;
-    return this;
-  }
+  private @Nullable String value;
 
-  public SaveWorkflowTestConfigurationInputsRequestModel putInputsItem(String key, String inputsItem) {
-    if (this.inputs == null) {
-      this.inputs = new HashMap<>();
-    }
-    this.inputs.put(key, inputsItem);
+  public SaveWorkflowTestConfigurationInputsRequestModel key(String key) {
+    this.key = key;
     return this;
   }
 
   /**
-   * The input parameters used as workflow input values.
-   * @return inputs
+   * Get key
+   * @return key
    */
   
-  @Schema(name = "inputs", description = "The input parameters used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("inputs")
-  public Map<String, String> getInputs() {
-    return inputs;
+  @Schema(name = "key", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("key")
+  public String getKey() {
+    return key;
   }
 
-  public void setInputs(Map<String, String> inputs) {
-    this.inputs = inputs;
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public SaveWorkflowTestConfigurationInputsRequestModel value(String value) {
+    this.value = value;
+    return this;
+  }
+
+  /**
+   * Get value
+   * @return value
+   */
+  
+  @Schema(name = "value", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("value")
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
   }
 
   @Override
@@ -66,19 +77,21 @@ public class SaveWorkflowTestConfigurationInputsRequestModel {
       return false;
     }
     SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequest = (SaveWorkflowTestConfigurationInputsRequestModel) o;
-    return Objects.equals(this.inputs, saveWorkflowTestConfigurationInputsRequest.inputs);
+    return Objects.equals(this.key, saveWorkflowTestConfigurationInputsRequest.key) &&
+        Objects.equals(this.value, saveWorkflowTestConfigurationInputsRequest.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputs);
+    return Objects.hash(key, value);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class SaveWorkflowTestConfigurationInputsRequestModel {\n");
-    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
+    sb.append("    key: ").append(toIndentedString(key)).append("\n");
+    sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");
     return sb.toString();
   }
