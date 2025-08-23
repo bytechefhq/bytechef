@@ -19,6 +19,8 @@ import createConditionEdges, {hasTaskInConditionBranches} from '../utils/createC
 import createConditionNode from '../utils/createConditionNode';
 import createEachEdges from '../utils/createEachEdges';
 import createEachNode from '../utils/createEachNode';
+import createForkJoinEdges from '../utils/createForkJoinEdges';
+import createForkJoinNode from '../utils/createForkJoinNode';
 import createLoopEdges from '../utils/createLoopEdges';
 import createLoopNode from '../utils/createLoopNode';
 import createParallelEdges from '../utils/createParallelEdges';
@@ -80,6 +82,7 @@ export default function useLayout({
         const branchChildTasks = {};
         const conditionChildTasks = {};
         const eachChildTasks = {};
+        const forkJoinChildTasks = {};
         const loopChildTasks = {};
         const parallelChildTasks = {};
 
@@ -90,6 +93,7 @@ export default function useLayout({
                 branchChildTasks,
                 conditionChildTasks,
                 eachChildTasks,
+                forkJoinChildTasks,
                 loopChildTasks,
                 parallelChildTasks
             );
@@ -130,6 +134,7 @@ export default function useLayout({
                 branchChildTasks,
                 conditionChildTasks,
                 eachChildTasks,
+                forkJoinChildTasks,
                 loopChildTasks,
                 parallelChildTasks,
                 taskName: name,
@@ -207,6 +212,17 @@ export default function useLayout({
                         createPlaceholder: !hasSubtasks,
                     },
                 });
+            } else if (componentName === 'fork-join') {
+                const hasSubtasks = parameters?.branches?.length > 0;
+
+                allNodes = createForkJoinNode({
+                    allNodes: [...allNodes, taskNode],
+                    forkJoinId: taskNode.id,
+                    isNested,
+                    options: {
+                        createLeftGhost: !hasSubtasks,
+                    },
+                });
             } else {
                 allNodes.push(taskNode);
             }
@@ -233,6 +249,7 @@ export default function useLayout({
         const isEachNode = nodeData.componentName === 'each';
         const isLoopNode = nodeData.componentName === 'loop';
         const isParallellNode = nodeData.componentName === 'parallel';
+        const isForkJoinNode = nodeData.componentName === 'fork-join';
 
         const isConditionPlaceholderNode = nodeData.conditionId && node.type === 'placeholder';
         const isBranchPlaceholderNode = nodeData.branchId && node.type === 'placeholder';
@@ -282,6 +299,15 @@ export default function useLayout({
             const eachEdges = createEachEdges(node);
 
             taskEdges.push(...eachEdges);
+
+            return;
+        }
+
+        // Create initial edges for the Fork-Join node
+        if (isForkJoinNode) {
+            const forkJoinEdges = createForkJoinEdges(node);
+
+            taskEdges.push(...forkJoinEdges);
 
             return;
         }

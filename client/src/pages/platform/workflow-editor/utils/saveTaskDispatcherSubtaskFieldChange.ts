@@ -49,7 +49,8 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     );
 
     let taskDispatcherContext: TaskDispatcherContextType | undefined = undefined;
-    let taskDispatcherComponentName: 'branch' | 'condition' | 'each' | 'loop' | 'parallel' | undefined = undefined;
+    let taskDispatcherComponentName: 'branch' | 'condition' | 'each' | 'fork-join' | 'loop' | 'parallel' | undefined =
+        undefined;
 
     switch (taskDispatcherDataKey) {
         case 'branchData': {
@@ -121,6 +122,21 @@ export default function saveTaskDispatcherSubtaskFieldChange({
             };
 
             taskDispatcherComponentName = 'parallel';
+
+            break;
+        }
+        case 'forkJoinData': {
+            if (!currentNode.forkJoinData) {
+                break;
+            }
+
+            taskDispatcherContext = {
+                branchIndex: currentNode.forkJoinData.branchIndex,
+                index: currentNodeIndex,
+                taskDispatcherId: currentNode.forkJoinData.forkJoinId,
+            };
+
+            taskDispatcherComponentName = 'fork-join';
 
             break;
         }

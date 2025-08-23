@@ -79,11 +79,11 @@ function createEdgesForSingleCase(
         const sourceTaskId = caseTask.name;
         const targetTaskId = caseTasks[index + 1]?.name;
 
-        const sourceTaskComponentName = sourceTaskId.split('_')[0];
-
         if (!targetTaskId) {
             return;
         }
+
+        const sourceTaskComponentName = sourceTaskId.split('_')[0];
 
         if (TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) && sourceTaskComponentName !== 'loopBreak') {
             const nestedBottomGhostId = `${sourceTaskId}-${sourceTaskComponentName}-bottom-ghost`;

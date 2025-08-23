@@ -170,6 +170,27 @@ export default function handleDeleteTask({
 
             return parentEachTask;
         }) as Array<WorkflowTaskType>;
+    } else if (data.forkJoinData) {
+        const parentForkJoinTask = TASK_DISPATCHER_CONFIG['fork-join'].getTask({
+            taskDispatcherId: data.forkJoinData.forkJoinId,
+            tasks: workflowTasks,
+        });
+
+        if (!parentForkJoinTask?.parameters) {
+            return;
+        }
+
+        parentForkJoinTask.parameters.branches = parentForkJoinTask.parameters.branches
+            .map((branch: Array<WorkflowTask>) => branch.filter((task: WorkflowTask) => task.name !== data.name))
+            .filter((branch: Array<WorkflowTask>) => branch.length > 0);
+
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== parentForkJoinTask.name) {
+                return task;
+            }
+
+            return parentForkJoinTask;
+        }) as Array<WorkflowTaskType>;
     } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
         const mainRootClusterElementTask = workflowTasks.find((task) => task.name === rootClusterElementNodeData?.name);
 

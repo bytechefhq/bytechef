@@ -128,12 +128,19 @@ type EachDataType = {
     index: number;
 };
 
+type ForkJoinDataType = {
+    branchIndex: number;
+    forkJoinId: string;
+    index: number;
+};
+
 export type TaskDispatcherDataType = BranchDataType &
     EachDataType &
     LoopDataType &
     LoopBreakDataType &
     ConditionDataType &
-    ParallelDataType;
+    ParallelDataType &
+    ForkJoinDataType;
 
 export type ClusterElementItemType = {
     clusterElements?: ClusterElementsType;
@@ -179,6 +186,8 @@ export type NodeDataType = {
     };
     eachId?: string;
     eachData?: EachDataType;
+    forkJoinId?: string;
+    forkJoinData?: ForkJoinDataType;
     icon?: JSX.Element | ReactNode | string;
     isNestedClusterRoot?: boolean;
     label?: string;
@@ -309,11 +318,13 @@ export type PropertyAllType = Omit<PropertyTypeAllType, 'controlType'> & {
 export type UpdateWorkflowMutationType = UseMutationResult<void, Error, UpdateWorkflowRequestI, unknown>;
 
 export type TaskDispatcherContextType = {
+    branchIndex?: number;
     branchId?: string;
     caseKey?: string;
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionId?: string;
     eachId?: string;
+    forkJoinId?: string;
     index?: number;
     loopBreakId?: string;
     loopId?: string;
@@ -338,6 +349,7 @@ export type ConditionChildTasksType = {[conditionId: string]: {caseTrue: string[
 export type EachChildTasksType = {[eachId: string]: {iteratee: string}};
 export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
 export type ParallelChildTasksType = {[parallelId: string]: {tasks: string[]}};
+export type ForkJoinChildTasksType = {[forkJoinId: string]: {branches: string[][]}};
 
 export type WorkflowInputType = WorkflowInput & {
     testValue?: string;

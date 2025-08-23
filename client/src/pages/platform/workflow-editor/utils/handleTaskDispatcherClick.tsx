@@ -95,6 +95,12 @@ export default async function handleTaskDispatcherClick({
                 eachId: taskDispatcherContext.eachId as string,
                 index: (taskDispatcherContext.index ?? 0) as number,
             };
+        } else if (taskDispatcherContext.forkJoinId) {
+            newNodeData.forkJoinData = {
+                branchIndex: taskDispatcherContext.branchIndex ?? 0,
+                forkJoinId: taskDispatcherContext.forkJoinId as string,
+                index: (taskDispatcherContext.index ?? 0) as number,
+            };
         }
     }
 
