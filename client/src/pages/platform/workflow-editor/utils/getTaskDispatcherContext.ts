@@ -39,6 +39,11 @@ function getContextFromTaskNodeData(
         context.eachId = nodeData.eachData.eachId as string;
         context.index = (nodeData.eachData.index as number) + indexIncrement;
         context.taskDispatcherId = nodeData.eachData.eachId as string;
+    } else if (nodeData.forkJoinData) {
+        context.branchIndex = nodeData.forkJoinData.branchIndex as number;
+        context.forkJoinId = nodeData.forkJoinData.forkJoinId as string;
+        context.index = (nodeData.forkJoinData.index as number) + indexIncrement;
+        context.taskDispatcherId = nodeData.forkJoinData.forkJoinId as string;
     }
 
     return context;
@@ -54,6 +59,7 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     const isBranchPlaceholder = placeholderNode.id.includes('branch') && isPlaceholder;
     const isParallelPlaceholder = placeholderNode.id.includes('parallel') && isPlaceholder;
     const isEachPlaceholder = placeholderNode.id.includes('each') && isPlaceholder;
+    const isForkJoinPlaceholder = placeholderNode.id.includes('forkJoin') && isPlaceholder;
 
     const context: TaskDispatcherContextType = {
         taskDispatcherId: placeholderNode.data?.taskDispatcherId as string,
@@ -94,6 +100,13 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
 
         context.eachId = eachId;
         context.taskDispatcherId = eachId;
+    } else if (isForkJoinPlaceholder) {
+        const forkJoinId = placeholderNode.data?.forkJoinId as string;
+
+        context.index = 0;
+        context.branchIndex = placeholderNode.data?.branchIndex as number;
+        context.forkJoinId = forkJoinId;
+        context.taskDispatcherId = forkJoinId;
     }
 
     return context;
@@ -160,7 +173,8 @@ export default function getTaskDispatcherContext({
                 targetNode.data.loopData ||
                 targetNode.data.branchData ||
                 targetNode.data.parallelData ||
-                targetNode.data.eachData
+                targetNode.data.eachData ||
+                targetNode.data.forkJoinData
             ) {
                 return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
             }
@@ -196,7 +210,12 @@ export default function getTaskDispatcherContext({
     }
 
     if (isSourceTask && isTargetTaskDispatcher) {
-        if (!sourceNode.data.conditionData && !sourceNode.data.loopData && !sourceNode.data.branchData) {
+        if (
+            !sourceNode.data.conditionData &&
+            !sourceNode.data.loopData &&
+            !sourceNode.data.branchData &&
+            !sourceNode.data.forkJoinData
+        ) {
             return undefined;
         }
 

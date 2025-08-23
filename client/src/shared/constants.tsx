@@ -127,6 +127,7 @@ export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
     branch: ['default', 'cases'],
     condition: ['caseTrue', 'caseFalse'],
     each: ['iteratee'],
+    'fork-join': ['branches'],
     loop: ['iteratee'],
     parallel: ['tasks'],
 };
@@ -153,6 +154,10 @@ export const TASK_DISPATCHER_DATA_KEY_MAP = {
     branch: 'branchData',
     condition: 'conditionData',
     each: 'eachData',
+    'fork-join': 'forkJoinData',
     loop: 'loopData',
+    loopBreak: 'loopBreakData',
+    map: 'mapData',
     parallel: 'parallelData',
+    subflow: 'subflowData',
 };

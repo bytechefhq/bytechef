@@ -21,6 +21,7 @@ import {
     BranchChildTasksType,
     ConditionChildTasksType,
     EachChildTasksType,
+    ForkJoinChildTasksType,
     LoopChildTasksType,
     NodeDataType,
     ParallelChildTasksType,
@@ -30,6 +31,7 @@ import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 import {getConditionBranchSide} from './createConditionEdges';
+import {getForkJoinBranchSide} from './createForkJoinEdges';
 import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatcherConfig';
 
 let dagre: typeof import('@dagrejs/dagre') | null = null;
@@ -288,6 +290,9 @@ export const getLayoutedElements = async ({
             {
                 condition: sourceNode.data.componentName === 'branch',
             },
+            {
+                condition: sourceNode.data.componentName === 'fork-join',
+            },
         ];
 
         if (multipleEdgesAllowed.some(({condition}) => condition)) {
@@ -366,6 +371,15 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
                 },
                 task: parentTaskDispatcher,
             });
+        } else if (componentName === 'fork-join') {
+            const branches = parentTaskDispatcher.parameters?.branches || [];
+
+            const branchIndex = branches.findIndex(
+                (branch: WorkflowTask[]) =>
+                    Array.isArray(branch) && branch.some((subtask) => subtask.name === taskDispatcherId)
+            );
+
+            parentSubtasks = branchIndex !== -1 ? branches[branchIndex] || [] : [];
         } else {
             parentSubtasks = TASK_DISPATCHER_CONFIG[componentName as keyof typeof TASK_DISPATCHER_CONFIG].getSubtasks({
                 task: parentTaskDispatcher,
@@ -401,6 +415,10 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
             const branchSide = getConditionBranchSide(taskDispatcherId, tasks, parentTaskDispatcher.name);
 
             targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
+        } else if (componentName === 'fork-join') {
+            const branchSide = getForkJoinBranchSide(taskDispatcherId, tasks, parentTaskDispatcher.name);
+
+            targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
         }
 
         return {
@@ -432,6 +450,8 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
             return false;
         } else if (subsequentNodeData.eachData && subsequentNodeData.eachData.eachId === taskDispatcherId) {
             return false;
+        } else if (subsequentNodeData.forkJoinData && subsequentNodeData.forkJoinData.forkJoinId === taskDispatcherId) {
+            return false;
         }
 
         for (const task of tasks || []) {
@@ -446,7 +466,7 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
                 task,
             });
 
-            if (subtasks.some((subtask) => subtask.name === subsequentNode.id)) {
+            if (Array.isArray(subtasks) && subtasks.some((subtask) => subtask.name === subsequentNode.id)) {
                 return false;
             }
         }
@@ -481,6 +501,7 @@ export function collectTaskDispatcherData(
     branchChildTasks: BranchChildTasksType,
     conditionChildTasks: ConditionChildTasksType,
     eachChildTasks: EachChildTasksType,
+    forkJoinChildTasks: ForkJoinChildTasksType,
     loopChildTasks: LoopChildTasksType,
     parallelChildTasks: ParallelChildTasksType
 ): void {
@@ -533,6 +554,14 @@ export function collectTaskDispatcherData(
         eachChildTasks[name] = {
             iteratee: parameters.iteratee.name,
         };
+    } else if (componentName === 'fork-join') {
+        forkJoinChildTasks[name] = {
+            branches: Array.isArray(parameters?.branches)
+                ? parameters.branches.map((branch: WorkflowTask[]) =>
+                      Array.isArray(branch) ? branch.map((task: WorkflowTask) => task.name) : []
+                  )
+                : [],
+        };
     }
 }
 
@@ -543,6 +572,7 @@ interface GetTaskAncestryProps {
     branchChildTasks: BranchChildTasksType;
     conditionChildTasks: ConditionChildTasksType;
     eachChildTasks: EachChildTasksType;
+    forkJoinChildTasks: ForkJoinChildTasksType;
     loopChildTasks: LoopChildTasksType;
     parallelChildTasks: ParallelChildTasksType;
     taskName: string;
@@ -552,6 +582,7 @@ export function getTaskAncestry({
     branchChildTasks,
     conditionChildTasks,
     eachChildTasks,
+    forkJoinChildTasks,
     loopChildTasks,
     parallelChildTasks,
     taskName,
@@ -666,6 +697,36 @@ export function getTaskAncestry({
 
                 isNested = true;
 
+                break;
+            }
+        }
+    }
+
+    if (!isNested) {
+        for (const [forkJoinId, forkJoinData] of Object.entries(forkJoinChildTasks)) {
+            const forkJoinSubtaskNameBranches = forkJoinData.branches;
+
+            forkJoinSubtaskNameBranches.forEach((branch, branchIndex) => {
+                if (isNested) {
+                    return;
+                }
+
+                const taskIndex = branch.indexOf(taskName);
+
+                if (taskIndex !== -1) {
+                    nestingData = {
+                        forkJoinData: {
+                            branchIndex,
+                            forkJoinId,
+                            index: taskIndex,
+                        },
+                    };
+
+                    isNested = true;
+                }
+            });
+
+            if (isNested) {
                 break;
             }
         }

@@ -66,6 +66,12 @@ export function buildGenericNodeData(
                     eachId: taskDispatcherId,
                     index: 0,
                 };
+            } else if (type === 'fork-join') {
+                newNodeData.forkJoinData = {
+                    branchIndex: taskDispatcherContext.branchIndex ?? 0,
+                    forkJoinId: taskDispatcherId,
+                    index: taskDispatcherContext.index ?? 0,
+                };
             }
 
             newNodeData.taskDispatcherId = taskDispatcherId;
@@ -309,6 +315,72 @@ export const TASK_DISPATCHER_CONFIG = {
             },
         }),
     },
+    'fork-join': {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'fork-join'),
+        contextIdentifier: 'forkJoinId',
+        dataKey: 'forkJoinData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+            const index = parseInt(parts[parts.length - 1] || '-1');
+
+            return {branchIndex: index ?? 0, index, taskDispatcherId: parts[0]};
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.forkJoinId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+            branches: [],
+        }),
+        getSubtasks: ({
+            context,
+            getAllSubtasks,
+            task,
+        }: {
+            context?: TaskDispatcherContextType;
+            getAllSubtasks?: boolean;
+            task: WorkflowTask;
+        }): Array<WorkflowTask> => {
+            const branches = task.parameters?.branches || [];
+
+            if (getAllSubtasks) {
+                return branches.flat();
+            }
+
+            const branchIndex = context?.branchIndex ?? 0;
+
+            if (branchIndex >= 0 && branchIndex < branches.length) {
+                return branches[branchIndex] || [];
+            }
+
+            return [];
+        },
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({
+            branches: [],
+        }),
+        updateTaskParameters: ({context, task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => {
+            const branches = [...(task.parameters?.branches || [])];
+            const branchIndex = context?.branchIndex ?? 0;
+
+            if (branchIndex >= 0 && branchIndex < branches.length) {
+                branches[branchIndex] = updatedSubtasks;
+            } else {
+                while (branches.length <= branchIndex) {
+                    branches.push([]);
+                }
+
+                branches[branchIndex] = updatedSubtasks;
+            }
+
+            return {
+                ...task,
+                parameters: {
+                    ...task.parameters,
+                    branches: branches,
+                },
+            };
+        },
+    },
     loop: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
             buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'loop'),
@@ -427,19 +499,19 @@ export function getParentTaskDispatcherTask(taskId: string, tasks: WorkflowTask[
 
         if (componentName === 'condition') {
             const trueBranchTasks = config.getSubtasks({
-                context: {conditionCase: CONDITION_CASE_TRUE, taskDispatcherId: taskId},
+                context: {conditionCase: CONDITION_CASE_TRUE, taskDispatcherId: task.name},
                 task,
             });
 
             const falseBranchTasks = config.getSubtasks({
-                context: {conditionCase: CONDITION_CASE_FALSE, taskDispatcherId: taskId},
+                context: {conditionCase: CONDITION_CASE_FALSE, taskDispatcherId: task.name},
                 task,
             });
 
             return [...trueBranchTasks, ...falseBranchTasks].some((subtask) => subtask.name === taskId);
         }
 
-        const allSubtasks = config.getSubtasks({task});
+        const allSubtasks = config.getSubtasks({getAllSubtasks: true, task});
 
         return allSubtasks.some((subtask) => subtask.name === taskId);
     });
@@ -457,7 +529,7 @@ export function getTaskDispatcherTask({
     tasks,
 }: GetParentTaskDispatcherTaskType): WorkflowTask | undefined {
     for (const task of tasks) {
-        if (task.name === taskDispatcherId) {
+        if (task?.name === taskDispatcherId) {
             return task;
         }
 
@@ -467,6 +539,8 @@ export function getTaskDispatcherTask({
 
                 if (collectionName === 'cases') {
                     subtasks = subtasks?.flatMap((branchCase: BranchCaseType) => branchCase.tasks);
+                } else if (collectionName === 'branches') {
+                    subtasks = subtasks?.flat();
                 }
 
                 if (Array.isArray(subtasks) && subtasks.length > 0) {

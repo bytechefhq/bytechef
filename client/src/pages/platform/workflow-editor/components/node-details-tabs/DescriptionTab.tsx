@@ -46,7 +46,8 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
             currentNode.loopData ||
             currentNode.branchData ||
             currentNode.parallelData ||
-            currentNode.eachData
+            currentNode.eachData ||
+            currentNode.forkJoinData
         ) {
             saveTaskDispatcherSubtaskFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
@@ -113,7 +114,8 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
             currentNode.loopData ||
             currentNode.branchData ||
             currentNode.parallelData ||
-            currentNode.eachData
+            currentNode.eachData ||
+            currentNode.forkJoinData
         ) {
             saveTaskDispatcherSubtaskFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,

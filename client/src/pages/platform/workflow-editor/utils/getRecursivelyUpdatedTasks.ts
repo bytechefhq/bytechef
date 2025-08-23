@@ -82,6 +82,18 @@ export default function getRecursivelyUpdatedTasks(
             };
         }
 
+        if (task.parameters?.branches) {
+            return {
+                ...task,
+                parameters: {
+                    ...task.parameters,
+                    branches: ((task.parameters?.branches as WorkflowTask[][]) || []).map((branch) =>
+                        getRecursivelyUpdatedTasks(branch, taskToReplace)
+                    ),
+                },
+            };
+        }
+
         return task;
     });
 }

@@ -149,7 +149,8 @@ const isTaskDispatcherSubtask = (node?: Node) =>
     !!node?.data?.conditionData ||
     !!node?.data?.branchData ||
     !!node?.data?.parallelData ||
-    !!node?.data?.eachData;
+    !!node?.data?.eachData ||
+    !!node?.data?.forkJoinData;
 
 const filterTaskDispatcherDefinitions = (
     taskDispatcherDefinitions: Array<TaskDispatcherDefinition> | null,
@@ -179,7 +180,6 @@ const filterTaskDispatcherDefinitions = (
         return result;
     }
 
-    // Find the source node
     const sourceNode = nodes.find((node) => node.id === nodeId);
 
     if (!sourceNode) {
