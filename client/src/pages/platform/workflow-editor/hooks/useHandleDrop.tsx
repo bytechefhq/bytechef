@@ -3,6 +3,7 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ActionDefinitionApi,
     ComponentDefinitionApi,
+    TaskDispatcherDefinition,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
@@ -11,6 +12,7 @@ import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinition
 import {
     ClickedDefinitionType,
     NodeDataType,
+    PropertyAllType,
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
@@ -27,7 +29,8 @@ import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 
 async function createWorkflowNodeData(
     droppedNode: ClickedDefinitionType,
-    queryClient: QueryClient
+    queryClient: QueryClient,
+    taskDispatcherDefinitions: TaskDispatcherDefinition[]
 ): Promise<{nodeData: NodeDataType; operationName?: string}> {
     const baseNodeData: NodeDataType = {
         componentName: droppedNode.name!,
@@ -41,9 +44,13 @@ async function createWorkflowNodeData(
     };
 
     if (baseNodeData.taskDispatcher) {
+        const taskDispatcherDefinition = taskDispatcherDefinitions.find(
+            (definition) => definition.name === baseNodeData.componentName
+        );
+
         const initialParameters = TASK_DISPATCHER_CONFIG[
             baseNodeData.componentName as keyof typeof TASK_DISPATCHER_CONFIG
-        ]?.getInitialParameters([]);
+        ]?.getInitialParameters((taskDispatcherDefinition?.properties as Array<PropertyAllType>) || []);
 
         return {
             nodeData: {
@@ -166,8 +173,10 @@ async function saveDroppedNode({
 
 export default function useHandleDrop({
     invalidateWorkflowQueries,
+    taskDispatcherDefinitions,
 }: {
     invalidateWorkflowQueries: () => void;
+    taskDispatcherDefinitions: TaskDispatcherDefinition[];
 }): [
     (targetNode: Node, droppedNode: ClickedDefinitionType) => void,
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
@@ -178,7 +187,11 @@ export default function useHandleDrop({
     const queryClient = useQueryClient();
 
     async function handleDropOnPlaceholderNode(targetNode: Node, droppedNode: ClickedDefinitionType) {
-        const {nodeData, operationName} = await createWorkflowNodeData(droppedNode, queryClient);
+        const {nodeData, operationName} = await createWorkflowNodeData(
+            droppedNode,
+            queryClient,
+            taskDispatcherDefinitions
+        );
 
         await saveDroppedNode({
             captureComponentUsed,
@@ -195,7 +208,11 @@ export default function useHandleDrop({
 
     async function handleDropOnWorkflowEdge(targetEdge: Edge, droppedNode: ClickedDefinitionType) {
         const {nodes} = useWorkflowDataStore.getState();
-        const {nodeData, operationName} = await createWorkflowNodeData(droppedNode, queryClient);
+        const {nodeData, operationName} = await createWorkflowNodeData(
+            droppedNode,
+            queryClient,
+            taskDispatcherDefinitions
+        );
 
         const insertIndex = calculateNodeInsertIndex(targetEdge.target);
 
@@ -213,7 +230,11 @@ export default function useHandleDrop({
     }
 
     async function handleDropOnTriggerNode(droppedNode: ClickedDefinitionType) {
-        const {nodeData, operationName} = await createWorkflowNodeData(droppedNode, queryClient);
+        const {nodeData, operationName} = await createWorkflowNodeData(
+            droppedNode,
+            queryClient,
+            taskDispatcherDefinitions
+        );
 
         await saveDroppedNode({
             captureComponentUsed,
