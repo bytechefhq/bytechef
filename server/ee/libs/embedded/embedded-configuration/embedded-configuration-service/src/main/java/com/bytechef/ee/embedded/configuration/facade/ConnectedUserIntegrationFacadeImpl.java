@@ -109,6 +109,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     @Override
     public void deleteIntegrationInstance(String externalUserId, long integrationInstanceId) {
+        integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
+
         IntegrationInstance integrationInstance =
             integrationInstanceService.getIntegrationInstance(integrationInstanceId);
 

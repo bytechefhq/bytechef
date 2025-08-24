@@ -102,5 +102,4 @@ public class IntegrationApiController implements IntegrationApi {
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
     }
-
 }

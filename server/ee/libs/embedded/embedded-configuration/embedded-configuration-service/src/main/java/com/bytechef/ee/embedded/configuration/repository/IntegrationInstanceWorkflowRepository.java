@@ -38,6 +38,13 @@ public interface IntegrationInstanceWorkflowRepository extends ListCrudRepositor
     @Modifying
     @Query("""
         DELETE FROM integration_instance_workflow
+        WHERE integration_instance_id = :integrationInstanceId
+        """)
+    void deleteByIntegrationInstanceId(@Param("integrationInstanceId") long integrationInstanceId);
+
+    @Modifying
+    @Query("""
+        DELETE FROM integration_instance_workflow
         WHERE integration_instance_configuration_workflow_id = :integrationInstanceConfigurationWorkflowId
         """)
     void deleteByIntegrationInstanceConfigurationWorkflowId(
