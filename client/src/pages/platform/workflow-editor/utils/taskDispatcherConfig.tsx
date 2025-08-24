@@ -541,6 +541,12 @@ export function getTaskDispatcherTask({
                     subtasks = subtasks?.flatMap((branchCase: BranchCaseType) => branchCase.tasks);
                 } else if (collectionName === 'branches') {
                     subtasks = subtasks?.flat();
+                } else if (collectionName === 'iteratee') {
+                    if (subtasks && typeof subtasks === 'object' && !Array.isArray(subtasks)) {
+                        subtasks = [subtasks];
+                    } else if (!Array.isArray(subtasks)) {
+                        subtasks = [];
+                    }
                 }
 
                 if (Array.isArray(subtasks) && subtasks.length > 0) {

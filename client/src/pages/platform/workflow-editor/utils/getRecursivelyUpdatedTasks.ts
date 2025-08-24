@@ -1,6 +1,26 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType} from '@/shared/types';
 
+function updateTaskParameter(task: WorkflowTask, parameterKey: string, parameterValue: unknown): WorkflowTask {
+    return {
+        ...task,
+        parameters: {
+            ...task.parameters,
+            [parameterKey]: parameterValue,
+        },
+    };
+}
+
+function updateTaskArray(task: WorkflowTask, parameterKey: string, taskToReplace: WorkflowTask): WorkflowTask {
+    const tasks = task.parameters?.[parameterKey] as WorkflowTask[];
+
+    if (!tasks) {
+        return task;
+    }
+
+    return updateTaskParameter(task, parameterKey, getRecursivelyUpdatedTasks(tasks, taskToReplace));
+}
+
 export default function getRecursivelyUpdatedTasks(
     tasks: Array<WorkflowTask>,
     taskToReplace: WorkflowTask
@@ -15,83 +35,60 @@ export default function getRecursivelyUpdatedTasks(
         }
 
         if (task.parameters?.caseTrue || task.parameters?.caseFalse) {
-            const updatedTask = {...task};
+            let updatedTask = {...task};
 
             if (task.parameters.caseTrue) {
-                updatedTask.parameters = {
-                    ...updatedTask.parameters,
-                    caseTrue: getRecursivelyUpdatedTasks(task.parameters.caseTrue, taskToReplace),
-                };
+                updatedTask = updateTaskArray(updatedTask, 'caseTrue', taskToReplace);
             }
 
             if (task.parameters.caseFalse) {
-                updatedTask.parameters = {
-                    ...updatedTask.parameters,
-                    caseFalse: getRecursivelyUpdatedTasks(task.parameters.caseFalse, taskToReplace),
-                };
+                updatedTask = updateTaskArray(updatedTask, 'caseFalse', taskToReplace);
             }
 
             return updatedTask;
         }
 
         if (task.parameters?.iteratee) {
-            return {
-                ...task,
-                parameters: {
-                    ...task.parameters,
-                    iteratee: getRecursivelyUpdatedTasks(task.parameters.iteratee, taskToReplace),
-                },
-            };
+            if (Array.isArray(task.parameters.iteratee)) {
+                return updateTaskArray(task, 'iteratee', taskToReplace);
+            } else {
+                return updateTaskParameter(
+                    task,
+                    'iteratee',
+                    getRecursivelyUpdatedTasks([task.parameters.iteratee], taskToReplace)[0]
+                );
+            }
         }
 
         if (task.parameters?.cases) {
-            const updatedTask = {...task};
+            let updatedTask = {...task};
 
             if (task.parameters.default) {
-                updatedTask.parameters = {
-                    ...updatedTask.parameters,
-                    default: getRecursivelyUpdatedTasks(task.parameters.default, taskToReplace),
-                };
+                updatedTask = updateTaskArray(updatedTask, 'default', taskToReplace);
             }
 
             if (task.parameters.cases) {
-                updatedTask.parameters = {
-                    ...updatedTask.parameters,
-                    cases: (task.parameters.cases as BranchCaseType[]).map((caseItem) => {
-                        const updatedCaseItem = {...caseItem};
+                const updatedCases = (task.parameters.cases as BranchCaseType[]).map((caseItem) => ({
+                    ...caseItem,
+                    tasks: caseItem.tasks ? getRecursivelyUpdatedTasks(caseItem.tasks, taskToReplace) : caseItem.tasks,
+                }));
 
-                        if (caseItem.tasks) {
-                            updatedCaseItem.tasks = getRecursivelyUpdatedTasks(caseItem.tasks, taskToReplace);
-                        }
-
-                        return updatedCaseItem;
-                    }),
-                };
+                updatedTask = updateTaskParameter(updatedTask, 'cases', updatedCases);
             }
 
             return updatedTask;
         }
 
         if (task.parameters?.tasks) {
-            return {
-                ...task,
-                parameters: {
-                    ...task.parameters,
-                    tasks: getRecursivelyUpdatedTasks(task.parameters.tasks, taskToReplace),
-                },
-            };
+            return updateTaskArray(task, 'tasks', taskToReplace);
         }
 
         if (task.parameters?.branches) {
-            return {
-                ...task,
-                parameters: {
-                    ...task.parameters,
-                    branches: ((task.parameters?.branches as WorkflowTask[][]) || []).map((branch) =>
-                        getRecursivelyUpdatedTasks(branch, taskToReplace)
-                    ),
-                },
-            };
+            const updatedBranches = ((task.parameters?.branches as WorkflowTask[][]) || []).map((branch) =>
+                getRecursivelyUpdatedTasks(branch, taskToReplace)
+            );
+
+            return updateTaskParameter(task, 'branches', updatedBranches);
         }
 
         return task;
