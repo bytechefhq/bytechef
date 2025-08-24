@@ -34,7 +34,6 @@ public interface IntegrationInstanceRepository
         WHERE integration.component_name = :componentName
         AND integration_instance_configuration.environment = :environment
         AND integration_instance.connected_user_id = :connectedUserId
-        LIMIT 1
         """)
     List<IntegrationInstance> findAllByConnectedUserIdIdAndComponentNameAndEnvironment(
         @Param("connectedUserId") long connectedUserId, @Param("componentName") String componentName,

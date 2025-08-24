@@ -23,6 +23,8 @@ public interface IntegrationInstanceWorkflowService {
 
     void delete(Long id);
 
+    void deleteByIntegrationInstanceId(Long integrationInstanceId);
+
     void deleteByIntegrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId);
 
     Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(

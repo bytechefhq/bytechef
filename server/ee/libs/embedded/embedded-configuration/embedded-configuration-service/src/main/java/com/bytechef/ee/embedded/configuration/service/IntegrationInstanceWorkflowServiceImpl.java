@@ -54,6 +54,11 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
     }
 
     @Override
+    public void deleteByIntegrationInstanceId(Long integrationInstanceId) {
+        integrationInstanceWorkflowRepository.deleteByIntegrationInstanceId(integrationInstanceId);
+    }
+
+    @Override
     public void deleteByIntegrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId) {
         integrationInstanceWorkflowRepository.deleteByIntegrationInstanceConfigurationWorkflowId(
             integrationInstanceConfigurationWorkflowId);
