@@ -80,6 +80,7 @@ const WorkflowEditor = ({
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop({
         invalidateWorkflowQueries,
+        taskDispatcherDefinitions,
     });
 
     const nodeTypes = useMemo(
