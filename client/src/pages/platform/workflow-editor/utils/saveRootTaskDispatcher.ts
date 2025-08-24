@@ -12,6 +12,19 @@ import {Node} from '@xyflow/react';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
+/**
+ * Maps task dispatcher names to their corresponding property names
+ * Handles special cases like 'fork-join' -> 'forkJoin'
+ */
+function getTaskDispatcherPropertyName(taskDispatcherName: string): string {
+    switch (taskDispatcherName) {
+        case 'fork-join':
+            return 'forkJoin';
+        default:
+            return taskDispatcherName;
+    }
+}
+
 interface SaveRootTaskDispatcherProps {
     invalidateWorkflowQueries: () => void;
     nodes: Node[];
@@ -107,17 +120,17 @@ function getRecursivelyUpdatedRootTaskDispatcherNodeData(
 
     // Look for parent dispatchers of all types
     for (const taskDispatcherName of TASK_DISPATCHER_NAMES) {
+        const propertyName = getTaskDispatcherPropertyName(taskDispatcherName);
+
         const taskDispatcherData = nodeData[
-            `${taskDispatcherName as keyof typeof TASK_DISPATCHER_CONFIG}Data`
+            `${propertyName}Data` as keyof typeof nodeData
         ] as TaskDispatcherContextType;
 
         if (!taskDispatcherData) {
             continue;
         }
 
-        const taskDispatcherId: string = (taskDispatcherData as TaskDispatcherDataType)[
-            `${taskDispatcherName as keyof typeof TASK_DISPATCHER_CONFIG}Id`
-        ];
+        const taskDispatcherId: string = (taskDispatcherData as unknown as Record<string, string>)[`${propertyName}Id`];
 
         const taskDispatcherConfig = TASK_DISPATCHER_CONFIG[taskDispatcherName as keyof typeof TASK_DISPATCHER_CONFIG];
 
