@@ -301,7 +301,7 @@ export const TASK_DISPATCHER_CONFIG = {
                 return [];
             }
 
-            return parameters.iteratee;
+            return [parameters.iteratee];
         },
         getTask: getTaskDispatcherTask,
         initializeParameters: () => ({
@@ -311,7 +311,7 @@ export const TASK_DISPATCHER_CONFIG = {
             ...task,
             parameters: {
                 ...task.parameters,
-                iteratee: updatedSubtasks,
+                iteratee: updatedSubtasks[0] || null,
             },
         }),
     },

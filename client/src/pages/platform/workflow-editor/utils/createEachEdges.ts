@@ -1,4 +1,4 @@
-import {EDGE_STYLES} from '@/shared/constants';
+import {EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
@@ -64,24 +64,46 @@ function createEdgesForEmptyEach(eachId: string): Edge[] {
 }
 
 function createEdgeSubtaskEdges(eachId: string, eachChildTask: WorkflowTask): Edge[] {
+    const topGhostId = `${eachId}-each-top-ghost`;
+    const bottomGhostId = `${eachId}-each-bottom-ghost`;
+    const childTaskId = eachChildTask.name;
+    const childTaskComponentName = childTaskId.split('_')[0];
+
     const edgeFromTopGhostToChildTask = {
-        id: `${eachId}-each-top-ghost=>${eachChildTask.name}`,
-        source: `${eachId}-each-top-ghost`,
-        sourceHandle: `${eachId}-each-top-ghost-right`,
+        id: `${topGhostId}=>${childTaskId}`,
+        source: topGhostId,
+        sourceHandle: `${topGhostId}-right`,
         style: EDGE_STYLES,
-        target: eachChildTask.name,
+        target: childTaskId,
         type: 'smoothstep',
     };
 
-    const edgeFromSubtaskToBottomGhost = {
-        id: `${eachChildTask.name}=>${eachId}-each-bottom-ghost`,
-        source: eachChildTask.name,
-        style: EDGE_STYLES,
-        target: `${eachId}-each-bottom-ghost`,
-        type: 'smoothstep',
-    };
+    // Check if the child task is itself a task dispatcher
+    if (TASK_DISPATCHER_NAMES.includes(childTaskComponentName) && childTaskComponentName !== 'loopBreak') {
+        const nestedBottomGhostId = `${childTaskId}-${childTaskComponentName}-bottom-ghost`;
 
-    return [edgeFromTopGhostToChildTask, edgeFromSubtaskToBottomGhost];
+        const edgeFromNestedGhostToBottomGhost = {
+            id: `${nestedBottomGhostId}=>${bottomGhostId}`,
+            source: nestedBottomGhostId,
+            style: EDGE_STYLES,
+            target: bottomGhostId,
+            targetHandle: `${bottomGhostId}-right`,
+            type: 'smoothstep',
+        };
+
+        return [edgeFromTopGhostToChildTask, edgeFromNestedGhostToBottomGhost];
+    } else {
+        const edgeFromSubtaskToBottomGhost = {
+            id: `${childTaskId}=>${bottomGhostId}`,
+            source: childTaskId,
+            style: EDGE_STYLES,
+            target: bottomGhostId,
+            targetHandle: `${bottomGhostId}-right`,
+            type: 'smoothstep',
+        };
+
+        return [edgeFromTopGhostToChildTask, edgeFromSubtaskToBottomGhost];
+    }
 }
 
 /**
