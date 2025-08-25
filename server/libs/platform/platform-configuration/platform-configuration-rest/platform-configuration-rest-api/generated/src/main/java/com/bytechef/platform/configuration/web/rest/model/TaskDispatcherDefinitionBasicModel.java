@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class TaskDispatcherDefinitionBasicModel {
 
   private @Nullable String description;
@@ -59,7 +59,7 @@ public class TaskDispatcherDefinitionBasicModel {
     this.version = version;
   }
 
-  public TaskDispatcherDefinitionBasicModel description(String description) {
+  public TaskDispatcherDefinitionBasicModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -71,15 +71,15 @@ public class TaskDispatcherDefinitionBasicModel {
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public TaskDispatcherDefinitionBasicModel icon(String icon) {
+  public TaskDispatcherDefinitionBasicModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -91,11 +91,11 @@ public class TaskDispatcherDefinitionBasicModel {
   
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
@@ -139,7 +139,7 @@ public class TaskDispatcherDefinitionBasicModel {
     this.outputDefined = outputDefined;
   }
 
-  public TaskDispatcherDefinitionBasicModel outputFunctionDefined(Boolean outputFunctionDefined) {
+  public TaskDispatcherDefinitionBasicModel outputFunctionDefined(@Nullable Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
     return this;
   }
@@ -151,15 +151,15 @@ public class TaskDispatcherDefinitionBasicModel {
   
   @Schema(name = "outputFunctionDefined", description = "Does task dispatcher defines output function.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputFunctionDefined")
-  public Boolean getOutputFunctionDefined() {
+  public @Nullable Boolean getOutputFunctionDefined() {
     return outputFunctionDefined;
   }
 
-  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+  public void setOutputFunctionDefined(@Nullable Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
   }
 
-  public TaskDispatcherDefinitionBasicModel outputSchemaDefined(Boolean outputSchemaDefined) {
+  public TaskDispatcherDefinitionBasicModel outputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
     return this;
   }
@@ -171,15 +171,15 @@ public class TaskDispatcherDefinitionBasicModel {
   
   @Schema(name = "outputSchemaDefined", description = "Does task dispatcher defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchemaDefined")
-  public Boolean getOutputSchemaDefined() {
+  public @Nullable Boolean getOutputSchemaDefined() {
     return outputSchemaDefined;
   }
 
-  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+  public void setOutputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
   }
 
-  public TaskDispatcherDefinitionBasicModel resources(ResourcesModel resources) {
+  public TaskDispatcherDefinitionBasicModel resources(@Nullable ResourcesModel resources) {
     this.resources = resources;
     return this;
   }
@@ -191,15 +191,15 @@ public class TaskDispatcherDefinitionBasicModel {
   @Valid 
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("resources")
-  public ResourcesModel getResources() {
+  public @Nullable ResourcesModel getResources() {
     return resources;
   }
 
-  public void setResources(ResourcesModel resources) {
+  public void setResources(@Nullable ResourcesModel resources) {
     this.resources = resources;
   }
 
-  public TaskDispatcherDefinitionBasicModel title(String title) {
+  public TaskDispatcherDefinitionBasicModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -211,15 +211,15 @@ public class TaskDispatcherDefinitionBasicModel {
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
-  public TaskDispatcherDefinitionBasicModel variablePropertiesDefined(Boolean variablePropertiesDefined) {
+  public TaskDispatcherDefinitionBasicModel variablePropertiesDefined(@Nullable Boolean variablePropertiesDefined) {
     this.variablePropertiesDefined = variablePropertiesDefined;
     return this;
   }
@@ -231,11 +231,11 @@ public class TaskDispatcherDefinitionBasicModel {
   
   @Schema(name = "variablePropertiesDefined", description = "Does task dispatcher define dynamic variable properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("variablePropertiesDefined")
-  public Boolean getVariablePropertiesDefined() {
+  public @Nullable Boolean getVariablePropertiesDefined() {
     return variablePropertiesDefined;
   }
 
-  public void setVariablePropertiesDefined(Boolean variablePropertiesDefined) {
+  public void setVariablePropertiesDefined(@Nullable Boolean variablePropertiesDefined) {
     this.variablePropertiesDefined = variablePropertiesDefined;
   }
 

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementType", description = "A type of a cluster element.")
 @JsonTypeName("ClusterElementType")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ClusterElementTypeModel {
 
   private @Nullable String name;
@@ -33,7 +33,7 @@ public class ClusterElementTypeModel {
 
   private @Nullable Boolean multipleElements;
 
-  public ClusterElementTypeModel name(String name) {
+  public ClusterElementTypeModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -45,15 +45,15 @@ public class ClusterElementTypeModel {
   
   @Schema(name = "name", description = "The name of a cluster element type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
-  public String getName() {
+  public @Nullable String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nullable String name) {
     this.name = name;
   }
 
-  public ClusterElementTypeModel label(String label) {
+  public ClusterElementTypeModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -65,15 +65,15 @@ public class ClusterElementTypeModel {
   
   @Schema(name = "label", description = "The label of a cluster element type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 
-  public ClusterElementTypeModel required(Boolean required) {
+  public ClusterElementTypeModel required(@Nullable Boolean required) {
     this.required = required;
     return this;
   }
@@ -85,15 +85,15 @@ public class ClusterElementTypeModel {
   
   @Schema(name = "required", description = "If the cluster element type is required.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("required")
-  public Boolean getRequired() {
+  public @Nullable Boolean getRequired() {
     return required;
   }
 
-  public void setRequired(Boolean required) {
+  public void setRequired(@Nullable Boolean required) {
     this.required = required;
   }
 
-  public ClusterElementTypeModel multipleElements(Boolean multipleElements) {
+  public ClusterElementTypeModel multipleElements(@Nullable Boolean multipleElements) {
     this.multipleElements = multipleElements;
     return this;
   }
@@ -105,11 +105,11 @@ public class ClusterElementTypeModel {
   
   @Schema(name = "multipleElements", description = "If multiple elements can be added.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("multipleElements")
-  public Boolean getMultipleElements() {
+  public @Nullable Boolean getMultipleElements() {
     return multipleElements;
   }
 
-  public void setMultipleElements(Boolean multipleElements) {
+  public void setMultipleElements(@Nullable Boolean multipleElements) {
     this.multipleElements = multipleElements;
   }
 

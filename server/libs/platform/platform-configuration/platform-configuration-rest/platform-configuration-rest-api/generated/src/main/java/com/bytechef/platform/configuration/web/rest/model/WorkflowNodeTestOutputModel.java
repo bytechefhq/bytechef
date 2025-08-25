@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeTestOutput", description = "Contains test output of a workflow node.")
 @JsonTypeName("WorkflowNodeTestOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowNodeTestOutputModel {
 
   private @Nullable Long id;
@@ -31,7 +31,7 @@ public class WorkflowNodeTestOutputModel {
 
   private @Nullable String workflowId;
 
-  public WorkflowNodeTestOutputModel id(Long id) {
+  public WorkflowNodeTestOutputModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -43,15 +43,15 @@ public class WorkflowNodeTestOutputModel {
   
   @Schema(name = "id", description = "The workflow test node output id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public WorkflowNodeTestOutputModel workflowNodeName(String workflowNodeName) {
+  public WorkflowNodeTestOutputModel workflowNodeName(@Nullable String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
     return this;
   }
@@ -63,15 +63,15 @@ public class WorkflowNodeTestOutputModel {
   
   @Schema(name = "workflowNodeName", description = "The workflow node name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowNodeName")
-  public String getWorkflowNodeName() {
+  public @Nullable String getWorkflowNodeName() {
     return workflowNodeName;
   }
 
-  public void setWorkflowNodeName(String workflowNodeName) {
+  public void setWorkflowNodeName(@Nullable String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
   }
 
-  public WorkflowNodeTestOutputModel workflowId(String workflowId) {
+  public WorkflowNodeTestOutputModel workflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
     return this;
   }
@@ -83,11 +83,11 @@ public class WorkflowNodeTestOutputModel {
   
   @Schema(name = "workflowId", description = "The workflow id.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")
-  public String getWorkflowId() {
+  public @Nullable String getWorkflowId() {
     return workflowId;
   }
 
-  public void setWorkflowId(String workflowId) {
+  public void setWorkflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
   }
 

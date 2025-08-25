@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2Properties")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class OAuth2PropertiesModel {
 
   private @Nullable String redirectUri;
@@ -32,7 +32,7 @@ public class OAuth2PropertiesModel {
   @Valid
   private List<String> predefinedApps = new ArrayList<>();
 
-  public OAuth2PropertiesModel redirectUri(String redirectUri) {
+  public OAuth2PropertiesModel redirectUri(@Nullable String redirectUri) {
     this.redirectUri = redirectUri;
     return this;
   }
@@ -44,11 +44,11 @@ public class OAuth2PropertiesModel {
   
   @Schema(name = "redirectUri", accessMode = Schema.AccessMode.READ_ONLY, description = "The redirect URI used for OAuth2 callback URL.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("redirectUri")
-  public String getRedirectUri() {
+  public @Nullable String getRedirectUri() {
     return redirectUri;
   }
 
-  public void setRedirectUri(String redirectUri) {
+  public void setRedirectUri(@Nullable String redirectUri) {
     this.redirectUri = redirectUri;
   }
 

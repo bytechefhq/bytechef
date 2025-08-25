@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "BooleanProperty", description = "A boolean property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class BooleanPropertyModel extends ValuePropertyModel {
 
   private @Nullable Boolean defaultValue;
@@ -54,7 +54,7 @@ public class BooleanPropertyModel extends ValuePropertyModel {
     super(controlType, type);
   }
 
-  public BooleanPropertyModel defaultValue(Boolean defaultValue) {
+  public BooleanPropertyModel defaultValue(@Nullable Boolean defaultValue) {
     this.defaultValue = defaultValue;
     return this;
   }
@@ -66,15 +66,15 @@ public class BooleanPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
-  public Boolean getDefaultValue() {
+  public @Nullable Boolean getDefaultValue() {
     return defaultValue;
   }
 
-  public void setDefaultValue(Boolean defaultValue) {
+  public void setDefaultValue(@Nullable Boolean defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  public BooleanPropertyModel exampleValue(Boolean exampleValue) {
+  public BooleanPropertyModel exampleValue(@Nullable Boolean exampleValue) {
     this.exampleValue = exampleValue;
     return this;
   }
@@ -86,11 +86,11 @@ public class BooleanPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
-  public Boolean getExampleValue() {
+  public @Nullable Boolean getExampleValue() {
     return exampleValue;
   }
 
-  public void setExampleValue(Boolean exampleValue) {
+  public void setExampleValue(@Nullable Boolean exampleValue) {
     this.exampleValue = exampleValue;
   }
 

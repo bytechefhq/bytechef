@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUser")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:29.992941913+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.840775+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectedUserModel {
 
   private @Nullable String createdBy;
@@ -75,7 +75,7 @@ public class ConnectedUserModel {
     this.externalId = externalId;
   }
 
-  public ConnectedUserModel createdBy(String createdBy) {
+  public ConnectedUserModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -87,15 +87,15 @@ public class ConnectedUserModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public ConnectedUserModel createdDate(OffsetDateTime createdDate) {
+  public ConnectedUserModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -107,15 +107,15 @@ public class ConnectedUserModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public ConnectedUserModel email(String email) {
+  public ConnectedUserModel email(@Nullable String email) {
     this.email = email;
     return this;
   }
@@ -127,15 +127,15 @@ public class ConnectedUserModel {
   
   @Schema(name = "email", description = "The email address.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("email")
-  public String getEmail() {
+  public @Nullable String getEmail() {
     return email;
   }
 
-  public void setEmail(String email) {
+  public void setEmail(@Nullable String email) {
     this.email = email;
   }
 
-  public ConnectedUserModel enabled(Boolean enabled) {
+  public ConnectedUserModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -147,15 +147,15 @@ public class ConnectedUserModel {
   
   @Schema(name = "enabled", description = "If a connected user is enabled or not", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 
-  public ConnectedUserModel environment(EnvironmentModel environment) {
+  public ConnectedUserModel environment(@Nullable EnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -167,11 +167,11 @@ public class ConnectedUserModel {
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
-  public EnvironmentModel getEnvironment() {
+  public @Nullable EnvironmentModel getEnvironment() {
     return environment;
   }
 
-  public void setEnvironment(EnvironmentModel environment) {
+  public void setEnvironment(@Nullable EnvironmentModel environment) {
     this.environment = environment;
   }
 
@@ -195,7 +195,7 @@ public class ConnectedUserModel {
     this.externalId = externalId;
   }
 
-  public ConnectedUserModel id(Long id) {
+  public ConnectedUserModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -207,11 +207,11 @@ public class ConnectedUserModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connected user.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
@@ -271,7 +271,7 @@ public class ConnectedUserModel {
     this.metadata = metadata;
   }
 
-  public ConnectedUserModel name(String name) {
+  public ConnectedUserModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -283,15 +283,15 @@ public class ConnectedUserModel {
   
   @Schema(name = "name", description = "The name of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
-  public String getName() {
+  public @Nullable String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nullable String name) {
     this.name = name;
   }
 
-  public ConnectedUserModel lastModifiedBy(String lastModifiedBy) {
+  public ConnectedUserModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -303,15 +303,15 @@ public class ConnectedUserModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ConnectedUserModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ConnectedUserModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -323,15 +323,15 @@ public class ConnectedUserModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ConnectedUserModel version(Integer version) {
+  public ConnectedUserModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -343,11 +343,11 @@ public class ConnectedUserModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:28.963074682+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class OAuth2Model {
 
   private @Nullable String authorizationUrl;
@@ -41,7 +41,7 @@ public class OAuth2Model {
   @Valid
   private List<String> scopes = new ArrayList<>();
 
-  public OAuth2Model authorizationUrl(String authorizationUrl) {
+  public OAuth2Model authorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
     return this;
   }
@@ -53,11 +53,11 @@ public class OAuth2Model {
   
   @Schema(name = "authorizationUrl", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationUrl")
-  public String getAuthorizationUrl() {
+  public @Nullable String getAuthorizationUrl() {
     return authorizationUrl;
   }
 
-  public void setAuthorizationUrl(String authorizationUrl) {
+  public void setAuthorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
   }
 
@@ -89,7 +89,7 @@ public class OAuth2Model {
     this.extraQueryParameters = extraQueryParameters;
   }
 
-  public OAuth2Model clientId(String clientId) {
+  public OAuth2Model clientId(@Nullable String clientId) {
     this.clientId = clientId;
     return this;
   }
@@ -101,15 +101,15 @@ public class OAuth2Model {
   
   @Schema(name = "clientId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("clientId")
-  public String getClientId() {
+  public @Nullable String getClientId() {
     return clientId;
   }
 
-  public void setClientId(String clientId) {
+  public void setClientId(@Nullable String clientId) {
     this.clientId = clientId;
   }
 
-  public OAuth2Model redirectUri(String redirectUri) {
+  public OAuth2Model redirectUri(@Nullable String redirectUri) {
     this.redirectUri = redirectUri;
     return this;
   }
@@ -121,11 +121,11 @@ public class OAuth2Model {
   
   @Schema(name = "redirectUri", description = "The redirect URI used for OAuth2 callback URL.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("redirectUri")
-  public String getRedirectUri() {
+  public @Nullable String getRedirectUri() {
     return redirectUri;
   }
 
-  public void setRedirectUri(String redirectUri) {
+  public void setRedirectUri(@Nullable String redirectUri) {
     this.redirectUri = redirectUri;
   }
 

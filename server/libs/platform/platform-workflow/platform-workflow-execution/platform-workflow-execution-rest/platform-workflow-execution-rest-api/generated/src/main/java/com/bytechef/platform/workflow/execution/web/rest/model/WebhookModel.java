@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Webhook", description = "Used to register to receive notifications for certain events.")
 @JsonTypeName("Webhook")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:46.305254656+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.879388+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WebhookModel {
 
   private @Nullable String type;
@@ -32,7 +32,7 @@ public class WebhookModel {
 
   private @Nullable WebhookRetryModel retry;
 
-  public WebhookModel type(String type) {
+  public WebhookModel type(@Nullable String type) {
     this.type = type;
     return this;
   }
@@ -44,15 +44,15 @@ public class WebhookModel {
   
   @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("type")
-  public String getType() {
+  public @Nullable String getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(@Nullable String type) {
     this.type = type;
   }
 
-  public WebhookModel url(String url) {
+  public WebhookModel url(@Nullable String url) {
     this.url = url;
     return this;
   }
@@ -64,15 +64,15 @@ public class WebhookModel {
   
   @Schema(name = "url", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("url")
-  public String getUrl() {
+  public @Nullable String getUrl() {
     return url;
   }
 
-  public void setUrl(String url) {
+  public void setUrl(@Nullable String url) {
     this.url = url;
   }
 
-  public WebhookModel retry(WebhookRetryModel retry) {
+  public WebhookModel retry(@Nullable WebhookRetryModel retry) {
     this.retry = retry;
     return this;
   }
@@ -84,11 +84,11 @@ public class WebhookModel {
   @Valid 
   @Schema(name = "retry", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("retry")
-  public WebhookRetryModel getRetry() {
+  public @Nullable WebhookRetryModel getRetry() {
     return retry;
   }
 
-  public void setRetry(WebhookRetryModel retry) {
+  public void setRetry(@Nullable WebhookRetryModel retry) {
     this.retry = retry;
   }
 

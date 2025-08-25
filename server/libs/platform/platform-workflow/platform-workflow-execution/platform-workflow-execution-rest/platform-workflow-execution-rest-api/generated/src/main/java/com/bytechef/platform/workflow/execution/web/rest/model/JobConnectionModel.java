@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobConnection", description = "The connection used in a particular task.")
 @JsonTypeName("JobConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:46.305254656+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.879388+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class JobConnectionModel {
 
   private @Nullable Long id;
@@ -31,7 +31,7 @@ public class JobConnectionModel {
 
   private @Nullable String taskName;
 
-  public JobConnectionModel id(Long id) {
+  public JobConnectionModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -43,15 +43,15 @@ public class JobConnectionModel {
   
   @Schema(name = "id", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public JobConnectionModel key(String key) {
+  public JobConnectionModel key(@Nullable String key) {
     this.key = key;
     return this;
   }
@@ -63,15 +63,15 @@ public class JobConnectionModel {
   
   @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("key")
-  public String getKey() {
+  public @Nullable String getKey() {
     return key;
   }
 
-  public void setKey(String key) {
+  public void setKey(@Nullable String key) {
     this.key = key;
   }
 
-  public JobConnectionModel taskName(String taskName) {
+  public JobConnectionModel taskName(@Nullable String taskName) {
     this.taskName = taskName;
     return this;
   }
@@ -83,11 +83,11 @@ public class JobConnectionModel {
   
   @Schema(name = "taskName", description = "The task name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskName")
-  public String getTaskName() {
+  public @Nullable String getTaskName() {
     return taskName;
   }
 
-  public void setTaskName(String taskName) {
+  public void setTaskName(@Nullable String taskName) {
     this.taskName = taskName;
   }
 

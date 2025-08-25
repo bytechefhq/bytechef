@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiConnector", description = "An API connector.")
 @JsonTypeName("ApiConnector")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:45.499532334+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.641711+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ApiConnectorModel {
 
   private String connectorVersion;
@@ -100,7 +100,7 @@ public class ApiConnectorModel {
     this.connectorVersion = connectorVersion;
   }
 
-  public ApiConnectorModel createdBy(String createdBy) {
+  public ApiConnectorModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -112,15 +112,15 @@ public class ApiConnectorModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public ApiConnectorModel createdDate(OffsetDateTime createdDate) {
+  public ApiConnectorModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -132,15 +132,15 @@ public class ApiConnectorModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public ApiConnectorModel description(String description) {
+  public ApiConnectorModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -152,15 +152,15 @@ public class ApiConnectorModel {
   
   @Schema(name = "description", description = "The description of an API connector.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public ApiConnectorModel definition(String definition) {
+  public ApiConnectorModel definition(@Nullable String definition) {
     this.definition = definition;
     return this;
   }
@@ -172,15 +172,15 @@ public class ApiConnectorModel {
   
   @Schema(name = "definition", accessMode = Schema.AccessMode.READ_ONLY, description = "The definition of an API connector.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("definition")
-  public String getDefinition() {
+  public @Nullable String getDefinition() {
     return definition;
   }
 
-  public void setDefinition(String definition) {
+  public void setDefinition(@Nullable String definition) {
     this.definition = definition;
   }
 
-  public ApiConnectorModel enabled(Boolean enabled) {
+  public ApiConnectorModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -192,11 +192,11 @@ public class ApiConnectorModel {
   
   @Schema(name = "enabled", description = "If an API connector is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 
@@ -228,7 +228,7 @@ public class ApiConnectorModel {
     this.endpoints = endpoints;
   }
 
-  public ApiConnectorModel icon(String icon) {
+  public ApiConnectorModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -240,15 +240,15 @@ public class ApiConnectorModel {
   
   @Schema(name = "icon", description = "The icon of an API connector.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
-  public ApiConnectorModel id(Long id) {
+  public ApiConnectorModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -260,15 +260,15 @@ public class ApiConnectorModel {
   
   @Schema(name = "id", description = "The id of the API connector.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public ApiConnectorModel lastModifiedBy(String lastModifiedBy) {
+  public ApiConnectorModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -280,15 +280,15 @@ public class ApiConnectorModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ApiConnectorModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ApiConnectorModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -300,11 +300,11 @@ public class ApiConnectorModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -328,7 +328,7 @@ public class ApiConnectorModel {
     this.name = name;
   }
 
-  public ApiConnectorModel specification(String specification) {
+  public ApiConnectorModel specification(@Nullable String specification) {
     this.specification = specification;
     return this;
   }
@@ -340,11 +340,11 @@ public class ApiConnectorModel {
   
   @Schema(name = "specification", accessMode = Schema.AccessMode.READ_ONLY, description = "The specification of an API connector.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("specification")
-  public String getSpecification() {
+  public @Nullable String getSpecification() {
     return specification;
   }
 
-  public void setSpecification(String specification) {
+  public void setSpecification(@Nullable String specification) {
     this.specification = specification;
   }
 
@@ -376,7 +376,7 @@ public class ApiConnectorModel {
     this.tags = tags;
   }
 
-  public ApiConnectorModel title(String title) {
+  public ApiConnectorModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -388,15 +388,15 @@ public class ApiConnectorModel {
   
   @Schema(name = "title", description = "The title of an API connector.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
-  public ApiConnectorModel version(Integer version) {
+  public ApiConnectorModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -408,11 +408,11 @@ public class ApiConnectorModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

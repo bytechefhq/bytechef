@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceBasic", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:28.963074682+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceBasicModel {
 
   private @Nullable Long id;
@@ -33,7 +33,7 @@ public class IntegrationInstanceBasicModel {
 
   private @Nullable Boolean enabled;
 
-  public IntegrationInstanceBasicModel id(Long id) {
+  public IntegrationInstanceBasicModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -45,15 +45,15 @@ public class IntegrationInstanceBasicModel {
   
   @Schema(name = "id", description = "The id of an integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public IntegrationInstanceBasicModel credentialStatus(CredentialStatusModel credentialStatus) {
+  public IntegrationInstanceBasicModel credentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
     return this;
   }
@@ -65,15 +65,15 @@ public class IntegrationInstanceBasicModel {
   @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")
-  public CredentialStatusModel getCredentialStatus() {
+  public @Nullable CredentialStatusModel getCredentialStatus() {
     return credentialStatus;
   }
 
-  public void setCredentialStatus(CredentialStatusModel credentialStatus) {
+  public void setCredentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
 
-  public IntegrationInstanceBasicModel enabled(Boolean enabled) {
+  public IntegrationInstanceBasicModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -85,11 +85,11 @@ public class IntegrationInstanceBasicModel {
   
   @Schema(name = "enabled", description = "If an integration instance is enabled or not", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 

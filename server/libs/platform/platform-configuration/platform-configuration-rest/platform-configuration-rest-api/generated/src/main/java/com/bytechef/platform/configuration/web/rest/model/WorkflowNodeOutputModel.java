@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeOutput", description = "The workflow node output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowNodeOutputModel {
 
   private @Nullable ActionDefinitionBasicModel actionDefinition;
@@ -54,7 +54,7 @@ public class WorkflowNodeOutputModel {
     this.workflowNodeName = workflowNodeName;
   }
 
-  public WorkflowNodeOutputModel actionDefinition(ActionDefinitionBasicModel actionDefinition) {
+  public WorkflowNodeOutputModel actionDefinition(@Nullable ActionDefinitionBasicModel actionDefinition) {
     this.actionDefinition = actionDefinition;
     return this;
   }
@@ -66,15 +66,15 @@ public class WorkflowNodeOutputModel {
   @Valid 
   @Schema(name = "actionDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actionDefinition")
-  public ActionDefinitionBasicModel getActionDefinition() {
+  public @Nullable ActionDefinitionBasicModel getActionDefinition() {
     return actionDefinition;
   }
 
-  public void setActionDefinition(ActionDefinitionBasicModel actionDefinition) {
+  public void setActionDefinition(@Nullable ActionDefinitionBasicModel actionDefinition) {
     this.actionDefinition = actionDefinition;
   }
 
-  public WorkflowNodeOutputModel outputResponse(OutputResponseModel outputResponse) {
+  public WorkflowNodeOutputModel outputResponse(@Nullable OutputResponseModel outputResponse) {
     this.outputResponse = outputResponse;
     return this;
   }
@@ -86,15 +86,15 @@ public class WorkflowNodeOutputModel {
   @Valid 
   @Schema(name = "outputResponse", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputResponse")
-  public OutputResponseModel getOutputResponse() {
+  public @Nullable OutputResponseModel getOutputResponse() {
     return outputResponse;
   }
 
-  public void setOutputResponse(OutputResponseModel outputResponse) {
+  public void setOutputResponse(@Nullable OutputResponseModel outputResponse) {
     this.outputResponse = outputResponse;
   }
 
-  public WorkflowNodeOutputModel taskDispatcherDefinition(TaskDispatcherDefinitionBasicModel taskDispatcherDefinition) {
+  public WorkflowNodeOutputModel taskDispatcherDefinition(@Nullable TaskDispatcherDefinitionBasicModel taskDispatcherDefinition) {
     this.taskDispatcherDefinition = taskDispatcherDefinition;
     return this;
   }
@@ -106,11 +106,11 @@ public class WorkflowNodeOutputModel {
   @Valid 
   @Schema(name = "taskDispatcherDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskDispatcherDefinition")
-  public TaskDispatcherDefinitionBasicModel getTaskDispatcherDefinition() {
+  public @Nullable TaskDispatcherDefinitionBasicModel getTaskDispatcherDefinition() {
     return taskDispatcherDefinition;
   }
 
-  public void setTaskDispatcherDefinition(TaskDispatcherDefinitionBasicModel taskDispatcherDefinition) {
+  public void setTaskDispatcherDefinition(@Nullable TaskDispatcherDefinitionBasicModel taskDispatcherDefinition) {
     this.taskDispatcherDefinition = taskDispatcherDefinition;
   }
 
@@ -134,7 +134,7 @@ public class WorkflowNodeOutputModel {
     this.testOutputResponse = testOutputResponse;
   }
 
-  public WorkflowNodeOutputModel triggerDefinition(TriggerDefinitionBasicModel triggerDefinition) {
+  public WorkflowNodeOutputModel triggerDefinition(@Nullable TriggerDefinitionBasicModel triggerDefinition) {
     this.triggerDefinition = triggerDefinition;
     return this;
   }
@@ -146,15 +146,15 @@ public class WorkflowNodeOutputModel {
   @Valid 
   @Schema(name = "triggerDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggerDefinition")
-  public TriggerDefinitionBasicModel getTriggerDefinition() {
+  public @Nullable TriggerDefinitionBasicModel getTriggerDefinition() {
     return triggerDefinition;
   }
 
-  public void setTriggerDefinition(TriggerDefinitionBasicModel triggerDefinition) {
+  public void setTriggerDefinition(@Nullable TriggerDefinitionBasicModel triggerDefinition) {
     this.triggerDefinition = triggerDefinition;
   }
 
-  public WorkflowNodeOutputModel variableOutputResponse(OutputResponseModel variableOutputResponse) {
+  public WorkflowNodeOutputModel variableOutputResponse(@Nullable OutputResponseModel variableOutputResponse) {
     this.variableOutputResponse = variableOutputResponse;
     return this;
   }
@@ -166,11 +166,11 @@ public class WorkflowNodeOutputModel {
   @Valid 
   @Schema(name = "variableOutputResponse", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("variableOutputResponse")
-  public OutputResponseModel getVariableOutputResponse() {
+  public @Nullable OutputResponseModel getVariableOutputResponse() {
     return variableOutputResponse;
   }
 
-  public void setVariableOutputResponse(OutputResponseModel variableOutputResponse) {
+  public void setVariableOutputResponse(@Nullable OutputResponseModel variableOutputResponse) {
     this.variableOutputResponse = variableOutputResponse;
   }
 

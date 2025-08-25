@@ -21,14 +21,14 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("saveWorkflowTestConfigurationInputs_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class SaveWorkflowTestConfigurationInputsRequestModel {
 
   private @Nullable String key;
 
   private @Nullable String value;
 
-  public SaveWorkflowTestConfigurationInputsRequestModel key(String key) {
+  public SaveWorkflowTestConfigurationInputsRequestModel key(@Nullable String key) {
     this.key = key;
     return this;
   }
@@ -40,15 +40,15 @@ public class SaveWorkflowTestConfigurationInputsRequestModel {
   
   @Schema(name = "key", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("key")
-  public String getKey() {
+  public @Nullable String getKey() {
     return key;
   }
 
-  public void setKey(String key) {
+  public void setKey(@Nullable String key) {
     this.key = key;
   }
 
-  public SaveWorkflowTestConfigurationInputsRequestModel value(String value) {
+  public SaveWorkflowTestConfigurationInputsRequestModel value(@Nullable String value) {
     this.value = value;
     return this;
   }
@@ -60,11 +60,11 @@ public class SaveWorkflowTestConfigurationInputsRequestModel {
   
   @Schema(name = "value", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("value")
-  public String getValue() {
+  public @Nullable String getValue() {
     return value;
   }
 
-  public void setValue(String value) {
+  public void setValue(@Nullable String value) {
     this.value = value;
   }
 

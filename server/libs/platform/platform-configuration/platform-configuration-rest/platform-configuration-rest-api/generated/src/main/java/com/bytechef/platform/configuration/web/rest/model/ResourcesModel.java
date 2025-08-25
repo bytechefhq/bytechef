@@ -22,12 +22,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Resources", description = "A set of available resources.")
 @JsonTypeName("Resources")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ResourcesModel {
 
   private @Nullable String documentationUrl;
 
-  public ResourcesModel documentationUrl(String documentationUrl) {
+  public ResourcesModel documentationUrl(@Nullable String documentationUrl) {
     this.documentationUrl = documentationUrl;
     return this;
   }
@@ -39,11 +39,11 @@ public class ResourcesModel {
   
   @Schema(name = "documentationUrl", description = "The url of available documentation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("documentationUrl")
-  public String getDocumentationUrl() {
+  public @Nullable String getDocumentationUrl() {
     return documentationUrl;
   }
 
-  public void setDocumentationUrl(String documentationUrl) {
+  public void setDocumentationUrl(@Nullable String documentationUrl) {
     this.documentationUrl = documentationUrl;
   }
 

@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerExecution", description = "Adds execution semantics to a trigger.")
 @JsonTypeName("TriggerExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:46.305254656+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.879388+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class TriggerExecutionModel {
 
   private @Nullable Boolean batch;
@@ -136,7 +136,7 @@ public class TriggerExecutionModel {
     this.status = status;
   }
 
-  public TriggerExecutionModel batch(Boolean batch) {
+  public TriggerExecutionModel batch(@Nullable Boolean batch) {
     this.batch = batch;
     return this;
   }
@@ -148,15 +148,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "batch", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("batch")
-  public Boolean getBatch() {
+  public @Nullable Boolean getBatch() {
     return batch;
   }
 
-  public void setBatch(Boolean batch) {
+  public void setBatch(@Nullable Boolean batch) {
     this.batch = batch;
   }
 
-  public TriggerExecutionModel createdBy(String createdBy) {
+  public TriggerExecutionModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -168,15 +168,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public TriggerExecutionModel createdDate(OffsetDateTime createdDate) {
+  public TriggerExecutionModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -188,15 +188,15 @@ public class TriggerExecutionModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public TriggerExecutionModel endDate(OffsetDateTime endDate) {
+  public TriggerExecutionModel endDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
     return this;
   }
@@ -208,15 +208,15 @@ public class TriggerExecutionModel {
   @Valid 
   @Schema(name = "endDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance ended (CANCELLED, FAILED, COMPLETED).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endDate")
-  public OffsetDateTime getEndDate() {
+  public @Nullable OffsetDateTime getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(OffsetDateTime endDate) {
+  public void setEndDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
   }
 
-  public TriggerExecutionModel error(ExecutionErrorModel error) {
+  public TriggerExecutionModel error(@Nullable ExecutionErrorModel error) {
     this.error = error;
     return this;
   }
@@ -228,15 +228,15 @@ public class TriggerExecutionModel {
   @Valid 
   @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("error")
-  public ExecutionErrorModel getError() {
+  public @Nullable ExecutionErrorModel getError() {
     return error;
   }
 
-  public void setError(ExecutionErrorModel error) {
+  public void setError(@Nullable ExecutionErrorModel error) {
     this.error = error;
   }
 
-  public TriggerExecutionModel executionTime(Long executionTime) {
+  public TriggerExecutionModel executionTime(@Nullable Long executionTime) {
     this.executionTime = executionTime;
     return this;
   }
@@ -248,15 +248,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "executionTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The total time in ms for a task to execute (excluding wait time of the task in transit). i.e. actual execution time on a worker node.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("executionTime")
-  public Long getExecutionTime() {
+  public @Nullable Long getExecutionTime() {
     return executionTime;
   }
 
-  public void setExecutionTime(Long executionTime) {
+  public void setExecutionTime(@Nullable Long executionTime) {
     this.executionTime = executionTime;
   }
 
-  public TriggerExecutionModel icon(String icon) {
+  public TriggerExecutionModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -268,15 +268,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "icon", accessMode = Schema.AccessMode.READ_ONLY, description = "The icon of the trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
-  public TriggerExecutionModel id(String id) {
+  public TriggerExecutionModel id(@Nullable String id) {
     this.id = id;
     return this;
   }
@@ -288,11 +288,11 @@ public class TriggerExecutionModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a task execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public String getId() {
+  public @Nullable String getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(@Nullable String id) {
     this.id = id;
   }
 
@@ -324,7 +324,7 @@ public class TriggerExecutionModel {
     this.input = input;
   }
 
-  public TriggerExecutionModel lastModifiedBy(String lastModifiedBy) {
+  public TriggerExecutionModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -336,15 +336,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public TriggerExecutionModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public TriggerExecutionModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -356,15 +356,15 @@ public class TriggerExecutionModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public TriggerExecutionModel maxRetries(Integer maxRetries) {
+  public TriggerExecutionModel maxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
     return this;
   }
@@ -376,15 +376,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "maxRetries", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times that a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxRetries")
-  public Integer getMaxRetries() {
+  public @Nullable Integer getMaxRetries() {
     return maxRetries;
   }
 
-  public void setMaxRetries(Integer maxRetries) {
+  public void setMaxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
   }
 
-  public TriggerExecutionModel output(Object output) {
+  public TriggerExecutionModel output(@Nullable Object output) {
     this.output = output;
     return this;
   }
@@ -396,11 +396,11 @@ public class TriggerExecutionModel {
   
   @Schema(name = "output", accessMode = Schema.AccessMode.READ_ONLY, description = "The result output generated by the trigger handler which executed a trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("output")
-  public Object getOutput() {
+  public @Nullable Object getOutput() {
     return output;
   }
 
-  public void setOutput(Object output) {
+  public void setOutput(@Nullable Object output) {
     this.output = output;
   }
 
@@ -424,7 +424,7 @@ public class TriggerExecutionModel {
     this.priority = priority;
   }
 
-  public TriggerExecutionModel retryAttempts(Integer retryAttempts) {
+  public TriggerExecutionModel retryAttempts(@Nullable Integer retryAttempts) {
     this.retryAttempts = retryAttempts;
     return this;
   }
@@ -436,15 +436,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "retryAttempts", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of times that a task has been retried.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("retryAttempts")
-  public Integer getRetryAttempts() {
+  public @Nullable Integer getRetryAttempts() {
     return retryAttempts;
   }
 
-  public void setRetryAttempts(Integer retryAttempts) {
+  public void setRetryAttempts(@Nullable Integer retryAttempts) {
     this.retryAttempts = retryAttempts;
   }
 
-  public TriggerExecutionModel retryDelay(String retryDelay) {
+  public TriggerExecutionModel retryDelay(@Nullable String retryDelay) {
     this.retryDelay = retryDelay;
     return this;
   }
@@ -456,15 +456,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "retryDelay", accessMode = Schema.AccessMode.READ_ONLY, description = "The delay to introduce between each retry. Values are to be specified using the ISO-8601 format (excluding the PT prefix). e.g. 10s (ten seconds), 1m (one minute) etc.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("retryDelay")
-  public String getRetryDelay() {
+  public @Nullable String getRetryDelay() {
     return retryDelay;
   }
 
-  public void setRetryDelay(String retryDelay) {
+  public void setRetryDelay(@Nullable String retryDelay) {
     this.retryDelay = retryDelay;
   }
 
-  public TriggerExecutionModel retryDelayFactor(Integer retryDelayFactor) {
+  public TriggerExecutionModel retryDelayFactor(@Nullable Integer retryDelayFactor) {
     this.retryDelayFactor = retryDelayFactor;
     return this;
   }
@@ -476,15 +476,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "retryDelayFactor", accessMode = Schema.AccessMode.READ_ONLY, description = "The factor to use in order to calculate the actual delay time between each successive retry -- multiplying by the value of the retryDelay.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("retryDelayFactor")
-  public Integer getRetryDelayFactor() {
+  public @Nullable Integer getRetryDelayFactor() {
     return retryDelayFactor;
   }
 
-  public void setRetryDelayFactor(Integer retryDelayFactor) {
+  public void setRetryDelayFactor(@Nullable Integer retryDelayFactor) {
     this.retryDelayFactor = retryDelayFactor;
   }
 
-  public TriggerExecutionModel retryDelayMillis(Long retryDelayMillis) {
+  public TriggerExecutionModel retryDelayMillis(@Nullable Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
     return this;
   }
@@ -496,11 +496,11 @@ public class TriggerExecutionModel {
   
   @Schema(name = "retryDelayMillis", accessMode = Schema.AccessMode.READ_ONLY, description = "The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("retryDelayMillis")
-  public Long getRetryDelayMillis() {
+  public @Nullable Long getRetryDelayMillis() {
     return retryDelayMillis;
   }
 
-  public void setRetryDelayMillis(Long retryDelayMillis) {
+  public void setRetryDelayMillis(@Nullable Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
   }
 
@@ -544,7 +544,7 @@ public class TriggerExecutionModel {
     this.status = status;
   }
 
-  public TriggerExecutionModel workflowTrigger(com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel workflowTrigger) {
+  public TriggerExecutionModel workflowTrigger(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel workflowTrigger) {
     this.workflowTrigger = workflowTrigger;
     return this;
   }
@@ -556,15 +556,15 @@ public class TriggerExecutionModel {
   @Valid 
   @Schema(name = "workflowTrigger", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTrigger")
-  public com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel getWorkflowTrigger() {
+  public @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel getWorkflowTrigger() {
     return workflowTrigger;
   }
 
-  public void setWorkflowTrigger(com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel workflowTrigger) {
+  public void setWorkflowTrigger(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel workflowTrigger) {
     this.workflowTrigger = workflowTrigger;
   }
 
-  public TriggerExecutionModel title(String title) {
+  public TriggerExecutionModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -576,15 +576,15 @@ public class TriggerExecutionModel {
   
   @Schema(name = "title", accessMode = Schema.AccessMode.READ_ONLY, description = "The title of the trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
-  public TriggerExecutionModel type(String type) {
+  public TriggerExecutionModel type(@Nullable String type) {
     this.type = type;
     return this;
   }
@@ -596,11 +596,11 @@ public class TriggerExecutionModel {
   
   @Schema(name = "type", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("type")
-  public String getType() {
+  public @Nullable String getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(@Nullable String type) {
     this.type = type;
   }
 

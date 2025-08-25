@@ -48,7 +48,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class PropertyModel {
 
   private Boolean advancedOption = false;
@@ -98,7 +98,7 @@ public class PropertyModel {
     this.advancedOption = advancedOption;
   }
 
-  public PropertyModel description(String description) {
+  public PropertyModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -110,15 +110,15 @@ public class PropertyModel {
   
   @Schema(name = "description", description = "The property description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public PropertyModel displayCondition(String displayCondition) {
+  public PropertyModel displayCondition(@Nullable String displayCondition) {
     this.displayCondition = displayCondition;
     return this;
   }
@@ -130,11 +130,11 @@ public class PropertyModel {
   
   @Schema(name = "displayCondition", description = "Defines rules when the property should be shown or hidden.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("displayCondition")
-  public String getDisplayCondition() {
+  public @Nullable String getDisplayCondition() {
     return displayCondition;
   }
 
-  public void setDisplayCondition(String displayCondition) {
+  public void setDisplayCondition(@Nullable String displayCondition) {
     this.displayCondition = displayCondition;
   }
 
@@ -178,7 +178,7 @@ public class PropertyModel {
     this.hidden = hidden;
   }
 
-  public PropertyModel name(String name) {
+  public PropertyModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -190,11 +190,11 @@ public class PropertyModel {
   
   @Schema(name = "name", description = "The property name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
-  public String getName() {
+  public @Nullable String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nullable String name) {
     this.name = name;
   }
 

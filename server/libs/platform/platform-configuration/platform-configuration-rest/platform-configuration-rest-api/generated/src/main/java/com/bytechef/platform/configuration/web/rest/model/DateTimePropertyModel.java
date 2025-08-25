@@ -36,7 +36,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateTimeProperty", description = "A date-time property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class DateTimePropertyModel extends ValuePropertyModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -61,7 +61,7 @@ public class DateTimePropertyModel extends ValuePropertyModel {
     super(controlType, type);
   }
 
-  public DateTimePropertyModel defaultValue(OffsetDateTime defaultValue) {
+  public DateTimePropertyModel defaultValue(@Nullable OffsetDateTime defaultValue) {
     this.defaultValue = defaultValue;
     return this;
   }
@@ -73,15 +73,15 @@ public class DateTimePropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
-  public OffsetDateTime getDefaultValue() {
+  public @Nullable OffsetDateTime getDefaultValue() {
     return defaultValue;
   }
 
-  public void setDefaultValue(OffsetDateTime defaultValue) {
+  public void setDefaultValue(@Nullable OffsetDateTime defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  public DateTimePropertyModel exampleValue(OffsetDateTime exampleValue) {
+  public DateTimePropertyModel exampleValue(@Nullable OffsetDateTime exampleValue) {
     this.exampleValue = exampleValue;
     return this;
   }
@@ -93,11 +93,11 @@ public class DateTimePropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
-  public OffsetDateTime getExampleValue() {
+  public @Nullable OffsetDateTime getExampleValue() {
     return exampleValue;
   }
 
-  public void setExampleValue(OffsetDateTime exampleValue) {
+  public void setExampleValue(@Nullable OffsetDateTime exampleValue) {
     this.exampleValue = exampleValue;
   }
 
@@ -129,7 +129,7 @@ public class DateTimePropertyModel extends ValuePropertyModel {
     this.options = options;
   }
 
-  public DateTimePropertyModel optionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public DateTimePropertyModel optionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
     return this;
   }
@@ -141,11 +141,11 @@ public class DateTimePropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")
-  public OptionsDataSourceModel getOptionsDataSource() {
+  public @Nullable OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }
 
-  public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
 

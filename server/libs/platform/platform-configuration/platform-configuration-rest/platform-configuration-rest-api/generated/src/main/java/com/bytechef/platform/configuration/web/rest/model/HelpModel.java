@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Help", description = "The help text that is meant to guide your users as to how to configure this action or trigger.")
 @JsonTypeName("Help")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class HelpModel {
 
   private String body;
@@ -60,7 +60,7 @@ public class HelpModel {
     this.body = body;
   }
 
-  public HelpModel learnMoreUrl(String learnMoreUrl) {
+  public HelpModel learnMoreUrl(@Nullable String learnMoreUrl) {
     this.learnMoreUrl = learnMoreUrl;
     return this;
   }
@@ -72,11 +72,11 @@ public class HelpModel {
   
   @Schema(name = "learnMoreUrl", description = "The url to additional documentation", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("learnMoreUrl")
-  public String getLearnMoreUrl() {
+  public @Nullable String getLearnMoreUrl() {
     return learnMoreUrl;
   }
 
-  public void setLearnMoreUrl(String learnMoreUrl) {
+  public void setLearnMoreUrl(@Nullable String learnMoreUrl) {
     this.learnMoreUrl = learnMoreUrl;
   }
 

@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("lead")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:31.579120120+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.210243+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class LeadModel {
 
   @Valid
@@ -161,7 +161,7 @@ public class LeadModel {
     this.convertedAccountId = convertedAccountId;
   }
 
-  public LeadModel convertedAccount(AccountModel convertedAccount) {
+  public LeadModel convertedAccount(@Nullable AccountModel convertedAccount) {
     this.convertedAccount = convertedAccount;
     return this;
   }
@@ -173,11 +173,11 @@ public class LeadModel {
   @Valid 
   @Schema(name = "convertedAccount", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("convertedAccount")
-  public AccountModel getConvertedAccount() {
+  public @Nullable AccountModel getConvertedAccount() {
     return convertedAccount;
   }
 
-  public void setConvertedAccount(AccountModel convertedAccount) {
+  public void setConvertedAccount(@Nullable AccountModel convertedAccount) {
     this.convertedAccount = convertedAccount;
   }
 
@@ -201,7 +201,7 @@ public class LeadModel {
     this.convertedContactId = convertedContactId;
   }
 
-  public LeadModel convertedContact(ContactModel convertedContact) {
+  public LeadModel convertedContact(@Nullable ContactModel convertedContact) {
     this.convertedContact = convertedContact;
     return this;
   }
@@ -213,11 +213,11 @@ public class LeadModel {
   @Valid 
   @Schema(name = "convertedContact", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("convertedContact")
-  public ContactModel getConvertedContact() {
+  public @Nullable ContactModel getConvertedContact() {
     return convertedContact;
   }
 
-  public void setConvertedContact(ContactModel convertedContact) {
+  public void setConvertedContact(@Nullable ContactModel convertedContact) {
     this.convertedContact = convertedContact;
   }
 

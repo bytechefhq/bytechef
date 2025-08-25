@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiConnectorEndpoint", description = "An API connector.")
 @JsonTypeName("ApiConnectorEndpoint")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:45.499532334+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.641711+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ApiConnectorEndpointModel {
 
   private @Nullable String createdBy;
@@ -65,7 +65,7 @@ public class ApiConnectorEndpointModel {
     this.name = name;
   }
 
-  public ApiConnectorEndpointModel createdBy(String createdBy) {
+  public ApiConnectorEndpointModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -77,15 +77,15 @@ public class ApiConnectorEndpointModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public ApiConnectorEndpointModel createdDate(OffsetDateTime createdDate) {
+  public ApiConnectorEndpointModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -97,15 +97,15 @@ public class ApiConnectorEndpointModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public ApiConnectorEndpointModel description(String description) {
+  public ApiConnectorEndpointModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -117,15 +117,15 @@ public class ApiConnectorEndpointModel {
   
   @Schema(name = "description", description = "The description of an API connector's endpoint.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public ApiConnectorEndpointModel httpMethod(HttpMethodModel httpMethod) {
+  public ApiConnectorEndpointModel httpMethod(@Nullable HttpMethodModel httpMethod) {
     this.httpMethod = httpMethod;
     return this;
   }
@@ -137,15 +137,15 @@ public class ApiConnectorEndpointModel {
   @Valid 
   @Schema(name = "httpMethod", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("httpMethod")
-  public HttpMethodModel getHttpMethod() {
+  public @Nullable HttpMethodModel getHttpMethod() {
     return httpMethod;
   }
 
-  public void setHttpMethod(HttpMethodModel httpMethod) {
+  public void setHttpMethod(@Nullable HttpMethodModel httpMethod) {
     this.httpMethod = httpMethod;
   }
 
-  public ApiConnectorEndpointModel id(Long id) {
+  public ApiConnectorEndpointModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -157,15 +157,15 @@ public class ApiConnectorEndpointModel {
   
   @Schema(name = "id", description = "The id of the API connector's endpoint.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public ApiConnectorEndpointModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public ApiConnectorEndpointModel lastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -177,15 +177,15 @@ public class ApiConnectorEndpointModel {
   @Valid 
   @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
-  public OffsetDateTime getLastExecutionDate() {
+  public @Nullable OffsetDateTime getLastExecutionDate() {
     return lastExecutionDate;
   }
 
-  public void setLastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
 
-  public ApiConnectorEndpointModel lastModifiedBy(String lastModifiedBy) {
+  public ApiConnectorEndpointModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -197,15 +197,15 @@ public class ApiConnectorEndpointModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ApiConnectorEndpointModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ApiConnectorEndpointModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -217,11 +217,11 @@ public class ApiConnectorEndpointModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -245,7 +245,7 @@ public class ApiConnectorEndpointModel {
     this.name = name;
   }
 
-  public ApiConnectorEndpointModel path(String path) {
+  public ApiConnectorEndpointModel path(@Nullable String path) {
     this.path = path;
     return this;
   }
@@ -257,15 +257,15 @@ public class ApiConnectorEndpointModel {
   
   @Schema(name = "path", description = "The path of an API connector's endpoint.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("path")
-  public String getPath() {
+  public @Nullable String getPath() {
     return path;
   }
 
-  public void setPath(String path) {
+  public void setPath(@Nullable String path) {
     this.path = path;
   }
 
-  public ApiConnectorEndpointModel version(Integer version) {
+  public ApiConnectorEndpointModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -277,11 +277,11 @@ public class ApiConnectorEndpointModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

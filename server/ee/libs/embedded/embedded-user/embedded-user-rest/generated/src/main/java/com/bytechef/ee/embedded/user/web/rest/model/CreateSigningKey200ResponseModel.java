@@ -21,12 +21,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createSigningKey_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:32.449747822+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:39.677638+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class CreateSigningKey200ResponseModel {
 
   private @Nullable String privateKey;
 
-  public CreateSigningKey200ResponseModel privateKey(String privateKey) {
+  public CreateSigningKey200ResponseModel privateKey(@Nullable String privateKey) {
     this.privateKey = privateKey;
     return this;
   }
@@ -38,11 +38,11 @@ public class CreateSigningKey200ResponseModel {
   
   @Schema(name = "privateKey", description = "The private key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("privateKey")
-  public String getPrivateKey() {
+  public @Nullable String getPrivateKey() {
     return privateKey;
   }
 
-  public void setPrivateKey(String privateKey) {
+  public void setPrivateKey(@Nullable String privateKey) {
     this.privateKey = privateKey;
   }
 

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private @Nullable String header;
@@ -47,7 +47,7 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
     super(type);
   }
 
-  public DynamicPropertiesPropertyModel header(String header) {
+  public DynamicPropertiesPropertyModel header(@Nullable String header) {
     this.header = header;
     return this;
   }
@@ -59,15 +59,15 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
   
   @Schema(name = "header", description = "The dynamic property header.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("header")
-  public String getHeader() {
+  public @Nullable String getHeader() {
     return header;
   }
 
-  public void setHeader(String header) {
+  public void setHeader(@Nullable String header) {
     this.header = header;
   }
 
-  public DynamicPropertiesPropertyModel propertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
+  public DynamicPropertiesPropertyModel propertiesDataSource(@Nullable PropertiesDataSourceModel propertiesDataSource) {
     this.propertiesDataSource = propertiesDataSource;
     return this;
   }
@@ -79,11 +79,11 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
   @Valid 
   @Schema(name = "propertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("propertiesDataSource")
-  public PropertiesDataSourceModel getPropertiesDataSource() {
+  public @Nullable PropertiesDataSourceModel getPropertiesDataSource() {
     return propertiesDataSource;
   }
 
-  public void setPropertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
+  public void setPropertiesDataSource(@Nullable PropertiesDataSourceModel propertiesDataSource) {
     this.propertiesDataSource = propertiesDataSource;
   }
 

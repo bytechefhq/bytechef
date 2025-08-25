@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("importOpenApiSpecification_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:45.499532334+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.641711+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ImportOpenApiSpecificationRequestModel {
 
   private String name;
@@ -62,7 +62,7 @@ public class ImportOpenApiSpecificationRequestModel {
     this.name = name;
   }
 
-  public ImportOpenApiSpecificationRequestModel icon(String icon) {
+  public ImportOpenApiSpecificationRequestModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -74,11 +74,11 @@ public class ImportOpenApiSpecificationRequestModel {
   
   @Schema(name = "icon", description = "The icon of an API Connector.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 

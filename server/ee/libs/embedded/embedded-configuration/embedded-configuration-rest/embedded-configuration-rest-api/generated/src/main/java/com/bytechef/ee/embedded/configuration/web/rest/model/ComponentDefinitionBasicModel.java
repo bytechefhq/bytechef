@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ComponentDefinitionBasicModel {
 
   private @Nullable Integer actionsCount;
@@ -63,7 +63,7 @@ public class ComponentDefinitionBasicModel {
     this.version = version;
   }
 
-  public ComponentDefinitionBasicModel actionsCount(Integer actionsCount) {
+  public ComponentDefinitionBasicModel actionsCount(@Nullable Integer actionsCount) {
     this.actionsCount = actionsCount;
     return this;
   }
@@ -75,11 +75,11 @@ public class ComponentDefinitionBasicModel {
   
   @Schema(name = "actionsCount", description = "The number of actions a component has", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actionsCount")
-  public Integer getActionsCount() {
+  public @Nullable Integer getActionsCount() {
     return actionsCount;
   }
 
-  public void setActionsCount(Integer actionsCount) {
+  public void setActionsCount(@Nullable Integer actionsCount) {
     this.actionsCount = actionsCount;
   }
 
@@ -139,7 +139,7 @@ public class ComponentDefinitionBasicModel {
     this.componentCategories = componentCategories;
   }
 
-  public ComponentDefinitionBasicModel description(String description) {
+  public ComponentDefinitionBasicModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -151,15 +151,15 @@ public class ComponentDefinitionBasicModel {
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public ComponentDefinitionBasicModel icon(String icon) {
+  public ComponentDefinitionBasicModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -171,11 +171,11 @@ public class ComponentDefinitionBasicModel {
   
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
@@ -199,7 +199,7 @@ public class ComponentDefinitionBasicModel {
     this.name = name;
   }
 
-  public ComponentDefinitionBasicModel title(String title) {
+  public ComponentDefinitionBasicModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -211,15 +211,15 @@ public class ComponentDefinitionBasicModel {
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
-  public ComponentDefinitionBasicModel triggersCount(Integer triggersCount) {
+  public ComponentDefinitionBasicModel triggersCount(@Nullable Integer triggersCount) {
     this.triggersCount = triggersCount;
     return this;
   }
@@ -231,11 +231,11 @@ public class ComponentDefinitionBasicModel {
   
   @Schema(name = "triggersCount", description = "The number of triggers a component has", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggersCount")
-  public Integer getTriggersCount() {
+  public @Nullable Integer getTriggersCount() {
     return triggersCount;
   }
 
-  public void setTriggersCount(Integer triggersCount) {
+  public void setTriggersCount(@Nullable Integer triggersCount) {
     this.triggersCount = triggersCount;
   }
 

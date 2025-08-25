@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "A workflow data for particular integration instance.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:28.963074682+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceWorkflowModel {
 
   private @Nullable Boolean enabled;
@@ -34,7 +34,7 @@ public class IntegrationInstanceWorkflowModel {
 
   private @Nullable String workflowReferenceCode;
 
-  public IntegrationInstanceWorkflowModel enabled(Boolean enabled) {
+  public IntegrationInstanceWorkflowModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -46,11 +46,11 @@ public class IntegrationInstanceWorkflowModel {
   
   @Schema(name = "enabled", description = "If a workflow is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 
@@ -82,7 +82,7 @@ public class IntegrationInstanceWorkflowModel {
     this.inputs = inputs;
   }
 
-  public IntegrationInstanceWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+  public IntegrationInstanceWorkflowModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -94,11 +94,11 @@ public class IntegrationInstanceWorkflowModel {
   
   @Schema(name = "workflowReferenceCode", description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowReferenceCode")
-  public String getWorkflowReferenceCode() {
+  public @Nullable String getWorkflowReferenceCode() {
     return workflowReferenceCode;
   }
 
-  public void setWorkflowReferenceCode(String workflowReferenceCode) {
+  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AiProvider", description = "An AI provider.")
 @JsonTypeName("AiProvider")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:32.606238967+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:39.791632+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class AiProviderModel {
 
   private @Nullable Integer id;
@@ -46,7 +46,7 @@ public class AiProviderModel {
     this.name = name;
   }
 
-  public AiProviderModel id(Integer id) {
+  public AiProviderModel id(@Nullable Integer id) {
     this.id = id;
     return this;
   }
@@ -58,11 +58,11 @@ public class AiProviderModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an AI provider.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Integer getId() {
+  public @Nullable Integer getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(@Nullable Integer id) {
     this.id = id;
   }
 
@@ -86,7 +86,7 @@ public class AiProviderModel {
     this.name = name;
   }
 
-  public AiProviderModel icon(String icon) {
+  public AiProviderModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -98,15 +98,15 @@ public class AiProviderModel {
   
   @Schema(name = "icon", accessMode = Schema.AccessMode.READ_ONLY, description = "The icon of an AI provider.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
-  public AiProviderModel apiKey(String apiKey) {
+  public AiProviderModel apiKey(@Nullable String apiKey) {
     this.apiKey = apiKey;
     return this;
   }
@@ -118,15 +118,15 @@ public class AiProviderModel {
   
   @Schema(name = "apiKey", description = "The API key of an AI provider.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("apiKey")
-  public String getApiKey() {
+  public @Nullable String getApiKey() {
     return apiKey;
   }
 
-  public void setApiKey(String apiKey) {
+  public void setApiKey(@Nullable String apiKey) {
     this.apiKey = apiKey;
   }
 
-  public AiProviderModel enabled(Boolean enabled) {
+  public AiProviderModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -138,11 +138,11 @@ public class AiProviderModel {
   
   @Schema(name = "enabled", description = "The enabled status of an AI provider.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 

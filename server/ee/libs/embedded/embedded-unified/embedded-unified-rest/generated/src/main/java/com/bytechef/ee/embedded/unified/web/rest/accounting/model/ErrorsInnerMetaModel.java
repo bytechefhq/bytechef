@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 @Schema(name = "errors_inner_meta", description = "Additional metadata about the error.")
 @JsonTypeName("errors_inner_meta")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:30.890485467+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:14.997427+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ErrorsInnerMetaModel {
 
   private @Nullable Object cause;
@@ -82,7 +82,7 @@ public class ErrorsInnerMetaModel {
     this.origin = origin;
   }
 
-  public ErrorsInnerMetaModel cause(Object cause) {
+  public ErrorsInnerMetaModel cause(@Nullable Object cause) {
     this.cause = cause;
     return this;
   }
@@ -94,11 +94,11 @@ public class ErrorsInnerMetaModel {
   
   @Schema(name = "cause", description = "The cause of the error. Usually the underlying error from the remote Provider.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("cause")
-  public Object getCause() {
+  public @Nullable Object getCause() {
     return cause;
   }
 
-  public void setCause(Object cause) {
+  public void setCause(@Nullable Object cause) {
     this.cause = cause;
   }
 
@@ -122,7 +122,7 @@ public class ErrorsInnerMetaModel {
     this.origin = origin;
   }
 
-  public ErrorsInnerMetaModel applicationName(String applicationName) {
+  public ErrorsInnerMetaModel applicationName(@Nullable String applicationName) {
     this.applicationName = applicationName;
     return this;
   }
@@ -134,11 +134,11 @@ public class ErrorsInnerMetaModel {
   
   @Schema(name = "application_name", example = "MyCompany Production", description = "The name of the application that generated the error.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("application_name")
-  public String getApplicationName() {
+  public @Nullable String getApplicationName() {
     return applicationName;
   }
 
-  public void setApplicationName(String applicationName) {
+  public void setApplicationName(@Nullable String applicationName) {
     this.applicationName = applicationName;
   }
     /**

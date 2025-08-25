@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow_1", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow_1")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:33.209056231+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:40.062541+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class Workflow1Model implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
   private @Nullable String createdBy;
@@ -122,7 +122,7 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
 
   private @Nullable Integer version;
 
-  public Workflow1Model createdBy(String createdBy) {
+  public Workflow1Model createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -134,15 +134,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public Workflow1Model createdDate(OffsetDateTime createdDate) {
+  public Workflow1Model createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -154,15 +154,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public Workflow1Model connectionsCount(Integer connectionsCount) {
+  public Workflow1Model connectionsCount(@Nullable Integer connectionsCount) {
     this.connectionsCount = connectionsCount;
     return this;
   }
@@ -174,15 +174,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "connectionsCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of workflow connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionsCount")
-  public Integer getConnectionsCount() {
+  public @Nullable Integer getConnectionsCount() {
     return connectionsCount;
   }
 
-  public void setConnectionsCount(Integer connectionsCount) {
+  public void setConnectionsCount(@Nullable Integer connectionsCount) {
     this.connectionsCount = connectionsCount;
   }
 
-  public Workflow1Model definition(String definition) {
+  public Workflow1Model definition(@Nullable String definition) {
     this.definition = definition;
     return this;
   }
@@ -194,15 +194,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("definition")
-  public String getDefinition() {
+  public @Nullable String getDefinition() {
     return definition;
   }
 
-  public void setDefinition(String definition) {
+  public void setDefinition(@Nullable String definition) {
     this.definition = definition;
   }
 
-  public Workflow1Model description(String description) {
+  public Workflow1Model description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -214,15 +214,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public Workflow1Model format(com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format) {
+  public Workflow1Model format(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format) {
     this.format = format;
     return this;
   }
@@ -234,15 +234,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   @Valid 
   @Schema(name = "format", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("format")
-  public com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel getFormat() {
+  public @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel getFormat() {
     return format;
   }
 
-  public void setFormat(com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format) {
+  public void setFormat(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format) {
     this.format = format;
   }
 
-  public Workflow1Model id(String id) {
+  public Workflow1Model id(@Nullable String id) {
     this.id = id;
     return this;
   }
@@ -254,11 +254,11 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public String getId() {
+  public @Nullable String getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(@Nullable String id) {
     this.id = id;
   }
 
@@ -290,7 +290,7 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
     this.inputs = inputs;
   }
 
-  public Workflow1Model inputsCount(Integer inputsCount) {
+  public Workflow1Model inputsCount(@Nullable Integer inputsCount) {
     this.inputsCount = inputsCount;
     return this;
   }
@@ -302,15 +302,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "inputsCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of workflow inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputsCount")
-  public Integer getInputsCount() {
+  public @Nullable Integer getInputsCount() {
     return inputsCount;
   }
 
-  public void setInputsCount(Integer inputsCount) {
+  public void setInputsCount(@Nullable Integer inputsCount) {
     this.inputsCount = inputsCount;
   }
 
-  public Workflow1Model label(String label) {
+  public Workflow1Model label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -322,15 +322,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 
-  public Workflow1Model lastModifiedBy(String lastModifiedBy) {
+  public Workflow1Model lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -342,15 +342,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public Workflow1Model lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public Workflow1Model lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -362,11 +362,11 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -398,7 +398,7 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
     this.outputs = outputs;
   }
 
-  public Workflow1Model sourceType(SourceTypeEnum sourceType) {
+  public Workflow1Model sourceType(@Nullable SourceTypeEnum sourceType) {
     this.sourceType = sourceType;
     return this;
   }
@@ -410,15 +410,15 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "sourceType", description = "The type of the source which stores the workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("sourceType")
-  public SourceTypeEnum getSourceType() {
+  public @Nullable SourceTypeEnum getSourceType() {
     return sourceType;
   }
 
-  public void setSourceType(SourceTypeEnum sourceType) {
+  public void setSourceType(@Nullable SourceTypeEnum sourceType) {
     this.sourceType = sourceType;
   }
 
-  public Workflow1Model maxRetries(Integer maxRetries) {
+  public Workflow1Model maxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
     return this;
   }
@@ -430,11 +430,11 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "maxRetries", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxRetries")
-  public Integer getMaxRetries() {
+  public @Nullable Integer getMaxRetries() {
     return maxRetries;
   }
 
-  public void setMaxRetries(Integer maxRetries) {
+  public void setMaxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
   }
 
@@ -550,7 +550,7 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
     this.triggers = triggers;
   }
 
-  public Workflow1Model version(Integer version) {
+  public Workflow1Model version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -562,11 +562,11 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

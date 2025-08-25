@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentCategory", description = "A category of component.")
 @JsonTypeName("ComponentCategory")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ComponentCategoryModel {
 
   private String name;
@@ -60,7 +60,7 @@ public class ComponentCategoryModel {
     this.name = name;
   }
 
-  public ComponentCategoryModel label(String label) {
+  public ComponentCategoryModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -72,11 +72,11 @@ public class ComponentCategoryModel {
   
   @Schema(name = "label", description = "The label of a category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 

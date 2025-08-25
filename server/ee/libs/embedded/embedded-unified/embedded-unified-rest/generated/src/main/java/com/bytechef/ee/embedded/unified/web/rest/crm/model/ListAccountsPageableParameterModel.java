@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("listAccounts_pageable_parameter")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:31.579120120+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.210243+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ListAccountsPageableParameterModel {
 
   private @Nullable String direction;
@@ -32,7 +32,7 @@ public class ListAccountsPageableParameterModel {
 
   private @Nullable String continuationToken;
 
-  public ListAccountsPageableParameterModel direction(String direction) {
+  public ListAccountsPageableParameterModel direction(@Nullable String direction) {
     this.direction = direction;
     return this;
   }
@@ -44,15 +44,15 @@ public class ListAccountsPageableParameterModel {
   
   @Schema(name = "direction", description = "The direction parameter.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("direction")
-  public String getDirection() {
+  public @Nullable String getDirection() {
     return direction;
   }
 
-  public void setDirection(String direction) {
+  public void setDirection(@Nullable String direction) {
     this.direction = direction;
   }
 
-  public ListAccountsPageableParameterModel sort(String sort) {
+  public ListAccountsPageableParameterModel sort(@Nullable String sort) {
     this.sort = sort;
     return this;
   }
@@ -64,15 +64,15 @@ public class ListAccountsPageableParameterModel {
   
   @Schema(name = "sort", description = "The sorting parameter.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("sort")
-  public String getSort() {
+  public @Nullable String getSort() {
     return sort;
   }
 
-  public void setSort(String sort) {
+  public void setSort(@Nullable String sort) {
     this.sort = sort;
   }
 
-  public ListAccountsPageableParameterModel size(Integer size) {
+  public ListAccountsPageableParameterModel size(@Nullable Integer size) {
     this.size = size;
     return this;
   }
@@ -84,15 +84,15 @@ public class ListAccountsPageableParameterModel {
   
   @Schema(name = "size", description = "The number of items to be returned.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("size")
-  public Integer getSize() {
+  public @Nullable Integer getSize() {
     return size;
   }
 
-  public void setSize(Integer size) {
+  public void setSize(@Nullable Integer size) {
     this.size = size;
   }
 
-  public ListAccountsPageableParameterModel continuationToken(String continuationToken) {
+  public ListAccountsPageableParameterModel continuationToken(@Nullable String continuationToken) {
     this.continuationToken = continuationToken;
     return this;
   }
@@ -104,11 +104,11 @@ public class ListAccountsPageableParameterModel {
   
   @Schema(name = "continuationToken", description = "The the continuationToken parameter.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("continuationToken")
-  public String getContinuationToken() {
+  public @Nullable String getContinuationToken() {
     return continuationToken;
   }
 
-  public void setContinuationToken(String continuationToken) {
+  public void setContinuationToken(@Nullable String continuationToken) {
     this.continuationToken = continuationToken;
   }
 

@@ -49,7 +49,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TIME")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ValuePropertyModel extends PropertyModel {
 
   private ControlTypeModel controlType;
@@ -90,7 +90,7 @@ public class ValuePropertyModel extends PropertyModel {
     this.controlType = controlType;
   }
 
-  public ValuePropertyModel label(String label) {
+  public ValuePropertyModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -102,15 +102,15 @@ public class ValuePropertyModel extends PropertyModel {
   
   @Schema(name = "label", description = "The property label.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 
-  public ValuePropertyModel placeholder(String placeholder) {
+  public ValuePropertyModel placeholder(@Nullable String placeholder) {
     this.placeholder = placeholder;
     return this;
   }
@@ -122,11 +122,11 @@ public class ValuePropertyModel extends PropertyModel {
   
   @Schema(name = "placeholder", description = "The property placeholder.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("placeholder")
-  public String getPlaceholder() {
+  public @Nullable String getPlaceholder() {
     return placeholder;
   }
 
-  public void setPlaceholder(String placeholder) {
+  public void setPlaceholder(@Nullable String placeholder) {
     this.placeholder = placeholder;
   }
 

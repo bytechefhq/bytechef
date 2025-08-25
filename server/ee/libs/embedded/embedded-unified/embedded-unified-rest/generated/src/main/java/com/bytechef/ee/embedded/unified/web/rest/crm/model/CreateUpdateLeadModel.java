@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("create_update_lead")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:31.579120120+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.210243+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class CreateUpdateLeadModel {
 
   private JsonNullable<String> company = JsonNullable.<String>undefined();
@@ -138,7 +138,7 @@ public class CreateUpdateLeadModel {
     this.leadSource = leadSource;
   }
 
-  public CreateUpdateLeadModel title(String title) {
+  public CreateUpdateLeadModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -150,11 +150,11 @@ public class CreateUpdateLeadModel {
   
   @Schema(name = "title", example = "Co-Founder", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 

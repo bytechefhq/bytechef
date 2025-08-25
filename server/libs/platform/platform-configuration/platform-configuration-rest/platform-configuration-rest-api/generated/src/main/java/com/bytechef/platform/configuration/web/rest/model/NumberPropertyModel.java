@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NumberProperty", description = "A number property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class NumberPropertyModel extends ValuePropertyModel {
 
   private @Nullable Double defaultValue;
@@ -67,7 +67,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     super(controlType, type);
   }
 
-  public NumberPropertyModel defaultValue(Double defaultValue) {
+  public NumberPropertyModel defaultValue(@Nullable Double defaultValue) {
     this.defaultValue = defaultValue;
     return this;
   }
@@ -79,15 +79,15 @@ public class NumberPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
-  public Double getDefaultValue() {
+  public @Nullable Double getDefaultValue() {
     return defaultValue;
   }
 
-  public void setDefaultValue(Double defaultValue) {
+  public void setDefaultValue(@Nullable Double defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  public NumberPropertyModel exampleValue(Double exampleValue) {
+  public NumberPropertyModel exampleValue(@Nullable Double exampleValue) {
     this.exampleValue = exampleValue;
     return this;
   }
@@ -99,15 +99,15 @@ public class NumberPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
-  public Double getExampleValue() {
+  public @Nullable Double getExampleValue() {
     return exampleValue;
   }
 
-  public void setExampleValue(Double exampleValue) {
+  public void setExampleValue(@Nullable Double exampleValue) {
     this.exampleValue = exampleValue;
   }
 
-  public NumberPropertyModel maxNumberPrecision(Integer maxNumberPrecision) {
+  public NumberPropertyModel maxNumberPrecision(@Nullable Integer maxNumberPrecision) {
     this.maxNumberPrecision = maxNumberPrecision;
     return this;
   }
@@ -119,15 +119,15 @@ public class NumberPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "maxNumberPrecision", description = "The number value precision.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxNumberPrecision")
-  public Integer getMaxNumberPrecision() {
+  public @Nullable Integer getMaxNumberPrecision() {
     return maxNumberPrecision;
   }
 
-  public void setMaxNumberPrecision(Integer maxNumberPrecision) {
+  public void setMaxNumberPrecision(@Nullable Integer maxNumberPrecision) {
     this.maxNumberPrecision = maxNumberPrecision;
   }
 
-  public NumberPropertyModel maxValue(Double maxValue) {
+  public NumberPropertyModel maxValue(@Nullable Double maxValue) {
     this.maxValue = maxValue;
     return this;
   }
@@ -139,15 +139,15 @@ public class NumberPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "maxValue", description = "The maximum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxValue")
-  public Double getMaxValue() {
+  public @Nullable Double getMaxValue() {
     return maxValue;
   }
 
-  public void setMaxValue(Double maxValue) {
+  public void setMaxValue(@Nullable Double maxValue) {
     this.maxValue = maxValue;
   }
 
-  public NumberPropertyModel minNumberPrecision(Integer minNumberPrecision) {
+  public NumberPropertyModel minNumberPrecision(@Nullable Integer minNumberPrecision) {
     this.minNumberPrecision = minNumberPrecision;
     return this;
   }
@@ -159,15 +159,15 @@ public class NumberPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "minNumberPrecision", description = "The number value precision.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minNumberPrecision")
-  public Integer getMinNumberPrecision() {
+  public @Nullable Integer getMinNumberPrecision() {
     return minNumberPrecision;
   }
 
-  public void setMinNumberPrecision(Integer minNumberPrecision) {
+  public void setMinNumberPrecision(@Nullable Integer minNumberPrecision) {
     this.minNumberPrecision = minNumberPrecision;
   }
 
-  public NumberPropertyModel minValue(Double minValue) {
+  public NumberPropertyModel minValue(@Nullable Double minValue) {
     this.minValue = minValue;
     return this;
   }
@@ -179,15 +179,15 @@ public class NumberPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "minValue", description = "The minimum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minValue")
-  public Double getMinValue() {
+  public @Nullable Double getMinValue() {
     return minValue;
   }
 
-  public void setMinValue(Double minValue) {
+  public void setMinValue(@Nullable Double minValue) {
     this.minValue = minValue;
   }
 
-  public NumberPropertyModel numberPrecision(Integer numberPrecision) {
+  public NumberPropertyModel numberPrecision(@Nullable Integer numberPrecision) {
     this.numberPrecision = numberPrecision;
     return this;
   }
@@ -199,11 +199,11 @@ public class NumberPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "numberPrecision", description = "The number value precision.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("numberPrecision")
-  public Integer getNumberPrecision() {
+  public @Nullable Integer getNumberPrecision() {
     return numberPrecision;
   }
 
-  public void setNumberPrecision(Integer numberPrecision) {
+  public void setNumberPrecision(@Nullable Integer numberPrecision) {
     this.numberPrecision = numberPrecision;
   }
 
@@ -235,7 +235,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     this.options = options;
   }
 
-  public NumberPropertyModel optionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public NumberPropertyModel optionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
     return this;
   }
@@ -247,11 +247,11 @@ public class NumberPropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")
-  public OptionsDataSourceModel getOptionsDataSource() {
+  public @Nullable OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }
 
-  public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
 

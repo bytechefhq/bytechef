@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegerProperty", description = "An integer property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegerPropertyModel extends ValuePropertyModel {
 
   private @Nullable Long defaultValue;
@@ -61,7 +61,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     super(controlType, type);
   }
 
-  public IntegerPropertyModel defaultValue(Long defaultValue) {
+  public IntegerPropertyModel defaultValue(@Nullable Long defaultValue) {
     this.defaultValue = defaultValue;
     return this;
   }
@@ -73,15 +73,15 @@ public class IntegerPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
-  public Long getDefaultValue() {
+  public @Nullable Long getDefaultValue() {
     return defaultValue;
   }
 
-  public void setDefaultValue(Long defaultValue) {
+  public void setDefaultValue(@Nullable Long defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  public IntegerPropertyModel exampleValue(Long exampleValue) {
+  public IntegerPropertyModel exampleValue(@Nullable Long exampleValue) {
     this.exampleValue = exampleValue;
     return this;
   }
@@ -93,15 +93,15 @@ public class IntegerPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
-  public Long getExampleValue() {
+  public @Nullable Long getExampleValue() {
     return exampleValue;
   }
 
-  public void setExampleValue(Long exampleValue) {
+  public void setExampleValue(@Nullable Long exampleValue) {
     this.exampleValue = exampleValue;
   }
 
-  public IntegerPropertyModel maxValue(Long maxValue) {
+  public IntegerPropertyModel maxValue(@Nullable Long maxValue) {
     this.maxValue = maxValue;
     return this;
   }
@@ -113,15 +113,15 @@ public class IntegerPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "maxValue", description = "The maximum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxValue")
-  public Long getMaxValue() {
+  public @Nullable Long getMaxValue() {
     return maxValue;
   }
 
-  public void setMaxValue(Long maxValue) {
+  public void setMaxValue(@Nullable Long maxValue) {
     this.maxValue = maxValue;
   }
 
-  public IntegerPropertyModel minValue(Long minValue) {
+  public IntegerPropertyModel minValue(@Nullable Long minValue) {
     this.minValue = minValue;
     return this;
   }
@@ -133,11 +133,11 @@ public class IntegerPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "minValue", description = "The minimum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minValue")
-  public Long getMinValue() {
+  public @Nullable Long getMinValue() {
     return minValue;
   }
 
-  public void setMinValue(Long minValue) {
+  public void setMinValue(@Nullable Long minValue) {
     this.minValue = minValue;
   }
 
@@ -169,7 +169,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     this.options = options;
   }
 
-  public IntegerPropertyModel optionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public IntegerPropertyModel optionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
     return this;
   }
@@ -181,11 +181,11 @@ public class IntegerPropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")
-  public OptionsDataSourceModel getOptionsDataSource() {
+  public @Nullable OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }
 
-  public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
 

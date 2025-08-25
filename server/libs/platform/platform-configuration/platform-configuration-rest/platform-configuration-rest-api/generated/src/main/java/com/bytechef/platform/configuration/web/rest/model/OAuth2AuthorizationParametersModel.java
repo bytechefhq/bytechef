@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2AuthorizationParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class OAuth2AuthorizationParametersModel {
 
   private @Nullable String authorizationUrl;
@@ -39,7 +39,7 @@ public class OAuth2AuthorizationParametersModel {
   @Valid
   private List<String> scopes = new ArrayList<>();
 
-  public OAuth2AuthorizationParametersModel authorizationUrl(String authorizationUrl) {
+  public OAuth2AuthorizationParametersModel authorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
     return this;
   }
@@ -51,11 +51,11 @@ public class OAuth2AuthorizationParametersModel {
   
   @Schema(name = "authorizationUrl", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationUrl")
-  public String getAuthorizationUrl() {
+  public @Nullable String getAuthorizationUrl() {
     return authorizationUrl;
   }
 
-  public void setAuthorizationUrl(String authorizationUrl) {
+  public void setAuthorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
   }
 
@@ -87,7 +87,7 @@ public class OAuth2AuthorizationParametersModel {
     this.extraQueryParameters = extraQueryParameters;
   }
 
-  public OAuth2AuthorizationParametersModel clientId(String clientId) {
+  public OAuth2AuthorizationParametersModel clientId(@Nullable String clientId) {
     this.clientId = clientId;
     return this;
   }
@@ -99,11 +99,11 @@ public class OAuth2AuthorizationParametersModel {
   
   @Schema(name = "clientId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("clientId")
-  public String getClientId() {
+  public @Nullable String getClientId() {
     return clientId;
   }
 
-  public void setClientId(String clientId) {
+  public void setClientId(@Nullable String clientId) {
     this.clientId = clientId;
   }
 

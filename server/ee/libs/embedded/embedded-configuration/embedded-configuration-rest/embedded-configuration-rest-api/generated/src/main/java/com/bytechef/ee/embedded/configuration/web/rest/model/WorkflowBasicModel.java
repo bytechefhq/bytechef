@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowBasicModel {
 
   private @Nullable String createdBy;
@@ -49,7 +49,7 @@ public class WorkflowBasicModel {
 
   private @Nullable String workflowReferenceCode;
 
-  public WorkflowBasicModel createdBy(String createdBy) {
+  public WorkflowBasicModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -61,15 +61,15 @@ public class WorkflowBasicModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public WorkflowBasicModel createdDate(OffsetDateTime createdDate) {
+  public WorkflowBasicModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -81,15 +81,15 @@ public class WorkflowBasicModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public WorkflowBasicModel description(String description) {
+  public WorkflowBasicModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -101,15 +101,15 @@ public class WorkflowBasicModel {
   
   @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public WorkflowBasicModel id(String id) {
+  public WorkflowBasicModel id(@Nullable String id) {
     this.id = id;
     return this;
   }
@@ -121,15 +121,15 @@ public class WorkflowBasicModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public String getId() {
+  public @Nullable String getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(@Nullable String id) {
     this.id = id;
   }
 
-  public WorkflowBasicModel label(String label) {
+  public WorkflowBasicModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -141,15 +141,15 @@ public class WorkflowBasicModel {
   
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 
-  public WorkflowBasicModel lastModifiedBy(String lastModifiedBy) {
+  public WorkflowBasicModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -161,15 +161,15 @@ public class WorkflowBasicModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public WorkflowBasicModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public WorkflowBasicModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -181,15 +181,15 @@ public class WorkflowBasicModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public WorkflowBasicModel version(Integer version) {
+  public WorkflowBasicModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -201,15 +201,15 @@ public class WorkflowBasicModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 
-  public WorkflowBasicModel integrationWorkflowId(Long integrationWorkflowId) {
+  public WorkflowBasicModel integrationWorkflowId(@Nullable Long integrationWorkflowId) {
     this.integrationWorkflowId = integrationWorkflowId;
     return this;
   }
@@ -221,15 +221,15 @@ public class WorkflowBasicModel {
   
   @Schema(name = "integrationWorkflowId", accessMode = Schema.AccessMode.READ_ONLY, description = "The integration workflow id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationWorkflowId")
-  public Long getIntegrationWorkflowId() {
+  public @Nullable Long getIntegrationWorkflowId() {
     return integrationWorkflowId;
   }
 
-  public void setIntegrationWorkflowId(Long integrationWorkflowId) {
+  public void setIntegrationWorkflowId(@Nullable Long integrationWorkflowId) {
     this.integrationWorkflowId = integrationWorkflowId;
   }
 
-  public WorkflowBasicModel workflowReferenceCode(String workflowReferenceCode) {
+  public WorkflowBasicModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -241,11 +241,11 @@ public class WorkflowBasicModel {
   
   @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow reference code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowReferenceCode")
-  public String getWorkflowReferenceCode() {
+  public @Nullable String getWorkflowReferenceCode() {
     return workflowReferenceCode;
   }
 
-  public void setWorkflowReferenceCode(String workflowReferenceCode) {
+  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 

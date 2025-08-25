@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationVersion", description = "The integration version.")
 @JsonTypeName("IntegrationVersion")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationVersionModel {
 
   private @Nullable String description;
@@ -38,7 +38,7 @@ public class IntegrationVersionModel {
 
   private @Nullable IntegrationStatusModel status;
 
-  public IntegrationVersionModel description(String description) {
+  public IntegrationVersionModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -50,15 +50,15 @@ public class IntegrationVersionModel {
   
   @Schema(name = "description", description = "The description of an integration version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public IntegrationVersionModel publishedDate(OffsetDateTime publishedDate) {
+  public IntegrationVersionModel publishedDate(@Nullable OffsetDateTime publishedDate) {
     this.publishedDate = publishedDate;
     return this;
   }
@@ -70,15 +70,15 @@ public class IntegrationVersionModel {
   @Valid 
   @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("publishedDate")
-  public OffsetDateTime getPublishedDate() {
+  public @Nullable OffsetDateTime getPublishedDate() {
     return publishedDate;
   }
 
-  public void setPublishedDate(OffsetDateTime publishedDate) {
+  public void setPublishedDate(@Nullable OffsetDateTime publishedDate) {
     this.publishedDate = publishedDate;
   }
 
-  public IntegrationVersionModel version(Integer version) {
+  public IntegrationVersionModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -90,15 +90,15 @@ public class IntegrationVersionModel {
   
   @Schema(name = "version", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 
-  public IntegrationVersionModel status(IntegrationStatusModel status) {
+  public IntegrationVersionModel status(@Nullable IntegrationStatusModel status) {
     this.status = status;
     return this;
   }
@@ -110,11 +110,11 @@ public class IntegrationVersionModel {
   @Valid 
   @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("status")
-  public IntegrationStatusModel getStatus() {
+  public @Nullable IntegrationStatusModel getStatus() {
     return status;
   }
 
-  public void setStatus(IntegrationStatusModel status) {
+  public void setStatus(@Nullable IntegrationStatusModel status) {
     this.status = status;
   }
 

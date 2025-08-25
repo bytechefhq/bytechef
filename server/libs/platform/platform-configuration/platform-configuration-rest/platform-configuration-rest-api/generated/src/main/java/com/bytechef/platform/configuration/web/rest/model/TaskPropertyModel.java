@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskProperty", description = "A task property used in task dispatchers.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class TaskPropertyModel extends PropertyModel {
 
   private @Nullable String name;
@@ -44,7 +44,7 @@ public class TaskPropertyModel extends PropertyModel {
     super(type);
   }
 
-  public TaskPropertyModel name(String name) {
+  public TaskPropertyModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -56,11 +56,11 @@ public class TaskPropertyModel extends PropertyModel {
   
   @Schema(name = "name", description = "The task name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
-  public String getName() {
+  public @Nullable String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nullable String name) {
     this.name = name;
   }
 

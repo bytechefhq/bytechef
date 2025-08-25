@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:29.992941913+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.840775+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectedUserIntegrationInstanceModel {
 
   private @Nullable String componentName;
@@ -42,7 +42,7 @@ public class ConnectedUserIntegrationInstanceModel {
 
   private @Nullable CredentialStatusModel credentialStatus;
 
-  public ConnectedUserIntegrationInstanceModel componentName(String componentName) {
+  public ConnectedUserIntegrationInstanceModel componentName(@Nullable String componentName) {
     this.componentName = componentName;
     return this;
   }
@@ -54,15 +54,15 @@ public class ConnectedUserIntegrationInstanceModel {
   
   @Schema(name = "componentName", description = "The name of a component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentName")
-  public String getComponentName() {
+  public @Nullable String getComponentName() {
     return componentName;
   }
 
-  public void setComponentName(String componentName) {
+  public void setComponentName(@Nullable String componentName) {
     this.componentName = componentName;
   }
 
-  public ConnectedUserIntegrationInstanceModel enabled(Boolean enabled) {
+  public ConnectedUserIntegrationInstanceModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -74,15 +74,15 @@ public class ConnectedUserIntegrationInstanceModel {
   
   @Schema(name = "enabled", description = "If an integration's instance is enable dor not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 
-  public ConnectedUserIntegrationInstanceModel id(Long id) {
+  public ConnectedUserIntegrationInstanceModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -94,15 +94,15 @@ public class ConnectedUserIntegrationInstanceModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public ConnectedUserIntegrationInstanceModel integrationId(Long integrationId) {
+  public ConnectedUserIntegrationInstanceModel integrationId(@Nullable Long integrationId) {
     this.integrationId = integrationId;
     return this;
   }
@@ -114,15 +114,15 @@ public class ConnectedUserIntegrationInstanceModel {
   
   @Schema(name = "integrationId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationId")
-  public Long getIntegrationId() {
+  public @Nullable Long getIntegrationId() {
     return integrationId;
   }
 
-  public void setIntegrationId(Long integrationId) {
+  public void setIntegrationId(@Nullable Long integrationId) {
     this.integrationId = integrationId;
   }
 
-  public ConnectedUserIntegrationInstanceModel integrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
+  public ConnectedUserIntegrationInstanceModel integrationInstanceConfigurationId(@Nullable Long integrationInstanceConfigurationId) {
     this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
     return this;
   }
@@ -134,15 +134,15 @@ public class ConnectedUserIntegrationInstanceModel {
   
   @Schema(name = "integrationInstanceConfigurationId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstanceConfigurationId")
-  public Long getIntegrationInstanceConfigurationId() {
+  public @Nullable Long getIntegrationInstanceConfigurationId() {
     return integrationInstanceConfigurationId;
   }
 
-  public void setIntegrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
+  public void setIntegrationInstanceConfigurationId(@Nullable Long integrationInstanceConfigurationId) {
     this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
   }
 
-  public ConnectedUserIntegrationInstanceModel integrationVersion(Integer integrationVersion) {
+  public ConnectedUserIntegrationInstanceModel integrationVersion(@Nullable Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
     return this;
   }
@@ -154,15 +154,15 @@ public class ConnectedUserIntegrationInstanceModel {
   
   @Schema(name = "integrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationVersion")
-  public Integer getIntegrationVersion() {
+  public @Nullable Integer getIntegrationVersion() {
     return integrationVersion;
   }
 
-  public void setIntegrationVersion(Integer integrationVersion) {
+  public void setIntegrationVersion(@Nullable Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
   }
 
-  public ConnectedUserIntegrationInstanceModel connectionId(Long connectionId) {
+  public ConnectedUserIntegrationInstanceModel connectionId(@Nullable Long connectionId) {
     this.connectionId = connectionId;
     return this;
   }
@@ -174,15 +174,15 @@ public class ConnectedUserIntegrationInstanceModel {
   
   @Schema(name = "connectionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionId")
-  public Long getConnectionId() {
+  public @Nullable Long getConnectionId() {
     return connectionId;
   }
 
-  public void setConnectionId(Long connectionId) {
+  public void setConnectionId(@Nullable Long connectionId) {
     this.connectionId = connectionId;
   }
 
-  public ConnectedUserIntegrationInstanceModel credentialStatus(CredentialStatusModel credentialStatus) {
+  public ConnectedUserIntegrationInstanceModel credentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
     return this;
   }
@@ -194,11 +194,11 @@ public class ConnectedUserIntegrationInstanceModel {
   @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")
-  public CredentialStatusModel getCredentialStatus() {
+  public @Nullable CredentialStatusModel getCredentialStatus() {
     return credentialStatus;
   }
 
-  public void setCredentialStatus(CredentialStatusModel credentialStatus) {
+  public void setCredentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
 

@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectionDefinitionModel {
 
   private Boolean authorizationRequired = true;
@@ -108,7 +108,7 @@ public class ConnectionDefinitionModel {
     this.authorizations = authorizations;
   }
 
-  public ConnectionDefinitionModel baseUri(String baseUri) {
+  public ConnectionDefinitionModel baseUri(@Nullable String baseUri) {
     this.baseUri = baseUri;
     return this;
   }
@@ -120,15 +120,15 @@ public class ConnectionDefinitionModel {
   
   @Schema(name = "baseUri", description = "Defines the base URI for all future HTTP requests.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("baseUri")
-  public String getBaseUri() {
+  public @Nullable String getBaseUri() {
     return baseUri;
   }
 
-  public void setBaseUri(String baseUri) {
+  public void setBaseUri(@Nullable String baseUri) {
     this.baseUri = baseUri;
   }
 
-  public ConnectionDefinitionModel componentDescription(String componentDescription) {
+  public ConnectionDefinitionModel componentDescription(@Nullable String componentDescription) {
     this.componentDescription = componentDescription;
     return this;
   }
@@ -140,11 +140,11 @@ public class ConnectionDefinitionModel {
   
   @Schema(name = "componentDescription", description = "The description used from the connection's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentDescription")
-  public String getComponentDescription() {
+  public @Nullable String getComponentDescription() {
     return componentDescription;
   }
 
-  public void setComponentDescription(String componentDescription) {
+  public void setComponentDescription(@Nullable String componentDescription) {
     this.componentDescription = componentDescription;
   }
 
@@ -196,7 +196,7 @@ public class ConnectionDefinitionModel {
     this.properties = properties;
   }
 
-  public ConnectionDefinitionModel componentTitle(String componentTitle) {
+  public ConnectionDefinitionModel componentTitle(@Nullable String componentTitle) {
     this.componentTitle = componentTitle;
     return this;
   }
@@ -208,11 +208,11 @@ public class ConnectionDefinitionModel {
   
   @Schema(name = "componentTitle", description = "The title used from the connection's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentTitle")
-  public String getComponentTitle() {
+  public @Nullable String getComponentTitle() {
     return componentTitle;
   }
 
-  public void setComponentTitle(String componentTitle) {
+  public void setComponentTitle(@Nullable String componentTitle) {
     this.componentTitle = componentTitle;
   }
 

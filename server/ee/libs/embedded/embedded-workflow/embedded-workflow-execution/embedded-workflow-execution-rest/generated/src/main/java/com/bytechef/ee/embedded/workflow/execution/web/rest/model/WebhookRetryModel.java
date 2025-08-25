@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Webhook_retry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:45.136270797+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.381133+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WebhookRetryModel {
 
   private @Nullable Integer initialInterval;
@@ -32,7 +32,7 @@ public class WebhookRetryModel {
 
   private @Nullable Integer multiplier;
 
-  public WebhookRetryModel initialInterval(Integer initialInterval) {
+  public WebhookRetryModel initialInterval(@Nullable Integer initialInterval) {
     this.initialInterval = initialInterval;
     return this;
   }
@@ -44,15 +44,15 @@ public class WebhookRetryModel {
   
   @Schema(name = "initialInterval", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("initialInterval")
-  public Integer getInitialInterval() {
+  public @Nullable Integer getInitialInterval() {
     return initialInterval;
   }
 
-  public void setInitialInterval(Integer initialInterval) {
+  public void setInitialInterval(@Nullable Integer initialInterval) {
     this.initialInterval = initialInterval;
   }
 
-  public WebhookRetryModel maxInterval(Integer maxInterval) {
+  public WebhookRetryModel maxInterval(@Nullable Integer maxInterval) {
     this.maxInterval = maxInterval;
     return this;
   }
@@ -64,15 +64,15 @@ public class WebhookRetryModel {
   
   @Schema(name = "maxInterval", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxInterval")
-  public Integer getMaxInterval() {
+  public @Nullable Integer getMaxInterval() {
     return maxInterval;
   }
 
-  public void setMaxInterval(Integer maxInterval) {
+  public void setMaxInterval(@Nullable Integer maxInterval) {
     this.maxInterval = maxInterval;
   }
 
-  public WebhookRetryModel maxAttempts(Integer maxAttempts) {
+  public WebhookRetryModel maxAttempts(@Nullable Integer maxAttempts) {
     this.maxAttempts = maxAttempts;
     return this;
   }
@@ -84,15 +84,15 @@ public class WebhookRetryModel {
   
   @Schema(name = "maxAttempts", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxAttempts")
-  public Integer getMaxAttempts() {
+  public @Nullable Integer getMaxAttempts() {
     return maxAttempts;
   }
 
-  public void setMaxAttempts(Integer maxAttempts) {
+  public void setMaxAttempts(@Nullable Integer maxAttempts) {
     this.maxAttempts = maxAttempts;
   }
 
-  public WebhookRetryModel multiplier(Integer multiplier) {
+  public WebhookRetryModel multiplier(@Nullable Integer multiplier) {
     this.multiplier = multiplier;
     return this;
   }
@@ -104,11 +104,11 @@ public class WebhookRetryModel {
   
   @Schema(name = "multiplier", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("multiplier")
-  public Integer getMultiplier() {
+  public @Nullable Integer getMultiplier() {
     return multiplier;
   }
 
-  public void setMultiplier(Integer multiplier) {
+  public void setMultiplier(@Nullable Integer multiplier) {
     this.multiplier = multiplier;
   }
 

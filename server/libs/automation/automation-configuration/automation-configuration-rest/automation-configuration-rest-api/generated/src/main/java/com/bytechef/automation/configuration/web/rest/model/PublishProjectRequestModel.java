@@ -21,12 +21,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("publishProject_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:33.209056231+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:40.062541+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class PublishProjectRequestModel {
 
   private @Nullable String description;
 
-  public PublishProjectRequestModel description(String description) {
+  public PublishProjectRequestModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -38,11 +38,11 @@ public class PublishProjectRequestModel {
   
   @Schema(name = "description", description = "The description of a project version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 

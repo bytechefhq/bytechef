@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "connection_base", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("connection_base")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectionBaseModel {
 
   private @Nullable Boolean active;
@@ -91,7 +91,7 @@ public class ConnectionBaseModel {
     this.parameters = parameters;
   }
 
-  public ConnectionBaseModel active(Boolean active) {
+  public ConnectionBaseModel active(@Nullable Boolean active) {
     this.active = active;
     return this;
   }
@@ -103,15 +103,15 @@ public class ConnectionBaseModel {
   
   @Schema(name = "active", accessMode = Schema.AccessMode.READ_ONLY, description = "If a connection is used in any of active workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("active")
-  public Boolean getActive() {
+  public @Nullable Boolean getActive() {
     return active;
   }
 
-  public void setActive(Boolean active) {
+  public void setActive(@Nullable Boolean active) {
     this.active = active;
   }
 
-  public ConnectionBaseModel authorizationType(AuthorizationTypeModel authorizationType) {
+  public ConnectionBaseModel authorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
     return this;
   }
@@ -123,11 +123,11 @@ public class ConnectionBaseModel {
   @Valid 
   @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationType")
-  public AuthorizationTypeModel getAuthorizationType() {
+  public @Nullable AuthorizationTypeModel getAuthorizationType() {
     return authorizationType;
   }
 
-  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
+  public void setAuthorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
 
@@ -227,7 +227,7 @@ public class ConnectionBaseModel {
     this.connectionVersion = connectionVersion;
   }
 
-  public ConnectionBaseModel createdBy(String createdBy) {
+  public ConnectionBaseModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -239,15 +239,15 @@ public class ConnectionBaseModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public ConnectionBaseModel createdDate(OffsetDateTime createdDate) {
+  public ConnectionBaseModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -259,15 +259,15 @@ public class ConnectionBaseModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public ConnectionBaseModel credentialStatus(CredentialStatusModel credentialStatus) {
+  public ConnectionBaseModel credentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
     return this;
   }
@@ -279,15 +279,15 @@ public class ConnectionBaseModel {
   @Valid 
   @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("credentialStatus")
-  public CredentialStatusModel getCredentialStatus() {
+  public @Nullable CredentialStatusModel getCredentialStatus() {
     return credentialStatus;
   }
 
-  public void setCredentialStatus(CredentialStatusModel credentialStatus) {
+  public void setCredentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
 
-  public ConnectionBaseModel environment(EnvironmentModel environment) {
+  public ConnectionBaseModel environment(@Nullable EnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -299,15 +299,15 @@ public class ConnectionBaseModel {
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
-  public EnvironmentModel getEnvironment() {
+  public @Nullable EnvironmentModel getEnvironment() {
     return environment;
   }
 
-  public void setEnvironment(EnvironmentModel environment) {
+  public void setEnvironment(@Nullable EnvironmentModel environment) {
     this.environment = environment;
   }
 
-  public ConnectionBaseModel id(Long id) {
+  public ConnectionBaseModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -319,15 +319,15 @@ public class ConnectionBaseModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public ConnectionBaseModel lastModifiedBy(String lastModifiedBy) {
+  public ConnectionBaseModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -339,15 +339,15 @@ public class ConnectionBaseModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ConnectionBaseModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ConnectionBaseModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -359,11 +359,11 @@ public class ConnectionBaseModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -443,7 +443,7 @@ public class ConnectionBaseModel {
     this.tags = tags;
   }
 
-  public ConnectionBaseModel version(Integer version) {
+  public ConnectionBaseModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -455,11 +455,11 @@ public class ConnectionBaseModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("IntegrationWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:28.963074682+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationWorkflowModel {
 
   private @Nullable String description;
@@ -38,7 +38,7 @@ public class IntegrationWorkflowModel {
 
   private @Nullable String workflowReferenceCode;
 
-  public IntegrationWorkflowModel description(String description) {
+  public IntegrationWorkflowModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -50,11 +50,11 @@ public class IntegrationWorkflowModel {
   
   @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
@@ -86,7 +86,7 @@ public class IntegrationWorkflowModel {
     this.inputs = inputs;
   }
 
-  public IntegrationWorkflowModel label(String label) {
+  public IntegrationWorkflowModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -98,15 +98,15 @@ public class IntegrationWorkflowModel {
   
   @Schema(name = "label", description = "The label of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 
-  public IntegrationWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+  public IntegrationWorkflowModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -118,11 +118,11 @@ public class IntegrationWorkflowModel {
   
   @Schema(name = "workflowReferenceCode", description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowReferenceCode")
-  public String getWorkflowReferenceCode() {
+  public @Nullable String getWorkflowReferenceCode() {
     return workflowReferenceCode;
   }
 
-  public void setWorkflowReferenceCode(String workflowReferenceCode) {
+  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 

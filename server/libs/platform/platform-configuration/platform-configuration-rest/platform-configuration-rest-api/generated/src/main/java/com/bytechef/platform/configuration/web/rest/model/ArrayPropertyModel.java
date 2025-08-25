@@ -35,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ArrayProperty", description = "An array property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -153,7 +153,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     this.items = items;
   }
 
-  public ArrayPropertyModel maxItems(Long maxItems) {
+  public ArrayPropertyModel maxItems(@Nullable Long maxItems) {
     this.maxItems = maxItems;
     return this;
   }
@@ -165,15 +165,15 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "maxItems", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxItems")
-  public Long getMaxItems() {
+  public @Nullable Long getMaxItems() {
     return maxItems;
   }
 
-  public void setMaxItems(Long maxItems) {
+  public void setMaxItems(@Nullable Long maxItems) {
     this.maxItems = maxItems;
   }
 
-  public ArrayPropertyModel minItems(Long minItems) {
+  public ArrayPropertyModel minItems(@Nullable Long minItems) {
     this.minItems = minItems;
     return this;
   }
@@ -185,15 +185,15 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "minItems", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minItems")
-  public Long getMinItems() {
+  public @Nullable Long getMinItems() {
     return minItems;
   }
 
-  public void setMinItems(Long minItems) {
+  public void setMinItems(@Nullable Long minItems) {
     this.minItems = minItems;
   }
 
-  public ArrayPropertyModel multipleValues(Boolean multipleValues) {
+  public ArrayPropertyModel multipleValues(@Nullable Boolean multipleValues) {
     this.multipleValues = multipleValues;
     return this;
   }
@@ -205,11 +205,11 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "multipleValues", description = "If the array can contain multiple items.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("multipleValues")
-  public Boolean getMultipleValues() {
+  public @Nullable Boolean getMultipleValues() {
     return multipleValues;
   }
 
-  public void setMultipleValues(Boolean multipleValues) {
+  public void setMultipleValues(@Nullable Boolean multipleValues) {
     this.multipleValues = multipleValues;
   }
 
@@ -241,7 +241,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     this.options = options;
   }
 
-  public ArrayPropertyModel optionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public ArrayPropertyModel optionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
     return this;
   }
@@ -253,11 +253,11 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")
-  public OptionsDataSourceModel getOptionsDataSource() {
+  public @Nullable OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }
 
-  public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
 

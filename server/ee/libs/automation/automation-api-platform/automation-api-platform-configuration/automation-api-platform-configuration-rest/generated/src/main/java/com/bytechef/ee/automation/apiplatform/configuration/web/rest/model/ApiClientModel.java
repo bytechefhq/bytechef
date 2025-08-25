@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiClient", description = "Contains generated key required for calling API.")
 @JsonTypeName("ApiClient")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:41.418515386+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.114758+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ApiClientModel {
 
   private @Nullable String createdBy;
@@ -58,7 +58,7 @@ public class ApiClientModel {
     this.secretKey = secretKey;
   }
 
-  public ApiClientModel createdBy(String createdBy) {
+  public ApiClientModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -70,15 +70,15 @@ public class ApiClientModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public ApiClientModel createdDate(OffsetDateTime createdDate) {
+  public ApiClientModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -90,15 +90,15 @@ public class ApiClientModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public ApiClientModel id(Long id) {
+  public ApiClientModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -110,15 +110,15 @@ public class ApiClientModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an API key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public ApiClientModel lastModifiedBy(String lastModifiedBy) {
+  public ApiClientModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -130,15 +130,15 @@ public class ApiClientModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ApiClientModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ApiClientModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -150,15 +150,15 @@ public class ApiClientModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ApiClientModel lastUsedDate(OffsetDateTime lastUsedDate) {
+  public ApiClientModel lastUsedDate(@Nullable OffsetDateTime lastUsedDate) {
     this.lastUsedDate = lastUsedDate;
     return this;
   }
@@ -170,11 +170,11 @@ public class ApiClientModel {
   @Valid 
   @Schema(name = "lastUsedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last used date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastUsedDate")
-  public OffsetDateTime getLastUsedDate() {
+  public @Nullable OffsetDateTime getLastUsedDate() {
     return lastUsedDate;
   }
 
-  public void setLastUsedDate(OffsetDateTime lastUsedDate) {
+  public void setLastUsedDate(@Nullable OffsetDateTime lastUsedDate) {
     this.lastUsedDate = lastUsedDate;
   }
 

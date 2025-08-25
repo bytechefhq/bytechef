@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollectionEndpoint", description = "An API collection endpoint.")
 @JsonTypeName("ApiCollectionEndpoint")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:41.418515386+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.114758+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ApiCollectionEndpointModel {
 
   private @Nullable Long apiCollectionId;
@@ -74,7 +74,7 @@ public class ApiCollectionEndpointModel {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 
-  public ApiCollectionEndpointModel apiCollectionId(Long apiCollectionId) {
+  public ApiCollectionEndpointModel apiCollectionId(@Nullable Long apiCollectionId) {
     this.apiCollectionId = apiCollectionId;
     return this;
   }
@@ -86,15 +86,15 @@ public class ApiCollectionEndpointModel {
   
   @Schema(name = "apiCollectionId", description = "The id of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("apiCollectionId")
-  public Long getApiCollectionId() {
+  public @Nullable Long getApiCollectionId() {
     return apiCollectionId;
   }
 
-  public void setApiCollectionId(Long apiCollectionId) {
+  public void setApiCollectionId(@Nullable Long apiCollectionId) {
     this.apiCollectionId = apiCollectionId;
   }
 
-  public ApiCollectionEndpointModel createdBy(String createdBy) {
+  public ApiCollectionEndpointModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -106,15 +106,15 @@ public class ApiCollectionEndpointModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public ApiCollectionEndpointModel createdDate(OffsetDateTime createdDate) {
+  public ApiCollectionEndpointModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -126,11 +126,11 @@ public class ApiCollectionEndpointModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -174,7 +174,7 @@ public class ApiCollectionEndpointModel {
     this.httpMethod = httpMethod;
   }
 
-  public ApiCollectionEndpointModel id(Long id) {
+  public ApiCollectionEndpointModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -186,15 +186,15 @@ public class ApiCollectionEndpointModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public ApiCollectionEndpointModel name(String name) {
+  public ApiCollectionEndpointModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -206,15 +206,15 @@ public class ApiCollectionEndpointModel {
   
   @Schema(name = "name", description = "The name of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
-  public String getName() {
+  public @Nullable String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nullable String name) {
     this.name = name;
   }
 
-  public ApiCollectionEndpointModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public ApiCollectionEndpointModel lastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -226,15 +226,15 @@ public class ApiCollectionEndpointModel {
   @Valid 
   @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
-  public OffsetDateTime getLastExecutionDate() {
+  public @Nullable OffsetDateTime getLastExecutionDate() {
     return lastExecutionDate;
   }
 
-  public void setLastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
 
-  public ApiCollectionEndpointModel lastModifiedBy(String lastModifiedBy) {
+  public ApiCollectionEndpointModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -246,15 +246,15 @@ public class ApiCollectionEndpointModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ApiCollectionEndpointModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ApiCollectionEndpointModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -266,11 +266,11 @@ public class ApiCollectionEndpointModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -294,7 +294,7 @@ public class ApiCollectionEndpointModel {
     this.path = path;
   }
 
-  public ApiCollectionEndpointModel projectDeploymentWorkflowId(Long projectDeploymentWorkflowId) {
+  public ApiCollectionEndpointModel projectDeploymentWorkflowId(@Nullable Long projectDeploymentWorkflowId) {
     this.projectDeploymentWorkflowId = projectDeploymentWorkflowId;
     return this;
   }
@@ -306,11 +306,11 @@ public class ApiCollectionEndpointModel {
   
   @Schema(name = "projectDeploymentWorkflowId", accessMode = Schema.AccessMode.READ_ONLY, description = "The project deployment workflow id.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectDeploymentWorkflowId")
-  public Long getProjectDeploymentWorkflowId() {
+  public @Nullable Long getProjectDeploymentWorkflowId() {
     return projectDeploymentWorkflowId;
   }
 
-  public void setProjectDeploymentWorkflowId(Long projectDeploymentWorkflowId) {
+  public void setProjectDeploymentWorkflowId(@Nullable Long projectDeploymentWorkflowId) {
     this.projectDeploymentWorkflowId = projectDeploymentWorkflowId;
   }
 
@@ -334,7 +334,7 @@ public class ApiCollectionEndpointModel {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 
-  public ApiCollectionEndpointModel version(Integer version) {
+  public ApiCollectionEndpointModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -346,11 +346,11 @@ public class ApiCollectionEndpointModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

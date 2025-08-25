@@ -36,7 +36,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateProperty", description = "A date property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class DatePropertyModel extends ValuePropertyModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -61,7 +61,7 @@ public class DatePropertyModel extends ValuePropertyModel {
     super(controlType, type);
   }
 
-  public DatePropertyModel defaultValue(LocalDate defaultValue) {
+  public DatePropertyModel defaultValue(@Nullable LocalDate defaultValue) {
     this.defaultValue = defaultValue;
     return this;
   }
@@ -73,15 +73,15 @@ public class DatePropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
-  public LocalDate getDefaultValue() {
+  public @Nullable LocalDate getDefaultValue() {
     return defaultValue;
   }
 
-  public void setDefaultValue(LocalDate defaultValue) {
+  public void setDefaultValue(@Nullable LocalDate defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  public DatePropertyModel exampleValue(LocalDate exampleValue) {
+  public DatePropertyModel exampleValue(@Nullable LocalDate exampleValue) {
     this.exampleValue = exampleValue;
     return this;
   }
@@ -93,11 +93,11 @@ public class DatePropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
-  public LocalDate getExampleValue() {
+  public @Nullable LocalDate getExampleValue() {
     return exampleValue;
   }
 
-  public void setExampleValue(LocalDate exampleValue) {
+  public void setExampleValue(@Nullable LocalDate exampleValue) {
     this.exampleValue = exampleValue;
   }
 
@@ -129,7 +129,7 @@ public class DatePropertyModel extends ValuePropertyModel {
     this.options = options;
   }
 
-  public DatePropertyModel optionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public DatePropertyModel optionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
     return this;
   }
@@ -141,11 +141,11 @@ public class DatePropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")
-  public OptionsDataSourceModel getOptionsDataSource() {
+  public @Nullable OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }
 
-  public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
 

@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentBasic", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectDeploymentBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:33.209056231+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:40.062541+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ProjectDeploymentBasicModel {
 
   private @Nullable String createdBy;
@@ -67,7 +67,7 @@ public class ProjectDeploymentBasicModel {
     this.name = name;
   }
 
-  public ProjectDeploymentBasicModel createdBy(String createdBy) {
+  public ProjectDeploymentBasicModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -79,15 +79,15 @@ public class ProjectDeploymentBasicModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public ProjectDeploymentBasicModel createdDate(OffsetDateTime createdDate) {
+  public ProjectDeploymentBasicModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -99,15 +99,15 @@ public class ProjectDeploymentBasicModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public ProjectDeploymentBasicModel description(String description) {
+  public ProjectDeploymentBasicModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -119,15 +119,15 @@ public class ProjectDeploymentBasicModel {
   
   @Schema(name = "description", description = "The description of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public ProjectDeploymentBasicModel enabled(Boolean enabled) {
+  public ProjectDeploymentBasicModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -139,15 +139,15 @@ public class ProjectDeploymentBasicModel {
   
   @Schema(name = "enabled", description = "If a project deployment is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 
-  public ProjectDeploymentBasicModel environment(EnvironmentModel environment) {
+  public ProjectDeploymentBasicModel environment(@Nullable EnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -159,15 +159,15 @@ public class ProjectDeploymentBasicModel {
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
-  public EnvironmentModel getEnvironment() {
+  public @Nullable EnvironmentModel getEnvironment() {
     return environment;
   }
 
-  public void setEnvironment(EnvironmentModel environment) {
+  public void setEnvironment(@Nullable EnvironmentModel environment) {
     this.environment = environment;
   }
 
-  public ProjectDeploymentBasicModel id(Long id) {
+  public ProjectDeploymentBasicModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -179,15 +179,15 @@ public class ProjectDeploymentBasicModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public ProjectDeploymentBasicModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public ProjectDeploymentBasicModel lastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -199,15 +199,15 @@ public class ProjectDeploymentBasicModel {
   @Valid 
   @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
-  public OffsetDateTime getLastExecutionDate() {
+  public @Nullable OffsetDateTime getLastExecutionDate() {
     return lastExecutionDate;
   }
 
-  public void setLastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
 
-  public ProjectDeploymentBasicModel lastModifiedBy(String lastModifiedBy) {
+  public ProjectDeploymentBasicModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -219,15 +219,15 @@ public class ProjectDeploymentBasicModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ProjectDeploymentBasicModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ProjectDeploymentBasicModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -239,11 +239,11 @@ public class ProjectDeploymentBasicModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -267,7 +267,7 @@ public class ProjectDeploymentBasicModel {
     this.name = name;
   }
 
-  public ProjectDeploymentBasicModel projectId(Long projectId) {
+  public ProjectDeploymentBasicModel projectId(@Nullable Long projectId) {
     this.projectId = projectId;
     return this;
   }
@@ -279,15 +279,15 @@ public class ProjectDeploymentBasicModel {
   
   @Schema(name = "projectId", description = "The id of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectId")
-  public Long getProjectId() {
+  public @Nullable Long getProjectId() {
     return projectId;
   }
 
-  public void setProjectId(Long projectId) {
+  public void setProjectId(@Nullable Long projectId) {
     this.projectId = projectId;
   }
 
-  public ProjectDeploymentBasicModel projectVersion(Integer projectVersion) {
+  public ProjectDeploymentBasicModel projectVersion(@Nullable Integer projectVersion) {
     this.projectVersion = projectVersion;
     return this;
   }
@@ -299,11 +299,11 @@ public class ProjectDeploymentBasicModel {
   
   @Schema(name = "projectVersion", description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectVersion")
-  public Integer getProjectVersion() {
+  public @Nullable Integer getProjectVersion() {
     return projectVersion;
   }
 
-  public void setProjectVersion(Integer projectVersion) {
+  public void setProjectVersion(@Nullable Integer projectVersion) {
     this.projectVersion = projectVersion;
   }
 
