@@ -97,7 +97,6 @@ public class QuestionAnswerRag {
         VectorStoreFunction vectorStoreFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
-
         ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         return QuestionAnswerAdvisor

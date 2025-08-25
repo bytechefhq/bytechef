@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes" : {
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "load" : [ "EMBEDDING" ]
+    "search" : [ "EMBEDDING" ],
+    "load" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions" : [ {
     "batch" : null,
