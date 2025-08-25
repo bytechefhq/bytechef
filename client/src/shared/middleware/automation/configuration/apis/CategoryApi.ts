@@ -36,8 +36,11 @@ export class CategoryApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/projects/categories`;
+
         const response = await this.request({
-            path: `/projects/categories`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

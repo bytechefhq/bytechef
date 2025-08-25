@@ -36,8 +36,11 @@ export class NotificationEventApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/notifications/events`;
+
         const response = await this.request({
-            path: `/notifications/events`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

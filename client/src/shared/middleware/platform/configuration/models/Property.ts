@@ -21,19 +21,19 @@ import {
     PropertyTypeToJSONTyped,
 } from './PropertyType';
 
-import { ArrayProperty, ArrayPropertyFromJSONTyped, ArrayPropertyToJSON, ArrayPropertyToJSONTyped } from './ArrayProperty';
-import { BooleanProperty, BooleanPropertyFromJSONTyped, BooleanPropertyToJSON, BooleanPropertyToJSONTyped } from './BooleanProperty';
-import { DateProperty, DatePropertyFromJSONTyped, DatePropertyToJSON, DatePropertyToJSONTyped } from './DateProperty';
-import { DateTimeProperty, DateTimePropertyFromJSONTyped, DateTimePropertyToJSON, DateTimePropertyToJSONTyped } from './DateTimeProperty';
-import { DynamicPropertiesProperty, DynamicPropertiesPropertyFromJSONTyped, DynamicPropertiesPropertyToJSON, DynamicPropertiesPropertyToJSONTyped } from './DynamicPropertiesProperty';
-import { FileEntryProperty, FileEntryPropertyFromJSONTyped, FileEntryPropertyToJSON, FileEntryPropertyToJSONTyped } from './FileEntryProperty';
-import { IntegerProperty, IntegerPropertyFromJSONTyped, IntegerPropertyToJSON, IntegerPropertyToJSONTyped } from './IntegerProperty';
-import { NullProperty, NullPropertyFromJSONTyped, NullPropertyToJSON, NullPropertyToJSONTyped } from './NullProperty';
-import { NumberProperty, NumberPropertyFromJSONTyped, NumberPropertyToJSON, NumberPropertyToJSONTyped } from './NumberProperty';
-import { ObjectProperty, ObjectPropertyFromJSONTyped, ObjectPropertyToJSON, ObjectPropertyToJSONTyped } from './ObjectProperty';
-import { StringProperty, StringPropertyFromJSONTyped, StringPropertyToJSON, StringPropertyToJSONTyped } from './StringProperty';
-import { TaskProperty, TaskPropertyFromJSONTyped, TaskPropertyToJSON, TaskPropertyToJSONTyped } from './TaskProperty';
-import { TimeProperty, TimePropertyFromJSONTyped, TimePropertyToJSON, TimePropertyToJSONTyped } from './TimeProperty';
+import { type ArrayProperty, ArrayPropertyFromJSONTyped, ArrayPropertyToJSON, ArrayPropertyToJSONTyped } from './ArrayProperty';
+import { type BooleanProperty, BooleanPropertyFromJSONTyped, BooleanPropertyToJSON, BooleanPropertyToJSONTyped } from './BooleanProperty';
+import { type DateProperty, DatePropertyFromJSONTyped, DatePropertyToJSON, DatePropertyToJSONTyped } from './DateProperty';
+import { type DateTimeProperty, DateTimePropertyFromJSONTyped, DateTimePropertyToJSON, DateTimePropertyToJSONTyped } from './DateTimeProperty';
+import { type DynamicPropertiesProperty, DynamicPropertiesPropertyFromJSONTyped, DynamicPropertiesPropertyToJSON, DynamicPropertiesPropertyToJSONTyped } from './DynamicPropertiesProperty';
+import { type FileEntryProperty, FileEntryPropertyFromJSONTyped, FileEntryPropertyToJSON, FileEntryPropertyToJSONTyped } from './FileEntryProperty';
+import { type IntegerProperty, IntegerPropertyFromJSONTyped, IntegerPropertyToJSON, IntegerPropertyToJSONTyped } from './IntegerProperty';
+import { type NullProperty, NullPropertyFromJSONTyped, NullPropertyToJSON, NullPropertyToJSONTyped } from './NullProperty';
+import { type NumberProperty, NumberPropertyFromJSONTyped, NumberPropertyToJSON, NumberPropertyToJSONTyped } from './NumberProperty';
+import { type ObjectProperty, ObjectPropertyFromJSONTyped, ObjectPropertyToJSON, ObjectPropertyToJSONTyped } from './ObjectProperty';
+import { type StringProperty, StringPropertyFromJSONTyped, StringPropertyToJSON, StringPropertyToJSONTyped } from './StringProperty';
+import { type TaskProperty, TaskPropertyFromJSONTyped, TaskPropertyToJSON, TaskPropertyToJSONTyped } from './TaskProperty';
+import { type TimeProperty, TimePropertyFromJSONTyped, TimePropertyToJSON, TimePropertyToJSONTyped } from './TimeProperty';
 /**
  * A base property.
  * @export

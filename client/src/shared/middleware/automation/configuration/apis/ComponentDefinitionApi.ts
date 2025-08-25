@@ -59,8 +59,11 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions`;
+
         const response = await this.request({
-            path: `/component-definitions`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

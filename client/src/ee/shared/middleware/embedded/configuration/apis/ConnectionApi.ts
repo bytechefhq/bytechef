@@ -101,8 +101,13 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections`;
+        urlPath = urlPath.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId'])));
+        urlPath = urlPath.replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode'])));
+
         const response = await this.request({
-            path: `/connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections`.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId']))).replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode']))),
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -143,8 +148,11 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/connections`;
+
         const response = await this.request({
-            path: `/connections`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -183,8 +191,12 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/connections/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -228,8 +240,13 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/connected-users/{connectedUserId}/components/{componentName}/connections`;
+        urlPath = urlPath.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId'])));
+        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+
         const response = await this.request({
-            path: `/connected-users/{connectedUserId}/components/{componentName}/connections`.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId']))).replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -263,8 +280,12 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/connections/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -307,8 +328,11 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/connections`;
+
         const response = await this.request({
-            path: `/connections`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -351,8 +375,12 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/connections/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
