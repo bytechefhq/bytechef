@@ -14,7 +14,10 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {GetWorkflowNodeParameterDisplayConditions200Response, Option} from '@/shared/middleware/platform/configuration';
+import {
+    GetClusterElementParameterDisplayConditions200Response,
+    Option,
+} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
@@ -99,7 +102,7 @@ interface PropertyProps {
     controlPath?: string;
     customClassName?: string;
     deletePropertyButton?: ReactNode;
-    displayConditionsQuery?: UseQueryResult<GetWorkflowNodeParameterDisplayConditions200Response, Error>;
+    displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
     formState?: FormState<FieldValues>;
     objectName?: string;
     operationName?: string;
