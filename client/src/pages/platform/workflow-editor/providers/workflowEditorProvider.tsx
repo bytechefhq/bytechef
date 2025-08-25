@@ -2,12 +2,12 @@ import {
     AuthorizationType,
     ComponentDefinitionBasic,
     CredentialStatus,
-    DeleteWorkflowNodeParameter200Response,
-    DeleteWorkflowNodeParameterOperationRequest,
+    DeleteClusterElementParameter200Response,
+    DeleteWorkflowNodeParameterRequest,
     Environment,
     Tag,
-    UpdateWorkflowNodeParameter200Response,
-    UpdateWorkflowNodeParameterOperationRequest,
+    UpdateClusterElementParameter200Response,
+    UpdateWorkflowNodeParameterRequest,
 } from '@/shared/middleware/platform/configuration';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
@@ -85,17 +85,17 @@ export interface WorkflowReadOnlyStateI {
 export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     ConnectionKeys: ConnectionKeysI;
     deleteWorkflowNodeParameterMutation: UseMutationResult<
-        DeleteWorkflowNodeParameter200Response,
+        DeleteClusterElementParameter200Response,
         Error,
-        DeleteWorkflowNodeParameterOperationRequest,
+        DeleteWorkflowNodeParameterRequest,
         unknown
     >;
     invalidateWorkflowQueries: () => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     updateWorkflowNodeParameterMutation: UseMutationResult<
-        UpdateWorkflowNodeParameter200Response,
+        UpdateClusterElementParameter200Response,
         Error,
-        UpdateWorkflowNodeParameterOperationRequest,
+        UpdateWorkflowNodeParameterRequest,
         unknown
     >;
     useCreateConnectionMutation: (

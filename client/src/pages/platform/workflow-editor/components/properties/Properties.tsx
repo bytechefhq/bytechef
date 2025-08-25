@@ -1,6 +1,6 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import Property from '@/pages/platform/workflow-editor/components/properties/Property';
-import {GetWorkflowNodeParameterDisplayConditions200Response} from '@/shared/middleware/platform/configuration';
+import {GetClusterElementParameterDisplayConditions200Response} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';
 import {UseQueryResult} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
@@ -14,7 +14,7 @@ interface PropertiesProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     control?: Control<any, any>;
     controlPath?: string;
-    displayConditionsQuery?: UseQueryResult<GetWorkflowNodeParameterDisplayConditions200Response, Error>;
+    displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
     customClassName?: string;
     operationName?: string;
     formState?: FormState<FieldValues>;
