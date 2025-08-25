@@ -779,7 +779,7 @@ paths:
                   description:
                     type: string
 
-  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/properties/{clusterElementWorkflowNodeName}/options/{propertyName}:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/options/{propertyName}:
     get:
       description: "Get an action or trigger property options shown in the editor."
       summary: "Get an action or trigger property options shown in the editor"
@@ -840,7 +840,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Option"
 
-  /workflows/{id}/dynamic-properties/{workflowNodeName}/properties/{propertyName}:
+  /workflows/{id}/dynamic-properties/{workflowNodeName}/cluster-elements/{clusterElementType}/properties/{propertyName}:
     get:
       description: "Get dynamic properties for an action or trigger property shown in the editor."
       summary: "Get dynamic properties for an action or trigger property shown in the editor"
@@ -858,6 +858,61 @@ paths:
           description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
           in: "path"
           required: true
+          schema:
+            type: "string"
+        - name: "propertyName"
+          description: "The name of a property."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "lookupDependsOnPaths"
+          description: "The list of dependency paths."
+          required: false
+          in: "query"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Property"
+  /workflows/{id}/dynamic-properties/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/properties/{propertyName}:
+    get:
+      description: "Get dynamic properties for an action or trigger property shown in the editor."
+      summary: "Get dynamic properties for an action or trigger property shown in the editor"
+      tags:
+        - "workflow-node-dynamic-properties"
+      operationId: "getWorkflowNodeDynamicProperties"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "clusterElementType"
+          description: "The name of a cluster element type."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "clusterElementWorkflowNodeName"
+          description: "The name of a cluster element workflow node name."
+          required: true
+          in: "path"
           schema:
             type: "string"
         - name: "propertyName"
@@ -939,7 +994,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeOutput"
-  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/outputs/{clusterElementWorkflowNodeName}:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/outputs:
     get:
       description: "Get cluster element node output used in a workflow."
       summary: "Get cluster element node output used in a workflow"
@@ -1088,7 +1143,7 @@ paths:
                     type: "array"
                     items:
                       type: "string"
-  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/parameters/{clusterElementWorkflowNodeName}:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/parameters:
     delete:
       description: "Deletes a cluster element parameter."
       summary: "Deletes a cluster element parameter"
@@ -1127,7 +1182,6 @@ paths:
               type: "object"
               required:
                 - "path"
-                - "workflowNodeName"
               properties:
                 path:
                   description: "The workflow node parameter path."
@@ -1182,7 +1236,6 @@ paths:
               required:
                 - "path"
                 - "type"
-                - "workflowNodeName"
               properties:
                 includeInMetadata:
                   description: "If path and value type should be included in metadata "
@@ -1258,7 +1311,7 @@ paths:
                     type: "array"
                     items:
                       type: "string"
-  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/parameters/{clusterElementWorkflowNodeName}/display-conditions:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/display-conditions:
     get:
       description: "Get cluster element options shown in the editor."
       summary: "Get cluster element property options shown in the editor"
