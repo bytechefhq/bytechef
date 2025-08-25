@@ -209,6 +209,7 @@ const ConnectionTabConnectionSelect = ({
             {currentConnection && connectionDefinition && (
                 <ConnectionParameters
                     authorizationParameters={currentConnection.authorizationParameters}
+                    authorizationType={currentConnection.authorizationType}
                     connectionDefinition={connectionDefinition}
                     connectionParameters={currentConnection.connectionParameters}
                 />
