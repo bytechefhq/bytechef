@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "getOAuth2AuthorizationParameters_request", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("getOAuth2AuthorizationParameters_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class GetOAuth2AuthorizationParametersRequestModel {
 
   private @Nullable AuthorizationTypeModel authorizationType;
@@ -50,7 +50,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     this.parameters = parameters;
   }
 
-  public GetOAuth2AuthorizationParametersRequestModel authorizationType(AuthorizationTypeModel authorizationType) {
+  public GetOAuth2AuthorizationParametersRequestModel authorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
     return this;
   }
@@ -62,11 +62,11 @@ public class GetOAuth2AuthorizationParametersRequestModel {
   @Valid 
   @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationType")
-  public AuthorizationTypeModel getAuthorizationType() {
+  public @Nullable AuthorizationTypeModel getAuthorizationType() {
     return authorizationType;
   }
 
-  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
+  public void setAuthorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
 
@@ -90,7 +90,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     this.componentName = componentName;
   }
 
-  public GetOAuth2AuthorizationParametersRequestModel connectionVersion(Integer connectionVersion) {
+  public GetOAuth2AuthorizationParametersRequestModel connectionVersion(@Nullable Integer connectionVersion) {
     this.connectionVersion = connectionVersion;
     return this;
   }
@@ -102,11 +102,11 @@ public class GetOAuth2AuthorizationParametersRequestModel {
   
   @Schema(name = "connectionVersion", description = "The version of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionVersion")
-  public Integer getConnectionVersion() {
+  public @Nullable Integer getConnectionVersion() {
     return connectionVersion;
   }
 
-  public void setConnectionVersion(Integer connectionVersion) {
+  public void setConnectionVersion(@Nullable Integer connectionVersion) {
     this.connectionVersion = connectionVersion;
   }
 

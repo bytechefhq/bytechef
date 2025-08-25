@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
 @JsonTypeName("Authorization")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class AuthorizationModel {
 
   private @Nullable String description;
@@ -42,7 +42,7 @@ public class AuthorizationModel {
 
   private @Nullable AuthorizationTypeModel type;
 
-  public AuthorizationModel description(String description) {
+  public AuthorizationModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -54,15 +54,15 @@ public class AuthorizationModel {
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public AuthorizationModel name(String name) {
+  public AuthorizationModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -74,11 +74,11 @@ public class AuthorizationModel {
   
   @Schema(name = "name", description = "The authorization name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
-  public String getName() {
+  public @Nullable String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nullable String name) {
     this.name = name;
   }
 
@@ -110,7 +110,7 @@ public class AuthorizationModel {
     this.properties = properties;
   }
 
-  public AuthorizationModel title(String title) {
+  public AuthorizationModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -122,15 +122,15 @@ public class AuthorizationModel {
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
-  public AuthorizationModel type(AuthorizationTypeModel type) {
+  public AuthorizationModel type(@Nullable AuthorizationTypeModel type) {
     this.type = type;
     return this;
   }
@@ -142,11 +142,11 @@ public class AuthorizationModel {
   @Valid 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("type")
-  public AuthorizationTypeModel getType() {
+  public @Nullable AuthorizationTypeModel getType() {
     return type;
   }
 
-  public void setType(AuthorizationTypeModel type) {
+  public void setType(@Nullable AuthorizationTypeModel type) {
     this.type = type;
   }
 

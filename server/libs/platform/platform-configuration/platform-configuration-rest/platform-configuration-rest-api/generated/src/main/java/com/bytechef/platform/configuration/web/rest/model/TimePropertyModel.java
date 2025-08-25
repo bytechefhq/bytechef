@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TimeProperty", description = "A time property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class TimePropertyModel extends ValuePropertyModel {
 
   private @Nullable String defaultValue;
@@ -57,7 +57,7 @@ public class TimePropertyModel extends ValuePropertyModel {
     super(controlType, type);
   }
 
-  public TimePropertyModel defaultValue(String defaultValue) {
+  public TimePropertyModel defaultValue(@Nullable String defaultValue) {
     this.defaultValue = defaultValue;
     return this;
   }
@@ -69,15 +69,15 @@ public class TimePropertyModel extends ValuePropertyModel {
   
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
-  public String getDefaultValue() {
+  public @Nullable String getDefaultValue() {
     return defaultValue;
   }
 
-  public void setDefaultValue(String defaultValue) {
+  public void setDefaultValue(@Nullable String defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  public TimePropertyModel exampleValue(String exampleValue) {
+  public TimePropertyModel exampleValue(@Nullable String exampleValue) {
     this.exampleValue = exampleValue;
     return this;
   }
@@ -89,11 +89,11 @@ public class TimePropertyModel extends ValuePropertyModel {
   
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
-  public String getExampleValue() {
+  public @Nullable String getExampleValue() {
     return exampleValue;
   }
 
-  public void setExampleValue(String exampleValue) {
+  public void setExampleValue(@Nullable String exampleValue) {
     this.exampleValue = exampleValue;
   }
 
@@ -125,7 +125,7 @@ public class TimePropertyModel extends ValuePropertyModel {
     this.options = options;
   }
 
-  public TimePropertyModel optionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public TimePropertyModel optionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
     return this;
   }
@@ -137,11 +137,11 @@ public class TimePropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")
-  public OptionsDataSourceModel getOptionsDataSource() {
+  public @Nullable OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }
 
-  public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
+  public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
 

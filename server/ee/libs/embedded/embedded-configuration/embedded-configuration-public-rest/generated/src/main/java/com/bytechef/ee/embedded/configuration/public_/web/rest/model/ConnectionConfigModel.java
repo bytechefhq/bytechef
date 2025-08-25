@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionConfig", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("ConnectionConfig")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:28.963074682+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectionConfigModel {
 
   private @Nullable AuthorizationTypeModel authorizationType;
@@ -39,7 +39,7 @@ public class ConnectionConfigModel {
 
   private @Nullable OAuth2Model oauth2;
 
-  public ConnectionConfigModel authorizationType(AuthorizationTypeModel authorizationType) {
+  public ConnectionConfigModel authorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
     return this;
   }
@@ -51,11 +51,11 @@ public class ConnectionConfigModel {
   @Valid 
   @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationType")
-  public AuthorizationTypeModel getAuthorizationType() {
+  public @Nullable AuthorizationTypeModel getAuthorizationType() {
     return authorizationType;
   }
 
-  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
+  public void setAuthorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
 
@@ -87,7 +87,7 @@ public class ConnectionConfigModel {
     this.inputs = inputs;
   }
 
-  public ConnectionConfigModel oauth2(OAuth2Model oauth2) {
+  public ConnectionConfigModel oauth2(@Nullable OAuth2Model oauth2) {
     this.oauth2 = oauth2;
     return this;
   }
@@ -99,11 +99,11 @@ public class ConnectionConfigModel {
   @Valid 
   @Schema(name = "oauth2", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("oauth2")
-  public OAuth2Model getOauth2() {
+  public @Nullable OAuth2Model getOauth2() {
     return oauth2;
   }
 
-  public void setOauth2(OAuth2Model oauth2) {
+  public void setOauth2(@Nullable OAuth2Model oauth2) {
     this.oauth2 = oauth2;
   }
 

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable Long connectedUserId;
@@ -33,7 +33,7 @@ public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable WorkflowModel workflow;
 
-  public ConnectedUserProjectWorkflowModel connectedUserId(Long connectedUserId) {
+  public ConnectedUserProjectWorkflowModel connectedUserId(@Nullable Long connectedUserId) {
     this.connectedUserId = connectedUserId;
     return this;
   }
@@ -45,15 +45,15 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "connectedUserId", description = "The connected user id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectedUserId")
-  public Long getConnectedUserId() {
+  public @Nullable Long getConnectedUserId() {
     return connectedUserId;
   }
 
-  public void setConnectedUserId(Long connectedUserId) {
+  public void setConnectedUserId(@Nullable Long connectedUserId) {
     this.connectedUserId = connectedUserId;
   }
 
-  public ConnectedUserProjectWorkflowModel projectId(Long projectId) {
+  public ConnectedUserProjectWorkflowModel projectId(@Nullable Long projectId) {
     this.projectId = projectId;
     return this;
   }
@@ -65,15 +65,15 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "projectId", description = "The project id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectId")
-  public Long getProjectId() {
+  public @Nullable Long getProjectId() {
     return projectId;
   }
 
-  public void setProjectId(Long projectId) {
+  public void setProjectId(@Nullable Long projectId) {
     this.projectId = projectId;
   }
 
-  public ConnectedUserProjectWorkflowModel workflowVersion(Integer workflowVersion) {
+  public ConnectedUserProjectWorkflowModel workflowVersion(@Nullable Integer workflowVersion) {
     this.workflowVersion = workflowVersion;
     return this;
   }
@@ -85,15 +85,15 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "workflowVersion", description = "The workflow version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowVersion")
-  public Integer getWorkflowVersion() {
+  public @Nullable Integer getWorkflowVersion() {
     return workflowVersion;
   }
 
-  public void setWorkflowVersion(Integer workflowVersion) {
+  public void setWorkflowVersion(@Nullable Integer workflowVersion) {
     this.workflowVersion = workflowVersion;
   }
 
-  public ConnectedUserProjectWorkflowModel workflow(WorkflowModel workflow) {
+  public ConnectedUserProjectWorkflowModel workflow(@Nullable WorkflowModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -105,11 +105,11 @@ public class ConnectedUserProjectWorkflowModel {
   @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")
-  public WorkflowModel getWorkflow() {
+  public @Nullable WorkflowModel getWorkflow() {
     return workflow;
   }
 
-  public void setWorkflow(WorkflowModel workflow) {
+  public void setWorkflow(@Nullable WorkflowModel workflow) {
     this.workflow = workflow;
   }
 

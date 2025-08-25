@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:46.305254656+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.879388+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class JobModel {
 
   private @Nullable String createdBy;
@@ -134,7 +134,7 @@ public class JobModel {
     this.status = status;
   }
 
-  public JobModel createdBy(String createdBy) {
+  public JobModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -146,15 +146,15 @@ public class JobModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public JobModel createdDate(OffsetDateTime createdDate) {
+  public JobModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -166,15 +166,15 @@ public class JobModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public JobModel currentTask(Integer currentTask) {
+  public JobModel currentTask(@Nullable Integer currentTask) {
     this.currentTask = currentTask;
     return this;
   }
@@ -186,15 +186,15 @@ public class JobModel {
   
   @Schema(name = "currentTask", accessMode = Schema.AccessMode.READ_ONLY, description = "The index of the step on the job's workflow on which the job is working on right now.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("currentTask")
-  public Integer getCurrentTask() {
+  public @Nullable Integer getCurrentTask() {
     return currentTask;
   }
 
-  public void setCurrentTask(Integer currentTask) {
+  public void setCurrentTask(@Nullable Integer currentTask) {
     this.currentTask = currentTask;
   }
 
-  public JobModel endDate(OffsetDateTime endDate) {
+  public JobModel endDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
     return this;
   }
@@ -206,15 +206,15 @@ public class JobModel {
   @Valid 
   @Schema(name = "endDate", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endDate")
-  public OffsetDateTime getEndDate() {
+  public @Nullable OffsetDateTime getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(OffsetDateTime endDate) {
+  public void setEndDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
   }
 
-  public JobModel error(ExecutionErrorModel error) {
+  public JobModel error(@Nullable ExecutionErrorModel error) {
     this.error = error;
     return this;
   }
@@ -226,15 +226,15 @@ public class JobModel {
   @Valid 
   @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("error")
-  public ExecutionErrorModel getError() {
+  public @Nullable ExecutionErrorModel getError() {
     return error;
   }
 
-  public void setError(ExecutionErrorModel error) {
+  public void setError(@Nullable ExecutionErrorModel error) {
     this.error = error;
   }
 
-  public JobModel id(String id) {
+  public JobModel id(@Nullable String id) {
     this.id = id;
     return this;
   }
@@ -246,11 +246,11 @@ public class JobModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public String getId() {
+  public @Nullable String getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(@Nullable String id) {
     this.id = id;
   }
 
@@ -282,7 +282,7 @@ public class JobModel {
     this.inputs = inputs;
   }
 
-  public JobModel label(String label) {
+  public JobModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -294,15 +294,15 @@ public class JobModel {
   
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's human-readable name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 
-  public JobModel lastModifiedBy(String lastModifiedBy) {
+  public JobModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -314,15 +314,15 @@ public class JobModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public JobModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public JobModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -334,11 +334,11 @@ public class JobModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -370,7 +370,7 @@ public class JobModel {
     this.outputs = outputs;
   }
 
-  public JobModel parentTaskExecutionId(Long parentTaskExecutionId) {
+  public JobModel parentTaskExecutionId(@Nullable Long parentTaskExecutionId) {
     this.parentTaskExecutionId = parentTaskExecutionId;
     return this;
   }
@@ -382,11 +382,11 @@ public class JobModel {
   
   @Schema(name = "parentTaskExecutionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task that created this job. Required for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("parentTaskExecutionId")
-  public Long getParentTaskExecutionId() {
+  public @Nullable Long getParentTaskExecutionId() {
     return parentTaskExecutionId;
   }
 
-  public void setParentTaskExecutionId(Long parentTaskExecutionId) {
+  public void setParentTaskExecutionId(@Nullable Long parentTaskExecutionId) {
     this.parentTaskExecutionId = parentTaskExecutionId;
   }
 
@@ -506,7 +506,7 @@ public class JobModel {
     this.webhooks = webhooks;
   }
 
-  public JobModel workflowId(String workflowId) {
+  public JobModel workflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
     return this;
   }
@@ -518,11 +518,11 @@ public class JobModel {
   
   @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")
-  public String getWorkflowId() {
+  public @Nullable String getWorkflowId() {
     return workflowId;
   }
 
-  public void setWorkflowId(String workflowId) {
+  public void setWorkflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
   }
 

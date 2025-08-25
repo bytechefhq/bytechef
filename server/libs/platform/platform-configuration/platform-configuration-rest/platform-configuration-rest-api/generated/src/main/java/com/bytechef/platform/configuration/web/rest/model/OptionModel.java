@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Option", description = "Defines valid property value.")
 @JsonTypeName("Option")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class OptionModel {
 
   private @Nullable String description;
@@ -34,7 +34,7 @@ public class OptionModel {
 
   private JsonNullable<Object> value = JsonNullable.<Object>undefined();
 
-  public OptionModel description(String description) {
+  public OptionModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -46,15 +46,15 @@ public class OptionModel {
   
   @Schema(name = "description", description = "Description of the option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public OptionModel label(String label) {
+  public OptionModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -66,11 +66,11 @@ public class OptionModel {
   
   @Schema(name = "label", description = "The label of an option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 

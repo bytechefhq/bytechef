@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "CustomComponent", description = "An custom component.")
 @JsonTypeName("CustomComponent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:46.049396751+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.798881+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class CustomComponentModel {
 
   private @Nullable Integer componentVersion;
@@ -106,7 +106,7 @@ public class CustomComponentModel {
     this.name = name;
   }
 
-  public CustomComponentModel componentVersion(Integer componentVersion) {
+  public CustomComponentModel componentVersion(@Nullable Integer componentVersion) {
     this.componentVersion = componentVersion;
     return this;
   }
@@ -118,15 +118,15 @@ public class CustomComponentModel {
   
   @Schema(name = "componentVersion", description = "The version of a custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentVersion")
-  public Integer getComponentVersion() {
+  public @Nullable Integer getComponentVersion() {
     return componentVersion;
   }
 
-  public void setComponentVersion(Integer componentVersion) {
+  public void setComponentVersion(@Nullable Integer componentVersion) {
     this.componentVersion = componentVersion;
   }
 
-  public CustomComponentModel createdBy(String createdBy) {
+  public CustomComponentModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -138,15 +138,15 @@ public class CustomComponentModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public CustomComponentModel createdDate(OffsetDateTime createdDate) {
+  public CustomComponentModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -158,15 +158,15 @@ public class CustomComponentModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public CustomComponentModel description(String description) {
+  public CustomComponentModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -178,15 +178,15 @@ public class CustomComponentModel {
   
   @Schema(name = "description", description = "The description of a custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public CustomComponentModel enabled(Boolean enabled) {
+  public CustomComponentModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -198,15 +198,15 @@ public class CustomComponentModel {
   
   @Schema(name = "enabled", description = "If a custom component is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 
-  public CustomComponentModel icon(String icon) {
+  public CustomComponentModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -218,15 +218,15 @@ public class CustomComponentModel {
   
   @Schema(name = "icon", description = "The icon of a custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
-  public CustomComponentModel id(Long id) {
+  public CustomComponentModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -238,15 +238,15 @@ public class CustomComponentModel {
   
   @Schema(name = "id", description = "The id of an custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public CustomComponentModel language(LanguageEnum language) {
+  public CustomComponentModel language(@Nullable LanguageEnum language) {
     this.language = language;
     return this;
   }
@@ -258,15 +258,15 @@ public class CustomComponentModel {
   
   @Schema(name = "language", accessMode = Schema.AccessMode.READ_ONLY, description = "The language in which the component is implemented", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("language")
-  public LanguageEnum getLanguage() {
+  public @Nullable LanguageEnum getLanguage() {
     return language;
   }
 
-  public void setLanguage(LanguageEnum language) {
+  public void setLanguage(@Nullable LanguageEnum language) {
     this.language = language;
   }
 
-  public CustomComponentModel lastModifiedBy(String lastModifiedBy) {
+  public CustomComponentModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -278,15 +278,15 @@ public class CustomComponentModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public CustomComponentModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public CustomComponentModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -298,11 +298,11 @@ public class CustomComponentModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -326,7 +326,7 @@ public class CustomComponentModel {
     this.name = name;
   }
 
-  public CustomComponentModel title(String title) {
+  public CustomComponentModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -338,15 +338,15 @@ public class CustomComponentModel {
   
   @Schema(name = "title", description = "The title of a custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
-  public CustomComponentModel version(Integer version) {
+  public CustomComponentModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -358,11 +358,11 @@ public class CustomComponentModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("warnings_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:31.579120120+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.210243+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WarningsInnerModel {
 
   private @Nullable String detail;
@@ -30,7 +30,7 @@ public class WarningsInnerModel {
 
   private @Nullable String title;
 
-  public WarningsInnerModel detail(String detail) {
+  public WarningsInnerModel detail(@Nullable String detail) {
     this.detail = detail;
     return this;
   }
@@ -42,15 +42,15 @@ public class WarningsInnerModel {
   
   @Schema(name = "detail", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("detail")
-  public String getDetail() {
+  public @Nullable String getDetail() {
     return detail;
   }
 
-  public void setDetail(String detail) {
+  public void setDetail(@Nullable String detail) {
     this.detail = detail;
   }
 
-  public WarningsInnerModel problemType(String problemType) {
+  public WarningsInnerModel problemType(@Nullable String problemType) {
     this.problemType = problemType;
     return this;
   }
@@ -62,15 +62,15 @@ public class WarningsInnerModel {
   
   @Schema(name = "problem_type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("problem_type")
-  public String getProblemType() {
+  public @Nullable String getProblemType() {
     return problemType;
   }
 
-  public void setProblemType(String problemType) {
+  public void setProblemType(@Nullable String problemType) {
     this.problemType = problemType;
   }
 
-  public WarningsInnerModel title(String title) {
+  public WarningsInnerModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -82,11 +82,11 @@ public class WarningsInnerModel {
   
   @Schema(name = "title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 

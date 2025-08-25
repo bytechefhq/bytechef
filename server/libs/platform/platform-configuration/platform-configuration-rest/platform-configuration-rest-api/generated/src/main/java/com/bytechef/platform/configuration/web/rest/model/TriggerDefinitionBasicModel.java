@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinitionBasic", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class TriggerDefinitionBasicModel {
 
   private String componentName;
@@ -104,7 +104,7 @@ public class TriggerDefinitionBasicModel {
     this.componentVersion = componentVersion;
   }
 
-  public TriggerDefinitionBasicModel description(String description) {
+  public TriggerDefinitionBasicModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -116,15 +116,15 @@ public class TriggerDefinitionBasicModel {
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public TriggerDefinitionBasicModel help(HelpModel help) {
+  public TriggerDefinitionBasicModel help(@Nullable HelpModel help) {
     this.help = help;
     return this;
   }
@@ -136,11 +136,11 @@ public class TriggerDefinitionBasicModel {
   @Valid 
   @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("help")
-  public HelpModel getHelp() {
+  public @Nullable HelpModel getHelp() {
     return help;
   }
 
-  public void setHelp(HelpModel help) {
+  public void setHelp(@Nullable HelpModel help) {
     this.help = help;
   }
 
@@ -204,7 +204,7 @@ public class TriggerDefinitionBasicModel {
     this.outputFunctionDefined = outputFunctionDefined;
   }
 
-  public TriggerDefinitionBasicModel outputSchemaDefined(Boolean outputSchemaDefined) {
+  public TriggerDefinitionBasicModel outputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
     return this;
   }
@@ -216,15 +216,15 @@ public class TriggerDefinitionBasicModel {
   
   @Schema(name = "outputSchemaDefined", description = "Does trigger defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchemaDefined")
-  public Boolean getOutputSchemaDefined() {
+  public @Nullable Boolean getOutputSchemaDefined() {
     return outputSchemaDefined;
   }
 
-  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+  public void setOutputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
   }
 
-  public TriggerDefinitionBasicModel title(String title) {
+  public TriggerDefinitionBasicModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -236,11 +236,11 @@ public class TriggerDefinitionBasicModel {
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 

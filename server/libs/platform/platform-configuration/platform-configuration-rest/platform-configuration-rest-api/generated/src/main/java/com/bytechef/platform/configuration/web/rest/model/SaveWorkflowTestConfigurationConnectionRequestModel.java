@@ -21,12 +21,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("saveWorkflowTestConfigurationConnection_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class SaveWorkflowTestConfigurationConnectionRequestModel {
 
   private @Nullable Long connectionId;
 
-  public SaveWorkflowTestConfigurationConnectionRequestModel connectionId(Long connectionId) {
+  public SaveWorkflowTestConfigurationConnectionRequestModel connectionId(@Nullable Long connectionId) {
     this.connectionId = connectionId;
     return this;
   }
@@ -38,11 +38,11 @@ public class SaveWorkflowTestConfigurationConnectionRequestModel {
   
   @Schema(name = "connectionId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionId")
-  public Long getConnectionId() {
+  public @Nullable Long getConnectionId() {
     return connectionId;
   }
 
-  public void setConnectionId(Long connectionId) {
+  public void setConnectionId(@Nullable Long connectionId) {
     this.connectionId = connectionId;
   }
 

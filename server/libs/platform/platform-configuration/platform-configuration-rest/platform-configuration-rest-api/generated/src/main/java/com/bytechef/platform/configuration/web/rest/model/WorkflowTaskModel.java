@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowTaskModel {
 
   private Boolean clusterRoot = false;
@@ -154,7 +154,7 @@ public class WorkflowTaskModel {
     this.connections = connections;
   }
 
-  public WorkflowTaskModel description(String description) {
+  public WorkflowTaskModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -166,11 +166,11 @@ public class WorkflowTaskModel {
   
   @Schema(name = "description", description = "The description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
@@ -202,7 +202,7 @@ public class WorkflowTaskModel {
     this.finalize = finalize;
   }
 
-  public WorkflowTaskModel label(String label) {
+  public WorkflowTaskModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -214,11 +214,11 @@ public class WorkflowTaskModel {
   
   @Schema(name = "label", description = "The human-readable description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 
@@ -270,7 +270,7 @@ public class WorkflowTaskModel {
     this.name = name;
   }
 
-  public WorkflowTaskModel node(String node) {
+  public WorkflowTaskModel node(@Nullable String node) {
     this.node = node;
     return this;
   }
@@ -282,11 +282,11 @@ public class WorkflowTaskModel {
   
   @Schema(name = "node", description = "Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is \"encoder\", then the task will be routed to the \"encoder\" queue which is presumably subscribed to by worker nodes of \"encoder\" type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("node")
-  public String getNode() {
+  public @Nullable String getNode() {
     return node;
   }
 
-  public void setNode(String node) {
+  public void setNode(@Nullable String node) {
     this.node = node;
   }
 
@@ -374,7 +374,7 @@ public class WorkflowTaskModel {
     this.pre = pre;
   }
 
-  public WorkflowTaskModel timeout(String timeout) {
+  public WorkflowTaskModel timeout(@Nullable String timeout) {
     this.timeout = timeout;
     return this;
   }
@@ -386,11 +386,11 @@ public class WorkflowTaskModel {
   
   @Schema(name = "timeout", description = "The timeout expression which describes when a task should be deemed as timed-out.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("timeout")
-  public String getTimeout() {
+  public @Nullable String getTimeout() {
     return timeout;
   }
 
-  public void setTimeout(String timeout) {
+  public void setTimeout(@Nullable String timeout) {
     this.timeout = timeout;
   }
 

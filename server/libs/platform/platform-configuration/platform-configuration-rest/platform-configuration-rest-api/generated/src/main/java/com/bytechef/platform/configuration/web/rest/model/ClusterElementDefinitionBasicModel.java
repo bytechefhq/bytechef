@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementDefinitionBasic", description = "A cluster element basic definition.")
 @JsonTypeName("ClusterElementDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ClusterElementDefinitionBasicModel {
 
   private String componentName;
@@ -103,7 +103,7 @@ public class ClusterElementDefinitionBasicModel {
     this.componentVersion = componentVersion;
   }
 
-  public ClusterElementDefinitionBasicModel description(String description) {
+  public ClusterElementDefinitionBasicModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -115,15 +115,15 @@ public class ClusterElementDefinitionBasicModel {
   
   @Schema(name = "description", description = "The cluster element description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public ClusterElementDefinitionBasicModel help(HelpModel help) {
+  public ClusterElementDefinitionBasicModel help(@Nullable HelpModel help) {
     this.help = help;
     return this;
   }
@@ -135,11 +135,11 @@ public class ClusterElementDefinitionBasicModel {
   @Valid 
   @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("help")
-  public HelpModel getHelp() {
+  public @Nullable HelpModel getHelp() {
     return help;
   }
 
-  public void setHelp(HelpModel help) {
+  public void setHelp(@Nullable HelpModel help) {
     this.help = help;
   }
 
@@ -163,7 +163,7 @@ public class ClusterElementDefinitionBasicModel {
     this.name = name;
   }
 
-  public ClusterElementDefinitionBasicModel icon(String icon) {
+  public ClusterElementDefinitionBasicModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -175,11 +175,11 @@ public class ClusterElementDefinitionBasicModel {
   
   @Schema(name = "icon", description = "The component icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
@@ -203,7 +203,7 @@ public class ClusterElementDefinitionBasicModel {
     this.outputDefined = outputDefined;
   }
 
-  public ClusterElementDefinitionBasicModel outputFunctionDefined(Boolean outputFunctionDefined) {
+  public ClusterElementDefinitionBasicModel outputFunctionDefined(@Nullable Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
     return this;
   }
@@ -215,15 +215,15 @@ public class ClusterElementDefinitionBasicModel {
   
   @Schema(name = "outputFunctionDefined", description = "Does action defines output function.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputFunctionDefined")
-  public Boolean getOutputFunctionDefined() {
+  public @Nullable Boolean getOutputFunctionDefined() {
     return outputFunctionDefined;
   }
 
-  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+  public void setOutputFunctionDefined(@Nullable Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
   }
 
-  public ClusterElementDefinitionBasicModel outputSchemaDefined(Boolean outputSchemaDefined) {
+  public ClusterElementDefinitionBasicModel outputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
     return this;
   }
@@ -235,15 +235,15 @@ public class ClusterElementDefinitionBasicModel {
   
   @Schema(name = "outputSchemaDefined", description = "Does action defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchemaDefined")
-  public Boolean getOutputSchemaDefined() {
+  public @Nullable Boolean getOutputSchemaDefined() {
     return outputSchemaDefined;
   }
 
-  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+  public void setOutputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
   }
 
-  public ClusterElementDefinitionBasicModel title(String title) {
+  public ClusterElementDefinitionBasicModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -255,11 +255,11 @@ public class ClusterElementDefinitionBasicModel {
   
   @Schema(name = "title", description = "The cluster element title.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 

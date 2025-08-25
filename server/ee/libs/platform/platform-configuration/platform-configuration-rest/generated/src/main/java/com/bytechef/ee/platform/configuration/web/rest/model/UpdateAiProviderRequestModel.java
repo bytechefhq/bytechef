@@ -21,12 +21,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateAiProvider_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:32.606238967+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:39.791632+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class UpdateAiProviderRequestModel {
 
   private @Nullable String apiKey;
 
-  public UpdateAiProviderRequestModel apiKey(String apiKey) {
+  public UpdateAiProviderRequestModel apiKey(@Nullable String apiKey) {
     this.apiKey = apiKey;
     return this;
   }
@@ -38,11 +38,11 @@ public class UpdateAiProviderRequestModel {
   
   @Schema(name = "apiKey", description = "The API key of an AI provider.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("apiKey")
-  public String getApiKey() {
+  public @Nullable String getApiKey() {
     return apiKey;
   }
 
-  public void setApiKey(String apiKey) {
+  public void setApiKey(@Nullable String apiKey) {
     this.apiKey = apiKey;
   }
 

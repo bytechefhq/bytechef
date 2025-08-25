@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectVersion", description = "The project version.")
 @JsonTypeName("ProjectVersion")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:33.209056231+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:40.062541+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ProjectVersionModel {
 
   private @Nullable String description;
@@ -38,7 +38,7 @@ public class ProjectVersionModel {
 
   private @Nullable ProjectStatusModel status;
 
-  public ProjectVersionModel description(String description) {
+  public ProjectVersionModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -50,15 +50,15 @@ public class ProjectVersionModel {
   
   @Schema(name = "description", description = "The description of a project version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public ProjectVersionModel publishedDate(OffsetDateTime publishedDate) {
+  public ProjectVersionModel publishedDate(@Nullable OffsetDateTime publishedDate) {
     this.publishedDate = publishedDate;
     return this;
   }
@@ -70,15 +70,15 @@ public class ProjectVersionModel {
   @Valid 
   @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("publishedDate")
-  public OffsetDateTime getPublishedDate() {
+  public @Nullable OffsetDateTime getPublishedDate() {
     return publishedDate;
   }
 
-  public void setPublishedDate(OffsetDateTime publishedDate) {
+  public void setPublishedDate(@Nullable OffsetDateTime publishedDate) {
     this.publishedDate = publishedDate;
   }
 
-  public ProjectVersionModel version(Integer version) {
+  public ProjectVersionModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -90,15 +90,15 @@ public class ProjectVersionModel {
   
   @Schema(name = "version", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 
-  public ProjectVersionModel status(ProjectStatusModel status) {
+  public ProjectVersionModel status(@Nullable ProjectStatusModel status) {
     this.status = status;
     return this;
   }
@@ -110,11 +110,11 @@ public class ProjectVersionModel {
   @Valid 
   @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("status")
-  public ProjectStatusModel getStatus() {
+  public @Nullable ProjectStatusModel getStatus() {
     return status;
   }
 
-  public void setStatus(ProjectStatusModel status) {
+  public void setStatus(@Nullable ProjectStatusModel status) {
     this.status = status;
   }
 

@@ -21,12 +21,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createFrontendProjectWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:28.963074682+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class CreateFrontendProjectWorkflowRequestModel {
 
   private @Nullable String definition;
 
-  public CreateFrontendProjectWorkflowRequestModel definition(String definition) {
+  public CreateFrontendProjectWorkflowRequestModel definition(@Nullable String definition) {
     this.definition = definition;
     return this;
   }
@@ -38,11 +38,11 @@ public class CreateFrontendProjectWorkflowRequestModel {
   
   @Schema(name = "definition", description = "The workflow definition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("definition")
-  public String getDefinition() {
+  public @Nullable String getDefinition() {
     return definition;
   }
 
-  public void setDefinition(String definition) {
+  public void setDefinition(@Nullable String definition) {
     this.definition = definition;
   }
 

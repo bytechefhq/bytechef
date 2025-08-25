@@ -21,12 +21,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("getWorkflowNodeDescription_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class GetWorkflowNodeDescription200ResponseModel {
 
   private @Nullable String description;
 
-  public GetWorkflowNodeDescription200ResponseModel description(String description) {
+  public GetWorkflowNodeDescription200ResponseModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -38,11 +38,11 @@ public class GetWorkflowNodeDescription200ResponseModel {
   
   @Schema(name = "description", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 

@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "SigningKey", description = "Contains generated public key used for signing JWT tokens.")
 @JsonTypeName("SigningKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:39.678458406+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:42.758083+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class SigningKeyModel {
 
   private @Nullable String createdBy;
@@ -58,7 +58,7 @@ public class SigningKeyModel {
     this.name = name;
   }
 
-  public SigningKeyModel createdBy(String createdBy) {
+  public SigningKeyModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -70,15 +70,15 @@ public class SigningKeyModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public SigningKeyModel createdDate(OffsetDateTime createdDate) {
+  public SigningKeyModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -90,15 +90,15 @@ public class SigningKeyModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public SigningKeyModel id(Long id) {
+  public SigningKeyModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -110,11 +110,11 @@ public class SigningKeyModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a public key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
@@ -138,7 +138,7 @@ public class SigningKeyModel {
     this.keyId = keyId;
   }
 
-  public SigningKeyModel lastModifiedBy(String lastModifiedBy) {
+  public SigningKeyModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -150,15 +150,15 @@ public class SigningKeyModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public SigningKeyModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public SigningKeyModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -170,15 +170,15 @@ public class SigningKeyModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public SigningKeyModel lastUsedDate(OffsetDateTime lastUsedDate) {
+  public SigningKeyModel lastUsedDate(@Nullable OffsetDateTime lastUsedDate) {
     this.lastUsedDate = lastUsedDate;
     return this;
   }
@@ -190,11 +190,11 @@ public class SigningKeyModel {
   @Valid 
   @Schema(name = "lastUsedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last used date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastUsedDate")
-  public OffsetDateTime getLastUsedDate() {
+  public @Nullable OffsetDateTime getLastUsedDate() {
     return lastUsedDate;
   }
 
-  public void setLastUsedDate(OffsetDateTime lastUsedDate) {
+  public void setLastUsedDate(@Nullable OffsetDateTime lastUsedDate) {
     this.lastUsedDate = lastUsedDate;
   }
 

@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowTriggerModel {
 
   @Valid
@@ -90,7 +90,7 @@ public class WorkflowTriggerModel {
     this.connections = connections;
   }
 
-  public WorkflowTriggerModel description(String description) {
+  public WorkflowTriggerModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -102,15 +102,15 @@ public class WorkflowTriggerModel {
   
   @Schema(name = "description", description = "The description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public WorkflowTriggerModel label(String label) {
+  public WorkflowTriggerModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -122,11 +122,11 @@ public class WorkflowTriggerModel {
   
   @Schema(name = "label", description = "The human-readable description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 
@@ -206,7 +206,7 @@ public class WorkflowTriggerModel {
     this.parameters = parameters;
   }
 
-  public WorkflowTriggerModel timeout(String timeout) {
+  public WorkflowTriggerModel timeout(@Nullable String timeout) {
     this.timeout = timeout;
     return this;
   }
@@ -218,11 +218,11 @@ public class WorkflowTriggerModel {
   
   @Schema(name = "timeout", description = "The timeout expression which describes when a trigger should be deemed as timed-out.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("timeout")
-  public String getTimeout() {
+  public @Nullable String getTimeout() {
     return timeout;
   }
 
-  public void setTimeout(String timeout) {
+  public void setTimeout(@Nullable String timeout) {
     this.timeout = timeout;
   }
 

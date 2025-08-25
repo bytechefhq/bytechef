@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class TriggerDefinitionModel {
 
   private @Nullable String componentName;
@@ -71,7 +71,7 @@ public class TriggerDefinitionModel {
     this.type = type;
   }
 
-  public TriggerDefinitionModel componentName(String componentName) {
+  public TriggerDefinitionModel componentName(@Nullable String componentName) {
     this.componentName = componentName;
     return this;
   }
@@ -83,15 +83,15 @@ public class TriggerDefinitionModel {
   
   @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentName")
-  public String getComponentName() {
+  public @Nullable String getComponentName() {
     return componentName;
   }
 
-  public void setComponentName(String componentName) {
+  public void setComponentName(@Nullable String componentName) {
     this.componentName = componentName;
   }
 
-  public TriggerDefinitionModel componentVersion(Integer componentVersion) {
+  public TriggerDefinitionModel componentVersion(@Nullable Integer componentVersion) {
     this.componentVersion = componentVersion;
     return this;
   }
@@ -103,15 +103,15 @@ public class TriggerDefinitionModel {
   
   @Schema(name = "componentVersion", description = "The component version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentVersion")
-  public Integer getComponentVersion() {
+  public @Nullable Integer getComponentVersion() {
     return componentVersion;
   }
 
-  public void setComponentVersion(Integer componentVersion) {
+  public void setComponentVersion(@Nullable Integer componentVersion) {
     this.componentVersion = componentVersion;
   }
 
-  public TriggerDefinitionModel description(String description) {
+  public TriggerDefinitionModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -123,15 +123,15 @@ public class TriggerDefinitionModel {
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public TriggerDefinitionModel help(HelpModel help) {
+  public TriggerDefinitionModel help(@Nullable HelpModel help) {
     this.help = help;
     return this;
   }
@@ -143,11 +143,11 @@ public class TriggerDefinitionModel {
   @Valid 
   @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("help")
-  public HelpModel getHelp() {
+  public @Nullable HelpModel getHelp() {
     return help;
   }
 
-  public void setHelp(HelpModel help) {
+  public void setHelp(@Nullable HelpModel help) {
     this.help = help;
   }
 
@@ -211,7 +211,7 @@ public class TriggerDefinitionModel {
     this.outputFunctionDefined = outputFunctionDefined;
   }
 
-  public TriggerDefinitionModel outputSchemaDefined(Boolean outputSchemaDefined) {
+  public TriggerDefinitionModel outputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
     return this;
   }
@@ -223,11 +223,11 @@ public class TriggerDefinitionModel {
   
   @Schema(name = "outputSchemaDefined", description = "Does trigger defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchemaDefined")
-  public Boolean getOutputSchemaDefined() {
+  public @Nullable Boolean getOutputSchemaDefined() {
     return outputSchemaDefined;
   }
 
-  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+  public void setOutputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
   }
 
@@ -259,7 +259,7 @@ public class TriggerDefinitionModel {
     this.properties = properties;
   }
 
-  public TriggerDefinitionModel title(String title) {
+  public TriggerDefinitionModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -271,11 +271,11 @@ public class TriggerDefinitionModel {
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
@@ -299,7 +299,7 @@ public class TriggerDefinitionModel {
     this.type = type;
   }
 
-  public TriggerDefinitionModel workflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
+  public TriggerDefinitionModel workflowNodeDescriptionDefined(@Nullable Boolean workflowNodeDescriptionDefined) {
     this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
     return this;
   }
@@ -311,11 +311,11 @@ public class TriggerDefinitionModel {
   
   @Schema(name = "workflowNodeDescriptionDefined", description = "Does trigger define dynamic node description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowNodeDescriptionDefined")
-  public Boolean getWorkflowNodeDescriptionDefined() {
+  public @Nullable Boolean getWorkflowNodeDescriptionDefined() {
     return workflowNodeDescriptionDefined;
   }
 
-  public void setWorkflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
+  public void setWorkflowNodeDescriptionDefined(@Nullable Boolean workflowNodeDescriptionDefined) {
     this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
   }
 

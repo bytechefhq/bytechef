@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:41.418515386+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.114758+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ApiCollectionModel {
 
   private @Nullable Integer collectionVersion;
@@ -94,7 +94,7 @@ public class ApiCollectionModel {
     this.workspaceId = workspaceId;
   }
 
-  public ApiCollectionModel collectionVersion(Integer collectionVersion) {
+  public ApiCollectionModel collectionVersion(@Nullable Integer collectionVersion) {
     this.collectionVersion = collectionVersion;
     return this;
   }
@@ -106,11 +106,11 @@ public class ApiCollectionModel {
   
   @Schema(name = "collectionVersion", description = "The version of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("collectionVersion")
-  public Integer getCollectionVersion() {
+  public @Nullable Integer getCollectionVersion() {
     return collectionVersion;
   }
 
-  public void setCollectionVersion(Integer collectionVersion) {
+  public void setCollectionVersion(@Nullable Integer collectionVersion) {
     this.collectionVersion = collectionVersion;
   }
 
@@ -134,7 +134,7 @@ public class ApiCollectionModel {
     this.contextPath = contextPath;
   }
 
-  public ApiCollectionModel createdBy(String createdBy) {
+  public ApiCollectionModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -146,15 +146,15 @@ public class ApiCollectionModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public ApiCollectionModel createdDate(OffsetDateTime createdDate) {
+  public ApiCollectionModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -166,15 +166,15 @@ public class ApiCollectionModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public ApiCollectionModel description(String description) {
+  public ApiCollectionModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -186,11 +186,11 @@ public class ApiCollectionModel {
   
   @Schema(name = "description", description = "The description of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
@@ -262,7 +262,7 @@ public class ApiCollectionModel {
     this.environment = environment;
   }
 
-  public ApiCollectionModel id(Long id) {
+  public ApiCollectionModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -274,11 +274,11 @@ public class ApiCollectionModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
@@ -302,7 +302,7 @@ public class ApiCollectionModel {
     this.name = name;
   }
 
-  public ApiCollectionModel lastModifiedBy(String lastModifiedBy) {
+  public ApiCollectionModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -314,15 +314,15 @@ public class ApiCollectionModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ApiCollectionModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ApiCollectionModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -334,11 +334,11 @@ public class ApiCollectionModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -362,7 +362,7 @@ public class ApiCollectionModel {
     this.projectId = projectId;
   }
 
-  public ApiCollectionModel project(com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
+  public ApiCollectionModel project(@Nullable com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
     this.project = project;
     return this;
   }
@@ -374,15 +374,15 @@ public class ApiCollectionModel {
   @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("project")
-  public com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel getProject() {
+  public @Nullable com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel getProject() {
     return project;
   }
 
-  public void setProject(com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
+  public void setProject(@Nullable com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
     this.project = project;
   }
 
-  public ApiCollectionModel projectDeploymentId(Long projectDeploymentId) {
+  public ApiCollectionModel projectDeploymentId(@Nullable Long projectDeploymentId) {
     this.projectDeploymentId = projectDeploymentId;
     return this;
   }
@@ -394,15 +394,15 @@ public class ApiCollectionModel {
   
   @Schema(name = "projectDeploymentId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an project deployment the API collection is connected to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectDeploymentId")
-  public Long getProjectDeploymentId() {
+  public @Nullable Long getProjectDeploymentId() {
     return projectDeploymentId;
   }
 
-  public void setProjectDeploymentId(Long projectDeploymentId) {
+  public void setProjectDeploymentId(@Nullable Long projectDeploymentId) {
     this.projectDeploymentId = projectDeploymentId;
   }
 
-  public ApiCollectionModel projectDeployment(com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
+  public ApiCollectionModel projectDeployment(@Nullable com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
     this.projectDeployment = projectDeployment;
     return this;
   }
@@ -414,11 +414,11 @@ public class ApiCollectionModel {
   @Valid 
   @Schema(name = "projectDeployment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectDeployment")
-  public com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel getProjectDeployment() {
+  public @Nullable com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel getProjectDeployment() {
     return projectDeployment;
   }
 
-  public void setProjectDeployment(com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
+  public void setProjectDeployment(@Nullable com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
     this.projectDeployment = projectDeployment;
   }
 
@@ -490,7 +490,7 @@ public class ApiCollectionModel {
     this.workspaceId = workspaceId;
   }
 
-  public ApiCollectionModel version(Integer version) {
+  public ApiCollectionModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -502,11 +502,11 @@ public class ApiCollectionModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

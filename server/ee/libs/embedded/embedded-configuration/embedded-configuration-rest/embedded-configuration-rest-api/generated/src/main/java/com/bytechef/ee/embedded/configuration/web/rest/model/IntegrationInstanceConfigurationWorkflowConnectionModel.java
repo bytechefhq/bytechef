@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationWorkflowConnection", description = "The connection used in a particular task or trigger.")
 @JsonTypeName("IntegrationInstanceConfigurationWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceConfigurationWorkflowConnectionModel {
 
   private @Nullable Long connectionId;
@@ -31,7 +31,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
 
   private @Nullable String workflowNodeName;
 
-  public IntegrationInstanceConfigurationWorkflowConnectionModel connectionId(Long connectionId) {
+  public IntegrationInstanceConfigurationWorkflowConnectionModel connectionId(@Nullable Long connectionId) {
     this.connectionId = connectionId;
     return this;
   }
@@ -43,15 +43,15 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
   
   @Schema(name = "connectionId", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionId")
-  public Long getConnectionId() {
+  public @Nullable Long getConnectionId() {
     return connectionId;
   }
 
-  public void setConnectionId(Long connectionId) {
+  public void setConnectionId(@Nullable Long connectionId) {
     this.connectionId = connectionId;
   }
 
-  public IntegrationInstanceConfigurationWorkflowConnectionModel workflowConnectionKey(String workflowConnectionKey) {
+  public IntegrationInstanceConfigurationWorkflowConnectionModel workflowConnectionKey(@Nullable String workflowConnectionKey) {
     this.workflowConnectionKey = workflowConnectionKey;
     return this;
   }
@@ -63,15 +63,15 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
   
   @Schema(name = "workflowConnectionKey", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowConnectionKey")
-  public String getWorkflowConnectionKey() {
+  public @Nullable String getWorkflowConnectionKey() {
     return workflowConnectionKey;
   }
 
-  public void setWorkflowConnectionKey(String workflowConnectionKey) {
+  public void setWorkflowConnectionKey(@Nullable String workflowConnectionKey) {
     this.workflowConnectionKey = workflowConnectionKey;
   }
 
-  public IntegrationInstanceConfigurationWorkflowConnectionModel workflowNodeName(String workflowNodeName) {
+  public IntegrationInstanceConfigurationWorkflowConnectionModel workflowNodeName(@Nullable String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
     return this;
   }
@@ -83,11 +83,11 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
   
   @Schema(name = "workflowNodeName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowNodeName")
-  public String getWorkflowNodeName() {
+  public @Nullable String getWorkflowNodeName() {
     return workflowNodeName;
   }
 
-  public void setWorkflowNodeName(String workflowNodeName) {
+  public void setWorkflowNodeName(@Nullable String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
   }
 

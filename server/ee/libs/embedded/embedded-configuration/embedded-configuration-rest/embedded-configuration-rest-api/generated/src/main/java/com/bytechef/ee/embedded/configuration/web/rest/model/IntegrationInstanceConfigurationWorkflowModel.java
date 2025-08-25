@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationWorkflow", description = "Contains configuration and connections required for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceConfigurationWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceConfigurationWorkflowModel {
 
   private @Nullable String createdBy;
@@ -64,7 +64,7 @@ public class IntegrationInstanceConfigurationWorkflowModel {
 
   private @Nullable Integer version;
 
-  public IntegrationInstanceConfigurationWorkflowModel createdBy(String createdBy) {
+  public IntegrationInstanceConfigurationWorkflowModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -76,15 +76,15 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel createdDate(OffsetDateTime createdDate) {
+  public IntegrationInstanceConfigurationWorkflowModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -96,11 +96,11 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -160,7 +160,7 @@ public class IntegrationInstanceConfigurationWorkflowModel {
     this.connections = connections;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel enabled(Boolean enabled) {
+  public IntegrationInstanceConfigurationWorkflowModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -172,15 +172,15 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   
   @Schema(name = "enabled", description = "If a workflow is enabled or not in the integration instance configuration workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel id(Long id) {
+  public IntegrationInstanceConfigurationWorkflowModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -192,15 +192,15 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration instance configuration workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
+  public IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationId(@Nullable Long integrationInstanceConfigurationId) {
     this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
     return this;
   }
@@ -212,15 +212,15 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   
   @Schema(name = "integrationInstanceConfigurationId", description = "The id of an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstanceConfigurationId")
-  public Long getIntegrationInstanceConfigurationId() {
+  public @Nullable Long getIntegrationInstanceConfigurationId() {
     return integrationInstanceConfigurationId;
   }
 
-  public void setIntegrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
+  public void setIntegrationInstanceConfigurationId(@Nullable Long integrationInstanceConfigurationId) {
     this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public IntegrationInstanceConfigurationWorkflowModel lastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -232,15 +232,15 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   @Valid 
   @Schema(name = "lastExecutionDate", description = "The last execution date of an integration instance configuration workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
-  public OffsetDateTime getLastExecutionDate() {
+  public @Nullable OffsetDateTime getLastExecutionDate() {
     return lastExecutionDate;
   }
 
-  public void setLastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel lastModifiedBy(String lastModifiedBy) {
+  public IntegrationInstanceConfigurationWorkflowModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -252,15 +252,15 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public IntegrationInstanceConfigurationWorkflowModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -272,15 +272,15 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel workflowId(String workflowId) {
+  public IntegrationInstanceConfigurationWorkflowModel workflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
     return this;
   }
@@ -292,15 +292,15 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   
   @Schema(name = "workflowId", description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")
-  public String getWorkflowId() {
+  public @Nullable String getWorkflowId() {
     return workflowId;
   }
 
-  public void setWorkflowId(String workflowId) {
+  public void setWorkflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+  public IntegrationInstanceConfigurationWorkflowModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -312,15 +312,15 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   
   @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow reference code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowReferenceCode")
-  public String getWorkflowReferenceCode() {
+  public @Nullable String getWorkflowReferenceCode() {
     return workflowReferenceCode;
   }
 
-  public void setWorkflowReferenceCode(String workflowReferenceCode) {
+  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 
-  public IntegrationInstanceConfigurationWorkflowModel version(Integer version) {
+  public IntegrationInstanceConfigurationWorkflowModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -332,11 +332,11 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

@@ -35,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceConfigurationModel {
 
   private @Nullable String createdBy;
@@ -94,7 +94,7 @@ public class IntegrationInstanceConfigurationModel {
     this.name = name;
   }
 
-  public IntegrationInstanceConfigurationModel createdBy(String createdBy) {
+  public IntegrationInstanceConfigurationModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -106,15 +106,15 @@ public class IntegrationInstanceConfigurationModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public IntegrationInstanceConfigurationModel createdDate(OffsetDateTime createdDate) {
+  public IntegrationInstanceConfigurationModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -126,15 +126,15 @@ public class IntegrationInstanceConfigurationModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public IntegrationInstanceConfigurationModel description(String description) {
+  public IntegrationInstanceConfigurationModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -146,15 +146,15 @@ public class IntegrationInstanceConfigurationModel {
   
   @Schema(name = "description", description = "The description of an integration configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public IntegrationInstanceConfigurationModel enabled(Boolean enabled) {
+  public IntegrationInstanceConfigurationModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -166,15 +166,15 @@ public class IntegrationInstanceConfigurationModel {
   
   @Schema(name = "enabled", description = "If an integration instance configuration is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 
-  public IntegrationInstanceConfigurationModel environment(EnvironmentModel environment) {
+  public IntegrationInstanceConfigurationModel environment(@Nullable EnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -186,15 +186,15 @@ public class IntegrationInstanceConfigurationModel {
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
-  public EnvironmentModel getEnvironment() {
+  public @Nullable EnvironmentModel getEnvironment() {
     return environment;
   }
 
-  public void setEnvironment(EnvironmentModel environment) {
+  public void setEnvironment(@Nullable EnvironmentModel environment) {
     this.environment = environment;
   }
 
-  public IntegrationInstanceConfigurationModel id(Long id) {
+  public IntegrationInstanceConfigurationModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -206,15 +206,15 @@ public class IntegrationInstanceConfigurationModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public IntegrationInstanceConfigurationModel integrationId(Long integrationId) {
+  public IntegrationInstanceConfigurationModel integrationId(@Nullable Long integrationId) {
     this.integrationId = integrationId;
     return this;
   }
@@ -226,15 +226,15 @@ public class IntegrationInstanceConfigurationModel {
   
   @Schema(name = "integrationId", description = "Th id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationId")
-  public Long getIntegrationId() {
+  public @Nullable Long getIntegrationId() {
     return integrationId;
   }
 
-  public void setIntegrationId(Long integrationId) {
+  public void setIntegrationId(@Nullable Long integrationId) {
     this.integrationId = integrationId;
   }
 
-  public IntegrationInstanceConfigurationModel integrationVersion(Integer integrationVersion) {
+  public IntegrationInstanceConfigurationModel integrationVersion(@Nullable Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
     return this;
   }
@@ -246,15 +246,15 @@ public class IntegrationInstanceConfigurationModel {
   
   @Schema(name = "integrationVersion", description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationVersion")
-  public Integer getIntegrationVersion() {
+  public @Nullable Integer getIntegrationVersion() {
     return integrationVersion;
   }
 
-  public void setIntegrationVersion(Integer integrationVersion) {
+  public void setIntegrationVersion(@Nullable Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
   }
 
-  public IntegrationInstanceConfigurationModel lastModifiedBy(String lastModifiedBy) {
+  public IntegrationInstanceConfigurationModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -266,15 +266,15 @@ public class IntegrationInstanceConfigurationModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public IntegrationInstanceConfigurationModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public IntegrationInstanceConfigurationModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -286,11 +286,11 @@ public class IntegrationInstanceConfigurationModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -314,7 +314,7 @@ public class IntegrationInstanceConfigurationModel {
     this.name = name;
   }
 
-  public IntegrationInstanceConfigurationModel authorizationType(AuthorizationTypeModel authorizationType) {
+  public IntegrationInstanceConfigurationModel authorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
     return this;
   }
@@ -326,11 +326,11 @@ public class IntegrationInstanceConfigurationModel {
   @Valid 
   @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationType")
-  public AuthorizationTypeModel getAuthorizationType() {
+  public @Nullable AuthorizationTypeModel getAuthorizationType() {
     return authorizationType;
   }
 
-  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
+  public void setAuthorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
 
@@ -418,7 +418,7 @@ public class IntegrationInstanceConfigurationModel {
     this.connectionParameters = connectionParameters;
   }
 
-  public IntegrationInstanceConfigurationModel integration(IntegrationBasicModel integration) {
+  public IntegrationInstanceConfigurationModel integration(@Nullable IntegrationBasicModel integration) {
     this.integration = integration;
     return this;
   }
@@ -430,11 +430,11 @@ public class IntegrationInstanceConfigurationModel {
   @Valid 
   @Schema(name = "integration", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integration")
-  public IntegrationBasicModel getIntegration() {
+  public @Nullable IntegrationBasicModel getIntegration() {
     return integration;
   }
 
-  public void setIntegration(IntegrationBasicModel integration) {
+  public void setIntegration(@Nullable IntegrationBasicModel integration) {
     this.integration = integration;
   }
 
@@ -494,7 +494,7 @@ public class IntegrationInstanceConfigurationModel {
     this.tags = tags;
   }
 
-  public IntegrationInstanceConfigurationModel version(Integer version) {
+  public IntegrationInstanceConfigurationModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -506,11 +506,11 @@ public class IntegrationInstanceConfigurationModel {
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 

@@ -23,14 +23,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ScriptTestExecution", description = "Contains information about test execution of a script.")
 @JsonTypeName("ScriptTestExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ScriptTestExecutionModel {
 
   private @Nullable ExecutionErrorModel error;
 
   private @Nullable Object output;
 
-  public ScriptTestExecutionModel error(ExecutionErrorModel error) {
+  public ScriptTestExecutionModel error(@Nullable ExecutionErrorModel error) {
     this.error = error;
     return this;
   }
@@ -42,15 +42,15 @@ public class ScriptTestExecutionModel {
   @Valid 
   @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("error")
-  public ExecutionErrorModel getError() {
+  public @Nullable ExecutionErrorModel getError() {
     return error;
   }
 
-  public void setError(ExecutionErrorModel error) {
+  public void setError(@Nullable ExecutionErrorModel error) {
     this.error = error;
   }
 
-  public ScriptTestExecutionModel output(Object output) {
+  public ScriptTestExecutionModel output(@Nullable Object output) {
     this.output = output;
     return this;
   }
@@ -62,11 +62,11 @@ public class ScriptTestExecutionModel {
   
   @Schema(name = "output", description = "The result output of testing a script.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("output")
-  public Object getOutput() {
+  public @Nullable Object getOutput() {
     return output;
   }
 
-  public void setOutput(Object output) {
+  public void setOutput(@Nullable Object output) {
     this.output = output;
   }
 

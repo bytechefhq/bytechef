@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:28.963074682+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable String description;
@@ -37,7 +37,7 @@ public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable Integer workflowVersion;
 
-  public ConnectedUserProjectWorkflowModel description(String description) {
+  public ConnectedUserProjectWorkflowModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -49,15 +49,15 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public ConnectedUserProjectWorkflowModel definition(String definition) {
+  public ConnectedUserProjectWorkflowModel definition(@Nullable String definition) {
     this.definition = definition;
     return this;
   }
@@ -69,15 +69,15 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("definition")
-  public String getDefinition() {
+  public @Nullable String getDefinition() {
     return definition;
   }
 
-  public void setDefinition(String definition) {
+  public void setDefinition(@Nullable String definition) {
     this.definition = definition;
   }
 
-  public ConnectedUserProjectWorkflowModel enabled(Boolean enabled) {
+  public ConnectedUserProjectWorkflowModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -89,15 +89,15 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "enabled", description = "If a workflow is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
-  public Boolean getEnabled() {
+  public @Nullable Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
 
-  public ConnectedUserProjectWorkflowModel label(String label) {
+  public ConnectedUserProjectWorkflowModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -109,15 +109,15 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "label", description = "The label of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
-  public String getLabel() {
+  public @Nullable String getLabel() {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(@Nullable String label) {
     this.label = label;
   }
 
-  public ConnectedUserProjectWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+  public ConnectedUserProjectWorkflowModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -129,15 +129,15 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "workflowReferenceCode", description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowReferenceCode")
-  public String getWorkflowReferenceCode() {
+  public @Nullable String getWorkflowReferenceCode() {
     return workflowReferenceCode;
   }
 
-  public void setWorkflowReferenceCode(String workflowReferenceCode) {
+  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 
-  public ConnectedUserProjectWorkflowModel workflowVersion(Integer workflowVersion) {
+  public ConnectedUserProjectWorkflowModel workflowVersion(@Nullable Integer workflowVersion) {
     this.workflowVersion = workflowVersion;
     return this;
   }
@@ -149,11 +149,11 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "workflowVersion", description = "The workflow version, if null a workflow is not yet published", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowVersion")
-  public Integer getWorkflowVersion() {
+  public @Nullable Integer getWorkflowVersion() {
     return workflowVersion;
   }
 
-  public void setWorkflowVersion(Integer workflowVersion) {
+  public void setWorkflowVersion(@Nullable Integer workflowVersion) {
     this.workflowVersion = workflowVersion;
   }
 

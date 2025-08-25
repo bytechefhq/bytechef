@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationBasicModel {
 
   private String componentName;
@@ -90,7 +90,7 @@ public class IntegrationBasicModel {
     this.componentName = componentName;
   }
 
-  public IntegrationBasicModel createdBy(String createdBy) {
+  public IntegrationBasicModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -102,15 +102,15 @@ public class IntegrationBasicModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public IntegrationBasicModel createdDate(OffsetDateTime createdDate) {
+  public IntegrationBasicModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -122,15 +122,15 @@ public class IntegrationBasicModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public IntegrationBasicModel description(String description) {
+  public IntegrationBasicModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -142,15 +142,15 @@ public class IntegrationBasicModel {
   
   @Schema(name = "description", description = "The description of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public IntegrationBasicModel icon(String icon) {
+  public IntegrationBasicModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -162,15 +162,15 @@ public class IntegrationBasicModel {
   
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
-  public IntegrationBasicModel id(Long id) {
+  public IntegrationBasicModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -182,15 +182,15 @@ public class IntegrationBasicModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
-  public IntegrationBasicModel lastModifiedBy(String lastModifiedBy) {
+  public IntegrationBasicModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -202,15 +202,15 @@ public class IntegrationBasicModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public IntegrationBasicModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public IntegrationBasicModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -222,15 +222,15 @@ public class IntegrationBasicModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public IntegrationBasicModel lastPublishedDate(OffsetDateTime lastPublishedDate) {
+  public IntegrationBasicModel lastPublishedDate(@Nullable OffsetDateTime lastPublishedDate) {
     this.lastPublishedDate = lastPublishedDate;
     return this;
   }
@@ -242,15 +242,15 @@ public class IntegrationBasicModel {
   @Valid 
   @Schema(name = "lastPublishedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastPublishedDate")
-  public OffsetDateTime getLastPublishedDate() {
+  public @Nullable OffsetDateTime getLastPublishedDate() {
     return lastPublishedDate;
   }
 
-  public void setLastPublishedDate(OffsetDateTime lastPublishedDate) {
+  public void setLastPublishedDate(@Nullable OffsetDateTime lastPublishedDate) {
     this.lastPublishedDate = lastPublishedDate;
   }
 
-  public IntegrationBasicModel lastStatus(IntegrationStatusModel lastStatus) {
+  public IntegrationBasicModel lastStatus(@Nullable IntegrationStatusModel lastStatus) {
     this.lastStatus = lastStatus;
     return this;
   }
@@ -262,15 +262,15 @@ public class IntegrationBasicModel {
   @Valid 
   @Schema(name = "lastStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastStatus")
-  public IntegrationStatusModel getLastStatus() {
+  public @Nullable IntegrationStatusModel getLastStatus() {
     return lastStatus;
   }
 
-  public void setLastStatus(IntegrationStatusModel lastStatus) {
+  public void setLastStatus(@Nullable IntegrationStatusModel lastStatus) {
     this.lastStatus = lastStatus;
   }
 
-  public IntegrationBasicModel lastVersion(Integer lastVersion) {
+  public IntegrationBasicModel lastVersion(@Nullable Integer lastVersion) {
     this.lastVersion = lastVersion;
     return this;
   }
@@ -282,11 +282,11 @@ public class IntegrationBasicModel {
   
   @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastVersion")
-  public Integer getLastVersion() {
+  public @Nullable Integer getLastVersion() {
     return lastVersion;
   }
 
-  public void setLastVersion(Integer lastVersion) {
+  public void setLastVersion(@Nullable Integer lastVersion) {
     this.lastVersion = lastVersion;
   }
 
@@ -310,7 +310,7 @@ public class IntegrationBasicModel {
     this.multipleInstances = multipleInstances;
   }
 
-  public IntegrationBasicModel name(String name) {
+  public IntegrationBasicModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -322,11 +322,11 @@ public class IntegrationBasicModel {
   
   @Schema(name = "name", description = "The name of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
-  public String getName() {
+  public @Nullable String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nullable String name) {
     this.name = name;
   }
 

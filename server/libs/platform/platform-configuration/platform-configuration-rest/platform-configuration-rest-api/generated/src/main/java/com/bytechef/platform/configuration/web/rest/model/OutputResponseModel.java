@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "OutputResponse", description = "The output response")
 @JsonTypeName("OutputResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class OutputResponseModel {
 
   private @Nullable PropertyModel outputSchema;
@@ -32,7 +32,7 @@ public class OutputResponseModel {
 
   private @Nullable Object sampleOutput;
 
-  public OutputResponseModel outputSchema(PropertyModel outputSchema) {
+  public OutputResponseModel outputSchema(@Nullable PropertyModel outputSchema) {
     this.outputSchema = outputSchema;
     return this;
   }
@@ -44,15 +44,15 @@ public class OutputResponseModel {
   @Valid 
   @Schema(name = "outputSchema", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchema")
-  public PropertyModel getOutputSchema() {
+  public @Nullable PropertyModel getOutputSchema() {
     return outputSchema;
   }
 
-  public void setOutputSchema(PropertyModel outputSchema) {
+  public void setOutputSchema(@Nullable PropertyModel outputSchema) {
     this.outputSchema = outputSchema;
   }
 
-  public OutputResponseModel placeholder(Object placeholder) {
+  public OutputResponseModel placeholder(@Nullable Object placeholder) {
     this.placeholder = placeholder;
     return this;
   }
@@ -64,15 +64,15 @@ public class OutputResponseModel {
   
   @Schema(name = "placeholder", description = "The placeholder of an output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("placeholder")
-  public Object getPlaceholder() {
+  public @Nullable Object getPlaceholder() {
     return placeholder;
   }
 
-  public void setPlaceholder(Object placeholder) {
+  public void setPlaceholder(@Nullable Object placeholder) {
     this.placeholder = placeholder;
   }
 
-  public OutputResponseModel sampleOutput(Object sampleOutput) {
+  public OutputResponseModel sampleOutput(@Nullable Object sampleOutput) {
     this.sampleOutput = sampleOutput;
     return this;
   }
@@ -84,11 +84,11 @@ public class OutputResponseModel {
   
   @Schema(name = "sampleOutput", description = "The sample value of an output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("sampleOutput")
-  public Object getSampleOutput() {
+  public @Nullable Object getSampleOutput() {
     return sampleOutput;
   }
 
-  public void setSampleOutput(Object sampleOutput) {
+  public void setSampleOutput(@Nullable Object sampleOutput) {
     this.sampleOutput = sampleOutput;
   }
 

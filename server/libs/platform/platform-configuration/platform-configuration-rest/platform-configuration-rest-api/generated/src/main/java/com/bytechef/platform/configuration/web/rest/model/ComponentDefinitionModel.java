@@ -36,7 +36,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ComponentDefinitionModel {
 
   @Valid
@@ -277,7 +277,7 @@ public class ComponentDefinitionModel {
     this.componentCategories = componentCategories;
   }
 
-  public ComponentDefinitionModel connection(ConnectionDefinitionBasicModel connection) {
+  public ComponentDefinitionModel connection(@Nullable ConnectionDefinitionBasicModel connection) {
     this.connection = connection;
     return this;
   }
@@ -289,11 +289,11 @@ public class ComponentDefinitionModel {
   @Valid 
   @Schema(name = "connection", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connection")
-  public ConnectionDefinitionBasicModel getConnection() {
+  public @Nullable ConnectionDefinitionBasicModel getConnection() {
     return connection;
   }
 
-  public void setConnection(ConnectionDefinitionBasicModel connection) {
+  public void setConnection(@Nullable ConnectionDefinitionBasicModel connection) {
     this.connection = connection;
   }
 
@@ -317,7 +317,7 @@ public class ComponentDefinitionModel {
     this.connectionRequired = connectionRequired;
   }
 
-  public ComponentDefinitionModel description(String description) {
+  public ComponentDefinitionModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -329,15 +329,15 @@ public class ComponentDefinitionModel {
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public ComponentDefinitionModel icon(String icon) {
+  public ComponentDefinitionModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -349,11 +349,11 @@ public class ComponentDefinitionModel {
   
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
@@ -377,7 +377,7 @@ public class ComponentDefinitionModel {
     this.name = name;
   }
 
-  public ComponentDefinitionModel resources(ResourcesModel resources) {
+  public ComponentDefinitionModel resources(@Nullable ResourcesModel resources) {
     this.resources = resources;
     return this;
   }
@@ -389,11 +389,11 @@ public class ComponentDefinitionModel {
   @Valid 
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("resources")
-  public ResourcesModel getResources() {
+  public @Nullable ResourcesModel getResources() {
     return resources;
   }
 
-  public void setResources(ResourcesModel resources) {
+  public void setResources(@Nullable ResourcesModel resources) {
     this.resources = resources;
   }
 
@@ -425,7 +425,7 @@ public class ComponentDefinitionModel {
     this.tags = tags;
   }
 
-  public ComponentDefinitionModel title(String title) {
+  public ComponentDefinitionModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -437,11 +437,11 @@ public class ComponentDefinitionModel {
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
@@ -473,7 +473,7 @@ public class ComponentDefinitionModel {
     this.triggers = triggers;
   }
 
-  public ComponentDefinitionModel unifiedApiCategory(UnifiedApiCategoryModel unifiedApiCategory) {
+  public ComponentDefinitionModel unifiedApiCategory(@Nullable UnifiedApiCategoryModel unifiedApiCategory) {
     this.unifiedApiCategory = unifiedApiCategory;
     return this;
   }
@@ -485,11 +485,11 @@ public class ComponentDefinitionModel {
   @Valid 
   @Schema(name = "unifiedApiCategory", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("unifiedApiCategory")
-  public UnifiedApiCategoryModel getUnifiedApiCategory() {
+  public @Nullable UnifiedApiCategoryModel getUnifiedApiCategory() {
     return unifiedApiCategory;
   }
 
-  public void setUnifiedApiCategory(UnifiedApiCategoryModel unifiedApiCategory) {
+  public void setUnifiedApiCategory(@Nullable UnifiedApiCategoryModel unifiedApiCategory) {
     this.unifiedApiCategory = unifiedApiCategory;
   }
 

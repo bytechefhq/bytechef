@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration for a particular service represented by component.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:28.963074682+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationModel {
 
   private String componentName;
@@ -86,7 +86,7 @@ public class IntegrationModel {
     this.componentName = componentName;
   }
 
-  public IntegrationModel description(String description) {
+  public IntegrationModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -98,11 +98,11 @@ public class IntegrationModel {
   
   @Schema(name = "description", description = "The description of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
@@ -126,7 +126,7 @@ public class IntegrationModel {
     this.icon = icon;
   }
 
-  public IntegrationModel id(Long id) {
+  public IntegrationModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -138,11 +138,11 @@ public class IntegrationModel {
   
   @Schema(name = "id", description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
@@ -174,7 +174,7 @@ public class IntegrationModel {
     this.integrationInstances = integrationInstances;
   }
 
-  public IntegrationModel integrationVersion(Integer integrationVersion) {
+  public IntegrationModel integrationVersion(@Nullable Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
     return this;
   }
@@ -186,11 +186,11 @@ public class IntegrationModel {
   
   @Schema(name = "integrationVersion", description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationVersion")
-  public Integer getIntegrationVersion() {
+  public @Nullable Integer getIntegrationVersion() {
     return integrationVersion;
   }
 
-  public void setIntegrationVersion(Integer integrationVersion) {
+  public void setIntegrationVersion(@Nullable Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
   }
 
@@ -214,7 +214,7 @@ public class IntegrationModel {
     this.multipleInstances = multipleInstances;
   }
 
-  public IntegrationModel name(String name) {
+  public IntegrationModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -226,15 +226,15 @@ public class IntegrationModel {
   
   @Schema(name = "name", description = "The name of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
-  public String getName() {
+  public @Nullable String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nullable String name) {
     this.name = name;
   }
 
-  public IntegrationModel connectionConfig(ConnectionConfigModel connectionConfig) {
+  public IntegrationModel connectionConfig(@Nullable ConnectionConfigModel connectionConfig) {
     this.connectionConfig = connectionConfig;
     return this;
   }
@@ -246,11 +246,11 @@ public class IntegrationModel {
   @Valid 
   @Schema(name = "connectionConfig", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionConfig")
-  public ConnectionConfigModel getConnectionConfig() {
+  public @Nullable ConnectionConfigModel getConnectionConfig() {
     return connectionConfig;
   }
 
-  public void setConnectionConfig(ConnectionConfigModel connectionConfig) {
+  public void setConnectionConfig(@Nullable ConnectionConfigModel connectionConfig) {
     this.connectionConfig = connectionConfig;
   }
 

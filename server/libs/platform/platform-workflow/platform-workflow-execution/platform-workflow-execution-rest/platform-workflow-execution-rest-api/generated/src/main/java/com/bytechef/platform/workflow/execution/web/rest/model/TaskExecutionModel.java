@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:46.305254656+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:44.879388+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -143,7 +143,7 @@ public class TaskExecutionModel {
     this.status = status;
   }
 
-  public TaskExecutionModel createdBy(String createdBy) {
+  public TaskExecutionModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -155,15 +155,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
-  public String getCreatedBy() {
+  public @Nullable String getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
 
-  public TaskExecutionModel createdDate(OffsetDateTime createdDate) {
+  public TaskExecutionModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -175,15 +175,15 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public OffsetDateTime getCreatedDate() {
+  public @Nullable OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public TaskExecutionModel endDate(OffsetDateTime endDate) {
+  public TaskExecutionModel endDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
     return this;
   }
@@ -195,15 +195,15 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "endDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance ended (CANCELLED, FAILED, COMPLETED).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endDate")
-  public OffsetDateTime getEndDate() {
+  public @Nullable OffsetDateTime getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(OffsetDateTime endDate) {
+  public void setEndDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
   }
 
-  public TaskExecutionModel error(ExecutionErrorModel error) {
+  public TaskExecutionModel error(@Nullable ExecutionErrorModel error) {
     this.error = error;
     return this;
   }
@@ -215,15 +215,15 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("error")
-  public ExecutionErrorModel getError() {
+  public @Nullable ExecutionErrorModel getError() {
     return error;
   }
 
-  public void setError(ExecutionErrorModel error) {
+  public void setError(@Nullable ExecutionErrorModel error) {
     this.error = error;
   }
 
-  public TaskExecutionModel executionTime(Long executionTime) {
+  public TaskExecutionModel executionTime(@Nullable Long executionTime) {
     this.executionTime = executionTime;
     return this;
   }
@@ -235,15 +235,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "executionTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The total time in ms for a task to execute (excluding wait time of the task in transit). i.e. actual execution time on a worker node.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("executionTime")
-  public Long getExecutionTime() {
+  public @Nullable Long getExecutionTime() {
     return executionTime;
   }
 
-  public void setExecutionTime(Long executionTime) {
+  public void setExecutionTime(@Nullable Long executionTime) {
     this.executionTime = executionTime;
   }
 
-  public TaskExecutionModel icon(String icon) {
+  public TaskExecutionModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -255,15 +255,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "icon", accessMode = Schema.AccessMode.READ_ONLY, description = "The icon of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
-  public String getIcon() {
+  public @Nullable String getIcon() {
     return icon;
   }
 
-  public void setIcon(String icon) {
+  public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
 
-  public TaskExecutionModel id(String id) {
+  public TaskExecutionModel id(@Nullable String id) {
     this.id = id;
     return this;
   }
@@ -275,11 +275,11 @@ public class TaskExecutionModel {
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a task execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public String getId() {
+  public @Nullable String getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(@Nullable String id) {
     this.id = id;
   }
 
@@ -331,7 +331,7 @@ public class TaskExecutionModel {
     this.jobId = jobId;
   }
 
-  public TaskExecutionModel lastModifiedBy(String lastModifiedBy) {
+  public TaskExecutionModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -343,15 +343,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
+  public @Nullable String getLastModifiedBy() {
     return lastModifiedBy;
   }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
+  public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public TaskExecutionModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public TaskExecutionModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -363,15 +363,15 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public OffsetDateTime getLastModifiedDate() {
+  public @Nullable OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public TaskExecutionModel maxRetries(Integer maxRetries) {
+  public TaskExecutionModel maxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
     return this;
   }
@@ -383,15 +383,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "maxRetries", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times that a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxRetries")
-  public Integer getMaxRetries() {
+  public @Nullable Integer getMaxRetries() {
     return maxRetries;
   }
 
-  public void setMaxRetries(Integer maxRetries) {
+  public void setMaxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
   }
 
-  public TaskExecutionModel output(Object output) {
+  public TaskExecutionModel output(@Nullable Object output) {
     this.output = output;
     return this;
   }
@@ -403,15 +403,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "output", accessMode = Schema.AccessMode.READ_ONLY, description = "The result output generated by the task handler which executed a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("output")
-  public Object getOutput() {
+  public @Nullable Object getOutput() {
     return output;
   }
 
-  public void setOutput(Object output) {
+  public void setOutput(@Nullable Object output) {
     this.output = output;
   }
 
-  public TaskExecutionModel parentId(String parentId) {
+  public TaskExecutionModel parentId(@Nullable String parentId) {
     this.parentId = parentId;
     return this;
   }
@@ -423,11 +423,11 @@ public class TaskExecutionModel {
   
   @Schema(name = "parentId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task, if this is a sub-task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("parentId")
-  public String getParentId() {
+  public @Nullable String getParentId() {
     return parentId;
   }
 
-  public void setParentId(String parentId) {
+  public void setParentId(@Nullable String parentId) {
     this.parentId = parentId;
   }
 
@@ -451,7 +451,7 @@ public class TaskExecutionModel {
     this.priority = priority;
   }
 
-  public TaskExecutionModel progress(Integer progress) {
+  public TaskExecutionModel progress(@Nullable Integer progress) {
     this.progress = progress;
     return this;
   }
@@ -463,15 +463,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "progress", accessMode = Schema.AccessMode.READ_ONLY, description = "The current progress value, a number between 0 and 100.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("progress")
-  public Integer getProgress() {
+  public @Nullable Integer getProgress() {
     return progress;
   }
 
-  public void setProgress(Integer progress) {
+  public void setProgress(@Nullable Integer progress) {
     this.progress = progress;
   }
 
-  public TaskExecutionModel retryAttempts(Integer retryAttempts) {
+  public TaskExecutionModel retryAttempts(@Nullable Integer retryAttempts) {
     this.retryAttempts = retryAttempts;
     return this;
   }
@@ -483,15 +483,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "retryAttempts", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of times that a task has been retried.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("retryAttempts")
-  public Integer getRetryAttempts() {
+  public @Nullable Integer getRetryAttempts() {
     return retryAttempts;
   }
 
-  public void setRetryAttempts(Integer retryAttempts) {
+  public void setRetryAttempts(@Nullable Integer retryAttempts) {
     this.retryAttempts = retryAttempts;
   }
 
-  public TaskExecutionModel retryDelay(String retryDelay) {
+  public TaskExecutionModel retryDelay(@Nullable String retryDelay) {
     this.retryDelay = retryDelay;
     return this;
   }
@@ -503,15 +503,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "retryDelay", accessMode = Schema.AccessMode.READ_ONLY, description = "The delay to introduce between each retry. Values are to be specified using the ISO-8601 format (excluding the PT prefix). e.g. 10s (ten seconds), 1m (one minute) etc.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("retryDelay")
-  public String getRetryDelay() {
+  public @Nullable String getRetryDelay() {
     return retryDelay;
   }
 
-  public void setRetryDelay(String retryDelay) {
+  public void setRetryDelay(@Nullable String retryDelay) {
     this.retryDelay = retryDelay;
   }
 
-  public TaskExecutionModel retryDelayFactor(Integer retryDelayFactor) {
+  public TaskExecutionModel retryDelayFactor(@Nullable Integer retryDelayFactor) {
     this.retryDelayFactor = retryDelayFactor;
     return this;
   }
@@ -523,11 +523,11 @@ public class TaskExecutionModel {
   
   @Schema(name = "retryDelayFactor", accessMode = Schema.AccessMode.READ_ONLY, description = "The factor to use in order to calculate the actual delay time between each successive retry -- multiplying by the value of the retryDelay.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("retryDelayFactor")
-  public Integer getRetryDelayFactor() {
+  public @Nullable Integer getRetryDelayFactor() {
     return retryDelayFactor;
   }
 
-  public void setRetryDelayFactor(Integer retryDelayFactor) {
+  public void setRetryDelayFactor(@Nullable Integer retryDelayFactor) {
     this.retryDelayFactor = retryDelayFactor;
   }
 
@@ -571,7 +571,7 @@ public class TaskExecutionModel {
     this.status = status;
   }
 
-  public TaskExecutionModel taskNumber(Integer taskNumber) {
+  public TaskExecutionModel taskNumber(@Nullable Integer taskNumber) {
     this.taskNumber = taskNumber;
     return this;
   }
@@ -583,15 +583,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "taskNumber", accessMode = Schema.AccessMode.READ_ONLY, description = "The numeric order of the task in the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskNumber")
-  public Integer getTaskNumber() {
+  public @Nullable Integer getTaskNumber() {
     return taskNumber;
   }
 
-  public void setTaskNumber(Integer taskNumber) {
+  public void setTaskNumber(@Nullable Integer taskNumber) {
     this.taskNumber = taskNumber;
   }
 
-  public TaskExecutionModel title(String title) {
+  public TaskExecutionModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -603,15 +603,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "title", accessMode = Schema.AccessMode.READ_ONLY, description = "The title of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
-  public TaskExecutionModel retryDelayMillis(Long retryDelayMillis) {
+  public TaskExecutionModel retryDelayMillis(@Nullable Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
     return this;
   }
@@ -623,15 +623,15 @@ public class TaskExecutionModel {
   
   @Schema(name = "retryDelayMillis", accessMode = Schema.AccessMode.READ_ONLY, description = "The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("retryDelayMillis")
-  public Long getRetryDelayMillis() {
+  public @Nullable Long getRetryDelayMillis() {
     return retryDelayMillis;
   }
 
-  public void setRetryDelayMillis(Long retryDelayMillis) {
+  public void setRetryDelayMillis(@Nullable Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
   }
 
-  public TaskExecutionModel workflowTask(com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
+  public TaskExecutionModel workflowTask(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
     this.workflowTask = workflowTask;
     return this;
   }
@@ -643,15 +643,15 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "workflowTask", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTask")
-  public com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel getWorkflowTask() {
+  public @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel getWorkflowTask() {
     return workflowTask;
   }
 
-  public void setWorkflowTask(com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
+  public void setWorkflowTask(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
     this.workflowTask = workflowTask;
   }
 
-  public TaskExecutionModel type(String type) {
+  public TaskExecutionModel type(@Nullable String type) {
     this.type = type;
     return this;
   }
@@ -663,11 +663,11 @@ public class TaskExecutionModel {
   
   @Schema(name = "type", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("type")
-  public String getType() {
+  public @Nullable String getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(@Nullable String type) {
     this.type = type;
   }
 

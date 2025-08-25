@@ -21,12 +21,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createIntegrationInstanceConfigurationWorkflowJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:42.561540213+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:43.397779+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel {
 
   private @Nullable Long jobId;
 
-  public CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel jobId(Long jobId) {
+  public CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel jobId(@Nullable Long jobId) {
     this.jobId = jobId;
     return this;
   }
@@ -38,11 +38,11 @@ public class CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel {
   
   @Schema(name = "jobId", description = "The id of an executed job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("jobId")
-  public Long getJobId() {
+  public @Nullable Long getJobId() {
     return jobId;
   }
 
-  public void setJobId(Long jobId) {
+  public void setJobId(@Nullable Long jobId) {
     this.jobId = jobId;
   }
 

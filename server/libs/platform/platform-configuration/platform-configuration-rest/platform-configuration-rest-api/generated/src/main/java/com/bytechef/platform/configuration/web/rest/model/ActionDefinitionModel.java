@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-22T09:07:35.162792355+02:00[Europe/Zagreb]", comments = "Generator version: 7.13.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ActionDefinitionModel {
 
   private String componentName;
@@ -108,7 +108,7 @@ public class ActionDefinitionModel {
     this.componentVersion = componentVersion;
   }
 
-  public ActionDefinitionModel description(String description) {
+  public ActionDefinitionModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -120,15 +120,15 @@ public class ActionDefinitionModel {
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
-  public String getDescription() {
+  public @Nullable String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nullable String description) {
     this.description = description;
   }
 
-  public ActionDefinitionModel help(HelpModel help) {
+  public ActionDefinitionModel help(@Nullable HelpModel help) {
     this.help = help;
     return this;
   }
@@ -140,11 +140,11 @@ public class ActionDefinitionModel {
   @Valid 
   @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("help")
-  public HelpModel getHelp() {
+  public @Nullable HelpModel getHelp() {
     return help;
   }
 
-  public void setHelp(HelpModel help) {
+  public void setHelp(@Nullable HelpModel help) {
     this.help = help;
   }
 
@@ -208,7 +208,7 @@ public class ActionDefinitionModel {
     this.outputFunctionDefined = outputFunctionDefined;
   }
 
-  public ActionDefinitionModel outputSchemaDefined(Boolean outputSchemaDefined) {
+  public ActionDefinitionModel outputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
     return this;
   }
@@ -220,11 +220,11 @@ public class ActionDefinitionModel {
   
   @Schema(name = "outputSchemaDefined", description = "Does action defines output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchemaDefined")
-  public Boolean getOutputSchemaDefined() {
+  public @Nullable Boolean getOutputSchemaDefined() {
     return outputSchemaDefined;
   }
 
-  public void setOutputSchemaDefined(Boolean outputSchemaDefined) {
+  public void setOutputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
   }
 
@@ -256,7 +256,7 @@ public class ActionDefinitionModel {
     this.properties = properties;
   }
 
-  public ActionDefinitionModel title(String title) {
+  public ActionDefinitionModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -268,15 +268,15 @@ public class ActionDefinitionModel {
   
   @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
-  public String getTitle() {
+  public @Nullable String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nullable String title) {
     this.title = title;
   }
 
-  public ActionDefinitionModel workflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
+  public ActionDefinitionModel workflowNodeDescriptionDefined(@Nullable Boolean workflowNodeDescriptionDefined) {
     this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
     return this;
   }
@@ -288,11 +288,11 @@ public class ActionDefinitionModel {
   
   @Schema(name = "workflowNodeDescriptionDefined", description = "Does action define dynamic node description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowNodeDescriptionDefined")
-  public Boolean getWorkflowNodeDescriptionDefined() {
+  public @Nullable Boolean getWorkflowNodeDescriptionDefined() {
     return workflowNodeDescriptionDefined;
   }
 
-  public void setWorkflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
+  public void setWorkflowNodeDescriptionDefined(@Nullable Boolean workflowNodeDescriptionDefined) {
     this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
   }
 
