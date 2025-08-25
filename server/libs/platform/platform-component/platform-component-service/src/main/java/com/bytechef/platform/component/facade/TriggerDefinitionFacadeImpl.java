@@ -24,6 +24,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -204,7 +205,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
             componentName, componentVersion, triggerName, null, null, null, componentConnection, false);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, triggerContext, null,
+            componentName, componentVersion, componentConnection, triggerContext,
+            TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_ENABLE_FAILED,
             (componentConnection1, triggerContext1) -> triggerDefinitionService.executeWebhookEnable(
                 componentName, componentVersion, triggerName, inputParameters,
                 webhookUrl, workflowExecutionId, componentConnection1, triggerContext1),
