@@ -3,9 +3,11 @@ import {Fragment} from 'react';
 
 const ConnectionParameters = ({
     authorizationParameters,
+    authorizationType,
     connectionDefinition,
     connectionParameters,
 }: {
+    authorizationType?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     authorizationParameters?: {[key: string]: any};
     connectionDefinition: ConnectionDefinition;
@@ -16,6 +18,7 @@ const ConnectionParameters = ({
 
     const existingAuthorizations = authorizations?.filter(
         (authorization) =>
+            authorization.type === authorizationType &&
             authorization.properties &&
             authorization.properties.filter((property) => !!authorizationParameters![property.name!]).length > 0
     );
