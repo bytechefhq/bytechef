@@ -58,8 +58,11 @@ export class NotificationApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/notifications`;
+
         const response = await this.request({
-            path: `/notifications`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -94,8 +97,12 @@ export class NotificationApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/notifications/{notificationId}`;
+        urlPath = urlPath.replace(`{${"notificationId"}}`, encodeURIComponent(String(requestParameters['notificationId'])));
+
         const response = await this.request({
-            path: `/notifications/{notificationId}`.replace(`{${"notificationId"}}`, encodeURIComponent(String(requestParameters['notificationId']))),
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -121,8 +128,11 @@ export class NotificationApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/notifications`;
+
         const response = await this.request({
-            path: `/notifications`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -165,8 +175,12 @@ export class NotificationApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/notifications/{notificationId}`;
+        urlPath = urlPath.replace(`{${"notificationId"}}`, encodeURIComponent(String(requestParameters['notificationId'])));
+
         const response = await this.request({
-            path: `/notifications/{notificationId}`.replace(`{${"notificationId"}}`, encodeURIComponent(String(requestParameters['notificationId']))),
+            path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

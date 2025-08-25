@@ -74,8 +74,13 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions/{componentName}/versions/{componentVersion}`;
+        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
+
         const response = await this.request({
-            path: `/component-definitions/{componentName}/versions/{componentVersion}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -109,8 +114,12 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions/{componentName}/versions`;
+        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+
         const response = await this.request({
-            path: `/component-definitions/{componentName}/versions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -151,8 +160,13 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions/{componentName}/connection-versions/{connectionVersion}`;
+        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace(`{${"connectionVersion"}}`, encodeURIComponent(String(requestParameters['connectionVersion'])));
+
         const response = await this.request({
-            path: `/component-definitions/{componentName}/connection-versions/{connectionVersion}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"connectionVersion"}}`, encodeURIComponent(String(requestParameters['connectionVersion']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -186,8 +200,12 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/unified-api/{category}/component-definitions`;
+        urlPath = urlPath.replace(`{${"category"}}`, encodeURIComponent(String(requestParameters['category'])));
+
         const response = await this.request({
-            path: `/unified-api/{category}/component-definitions`.replace(`{${"category"}}`, encodeURIComponent(String(requestParameters['category']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

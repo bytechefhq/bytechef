@@ -55,8 +55,11 @@ export class Oauth2Api extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/oauth2/authorization-parameters`;
+
         const response = await this.request({
-            path: `/oauth2/authorization-parameters`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -84,8 +87,11 @@ export class Oauth2Api extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/oauth2/properties`;
+
         const response = await this.request({
-            path: `/oauth2/properties`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

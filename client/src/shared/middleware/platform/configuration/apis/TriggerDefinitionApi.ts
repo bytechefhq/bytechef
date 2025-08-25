@@ -71,8 +71,14 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions/{triggerName}`;
+        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
+        urlPath = urlPath.replace(`{${"triggerName"}}`, encodeURIComponent(String(requestParameters['triggerName'])));
+
         const response = await this.request({
-            path: `/component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions/{triggerName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))).replace(`{${"triggerName"}}`, encodeURIComponent(String(requestParameters['triggerName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -113,8 +119,13 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions`;
+        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
+
         const response = await this.request({
-            path: `/component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

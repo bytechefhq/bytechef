@@ -36,8 +36,11 @@ export class AuthorityApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/authorities`;
+
         const response = await this.request({
-            path: `/authorities`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

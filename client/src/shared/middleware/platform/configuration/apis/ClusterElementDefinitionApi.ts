@@ -72,8 +72,14 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementName}`;
+        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
+        urlPath = urlPath.replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName'])));
+
         const response = await this.request({
-            path: `/component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -121,8 +127,14 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions/{rootComponentName}/versions/{rootComponentVersion}/cluster-element-definitions/{clusterElementType}`;
+        urlPath = urlPath.replace(`{${"rootComponentName"}}`, encodeURIComponent(String(requestParameters['rootComponentName'])));
+        urlPath = urlPath.replace(`{${"rootComponentVersion"}}`, encodeURIComponent(String(requestParameters['rootComponentVersion'])));
+        urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
+
         const response = await this.request({
-            path: `/component-definitions/{rootComponentName}/versions/{rootComponentVersion}/cluster-element-definitions/{clusterElementType}`.replace(`{${"rootComponentName"}}`, encodeURIComponent(String(requestParameters['rootComponentName']))).replace(`{${"rootComponentVersion"}}`, encodeURIComponent(String(requestParameters['rootComponentVersion']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

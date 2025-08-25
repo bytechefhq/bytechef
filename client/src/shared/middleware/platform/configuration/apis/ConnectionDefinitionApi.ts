@@ -60,8 +60,12 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions/{componentName}/connection-definition`;
+        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+
         const response = await this.request({
-            path: `/component-definitions/{componentName}/connection-definition`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -99,8 +103,12 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/component-definitions/{componentName}/connection-definitions`;
+        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+
         const response = await this.request({
-            path: `/component-definitions/{componentName}/connection-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

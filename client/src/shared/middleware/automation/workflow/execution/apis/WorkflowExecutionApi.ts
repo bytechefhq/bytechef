@@ -65,8 +65,12 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/workflow-executions/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/workflow-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -129,8 +133,11 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/workflow-executions`;
+
         const response = await this.request({
-            path: `/workflow-executions`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

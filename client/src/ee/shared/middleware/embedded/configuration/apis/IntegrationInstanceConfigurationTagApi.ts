@@ -44,8 +44,11 @@ export class IntegrationInstanceConfigurationTagApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/integration-instance-configurations/tags`;
+
         const response = await this.request({
-            path: `/integration-instance-configurations/tags`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -88,8 +91,12 @@ export class IntegrationInstanceConfigurationTagApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/integration-instance-configurations/{id}/tags`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/integration-instance-configurations/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

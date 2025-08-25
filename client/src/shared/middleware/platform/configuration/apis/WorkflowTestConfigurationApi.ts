@@ -78,8 +78,12 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/workflow-test-configurations/{workflowId}`;
+        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+
         const response = await this.request({
-            path: `/workflow-test-configurations/{workflowId}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -120,8 +124,13 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/connections`;
+        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+
         const response = await this.request({
-            path: `/workflow-test-configurations/{workflowId}/connections/{workflowNodeName}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -164,8 +173,12 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/workflow-test-configurations/{workflowId}`;
+        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+
         const response = await this.request({
-            path: `/workflow-test-configurations/{workflowId}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))),
+            path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -223,8 +236,14 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections`;
+        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace(`{${"workflowConnectionKey"}}`, encodeURIComponent(String(requestParameters['workflowConnectionKey'])));
+
         const response = await this.request({
-            path: `/workflow-test-configurations/{workflowId}/connections/{workflowNodeName}/{workflowConnectionKey}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"workflowConnectionKey"}}`, encodeURIComponent(String(requestParameters['workflowConnectionKey']))),
+            path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -267,8 +286,12 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/workflow-test-configurations/{workflowId}/inputs`;
+        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+
         const response = await this.request({
-            path: `/workflow-test-configurations/{workflowId}/inputs`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))),
+            path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

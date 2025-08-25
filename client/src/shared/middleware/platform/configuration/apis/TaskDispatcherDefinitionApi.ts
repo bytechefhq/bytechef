@@ -62,8 +62,13 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}`;
+        urlPath = urlPath.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters['taskDispatcherName'])));
+        urlPath = urlPath.replace(`{${"taskDispatcherVersion"}}`, encodeURIComponent(String(requestParameters['taskDispatcherVersion'])));
+
         const response = await this.request({
-            path: `/task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters['taskDispatcherName']))).replace(`{${"taskDispatcherVersion"}}`, encodeURIComponent(String(requestParameters['taskDispatcherVersion']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -97,8 +102,12 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/task-dispatcher-definitions/{taskDispatcherName}/versions`;
+        urlPath = urlPath.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters['taskDispatcherName'])));
+
         const response = await this.request({
-            path: `/task-dispatcher-definitions/{taskDispatcherName}/versions`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters['taskDispatcherName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -125,8 +134,11 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/task-dispatcher-definitions`;
+
         const response = await this.request({
-            path: `/task-dispatcher-definitions`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

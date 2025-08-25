@@ -77,8 +77,13 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
             headerParameters['X-Environment'] = String(requestParameters['xEnvironment']);
         }
 
+
+        let urlPath = `/connected-user-project-workflows/{workflowReferenceCode}/enable/{enable}`;
+        urlPath = urlPath.replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode'])));
+        urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
+
         const response = await this.request({
-            path: `/connected-user-project-workflows/{workflowReferenceCode}/enable/{enable}`.replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode']))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable']))),
+            path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
@@ -115,8 +120,12 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
             headerParameters['X-Environment'] = String(requestParameters['xEnvironment']);
         }
 
+
+        let urlPath = `/connected-user-project-workflows/{workflowReferenceCode}`;
+        urlPath = urlPath.replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode'])));
+
         const response = await this.request({
-            path: `/connected-user-project-workflows/{workflowReferenceCode}`.replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -156,8 +165,12 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
             headerParameters['X-Environment'] = String(requestParameters['xEnvironment']);
         }
 
+
+        let urlPath = `/connected-user-project-workflows/{workflowReferenceCode}/publish`;
+        urlPath = urlPath.replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode'])));
+
         const response = await this.request({
-            path: `/connected-user-project-workflows/{workflowReferenceCode}/publish`.replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode']))),
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

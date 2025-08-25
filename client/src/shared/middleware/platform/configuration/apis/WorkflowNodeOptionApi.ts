@@ -46,8 +46,8 @@ export interface GetWorkflowNodeOptionsRequest {
 export class WorkflowNodeOptionApi extends runtime.BaseAPI {
 
     /**
-     * Get an action or trigger property options shown in the editor.
-     * Get an action or trigger property options shown in the editor
+     * Get a cluster element property options shown in the editor.
+     * Get a cluster element property options shown in the editor
      */
     async getClusterElementNodeOptionsRaw(requestParameters: GetClusterElementNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Option>>> {
         if (requestParameters['id'] == null) {
@@ -97,8 +97,16 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/options/{propertyName}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
+        urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
+        urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
+
         const response = await this.request({
-            path: `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/properties/{clusterElementWorkflowNodeName}/options/{propertyName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))).replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName']))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -108,8 +116,8 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an action or trigger property options shown in the editor.
-     * Get an action or trigger property options shown in the editor
+     * Get a cluster element property options shown in the editor.
+     * Get a cluster element property options shown in the editor
      */
     async getClusterElementNodeOptions(requestParameters: GetClusterElementNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Option>> {
         const response = await this.getClusterElementNodeOptionsRaw(requestParameters, initOverrides);
@@ -154,8 +162,14 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/options/{propertyName}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
+
         const response = await this.request({
-            path: `/workflows/{id}/properties/{workflowNodeName}/options/{propertyName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
