@@ -16,10 +16,6 @@
 
 package com.bytechef.server.config;
 
-import com.bytechef.ai.copilot.repository.converter.ListDoubleToPGObjectConverter;
-import com.bytechef.ai.copilot.repository.converter.MapToPGObjectConverter;
-import com.bytechef.ai.copilot.repository.converter.PGObjectToListDoubleConverter;
-import com.bytechef.ai.copilot.repository.converter.PGobjectToMapConverter;
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
@@ -32,6 +28,10 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConve
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.ee.ai.copilot.repository.converter.ListDoubleToPGObjectConverter;
+import com.bytechef.ee.ai.copilot.repository.converter.MapToPGObjectConverter;
+import com.bytechef.ee.ai.copilot.repository.converter.PGObjectToListDoubleConverter;
+import com.bytechef.ee.ai.copilot.repository.converter.PGobjectToMapConverter;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.DataEntryValueWrapperToStringConverter;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.StringToDataEntryValueWrapperConverter;
