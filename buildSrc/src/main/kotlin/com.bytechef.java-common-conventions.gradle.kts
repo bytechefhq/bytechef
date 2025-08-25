@@ -212,7 +212,7 @@ val test by tasks.existing(Test::class) {
         showCauses = true
         showStackTraces = true
     }
-    jvmArgs("-Djava.security.egd=file:/dev/./urandom -Xmx256m")
+    jvmArgs("-Djava.security.egd=file:/dev/./urandom", "-Xmx256m", "-XX:+EnableDynamicAgentLoading")
     // uncomment if the tests reports are not generated
     // ignoreFailures = true
     reports.html.required.set(true)
@@ -246,7 +246,7 @@ val testIntegration by tasks.registering(Test::class) {
         showCauses = true
         showStackTraces = true
     }
-    jvmArgs("-Djava.security.egd=file:/dev/./urandom -Xmx256m")
+    jvmArgs("-Djava.security.egd=file:/dev/./urandom", "-Xmx256m", "-XX:+EnableDynamicAgentLoading")
 
     environment["spring.profiles.active"] = "testint"
 
