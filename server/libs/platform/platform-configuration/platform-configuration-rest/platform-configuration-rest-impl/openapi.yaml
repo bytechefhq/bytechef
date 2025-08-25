@@ -652,35 +652,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowTestConfiguration"
-  /workflow-test-configurations/{workflowId}/connections/{workflowNodeName}:
-    get:
-      description: "Get a workflow test configuration connections."
-      summary: "Get a workflow test configuration connections"
-      tags:
-        - "workflow-test-configuration"
-      operationId: "getWorkflowTestConfigurationConnections"
-      parameters:
-        - name: "workflowId"
-          description: "The id of a testing workflow."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "workflowNodeName"
-          description: "The action/trigger name defined in the workflow."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "200":
-          description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
   /workflow-test-configurations/{workflowId}/inputs:
     put:
       description: "Save a workflow test configuration inputs."
@@ -709,7 +680,7 @@ paths:
       responses:
         "204":
           description: "Successful operation."
-  /workflow-test-configurations/{workflowId}/connections/{workflowNodeName}/{workflowConnectionKey}:
+  /workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections:
     put:
       description: "Save a workflow test configuration connection."
       summary: "Save a workflow test configuration connection"
@@ -748,13 +719,71 @@ paths:
       responses:
         "204":
           description: "Successful operation."
-  /workflows/{id}/descriptions/{workflowNodeName}:
+  /workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/connections:
     get:
-      description: "Get an action description shown in the editor."
-      summary: "Get an action description shown in the editor"
+      description: "Get a workflow test configuration connections."
+      summary: "Get a workflow test configuration connections"
       tags:
-        - "workflow-node-description"
-      operationId: "getWorkflowNodeDescription"
+        - "workflow-test-configuration"
+      operationId: "getWorkflowTestConfigurationConnections"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
+  /workflows/{id}/outputs:
+    get:
+      description: "Get all workflow node outputs used in a workflow."
+      summary: "Get all dynamic workflow node outputs used in a workflow"
+      tags:
+        - "workflow-node-output"
+      operationId: "getPreviousWorkflowNodeOutputs"
+      parameters:
+        - name: "id"
+          description: "The workflow id for which to return all used action definitions"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "lastWorkflowNodeName"
+          description: "The name of the last workflow node (action task or trigger) up to which include the output schema (E.g. mailchimp_1, airtable_3)"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkflowNodeOutput"
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/display-conditions:
+    get:
+      description: "Get cluster element options shown in the editor."
+      summary: "Get cluster element property options shown in the editor"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "getClusterElementParameterDisplayConditions"
       parameters:
         - name: "id"
           description: "The workflow id"
@@ -763,26 +792,98 @@ paths:
           schema:
             type: "string"
         - name: "workflowNodeName"
-          description: "The name of an workflow's action task or trigger (E.g. mailchimp_1)"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "clusterElementType"
+          description: "The name of a cluster element type."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "clusterElementWorkflowNodeName"
+          description: "The name of a cluster element workflow node name."
           required: true
           in: "path"
           schema:
             type: "string"
       responses:
         "200":
-          description: "The editor description."
+          description: "The workflow node parameter display conditions."
           content:
             application/json:
               schema:
                 type: "object"
                 properties:
-                  description:
-                    type: string
-
+                  displayConditions:
+                    type: "object"
+                    additionalProperties:
+                      type: "boolean"
+                  missingRequiredProperties:
+                    type: "array"
+                    items:
+                      type: "string"
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/dynamic-properties/{propertyName}:
+    get:
+      description: "Get dynamic properties for an action or trigger property shown in the editor."
+      summary: "Get dynamic properties for an action or trigger property shown in the editor"
+      tags:
+        - "workflow-node-dynamic-properties"
+      operationId: "getClusterElementDynamicProperties"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "clusterElementType"
+          description: "The name of a cluster element type."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "clusterElementWorkflowNodeName"
+          description: "The name of a cluster element workflow node name."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "propertyName"
+          description: "The name of a property."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "lookupDependsOnPaths"
+          description: "The list of dependency paths."
+          required: false
+          in: "query"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Property"
   /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/options/{propertyName}:
     get:
-      description: "Get an action or trigger property options shown in the editor."
-      summary: "Get an action or trigger property options shown in the editor"
+      description: "Get a cluster element property options shown in the editor."
+      summary: "Get a cluster element property options shown in the editor"
       tags:
         - "workflow-node-option"
       operationId: "getClusterElementNodeOptions"
@@ -839,161 +940,6 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Option"
-
-  /workflows/{id}/dynamic-properties/{workflowNodeName}/cluster-elements/{clusterElementType}/properties/{propertyName}:
-    get:
-      description: "Get dynamic properties for an action or trigger property shown in the editor."
-      summary: "Get dynamic properties for an action or trigger property shown in the editor"
-      tags:
-        - "workflow-node-dynamic-properties"
-      operationId: "getWorkflowNodeDynamicProperties"
-      parameters:
-        - name: "id"
-          description: "The workflow id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "workflowNodeName"
-          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "propertyName"
-          description: "The name of a property."
-          required: true
-          in: "path"
-          schema:
-            type: "string"
-        - name: "lookupDependsOnPaths"
-          description: "The list of dependency paths."
-          required: false
-          in: "query"
-          schema:
-            type: "array"
-            items:
-              type: "string"
-      responses:
-        "200":
-          description: "The list of options."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Property"
-  /workflows/{id}/dynamic-properties/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/properties/{propertyName}:
-    get:
-      description: "Get dynamic properties for an action or trigger property shown in the editor."
-      summary: "Get dynamic properties for an action or trigger property shown in the editor"
-      tags:
-        - "workflow-node-dynamic-properties"
-      operationId: "getWorkflowNodeDynamicProperties"
-      parameters:
-        - name: "id"
-          description: "The workflow id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "workflowNodeName"
-          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "clusterElementType"
-          description: "The name of a cluster element type."
-          required: true
-          in: "path"
-          schema:
-            type: "string"
-        - name: "clusterElementWorkflowNodeName"
-          description: "The name of a cluster element workflow node name."
-          required: true
-          in: "path"
-          schema:
-            type: "string"
-        - name: "propertyName"
-          description: "The name of a property."
-          required: true
-          in: "path"
-          schema:
-            type: "string"
-        - name: "lookupDependsOnPaths"
-          description: "The list of dependency paths."
-          required: false
-          in: "query"
-          schema:
-            type: "array"
-            items:
-              type: "string"
-      responses:
-        "200":
-          description: "The list of options."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Property"
-  /workflows/{id}/outputs:
-    get:
-      description: "Get all workflow node outputs used in a workflow."
-      summary: "Get all dynamic workflow node outputs used in a workflow"
-      tags:
-        - "workflow-node-output"
-      operationId: "getPreviousWorkflowNodeOutputs"
-      parameters:
-        - name: "id"
-          description: "The workflow id for which to return all used action definitions"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "lastWorkflowNodeName"
-          description: "The name of the last workflow node (action task or trigger) up to which include the output schema (E.g. mailchimp_1, airtable_3)"
-          in: "query"
-          required: false
-          schema:
-            type: "string"
-      responses:
-        "200":
-          description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/WorkflowNodeOutput"
-  /workflows/{id}/outputs/{workflowNodeName}:
-    get:
-      description: "Get workflow node output of an action task or trigger used in a workflow."
-      summary: "Get workflow node output of an action task or trigger used in a workflow"
-      tags:
-        - "workflow-node-output"
-      operationId: "getWorkflowNodeOutput"
-      parameters:
-        - name: "id"
-          description: "The workflow id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "workflowNodeName"
-          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "200":
-          description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WorkflowNodeOutput"
   /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/outputs:
     get:
       description: "Get cluster element node output used in a workflow."
@@ -1033,116 +979,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeOutput"
-  /workflows/{id}/parameters/{workflowNodeName}:
-    delete:
-      description: "Deletes a workflow node parameter."
-      summary: "Deletes a workflow node parameter"
-      tags:
-        - "workflow-node-parameter"
-      operationId: "deleteWorkflowNodeParameter"
-      parameters:
-        - name: "id"
-          description: "The workflow id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "workflowNodeName"
-          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              required:
-                - "path"
-                - "workflowNodeName"
-              properties:
-                path:
-                  description: "The workflow node parameter path."
-                  type: "string"
-      responses:
-        "200":
-          description: "The updated workflow node parameters."
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  parameters:
-                    type: "object"
-                    additionalProperties: true
-    patch:
-      description: "Updates a workflow node parameter."
-      summary: "Updates a workflow node parameter"
-      tags:
-        - "workflow-node-parameter"
-      operationId: "updateWorkflowNodeParameter"
-      parameters:
-        - name: "id"
-          description: "The workflow id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "workflowNodeName"
-          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              required:
-                - "path"
-                - "type"
-                - "workflowNodeName"
-              properties:
-                includeInMetadata:
-                  description: "If path and value type should be included in metadata "
-                  type: "boolean"
-                  default: false
-                path:
-                  description: "The workflow node parameter path."
-                  type: "string"
-                type:
-                  description: "The type of a property."
-                  type: "string"
-                value:
-                  description: "The value."
-                  type: "object"
-      responses:
-        "200":
-          description: "The updated workflow node parameters."
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  metadata:
-                    description: "Key-value map of metadata."
-                    type: "object"
-                    additionalProperties: true
-                  parameters:
-                    description: "Key-value map of parameters."
-                    type: "object"
-                    additionalProperties: true
-                  displayConditions:
-                    description: "Key-value map of display condition rules."
-                    type: "object"
-                    additionalProperties:
-                      type: "boolean"
-                  missingRequiredProperties:
-                    type: "array"
-                    items:
-                      type: "string"
   /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/parameters:
     delete:
       description: "Deletes a cluster element parameter."
@@ -1186,6 +1022,7 @@ paths:
                 path:
                   description: "The workflow node parameter path."
                   type: "string"
+        required: true
       responses:
         "200":
           description: "The updated workflow node parameters."
@@ -1250,6 +1087,7 @@ paths:
                 value:
                   description: "The value."
                   type: "object"
+        required: true
       responses:
         "200":
           description: "The updated workflow node parameters."
@@ -1275,10 +1113,40 @@ paths:
                     type: "array"
                     items:
                       type: "string"
-  /workflows/{id}/parameters/{workflowNodeName}/display-conditions:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/descriptions:
     get:
-      description: "Get action or trigger property options shown in the editor."
-      summary: "Get action or trigger property options shown in the editor"
+      description: "Get an action description shown in the editor."
+      summary: "Get an action description shown in the editor"
+      tags:
+        - "workflow-node-description"
+      operationId: "getWorkflowNodeDescription"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of an workflow's action task or trigger (E.g. mailchimp_1)"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The editor description."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  description:
+                    type: string
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/display-conditions:
+    get:
+      description: "Get action or trigger display conditions shown in the editor."
+      summary: "Get action or trigger display conditions shown in the editor"
       tags:
         - "workflow-node-parameter"
       operationId: "getWorkflowNodeParameterDisplayConditions"
@@ -1311,13 +1179,13 @@ paths:
                     type: "array"
                     items:
                       type: "string"
-  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/display-conditions:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/dynamic-properties/{propertyName}:
     get:
-      description: "Get cluster element options shown in the editor."
-      summary: "Get cluster element property options shown in the editor"
+      description: "Get dynamic properties for an action or trigger property shown in the editor."
+      summary: "Get dynamic properties for an action or trigger property shown in the editor"
       tags:
-        - "workflow-node-parameter"
-      operationId: "getClusterElementParameterDisplayConditions"
+        - "workflow-node-dynamic-properties"
+      operationId: "getWorkflowNodeDynamicProperties"
       parameters:
         - name: "id"
           description: "The workflow id"
@@ -1331,35 +1199,30 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "clusterElementType"
-          description: "The name of a cluster element type."
+        - name: "propertyName"
+          description: "The name of a property."
           required: true
           in: "path"
           schema:
             type: "string"
-        - name: "clusterElementWorkflowNodeName"
-          description: "The name of a cluster element workflow node name."
-          required: true
-          in: "path"
+        - name: "lookupDependsOnPaths"
+          description: "The list of dependency paths."
+          required: false
+          in: "query"
           schema:
-            type: "string"
+            type: "array"
+            items:
+              type: "string"
       responses:
         "200":
-          description: "The workflow node parameter display conditions."
+          description: "The list of options."
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  displayConditions:
-                    type: "object"
-                    additionalProperties:
-                      type: "boolean"
-                  missingRequiredProperties:
-                    type: "array"
-                    items:
-                      type: "string"
-  /workflows/{id}/properties/{workflowNodeName}/options/{propertyName}:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Property"
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/options/{propertyName}:
     get:
       description: "Get an action or trigger property options shown in the editor."
       summary: "Get an action or trigger property options shown in the editor"
@@ -1407,7 +1270,144 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Option"
-  /workflows/{id}/scripts/{workflowNodeName}:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/outputs:
+    get:
+      description: "Get workflow node output of an action task or trigger used in a workflow."
+      summary: "Get workflow node output of an action task or trigger used in a workflow"
+      tags:
+        - "workflow-node-output"
+      operationId: "getWorkflowNodeOutput"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowNodeOutput"
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/parameters:
+    delete:
+      description: "Deletes a workflow node parameter."
+      summary: "Deletes a workflow node parameter"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "deleteWorkflowNodeParameter"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "path"
+              properties:
+                path:
+                  description: "The workflow node parameter path."
+                  type: "string"
+        required: true
+      responses:
+        "200":
+          description: "The updated workflow node parameters."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  parameters:
+                    type: "object"
+                    additionalProperties: true
+    patch:
+      description: "Updates a workflow node parameter."
+      summary: "Updates a workflow node parameter"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "updateWorkflowNodeParameter"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "path"
+                - "type"
+              properties:
+                includeInMetadata:
+                  description: "If path and value type should be included in metadata "
+                  type: "boolean"
+                  default: false
+                path:
+                  description: "The workflow node parameter path."
+                  type: "string"
+                type:
+                  description: "The type of a property."
+                  type: "string"
+                value:
+                  description: "The value."
+                  type: "object"
+        required: true
+      responses:
+        "200":
+          description: "The updated workflow node parameters."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  metadata:
+                    description: "Key-value map of metadata."
+                    type: "object"
+                    additionalProperties: true
+                  parameters:
+                    description: "Key-value map of parameters."
+                    type: "object"
+                    additionalProperties: true
+                  displayConditions:
+                    description: "Key-value map of display condition rules."
+                    type: "object"
+                    additionalProperties:
+                      type: "boolean"
+                  missingRequiredProperties:
+                    type: "array"
+                    items:
+                      type: "string"
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/scripts:
     post:
       description: "Execute a script for testing purposes."
       summary: "Execute a script for testing purposes"
@@ -1434,7 +1434,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ScriptTestExecution"
-  /workflows/{id}/test-outputs/{workflowNodeName}:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs:
     delete:
       description: "Delete existing workflow node test output."
       summary: "Delete existing workflow node test output"
@@ -1483,7 +1483,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeTestOutput"
-  /workflows/{id}/test-outputs/{workflowNodeName}/exists:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/exists:
     get:
       description: "Check if a workflow node test output exists."
       summary: "Check if a workflow node test output exists"
@@ -1522,7 +1522,7 @@ paths:
                 properties:
                   exists:
                     type: "boolean"
-  /workflows/{id}/test-outputs/{workflowNodeName}/sample-output:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/sample-output:
     put:
       description: "Upload a sample output to create a new or update existing workflow node test output."
       summary: "Upload a sample output to create a new or update existing workflow node test output"
