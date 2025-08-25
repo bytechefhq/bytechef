@@ -153,6 +153,53 @@ paths:
           description: "Successful operation."
       security:
         - jwtBearerAuth: [ ]
+  /automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey}:
+    put:
+      description: "Update a workflow configuration connection."
+      summary: "Update a workflow configuration connection"
+      tags:
+        - "connected-user-project-workflow"
+      operationId: "updateFrontendWorkflowConfigurationConnection"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowConnectionKey"
+          description: "The name of a workflow connection key."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                connectionId:
+                  type: "integer"
+                  format: "int64"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+      security:
+        - jwtBearerAuth: [ ]
   /automation/workflows/{workflowReferenceCode}/enable:
     post:
       description: "Enable a workflow."
@@ -260,6 +307,46 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+      security:
+        - jwtBearerAuth: [ ]
+  /components/{componentName}/connections:
+    get:
+      description: "Get all connected user's connections."
+      summary: "Get all connected user's connections"
+      tags:
+        - "connection"
+      operationId: "getFrontendConnections"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "componentName"
+          description: "The component name."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "connectionIds"
+          description: "The list of allowed connection ids."
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "integer"
+              format: "int64"
+      responses:
+        "200":
+          description: "The list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Connection"
       security:
         - jwtBearerAuth: [ ]
   /integration-instances/{id}:
@@ -684,6 +771,59 @@ paths:
           description: "Successful operation."
       security:
         - bearerAuth: [ ]
+  /{externalUserId}/automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey}:
+    put:
+      description: "Update a workflow configuration connection."
+      summary: "Update a workflow configuration connection"
+      tags:
+        - "connected-user-project-workflow"
+      operationId: "updateWorkflowConfigurationConnection"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowReferenceCode"
+          description: "The workflow reference of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowConnectionKey"
+          description: "The name of a workflow connection key."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                connectionId:
+                  type: "integer"
+                  format: "int64"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+      security:
+        - bearerAuth: [ ]
   /{externalUserId}/automation/workflows/{workflowReferenceCode}/enable:
     post:
       description: "Enable a workflow."
@@ -784,6 +924,52 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+      security:
+        - bearerAuth: [ ]
+  /externalUserId/components/{componentName}/connections:
+    get:
+      description: "Get all connected user's connections."
+      summary: "Get all connected user's connections"
+      tags:
+        - "connection"
+      operationId: "getConnections"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "componentName"
+          description: "The component name."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "connectionIds"
+          description: "The list of allowed connection ids."
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "integer"
+              format: "int64"
+      responses:
+        "200":
+          description: "The list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Connection"
       security:
         - bearerAuth: [ ]
   /{externalUserId}/integration-instances/{id}:
@@ -1078,8 +1264,24 @@ components:
         workflowVersion:
           type: "integer"
           description: "The workflow version, if null a workflow is not yet published"
+    Connection:
+      description: "Contains all required information to open a connection to a service defined by componentName parameter"
+      type: "object"
+      required:
+        - "id"
+        - "name"
+      properties:
+        id:
+          description: "The id of an integration."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The name of a connection."
+          type: "string"
+        environment:
+          $ref: '#/components/schemas/Environment'
     ConnectionConfig:
-      description: "Contains all required information to open a connection to a service defined by componentName parameter."
+      description: "The connection configuration"
       type: "object"
       properties:
         authorizationType:
