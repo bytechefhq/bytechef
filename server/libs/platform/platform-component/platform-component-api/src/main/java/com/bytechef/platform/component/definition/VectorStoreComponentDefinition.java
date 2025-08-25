@@ -47,7 +47,7 @@ public interface VectorStoreComponentDefinition extends ClusterRootComponentDefi
     @Override
     default Map<String, List<String>> getActionClusterElementTypes() {
         return Map.of(
-            LOAD, List.of(EMBEDDING.name()),
-            SEARCH, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name(), EMBEDDING.name()));
+            LOAD, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name(), EMBEDDING.name()),
+            SEARCH, List.of(EMBEDDING.name()));
     }
 }
