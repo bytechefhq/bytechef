@@ -1,7 +1,6 @@
 import {useToast} from '@/hooks/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
-import {getCookie} from '@/shared/util/cookie-utils';
 import {useEffect, useState} from 'react';
 
 export default function useFetchInterceptor() {
@@ -37,7 +36,7 @@ export default function useFetchInterceptor() {
                             ...config.headers,
                             Authorization: `Bearer ${sessionStorage.getItem('jwtToken') || ''}`,
                             'X-ENVIRONMENT': sessionStorage.getItem('environment')?.toUpperCase() || '',
-                            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+                            // 'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
                         },
                     },
                 ];
