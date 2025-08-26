@@ -465,6 +465,7 @@ paths:
                 description:
                   description: The description of a connected user project workflow version.
                   type: "string"
+        required: true
       responses:
         "204":
           description: "Successful operation."

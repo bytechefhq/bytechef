@@ -231,6 +231,7 @@ paths:
                 description:
                   description: The description of a connected user project workflow version.
                   type: "string"
+        required: true
       responses:
         "204":
           description: "Successful operation."
@@ -314,6 +315,7 @@ paths:
                   description: The workflow inputs
                   type: "object"
                   additionalProperties: true
+        required: true
       responses:
         "204":
           description: "Successful operation."
@@ -461,6 +463,8 @@ paths:
           application/json:
             schema:
               type: "object"
+              required:
+                - "connection"
               properties:
                 connection:
                   type: "object"
@@ -468,6 +472,7 @@ paths:
                     parameters:
                       type: "object"
                       additionalProperties: true
+        required: true
       responses:
         "200":
           description: "The integration instance id."
@@ -775,6 +780,7 @@ paths:
                 description:
                   description: The description of a connected user project workflow version.
                   type: "string"
+        required: true
       responses:
         "204":
           description: "Successful operation."
@@ -845,6 +851,7 @@ paths:
                   description: The workflow inputs
                   type: "object"
                   additionalProperties: true
+        required: true
       responses:
         "204":
           description: "Successful operation."
@@ -1022,6 +1029,8 @@ paths:
           application/json:
             schema:
               type: "object"
+              required:
+                - "connection"
               properties:
                 connection:
                   type: "object"
@@ -1029,6 +1038,7 @@ paths:
                     parameters:
                       type: "object"
                       additionalProperties: true
+        required: true
       responses:
         "200":
           description: "The integration instance id."
