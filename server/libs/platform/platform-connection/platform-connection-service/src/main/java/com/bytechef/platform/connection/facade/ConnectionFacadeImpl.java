@@ -287,9 +287,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private ConnectionDTO toConnectionDTO(boolean active, Connection connection, List<Tag> tags) {
         Map<String, ?> parameters = connection.getParameters();
+        String componentName = connection.getComponentName();
 
         ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
-            connection.getComponentName(), connection.getConnectionVersion());
+            componentName, connection.getConnectionVersion());
 
         List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
             .stream()
@@ -302,8 +303,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .map(BaseProperty::getName)
             .toList();
 
+        Map<String, ?> predefinedParameters = oAuth2Service.checkPredefinedParameters(componentName, parameters);
+
         return new ConnectionDTO(
-            active, getAuthorizationParameters(parameters, authorizationPropertyNames), connection,
+            active, getAuthorizationParameters(predefinedParameters, authorizationPropertyNames), connection,
             getConnectionParameters(parameters, connectionPropertyNames), tags);
     }
 }
