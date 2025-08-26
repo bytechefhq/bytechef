@@ -1,6 +1,6 @@
 import {
-    UpdateClusterElementParameterRequest,
-    UpdateWorkflowNodeParameter200Response,
+    UpdateClusterElementParameter200Response,
+    UpdateClusterElementParameterOperationRequest,
     UpdateWorkflowNodeParameterRequest,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -15,9 +15,9 @@ interface SavePropertyProps {
     successCallback?: () => void;
     type: string;
     updateClusterElementParameterMutation?: UseMutationResult<
-        UpdateWorkflowNodeParameter200Response & {workflowNodeName?: string},
+        UpdateClusterElementParameter200Response & {workflowNodeName?: string},
         Error,
-        UpdateClusterElementParameterRequest,
+        UpdateClusterElementParameterOperationRequest,
         unknown
     >;
     updateWorkflowNodeParameterMutation: UseMutationResult<
@@ -58,7 +58,7 @@ export default function saveProperty({
                 clusterElementType: currentNode.clusterElementType,
                 clusterElementWorkflowNodeName: currentNode.workflowNodeName,
                 id: workflowId,
-                updateWorkflowNodeParameterRequest: {
+                updateClusterElementParameterRequest: {
                     includeInMetadata,
                     path: decodedPath,
                     type,

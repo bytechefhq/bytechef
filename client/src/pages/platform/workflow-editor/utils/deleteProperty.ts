@@ -1,6 +1,6 @@
 import {
-    DeleteClusterElementParameterRequest,
-    DeleteWorkflowNodeParameter200Response,
+    DeleteClusterElementParameter200Response,
+    DeleteClusterElementParameterOperationRequest,
     DeleteWorkflowNodeParameterRequest,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -14,13 +14,13 @@ export default function deleteProperty(
     deleteWorkflowNodeParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response,
         Error,
-        DeleteWorkflowNodeParameterOperationRequest,
+        DeleteWorkflowNodeParameterRequest,
         unknown
     >,
     deleteClusterElementParameterMutation?: UseMutationResult<
-        DeleteWorkflowNodeParameter200Response,
+        DeleteClusterElementParameter200Response,
         Error,
-        DeleteClusterElementParameterRequest,
+        DeleteClusterElementParameterOperationRequest,
         unknown
     >
 ) {
@@ -39,7 +39,7 @@ export default function deleteProperty(
             {
                 clusterElementType: currentNode?.clusterElementType,
                 clusterElementWorkflowNodeName: currentNode?.workflowNodeName,
-                deleteWorkflowNodeParameterRequest: {
+                deleteClusterElementParameterRequest: {
                     path,
                 },
                 id: workflowId,
