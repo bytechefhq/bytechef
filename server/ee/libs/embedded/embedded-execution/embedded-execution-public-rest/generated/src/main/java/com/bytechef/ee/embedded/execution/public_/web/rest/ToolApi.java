@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.967096+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T20:52:51.426912+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "tool", description = "The Embedded AI Tool Public API")
 public interface ToolApi {
@@ -52,9 +52,9 @@ public interface ToolApi {
      * Executes a tool and returns the result as the response.
      *
      * @param externalUserId The external user id. (required)
+     * @param executeToolRequestModel  (required)
      * @param xEnvironment The environment. (optional)
      * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (optional)
-     * @param executeToolRequestModel  (optional)
      * @return The provider&#39;s response&#39;. (status code 200)
      *         or Bad request (status code 400)
      *         or Unauthorized (status code 401)
@@ -113,9 +113,9 @@ public interface ToolApi {
     
     default ResponseEntity<Object> executeTool(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "ExecuteToolRequestModel", description = "", required = true) @Valid @RequestBody ExecuteToolRequestModel executeToolRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "X-Instance-Id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "X-Instance-Id", required = false) @Nullable Long xInstanceId,
-        @Parameter(name = "ExecuteToolRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable ExecuteToolRequestModel executeToolRequestModel
+        @Parameter(name = "X-Instance-Id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "X-Instance-Id", required = false) @Nullable Long xInstanceId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

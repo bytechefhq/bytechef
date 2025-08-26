@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.967096+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T20:52:51.426912+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "action", description = "The Embedded Component Action Public API")
 public interface ActionApi {
@@ -53,9 +53,9 @@ public interface ActionApi {
      * @param componentName The component name. (required)
      * @param componentVersion The component version. (required)
      * @param actionName The name of the action to call. (required)
+     * @param executeActionRequestModel  (required)
      * @param xEnvironment The environment. (optional)
      * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (optional)
-     * @param executeActionRequestModel  (optional)
      * @return The list of component action objects. (status code 200)
      *         or Bad request (status code 400)
      *         or Unauthorized (status code 401)
@@ -117,9 +117,9 @@ public interface ActionApi {
         @Parameter(name = "componentName", description = "The component name.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The component version.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of the action to call.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
+        @Parameter(name = "ExecuteActionRequestModel", description = "", required = true) @Valid @RequestBody ExecuteActionRequestModel executeActionRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "X-Instance-Id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "X-Instance-Id", required = false) @Nullable Long xInstanceId,
-        @Parameter(name = "ExecuteActionRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable ExecuteActionRequestModel executeActionRequestModel
+        @Parameter(name = "X-Instance-Id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "X-Instance-Id", required = false) @Nullable Long xInstanceId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

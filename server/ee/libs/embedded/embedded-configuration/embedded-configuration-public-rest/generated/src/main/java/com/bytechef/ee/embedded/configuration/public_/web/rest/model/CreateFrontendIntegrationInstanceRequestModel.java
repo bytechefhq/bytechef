@@ -22,12 +22,23 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createFrontendIntegrationInstance_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T23:06:17.853132+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class CreateFrontendIntegrationInstanceRequestModel {
 
-  private @Nullable CreateFrontendIntegrationInstanceRequestConnectionModel connection;
+  private CreateFrontendIntegrationInstanceRequestConnectionModel connection;
 
-  public CreateFrontendIntegrationInstanceRequestModel connection(@Nullable CreateFrontendIntegrationInstanceRequestConnectionModel connection) {
+  public CreateFrontendIntegrationInstanceRequestModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public CreateFrontendIntegrationInstanceRequestModel(CreateFrontendIntegrationInstanceRequestConnectionModel connection) {
+    this.connection = connection;
+  }
+
+  public CreateFrontendIntegrationInstanceRequestModel connection(CreateFrontendIntegrationInstanceRequestConnectionModel connection) {
     this.connection = connection;
     return this;
   }
@@ -36,14 +47,14 @@ public class CreateFrontendIntegrationInstanceRequestModel {
    * Get connection
    * @return connection
    */
-  @Valid 
-  @Schema(name = "connection", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "connection", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("connection")
-  public @Nullable CreateFrontendIntegrationInstanceRequestConnectionModel getConnection() {
+  public CreateFrontendIntegrationInstanceRequestConnectionModel getConnection() {
     return connection;
   }
 
-  public void setConnection(@Nullable CreateFrontendIntegrationInstanceRequestConnectionModel connection) {
+  public void setConnection(CreateFrontendIntegrationInstanceRequestConnectionModel connection) {
     this.connection = connection;
   }
 

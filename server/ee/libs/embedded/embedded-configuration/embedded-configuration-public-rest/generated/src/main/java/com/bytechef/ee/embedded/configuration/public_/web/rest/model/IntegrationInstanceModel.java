@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstance", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T23:06:17.853132+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceModel {
 
   private @Nullable Long id;

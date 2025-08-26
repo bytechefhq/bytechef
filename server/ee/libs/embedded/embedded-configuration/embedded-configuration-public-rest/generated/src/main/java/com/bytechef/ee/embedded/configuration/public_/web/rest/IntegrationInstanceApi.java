@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T23:06:17.853132+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "integration-instance", description = "The Embedded Integration Instance Public API")
 public interface IntegrationInstanceApi {
@@ -49,8 +49,8 @@ public interface IntegrationInstanceApi {
      * Creates and configures a new integration instance that connects to the specified integration, providing access to its functionality and enabling integration with external services and systems.
      *
      * @param id The id of an integration. (required)
+     * @param createFrontendIntegrationInstanceRequestModel  (required)
      * @param xEnvironment The environment. (optional)
-     * @param createFrontendIntegrationInstanceRequestModel  (optional)
      * @return The integration instance id. (status code 200)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -78,8 +78,8 @@ public interface IntegrationInstanceApi {
     
     default ResponseEntity<Long> createFrontendIntegrationInstance(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "CreateFrontendIntegrationInstanceRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel
+        @Parameter(name = "CreateFrontendIntegrationInstanceRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -92,8 +92,8 @@ public interface IntegrationInstanceApi {
      *
      * @param externalUserId The external user id. (required)
      * @param id The id of an integration. (required)
+     * @param createFrontendIntegrationInstanceRequestModel  (required)
      * @param xEnvironment The environment. (optional)
-     * @param createFrontendIntegrationInstanceRequestModel  (optional)
      * @return The integration instance id. (status code 200)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -122,8 +122,8 @@ public interface IntegrationInstanceApi {
     default ResponseEntity<Long> createIntegrationInstance(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "CreateFrontendIntegrationInstanceRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel
+        @Parameter(name = "CreateFrontendIntegrationInstanceRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
