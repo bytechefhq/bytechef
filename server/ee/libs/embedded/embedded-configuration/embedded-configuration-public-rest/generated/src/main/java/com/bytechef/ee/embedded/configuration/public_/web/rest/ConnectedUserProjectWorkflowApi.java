@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T23:06:17.853132+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Automation Workflow Public API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -505,8 +505,8 @@ public interface ConnectedUserProjectWorkflowApi {
      * Publishes existing workflow.
      *
      * @param workflowReferenceCode The workflow reference code. (required)
+     * @param publishFrontendProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
-     * @param publishFrontendProjectWorkflowRequestModel  (optional)
      * @return Successful operation. (status code 204)
      */
     @Operation(
@@ -529,8 +529,8 @@ public interface ConnectedUserProjectWorkflowApi {
     
     default ResponseEntity<Void> publishFrontendProjectWorkflow(
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "PublishFrontendProjectWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel
+        @Parameter(name = "PublishFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -543,8 +543,8 @@ public interface ConnectedUserProjectWorkflowApi {
      *
      * @param externalUserId The external user id. (required)
      * @param workflowReferenceCode The workflow reference code. (required)
+     * @param publishFrontendProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
-     * @param publishFrontendProjectWorkflowRequestModel  (optional)
      * @return Successful operation. (status code 204)
      */
     @Operation(
@@ -568,8 +568,8 @@ public interface ConnectedUserProjectWorkflowApi {
     default ResponseEntity<Void> publishProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "PublishFrontendProjectWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel
+        @Parameter(name = "PublishFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

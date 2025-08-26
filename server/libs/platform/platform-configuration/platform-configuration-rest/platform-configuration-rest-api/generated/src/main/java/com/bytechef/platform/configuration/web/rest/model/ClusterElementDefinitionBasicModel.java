@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementDefinitionBasic", description = "A cluster element basic definition.")
 @JsonTypeName("ClusterElementDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T21:08:42.700459+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ClusterElementDefinitionBasicModel {
 
   private String componentName;

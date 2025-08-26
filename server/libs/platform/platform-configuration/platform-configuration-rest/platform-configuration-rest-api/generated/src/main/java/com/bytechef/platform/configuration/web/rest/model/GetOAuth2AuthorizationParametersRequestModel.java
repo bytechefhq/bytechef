@@ -26,10 +26,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "getOAuth2AuthorizationParameters_request", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("getOAuth2AuthorizationParameters_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:58:15.529302+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T21:08:42.700459+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class GetOAuth2AuthorizationParametersRequestModel {
 
-  private @Nullable AuthorizationTypeModel authorizationType;
+  private AuthorizationTypeModel authorizationType;
 
   private String componentName;
 
@@ -45,12 +45,13 @@ public class GetOAuth2AuthorizationParametersRequestModel {
   /**
    * Constructor with only required parameters
    */
-  public GetOAuth2AuthorizationParametersRequestModel(String componentName, Map<String, Object> parameters) {
+  public GetOAuth2AuthorizationParametersRequestModel(AuthorizationTypeModel authorizationType, String componentName, Map<String, Object> parameters) {
+    this.authorizationType = authorizationType;
     this.componentName = componentName;
     this.parameters = parameters;
   }
 
-  public GetOAuth2AuthorizationParametersRequestModel authorizationType(@Nullable AuthorizationTypeModel authorizationType) {
+  public GetOAuth2AuthorizationParametersRequestModel authorizationType(AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
     return this;
   }
@@ -59,14 +60,14 @@ public class GetOAuth2AuthorizationParametersRequestModel {
    * Get authorizationType
    * @return authorizationType
    */
-  @Valid 
-  @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "authorizationType", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("authorizationType")
-  public @Nullable AuthorizationTypeModel getAuthorizationType() {
+  public AuthorizationTypeModel getAuthorizationType() {
     return authorizationType;
   }
 
-  public void setAuthorizationType(@Nullable AuthorizationTypeModel authorizationType) {
+  public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
 

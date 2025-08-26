@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:38.463612+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T23:06:17.853132+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "integration-instance-workflow", description = "The Embedded Integration Instance Workflow Public API")
 public interface IntegrationInstanceWorkflowApi {
@@ -197,7 +197,7 @@ public interface IntegrationInstanceWorkflowApi {
      *
      * @param id The id of an integration instance. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
-     * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (optional)
+     * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (required)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -223,7 +223,7 @@ public interface IntegrationInstanceWorkflowApi {
     default ResponseEntity<Void> updateFrontendIntegrationInstanceWorkflow(
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
+        @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "", required = true) @Valid @RequestBody UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -237,7 +237,7 @@ public interface IntegrationInstanceWorkflowApi {
      * @param externalUserId The external user id. (required)
      * @param id The id of an integration instance. (required)
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
-     * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (optional)
+     * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (required)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -264,7 +264,7 @@ public interface IntegrationInstanceWorkflowApi {
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
-        @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
+        @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "", required = true) @Valid @RequestBody UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
