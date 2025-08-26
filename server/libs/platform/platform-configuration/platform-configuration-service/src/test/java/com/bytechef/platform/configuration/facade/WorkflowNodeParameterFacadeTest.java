@@ -1841,8 +1841,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         List<List<Map<String, Object>>> forkJoinTasks = List.of(
             List.of(task1, targetTask),
-            List.of(task2)
-        );
+            List.of(task2));
 
         Map<String, Object> forkJoinParameters = new HashMap<>();
         forkJoinParameters.put("forks", forkJoinTasks);
@@ -1856,7 +1855,8 @@ public class WorkflowNodeParameterFacadeTest {
         definitionMap.put("tasks", List.of(forkJoinTask));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString())).thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
 
             Workflow workflow = mock(Workflow.class);
             when(workflow.getDefinition()).thenReturn("{}");
@@ -1871,7 +1871,8 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(Map.of());
 
             // When
-            DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(workflowId, workflowNodeName);
+            DisplayConditionResultDTO result =
+                workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(workflowId, workflowNodeName);
 
             // Then
             assertNotNull(result);
@@ -1917,7 +1918,8 @@ public class WorkflowNodeParameterFacadeTest {
         definitionMap.put("tasks", List.of(taskWithClusterElements));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString())).thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
             mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
                 .thenReturn("{}");
 
@@ -1985,7 +1987,8 @@ public class WorkflowNodeParameterFacadeTest {
         definitionMap.put("tasks", List.of(task));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString())).thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
             mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
                 .thenReturn("{}");
 
@@ -2067,7 +2070,8 @@ public class WorkflowNodeParameterFacadeTest {
         definitionMap.put("tasks", List.of(task));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString())).thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
             mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
                 .thenReturn("{}");
 
