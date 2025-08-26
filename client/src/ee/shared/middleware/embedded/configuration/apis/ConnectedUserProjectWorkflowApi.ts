@@ -41,8 +41,8 @@ export interface GetConnectedUserProjectWorkflowRequest {
 
 export interface PublishConnectedUserProjectWorkflowOperationRequest {
     workflowReferenceCode: string;
+    publishConnectedUserProjectWorkflowRequest: PublishConnectedUserProjectWorkflowRequest;
     xEnvironment?: Environment;
-    publishConnectedUserProjectWorkflowRequest?: PublishConnectedUserProjectWorkflowRequest;
 }
 
 /**
@@ -152,6 +152,13 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
             throw new runtime.RequiredError(
                 'workflowReferenceCode',
                 'Required parameter "workflowReferenceCode" was null or undefined when calling publishConnectedUserProjectWorkflow().'
+            );
+        }
+
+        if (requestParameters['publishConnectedUserProjectWorkflowRequest'] == null) {
+            throw new runtime.RequiredError(
+                'publishConnectedUserProjectWorkflowRequest',
+                'Required parameter "publishConnectedUserProjectWorkflowRequest" was null or undefined when calling publishConnectedUserProjectWorkflow().'
             );
         }
 
