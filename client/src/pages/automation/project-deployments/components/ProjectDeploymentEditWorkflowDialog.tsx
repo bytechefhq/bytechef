@@ -71,6 +71,9 @@ const ProjectDeploymentEditWorkflowDialog = ({
             return;
         }
 
+        formData.projectDeploymentWorkflows![0].connections =
+            formData.projectDeploymentWorkflows![0].connections?.filter((connection) => connection.connectionId);
+
         updateProjectDeploymentWorkflowMutation.mutate(formData.projectDeploymentWorkflows![0]);
     }
 

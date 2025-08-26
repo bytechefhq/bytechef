@@ -188,7 +188,9 @@ const ProjectDeploymentDialog = ({
                 projectDeploymentWorkflows: formData.projectDeploymentWorkflows?.map((projectDeploymentWorkflow) => {
                     return {
                         ...projectDeploymentWorkflow,
-                        connections: projectDeploymentWorkflow.enabled ? projectDeploymentWorkflow.connections : [],
+                        connections: projectDeploymentWorkflow.enabled
+                            ? projectDeploymentWorkflow.connections?.filter((connection) => connection.connectionId)
+                            : [],
                         inputs: projectDeploymentWorkflow.enabled ? projectDeploymentWorkflow.inputs : {},
                     };
                 }),
@@ -199,7 +201,9 @@ const ProjectDeploymentDialog = ({
                 projectDeploymentWorkflows: formData.projectDeploymentWorkflows?.map((projectDeploymentWorkflow) => {
                     return {
                         ...projectDeploymentWorkflow,
-                        connections: projectDeploymentWorkflow.enabled ? projectDeploymentWorkflow.connections : [],
+                        connections: projectDeploymentWorkflow.enabled
+                            ? projectDeploymentWorkflow.connections?.filter((connection) => connection.connectionId)
+                            : [],
                         inputs: projectDeploymentWorkflow.enabled ? projectDeploymentWorkflow.inputs : {},
                     };
                 }),
