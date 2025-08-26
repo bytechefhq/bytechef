@@ -145,8 +145,9 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     @Override
     @CrossOrigin
     public ResponseEntity<Void> publishFrontendProjectWorkflow(
-        String workflowReferenceCode, EnvironmentModel xEnvironment,
-        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel) {
+        String workflowReferenceCode,
+        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
+        EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.publishProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
@@ -226,8 +227,9 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     @Override
     public ResponseEntity<Void> publishProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, EnvironmentModel xEnvironment,
-        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel) {
+        String externalUserId, String workflowReferenceCode,
+        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
+        EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.publishProjectWorkflow(
             externalUserId, workflowReferenceCode,

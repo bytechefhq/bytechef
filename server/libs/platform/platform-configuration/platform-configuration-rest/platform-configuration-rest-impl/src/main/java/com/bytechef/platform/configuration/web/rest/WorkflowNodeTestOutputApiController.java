@@ -57,7 +57,7 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
         return ResponseEntity.ok(
             new CheckWorkflowNodeTestOutputExists200ResponseModel().exists(
                 workflowNodeTestOutputService.checkWorkflowNodeTestOutputExists(
-                    id, workflowNodeName, createdDate.toInstant())));
+                    id, workflowNodeName, createdDate == null ? null : createdDate.toInstant())));
     }
 
     @Override

@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
@@ -25,6 +25,7 @@ import com.bytechef.platform.configuration.web.rest.model.OAuth2AuthorizationPar
 import com.bytechef.platform.configuration.web.rest.model.OAuth2PropertiesModel;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,9 +62,10 @@ public class OAuth2ApiController implements Oauth2Api {
         return ResponseEntity.ok(
             conversionService.convert(
                 oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
-                    parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
+                    parametersRequestModel.getComponentName(),
+                    Objects.requireNonNull(parametersRequestModel.getConnectionVersion()),
                     parametersRequestModel.getParameters(),
-                    Authorization.AuthorizationType.valueOf(authorizationType.name())),
+                    AuthorizationType.valueOf(authorizationType.name())),
                 OAuth2AuthorizationParametersModel.class));
     }
 

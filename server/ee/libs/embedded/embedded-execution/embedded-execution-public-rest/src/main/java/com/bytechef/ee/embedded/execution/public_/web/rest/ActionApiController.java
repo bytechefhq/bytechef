@@ -52,7 +52,7 @@ public class ActionApiController implements ActionApi {
     @Override
     public ResponseEntity<Object> executeAction(
         String externalUserId, String componentName, Integer componentVersion, String actionName,
-        EnvironmentModel xEnvironment, Long xInstanceId, ExecuteActionRequestModel executeActionRequestModel) {
+        ExecuteActionRequestModel executeActionRequestModel, EnvironmentModel xEnvironment, Long xInstanceId) {
 
         Environment environment = xEnvironment == null
             ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));

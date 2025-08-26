@@ -19,7 +19,6 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Environment
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,8 +46,9 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     @Override
     @CrossOrigin
     public ResponseEntity<Long> createFrontendIntegrationInstance(
-        Long id, EnvironmentModel xEnvironment,
-        CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel) {
+        Long id,
+        CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel,
+        EnvironmentModel xEnvironment) {
 
         CreateFrontendIntegrationInstanceRequestConnectionModel connection =
             createFrontendIntegrationInstanceRequestModel.getConnection();
@@ -56,8 +56,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
         String externalUserId = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
-        Map<String, Object> parameters = Objects.requireNonNull(connection)
-            .getParameters();
+        Map<String, Object> parameters = connection.getParameters();
 
         IntegrationInstance integrationInstance = connectedUserIntegrationFacade.createIntegrationInstance(
             externalUserId, id, parameters, getEnvironment(xEnvironment));
@@ -79,14 +78,14 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
 
     @Override
     public ResponseEntity<Long> createIntegrationInstance(
-        String externalUserId, Long id, EnvironmentModel xEnvironment,
-        CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel) {
+        String externalUserId, Long id,
+        CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel,
+        EnvironmentModel xEnvironment) {
 
         CreateFrontendIntegrationInstanceRequestConnectionModel connection =
             createFrontendIntegrationInstanceRequestModel.getConnection();
 
-        Map<String, Object> parameters = Objects.requireNonNull(connection)
-            .getParameters();
+        Map<String, Object> parameters = connection.getParameters();
 
         IntegrationInstance integrationInstance = connectedUserIntegrationFacade.createIntegrationInstance(
             externalUserId, id, parameters, getEnvironment(xEnvironment));

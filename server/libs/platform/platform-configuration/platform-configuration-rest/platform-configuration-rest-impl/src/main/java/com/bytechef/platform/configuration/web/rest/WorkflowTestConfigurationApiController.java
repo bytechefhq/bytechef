@@ -28,6 +28,7 @@ import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurat
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -93,7 +94,7 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey,
-            saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId());
+            Objects.requireNonNull(saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId()));
 
         return ResponseEntity.noContent()
             .build();
