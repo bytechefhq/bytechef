@@ -201,8 +201,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     @Override
     public UpdateParameterResultDTO updateClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName,
-        String parameterPath, Object value, String type, boolean includeInMetadata) {
+        String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
+        boolean includeInMetadata) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -554,6 +554,190 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
     }
 
+    private static Map<String, ?> getClusterElementMap(
+        String clusterElementTypeName, String clusterElementWorkflowNodeName, Map<String, ?> taskMap) {
+
+        return getClusterElementMap(clusterElementTypeName, clusterElementWorkflowNodeName, taskMap, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, ?> getClusterElementMap(
+        String clusterElementTypeName, String clusterElementWorkflowNodeName, Map<String, ?> taskMap,
+        boolean nullCheck) {
+
+        Map<String, ?> clusterElementMap = null;
+        Map<String, Map<String, ?>> clusterElementsMap = (Map<String, Map<String, ?>>) taskMap.get(
+            WorkflowExtConstants.CLUSTER_ELEMENTS);
+
+        for (Map.Entry<String, ?> entry : clusterElementsMap.entrySet()) {
+            if (clusterElementTypeName.equalsIgnoreCase(entry.getKey())) {
+                if (entry.getValue() instanceof Map<?, ?> map &&
+                    Objects.equals(map.get(WorkflowConstants.NAME), clusterElementWorkflowNodeName)) {
+
+                    clusterElementMap = (Map<String, ?>) map;
+                } else if (entry.getValue() instanceof List<?> list) {
+                    for (Object item : list) {
+                        if (item instanceof Map<?, ?> map) {
+                            String name = (String) map.get(WorkflowConstants.NAME);
+
+                            if (name.equals(clusterElementWorkflowNodeName)) {
+                                clusterElementMap = (Map<String, ?>) map;
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (entry.getValue() instanceof Map<?, ?> map) {
+                    if (map.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
+                        clusterElementMap = getClusterElementMap(
+                            clusterElementTypeName, clusterElementWorkflowNodeName, (Map<String, ?>) map, false);
+                    }
+                } else if (entry.getValue() instanceof List<?> list) {
+                    for (Object item : list) {
+                        if ((item instanceof Map<?, ?> map) && map.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
+                            clusterElementMap = getClusterElementMap(
+                                clusterElementTypeName, clusterElementWorkflowNodeName, (Map<String, ?>) map, false);
+                        }
+                    }
+
+                }
+            }
+
+            if (clusterElementMap != null) {
+                break;
+            }
+        }
+
+        if (nullCheck && clusterElementMap == null) {
+            throw new ConfigurationException(
+                "Cluster element with name: %s does not exist".formatted(clusterElementWorkflowNodeName),
+                WorkflowErrorType.CLUSTER_ELEMENT_NOT_FOUND);
+        }
+
+        return clusterElementMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, ?> getTask(String workflowNodeName, List<Map<String, ?>> taskMaps) {
+        for (Map<String, ?> taskMap : taskMaps) {
+            if (Objects.equals(taskMap.get(WorkflowConstants.NAME), workflowNodeName)) {
+                if (!taskMap.containsKey(WorkflowConstants.PARAMETERS)) {
+                    ((Map<String, Object>) taskMap).put(WorkflowConstants.PARAMETERS, new HashMap<>());
+                }
+
+                return taskMap;
+            }
+
+            Map<String, ?> parameters = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);
+
+            if (parameters == null) {
+                continue;
+            }
+
+            for (Map.Entry<String, ?> entry : parameters.entrySet()) {
+                Object value = entry.getValue();
+
+                if (value instanceof Map<?, ?> curMap) {
+                    if (curMap.containsKey(WorkflowConstants.NAME)) {
+                        Map<String, ?> curTaskMap = getTask(workflowNodeName, List.of((Map<String, ?>) curMap));
+
+                        if (curTaskMap != null) {
+                            return curTaskMap;
+                        }
+                    } else {
+                        for (Map.Entry<?, ?> curMapEntry : curMap.entrySet()) {
+                            if (curMapEntry.getValue() instanceof Map<?, ?> curTask) {
+                                if (!curTask.containsKey(WorkflowConstants.NAME) &&
+                                    !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
+
+                                    continue;
+                                }
+
+                                Map<String, ?> curTaskMap = getTask(
+                                    workflowNodeName, List.of((Map<String, ?>) curTask));
+
+                                if (curTaskMap != null) {
+                                    return curTaskMap;
+                                }
+                            }
+                        }
+                    }
+                } else if (value instanceof List<?> curList && !curList.isEmpty()) {
+                    if (curList.getFirst() instanceof Map<?, ?>) {
+                        for (Object curItem : curList) {
+                            if (curItem instanceof Map<?, ?> curTask) {
+                                if (curTask.containsKey(WorkflowConstants.TASKS)) {
+                                    Map<String, ?> curTaskMap = getTask(
+                                        workflowNodeName, (List<Map<String, ?>>) curTask.get(WorkflowConstants.TASKS));
+
+                                    if (curTaskMap != null) {
+                                        return curTaskMap;
+                                    }
+                                }
+
+                                if (!curTask.containsKey(WorkflowConstants.NAME) &&
+                                    !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
+
+                                    continue;
+                                }
+
+                                Map<String, ?> curTaskMap = getTask(
+                                    workflowNodeName, List.of((Map<String, ?>) curTask));
+
+                                if (curTaskMap != null) {
+                                    return curTaskMap;
+                                }
+                            } else {
+                                Class<?> itemClass = curItem.getClass();
+
+                                throw new IllegalStateException(
+                                    String.format("Unexpected list item type: %s", itemClass.getName()));
+                            }
+                        }
+                    } else if (curList.getFirst() instanceof List<?>) {
+                        for (Object curListItem : curList) {
+                            for (Object curItem : (List<?>) curListItem) {
+                                if (curItem instanceof Map<?, ?> curTask) {
+                                    if (curTask.containsKey(WorkflowConstants.TASKS)) {
+                                        Map<String, ?> curTaskMap = getTask(
+                                            workflowNodeName,
+                                            (List<Map<String, ?>>) curTask.get(WorkflowConstants.TASKS));
+
+                                        if (curTaskMap != null) {
+                                            return curTaskMap;
+                                        }
+                                    }
+
+                                    if (!curTask.containsKey(WorkflowConstants.NAME) &&
+                                        !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
+
+                                        continue;
+                                    }
+
+                                    Map<String, ?> curTaskMap = getTask(
+                                        workflowNodeName, List.of((Map<String, ?>) curTask));
+
+                                    if (curTaskMap != null) {
+                                        return curTaskMap;
+                                    }
+                                } else {
+                                    Class<?> itemClass = curItem.getClass();
+
+                                    throw new IllegalStateException(
+                                        String.format("Unexpected list item type: %s", itemClass.getName()));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     private static void removeParameter(String parameterName, List<Integer> indexes, Map<?, ?> parameterMap) {
         for (Map.Entry<?, ?> entry : parameterMap.entrySet()) {
             String key = (String) entry.getKey();
@@ -682,69 +866,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
     }
 
-    private static Map<String, ?> getClusterElementMap(
-        String clusterElementTypeName, String clusterElementWorkflowNodeName, Map<String, ?> taskMap) {
-
-        return getClusterElementMap(clusterElementTypeName, clusterElementWorkflowNodeName, taskMap, true);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, ?> getClusterElementMap(
-        String clusterElementTypeName, String clusterElementWorkflowNodeName, Map<String, ?> taskMap,
-        boolean nullCheck) {
-
-        Map<String, ?> clusterElementMap = null;
-        Map<String, Map<String, ?>> clusterElementsMap =
-            (Map<String, Map<String, ?>>) taskMap.get(WorkflowExtConstants.CLUSTER_ELEMENTS);
-
-        for (Map.Entry<String, ?> entry : clusterElementsMap.entrySet()) {
-            if (clusterElementTypeName.equalsIgnoreCase(entry.getKey())) {
-                if (entry.getValue() instanceof Map<?, ?> map) {
-                    clusterElementMap = (Map<String, ?>) map;
-                } else if (entry.getValue() instanceof List<?> list) {
-                    for (Object item : list) {
-                        if (item instanceof Map<?, ?> map) {
-                            String name = (String) map.get(WorkflowConstants.NAME);
-
-                            if (name.equals(clusterElementWorkflowNodeName)) {
-                                clusterElementMap = (Map<String, ?>) map;
-
-                                break;
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (entry.getValue() instanceof Map<?, ?> map) {
-                    if (map.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
-                        clusterElementMap = getClusterElementMap(
-                            clusterElementTypeName, clusterElementWorkflowNodeName, (Map<String, ?>) map, false);
-                    }
-                } else if (entry.getValue() instanceof List<?> list) {
-                    for (Object item : list) {
-                        if ((item instanceof Map<?, ?> map) && map.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
-                            clusterElementMap = getClusterElementMap(
-                                clusterElementTypeName, clusterElementWorkflowNodeName, (Map<String, ?>) map, false);
-                        }
-                    }
-
-                }
-            }
-
-            if (clusterElementMap != null) {
-                break;
-            }
-        }
-
-        if (nullCheck && clusterElementMap == null) {
-            throw new ConfigurationException(
-                "Cluster element with name: %s does not exist".formatted(clusterElementWorkflowNodeName),
-                WorkflowErrorType.CLUSTER_ELEMENT_NOT_FOUND);
-        }
-
-        return clusterElementMap;
-    }
-
     @SuppressWarnings("unchecked")
     private Map<String, Object> getMetadataMap(
         String workflowNodeName, String clusterElementTypeName, String clusterElementWorkflowNodeName,
@@ -790,125 +911,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
 
         return metadataMap;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, ?> getTask(String workflowNodeName, List<Map<String, ?>> tasksMaps) {
-        for (Map<String, ?> taskMap : tasksMaps) {
-            if (Objects.equals(taskMap.get(WorkflowConstants.NAME), workflowNodeName)) {
-                if (!taskMap.containsKey(WorkflowConstants.PARAMETERS)) {
-                    ((Map<String, Object>) taskMap).put(WorkflowConstants.PARAMETERS, new HashMap<>());
-                }
-
-                return taskMap;
-            }
-
-            Map<String, ?> parameters = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);
-
-            if (parameters == null) {
-                continue;
-            }
-
-            for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                Object value = entry.getValue();
-
-                if (value instanceof Map<?, ?> curMap) {
-                    if (curMap.containsKey(WorkflowConstants.NAME)) {
-                        Map<String, ?> curTaskMap = getTask(workflowNodeName, List.of((Map<String, ?>) curMap));
-
-                        if (curTaskMap != null) {
-                            return curTaskMap;
-                        }
-                    } else {
-                        for (Map.Entry<?, ?> curMapEntry : curMap.entrySet()) {
-                            if (curMapEntry.getValue() instanceof Map<?, ?> curTask) {
-                                if (!curTask.containsKey(WorkflowConstants.NAME) &&
-                                    !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
-
-                                    continue;
-                                }
-
-                                Map<String, ?> curTaskMap = getTask(
-                                    workflowNodeName, List.of((Map<String, ?>) curTask));
-
-                                if (curTaskMap != null) {
-                                    return curTaskMap;
-                                }
-                            }
-                        }
-                    }
-                } else if (value instanceof List<?> curList && !curList.isEmpty()) {
-                    if (curList.getFirst() instanceof Map<?, ?>) {
-                        for (Object curItem : curList) {
-                            if (curItem instanceof Map<?, ?> curTask) {
-                                if (curTask.containsKey(WorkflowConstants.TASKS)) {
-                                    Map<String, ?> curTaskMap = getTask(
-                                        workflowNodeName, (List<Map<String, ?>>) curTask.get(WorkflowConstants.TASKS));
-
-                                    if (curTaskMap != null) {
-                                        return curTaskMap;
-                                    }
-                                }
-
-                                if (!curTask.containsKey(WorkflowConstants.NAME) &&
-                                    !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
-
-                                    continue;
-                                }
-
-                                Map<String, ?> curTaskMap = getTask(
-                                    workflowNodeName, List.of((Map<String, ?>) curTask));
-
-                                if (curTaskMap != null) {
-                                    return curTaskMap;
-                                }
-                            } else {
-                                Class<?> itemClass = curItem.getClass();
-
-                                throw new IllegalStateException(
-                                    String.format("Unexpected list item type: %s", itemClass.getName()));
-                            }
-                        }
-                    } else if (curList.getFirst() instanceof List<?>) {
-                        for (Object curListItem : curList) {
-                            for (Object curItem : (List<?>) curListItem) {
-                                if (curItem instanceof Map<?, ?> curTask) {
-                                    if (curTask.containsKey(WorkflowConstants.TASKS)) {
-                                        Map<String, ?> curTaskMap = getTask(
-                                            workflowNodeName,
-                                            (List<Map<String, ?>>) curTask.get(WorkflowConstants.TASKS));
-
-                                        if (curTaskMap != null) {
-                                            return curTaskMap;
-                                        }
-                                    }
-
-                                    if (!curTask.containsKey(WorkflowConstants.NAME) &&
-                                        !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
-
-                                        continue;
-                                    }
-
-                                    Map<String, ?> curTaskMap = getTask(
-                                        workflowNodeName, List.of((Map<String, ?>) curTask));
-
-                                    if (curTaskMap != null) {
-                                        return curTaskMap;
-                                    }
-                                } else {
-                                    Class<?> itemClass = curItem.getClass();
-
-                                    throw new IllegalStateException(
-                                        String.format("Unexpected list item type: %s", itemClass.getName()));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -1006,8 +1008,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 (String) triggerMap.get(WorkflowConstants.TYPE));
 
             TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                workflowNodeType.name(), workflowNodeType.version(),
-                workflowNodeType.operation());
+                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
 
             properties = triggerDefinition.getProperties();
         }

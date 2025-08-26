@@ -115,6 +115,18 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
         return (ClusterElement) value;
     }
 
+    public ClusterElement getClusterElement(
+        ClusterElementType clusterElementType, String clusterElementWorkflowNodeName) {
+
+        return getClusterElements(clusterElementType)
+            .stream()
+            .filter(curClusterElement -> Objects.equals(
+                curClusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Cluster element %s not found".formatted(clusterElementWorkflowNodeName)));
+    }
+
     @SuppressWarnings("unchecked")
     public List<ClusterElement> getClusterElements(ClusterElementType clusterElementType) {
         List<ClusterElement> clusterElements = (List<ClusterElement>) super.get(clusterElementType.key());

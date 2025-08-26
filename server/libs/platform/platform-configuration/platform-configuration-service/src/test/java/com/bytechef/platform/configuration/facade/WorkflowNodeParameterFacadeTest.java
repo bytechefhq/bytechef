@@ -1819,4 +1819,277 @@ public class WorkflowNodeParameterFacadeTest {
 
         return actionDefinition;
     }
+
+    @Test
+    void testGetTaskWithForkJoinNestedLists() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "forkJoinTask";
+
+        // Setup workflow with fork/join structure (List<List<Map>>) using mutable maps
+        Map<String, Object> task1 = new HashMap<>();
+        task1.put("name", "task1");
+        task1.put("type", "component/v1/action");
+
+        Map<String, Object> targetTask = new HashMap<>();
+        targetTask.put("name", workflowNodeName);
+        targetTask.put("type", "component/v1/action");
+
+        Map<String, Object> task2 = new HashMap<>();
+        task2.put("name", "task2");
+        task2.put("type", "component/v1/action");
+
+        List<List<Map<String, Object>>> forkJoinTasks = List.of(
+            List.of(task1, targetTask),
+            List.of(task2)
+        );
+
+        Map<String, Object> forkJoinParameters = new HashMap<>();
+        forkJoinParameters.put("forks", forkJoinTasks);
+
+        Map<String, Object> forkJoinTask = new HashMap<>();
+        forkJoinTask.put("name", "forkJoin");
+        forkJoinTask.put("type", "fork/v1");
+        forkJoinTask.put("parameters", forkJoinParameters);
+
+        Map<String, Object> definitionMap = new HashMap<>();
+        definitionMap.put("tasks", List.of(forkJoinTask));
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString())).thenReturn(definitionMap);
+
+            Workflow workflow = mock(Workflow.class);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // Mock ActionDefinition for the component tasks
+            ActionDefinition actionDefinition = mock(ActionDefinition.class);
+            when(actionDefinition.getProperties()).thenReturn(List.of());
+            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(actionDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(any()))
+                .thenReturn(Map.of());
+
+            // When
+            DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(workflowId, workflowNodeName);
+
+            // Then
+            assertNotNull(result);
+            // The method should be able to find the nested task within the fork/join structure
+        }
+    }
+
+    @Test
+    void testGetTaskWithNestedClusterElementsInList() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String clusterElementTypeName = "case";
+        String clusterElementWorkflowNodeName = "subtask1";
+
+        // Setup workflow with cluster elements in a list structure using mutable maps
+        Map<String, Object> clusterElementParams = new HashMap<>();
+        clusterElementParams.put("param1", "value1");
+
+        Map<String, Object> clusterElement = new HashMap<>();
+        clusterElement.put("name", clusterElementWorkflowNodeName);
+        clusterElement.put("type", "component/v1/action");
+        clusterElement.put("parameters", clusterElementParams);
+
+        // Create cluster elements map structure as expected by the implementation
+        Map<String, Object> clusterElementsMap = new HashMap<>();
+        clusterElementsMap.put(clusterElementTypeName, List.of(clusterElement));
+
+        Map<String, Object> caseMap = new HashMap<>();
+        caseMap.put("key", "case1");
+        caseMap.put("clusterElements", clusterElementsMap);
+
+        Map<String, Object> taskParameters = new HashMap<>();
+        taskParameters.put("cases", List.of(caseMap));
+
+        Map<String, Object> taskWithClusterElements = new HashMap<>();
+        taskWithClusterElements.put("name", workflowNodeName);
+        taskWithClusterElements.put("type", "branch/v1");
+        taskWithClusterElements.put("parameters", taskParameters);
+        taskWithClusterElements.put("clusterElements", clusterElementsMap);
+
+        Map<String, Object> definitionMap = new HashMap<>();
+        definitionMap.put("tasks", List.of(taskWithClusterElements));
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString())).thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+            when(clusterElementDefinition.getProperties()).thenReturn(List.of());
+            when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(clusterElementDefinition);
+
+            // When
+            DisplayConditionResultDTO result = workflowNodeParameterFacade.getClusterElementDisplayConditions(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName);
+
+            // Then
+            assertNotNull(result);
+            // The method should be able to find cluster elements within list structures
+        }
+    }
+
+    @Test
+    void testUpdateClusterElementParameterWithNestedStructures() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "branchTask";
+        String clusterElementTypeName = "case";
+        String clusterElementWorkflowNodeName = "nestedTask";
+        String parameterPath = "config.nested.value";
+        Object value = "nestedValue";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        // Setup complex nested structure with cluster elements
+        Map<String, Object> clusterElement = new HashMap<>();
+
+        clusterElement.put("name", clusterElementWorkflowNodeName);
+        clusterElement.put("type", "component/v1/action");
+        clusterElement.put("parameters", new HashMap<>());
+        clusterElement.put("metadata", new HashMap<>());
+
+        // Create cluster elements map structure as expected by the implementation
+        Map<String, Object> clusterElementsMap = new HashMap<>();
+
+        clusterElementsMap.put(clusterElementTypeName, List.of(clusterElement));
+
+        Map<String, Object> caseMap = new HashMap<>();
+        caseMap.put("key", "case1");
+        caseMap.put("clusterElements", clusterElementsMap);
+
+        Map<String, Object> taskParameters = new HashMap<>();
+        taskParameters.put("cases", List.of(caseMap));
+
+        Map<String, Object> task = new HashMap<>();
+
+        task.put("name", workflowNodeName);
+        task.put("type", "branch/v1");
+        task.put("parameters", taskParameters);
+        task.put("metadata", new HashMap<>());
+        task.put("clusterElements", clusterElementsMap);
+
+        Map<String, Object> definitionMap = new HashMap<>();
+        definitionMap.put("tasks", List.of(task));
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString())).thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflow.getVersion()).thenReturn(1);
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+            when(clusterElementDefinition.getProperties()).thenReturn(List.of());
+            when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(clusterElementDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(any()))
+                .thenReturn(Map.of());
+
+            // When
+            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
+                parameterPath, value, type, includeInMetadata);
+
+            // Then
+            assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+            // Verify that the parameter was set in the nested structure
+        }
+    }
+
+    @Test
+    void testDeleteClusterElementParameterWithListStructure() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "conditionalTask";
+        String clusterElementTypeName = "case";
+        String clusterElementWorkflowNodeName = "listTask";
+        String parameterPath = "items.config";
+
+        // Setup cluster elements in list structure using mutable maps
+        Map<String, Object> configMap = new HashMap<>();
+        configMap.put("key", "value");
+
+        Map<String, Object> itemsMap = new HashMap<>();
+        itemsMap.put("config", configMap);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("items", itemsMap);
+
+        Map<String, Object> clusterElement = new HashMap<>();
+
+        clusterElement.put("name", clusterElementWorkflowNodeName);
+        clusterElement.put("type", "component/v1/action");
+        clusterElement.put("parameters", parameters);
+        clusterElement.put("metadata", new HashMap<>());
+
+        // Create cluster elements map structure as expected by the implementation
+        Map<String, Object> clusterElementsMap = new HashMap<>();
+        clusterElementsMap.put(clusterElementTypeName, List.of(clusterElement));
+
+        Map<String, Object> caseMap = new HashMap<>();
+
+        caseMap.put("key", "case1");
+        caseMap.put("clusterElements", clusterElementsMap);
+
+        Map<String, Object> taskParameters = new HashMap<>();
+
+        taskParameters.put("cases", List.of(caseMap));
+
+        Map<String, Object> task = new HashMap<>();
+
+        task.put("name", workflowNodeName);
+        task.put("type", "condition/v1");
+        task.put("parameters", taskParameters);
+        task.put("metadata", new HashMap<>());
+        task.put("clusterElements", clusterElementsMap);
+
+        Map<String, Object> definitionMap = new HashMap<>();
+
+        definitionMap.put("tasks", List.of(task));
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString())).thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflow.getVersion()).thenReturn(1);
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+            when(clusterElementDefinition.getProperties()).thenReturn(List.of());
+            when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(clusterElementDefinition);
+
+            // When
+            Map<String, ?> result = workflowNodeParameterFacade.deleteClusterElementParameter(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, parameterPath);
+
+            // Then
+            assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
 }

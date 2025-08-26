@@ -24,6 +24,9 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.domain.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -39,6 +42,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDynamicPropertiesFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final Evaluator evaluator;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
@@ -47,17 +51,55 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeDynamicPropertiesFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator,
-        TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
+        ActionDefinitionFacade actionDefinitionFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        Evaluator evaluator, TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Property> getClusterElementDynamicProperties(
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths) {
+
+        Long connectionId = workflowTestConfigurationService
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
+            .orElse(null);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+            workflowId, workflowNodeType.name());
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+
+        ClusterElement clusterElement = clusterElementMap.getClusterElement(
+            clusterElementDefinitionService.getClusterElementType(
+                workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName),
+            clusterElementWorkflowNodeName);
+
+        WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
+
+        return actionDefinitionFacade.executeDynamicProperties(
+            clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
+            clusterElementWorkflowNodeType.operation(), propertyName, workflowId,
+            evaluator.evaluate(
+                clusterElement.getParameters(),
+                MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
+            lookupDependsOnPaths, connectionId);
     }
 
     @Override

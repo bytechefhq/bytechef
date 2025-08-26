@@ -323,13 +323,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             clusterElementDefinitionService.getClusterElementType(
                 workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName);
 
-        ClusterElement clusterElement = clusterElementMap.getClusterElements(clusterElementType)
-            .stream()
-            .filter(curClusterElement -> Objects.equals(
-                curClusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Cluster element %s not found".formatted(clusterElementWorkflowNodeName)));
+        ClusterElement clusterElement = clusterElementMap.getClusterElement(
+            clusterElementType, clusterElementWorkflowNodeName);
 
         WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
