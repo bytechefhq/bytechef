@@ -30,6 +30,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +63,8 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<Long> createConnection(ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             workspaceConnectionFacade.create(
-                connectionModel.getWorkspaceId(), conversionService.convert(connectionModel, ConnectionDTO.class)));
+                Objects.requireNonNull(connectionModel.getWorkspaceId()),
+                conversionService.convert(connectionModel, ConnectionDTO.class)));
     }
 
     @Override
@@ -100,7 +102,8 @@ public class ConnectionApiController implements ConnectionApi {
             .toList();
 
         connectionFacade.update(
-            id, updateConnectionRequestModel.getName(), list, updateConnectionRequestModel.getVersion());
+            id, updateConnectionRequestModel.getName(), list,
+            Objects.requireNonNull(updateConnectionRequestModel.getVersion()));
 
         return ResponseEntity.noContent()
             .build();
@@ -110,11 +113,12 @@ public class ConnectionApiController implements ConnectionApi {
     private ConnectionModel toConnectionModel(ConnectionDTO connection) {
         ConnectionModel connectionModel = conversionService.convert(connection, ConnectionModel.class);
 
-        connectionModel.authorizationParameters(
-            MapUtils.toMap(
-                connectionModel.getAuthorizationParameters(),
-                Map.Entry::getKey,
-                entry -> StringUtils.obfuscate(String.valueOf(entry.getValue()), 28, 8)));
+        Objects.requireNonNull(connectionModel)
+            .authorizationParameters(
+                MapUtils.toMap(
+                    connectionModel.getAuthorizationParameters(),
+                    Map.Entry::getKey,
+                    entry -> StringUtils.obfuscate(String.valueOf(entry.getValue()), 28, 8)));
 
         return Validate.notNull(connectionModel, "connectionModel")
             .parameters(null);

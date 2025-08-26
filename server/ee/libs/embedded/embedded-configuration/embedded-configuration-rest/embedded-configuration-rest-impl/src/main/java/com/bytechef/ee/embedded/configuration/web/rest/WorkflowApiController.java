@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.web.rest.AbstractWorkflowApiController;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -98,7 +99,8 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     public ResponseEntity<Void> updateWorkflow(String id, WorkflowModel workflowModel) {
         // TODO Add check regarding platform type
 
-        integrationFacade.updateWorkflow(id, workflowModel.getDefinition(), workflowModel.getVersion());
+        integrationFacade.updateWorkflow(id, workflowModel.getDefinition(),
+            Objects.requireNonNull(workflowModel.getVersion()));
 
         return ResponseEntity.noContent()
             .build();

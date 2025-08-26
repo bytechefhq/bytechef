@@ -69,8 +69,9 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     @Override
     public ResponseEntity<Void> publishConnectedUserProjectWorkflow(
-        String workflowReferenceCode, EnvironmentModel xEnvironment,
-        PublishConnectedUserProjectWorkflowRequestModel publishConnectedUserProjectWorkflowRequestModel) {
+        String workflowReferenceCode,
+        PublishConnectedUserProjectWorkflowRequestModel publishConnectedUserProjectWorkflowRequestModel,
+        EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.publishProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
