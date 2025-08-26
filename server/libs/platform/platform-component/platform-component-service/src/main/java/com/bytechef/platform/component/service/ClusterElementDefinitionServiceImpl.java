@@ -32,7 +32,6 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.annotation.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -147,7 +146,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
         return rootComponentDefinition.getClusterElementType()
             .stream()
-            .filter(curClusterElementType -> Objects.equals(curClusterElementType.name(), clusterElementTypeName))
+            .filter(curClusterElementType -> clusterElementTypeName.equalsIgnoreCase(curClusterElementType.name()))
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException(
                 "Cluster element type %s not found in root component %s".formatted(
