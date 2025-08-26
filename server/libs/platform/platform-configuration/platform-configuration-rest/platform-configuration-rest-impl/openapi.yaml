@@ -477,6 +477,7 @@ paths:
                 \ to a service defined by componentName parameter."
               type: "object"
               required:
+              - "authorizationType"
               - "name"
               - "componentName"
               - "componentVersion"

@@ -183,6 +183,7 @@ paths:
                   description: The input parameters for the action.
                   type: object
                   additionalProperties: true
+        required: true
       responses:
         "200":
           description: "The list of component action objects."
@@ -365,6 +366,7 @@ paths:
                   description: The input parameters for the tool.
                   type: object
                   additionalProperties: true
+        required: true
       responses:
         "200":
           description: "The provider's response'."
