@@ -32,7 +32,7 @@ export interface GetOAuth2AuthorizationParametersRequest {
      * @type {AuthorizationType}
      * @memberof GetOAuth2AuthorizationParametersRequest
      */
-    authorizationType?: AuthorizationType;
+    authorizationType: AuthorizationType;
     /**
      * The name of a component that uses this connection.
      * @type {string}
@@ -59,6 +59,7 @@ export interface GetOAuth2AuthorizationParametersRequest {
  * Check if a given object implements the GetOAuth2AuthorizationParametersRequest interface.
  */
 export function instanceOfGetOAuth2AuthorizationParametersRequest(value: object): value is GetOAuth2AuthorizationParametersRequest {
+    if (!('authorizationType' in value) || value['authorizationType'] === undefined) return false;
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
     if (!('parameters' in value) || value['parameters'] === undefined) return false;
     return true;
@@ -74,7 +75,7 @@ export function GetOAuth2AuthorizationParametersRequestFromJSONTyped(json: any, 
     }
     return {
         
-        'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
+        'authorizationType': AuthorizationTypeFromJSON(json['authorizationType']),
         'componentName': json['componentName'],
         'connectionVersion': json['connectionVersion'] == null ? undefined : json['connectionVersion'],
         'parameters': json['parameters'],
