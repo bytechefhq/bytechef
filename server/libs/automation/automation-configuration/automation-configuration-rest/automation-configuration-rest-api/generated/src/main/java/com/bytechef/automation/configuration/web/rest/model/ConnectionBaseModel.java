@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "connection_base", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("connection_base")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:40.062541+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-27T07:07:19.095179434+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectionBaseModel {
 
   private @Nullable Boolean active;
@@ -43,6 +43,8 @@ public class ConnectionBaseModel {
 
   @Valid
   private Map<String, Object> authorizationParameters = new HashMap<>();
+
+  private @Nullable String baseUri;
 
   private String componentName;
 
@@ -157,6 +159,26 @@ public class ConnectionBaseModel {
 
   public void setAuthorizationParameters(Map<String, Object> authorizationParameters) {
     this.authorizationParameters = authorizationParameters;
+  }
+
+  public ConnectionBaseModel baseUri(@Nullable String baseUri) {
+    this.baseUri = baseUri;
+    return this;
+  }
+
+  /**
+   * The base URI of a connection.
+   * @return baseUri
+   */
+  
+  @Schema(name = "baseUri", description = "The base URI of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("baseUri")
+  public @Nullable String getBaseUri() {
+    return baseUri;
+  }
+
+  public void setBaseUri(@Nullable String baseUri) {
+    this.baseUri = baseUri;
   }
 
   public ConnectionBaseModel componentName(String componentName) {
@@ -475,6 +497,7 @@ public class ConnectionBaseModel {
     return Objects.equals(this.active, connectionBase.active) &&
         Objects.equals(this.authorizationType, connectionBase.authorizationType) &&
         Objects.equals(this.authorizationParameters, connectionBase.authorizationParameters) &&
+        Objects.equals(this.baseUri, connectionBase.baseUri) &&
         Objects.equals(this.componentName, connectionBase.componentName) &&
         Objects.equals(this.connectionParameters, connectionBase.connectionParameters) &&
         Objects.equals(this.connectionVersion, connectionBase.connectionVersion) &&
@@ -493,7 +516,7 @@ public class ConnectionBaseModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationType, authorizationParameters, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
+    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
   }
 
   @Override
@@ -503,6 +526,7 @@ public class ConnectionBaseModel {
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
     sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
     sb.append("    authorizationParameters: ").append(toIndentedString(authorizationParameters)).append("\n");
+    sb.append("    baseUri: ").append(toIndentedString(baseUri)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    connectionParameters: ").append(toIndentedString(connectionParameters)).append("\n");
     sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");

@@ -67,6 +67,12 @@ export interface ConnectionBase {
      */
     readonly authorizationParameters?: { [key: string]: any; };
     /**
+     * The base URI of a connection.
+     * @type {string}
+     * @memberof ConnectionBase
+     */
+    baseUri?: string;
+    /**
      * The name of a component that uses this connection.
      * @type {string}
      * @memberof ConnectionBase
@@ -178,6 +184,7 @@ export function ConnectionBaseFromJSONTyped(json: any, ignoreDiscriminator: bool
         'active': json['active'] == null ? undefined : json['active'],
         'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
         'authorizationParameters': json['authorizationParameters'] == null ? undefined : json['authorizationParameters'],
+        'baseUri': json['baseUri'] == null ? undefined : json['baseUri'],
         'componentName': json['componentName'],
         'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
         'connectionVersion': json['connectionVersion'],
@@ -207,6 +214,7 @@ export function ConnectionBaseToJSONTyped(value?: Omit<ConnectionBase, 'active'|
     return {
         
         'authorizationType': AuthorizationTypeToJSON(value['authorizationType']),
+        'baseUri': value['baseUri'],
         'componentName': value['componentName'],
         'connectionVersion': value['connectionVersion'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),
