@@ -38,6 +38,8 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
 
     List<ProjectWorkflow> findAllByProjectIdAndWorkflowReferenceCode(Long projectId, String workflowReferenceCode);
 
+    List<ProjectWorkflow> findAllByProjectIdIn(List<Long> projectIds);
+
     Optional<ProjectWorkflow> findByProjectIdAndProjectVersionAndWorkflowId(
         long projectId, int projectVersion, String workflowId);
 

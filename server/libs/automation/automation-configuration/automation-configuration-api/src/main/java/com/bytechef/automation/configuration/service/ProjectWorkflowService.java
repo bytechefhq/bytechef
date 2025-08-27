@@ -51,6 +51,8 @@ public interface ProjectWorkflowService {
 
     List<ProjectWorkflow> getProjectWorkflows();
 
+    List<ProjectWorkflow> getProjectWorkflows(List<Long> projectIds);
+
     List<ProjectWorkflow> getProjectWorkflows(long projectId);
 
     List<ProjectWorkflow> getProjectWorkflows(long projectId, int projectVersion);
@@ -64,5 +66,4 @@ public interface ProjectWorkflowService {
     ProjectWorkflow getWorkflowProjectWorkflow(String workflowId);
 
     ProjectWorkflow update(ProjectWorkflow projectWorkflow);
-
 }

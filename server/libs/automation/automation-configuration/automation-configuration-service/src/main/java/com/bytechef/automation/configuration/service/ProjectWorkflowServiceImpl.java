@@ -122,6 +122,11 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public List<ProjectWorkflow> getProjectWorkflows(List<Long> projectIds) {
+        return projectWorkflowRepository.findAllByProjectIdIn(projectIds);
+    }
+
+    @Override
     public List<ProjectWorkflow> getProjectWorkflows(long projectId) {
         return projectWorkflowRepository.findAllByProjectId(projectId);
     }

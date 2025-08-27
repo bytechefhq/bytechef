@@ -68,6 +68,10 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         List<Long> connectionIds = CollectionUtils.map(
             workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
 
+        if (connectionIds.isEmpty()) {
+            return List.of();
+        }
+
         return connectionFacade.getConnections(
             componentName, connectionVersion, connectionIds, tagId, environmentId, ModeType.AUTOMATION);
     }

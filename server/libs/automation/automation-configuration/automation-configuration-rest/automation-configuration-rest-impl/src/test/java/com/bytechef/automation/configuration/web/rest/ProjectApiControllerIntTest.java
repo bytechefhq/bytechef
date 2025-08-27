@@ -44,6 +44,7 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.domain.Tag;
 import jakarta.servlet.ServletException;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -377,7 +378,7 @@ public class ProjectApiControllerIntTest {
     public void testExportProject() {
         try {
             ProjectDTO projectDTO = getProjectDTO();
-            byte[] mockProjectData = "mock zip data".getBytes();
+            byte[] mockProjectData = "mock zip data".getBytes(StandardCharsets.UTF_8);
 
             when(projectFacade.exportProject(1L))
                 .thenReturn(mockProjectData);
@@ -430,12 +431,9 @@ public class ProjectApiControllerIntTest {
     @Test
     public void testImportProject() {
         try {
-            byte[] mockProjectData = "mock zip data".getBytes();
+            byte[] mockProjectData = "mock zip data".getBytes(StandardCharsets.UTF_8);
             MockMultipartFile mockFile = new MockMultipartFile(
-                "file",
-                "project.zip",
-                "application/zip",
-                mockProjectData);
+                "file", "project.zip", "application/zip", mockProjectData);
 
             when(projectFacade.importProject(mockProjectData, 1L))
                 .thenReturn(123L);
@@ -459,18 +457,14 @@ public class ProjectApiControllerIntTest {
 
         verify(projectFacade).importProject(dataArgumentCaptor.capture(), workspaceIdArgumentCaptor.capture());
 
-        Assertions.assertEquals("mock zip data", new String(dataArgumentCaptor.getValue()));
+        Assertions.assertEquals("mock zip data", new String(dataArgumentCaptor.getValue(), StandardCharsets.UTF_8));
         Assertions.assertEquals(1L, workspaceIdArgumentCaptor.getValue());
     }
 
     @Test
     public void testImportProjectWithInvalidFile() {
-        byte[] invalidData = "invalid data".getBytes();
-        MockMultipartFile mockFile = new MockMultipartFile(
-            "file",
-            "project.txt",
-            "text/plain",
-            invalidData);
+        byte[] invalidData = "invalid data".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile mockFile = new MockMultipartFile("file", "project.txt", "text/plain", invalidData);
 
         when(projectFacade.importProject(invalidData, 1L))
             .thenThrow(new RuntimeException("Invalid project file"));
@@ -494,18 +488,14 @@ public class ProjectApiControllerIntTest {
 
         verify(projectFacade).importProject(dataArgumentCaptor.capture(), workspaceIdArgumentCaptor.capture());
 
-        Assertions.assertEquals("invalid data", new String(dataArgumentCaptor.getValue()));
+        Assertions.assertEquals("invalid data", new String(dataArgumentCaptor.getValue(), StandardCharsets.UTF_8));
         Assertions.assertEquals(1L, workspaceIdArgumentCaptor.getValue());
     }
 
     @Test
     public void testImportProjectWithEmptyFile() {
         byte[] emptyData = new byte[0];
-        MockMultipartFile mockFile = new MockMultipartFile(
-            "file",
-            "empty.zip",
-            "application/zip",
-            emptyData);
+        MockMultipartFile mockFile = new MockMultipartFile("file", "empty.zip", "application/zip", emptyData);
 
         when(projectFacade.importProject(emptyData, 1L))
             .thenThrow(new RuntimeException("Empty project file"));

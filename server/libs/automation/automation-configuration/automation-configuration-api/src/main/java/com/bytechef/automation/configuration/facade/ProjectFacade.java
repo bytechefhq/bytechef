@@ -56,9 +56,9 @@ public interface ProjectFacade {
 
     List<ProjectWorkflowDTO> getProjectWorkflows();
 
-    List<ProjectWorkflowDTO> getProjectWorkflows(long id);
+    List<ProjectWorkflowDTO> getProjectWorkflows(long projectId);
 
-    List<ProjectWorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion, boolean includeAllFields);
+    List<ProjectWorkflowDTO> getProjectVersionWorkflows(long projectId, int projectVersion, boolean includeAllFields);
 
     List<ProjectDTO> getProjects(
         @Nullable Long categoryId, @Nullable Boolean projectDeployments, @Nullable Long tagId, @Nullable Status status);
@@ -66,6 +66,8 @@ public interface ProjectFacade {
     List<ProjectDTO> getWorkspaceProjects(
         Boolean apiCollections, @Nullable Long categoryId, boolean includeAllFields, Boolean projectDeployments,
         @Nullable Status status, @Nullable Long tagId, long workspaceId);
+
+    List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId);
 
     long importProject(byte[] projectData, long workspaceId);
 
