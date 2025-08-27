@@ -14,6 +14,7 @@ export const useWorkflowExecutions = (
     automations: number,
     request: {
         environmentId?: number;
+        id: number;
         jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
         jobStartDate?: Date;
         jobEndDate?: Date;

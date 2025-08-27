@@ -1,16 +1,12 @@
 import {GetConnectedUsersRequest, Page} from '@/ee/shared/middleware/embedded/connected-user';
 import {ConnectedUserApi} from '@/ee/shared/middleware/embedded/connected-user/apis/ConnectedUserApi';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user/models/ConnectedUser';
-import {GetWorkflowExecutionsPageRequest} from '@/shared/middleware/automation/workflow/execution';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectedUserKeys = {
-    filteredConnectedUsers: (request: GetWorkflowExecutionsPageRequest) => [
-        ...ConnectedUserKeys.connectedUsers,
-        request,
-    ],
+    filteredConnectedUsers: (request: GetConnectedUsersRequest) => [...ConnectedUserKeys.connectedUsers, request],
     connectedUser: (id: number) => ['connectedUsers', id] as const,
     connectedUsers: ['connectedUsers'] as const,
 };

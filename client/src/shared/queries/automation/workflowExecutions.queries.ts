@@ -18,7 +18,7 @@ export const WorkflowExecutionKeys = {
     workflowExecutions: ['automation_workflowExecutions'] as const,
 };
 
-export const useGetProjectWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
+export const useGetWorkspaceProjectWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
     useQuery<Page, Error>({
         queryKey: WorkflowExecutionKeys.filteredWorkflowExecutions(request),
         queryFn: () =>
