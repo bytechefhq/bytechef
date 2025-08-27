@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
@@ -53,7 +52,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.enableProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, enable,
+            SecurityUtils.getCurrentUserLogin(), workflowReferenceCode, enable,
             (long) getEnvironment(xEnvironment).ordinal());
 
         return ResponseEntity.noContent()
@@ -67,7 +66,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         return ResponseEntity.ok(
             conversionService.convert(
                 connectedUserProjectFacade.getConnectedUserProjectWorkflow(
-                    OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
+                    SecurityUtils.getCurrentUserLogin(), workflowReferenceCode,
                     (long) getEnvironment(xEnvironment).ordinal()),
                 ConnectedUserProjectWorkflowModel.class));
     }
@@ -79,7 +78,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.publishProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
+            SecurityUtils.getCurrentUserLogin(), workflowReferenceCode,
             publishConnectedUserProjectWorkflowRequestModel.getDescription(),
             (long) getEnvironment(xEnvironment).ordinal());
 
