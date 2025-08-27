@@ -4,22 +4,21 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 
 export default function calculateNodeInsertIndex(targetId: string): number {
     const workflow = useWorkflowDataStore.getState().workflow;
+    const {tasks} = workflow;
 
-    const nextTaskIndex = workflow.tasks?.findIndex((task) => task.name === targetId) ?? 0;
+    const nextTaskIndex = tasks?.findIndex((task) => task.name === targetId) ?? 0;
 
-    const conditionTasks =
-        workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('condition/')) || [];
-
-    const loopTasks = workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('loop/')) || [];
-
-    const branchTasks = workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('branch/')) || [];
-
-    const eachTasks = workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('each/')) || [];
+    const conditionTasks = tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('condition/')) || [];
+    const loopTasks = tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('loop/')) || [];
+    const branchTasks = tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('branch/')) || [];
+    const eachTasks = tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('each/')) || [];
+    const forkJoinTasks = tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('fork-join/')) || [];
 
     let tasksInConditions = 0;
     let tasksInLoops = 0;
     let tasksInBranches = 0;
     let tasksInEach = 0;
+    let tasksInForkJoins = 0;
 
     if (conditionTasks.length) {
         tasksInConditions = conditionTasks.reduce((count, conditionTask) => {
@@ -57,5 +56,12 @@ export default function calculateNodeInsertIndex(targetId: string): number {
         }, 0);
     }
 
-    return nextTaskIndex - tasksInConditions - tasksInLoops - tasksInBranches - tasksInEach;
+    if (forkJoinTasks.length) {
+        tasksInForkJoins = forkJoinTasks.reduce(
+            (count, forkJoinTask) => count + (forkJoinTask.parameters?.branches.flat().length || 0),
+            0
+        );
+    }
+
+    return nextTaskIndex - tasksInConditions - tasksInLoops - tasksInBranches - tasksInEach - tasksInForkJoins;
 }
