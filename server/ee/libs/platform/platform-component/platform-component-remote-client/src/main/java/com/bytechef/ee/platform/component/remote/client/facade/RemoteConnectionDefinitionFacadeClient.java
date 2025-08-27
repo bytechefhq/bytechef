@@ -11,10 +11,12 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +48,11 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
             new AuthorizationCallbackRequest(
                 componentName, connectionVersion, authorizationType, connectionParameters, redirectUri),
             Authorization.AuthorizationCallbackResponse.class);
+    }
+
+    @Override
+    public Optional<String> executeBaseUri(String componentName, ComponentConnection connection) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

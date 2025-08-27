@@ -33,20 +33,20 @@ import org.springframework.lang.Nullable;
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
     boolean active, @Nullable AuthorizationType authorizationType, Map<String, ?> authorizationParameters,
-    String componentName, Map<String, ?> connectionParameters, int connectionVersion, String createdBy,
+    String baseUri, String componentName, Map<String, ?> connectionParameters, int connectionVersion, String createdBy,
     Instant createdDate, CredentialStatus credentialStatus, Environment environment, Long id, String lastModifiedBy,
-    Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version, String baseUri) {
+    Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
 
     public ConnectionDTO(
-        boolean active, Map<String, ?> authorizationParameters, Connection connection,
-        Map<String, ?> connectionParameters, List<Tag> tags, String baseUri) {
+        boolean active, Map<String, ?> authorizationParameters, String baseUri, Connection connection,
+        Map<String, ?> connectionParameters, List<Tag> tags) {
 
         this(
-            active, connection.getAuthorizationType(), authorizationParameters, connection.getComponentName(),
+            active, connection.getAuthorizationType(), authorizationParameters, baseUri, connection.getComponentName(),
             connectionParameters, connection.getConnectionVersion(), connection.getCreatedBy(),
             connection.getCreatedDate(), connection.getCredentialStatus(), connection.getEnvironment(),
             connection.getId(), connection.getLastModifiedBy(), connection.getLastModifiedDate(), connection.getName(),
-            connection.getParameters(), tags, connection.getVersion(), baseUri);
+            connection.getParameters(), tags, connection.getVersion());
     }
 
     public Connection toConnection() {
@@ -104,11 +104,13 @@ public record ConnectionDTO(
 
         public Builder baseUri(String baseUri) {
             this.baseUri = baseUri;
+
             return this;
         }
 
         public Builder componentName(String componentName) {
             this.componentName = componentName;
+
             return this;
         }
 
@@ -185,9 +187,9 @@ public record ConnectionDTO(
 
         public ConnectionDTO build() {
             return new ConnectionDTO(
-                active, authorizationType, Map.of(), componentName, Map.of(), connectionVersion, createdBy, createdDate,
-                credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version,
-                baseUri);
+                active, authorizationType, Map.of(), baseUri, componentName, Map.of(), connectionVersion, createdBy,
+                createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters,
+                tags, version);
         }
     }
 }

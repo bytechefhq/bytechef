@@ -22,7 +22,6 @@ import com.bytechef.component.definition.Authorization.AuthorizationCallbackResp
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -66,7 +65,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
-    private final ContextFactory contextFactory;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
@@ -75,14 +73,13 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionFacade connectionDefinitionFacade, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, ContextFactory contextFactory,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
+        ConnectionService connectionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        OAuth2Service oAuth2Service, TagService tagService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
-        this.contextFactory = contextFactory;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
@@ -314,13 +311,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         ComponentConnection componentConnection = new ComponentConnection(
             componentName, connectionVersion, connection.getId(), parameters, connection.getAuthorizationType());
 
-        Optional<String> baseUri = connectionDefinitionService.executeBaseUri(
-            componentName, componentConnection, contextFactory.createContext(componentName, componentConnection));
+        Optional<String> baseUri = connectionDefinitionFacade.executeBaseUri(componentName, componentConnection);
 
         String uri = baseUri.orElse(null);
 
         return new ConnectionDTO(
-            active, getAuthorizationParameters(predefinedParameters, authorizationPropertyNames), connection,
-            getConnectionParameters(parameters, connectionPropertyNames), tags, uri);
+            active, getAuthorizationParameters(predefinedParameters, authorizationPropertyNames), uri, connection,
+            getConnectionParameters(parameters, connectionPropertyNames), tags);
     }
 }

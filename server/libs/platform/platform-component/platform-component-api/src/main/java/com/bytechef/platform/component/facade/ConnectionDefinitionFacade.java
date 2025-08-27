@@ -18,8 +18,10 @@ package com.bytechef.platform.component.facade;
 
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -32,6 +34,8 @@ public interface ConnectionDefinitionFacade {
 
         return null;
     }
+
+    Optional<String> executeBaseUri(String componentName, ComponentConnection connection);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
