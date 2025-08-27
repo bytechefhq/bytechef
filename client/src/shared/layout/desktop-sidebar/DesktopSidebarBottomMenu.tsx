@@ -169,6 +169,71 @@ const DesktopSidebarBottomMenu = () => {
 
                 <DropdownMenuSeparator />
 
+                {ff_520 && application?.edition === 'EE' && (
+                    <>
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
+                                <BlendIcon className="size-5" />
+
+                                <span>Mode: {currentType === 0 ? 'Automation' : 'Embedded'}</span>
+                            </DropdownMenuSubTrigger>
+
+                            <DropdownMenuPortal>
+                                <DropdownMenuSubContent>
+                                    <DropdownMenuRadioGroup
+                                        onValueChange={handleModeTypeChange}
+                                        value={currentType?.toString()}
+                                    >
+                                        <DropdownMenuRadioItem value="0">Automation</DropdownMenuRadioItem>
+
+                                        <DropdownMenuRadioItem value="1">Embedded</DropdownMenuRadioItem>
+                                    </DropdownMenuRadioGroup>
+                                </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                        </DropdownMenuSub>
+
+                        <DropdownMenuSeparator />
+                    </>
+                )}
+
+                {pathname.startsWith('/automation') && application?.edition === 'EE' && workspaces && (
+                    <>
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
+                                <DiamondIcon className="size-5" />
+
+                                {`Workspace: ${workspaces.find((w) => w.id === currentWorkspaceId)?.name}`}
+                            </DropdownMenuSubTrigger>
+
+                            <DropdownMenuPortal>
+                                <DropdownMenuSubContent>
+                                    <DropdownMenuRadioGroup
+                                        onValueChange={handleWorkspaceValueChange}
+                                        value={currentWorkspaceId?.toString()}
+                                    >
+                                        {workspaces.map((workspace) => (
+                                            <DropdownMenuRadioItem key={workspace.id} value={workspace.id!.toString()}>
+                                                {workspace.name}
+                                            </DropdownMenuRadioItem>
+                                        ))}
+                                    </DropdownMenuRadioGroup>
+
+                                    <DropdownMenuSeparator />
+
+                                    <DropdownMenuItem
+                                        className="flex space-x-2"
+                                        onClick={() => navigate('/automation/settings/workspaces')}
+                                    >
+                                        <PlusIcon /> <span>New Workspace</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                        </DropdownMenuSub>
+
+                        <DropdownMenuSeparator />
+                    </>
+                )}
+
                 {application?.edition === 'EE' && environmentsQuery?.environments && (
                     <>
                         <DropdownMenuSub>
@@ -198,75 +263,7 @@ const DesktopSidebarBottomMenu = () => {
                     </>
                 )}
 
-                {ff_520 && application?.edition === 'EE' && (
-                    <>
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
-                                <BlendIcon className="size-5" />
-
-                                <span>Mode: {currentType === 0 ? 'Automation' : 'Embedded'}</span>
-                            </DropdownMenuSubTrigger>
-
-                            <DropdownMenuPortal>
-                                <DropdownMenuSubContent>
-                                    <DropdownMenuRadioGroup
-                                        onValueChange={handleModeTypeChange}
-                                        value={currentType?.toString()}
-                                    >
-                                        <DropdownMenuRadioItem value="0">Automation</DropdownMenuRadioItem>
-
-                                        <DropdownMenuRadioItem value="1">Embedded</DropdownMenuRadioItem>
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuSubContent>
-                            </DropdownMenuPortal>
-                        </DropdownMenuSub>
-
-                        <DropdownMenuSeparator />
-                    </>
-                )}
-
-                <div className="min-h-52 space-y-1">
-                    {pathname.startsWith('/automation') && application?.edition === 'EE' && workspaces && (
-                        <>
-                            <DropdownMenuSub>
-                                <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
-                                    <DiamondIcon className="size-5" />
-
-                                    {`Workspace: ${workspaces.find((w) => w.id === currentWorkspaceId)?.name}`}
-                                </DropdownMenuSubTrigger>
-
-                                <DropdownMenuPortal>
-                                    <DropdownMenuSubContent>
-                                        <DropdownMenuRadioGroup
-                                            onValueChange={handleWorkspaceValueChange}
-                                            value={currentWorkspaceId?.toString()}
-                                        >
-                                            {workspaces.map((workspace) => (
-                                                <DropdownMenuRadioItem
-                                                    key={workspace.id}
-                                                    value={workspace.id!.toString()}
-                                                >
-                                                    {workspace.name}
-                                                </DropdownMenuRadioItem>
-                                            ))}
-                                        </DropdownMenuRadioGroup>
-
-                                        <DropdownMenuSeparator />
-
-                                        <DropdownMenuItem
-                                            className="flex space-x-2"
-                                            onClick={() => navigate('/automation/settings/workspaces')}
-                                        >
-                                            <PlusIcon /> <span>New Workspace</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuSubContent>
-                                </DropdownMenuPortal>
-                            </DropdownMenuSub>
-
-                            <DropdownMenuSeparator />
-                        </>
-                    )}
-
+                <div className="min-h-40 space-y-1">
                     <DropdownMenuItem
                         className="cursor-pointer font-semibold"
                         onClick={() =>
