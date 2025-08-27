@@ -21,7 +21,7 @@ import {
 } from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
-import {useGetProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
+import {useGetWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -107,8 +107,9 @@ export const WorkflowExecutions = () => {
         data: workflowExecutionPage,
         error: workflowExecutionsError,
         isLoading: workflowExecutionsIsLoading,
-    } = useGetProjectWorkflowExecutionsQuery({
+    } = useGetWorkspaceProjectWorkflowExecutionsQuery({
         environmentId: currentEnvironmentId,
+        id: currentWorkspaceId!,
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,

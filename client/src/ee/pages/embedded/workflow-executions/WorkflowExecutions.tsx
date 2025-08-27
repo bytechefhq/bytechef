@@ -127,6 +127,7 @@ export const WorkflowExecutions = () => {
     const {connectedUserProjects, workflowExecutionPage, workflowExecutionsError, workflowExecutionsIsLoading} =
         useWorkflowExecutions(filterAutomations, {
             environmentId: currentEnvironmentId,
+            id: 1049, // Default workspace id
             integrationId: filterIntegrationId,
             integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
             jobEndDate: filterEndDate,
