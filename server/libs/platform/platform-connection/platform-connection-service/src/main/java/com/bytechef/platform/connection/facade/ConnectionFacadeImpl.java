@@ -21,6 +21,8 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -44,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -63,6 +66,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
+    private final ContextFactory contextFactory;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
@@ -71,13 +75,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionFacade connectionDefinitionFacade, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        OAuth2Service oAuth2Service, TagService tagService,
+        ConnectionService connectionService, ContextFactory contextFactory,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
+        this.contextFactory = contextFactory;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
@@ -288,9 +293,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private ConnectionDTO toConnectionDTO(boolean active, Connection connection, List<Tag> tags) {
         Map<String, ?> parameters = connection.getParameters();
         String componentName = connection.getComponentName();
+        int connectionVersion = connection.getConnectionVersion();
 
         ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
-            componentName, connection.getConnectionVersion());
+            componentName, connectionVersion);
 
         List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
             .stream()
@@ -305,8 +311,16 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         Map<String, ?> predefinedParameters = oAuth2Service.checkPredefinedParameters(componentName, parameters);
 
+        ComponentConnection componentConnection = new ComponentConnection(
+            componentName, connectionVersion, connection.getId(), parameters, connection.getAuthorizationType());
+
+        Optional<String> baseUri = connectionDefinitionService.executeBaseUri(
+            componentName, componentConnection, contextFactory.createContext(componentName, componentConnection));
+
+        String uri = baseUri.orElse(null);
+
         return new ConnectionDTO(
             active, getAuthorizationParameters(predefinedParameters, authorizationPropertyNames), connection,
-            getConnectionParameters(parameters, connectionPropertyNames), tags);
+            getConnectionParameters(parameters, connectionPropertyNames), tags, uri);
     }
 }
