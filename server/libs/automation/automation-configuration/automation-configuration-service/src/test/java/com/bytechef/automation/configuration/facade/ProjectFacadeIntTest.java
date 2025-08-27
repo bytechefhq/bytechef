@@ -46,6 +46,7 @@ import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -419,7 +420,7 @@ public class ProjectFacadeIntTest {
 
         String projectJson = "{\"name\":\"Imported Project\",\"description\":\"Test imported project\"}";
 
-        zipOutputStream.write(projectJson.getBytes());
+        zipOutputStream.write(projectJson.getBytes(StandardCharsets.UTF_8));
 
         zipOutputStream.closeEntry();
 
@@ -430,7 +431,7 @@ public class ProjectFacadeIntTest {
 
         String workflowJson = "{\"label\":\"Test Workflow\",\"tasks\":[]}";
 
-        zipOutputStream.write(workflowJson.getBytes());
+        zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
 
         zipOutputStream.closeEntry();
 
@@ -463,7 +464,7 @@ public class ProjectFacadeIntTest {
 
             zipOutputStream.putNextEntry(zipEntry);
 
-            zipOutputStream.write("{\"label\":\"Test Workflow\",\"tasks\":[]}".getBytes());
+            zipOutputStream.write("{\"label\":\"Test Workflow\",\"tasks\":[]}".getBytes(StandardCharsets.UTF_8));
             zipOutputStream.closeEntry();
             zipOutputStream.finish();
         } catch (Exception e) {

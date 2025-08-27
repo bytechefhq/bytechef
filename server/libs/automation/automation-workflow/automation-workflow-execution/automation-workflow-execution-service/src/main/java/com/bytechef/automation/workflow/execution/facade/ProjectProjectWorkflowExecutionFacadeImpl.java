@@ -146,7 +146,7 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
-        Long projectId, Long projectDeploymentId, String workflowId, int pageNumber) {
+        Long projectId, Long projectDeploymentId, String workflowId, long workspaceId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();
 
@@ -155,7 +155,9 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
         } else if (projectId != null) {
             workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
         } else {
-            workflowIds.addAll(CollectionUtils.map(projectFacade.getProjectWorkflows(), ProjectWorkflowDTO::getId));
+            workflowIds.addAll(
+                CollectionUtils.map(
+                    projectFacade.getWorkspaceProjectWorkflows(workspaceId), ProjectWorkflowDTO::getId));
         }
 
         Page<WorkflowExecutionDTO> workflowExecutionPage;

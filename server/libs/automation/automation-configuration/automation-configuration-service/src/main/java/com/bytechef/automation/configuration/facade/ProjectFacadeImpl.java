@@ -51,6 +51,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -251,13 +252,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     public byte[] exportProject(long id) {
         Project project = projectService.getProject(id);
-        List<ProjectWorkflow> projectWorkflows =
-            projectWorkflowService.getProjectWorkflows(id, project.getLastVersion());
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
+            id, project.getLastVersion());
 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ZipOutputStream zos = new ZipOutputStream(baos)) {
 
-            // Create project.json with name and description
             Map<String, Object> projectData = new HashMap<>();
 
             projectData.put("name", project.getName());
@@ -266,12 +266,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
             ZipEntry projectEntry = new ZipEntry("project.json");
 
             zos.putNextEntry(projectEntry);
-            zos.write(JsonUtils.write(projectData)
-                .getBytes());
+
+            String projectJson = JsonUtils.write(projectData);
+
+            zos.write(projectJson.getBytes(StandardCharsets.UTF_8));
 
             zos.closeEntry();
 
-            // Add all workflows
             for (ProjectWorkflow projectWorkflow : projectWorkflows) {
                 Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
                 Format format = workflow.getFormat();
@@ -285,8 +286,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 ZipEntry workflowEntry = new ZipEntry(fileName);
 
                 zos.putNextEntry(workflowEntry);
-                zos.write(workflow.getDefinition()
-                    .getBytes());
+
+                String definition = workflow.getDefinition();
+
+                zos.write(definition.getBytes(StandardCharsets.UTF_8));
+
                 zos.closeEntry();
             }
 
@@ -351,8 +355,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectWorkflowDTO> getProjectWorkflows(long id) {
-        Project project = projectService.getProject(id);
+    public List<ProjectWorkflowDTO> getProjectWorkflows(long projectId) {
+        Project project = projectService.getProject(projectId);
 
         return projectWorkflowService
             .getProjectWorkflows(project.getId(), project.getLastVersion())
@@ -371,15 +375,17 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectWorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion, boolean includeAllFields) {
+    public List<ProjectWorkflowDTO> getProjectVersionWorkflows(
+        long projectId, int projectVersion, boolean includeAllFields) {
+
         if (includeAllFields) {
-            return projectWorkflowService.getProjectWorkflows(id, projectVersion)
+            return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
                 .stream()
                 .map(projectWorkflow -> new ProjectWorkflowDTO(
                     workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
                 .toList();
         } else {
-            return projectWorkflowService.getProjectWorkflows(id, projectVersion)
+            return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
                 .stream()
                 .map(projectWorkflow -> new ProjectWorkflowDTO(
                     workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
@@ -404,6 +410,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    public List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId) {
+        List<Long> projectIds = projectService.getProjects(null, null, null, null, null, workspaceId)
+            .stream()
+            .map(Project::getId)
+            .toList();
+
+        return projectWorkflowService.getProjectWorkflows(projectIds)
+            .stream()
+            .map(projectWorkflow -> new ProjectWorkflowDTO(
+                workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
+            .toList();
+    }
+
+    @Override
     public long importProject(byte[] projectData, long workspaceId) {
         try (ZipInputStream zis = new ZipInputStream(new java.io.ByteArrayInputStream(projectData))) {
             Map<String, String> projectInfo = null;
@@ -414,11 +434,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
             while ((entry = zis.getNextEntry()) != null) {
                 byte[] entryData = zis.readAllBytes();
 
-                if ("project.json".equals(entry.getName())) {
-                    projectInfo = JsonUtils.read(new String(entryData), new TypeReference<Map<String, String>>() {});
-                } else if (entry.getName()
-                    .startsWith("workflow-")) {
-                    workflowDefinitions.add(new String(entryData));
+                String name = entry.getName();
+
+                if ("project.json".equals(name)) {
+                    projectInfo = JsonUtils.read(
+                        new String(entryData, StandardCharsets.UTF_8), new TypeReference<>() {});
+                } else if (name.startsWith("workflow-")) {
+                    workflowDefinitions.add(new String(entryData, StandardCharsets.UTF_8));
                 }
 
                 zis.closeEntry();
@@ -428,7 +450,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 throw new RuntimeException("project.json not found in import file");
             }
 
-            // Create project
             Project project = new Project();
 
             project.setName(projectInfo.get("name"));
@@ -439,7 +460,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
             long projectId = createProject(projectDTO);
 
-            // Add workflows
             for (String workflowDefinition : workflowDefinitions) {
                 addWorkflow(projectId, workflowDefinition);
             }

@@ -9,7 +9,7 @@ tags:
   - name: "workflow-execution"
     description: "The Automation Workflow Execution Internal API"
 paths:
-  /workflow-executions:
+  /workspaces/{id}/workflow-executions:
     get:
       description: "Get project workflow executions."
       summary: "Get project workflow executions"
@@ -17,6 +17,13 @@ paths:
       - "workflow-execution"
       operationId: "getWorkflowExecutionsPage"
       parameters:
+      - name: "id"
+        description: "The id of a workspace."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       - name: "embedded"
         description: "If embedded automation workflows executions should be filtered."
         in: "query"
