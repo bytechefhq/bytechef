@@ -133,7 +133,8 @@ export default async function saveWorkflowDefinition({
     if (
         existingWorkflowTask &&
         !decorative &&
-        (!operationName || !differenceInParameters) &&
+        !operationName &&
+        !differenceInParameters &&
         !differenceInClusterElements &&
         !differenceInType &&
         !differenceInCaseCount &&
