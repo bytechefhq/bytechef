@@ -35,18 +35,18 @@ public record ConnectionDTO(
     boolean active, @Nullable AuthorizationType authorizationType, Map<String, ?> authorizationParameters,
     String componentName, Map<String, ?> connectionParameters, int connectionVersion, String createdBy,
     Instant createdDate, CredentialStatus credentialStatus, Environment environment, Long id, String lastModifiedBy,
-    Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
+    Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version, String baseUri) {
 
     public ConnectionDTO(
         boolean active, Map<String, ?> authorizationParameters, Connection connection,
-        Map<String, ?> connectionParameters, List<Tag> tags) {
+        Map<String, ?> connectionParameters, List<Tag> tags, String baseUri) {
 
         this(
             active, connection.getAuthorizationType(), authorizationParameters, connection.getComponentName(),
             connectionParameters, connection.getConnectionVersion(), connection.getCreatedBy(),
             connection.getCreatedDate(), connection.getCredentialStatus(), connection.getEnvironment(),
             connection.getId(), connection.getLastModifiedBy(), connection.getLastModifiedDate(), connection.getName(),
-            connection.getParameters(), tags, connection.getVersion());
+            connection.getParameters(), tags, connection.getVersion(), baseUri);
     }
 
     public Connection toConnection() {
@@ -72,6 +72,7 @@ public record ConnectionDTO(
     public static final class Builder {
         private boolean active;
         private AuthorizationType authorizationType;
+        private String baseUri;
         private String componentName;
         private int connectionVersion;
         private String createdBy;
@@ -98,6 +99,11 @@ public record ConnectionDTO(
         public Builder authorizationType(AuthorizationType authorizationType) {
             this.authorizationType = authorizationType;
 
+            return this;
+        }
+
+        public Builder baseUri(String baseUri) {
+            this.baseUri = baseUri;
             return this;
         }
 
@@ -180,7 +186,8 @@ public record ConnectionDTO(
         public ConnectionDTO build() {
             return new ConnectionDTO(
                 active, authorizationType, Map.of(), componentName, Map.of(), connectionVersion, createdBy, createdDate,
-                credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
+                credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version,
+                baseUri);
         }
     }
 }

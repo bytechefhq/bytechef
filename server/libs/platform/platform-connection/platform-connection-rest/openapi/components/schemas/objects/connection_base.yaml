@@ -18,6 +18,9 @@ properties:
     type: "object"
     additionalProperties: true
     readOnly: true
+  baseUri:
+    description: "The base URI of a connection."
+    type: "string"
   componentName:
     description: "The name of a component that uses this connection."
     type: "string"
