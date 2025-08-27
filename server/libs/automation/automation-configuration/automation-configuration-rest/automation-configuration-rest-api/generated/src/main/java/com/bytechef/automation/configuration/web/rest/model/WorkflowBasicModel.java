@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-26T09:32:40.062541+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-27T07:07:19.095179434+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowBasicModel {
 
   private @Nullable String createdBy;
