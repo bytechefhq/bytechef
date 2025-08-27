@@ -24,6 +24,7 @@ export interface ConnectionI {
     authorizationType?: AuthorizationType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     readonly authorizationParameters?: {[key: string]: any};
+    baseUri?: string;
     componentName: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     readonly connectionParameters?: {[key: string]: any};

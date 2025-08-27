@@ -4,12 +4,14 @@ import {Fragment} from 'react';
 const ConnectionParameters = ({
     authorizationParameters,
     authorizationType,
+    baseUri,
     connectionDefinition,
     connectionParameters,
 }: {
     authorizationType?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     authorizationParameters?: {[key: string]: any};
+    baseUri?: string;
     connectionDefinition: ConnectionDefinition;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     connectionParameters?: {[key: string]: any};
@@ -40,6 +42,14 @@ const ConnectionParameters = ({
 
     return (
         <div className="space-y-2">
+            {baseUri && (
+                <div className="mb-8 flex">
+                    <span className="w-1/3 text-sm font-medium text-muted-foreground">Base URI:</span>
+
+                    <span className="text-sm">{baseUri}</span>
+                </div>
+            )}
+
             <h2 className="heading-tertiary text-sm">
                 {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
             </h2>
