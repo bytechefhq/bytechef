@@ -58,7 +58,7 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<List<ConnectionModel>> getFrontendConnections(
         String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
 
-        String externalUserId = SecurityUtils.getCurrentUserLogin()
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         Environment environment = getEnvironment(xEnvironment);

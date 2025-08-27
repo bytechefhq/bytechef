@@ -55,7 +55,7 @@ public class ConnectedUserApiController implements ConnectedUserApi {
     public ResponseEntity<Void> updateFrontendConnectedUser(
         EnvironmentModel xEnvironment, Map<String, Object> requestBody) {
 
-        String externalUserId = SecurityUtils.getCurrentUserLogin()
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         connectedUserService.updateConnectedUser(

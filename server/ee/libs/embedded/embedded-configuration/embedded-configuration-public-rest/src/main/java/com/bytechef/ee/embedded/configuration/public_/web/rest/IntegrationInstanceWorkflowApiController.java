@@ -44,7 +44,7 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     @Override
     @CrossOrigin
     public ResponseEntity<Void> disableFrontendIntegrationInstanceWorkflow(Long id, String workflowReferenceCode) {
-        String externalUserId = SecurityUtils.getCurrentUserLogin()
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         connectedUserIntegrationInstanceFacade.disableIntegrationInstanceWorkflow(
@@ -57,7 +57,7 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     @Override
     @CrossOrigin
     public ResponseEntity<Void> enableFrontendIntegrationInstanceWorkflow(Long id, String workflowReferenceCode) {
-        String externalUserId = SecurityUtils.getCurrentUserLogin()
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
@@ -100,7 +100,7 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
         Long id, String workflowReferenceCode,
         UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
 
-        String externalUserId = SecurityUtils.getCurrentUserLogin()
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         connectedUserIntegrationInstanceFacade.updateIntegrationInstanceWorkflow(

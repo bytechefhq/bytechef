@@ -58,7 +58,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
         CreateFrontendIntegrationInstanceRequestConnectionModel connection =
             createFrontendIntegrationInstanceRequestModel.getConnection();
 
-        String externalUserId = SecurityUtils.getCurrentUserLogin()
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         Map<String, Object> parameters = connection.getParameters();
@@ -72,7 +72,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     @Override
     @CrossOrigin
     public ResponseEntity<Void> deleteFrontendIntegrationInstance(Long id) {
-        String externalUserId = SecurityUtils.getCurrentUserLogin()
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         connectedUserIntegrationFacade.deleteIntegrationInstance(externalUserId, id);

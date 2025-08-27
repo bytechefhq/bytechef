@@ -57,7 +57,7 @@ public class CrmAccountApiController implements AccountApi {
         return ResponseEntity.ok(
             new CreatedModel(
                 unifiedApiFacade.create(
-                    OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
+                    OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"),
                     conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
                     UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
                     Environment.valueOf(StringUtils.upperCase(environment)),
@@ -71,7 +71,7 @@ public class CrmAccountApiController implements AccountApi {
         return ResponseEntity.ok(
             conversionService.convert(
                 unifiedApiFacade.get(
-                    OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
+                    OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"),
                     accountId, UnifiedApiDefinition.UnifiedApiCategory.CRM,
                     xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)), CrmModelType.ACCOUNT),
                 AccountModel.class));
@@ -85,7 +85,7 @@ public class CrmAccountApiController implements AccountApi {
         return ResponseEntity.ok(
             unifiedApiFacade
                 .getPage(
-                    OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"),
+                    OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"),
                     conversionService.convert(pageable, CursorPageRequest.class),
                     UnifiedApiDefinition.UnifiedApiCategory.CRM,
                     xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)), CrmModelType.ACCOUNT)
@@ -98,7 +98,7 @@ public class CrmAccountApiController implements AccountApi {
         String accountId, CreateUpdateAccountModel createUpdateAccountModel, Long xInstanceId, String environment) {
 
         unifiedApiFacade.update(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), accountId,
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), accountId,
             conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
             UnifiedApiDefinition.UnifiedApiCategory.CRM,
             xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)),
