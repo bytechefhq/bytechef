@@ -55,7 +55,7 @@ public class IntegrationApiController implements IntegrationApi {
     @CrossOrigin
     @Override
     public ResponseEntity<IntegrationModel> getFrontendIntegration(Long id, EnvironmentModel xEnvironment) {
-        String externalId = SecurityUtils.getCurrentUserLogin()
+        String externalId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         return ResponseEntity.ok(
@@ -68,7 +68,7 @@ public class IntegrationApiController implements IntegrationApi {
     @CrossOrigin
     @Override
     public ResponseEntity<List<IntegrationBasicModel>> getFrontendIntegrations(EnvironmentModel xEnvironment) {
-        String externalId = SecurityUtils.getCurrentUserLogin()
+        String externalId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         return ResponseEntity.ok(

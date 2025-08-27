@@ -43,13 +43,13 @@ class SecurityUtilsTest {
     }
 
     @Test
-    void testGetCurrentUserLogin() {
+    void testFetchCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("admin", "admin"));
 
         SecurityContextHolder.setContext(securityContext);
 
-        Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        Optional<String> login = SecurityUtils.fetchCurrentUserLogin();
 
         assertThat(login).contains("admin");
     }

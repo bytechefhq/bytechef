@@ -98,7 +98,7 @@ public class EmbeddedMcpServerConfiguration {
 
     private Function<Map<String, Object>, Object> getToolCallbackFunction(String toolName) {
         return request -> toolFacade.executeTool(
-            OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), toolName, request, null,
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), toolName, request, null,
             Environment.PRODUCTION);
     }
 }

@@ -210,7 +210,7 @@ public class AccountController {
      */
     @PostMapping("/account")
     public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
+        String userLogin = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException(
                 "Current user login not found", AccountErrorType.USER_NOT_FOUND));
 
@@ -267,7 +267,7 @@ public class AccountController {
     public List<PersistentToken> getCurrentSessions() {
         User user = userService
             .fetchUserByLogin(
-                SecurityUtils.getCurrentUserLogin()
+                SecurityUtils.fetchCurrentUserLogin()
                     .orElseThrow(() -> new AccountResourceException(
                         "Current user login not found", AccountErrorType.USER_NOT_FOUND)))
             .orElseThrow(() -> new AccountResourceException(
@@ -294,7 +294,7 @@ public class AccountController {
     public void invalidateSession(@PathVariable("series") String series) {
         String decodedSeries = URLDecoder.decode(series, StandardCharsets.UTF_8);
 
-        SecurityUtils.getCurrentUserLogin()
+        SecurityUtils.fetchCurrentUserLogin()
             .flatMap(userService::fetchUserByLogin)
             .ifPresent(
                 u -> persistentTokenService.getUserPersistentTokens(u.getId())

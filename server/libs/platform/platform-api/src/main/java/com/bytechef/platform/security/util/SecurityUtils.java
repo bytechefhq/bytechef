@@ -42,10 +42,21 @@ public final class SecurityUtils {
      *
      * @return the login of the current user.
      */
-    public static Optional<String> getCurrentUserLogin() {
+    public static Optional<String> fetchCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
+    }
+
+    /**
+     * Retrieves the login of the current user. Throws an {@link IllegalStateException} if no user is currently
+     * authenticated.
+     *
+     * @return the login of the current user.
+     * @throws IllegalStateException if the current user is not set.
+     */
+    public static String getCurrentUserLogin() {
+        return fetchCurrentUserLogin().orElseThrow(() -> new IllegalStateException("Current user is not set!"));
     }
 
     /**

@@ -349,7 +349,7 @@ public class UserServiceImpl implements UserService {
             throw new InvalidEmailException(email);
         }
 
-        SecurityUtils.getCurrentUserLogin()
+        SecurityUtils.fetchCurrentUserLogin()
             .flatMap(userRepository::findByLogin)
             .ifPresent(user -> {
                 user.setFirstName(firstName);
@@ -374,7 +374,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void changePassword(String currentClearTextPassword, String newPassword) {
-        SecurityUtils.getCurrentUserLogin()
+        SecurityUtils.fetchCurrentUserLogin()
             .flatMap(userRepository::findByLogin)
             .ifPresent(user -> {
                 String currentEncryptedPassword = user.getPassword();
@@ -416,7 +416,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Optional<User> fetchCurrentUser() {
-        return SecurityUtils.getCurrentUserLogin()
+        return SecurityUtils.fetchCurrentUserLogin()
             .flatMap(userRepository::findByLogin);
     }
 
