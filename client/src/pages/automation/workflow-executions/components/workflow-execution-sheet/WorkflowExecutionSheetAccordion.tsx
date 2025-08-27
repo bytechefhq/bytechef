@@ -56,7 +56,11 @@ const WorkflowExecutionSheetAccordion = ({job, triggerExecution}: {job: Job; tri
                             </AccordionTrigger>
 
                             <AccordionContent className="space-y-4 border-b border-b-border/50 p-3">
-                                <WorkflowExecutionContent {...triggerExecution} />
+                                <WorkflowExecutionContent
+                                    jobInputs={job.inputs}
+                                    workflowTriggerName={triggerExecution?.workflowTrigger?.name}
+                                    {...triggerExecution}
+                                />
                             </AccordionContent>
                         </AccordionItem>
                     )}
