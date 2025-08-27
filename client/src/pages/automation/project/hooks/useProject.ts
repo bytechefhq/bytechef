@@ -1,5 +1,6 @@
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {Type} from '@/pages/automation/projects/Projects';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -31,6 +32,7 @@ export const useProject = () => {
     const {setWorkflow, workflow} = useWorkflowDataStore();
     const {setCopilotPanelOpen} = useCopilotStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
+    const {currentEnvironmentId} = useEnvironmentStore();
     const {setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {setRightSidebarOpen} = useRightSidebarStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
@@ -66,6 +68,7 @@ export const useProject = () => {
     const useGetConnectionsQuery = (request: RequestI, enabled?: boolean) => {
         return useGetWorkspaceConnectionsQuery(
             {
+                environmentId: currentEnvironmentId,
                 id: currentWorkspaceId!,
                 ...request,
             },
