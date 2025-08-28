@@ -35,6 +35,9 @@ import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource;
 
+/**
+ * @author Karlo Čehulić
+ */
 public class ClickupCreateTaskCommentAction {
     public static final String ACTION_NAME = "createTaskComment";
 
