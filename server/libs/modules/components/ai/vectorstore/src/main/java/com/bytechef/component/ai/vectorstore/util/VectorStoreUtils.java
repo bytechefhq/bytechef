@@ -33,12 +33,6 @@ import org.springframework.ai.embedding.EmbeddingModel;
  */
 public class VectorStoreUtils {
 
-    protected final ClusterElementDefinitionService clusterElementDefinitionService;
-
-    public VectorStoreUtils(ClusterElementDefinitionService clusterElementDefinitionService) {
-        this.clusterElementDefinitionService = clusterElementDefinitionService;
-    }
-
     public static EmbeddingModel getEmbeddingModel(
         Parameters extensions, Map<String, ComponentConnection> componentConnections,
         ClusterElementDefinitionService clusterElementDefinitionService) {
