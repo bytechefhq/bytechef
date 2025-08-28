@@ -27,7 +27,6 @@ import com.bytechef.component.ai.vectorstore.qdrant.connection.QdrantConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.context.annotation.Lazy;
@@ -42,7 +41,7 @@ public class QdrantComponentHandler implements ComponentHandler {
     private final VectorStoreComponentDefinition componentDefinition;
 
     public QdrantComponentHandler(
-        @Lazy ClusterElementDefinitionService clusterElementDefinitionService, @Lazy ContextFactory contextFactory) {
+        @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.componentDefinition = new QdrantComponentDefinitionImpl(
             component(QDRANT)
@@ -55,7 +54,7 @@ public class QdrantComponentHandler implements ComponentHandler {
                 .connection(QdrantConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
-                    new QdrantLoadAction(clusterElementDefinitionService, contextFactory).actionDefinition,
+                    new QdrantLoadAction(clusterElementDefinitionService).actionDefinition,
                     new QdrantSearchAction(clusterElementDefinitionService).actionDefinition)
                 .clusterElements(
                     new QdrantVectorStore(clusterElementDefinitionService).clusterElementDefinition));

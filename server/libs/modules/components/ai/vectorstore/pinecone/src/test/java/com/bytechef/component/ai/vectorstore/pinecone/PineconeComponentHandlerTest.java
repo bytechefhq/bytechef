@@ -27,6 +27,6 @@ class PineconeComponentHandlerTest {
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/pinecone_v1.json", new PineconeComponentHandler(null, null).getDefinition());
+            "definition/pinecone_v1.json", new PineconeComponentHandler(null).getDefinition());
     }
 }

@@ -27,7 +27,6 @@ import com.bytechef.component.ai.vectorstore.weaviate.connection.WeaviateConnect
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.context.annotation.Lazy;
@@ -42,7 +41,7 @@ public class WeaviateComponentHandler implements ComponentHandler {
     private final VectorStoreComponentDefinition componentDefinition;
 
     public WeaviateComponentHandler(
-        @Lazy ClusterElementDefinitionService clusterElementDefinitionService, @Lazy ContextFactory contextFactory) {
+        @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.componentDefinition = new WeaviateComponentDefinitionImpl(component(WEAVIATE)
             .title("Weaviate")
@@ -55,7 +54,7 @@ public class WeaviateComponentHandler implements ComponentHandler {
             .connection(WeaviateConnection.CONNECTION_DEFINITION)
             .actions(
                 new WeaviateSearchAction(clusterElementDefinitionService).actionDefinition,
-                new WeaviateLoadAction(clusterElementDefinitionService, contextFactory).actionDefinition)
+                new WeaviateLoadAction(clusterElementDefinitionService).actionDefinition)
             .clusterElements(new WeaviateVectorStore(clusterElementDefinitionService).clusterElementDefinition));
     }
 

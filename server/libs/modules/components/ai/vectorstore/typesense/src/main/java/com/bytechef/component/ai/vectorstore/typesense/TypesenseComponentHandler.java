@@ -27,7 +27,6 @@ import com.bytechef.component.ai.vectorstore.typesense.connection.TypesenseConne
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.context.annotation.Lazy;
@@ -42,7 +41,7 @@ public class TypesenseComponentHandler implements ComponentHandler {
     private final VectorStoreComponentDefinition componentDefinition;
 
     public TypesenseComponentHandler(
-        @Lazy ClusterElementDefinitionService clusterElementDefinitionService, @Lazy ContextFactory contextFactory) {
+        @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.componentDefinition = new TypesenseComponentDefinitionImpl(component(TYPESENSE)
             .title("Typesense")
@@ -54,7 +53,7 @@ public class TypesenseComponentHandler implements ComponentHandler {
             .connection(TypesenseConnection.CONNECTION_DEFINITION)
             .actions(
                 new TypesenseSearchAction(clusterElementDefinitionService).actionDefinition,
-                new TypesenseLoadAction(clusterElementDefinitionService, contextFactory).actionDefinition)
+                new TypesenseLoadAction(clusterElementDefinitionService).actionDefinition)
             .clusterElements(new TypesenseVectorStore(clusterElementDefinitionService).clusterElementDefinition));
     }
 

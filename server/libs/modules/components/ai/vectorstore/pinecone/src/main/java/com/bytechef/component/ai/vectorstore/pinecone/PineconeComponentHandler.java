@@ -27,7 +27,6 @@ import com.bytechef.component.ai.vectorstore.pinecone.connection.PineconeConnect
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.context.annotation.Lazy;
@@ -42,7 +41,7 @@ public class PineconeComponentHandler implements ComponentHandler {
     private final VectorStoreComponentDefinition componentDefinition;
 
     public PineconeComponentHandler(
-        @Lazy ClusterElementDefinitionService clusterElementDefinitionService, @Lazy ContextFactory contextFactory) {
+        @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.componentDefinition = new PineconeComponentDefinitionImpl(
             component(PINECONE)
@@ -54,7 +53,7 @@ public class PineconeComponentHandler implements ComponentHandler {
                 .connection(PineconeConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
-                    new PineconeLoadAction(clusterElementDefinitionService, contextFactory).actionDefinition,
+                    new PineconeLoadAction(clusterElementDefinitionService).actionDefinition,
                     new PineconeSearchAction(clusterElementDefinitionService).actionDefinition)
                 .clusterElements(
                     new PineconeVectorStore(clusterElementDefinitionService).clusterElementDefinition));

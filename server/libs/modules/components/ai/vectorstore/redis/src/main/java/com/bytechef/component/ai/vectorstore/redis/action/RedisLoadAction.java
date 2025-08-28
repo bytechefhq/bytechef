@@ -20,7 +20,6 @@ import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstant
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
 import com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
@@ -30,8 +29,8 @@ import java.util.List;
 public class RedisLoadAction extends AbstractLoadAction {
 
     public RedisLoadAction(
-        ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
+        ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        super(REDIS, RedisConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService, contextFactory);
+        super(REDIS, RedisConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }
