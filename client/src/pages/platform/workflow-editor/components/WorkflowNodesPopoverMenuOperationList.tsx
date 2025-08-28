@@ -207,7 +207,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 elementType: clusterElementType,
                 isMultipleElements,
                 mainRootId: rootClusterElementNodeData?.workflowNodeName,
-                nodePositions,
                 sourceNodeId,
             });
 

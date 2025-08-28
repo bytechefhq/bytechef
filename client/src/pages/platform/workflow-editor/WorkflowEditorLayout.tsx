@@ -31,7 +31,6 @@ import WorkflowInputsSheet from './components/workflow-inputs/WorkflowInputsShee
 import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
-import saveClusterElementNodesPosition from './utils/saveClusterElementNodesPosition';
 
 const WorkflowNodeDetailsPanel = lazy(() => import('./components/WorkflowNodeDetailsPanel'));
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
@@ -154,12 +153,6 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                     setClusterElementsCanvasOpen(open);
 
                     if (!open) {
-                        saveClusterElementNodesPosition({
-                            invalidateWorkflowQueries: invalidateWorkflowQueries!,
-                            updateWorkflowMutation: updateWorkflowMutation!,
-                            workflow,
-                        });
-
                         setRootClusterElementNodeData(undefined);
                         useWorkflowNodeDetailsPanelStore.getState().reset();
                     }

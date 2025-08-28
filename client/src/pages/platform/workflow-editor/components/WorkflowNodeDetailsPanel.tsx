@@ -69,7 +69,6 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChange';
-import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {
@@ -727,16 +726,8 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const handlePanelClose = useCallback(() => {
-        if (clusterElementsCanvasOpen) {
-            saveClusterElementNodesPosition({
-                invalidateWorkflowQueries,
-                updateWorkflowMutation,
-                workflow,
-            });
-        }
-
         useWorkflowNodeDetailsPanelStore.getState().reset();
-    }, [clusterElementsCanvasOpen, invalidateWorkflowQueries, updateWorkflowMutation, workflow]);
+    }, []);
 
     const getNodeVersion = useCallback((node: typeof currentWorkflowNode): string => {
         if (!node) {
