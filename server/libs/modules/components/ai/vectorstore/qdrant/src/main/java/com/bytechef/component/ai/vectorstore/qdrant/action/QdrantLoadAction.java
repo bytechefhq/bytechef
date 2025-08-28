@@ -20,7 +20,6 @@ import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConsta
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
 import com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
@@ -30,8 +29,8 @@ import java.util.List;
 public class QdrantLoadAction extends AbstractLoadAction {
 
     public QdrantLoadAction(
-        ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
+        ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        super(QDRANT, QdrantConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService, contextFactory);
+        super(QDRANT, QdrantConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

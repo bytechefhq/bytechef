@@ -19,6 +19,7 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval.Links;
+import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
@@ -40,6 +41,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     private final String actionName;
     private Approval approval;
+    private final ContextFactory contextFactory;
     private final Data data;
     private final boolean editorEnvironment;
     private final Event event;
@@ -51,15 +53,17 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, @Nullable ModeType modeType,
-        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable String workflowId,
-        @Nullable Long jobId, @Nullable ComponentConnection connection,
-        String publicUrl, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
-        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor, boolean editorEnvironment) {
+        String actionName, String componentName, int componentVersion, @Nullable ComponentConnection connection,
+        ContextFactory contextFactory, DataStorage dataStorage, boolean editorEnvironment,
+        ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage,
+        HttpClientExecutor httpClientExecutor, @Nullable Long jobId, @Nullable Long jobPrincipalId,
+        @Nullable Long jobPrincipalWorkflowId, @Nullable ModeType modeType,
+        String publicUrl, @Nullable String workflowId) {
 
         super(componentName, componentVersion, actionName, connection, filesFileStorage, httpClientExecutor);
 
         this.actionName = actionName;
+        this.contextFactory = contextFactory;
 
         if (jobId != null) {
             this.approval = new ApprovalImpl(jobId, publicUrl);
@@ -98,6 +102,11 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Override
     public void event(Consumer<Event> eventConsumer) {
         eventConsumer.accept(event);
+    }
+
+    @Override
+    public Context createContext(String componentName, @Nullable ComponentConnection connection) {
+        return contextFactory.createContext(componentName, connection);
     }
 
     @Override

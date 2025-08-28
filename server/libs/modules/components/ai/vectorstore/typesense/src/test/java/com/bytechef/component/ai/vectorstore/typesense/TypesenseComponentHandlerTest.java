@@ -27,6 +27,6 @@ class TypesenseComponentHandlerTest {
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/typesense_v1.json", new TypesenseComponentHandler(null, null).getDefinition());
+            "definition/typesense_v1.json", new TypesenseComponentHandler(null).getDefinition());
     }
 }

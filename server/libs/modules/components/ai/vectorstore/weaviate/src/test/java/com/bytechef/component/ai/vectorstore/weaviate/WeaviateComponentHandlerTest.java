@@ -27,6 +27,6 @@ class WeaviateComponentHandlerTest {
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/weaviate_v1.json", new WeaviateComponentHandler(null, null).getDefinition());
+            "definition/weaviate_v1.json", new WeaviateComponentHandler(null).getDefinition());
     }
 }

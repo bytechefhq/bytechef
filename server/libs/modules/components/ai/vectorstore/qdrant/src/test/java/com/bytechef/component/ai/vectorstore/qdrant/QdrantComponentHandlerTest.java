@@ -27,6 +27,6 @@ class QdrantComponentHandlerTest {
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/qdrant_v1.json", new QdrantComponentHandler(null, null).getDefinition());
+            "definition/qdrant_v1.json", new QdrantComponentHandler(null).getDefinition());
     }
 }

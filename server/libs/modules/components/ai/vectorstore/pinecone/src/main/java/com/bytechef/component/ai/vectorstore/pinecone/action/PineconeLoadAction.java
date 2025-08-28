@@ -20,7 +20,6 @@ import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeCo
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
 import com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
@@ -30,8 +29,8 @@ import java.util.List;
 public class PineconeLoadAction extends AbstractLoadAction {
 
     public PineconeLoadAction(
-        ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
+        ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        super(PINECONE, PineconeConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService, contextFactory);
+        super(PINECONE, PineconeConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

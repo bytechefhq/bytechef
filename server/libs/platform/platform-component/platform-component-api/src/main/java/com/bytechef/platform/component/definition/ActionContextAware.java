@@ -17,12 +17,17 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.ModeType;
+import javax.annotation.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface ActionContextAware extends ActionContext {
+
+    Context createContext(String componentName, @Nullable ComponentConnection connection);
 
     String getActionName();
 

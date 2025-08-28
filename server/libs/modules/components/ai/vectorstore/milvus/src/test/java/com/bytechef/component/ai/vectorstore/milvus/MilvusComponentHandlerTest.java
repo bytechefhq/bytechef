@@ -27,6 +27,6 @@ class MilvusComponentHandlerTest {
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/milvus_v1.json", new MilvusComponentHandler(null, null).getDefinition());
+            "definition/milvus_v1.json", new MilvusComponentHandler(null).getDefinition());
     }
 }

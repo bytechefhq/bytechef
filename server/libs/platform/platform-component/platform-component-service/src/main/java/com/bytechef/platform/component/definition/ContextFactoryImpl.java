@@ -48,7 +48,7 @@ class ContextFactoryImpl implements ContextFactory {
 
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
-        ApplicationContext applicationContext, CacheManager cacheManager, ApplicationProperties applicationProperties,
+        ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
         ConnectionDefinitionService connectionDefinitionService, DataStorage dataStorage,
         ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage) {
 
@@ -68,9 +68,10 @@ class ContextFactoryImpl implements ContextFactory {
         @Nullable String workflowId, @Nullable ComponentConnection connection, boolean editorEnvironment) {
 
         return new ActionContextImpl(
-            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
-            jobId, connection, publicUrl, getDataStorage(workflowId, editorEnvironment), eventPublisher,
-            getFilesFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment), editorEnvironment);
+            actionName, componentName, componentVersion, connection, this,
+            getDataStorage(workflowId, editorEnvironment), editorEnvironment, eventPublisher,
+            getFilesFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment), jobId, jobPrincipalId,
+            jobPrincipalWorkflowId, type, publicUrl, workflowId);
     }
 
     @Override
@@ -93,9 +94,9 @@ class ContextFactoryImpl implements ContextFactory {
         boolean editorEnvironment) {
 
         return new TriggerContextImpl(
-            componentName, componentVersion, triggerName, type, jobPrincipalId, workflowReferenceCode, connection,
-            getDataStorage(workflowReferenceCode, editorEnvironment), getFilesFileStorage(editorEnvironment),
-            getHttpClientExecutor(editorEnvironment), editorEnvironment);
+            componentName, componentVersion, connection, getDataStorage(workflowReferenceCode, editorEnvironment),
+            editorEnvironment, getFilesFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment),
+            jobPrincipalId, triggerName, type, workflowReferenceCode);
     }
 
     private DataStorage getDataStorage(String workflowReference, boolean editorEnvironment) {

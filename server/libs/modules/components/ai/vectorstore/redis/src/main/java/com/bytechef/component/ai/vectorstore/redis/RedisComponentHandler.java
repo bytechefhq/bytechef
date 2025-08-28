@@ -27,7 +27,6 @@ import com.bytechef.component.ai.vectorstore.redis.connection.RedisConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.context.annotation.Lazy;
@@ -42,7 +41,7 @@ public class RedisComponentHandler implements ComponentHandler {
     private final VectorStoreComponentDefinition componentDefinition;
 
     public RedisComponentHandler(
-        @Lazy ClusterElementDefinitionService clusterElementDefinitionService, @Lazy ContextFactory contextFactory) {
+        @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.componentDefinition = new RedisComponentDefinitionImpl(component(REDIS)
             .title("Redis")
@@ -55,7 +54,7 @@ public class RedisComponentHandler implements ComponentHandler {
             .connection(RedisConnection.CONNECTION_DEFINITION)
             .actions(
                 new RedisSearchAction(clusterElementDefinitionService).actionDefinition,
-                new RedisLoadAction(clusterElementDefinitionService, contextFactory).actionDefinition)
+                new RedisLoadAction(clusterElementDefinitionService).actionDefinition)
             .clusterElements(new RedisVectorStore(clusterElementDefinitionService).clusterElementDefinition));
     }
 

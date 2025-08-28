@@ -27,7 +27,6 @@ import com.bytechef.component.ai.vectorstore.milvus.connection.MilvusConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.context.annotation.Lazy;
@@ -42,7 +41,7 @@ public class MilvusComponentHandler implements ComponentHandler {
     private final VectorStoreComponentDefinition componentDefinition;
 
     public MilvusComponentHandler(
-        @Lazy ClusterElementDefinitionService clusterElementDefinitionService, @Lazy ContextFactory contextFactory) {
+        @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.componentDefinition = new MilvusComponentDefinitionImpl(component(MILVUS)
             .title("Milvus")
@@ -54,7 +53,7 @@ public class MilvusComponentHandler implements ComponentHandler {
             .connection(MilvusConnection.CONNECTION_DEFINITION)
             .actions(
                 new MilvusSearchAction(clusterElementDefinitionService).actionDefinition,
-                new MilvusLoadAction(clusterElementDefinitionService, contextFactory).actionDefinition)
+                new MilvusLoadAction(clusterElementDefinitionService).actionDefinition)
             .clusterElements(new MilvusVectorStore(clusterElementDefinitionService).clusterElementDefinition));
     }
 

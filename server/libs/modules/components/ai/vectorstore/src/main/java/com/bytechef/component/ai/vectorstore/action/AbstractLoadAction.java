@@ -28,7 +28,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.vectorstore.DocumentEnricherFunction;
@@ -52,12 +52,11 @@ public abstract class AbstractLoadAction {
 
     private final String componentName;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
-    private final ContextFactory contextFactory;
     private final VectorStore vectorStore;
 
     protected AbstractLoadAction(
         String componentName, VectorStore vectorStore, List<Property> properties,
-        ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
+        ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.actionDefinition = action(LOAD)
             .title("Load Data")
@@ -66,7 +65,6 @@ public abstract class AbstractLoadAction {
             .perform((MultipleConnectionsPerformFunction) this::perform);
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentName = componentName;
-        this.contextFactory = contextFactory;
         this.vectorStore = vectorStore;
     }
 
@@ -80,14 +78,14 @@ public abstract class AbstractLoadAction {
             inputParameters,
             ParametersFactory.createParameters(vectorStoreComponentConnection.getParameters()),
             VectorStoreUtils.getEmbeddingModel(extensions, componentConnections, clusterElementDefinitionService),
-            getDocumentReader(extensions, componentConnections),
+            getDocumentReader(extensions, componentConnections, context),
             getDocumentTransformers(extensions, componentConnections));
 
         return null;
     }
 
     private DocumentReader getDocumentReader(
-        Parameters extensions, Map<String, ComponentConnection> componentConnections) {
+        Parameters extensions, Map<String, ComponentConnection> componentConnections, ActionContext context) {
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
@@ -103,7 +101,7 @@ public abstract class AbstractLoadAction {
             ParametersFactory.createParameters(clusterElement.getParameters()),
             ParametersFactory.createParameters(
                 componentConnection == null ? Map.of() : componentConnection.getParameters()),
-            contextFactory.createContext(clusterElement.getComponentName(), componentConnection));
+            ((ActionContextAware) context).createContext(clusterElement.getComponentName(), componentConnection));
     }
 
     private List<DocumentTransformer> getDocumentTransformers(
