@@ -28,7 +28,7 @@ function getContextFromTaskNodeData(
         context.taskDispatcherId = nodeData.loopData.loopId as string;
     } else if (nodeData.branchData) {
         context.branchId = nodeData.branchData.branchId as string;
-        context.caseKey = nodeData.branchData.caseKey as string;
+        context.caseKey = nodeData.branchData.caseKey as string | number;
         context.index = (nodeData.branchData.index as number) + indexIncrement;
         context.taskDispatcherId = nodeData.branchData.branchId as string;
     } else if (nodeData.parallelData) {
@@ -88,7 +88,7 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
         const branchId = placeholderNode.data.branchId as string;
 
         context.branchId = branchId;
-        context.caseKey = placeholderNode.data?.caseKey as string;
+        context.caseKey = placeholderNode.data?.caseKey as string | number;
         context.taskDispatcherId = branchId;
     } else if (isParallelPlaceholder) {
         const parallelId = placeholderNode.data?.parallelId as string;

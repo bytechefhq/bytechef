@@ -93,7 +93,15 @@ export const TASK_DISPATCHER_CONFIG = {
             const parts = placeholderId.split('-');
 
             const index = parseInt(parts[parts.length - 1] || '-1');
-            const caseKey = parts[2];
+            const caseKeyRaw = parts[2];
+
+            let caseKey: string | number = caseKeyRaw;
+
+            const isCaseKeyNumeric = /^-?\d*\.?\d+$/.test(caseKeyRaw);
+
+            if (isCaseKeyNumeric) {
+                caseKey = parseFloat(caseKeyRaw);
+            }
 
             return {
                 caseKey,
@@ -112,7 +120,7 @@ export const TASK_DISPATCHER_CONFIG = {
             ],
             default: [],
         }),
-        getNewCaseKey: (cases: Array<BranchCaseType>): string => {
+        getNewCaseKey: (cases: Array<BranchCaseType>): string | number => {
             if (!cases) {
                 return 'case_0';
             }

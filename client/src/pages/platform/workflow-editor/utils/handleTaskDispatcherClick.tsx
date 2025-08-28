@@ -82,7 +82,7 @@ export default async function handleTaskDispatcherClick({
         } else if (taskDispatcherContext.branchId) {
             newNodeData.branchData = {
                 branchId: taskDispatcherContext.branchId as string,
-                caseKey: taskDispatcherContext.caseKey as string,
+                caseKey: taskDispatcherContext.caseKey as string | number,
                 index: (taskDispatcherContext.index ?? 0) as number,
             };
         } else if (taskDispatcherContext.parallelId) {

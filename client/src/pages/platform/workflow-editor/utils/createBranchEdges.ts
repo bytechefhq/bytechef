@@ -26,7 +26,7 @@ function createBaseBranchStructureEdges(branchId: string): Edge[] {
  */
 function createEdgesForSingleCase(
     branchId: string,
-    caseKey: string,
+    caseKey: string | number,
     caseTasks: WorkflowTask[],
     handlePosition: 'left' | 'middle' | 'right'
 ): Edge[] {
