@@ -21,14 +21,21 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
+import utils.WorkflowValidator;
 
 /**
  * The ProjectWorkflowTools class provides utility methods and components to facilitate the management and execution of
@@ -43,6 +50,7 @@ public class ProjectWorkflowTools {
     private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowTools.class);
 
     private final ProjectFacade projectFacade;
+    private final GenericTools genericTools;
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -61,8 +69,9 @@ public class ProjectWorkflowTools {
         """;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowTools(ProjectFacade projectFacade) {
+    public ProjectWorkflowTools(ProjectFacade projectFacade, GenericTools genericTools) {
         this.projectFacade = projectFacade;
+        this.genericTools = genericTools;
     }
 
     @Tool(
@@ -240,6 +249,71 @@ public class ProjectWorkflowTools {
         }
     }
 
+    @Tool(
+        description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
+    public WorkflowValidationResult validateWorkflow(
+        @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            StringBuilder errors = new StringBuilder("[");
+            StringBuilder warnings = new StringBuilder("[");
+
+            // First validate the basic workflow structure
+            WorkflowValidator.validateWorkflowStructure(workflow, errors);
+
+            // Extract task properties from the provided task JSON
+            JsonNode workflowNode = objectMapper.readTree(workflow);
+
+            List<JsonNode> tasks = new ArrayList<>();
+            Map<String, String> taskDefinitions = new HashMap<>();
+            Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
+
+            if (workflowNode.has("triggers") && workflowNode.get("triggers").isArray()) {
+                workflowNode.get("triggers").elements().forEachRemaining(task -> {
+                    tasks.add(task);
+                    taskDefinitions.putIfAbsent(
+                        task.get("type").asText(),
+                        genericTools.getTaskDefinition(task.get("type").asText(), "trigger"));
+
+                    taskOutputs.putIfAbsent(
+                        task.get("type").asText(),
+                        genericTools.getTaskOutputProperty(task.get("type").asText(), "trigger", warnings));
+                });
+            }
+
+            if (workflowNode.has("tasks") && workflowNode.get("tasks").isArray()) {
+                workflowNode.get("tasks").elements().forEachRemaining(task -> {
+                    tasks.add(task);
+                    taskDefinitions.putIfAbsent(
+                        task.get("type").asText(),
+                        genericTools.getTaskDefinition(task.get("type").asText(), ""));
+
+                    taskOutputs.putIfAbsent(
+                        task.get("type").asText(),
+                        genericTools.getTaskOutputProperty(task.get("type").asText(), "", warnings));
+                });
+            }
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            String errorMessages = errors.append("]").toString().trim();
+            String warningMessages = warnings.append("]").toString().trim();
+            boolean isValid = errorMessages.equals("[]");
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Validated workflow. Valid: {}, Errors: {}, Warnings: {}",
+                    isValid, errorMessages, warningMessages);
+            }
+
+            return new WorkflowValidationResult(isValid, errorMessages, warningMessages);
+
+        } catch (Exception e) {
+            logger.error("Failed to workflow", e);
+            throw ToolUtils.createOperationException("Failed to validate task", e);
+        }
+    }
+
 
     /**
      * Project workflow information record for the response.
@@ -269,5 +343,15 @@ public class ProjectWorkflowTools {
         @JsonProperty("version") @JsonPropertyDescription("The version of the workflow") int version,
         @JsonProperty("created_date") @JsonPropertyDescription("When the workflow was created") Instant createdDate,
         @JsonProperty("last_modified_date") @JsonPropertyDescription("When the workflow was last modified") Instant lastModifiedDate) {
+    }
+
+    /**
+     * Workflow validation result record for the response.
+     */
+    @SuppressFBWarnings("EI")
+    public record WorkflowValidationResult(
+        @JsonProperty("valid") @JsonPropertyDescription("Whether the workflow is valid") boolean valid,
+        @JsonProperty("errors") @JsonPropertyDescription("Error details, which need to be fixed before the workflow can be valid") String errors,
+        @JsonProperty("warnings") @JsonPropertyDescription("Warning details that give additional information") String warnings) {
     }
 }
