@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.platform;
+package com.bytechef.ai.mcp.tool.automation;
 
-import com.bytechef.ai.mcp.tool.platform.model.PropertyInfo;
-import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
+import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,6 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -45,7 +46,7 @@ public class FlowTools {
     // Error message constants
     private static final String FAILED_TO_LIST_FLOWS = "Failed to list flows";
     private static final String FAILED_TO_GET_FLOW = "Failed to get flow";
-    private static final String FAILED_TO_SEARCH_FLOWS = "Failed to search flow";
+    private static final String FAILED_TO_SEARCH_FLOWS = "Failed to search flows";
 
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
@@ -69,7 +70,7 @@ public class FlowTools {
     }
 
     @Tool(
-        description = "List all flows. Returns a list of flows with their basic information including name and description")
+        description = "List all flows in the project. Returns a list of flows with their basic information including name and description")
     public List<FlowMinimalInfo> listFlows() {
         try {
             List<TaskDispatcherDefinition> taskDispatcherDefinitions =
@@ -87,7 +88,6 @@ public class FlowTools {
                 .toList();
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_FLOWS, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_LIST_FLOWS, e);
         }
     }
@@ -110,10 +110,10 @@ public class FlowTools {
             String taskProperties = ToolUtils.generateParametersJson(taskDispatcherDefinition.getTaskProperties());
 
             String outputPropertiesJson = null;
-            OutputResponse outputResponse = taskDispatcherDefinition.getOutputResponse();
+            OutputResponse outputResponse = taskDispatcherDefinition.isOutputDefined() ? taskDispatcherDefinition.getOutputResponse() : null;
 
-            if (taskDispatcherDefinition.isOutputDefined() && outputResponse != null
-                && outputResponse.outputSchema() != null) {
+
+            if (outputResponse != null && outputResponse.outputSchema() != null) {
                 outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
             }
 
@@ -127,7 +127,6 @@ public class FlowTools {
                 outputPropertiesJson);
         } catch (Exception e) {
             logger.error("Failed to get flow {}", name, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_GET_FLOW, e);
         }
     }
@@ -161,14 +160,13 @@ public class FlowTools {
             return matchingFlows;
         } catch (Exception e) {
             logger.error("Failed to search flows with query '{}'", query, e);
-
             throw ToolUtils.createOperationException(FAILED_TO_SEARCH_FLOWS, e);
         }
     }
 
     @Tool(
         description = "Get all properties of a specific flow. Returns a hierarchical list of properties including nested properties")
-    public List<PropertyInfo> getFlowProperties(
+    public List<ToolUtils.PropertyInfo> getFlowProperties(
         @ToolParam(description = "The name of the flow to retrieve properties for") String name,
         @ToolParam(description = "The version of the flow (optional)") Integer version) {
 
@@ -183,9 +181,8 @@ public class FlowTools {
                 logger.debug("Retrieved {} task properties for flow '{}'", taskProperties.size(), name);
             }
 
-            List<PropertyInfo> propertyInfos = new ArrayList<>(
-                ToolUtils.convertToPropertyInfoList(properties));
-
+            List<ToolUtils.PropertyInfo> propertyInfos =
+                new ArrayList<>(ToolUtils.convertToPropertyInfoList(properties));
             propertyInfos.addAll(ToolUtils.convertToPropertyInfoList(taskProperties));
 
             return propertyInfos;
@@ -224,23 +221,29 @@ public class FlowTools {
             return flowDefinition;
         } catch (Exception e) {
             logger.error("Failed to generate flow definition for '{}'", name, e);
-
             throw ToolUtils.createOperationException("Failed to generate flow definition", e);
         }
     }
 
     @Tool(
         description = "Get the output property of a specific flow. Returns the structure of the output property")
-    public PropertyInfo getFlowOutput(
+    public ToolUtils.PropertyInfo getFlowOutput(
         @ToolParam(description = "The name of the flow to retrieve output properties for") String name,
         @ToolParam(description = "The version of the flow (optional)") Integer version) {
 
         try {
             TaskDispatcherDefinition taskDispatcherDefinition = getTaskDispatcherDefinition(name, version);
 
-            OutputResponse outputResponse = taskDispatcherDefinition.isOutputDefined()
-                ? taskDispatcherDefinition.getOutputResponse()
-                : null;
+            //fix it
+            OutputResponse outputResponse = null;
+
+            if (taskDispatcherDefinition.isOutputDefined()) {
+                if (taskDispatcherDefinition.isOutputSchemaDefined()) {
+                    outputResponse = taskDispatcherDefinition.getOutputResponse();
+                } else if (taskDispatcherDefinition.isOutputFunctionDefined()) {
+                    outputResponse = taskDispatcherDefinitionService.executeOutput(taskDispatcherDefinition.getName(), taskDispatcherDefinition.getVersion(), Map.of());
+                }
+            }
 
             if (outputResponse == null || outputResponse.outputSchema() == null) {
                 return null;
