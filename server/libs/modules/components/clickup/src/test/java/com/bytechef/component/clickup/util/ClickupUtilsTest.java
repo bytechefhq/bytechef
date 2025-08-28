@@ -18,6 +18,7 @@ package com.bytechef.component.clickup.util;
 
 import static com.bytechef.component.clickup.constant.ClickupConstants.FOLDER_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.ID;
+import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.NAME;
 import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -28,6 +29,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -35,11 +43,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
-import java.util.List;
-import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 /**
  * * @author Monika Kušter
@@ -58,62 +61,82 @@ class ClickupUtilsTest {
     @BeforeEach()
     void beforeEach() {
         when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
+                .thenReturn(mockedExecutor);
         when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
+                .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
+                .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
+                .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
+                .thenReturn(mockedResponse);
+    }
+
+    @Test
+    void testGetTestIdOptions() {
+        when(mockedParameters.getString(LIST_ID))
+                .thenReturn("list");
+        when(mockedParameters.getString(FOLDER_ID))
+                .thenReturn("folder");
+        when(mockedParameters.getRequiredString(SPACE_ID))
+                .thenReturn("space");
+
+        // last page parameter key is present to correctly mock Clickup API
+        when(mockedResponse.getBody(any(TypeReference.class)))
+                .thenReturn(Map.of("tasks",
+                        List.of(Map.of(NAME, "some name", ID, "abc"), Map.of(NAME, "some other name", ID, "abcd"))),
+                        "last_page", true);
+
+        assertEquals(List.of(option("some name", "abc"), option("some other name", "abcd")),
+                ClickupUtils.getTaskIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
     void testGetListIdOptions() {
         when(mockedParameters.getString(FOLDER_ID))
-            .thenReturn("folder");
+                .thenReturn("folder");
         when(mockedParameters.getRequiredString(SPACE_ID))
-            .thenReturn("space");
+                .thenReturn("space");
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("lists", List.of(Map.of(NAME, "some name", ID, "abc"))));
+                .thenReturn(Map.of("lists", List.of(Map.of(NAME, "some name", ID, "abc"))));
 
         assertEquals(List.of(option("some name", "abc"), option("some name", "abc")),
-            ClickupUtils.getListIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+                ClickupUtils.getListIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
     void testGetFolderIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("folders", List.of(Map.of(NAME, "some name", ID, "abc"))));
+                .thenReturn(Map.of("folders", List.of(Map.of(NAME, "some name", ID, "abc"))));
 
         assertEquals(expectedOptions,
-            ClickupUtils.getFolderIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+                ClickupUtils.getFolderIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
     void testGetSpaceIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("spaces", List.of(Map.of(NAME, "some name", ID, "abc"))));
+                .thenReturn(Map.of("spaces", List.of(Map.of(NAME, "some name", ID, "abc"))));
 
         assertEquals(expectedOptions,
-            ClickupUtils.getSpaceIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+                ClickupUtils.getSpaceIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
     void testGetWorkspaceIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("teams", List.of(Map.of(NAME, "some name", ID, "abc"))));
+                .thenReturn(Map.of("teams", List.of(Map.of(NAME, "some name", ID, "abc"))));
 
         assertEquals(expectedOptions,
-            ClickupUtils.getWorkspaceIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+                ClickupUtils.getWorkspaceIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+                        mockedActionContext));
     }
 
     @Test
     void testSubscribeWebhook() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(ID, "123"));
+                .thenReturn(Map.of(ID, "123"));
 
         String id = ClickupUtils.subscribeWebhook("webhookUrl", mockedTriggerContext, "id", "eventType");
 
@@ -136,9 +159,9 @@ class ClickupUtilsTest {
     @Test
     void testGetCreatedObject() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(ID, "123"));
+                .thenReturn(Map.of(ID, "123"));
 
         assertEquals(Map.of(ID, "123"),
-            ClickupUtils.getCreatedObject(mockedWebhookBody, mockedTriggerContext, "id", "path"));
+                ClickupUtils.getCreatedObject(mockedWebhookBody, mockedTriggerContext, "id", "path"));
     }
 }
