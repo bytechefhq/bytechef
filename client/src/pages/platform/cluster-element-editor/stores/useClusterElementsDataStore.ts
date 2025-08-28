@@ -15,6 +15,14 @@ interface ClusterElementsDataStoreI {
     nodes: Node[];
     setNodes: (nodes: Node[]) => void;
     onNodesChange: OnNodesChange;
+
+    isDragging: boolean;
+    setIsDragging: (isDragging: boolean) => void;
+    draggingNodeId: string | null;
+    setDraggingNodeId: (nodeId: string | null) => void;
+
+    isPositionSaving: boolean;
+    setIsPositionSaving: (isPositionSaving: boolean) => void;
 }
 
 const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
@@ -38,6 +46,20 @@ const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
                 set({
                     nodes: applyNodeChanges(changes, get().nodes),
                 });
+            },
+
+            isDragging: false,
+            setIsDragging: (isDragging) => {
+                set({isDragging});
+            },
+            draggingNodeId: null,
+            setDraggingNodeId: (draggingNodeId) => {
+                set({draggingNodeId});
+            },
+
+            isPositionSaving: false,
+            setIsPositionSaving: (isPositionSaving) => {
+                set({isPositionSaving});
             },
         }),
         {name: 'cluster-elements-data'}
