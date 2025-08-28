@@ -7,6 +7,7 @@ const ConnectionParameters = ({
     baseUri,
     connectionDefinition,
     connectionParameters,
+    customAction,
 }: {
     authorizationType?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -15,6 +16,7 @@ const ConnectionParameters = ({
     connectionDefinition: ConnectionDefinition;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     connectionParameters?: {[key: string]: any};
+    customAction?: boolean;
 }) => {
     const {authorizations, properties: connectionProperties} = connectionDefinition;
 
@@ -42,13 +44,13 @@ const ConnectionParameters = ({
 
     return (
         <div className="space-y-2">
-            {baseUri && (
+            {baseUri && customAction ? (
                 <div className="mb-8 flex">
                     <span className="w-1/3 text-sm font-medium text-muted-foreground">Base URI:</span>
 
                     <span className="text-sm">{baseUri}</span>
                 </div>
-            )}
+            ) : null}
 
             <h2 className="heading-tertiary text-sm">
                 {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
