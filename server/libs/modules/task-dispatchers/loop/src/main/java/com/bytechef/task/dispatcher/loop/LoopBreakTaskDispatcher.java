@@ -53,6 +53,10 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
         loopTaskExecution.setEndDate(Instant.now());
 
+        taskExecution.setStatus(TaskExecution.Status.COMPLETED);
+
+        taskExecutionService.update(taskExecution);
+
         eventPublisher.publishEvent(new TaskExecutionCompleteEvent(loopTaskExecution));
     }
 
@@ -69,6 +73,10 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
             if (taskExecution.getParentId() == null) {
                 throw new IllegalStateException("Loop must be specified");
             }
+
+            taskExecution.setStatus(TaskExecution.Status.COMPLETED);
+
+            taskExecutionService.update(taskExecution);
 
             return findLoopTaskExecution(taskExecution.getParentId());
         }
