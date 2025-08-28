@@ -39,7 +39,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     isDropzoneActive
                         ? 'absolute ml-2 size-16 scale-150 cursor-pointer bg-blue-100'
                         : 'size-7 bg-gray-300',
-                    isClusterElement && 'mx-0'
+                    isClusterElement && 'mx-0 size-6'
                 )}
                 onDragEnter={() => setDropzoneActive(true)}
                 onDragLeave={() => setDropzoneActive(false)}
