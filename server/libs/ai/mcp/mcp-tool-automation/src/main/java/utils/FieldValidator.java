@@ -16,6 +16,13 @@ public class FieldValidator {
     private FieldValidator() {
         // Utility class
     }
+    
+    /**
+     * Checks if a string value is a data pill expression (e.g., "${taskName.property}").
+     */
+    private static boolean isDataPillExpression(String value) {
+        return value != null && value.matches("\\$\\{[^}]+}");
+    }
 
     /**
      * Validates that a required string field exists and is of correct type.
@@ -120,6 +127,12 @@ public class FieldValidator {
             }
 
             // Inline type validation to avoid wrapper function
+            // Skip type validation for data pill expressions
+            if (currentValue.isTextual() && isDataPillExpression(currentValue.asText())) {
+                // Data pill expressions will be validated separately by validateTaskDataPills
+                return;
+            }
+            
             if (!isTypeValid(currentValue, expectedType)) {
                 String actualType = WorkflowParser.getJsonNodeType(currentValue);
                 ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(propertyPath, expectedType, actualType));

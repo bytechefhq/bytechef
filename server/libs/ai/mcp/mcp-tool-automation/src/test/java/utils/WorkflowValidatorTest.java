@@ -1,11 +1,33 @@
 package utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import com.bytechef.ai.mcp.tool.automation.ToolUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class WorkflowValidatorTest {
+    private static final ToolUtils.PropertyInfo trigger1 = new ToolUtils.PropertyInfo("propString", "STRING", null, false, true, null, null);
+    private static final ToolUtils.PropertyInfo action1 = new ToolUtils.PropertyInfo("propBool", "BOOLEAN", null, false, true, null, null);
+    private static final ToolUtils.PropertyInfo action2 = new ToolUtils.PropertyInfo("propNumber", "NUMBER", null, false, true, null, null);
+    private static final ToolUtils.PropertyInfo action3 = new ToolUtils.PropertyInfo("propInteger", "INTEGER", null, false, true, null, null);
+    private static final ToolUtils.PropertyInfo actionObj = new ToolUtils.PropertyInfo(
+        "item", "OBJECT", null, false, true, null, List.of(
+            action1, action2, action3
+    ));
+    private static final ToolUtils.PropertyInfo actionArr = new ToolUtils.PropertyInfo(
+        "items", "ARRAY", null, false, true, null, List.of(
+            //unnamed objects don't have to be referenced
+        new ToolUtils.PropertyInfo(null, "OBJECT", null, false, true, null, List.of(
+        action1, action2, action3
+    ))));
+
     @Test
     void validateWorkflowStructure_validWorkflow_noErrors() {
         String validWorkflow = """
@@ -1840,5 +1862,1052 @@ class WorkflowValidatorTest {
             Property 'headers.Authorization' is not defined in task definition
             Property 'headers.Content-Type' is not defined in task definition
             Property 'queryParameters.debug' is not defined in task definition""", warnings.toString());
+    }
+
+    @Test
+    void validateWorkflowTasks_validTasks_noErrors() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Test Task 1",
+                    "name": "testTask1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John",
+                        "age": 30
+                    }
+                },
+                {
+                    "label": "Test Task 2",
+                    "name": "testTask2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "active": true,
+                        "name": "${testTask1.propString}"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1",
+            """
+                {
+                    "parameters": {
+                        "name": "string (required)",
+                        "age": "integer"
+                    }
+                }
+                """,
+            "component/v1/action1",
+                """
+                {
+                    "parameters": {
+                        "active": "boolean (required)",
+                        "name": "string (required)"
+                    }
+                }
+                """);
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1, "component/v1/action2", action1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception for valid tasks: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_invalidTaskStructure_addsError() {
+        String tasksJson = """
+            [
+                {
+                    "name": "testTask1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {}
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1",
+            """
+                {
+                    "parameters": {}
+                }
+                """);
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1",
+            new ToolUtils.PropertyInfo("testTask1", "component/v1/action", "", true, true, null, null)
+        );
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("Missing required field: label", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_invalidTaskParameters_addsError() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Test Task",
+                    "name": "testTask1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": 123
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1",
+                """
+                {
+                    "parameters": {
+                        "name": "string (required)",
+                        "age": "integer (required)"
+                    }
+                }
+                """);
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("""
+                Property 'name' has incorrect type. Expected: string, but got: integer
+                Missing required property: age""", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_noSuchAttributeOutput_addsError() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Test Task 1",
+                    "name": "testTask1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John",
+                        "age": 30
+                    }
+                },
+                {
+                    "label": "Test Task 2",
+                    "name": "testTask2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "active": "${testTask1.propBool}",
+                        "name": "John"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1",
+            """
+                {
+                    "parameters": {
+                        "name": "string (required)",
+                        "age": "integer"
+                    }
+                }
+                """,
+            "component/v1/action1",
+            """
+            {
+                "parameters": {
+                    "active": "boolean (required)",
+                    "name": "string (required)"
+                }
+            }
+            """);
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1, "component/v1/action2", action1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception for valid tasks: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_wrongDataPillType_addsError() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Test Task 1",
+                    "name": "testTask1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John",
+                        "age": 30
+                    }
+                },
+                {
+                    "label": "Test Task 2",
+                    "name": "testTask2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "active": "${testTask1.propString}",
+                        "name": "John"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1",
+            """
+                {
+                    "parameters": {
+                        "name": "string (required)",
+                        "age": "integer"
+                    }
+                }
+                """,
+            "component/v1/action1",
+            """
+            {
+                "parameters": {
+                    "active": "boolean (required)",
+                    "name": "string (required)"
+                }
+            }
+            """);
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1, "component/v1/action2", action1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("Property 'testTask1.propString' in output of 'component/v1/trigger1' is of type string, not boolean", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception for valid tasks: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_incorrectOutputOrder_addsError() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Test Task 1",
+                    "name": "testTask1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John",
+                        "age": 30
+                    }
+                },
+                {
+                    "label": "Test Task 2",
+                    "name": "testTask2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "active": "${testTask3.prepNumber}",
+                        "name": "${testTask1.prepString}"
+                    }
+                },
+                {
+                    "label": "Test Task 3",
+                    "name": "testTask3",
+                    "type": "component/v1/action2",
+                    "parameters": {
+                        "active": "${testTask2.propBool}",
+                        "name": "${testTask1.propBool}"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1",
+            """
+            {
+                "parameters": {
+                    "name": "string (required)",
+                    "age": "integer"
+                }
+            }
+            """,
+            "component/v1/action1",
+            """
+            {
+                "parameters": {
+                    "active": "boolean (required)",
+                    "name": "string (required)"
+                }
+            }
+            """,
+            "component/v1/action2",
+            """
+            {
+                "parameters": {
+                    "active": "boolean (required)",
+                    "name": "string (required)"
+                }
+            }
+            """);
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1, "component/v1/action2", action1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2.", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception for valid tasks: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_missingTaskDefinition_handlesGracefully() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Test Task",
+                    "name": "unknownTask",
+                    "type": "component/v1/trigger1",
+                    "parameters": {}
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of();
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            // This should throw a NullPointerException or similar when trying to validate
+            // parameters with a null task definition, which is expected behavior
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            // The task structure validation should pass, but parameter validation should fail
+            // due to null task definition
+            assertFalse(errors.isEmpty(), "Should have errors when task definition is missing");
+        } catch (Exception e) {
+            // It's acceptable for this to throw an exception when task definition is null
+            assertFalse(e.getMessage().isEmpty(),
+                "Exception should be related to missing task definition: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_taskWithoutParameters_validatesCorrectly() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Test Task",
+                    "name": "testTask1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {}
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1",
+            """
+                {
+                    "parameters": {}
+                }
+                """);
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_taskWithMissingParametersField_handlesCorrectly() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Test Task",
+                    "name": "testTask1",
+                    "type": "component/v1/trigger1"
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1",
+            """
+                {
+                    "parameters": {}
+                }
+                """);
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertTrue(errors.toString().contains("Missing required field: parameters") ||
+                errors.toString().contains("Task definition must have a 'parameters' object"));
+        } catch (Exception e) {
+            fail("Should handle missing parameters field: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_multipleTasks_validatesAll() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Valid Task",
+                    "name": "validTask",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                    "name": "invalidTask",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "age": "thirty"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1",
+            """
+                {
+                    "parameters": {
+                        "name": "string (required)"
+                    }
+                }
+                """,
+            "component/v1/action1",
+                """
+                {
+                    "parameters": {
+                        "age": "integer (required)"
+                    }
+                }
+                """);
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1,
+            "component/v1/action1", action1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            // Should contain errors from both task validation and parameter validation
+            assertTrue(errors.toString().contains("Missing required field: label"));
+            assertTrue(errors.toString().contains("Property 'age' has incorrect type"));
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateTaskDataPills_arrayParameters_validatesCorrectly() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                    "label": "Task 2",
+                    "name": "task2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "items": ["${task1.propString}", "literal value"]
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
+            "component/v1/action1", "{ \"parameters\": { \"items\": [\"string\"] } }"
+        );
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1
+        );
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateTaskDataPills_multipleDataPillsInSameValue_validatesAll() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                    "label": "Task 2",
+                    "name": "task2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "active": true
+                    }
+                },
+                {
+                    "label": "Task 3",
+                    "name": "task3",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "name": "Name: ${task1.propString}, Other: ${task2.propBool}"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
+            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\", \"active\": \"boolean\" } }"
+        );
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1,
+            "component/v1/action1", action1
+        );
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            // this is an exception, every value can be converted to string
+            assertEquals("", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateTaskDataPills_invalidDataPillFormat_ignoresGracefully() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                    "label": "Task 2",
+                    "name": "task2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "name": "${invalidformat}",
+                        "active": "${task1}"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
+            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\", \"active\": \"boolean\" } }"
+        );
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1
+        );
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            //check this
+            assertEquals("Task 'invalidformat' doesn't exits.", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateTaskDataPills_missingTaskOutputInfo_handlesGracefully() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                    "label": "Task 2",
+                    "name": "task2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "name": "${task1.propString}"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
+            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\" } }"
+        );
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of();
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateTaskDataPills_objectDataPillValidation_validatesCorrectly() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                    "label": "Task 2",
+                    "name": "task2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "active": "${task1.item.propBool}",
+                        "height": "${task1.item.propNumber}",
+                        "age": "${task1.propInteger}"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
+            "component/v1/action1", "{ \"parameters\": { \"active\": \"boolean\", \"height\": \"float\", \"age\": \"integer\" } }"
+        );
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", actionObj
+        );
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateTaskDataPills_arrayDataPillValidation_validatesCorrectly() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                    "label": "Task 2",
+                    "name": "task2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "active": "${task1.items[0].propBool}",
+                        "height": "${task1.items[0].propNumber}",
+                        "age": "${task1.items[0].propInteger}"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
+            "component/v1/action1", "{ \"parameters\": { \"active\": \"boolean\", \"height\": \"float\", \"age\": \"integer\" } }"
+        );
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", actionArr
+        );
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateTaskDataPills_complexNestedArrayWithDataPills_validatesCorrectly() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                    "label": "Task 2",
+                    "name": "task2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "configs": [
+                            {
+                                "setting": "${task1.propInvalid}",
+                                "enabled": true
+                            },
+                            {
+                                "setting": "static value",
+                                "enabled": false
+                            }
+                        ]
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
+            "component/v1/action1", "{ \"parameters\": { \"configs\": \"array\" } }"
+        );
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1
+        );
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("Property 'task1.propInvalid' might not exist in the output of 'component/v1/trigger1'", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateTaskDataPills_malformedDataPillFormat_ignoresGracefully() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                    "label": "Task 2",
+                    "name": "task2",
+                    "type": "component/v1/action1",
+                    "parameters": {
+                        "name": "${incomplete",
+                        "active": "${}",
+                        "value": "normal text"
+                    }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
+            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\", \"active\": \"boolean\", \"value\": \"string\" } }"
+        );
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1
+        );
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("Property 'active' has incorrect type. Expected: boolean, but got: string", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasks_flowCondition_noErrors() {
+        String tasksJson = """
+            [
+                {
+                     "label": "Condition",
+                     "name": "condition_1",
+                     "type": "condition/v1",
+                     "parameters": {
+                         "rawExpression": false,
+                         "caseFalse": [
+                            {
+                                "label": "Task 1",
+                                "name": "task1",
+                                "type": "component/v1/action1",
+                                "parameters": {
+                                    "name": "John"
+                                }
+                            },
+                         ],
+                         "caseTrue": [
+                            {
+                                "label": "Task 2",
+                                "name": "task2",
+                                "type": "component/v1/action1",
+                                "parameters": {
+                                    "name": "Mike"
+                                }
+                            }
+                         ]
+                     }
+                }
+            ]
+            """;
+
+        Map<String, String> taskDefinitions = Map.of(
+            "condition/v1", "{ \"parameters\": { \"rawExpression\": \"boolean\" } }",
+            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\" } }"
+        );
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/action1", action1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
     }
 }

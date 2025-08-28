@@ -315,7 +315,7 @@ public class GenericTools {
             };
         } catch (Exception e) {
             logger.error("Failed to get output property for task '{}' of type '{}'", name, type, e);
-            throw ToolUtils.createOperationException("Failed to get output property", e);
+            throw e;
         }
     }
 
@@ -381,15 +381,16 @@ public class GenericTools {
             // Validate task properties against the definition (display condition processing happens inside)
             WorkflowValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
-            String errorMessages = errors.append("]").toString();
+            String errorMessages = errors.append("]").toString().trim();
+            String warningMessages = warnings.append("]").toString().trim();
             boolean isValid = errorMessages.equals("[]");
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Validated task '{}' of type '{}'. Valid: {}, Errors: {}",
-                    name, type, isValid, isValid ? "none" : errorMessages.trim());
+                logger.debug("Validated task '{}' of type '{}'. Valid: {}, Errors: {}, Warnings: {}",
+                    name, type, isValid, errorMessages, warningMessages);
             }
 
-            return new TaskValidationResult(isValid, errorMessages.trim());
+            return new TaskValidationResult(isValid, errorMessages, warningMessages);
 
         } catch (Exception e) {
             logger.error("Failed to validate task '{}' of type '{}'", name, type, e);
@@ -428,6 +429,41 @@ public class GenericTools {
     @SuppressFBWarnings("EI")
     public record TaskValidationResult(
         @JsonProperty("valid") @JsonPropertyDescription("Whether the task is valid") boolean valid,
-        @JsonProperty("errors") @JsonPropertyDescription("Error details") String errors) {
+        @JsonProperty("errors") @JsonPropertyDescription("Error details, which need to be fixed before the task can be valid") String errors,
+        @JsonProperty("warnings") @JsonPropertyDescription("Warning details that give additional information") String warnings) {
+    }
+
+
+
+    public String getTaskDefinition(String type, String taskType) {
+        String[] split = type.split("/");
+        int version = Integer.parseInt(split[1].substring(1));
+        if(split.length == 2){
+            return getTaskDefinition("flow", split[0], split[0], version);
+        }
+        else if(taskType.equals("trigger")){
+            return getTaskDefinition(taskType, split[2], split[0], version);
+        }
+        else {
+            return getTaskDefinition("action", split[2], split[0], version);
+        }
+    }
+
+    public ToolUtils.PropertyInfo getTaskOutputProperty(String type, String taskType, StringBuilder warnings) {
+        String[] split = type.split("/");
+        int version = Integer.parseInt(split[1].substring(1));
+
+        try {
+            if (split.length == 2) {
+                return getTaskOutputProperty("flow", split[0], split[0], version);
+            } else if (taskType.equals("trigger")) {
+                return getTaskOutputProperty(taskType, split[2], split[0], version);
+            } else {
+                return getTaskOutputProperty("action", split[2], split[0], version);
+            }
+        } catch (Exception e) {
+            warnings.append(e.getMessage());
+            return null;
+        }
     }
 }
