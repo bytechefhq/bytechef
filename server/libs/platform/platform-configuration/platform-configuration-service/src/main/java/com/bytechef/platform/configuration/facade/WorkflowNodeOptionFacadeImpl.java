@@ -75,8 +75,8 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     @SuppressWarnings("unchecked")
     public List<Option> getClusterElementNodeOptions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName,
-        String propertyName, List<String> lookupDependsOnPaths, @Nullable String searchText) {
+        String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
+        @Nullable String searchText) {
 
         Long connectionId = workflowTestConfigurationService
             .fetchWorkflowTestConfiguration(workflowId)
