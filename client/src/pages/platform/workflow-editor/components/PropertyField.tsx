@@ -43,11 +43,7 @@ const PropertyField = ({
     return (
         <div className="group inline-flex w-full items-center justify-between rounded-md p-1 text-sm hover:bg-surface-neutral-primary-hover">
             <div className="flex w-11/12 items-center gap-2">
-                {label !== '[index]' && (
-                    <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
-                )}
-
-                {label === '[index]' && <span title={property.type}>{TYPE_ICONS.INTEGER}</span>}
+                <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
 
                 <span>{label}</span>
 
