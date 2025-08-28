@@ -33,7 +33,7 @@ export default function LabeledBranchCaseEdge({
 
     const targetNode = nodes.find((node) => node.id === targetNodeId);
 
-    const caseKey = targetNode?.data?.caseKey as string | undefined;
+    const caseKey = targetNode?.data?.caseKey as string | number | undefined;
 
     return (
         <>

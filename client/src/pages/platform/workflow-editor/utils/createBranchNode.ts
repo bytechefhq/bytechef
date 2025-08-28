@@ -40,7 +40,7 @@ function createDefaultPlaceholderNode(branchId: string): Node {
     };
 }
 
-function createCasePlaceholderNode(branchId: string, caseKey: string): Node {
+function createCasePlaceholderNode(branchId: string, caseKey: string | number): Node {
     return {
         data: {
             branchId,
@@ -60,7 +60,7 @@ interface CreateBranchNodeProps {
     isNested?: boolean;
     options?: {
         createDefaultPlaceholder?: boolean;
-        emptyCaseKeys?: Array<string>;
+        emptyCaseKeys?: Array<string | number>;
     };
 }
 

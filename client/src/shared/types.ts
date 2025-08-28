@@ -105,7 +105,7 @@ type ConditionDataType = {
 
 type BranchDataType = {
     branchId: string;
-    caseKey: string;
+    caseKey: string | number;
     index: number;
 };
 
@@ -222,7 +222,7 @@ export type NodeDataType = {
 };
 
 export type BranchCaseType = {
-    key: string;
+    key: string | number;
     tasks: Array<WorkflowTask>;
 };
 
@@ -320,7 +320,7 @@ export type UpdateWorkflowMutationType = UseMutationResult<void, Error, UpdateWo
 export type TaskDispatcherContextType = {
     branchIndex?: number;
     branchId?: string;
-    caseKey?: string;
+    caseKey?: string | number;
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionId?: string;
     eachId?: string;
@@ -344,7 +344,9 @@ export type UpdateTaskParametersType = {
     updatedSubtasks: Array<WorkflowTask>;
 };
 
-export type BranchChildTasksType = {[branchId: string]: {cases: {[caseKey: string]: string[]}; default: string[]}};
+export type BranchChildTasksType = {
+    [branchId: string]: {cases: {[caseKey: string | number]: string[]}; default: string[]};
+};
 export type ConditionChildTasksType = {[conditionId: string]: {caseTrue: string[]; caseFalse: string[]}};
 export type EachChildTasksType = {[eachId: string]: {iteratee: string}};
 export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};

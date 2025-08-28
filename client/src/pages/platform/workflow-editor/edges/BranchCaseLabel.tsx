@@ -13,16 +13,30 @@ import saveRootTaskDispatcher from '../utils/saveRootTaskDispatcher';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 
 interface BranchCaseLabelProps {
-    caseKey: string;
+    caseKey: string | number;
     edgeId: string;
     sourceY: number;
     targetX: number;
 }
 
+function parseCaseKeyValue(value: string): string | number {
+    const trimmedValue = value.trim();
+
+    if (/^-?\d*\.?\d+$/.test(trimmedValue)) {
+        const numericValue = parseFloat(trimmedValue);
+
+        if (trimmedValue !== 'default') {
+            return numericValue;
+        }
+    }
+
+    return trimmedValue;
+}
+
 export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: BranchCaseLabelProps) {
     const [isCaseKeyEditable, setIsCaseKeyEditable] = useState(false);
     const [isDeleteConfirmationVisible, setIsDeleteConfirmationVisible] = useState(false);
-    const [caseKeyValue, setCaseKeyValue] = useState(caseKey);
+    const [caseKeyValue, setCaseKeyValue] = useState(String(caseKey));
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -102,7 +116,7 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
     }, [parentBranchNodeData, saveBranchChange]);
 
     const handleDeleteCaseClick = useCallback(
-        (caseKeyToDelete: string) => {
+        (caseKeyToDelete: string | number) => {
             const parentBranchCases: BranchCaseType[] = parentBranchNodeData?.parameters?.cases;
 
             if (!parentBranchCases) {
@@ -138,13 +152,16 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
         const parentBranchCases: BranchCaseType[] = parentBranchNodeData.parameters?.cases;
 
+        const parsedCaseKey = parseCaseKeyValue(caseKeyValue);
+
         const isDuplicate =
-            caseKeyValue !== caseKey && (parentBranchCases || []).some((branchCase) => branchCase.key === caseKeyValue);
+            parsedCaseKey !== caseKey &&
+            (parentBranchCases || []).some((branchCase) => branchCase.key === parsedCaseKey);
 
         if (isDuplicate || caseKeyValue === 'default' || !caseKeyValue) {
             setIsCaseKeyEditable(false);
 
-            setCaseKeyValue(caseKey);
+            setCaseKeyValue(String(caseKey));
 
             return;
         }
@@ -153,7 +170,7 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
             if (branchCase.key === caseKey) {
                 return {
                     ...branchCase,
-                    key: caseKeyValue,
+                    key: parsedCaseKey,
                 };
             }
 
@@ -168,9 +185,7 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
         setIsCaseKeyEditable(false);
     }, [caseKey, caseKeyValue, isCaseKeyEditable, parentBranchNodeData?.parameters, saveBranchChange]);
 
-    useEffect(() => {
-        setCaseKeyValue(caseKey);
-    }, [caseKey]);
+    useEffect(() => setCaseKeyValue(String(caseKey)), [caseKey]);
 
     return (
         <EdgeLabelRenderer key={`${edgeId}-case-label`}>
