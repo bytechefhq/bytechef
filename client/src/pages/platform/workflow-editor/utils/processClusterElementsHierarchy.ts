@@ -1,7 +1,6 @@
 import {ClusterElementItemType, ClusterElementsType} from '@/shared/types';
 
 import {addElementToClusterRoot, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
-import updateClusterElementsPositions from './updateClusterElementsPositions';
 
 interface ProcessClusterElementsHierarchyProps {
     clusterElementData: ClusterElementItemType;
@@ -9,7 +8,6 @@ interface ProcessClusterElementsHierarchyProps {
     elementType: string;
     isMultipleElements: boolean;
     mainRootId?: string;
-    nodePositions: Record<string, {x: number; y: number}>;
     sourceNodeId: string;
 }
 
@@ -19,18 +17,13 @@ export default function processClusterElementsHierarchy({
     elementType,
     isMultipleElements = false,
     mainRootId,
-    nodePositions,
     sourceNodeId,
 }: ProcessClusterElementsHierarchyProps): {parentFound: boolean; nestedClusterElements: ClusterElementsType} {
     let parentFound = false;
 
     if (!sourceNodeId || !clusterElementData || elementType === undefined) {
         return {
-            nestedClusterElements: updateClusterElementsPositions({
-                clusterElements,
-                nodePositions,
-            }),
-
+            nestedClusterElements: clusterElements,
             parentFound: false,
         };
     }
@@ -83,7 +76,6 @@ export default function processClusterElementsHierarchy({
                             elementType,
                             isMultipleElements,
                             mainRootId,
-                            nodePositions,
                             sourceNodeId,
                         });
 
@@ -127,7 +119,6 @@ export default function processClusterElementsHierarchy({
                         elementType,
                         isMultipleElements,
                         mainRootId,
-                        nodePositions,
                         sourceNodeId,
                     });
 
@@ -149,10 +140,7 @@ export default function processClusterElementsHierarchy({
     );
 
     return {
-        nestedClusterElements: updateClusterElementsPositions({
-            clusterElements: updatedClusterElements,
-            nodePositions,
-        }),
+        nestedClusterElements: updatedClusterElements,
         parentFound,
     };
 }
