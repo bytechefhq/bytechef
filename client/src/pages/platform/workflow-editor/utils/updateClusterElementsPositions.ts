@@ -1,69 +1,91 @@
 import {ClusterElementItemType, ClusterElementsType} from '@/shared/types';
 
+import {isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
+
 interface UpdateElementsWithPositionsProps {
     clusterElements: ClusterElementsType;
+    movedClusterElementId: string;
     nodePositions: Record<string, {x: number; y: number}>;
 }
 
 export default function updateClusterElementsPositions({
     clusterElements,
+    movedClusterElementId,
     nodePositions,
 }: UpdateElementsWithPositionsProps): ClusterElementsType {
-    const updatedElements = {...clusterElements};
+    const updatedClusterElements: ClusterElementsType = {};
 
-    Object.entries(updatedElements).forEach(([elementKey, elementValue]) => {
+    Object.entries(clusterElements).forEach(([elementKey, elementValue]) => {
         if (Array.isArray(elementValue)) {
-            updatedElements[elementKey] = elementValue.map((element) => {
-                const elementNodeId = element.name;
+            updatedClusterElements[elementKey] = elementValue.map((element) => {
+                const isMovedElement = element.name === movedClusterElementId;
 
-                const elementPosition = nodePositions[elementNodeId];
+                const elementPosition = isMovedElement ? nodePositions[element.name] : undefined;
 
-                const updatedElement = {
+                const updatedElement: ClusterElementItemType = {
                     ...element,
-                    metadata: {
-                        ...element?.metadata,
-                        ui: {
-                            ...element?.metadata?.ui,
-                            nodePosition: elementPosition || element?.metadata?.ui?.nodePosition,
-                        },
-                    },
+                    ...(isMovedElement &&
+                        elementPosition && {
+                            metadata: {
+                                ...element?.metadata,
+                                ui: {
+                                    ...element?.metadata?.ui,
+                                    nodePosition: elementPosition,
+                                },
+                            },
+                        }),
                 };
 
-                if (updatedElement.clusterElements) {
-                    updatedElement.clusterElements = updateClusterElementsPositions({
-                        clusterElements: updatedElement.clusterElements,
+                // Process nested elements if needed
+                if (element.clusterElements) {
+                    const updatedNestedClusterElements = updateClusterElementsPositions({
+                        clusterElements: element.clusterElements,
+                        movedClusterElementId,
                         nodePositions,
                     });
+
+                    if (updatedNestedClusterElements !== element.clusterElements) {
+                        updatedElement.clusterElements = updatedNestedClusterElements;
+                    }
                 }
 
                 return updatedElement;
             });
-        } else if (elementValue && typeof elementValue === 'object') {
-            const elementNodeId = elementValue.name;
+        } else if (elementValue && isPlainObject(elementValue)) {
+            const isMovedElement = elementValue.name === movedClusterElementId;
 
-            const elementPosition = nodePositions[elementNodeId];
+            const elementPosition = isMovedElement ? nodePositions[elementValue.name] : undefined;
 
-            updatedElements[elementKey] = {
+            const updatedElement = {
                 ...elementValue,
-                metadata: {
-                    ...elementValue?.metadata,
-                    ui: {
-                        ...elementValue?.metadata?.ui,
-                        nodePosition: elementPosition || elementValue?.metadata?.ui?.nodePosition,
-                    },
-                },
-            } as ClusterElementItemType;
+                ...(isMovedElement &&
+                    elementPosition && {
+                        metadata: {
+                            ...elementValue?.metadata,
+                            ui: {
+                                ...elementValue?.metadata?.ui,
+                                nodePosition: elementPosition,
+                            },
+                        },
+                    }),
+            };
 
-            const updatedElement = updatedElements[elementKey] as ClusterElementItemType;
-
-            if (updatedElement.clusterElements) {
-                updatedElement.clusterElements = updateClusterElementsPositions({
-                    clusterElements: updatedElement.clusterElements,
+            // Process nested elements if needed
+            if (elementValue.clusterElements) {
+                const updatedNestedClusterElements = updateClusterElementsPositions({
+                    clusterElements: elementValue.clusterElements,
+                    movedClusterElementId,
                     nodePositions,
                 });
+
+                if (updatedNestedClusterElements !== elementValue.clusterElements) {
+                    updatedElement.clusterElements = updatedNestedClusterElements;
+                }
             }
+
+            updatedClusterElements[elementKey] = updatedElement;
         }
     });
 
-    return updatedElements;
+    return updatedClusterElements;
 }

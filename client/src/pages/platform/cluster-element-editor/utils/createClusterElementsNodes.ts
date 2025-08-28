@@ -7,42 +7,32 @@ import {convertNameToCamelCase, getClusterElementTypesCount, isPlainObject} from
 
 interface CreateClusterElementNodesProps {
     clusterElements: ClusterElementsType;
-    clusterRootComponentDefinition: ComponentDefinition;
+    currentRootComponentDefinition: ComponentDefinition;
     clusterRootId: string;
-    currentNodePositions: Record<string, {x: number; y: number}>;
     nestedClusterRootsDefinitions: Record<string, ComponentDefinition>;
     operationName?: string;
 }
 
 export default function createClusterElementNodes({
     clusterElements,
-    clusterRootComponentDefinition,
     clusterRootId,
-    currentNodePositions = {},
+    currentRootComponentDefinition,
     nestedClusterRootsDefinitions,
     operationName = '',
 }: CreateClusterElementNodesProps) {
-    if (!clusterRootComponentDefinition || !clusterRootComponentDefinition.clusterElementTypes || !clusterElements) {
+    if (!currentRootComponentDefinition || !currentRootComponentDefinition.clusterElementTypes || !clusterElements) {
         return [];
     }
 
     const createdNodes: Node[] = [];
 
-    const totalClusterElementTypeCount = getClusterElementTypesCount({
-        clusterRootComponentDefinition,
-        operationName,
-    });
-
-    if (totalClusterElementTypeCount === 0) {
-        return [];
-    }
-
-    const elementTypesToUse = clusterRootComponentDefinition.clusterElementTypes!.filter((elementType) => {
+    // Filter cluster element types based on actionClusterElementTypes object and operationName chosen by the user in the main editor
+    const filteredClusterElementTypes = currentRootComponentDefinition.clusterElementTypes.filter((elementType) => {
         if (!operationName) {
             return true;
         }
 
-        const actionTypes = clusterRootComponentDefinition.actionClusterElementTypes;
+        const actionTypes = currentRootComponentDefinition.actionClusterElementTypes;
 
         if (!actionTypes || Object.keys(actionTypes).length === 0) {
             return true;
@@ -57,7 +47,9 @@ export default function createClusterElementNodes({
         return operationElementTypes.includes(elementType.name || '');
     });
 
-    elementTypesToUse.forEach((clusterElementType, clusterElementTypeIndex) => {
+    const parentClusterRootElementsTypeCount = filteredClusterElementTypes.length;
+
+    filteredClusterElementTypes.forEach((clusterElementType, clusterElementTypeIndex) => {
         const clusterElementTypeName = convertNameToCamelCase(clusterElementType.name || '');
         const clusterElementTypeLabel = clusterElementType.label || '';
         const isMultipleClusterElementsNode = clusterElementType.multipleElements;
@@ -65,17 +57,19 @@ export default function createClusterElementNodes({
 
         if (isMultipleClusterElementsNode) {
             if (Array.isArray(clusterElementValue) && clusterElementValue.length) {
-                clusterElementValue.forEach((element, multipleElementIndex) => {
+                clusterElementValue.forEach((element) => {
                     // Create the multiple element node
                     const multipleElementsNode = createMultipleElementsNode({
-                        clusterElementTypeIndex,
                         clusterElementTypeName,
                         clusterRootId,
-                        currentNodePositions,
+                        currentNestedRootElementTypesCount: element.clusterElements
+                            ? getClusterElementTypesCount({
+                                  clusterRootComponentDefinition:
+                                      nestedClusterRootsDefinitions[element.type?.split('/')[0]],
+                              })
+                            : undefined,
                         element,
                         isMultipleClusterElementsNode,
-                        multipleElementIndex,
-                        totalClusterElementTypeCount,
                     });
 
                     // Set root parent/child relationship
@@ -93,9 +87,8 @@ export default function createClusterElementNodes({
                         if (nestedClusterRootDefinition) {
                             const nestedClusterElementNodes = createClusterElementNodes({
                                 clusterElements: element.clusterElements,
-                                clusterRootComponentDefinition: nestedClusterRootDefinition,
                                 clusterRootId: element.name,
-                                currentNodePositions,
+                                currentRootComponentDefinition: nestedClusterRootDefinition,
                                 nestedClusterRootsDefinitions,
                             });
 
@@ -111,9 +104,8 @@ export default function createClusterElementNodes({
                 clusterElementTypeLabel,
                 clusterElementTypeName,
                 clusterRootId,
-                currentNodePositions,
                 isMultipleClusterElementsNode,
-                totalClusterElementTypeCount,
+                parentClusterRootElementsTypeCount,
             });
 
             createdNodes.push(placeholderNode);
@@ -122,12 +114,15 @@ export default function createClusterElementNodes({
                 // Create the single element node
                 const singleElementNode = createSingleElementsNode({
                     clusterElementItem: clusterElementValue,
-                    clusterElementTypeIndex,
                     clusterElementTypeLabel,
                     clusterElementTypeName,
                     clusterRootId,
-                    currentNodePositions,
-                    totalClusterElementTypeCount,
+                    currentNestedRootElementTypesCount: clusterElementValue.clusterElements
+                        ? getClusterElementTypesCount({
+                              clusterRootComponentDefinition:
+                                  nestedClusterRootsDefinitions[clusterElementValue.type?.split('/')[0]],
+                          })
+                        : undefined,
                 });
 
                 // Set root parent/child relationship
@@ -145,9 +140,8 @@ export default function createClusterElementNodes({
                     if (nestedClusterRootDefinition) {
                         const nestedClusterElementNodes = createClusterElementNodes({
                             clusterElements: clusterElementValue.clusterElements,
-                            clusterRootComponentDefinition: nestedClusterRootDefinition,
                             clusterRootId: clusterElementValue.name,
-                            currentNodePositions,
+                            currentRootComponentDefinition: nestedClusterRootDefinition,
                             nestedClusterRootsDefinitions,
                         });
 
@@ -160,8 +154,7 @@ export default function createClusterElementNodes({
                     clusterElementTypeLabel,
                     clusterElementTypeName,
                     clusterRootId,
-                    currentNodePositions,
-                    totalClusterElementTypeCount,
+                    parentClusterRootElementsTypeCount,
                 });
 
                 createdNodes.push(placeholderNode);

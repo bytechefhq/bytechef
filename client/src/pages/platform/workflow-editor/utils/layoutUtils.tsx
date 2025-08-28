@@ -30,6 +30,7 @@ import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
+import {calculateNodeWidth} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {getConditionBranchSide} from './createConditionEdges';
 import {getForkJoinBranchSide} from './createForkJoinEdges';
 import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatcherConfig';
@@ -119,21 +120,24 @@ export const getLayoutedElements = async ({
 
     const dagreGraph = new dagreModule.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
-    dagreGraph.setGraph({rankdir: DIRECTION});
+    const horizontalGap = isClusterElementsCanvas ? 100 : 50;
+
+    dagreGraph.setGraph({
+        nodesep: horizontalGap,
+        rankdir: DIRECTION,
+    });
 
     nodes.forEach((node) => {
         let height = NODE_HEIGHT;
         let width = NODE_WIDTH;
 
         if (isClusterElementsCanvas) {
-            width = 72;
-
             if (node.id.includes('placeholder')) {
                 width = 15;
-            }
-
-            if (node.data.clusterRoot) {
-                width = ROOT_CLUSTER_WIDTH;
+            } else if (node.data.isNestedClusterRoot || node.data.clusterRoot) {
+                width = calculateNodeWidth(node.data.clusterElementTypesCount as number) || ROOT_CLUSTER_WIDTH;
+            } else {
+                width = 72;
             }
         } else {
             height = calculateNodeHeight(node);
@@ -155,8 +159,12 @@ export const getLayoutedElements = async ({
                         value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
                 );
 
-            if (hasValidClusterElements) {
+            if (hasValidClusterElements && !isClusterElementsCanvas) {
                 dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
+            }
+
+            if (isClusterElementsCanvas) {
+                dagreGraph.setEdge(edge.source, edge.target, {minlen: 1.5});
             }
 
             dagreGraph.setEdge(edge.source, edge.target);
@@ -181,33 +189,61 @@ export const getLayoutedElements = async ({
         let positionedNodes = [] as Node[];
         let centeredMainRootNode = [] as Node[];
 
-        if (clusterElementWorkflowNodes.length > 0) {
-            positionedNodes = [
-                ...positionedNodes,
-                ...clusterElementWorkflowNodes.map((node) => ({
-                    ...node,
-                    position: containsNodePosition(node.data.metadata)
-                        ? node.data.metadata.ui.nodePosition
-                        : node.position,
-                })),
-            ];
-        }
-
-        if (mainRootNode && !containsNodePosition(mainRootNode.data.metadata)) {
-            const dagreNode = dagreGraph.node(mainRootNode.id);
+        if (mainRootNode) {
+            const mainRootDagreNode = dagreGraph.node(mainRootNode.id);
 
             const centeringOffsetX =
-                canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM / 2 - dagreNode.x - ROOT_CLUSTER_WIDTH / 2;
+                canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM / 2 - mainRootDagreNode.x - ROOT_CLUSTER_WIDTH / 2;
+
+            const newMainRootPosition = {
+                x: mainRootDagreNode.x + centeringOffsetX,
+                y: NODE_HEIGHT,
+            };
 
             centeredMainRootNode = [
                 {
                     ...mainRootNode,
-                    position: {
-                        x: dagreNode.x + centeringOffsetX,
-                        y: NODE_HEIGHT,
-                    },
+                    position: newMainRootPosition,
                 },
             ];
+
+            // Position child nodes relative to their own parent root nodes
+            if (clusterElementWorkflowNodes.length > 0) {
+                positionedNodes = [
+                    ...positionedNodes,
+                    ...clusterElementWorkflowNodes.map((clusterElementNode) => {
+                        const childDagreNode = dagreGraph.node(clusterElementNode.id);
+                        const parentRootNode = clusterElementNode.parentId
+                            ? nodes.find((node) => node.id === clusterElementNode.parentId)
+                            : mainRootNode;
+
+                        if (!parentRootNode) {
+                            return clusterElementNode;
+                        }
+
+                        const parentRootDagreNode = dagreGraph.node(parentRootNode.id);
+
+                        const parentRootLeftEdge =
+                            parentRootDagreNode.x - parentRootDagreNode.width / 2 + centeringOffsetX;
+                        const childNodeLeftEdge = childDagreNode.x - childDagreNode.width / 2 + centeringOffsetX;
+
+                        const relativeX = childNodeLeftEdge - parentRootLeftEdge;
+                        const relativeY = childDagreNode.y - parentRootDagreNode.y;
+
+                        const defaultPosition = {
+                            x: relativeX,
+                            y: relativeY,
+                        };
+
+                        return {
+                            ...clusterElementNode,
+                            position: containsNodePosition(clusterElementNode.data.metadata)
+                                ? clusterElementNode.data.metadata.ui.nodePosition
+                                : defaultPosition,
+                        };
+                    }),
+                ];
+            }
         }
 
         positionedNodes = [...positionedNodes, ...centeredMainRootNode, ...placeholderNodes];

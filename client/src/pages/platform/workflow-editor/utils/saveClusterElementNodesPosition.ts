@@ -3,41 +3,48 @@ import {ClusterElementItemType, UpdateWorkflowMutationType} from '@/shared/types
 
 import useClusterElementsDataStore from '../../cluster-element-editor/stores/useClusterElementsDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
-import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import updateClusterElementsPositions from './updateClusterElementsPositions';
 
 interface SaveClusterElementNodesPositionProps {
     invalidateWorkflowQueries: () => void;
+    movedClusterElementId: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
 }
 
 export default function saveClusterElementNodesPosition({
     invalidateWorkflowQueries,
+    movedClusterElementId,
     updateWorkflowMutation,
     workflow,
 }: SaveClusterElementNodesPositionProps) {
-    const {nodes: clusterElementNodes} = useClusterElementsDataStore.getState();
+    const {nodes: clusterElementNodes, setIsPositionSaving} = useClusterElementsDataStore.getState();
     const {rootClusterElementNodeData, setRootClusterElementNodeData} = useWorkflowEditorStore.getState();
-    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
+
+    // Position saving is in progress
+    setIsPositionSaving(true);
 
     if (!workflow.definition || !rootClusterElementNodeData) {
+        setIsPositionSaving(false);
+
         return;
     }
 
     const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-    const currentClusterRootTask = workflowDefinitionTasks.find(
+    const mainClusterRootTask = workflowDefinitionTasks.find(
         (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
     );
 
-    if (!currentClusterRootTask || !currentClusterRootTask.clusterElements) {
+    if (!mainClusterRootTask || !mainClusterRootTask.clusterElements) {
+        setIsPositionSaving(false);
+
         return;
     }
 
     const clusterElements: Record<string, ClusterElementItemType | ClusterElementItemType[]> =
-        currentClusterRootTask.clusterElements;
+        mainClusterRootTask.clusterElements;
 
     const nodePositions = clusterElementNodes.reduce<Record<string, {x: number; y: number}>>((accumulator, node) => {
         accumulator[node.id] = {
@@ -50,44 +57,26 @@ export default function saveClusterElementNodesPosition({
 
     const updatedClusterElements = updateClusterElementsPositions({
         clusterElements,
+        movedClusterElementId,
         nodePositions,
     });
 
-    const rootNodePosition = rootClusterElementNodeData?.workflowNodeName
-        ? nodePositions[rootClusterElementNodeData.workflowNodeName]
-        : undefined;
-
-    const metadata = {
-        ...currentClusterRootTask.metadata,
-        ui: {
-            ...currentClusterRootTask.metadata?.ui,
-            nodePosition: rootNodePosition,
-        },
-    };
-
     const updatedNodeData = {
-        ...currentClusterRootTask,
+        ...mainClusterRootTask,
         clusterElements: updatedClusterElements,
-        metadata,
     };
 
     setRootClusterElementNodeData({
         ...rootClusterElementNodeData,
         clusterElements: updatedClusterElements,
-        metadata,
     } as typeof rootClusterElementNodeData);
 
-    if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
-        setCurrentNode({
-            ...currentNode,
-            clusterElements: updatedClusterElements,
-            metadata,
-        });
-    }
-
+    // Save updated data but reset the position saving flag even when there are errors
     saveWorkflowDefinition({
         invalidateWorkflowQueries,
         nodeData: updatedNodeData,
         updateWorkflowMutation,
+    }).finally(() => {
+        setIsPositionSaving(false);
     });
 }
