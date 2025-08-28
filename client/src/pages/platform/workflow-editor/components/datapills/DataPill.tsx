@@ -184,7 +184,7 @@ const DataPill = ({
 
                         {!property?.name && (
                             <span className="mr-2" title={property?.type}>
-                                {TYPE_ICONS.INTEGER}
+                                {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
                             </span>
                         )}
 
