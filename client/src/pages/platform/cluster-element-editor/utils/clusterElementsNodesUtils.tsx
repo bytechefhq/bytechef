@@ -1,4 +1,4 @@
-import {DEFAULT_NODE_POSITION, NODE_HEIGHT, NODE_WIDTH, PLACEHOLDER_NODE_WIDTH} from '@/shared/constants';
+import {CLUSTER_ELEMENT_PLACEHOLDER_WIDTH, DEFAULT_NODE_POSITION} from '@/shared/constants';
 import {ClusterElementItemType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
@@ -9,11 +9,10 @@ import {calculateNodeWidth, getHandlePosition} from './clusterElementsUtils';
 interface CreatePlaceholderNodeProps {
     clusterElementTypeIndex?: number;
     clusterRootId: string;
-    currentNodePositions?: Record<string, {x: number; y: number}>;
     clusterElementTypeLabel: string;
     clusterElementTypeName: string;
     isMultipleClusterElementsNode?: boolean;
-    totalClusterElementTypeCount?: number;
+    parentClusterRootElementsTypeCount?: number;
 }
 
 export function createPlaceholderNode({
@@ -21,23 +20,22 @@ export function createPlaceholderNode({
     clusterElementTypeLabel,
     clusterElementTypeName,
     clusterRootId,
-    currentNodePositions = {},
     isMultipleClusterElementsNode = false,
-    totalClusterElementTypeCount = 1,
+    parentClusterRootElementsTypeCount = 1,
 }: CreatePlaceholderNodeProps): Node {
     const nodeId = `${clusterRootId}-${clusterElementTypeName}-placeholder-0`;
 
-    const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
+    const parentNodeWidth = calculateNodeWidth(parentClusterRootElementsTypeCount);
 
-    const handleX = getHandlePosition({
-        handlesCount: totalClusterElementTypeCount,
+    const handleXPosition = getHandlePosition({
+        handlesCount: parentClusterRootElementsTypeCount,
         index: clusterElementTypeIndex,
-        nodeWidth,
+        nodeWidth: parentNodeWidth,
     });
 
     const position = {
-        x: handleX - PLACEHOLDER_NODE_WIDTH / 2,
-        y: 160,
+        x: handleXPosition - CLUSTER_ELEMENT_PLACEHOLDER_WIDTH / 2,
+        y: 140,
     };
 
     return {
@@ -49,51 +47,34 @@ export function createPlaceholderNode({
         },
         id: nodeId,
         parentId: clusterRootId,
-        position: position || currentNodePositions[clusterElementTypeName] || DEFAULT_NODE_POSITION,
+        position: position || DEFAULT_NODE_POSITION,
         type: 'placeholder',
     };
 }
 
 interface CreateSingleElementsNodeProps {
     clusterElementItem: ClusterElementItemType;
-    clusterElementTypeIndex: number;
     clusterRootId: string;
-    currentNodePositions: Record<string, {x: number; y: number}>;
     clusterElementTypeLabel: string;
     clusterElementTypeName: string;
-    totalClusterElementTypeCount?: number;
+    currentNestedRootElementTypesCount?: number;
 }
 
 export function createSingleElementsNode({
     clusterElementItem,
-    clusterElementTypeIndex = 0,
     clusterElementTypeLabel,
     clusterElementTypeName,
     clusterRootId,
-    currentNodePositions = {},
-    totalClusterElementTypeCount = 1,
+    currentNestedRootElementTypesCount,
 }: CreateSingleElementsNodeProps): Node {
     const {label, metadata, name, parameters, type} = clusterElementItem;
     const typeSegments = type.split('/');
-
-    const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
-
-    const handleX = getHandlePosition({
-        handlesCount: totalClusterElementTypeCount,
-        index: clusterElementTypeIndex,
-        nodeWidth,
-    });
-
-    const position = {
-        x: handleX - NODE_WIDTH / 2,
-        y: 300 + clusterElementTypeIndex * NODE_HEIGHT * 2,
-    };
 
     const enhancedMetadata = {
         ...(metadata || {}),
         ui: {
             ...(metadata?.ui || {}),
-            nodePosition: currentNodePositions[name] ?? metadata?.ui?.nodePosition ?? position,
+            nodePosition: metadata?.ui?.nodePosition,
         },
     };
 
@@ -105,6 +86,7 @@ export function createSingleElementsNode({
             clusterElementLabel: clusterElementTypeLabel,
             clusterElementName: clusterElementTypeName,
             clusterElementType: clusterElementTypeName,
+            clusterElementTypesCount: currentNestedRootElementTypesCount,
             componentName: typeSegments[0],
             icon: (
                 <InlineSVG
@@ -124,53 +106,34 @@ export function createSingleElementsNode({
         },
         id: name,
         parentId: clusterRootId,
-        position: position || currentNodePositions[name] || DEFAULT_NODE_POSITION,
+        position: metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION,
         type: 'workflow',
     };
 }
 
 interface CreateMultipleElementsNodeProps {
-    clusterElementTypeIndex: number;
     clusterElementTypeName: string;
     clusterRootId: string;
-    currentNodePositions: Record<string, {x: number; y: number}>;
+    currentNestedRootElementTypesCount?: number;
     element: ClusterElementItemType;
     isMultipleClusterElementsNode: boolean;
-    multipleElementIndex: number;
-    totalClusterElementTypeCount: number;
 }
 
 export function createMultipleElementsNode({
-    clusterElementTypeIndex = 0,
     clusterElementTypeName,
     clusterRootId,
-    currentNodePositions = {},
+    currentNestedRootElementTypesCount,
     element,
     isMultipleClusterElementsNode,
-    multipleElementIndex = 0,
-    totalClusterElementTypeCount = 1,
 }: CreateMultipleElementsNodeProps): Node {
     const {label, metadata, name, parameters, type} = element;
     const typeSegments = type.split('/');
-
-    const nodeWidth = calculateNodeWidth(totalClusterElementTypeCount);
-
-    const handleX = getHandlePosition({
-        handlesCount: totalClusterElementTypeCount,
-        index: clusterElementTypeIndex,
-        nodeWidth,
-    });
-
-    const position = {
-        x: handleX - NODE_WIDTH / 2 + multipleElementIndex * NODE_WIDTH,
-        y: 300 + (multipleElementIndex * NODE_HEIGHT) / 2,
-    };
 
     const enhancedMetadata = {
         ...(metadata || {}),
         ui: {
             ...(metadata?.ui || {}),
-            nodePosition: currentNodePositions[name] ?? metadata?.ui?.nodePosition ?? position,
+            nodePosition: metadata?.ui?.nodePosition,
         },
     };
 
@@ -181,6 +144,7 @@ export function createMultipleElementsNode({
             ...element,
             clusterElementName: typeSegments[2],
             clusterElementType: clusterElementTypeName,
+            clusterElementTypesCount: currentNestedRootElementTypesCount,
             componentName: typeSegments[0],
             icon: (
                 <InlineSVG
@@ -201,7 +165,7 @@ export function createMultipleElementsNode({
         },
         id: name,
         parentId: clusterRootId,
-        position: position || currentNodePositions[name] || DEFAULT_NODE_POSITION,
+        position: metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION,
         type: 'workflow',
     };
 }

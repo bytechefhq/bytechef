@@ -24,7 +24,13 @@ const useClusterElementsLayout = () => {
     >({});
 
     const {rootClusterElementNodeData} = useWorkflowEditorStore();
-    const {workflow} = useWorkflowDataStore.getState();
+    const {workflow} = useWorkflowDataStore();
+    const {isDragging, isPositionSaving} = useClusterElementsDataStore(
+        useShallow((state) => ({
+            isDragging: state.isDragging,
+            isPositionSaving: state.isPositionSaving,
+        }))
+    );
 
     const queryClient = useQueryClient();
 
@@ -47,25 +53,11 @@ const useClusterElementsLayout = () => {
         !!rootClusterElementNodeData?.workflowNodeName
     );
 
-    const {nodes, setEdges, setNodes} = useClusterElementsDataStore(
+    const {setEdges, setNodes} = useClusterElementsDataStore(
         useShallow((state) => ({
-            nodes: state.nodes,
             setEdges: state.setEdges,
             setNodes: state.setNodes,
         }))
-    );
-
-    const nodePositions = useMemo(
-        () =>
-            nodes.reduce<Record<string, {x: number; y: number}>>((accumulator, node) => {
-                accumulator[node.id] = {
-                    x: node.position.x,
-                    y: node.position.y,
-                };
-
-                return accumulator;
-            }, {}),
-        [nodes]
     );
 
     const canvasWidth = window.innerWidth - 80;
@@ -93,10 +85,7 @@ const useClusterElementsLayout = () => {
         const mainRootClusterElementNode = {
             data: rootClusterElementNodeData,
             id: rootClusterElementNodeData.workflowNodeName,
-            position:
-                rootClusterElementNodeData.metadata?.ui?.nodePosition ||
-                nodePositions[rootClusterElementNodeData.workflowNodeName] ||
-                DEFAULT_NODE_POSITION,
+            position: rootClusterElementNodeData.metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION,
             type: 'workflow',
         };
 
@@ -106,9 +95,8 @@ const useClusterElementsLayout = () => {
 
         const clusterElementNodes = createClusterElementsNodes({
             clusterElements,
-            clusterRootComponentDefinition: mainRootClusterElementDefinition,
             clusterRootId: rootClusterElementNodeData.workflowNodeName,
-            currentNodePositions: nodePositions,
+            currentRootComponentDefinition: mainRootClusterElementDefinition,
             nestedClusterRootsDefinitions: nestedClusterRootsDefinitions || {},
             operationName: rootClusterElementNodeData.operationName,
         });
@@ -220,6 +208,11 @@ const useClusterElementsLayout = () => {
     ]);
 
     useEffect(() => {
+        // Do not recalculate layout during dragging or position saving
+        if (isDragging || isPositionSaving) {
+            return;
+        }
+
         const layoutNodes = allNodes;
         const edges: Edge[] = taskEdges;
 

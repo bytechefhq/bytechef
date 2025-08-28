@@ -174,7 +174,7 @@ export function getClusterElementTypesCount({
     clusterRootComponentDefinition,
     operationName,
 }: GetClusterElementTypesCountProps): number {
-    if (!clusterRootComponentDefinition.clusterElementTypes) {
+    if (!clusterRootComponentDefinition || !clusterRootComponentDefinition.clusterElementTypes) {
         return 0;
     }
 
