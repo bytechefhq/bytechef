@@ -176,7 +176,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             [
                                 'img',
                                 {
-                                    class: 'h-4 absolute',
+                                    class: 'size-4 absolute',
                                     src: svg,
                                 },
                             ],
