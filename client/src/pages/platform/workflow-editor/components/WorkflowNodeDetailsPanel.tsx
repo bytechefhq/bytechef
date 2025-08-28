@@ -42,6 +42,7 @@ import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/
 import {
     BranchCaseType,
     ComponentPropertiesType,
+    DataPillType,
     NodeDataType,
     PropertyAllType,
     TabNameType,
@@ -51,7 +52,7 @@ import {
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, XIcon} from 'lucide-react';
-import {Suspense, lazy, useCallback, useEffect, useMemo, useState} from 'react';
+import {Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -151,8 +152,9 @@ const WorkflowNodeDetailsPanel = ({
         }))
     );
 
-    const {setDataPills, workflow, workflowNodes} = useWorkflowDataStore(
+    const {nodes, setDataPills, workflow, workflowNodes} = useWorkflowDataStore(
         useShallow((state) => ({
+            nodes: state.nodes,
             setDataPills: state.setDataPills,
             workflow: state.workflow,
             workflowNodes: state.workflowNodes,
@@ -203,7 +205,7 @@ const WorkflowNodeDetailsPanel = ({
         },
     });
 
-    const {nodeNames} = workflow;
+    const previousDataPillsRef = useRef<Array<DataPillType>>([]);
 
     const matchingOperation = useMemo(
         () =>
@@ -367,31 +369,8 @@ const WorkflowNodeDetailsPanel = ({
     ]);
 
     const currentNodeIndex = useMemo(
-        () => currentNode && nodeNames?.indexOf(currentNode?.workflowNodeName),
-        [currentNode, nodeNames]
-    );
-
-    const previousNodeNames = useMemo(
-        () => (nodeNames.length > 1 ? nodeNames?.slice(0, currentNodeIndex) : []),
-        [nodeNames, currentNodeIndex]
-    );
-
-    const previousComponentProperties: Array<ComponentPropertiesType> = useMemo(
-        () =>
-            previousComponentDefinitions?.map((componentDefinition, index) => {
-                const outputSchemaDefinition: PropertyAllType | undefined =
-                    workflowNodeOutputs[index]?.outputResponse?.outputSchema;
-
-                const properties = outputSchemaDefinition?.properties?.length
-                    ? outputSchemaDefinition.properties
-                    : outputSchemaDefinition?.items;
-
-                return {
-                    componentDefinition,
-                    properties,
-                };
-            }),
-        [previousComponentDefinitions, workflowNodeOutputs]
+        () => currentNode && nodes?.findIndex((node) => node.data.name === currentNode?.workflowNodeName),
+        [currentNode, nodes]
     );
 
     const hasOutputData = useMemo(
@@ -508,6 +487,97 @@ const WorkflowNodeDetailsPanel = ({
         currentComponentDefinition?.clusterElement,
         currentComponentDefinition?.clusterElements,
         currentNode?.clusterElementType,
+    ]);
+
+    const calculatedDataPills = useMemo(() => {
+        if (!previousComponentDefinitions || !workflowNodeOutputs) {
+            return [];
+        }
+
+        let filteredNodeNames = workflowNodeOutputs?.map((output) => output.workflowNodeName) || [];
+
+        if (currentNode?.conditionData) {
+            const parentConditionTask = workflow.tasks?.find(
+                (task) => task.name === currentNode.conditionData?.conditionId
+            );
+
+            if (!parentConditionTask) {
+                return [];
+            }
+
+            const {conditionCase} = currentNode.conditionData;
+
+            const oppositeConditionCase =
+                conditionCase === CONDITION_CASE_TRUE ? CONDITION_CASE_FALSE : CONDITION_CASE_TRUE;
+
+            const oppositeConditionCaseNodeNames = parentConditionTask.parameters?.[oppositeConditionCase].map(
+                (task: WorkflowTask) => task.name
+            );
+
+            filteredNodeNames = filteredNodeNames.filter(
+                (nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName)
+            );
+        } else if (currentNode?.branchData) {
+            const parentBranchTask = workflow.tasks?.find((task) => task.name === currentNode.branchData?.branchId);
+
+            if (!parentBranchTask || !parentBranchTask.parameters) {
+                return [];
+            }
+
+            const {caseKey} = currentNode.branchData;
+            const branchCases: BranchCaseType[] = [
+                {key: 'default', tasks: parentBranchTask.parameters.default},
+                ...parentBranchTask.parameters.cases,
+            ];
+
+            let otherCaseKeys;
+
+            if (caseKey === 'default') {
+                otherCaseKeys = branchCases.map((caseItem) => caseItem.key);
+            } else {
+                otherCaseKeys = ['default'];
+
+                branchCases.forEach((caseItem) => {
+                    if (caseItem.key !== caseKey) {
+                        otherCaseKeys.push(caseItem.key);
+                    }
+                });
+            }
+
+            const otherCasesNodeNames = branchCases
+                .filter((caseItem) => otherCaseKeys.includes(caseItem.key))
+                .map((caseItem) => caseItem.tasks.map((task: WorkflowTask) => task.name))
+                .flat(Infinity);
+
+            filteredNodeNames = filteredNodeNames.filter((nodeName) => !otherCasesNodeNames?.includes(nodeName));
+        }
+
+        const componentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions?.map(
+            (componentDefinition, index) => {
+                const outputSchemaDefinition: PropertyAllType | undefined =
+                    workflowNodeOutputs[index]?.outputResponse?.outputSchema;
+
+                const properties = outputSchemaDefinition?.properties?.length
+                    ? outputSchemaDefinition.properties
+                    : outputSchemaDefinition?.items;
+
+                return {
+                    componentDefinition,
+                    properties,
+                    workflowNodeName: workflowNodeOutputs[index]?.workflowNodeName,
+                };
+            }
+        );
+
+        const dataPills = getDataPillsFromProperties(componentProperties!, filteredNodeNames);
+
+        return dataPills.flat(Infinity);
+    }, [
+        previousComponentDefinitions,
+        workflowNodeOutputs,
+        currentNode?.conditionData,
+        currentNode?.branchData,
+        workflow.tasks,
     ]);
 
     const handleOperationSelectChange = useCallback(
@@ -710,75 +780,16 @@ const WorkflowNodeDetailsPanel = ({
         }
     }, [currentOperationDefinition?.properties]);
 
-    // Set availableDataPills depending on previousComponentProperties
+    // Set data pills only when the calculated data pills change
     useEffect(() => {
-        if (!previousComponentProperties) {
-            return;
+        const currentDataPillsString = JSON.stringify(calculatedDataPills);
+        const previousDataPillsString = JSON.stringify(previousDataPillsRef.current);
+
+        if (currentDataPillsString !== previousDataPillsString) {
+            previousDataPillsRef.current = calculatedDataPills;
+            setDataPills(calculatedDataPills);
         }
-
-        let filteredNodeNames = previousNodeNames;
-
-        if (currentNode?.conditionData) {
-            const parentConditionTask = workflow.tasks?.find(
-                (task) => task.name === currentNode.conditionData?.conditionId
-            );
-
-            if (!parentConditionTask) {
-                return;
-            }
-
-            const {conditionCase} = currentNode.conditionData;
-
-            const oppositeConditionCase =
-                conditionCase === CONDITION_CASE_TRUE ? CONDITION_CASE_FALSE : CONDITION_CASE_TRUE;
-
-            const oppositeConditionCaseNodeNames = parentConditionTask.parameters?.[oppositeConditionCase].map(
-                (task: WorkflowTask) => task.name
-            );
-
-            filteredNodeNames = filteredNodeNames.filter(
-                (nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName)
-            );
-        } else if (currentNode?.branchData) {
-            const parentBranchTask = workflow.tasks?.find((task) => task.name === currentNode.branchData?.branchId);
-
-            if (!parentBranchTask || !parentBranchTask.parameters) {
-                return;
-            }
-
-            const {caseKey} = currentNode.branchData;
-            const branchCases: BranchCaseType[] = [
-                {key: 'default', tasks: parentBranchTask.parameters.default},
-                ...parentBranchTask.parameters.cases,
-            ];
-
-            let otherCaseKeys;
-
-            if (caseKey === 'default') {
-                otherCaseKeys = branchCases.map((caseItem) => caseItem.key);
-            } else {
-                otherCaseKeys = ['default'];
-
-                branchCases.forEach((caseItem) => {
-                    if (caseItem.key !== caseKey) {
-                        otherCaseKeys.push(caseItem.key);
-                    }
-                });
-            }
-
-            const otherCasesNodeNames = branchCases
-                .filter((caseItem) => otherCaseKeys.includes(caseItem.key))
-                .map((caseItem) => caseItem.tasks.map((task: WorkflowTask) => task.name))
-                .flat(Infinity);
-
-            filteredNodeNames = filteredNodeNames.filter((nodeName) => !otherCasesNodeNames?.includes(nodeName));
-        }
-
-        const dataPills = getDataPillsFromProperties(previousComponentProperties!, filteredNodeNames);
-
-        setDataPills(dataPills.flat(Infinity));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [previousComponentProperties.length, previousNodeNames]);
+    }, [calculatedDataPills, setDataPills]);
 
     // Tab switching logic
     useEffect(() => {
