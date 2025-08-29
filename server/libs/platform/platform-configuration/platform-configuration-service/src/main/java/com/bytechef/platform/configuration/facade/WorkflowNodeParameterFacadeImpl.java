@@ -170,7 +170,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     workflowNodeStructure.parameterMap, inputMap, Map.of(), workflowNodeStructure.properties, false));
         }
 
-        return new DisplayConditionResultDTO(displayConditionMap, workflowNodeStructure.missingRequiredProperties);
+        return new DisplayConditionResultDTO(
+            displayConditionMap, new ArrayList<>(workflowNodeStructure.missingRequiredProperties));
     }
 
     @Override
@@ -195,7 +196,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     workflowNodeStructure.parameterMap, inputMap, Map.of(), workflowNodeStructure.properties, false));
         }
 
-        return new DisplayConditionResultDTO(displayConditionMap, workflowNodeStructure.missingRequiredProperties);
+        return new DisplayConditionResultDTO(
+            displayConditionMap, new ArrayList<>(workflowNodeStructure.missingRequiredProperties));
     }
 
     @Override
@@ -1013,7 +1015,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             properties = triggerDefinition.getProperties();
         }
 
-        List<String> missingRequiredProperties = new ArrayList<>();
+        Set<String> missingRequiredProperties = new HashSet<>();
 
         if (parameterMap != null && properties != null) {
             checkRequiredProperties(properties, parameterMap, "", missingRequiredProperties);
@@ -1023,7 +1025,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     private void checkRequiredProperties(
-        List<?> properties, Map<?, ?> parameterMap, String prefix, List<String> missingRequiredProperties) {
+        List<?> properties, Map<?, ?> parameterMap, String prefix, Set<String> missingRequiredProperties) {
 
         for (Object prop : properties) {
             if (!(prop instanceof BaseProperty property)) {
@@ -1217,7 +1219,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     @SuppressFBWarnings("EI")
     private record WorkflowNodeStructure(
         OperationType operationType, Map<String, ?> parameterMap, List<? extends BaseProperty> properties,
-        List<String> missingRequiredProperties) {
+        Set<String> missingRequiredProperties) {
 
         enum OperationType {
             CLUSTER_ELEMENT,

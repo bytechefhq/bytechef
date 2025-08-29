@@ -17,14 +17,14 @@
 package com.bytechef.platform.configuration.dto;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record UpdateParameterResultDTO(
-    Map<String, Boolean> displayConditions, Map<String, ?> metadata, List<String> missingRequiredProperties,
+    Map<String, Boolean> displayConditions, Map<String, ?> metadata, Set<String> missingRequiredProperties,
     Map<String, ?> parameters) {
 }
