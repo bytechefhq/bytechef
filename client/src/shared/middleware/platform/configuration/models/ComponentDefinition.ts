@@ -95,6 +95,12 @@ export interface ComponentDefinition {
      */
     clusterElement: boolean;
     /**
+     * The list of cluster element types per root cluster element.
+     * @type {{ [key: string]: Array<string>; }}
+     * @memberof ComponentDefinition
+     */
+    clusterElementClusterElementTypes?: { [key: string]: Array<string>; };
+    /**
      * The list of all available cluster elements the component can perform.
      * @type {Array<ClusterElementDefinitionBasic>}
      * @memberof ComponentDefinition
@@ -213,6 +219,7 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
         'actionClusterElementTypes': json['actionClusterElementTypes'] == null ? undefined : json['actionClusterElementTypes'],
         'actions': json['actions'] == null ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicFromJSON)),
         'clusterElement': json['clusterElement'],
+        'clusterElementClusterElementTypes': json['clusterElementClusterElementTypes'] == null ? undefined : json['clusterElementClusterElementTypes'],
         'clusterElements': json['clusterElements'] == null ? undefined : ((json['clusterElements'] as Array<any>).map(ClusterElementDefinitionBasicFromJSON)),
         'clusterElementTypes': json['clusterElementTypes'] == null ? undefined : ((json['clusterElementTypes'] as Array<any>).map(ClusterElementTypeFromJSON)),
         'clusterRoot': json['clusterRoot'],
@@ -245,6 +252,7 @@ export function ComponentDefinitionToJSONTyped(value?: ComponentDefinition | nul
         'actionClusterElementTypes': value['actionClusterElementTypes'],
         'actions': value['actions'] == null ? undefined : ((value['actions'] as Array<any>).map(ActionDefinitionBasicToJSON)),
         'clusterElement': value['clusterElement'],
+        'clusterElementClusterElementTypes': value['clusterElementClusterElementTypes'],
         'clusterElements': value['clusterElements'] == null ? undefined : ((value['clusterElements'] as Array<any>).map(ClusterElementDefinitionBasicToJSON)),
         'clusterElementTypes': value['clusterElementTypes'] == null ? undefined : ((value['clusterElementTypes'] as Array<any>).map(ClusterElementTypeToJSON)),
         'clusterRoot': value['clusterRoot'],
