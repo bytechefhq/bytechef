@@ -201,17 +201,23 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         Connection connection = getConnection(connectionId);
 
-        logger.info("New....: {}", FormatUtils.toString(parameters));
+        if (logger.isTraceEnabled()) {
+            logger.trace("New....: {}", FormatUtils.toString(parameters));
+        }
 
         Map<String, Object> curParameters = new HashMap<>(connection.getParameters());
 
-        logger.info("Current: {}", FormatUtils.toString(curParameters));
+        if (logger.isTraceEnabled()) {
+            logger.trace("Current: {}", FormatUtils.toString(curParameters));
+        }
 
         curParameters.putAll(parameters);
 
         connection.setParameters(curParameters);
 
-        logger.info("Saved..: {}", FormatUtils.toString(curParameters));
+        if (logger.isTraceEnabled()) {
+            logger.trace("Saved..: {}", FormatUtils.toString(curParameters));
+        }
 
         return connectionRepository.save(connection);
     }
