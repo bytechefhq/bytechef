@@ -1,7 +1,8 @@
 {
   "actionClusterElementTypes" : { },
   "actions" : [ ],
-  "clusterElementType" : [ {
+  "clusterElementClusterElementTypes" : { },
+  "clusterElementTypes" : [ {
     "key" : "model",
     "label" : "Model",
     "multipleElements" : false,

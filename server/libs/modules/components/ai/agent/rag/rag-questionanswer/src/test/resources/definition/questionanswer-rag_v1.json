@@ -1,7 +1,8 @@
 {
   "actionClusterElementTypes" : { },
   "actions" : [ ],
-  "clusterElementType" : [ {
+  "clusterElementClusterElementTypes" : { },
+  "clusterElementTypes" : [ {
     "key" : "vectorStore",
     "label" : "Vector Store",
     "multipleElements" : false,
