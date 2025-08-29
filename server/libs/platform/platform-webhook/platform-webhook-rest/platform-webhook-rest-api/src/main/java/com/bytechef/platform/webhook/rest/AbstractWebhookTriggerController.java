@@ -231,7 +231,7 @@ public abstract class AbstractWebhookTriggerController {
                 multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType(), null);
             parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
         } else if (contentType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
-            Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
+            Map<String, String[]> parameterMap = new HashMap<>(httpServletRequest.getParameterMap());
 
             UriComponents uriComponents = getUriComponents(httpServletRequest);
 
