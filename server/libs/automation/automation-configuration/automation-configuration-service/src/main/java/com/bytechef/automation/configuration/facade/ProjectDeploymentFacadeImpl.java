@@ -176,7 +176,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         }
 
         if (!tags.isEmpty()) {
-            projectDeployment.setTags(tags);
+            projectDeployment.setTags(checkTags(tags));
         }
 
         projectDeployment = projectDeploymentService.create(projectDeployment);
