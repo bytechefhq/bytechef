@@ -7,7 +7,6 @@
     "build-component",
     "generate-component",
     "working-with-triggers",
-    "component-specification",
-    "components/add-component-manually"
+    "component-specification"
   ]
 }
