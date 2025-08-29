@@ -25,15 +25,24 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.clickup.constant.ClickupConstants.COMMENT_TEXT;
 import static com.bytechef.component.clickup.constant.ClickupConstants.NOTIFY_ALL;
 import static com.bytechef.component.clickup.constant.ClickupConstants.TASK_ID;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
 import java.util.Map;
 
 import com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Karlo Čehulić
@@ -44,8 +53,6 @@ public class ClickupCreateTaskCommentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ACTION_NAME)
             .title("Create Task Comment")
             .description("Create a new comment for specified class.")
-            .metadata(Map.of("method", "POST", "path", "/task/{" + TASK_ID + "}/comment", "bodyContentType",
-                    BodyContentType.JSON, "mimeType", "application/json"))
             .properties(
                     string(TASK_ID).label("Task ID").description("ID of the task to which the comment will be added.")
                             .required(true)
@@ -62,8 +69,19 @@ public class ClickupCreateTaskCommentAction {
                     object().properties(string("id").description("The ID of newly created comment.").required(true),
                             string("hist_id").description("The hist ID of newly created comment.").required(true),
                             integer("date").description("The date of the newly created comment.").required(true))
-                            .metadata(Map.of("responseType", ResponseType.JSON))));
+
+                            .metadata(Map.of("responseType", ResponseType.JSON))))
+            .perform(ClickupCreateTaskCommentAction::perform);
 
     private ClickupCreateTaskCommentAction() {
+    }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context.http(http -> http.post("/task/" + inputParameters.getString(TASK_ID) + "/comment"))
+                .body(Http.Body.of(Map.of(COMMENT_TEXT, inputParameters.getString(COMMENT_TEXT), NOTIFY_ALL,
+                        inputParameters.getBoolean(NOTIFY_ALL))))
+                .configuration(Http.responseType(ResponseType.JSON)).execute().getBody(new TypeReference<>() {
+                });
+
     }
 }
