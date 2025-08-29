@@ -518,7 +518,8 @@
     "title" : "Chat",
     "workflowNodeDescription" : null
   } ],
-  "clusterElementType" : [ {
+  "clusterElementClusterElementTypes" : { },
+  "clusterElementTypes" : [ {
     "key" : "model",
     "label" : "Model",
     "multipleElements" : false,

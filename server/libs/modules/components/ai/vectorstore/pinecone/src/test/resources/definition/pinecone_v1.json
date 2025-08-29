@@ -56,7 +56,10 @@
     "title" : "Search Data",
     "workflowNodeDescription" : null
   } ],
-  "clusterElementType" : [ {
+  "clusterElementClusterElementTypes" : {
+    "vectorStore" : [ "EMBEDDING" ]
+  },
+  "clusterElementTypes" : [ {
     "key" : "documentReader",
     "label" : "Document Reader",
     "multipleElements" : false,

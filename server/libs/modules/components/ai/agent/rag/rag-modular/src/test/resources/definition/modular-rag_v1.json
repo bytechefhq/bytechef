@@ -1,7 +1,8 @@
 {
   "actionClusterElementTypes" : { },
   "actions" : [ ],
-  "clusterElementType" : [ {
+  "clusterElementClusterElementTypes" : { },
+  "clusterElementTypes" : [ {
     "key" : "documentJoiner",
     "label" : "Document Joiner",
     "multipleElements" : false,
