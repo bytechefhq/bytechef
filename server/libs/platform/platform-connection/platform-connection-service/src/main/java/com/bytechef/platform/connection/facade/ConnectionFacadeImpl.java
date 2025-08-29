@@ -45,7 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -300,23 +299,37 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
             .map(BaseProperty::getName)
             .toList();
-
         List<String> connectionPropertyNames = connectionDefinition.getProperties()
             .stream()
             .map(BaseProperty::getName)
             .toList();
-
         Map<String, ?> predefinedParameters = oAuth2Service.checkPredefinedParameters(componentName, parameters);
-
-        ComponentConnection componentConnection = new ComponentConnection(
-            componentName, connectionVersion, connection.getId(), parameters, connection.getAuthorizationType());
-
-        Optional<String> baseUri = connectionDefinitionFacade.executeBaseUri(componentName, componentConnection);
-
-        String uri = baseUri.orElse(null);
+        String baseUri = getBaseUri(connection, componentName, connectionVersion, parameters);
 
         return new ConnectionDTO(
-            active, getAuthorizationParameters(predefinedParameters, authorizationPropertyNames), uri, connection,
+            active, getAuthorizationParameters(predefinedParameters, authorizationPropertyNames), baseUri, connection,
             getConnectionParameters(parameters, connectionPropertyNames), tags);
+    }
+
+    private String getBaseUri(
+        Connection connection, String componentName, int connectionVersion, Map<String, ?> parameters) {
+
+        String uri = null;
+
+        try {
+            uri = connectionDefinitionFacade
+                .executeBaseUri(
+                    componentName,
+                    new ComponentConnection(
+                        componentName, connectionVersion, connection.getId(), parameters,
+                        connection.getAuthorizationType()))
+                .orElse(null);
+        } catch (IllegalStateException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage());
+            }
+        }
+
+        return uri;
     }
 }

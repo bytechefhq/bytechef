@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.connection.facade;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -25,6 +26,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
@@ -67,6 +69,9 @@ public class ConnectionFacadeIntTest {
 
     @Autowired
     private ConnectionDefinitionService connectionDefinitionService;
+
+    @Autowired
+    private ConnectionDefinitionFacade connectionDefinitionFacade;
 
     @Autowired
     private ConnectionFacade connectionFacade;
@@ -163,7 +168,39 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
+        when(connectionDefinitionFacade.executeBaseUri(eq("componentName"), any()))
+            .thenReturn(Optional.of("baseUri"));
+
         Assertions.assertThat(connectionFacade.getConnection(connection.getId()))
+            .hasFieldOrPropertyWithValue("baseUri", "baseUri")
+            .hasFieldOrPropertyWithValue("componentName", "componentName")
+            .hasFieldOrPropertyWithValue("name", "name")
+            .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
+    }
+
+    @Test
+    public void testGetConnectionWhenExecuteBaseUriThrowsException() {
+        Connection connection = new Connection();
+
+        connection.setComponentName("componentName");
+        connection.setName("name");
+        connection.setType(ModeType.AUTOMATION);
+
+        Tag tag1 = tagRepository.save(new Tag("tag1"));
+        Tag tag2 = tagRepository.save(new Tag("tag2"));
+
+        connection.setTags(List.of(tag1, tag2));
+
+        connection = connectionRepository.save(connection);
+
+        when(connectionDefinitionFacade.executeBaseUri(eq("componentName"), any()))
+            .thenThrow(new IllegalStateException("Connection failed"));
+
+        ConnectionDTO result = connectionFacade.getConnection(connection.getId());
+
+        Assertions.assertThat(result)
+            .isNotNull()
+            .hasFieldOrPropertyWithValue("baseUri", null)
             .hasFieldOrPropertyWithValue("componentName", "componentName")
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
