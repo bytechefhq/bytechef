@@ -1841,6 +1841,13 @@ components:
         clusterElement:
           description: "Is the component cluster element."
           type: "boolean"
+        clusterElementClusterElementTypes:
+          description: "The list of cluster element types per root cluster element."
+          type: "object"
+          additionalProperties:
+            type: "array"
+            items:
+              type: "string"
         clusterElements:
           description: "The list of all available cluster elements the component can perform."
           type: "array"
