@@ -115,9 +115,11 @@ public class TokenRefreshHelper {
         Map<String, ?> parameters;
 
         try {
-            logger.info(
-                "Getting refreshed credentials with oAuth2AuthorizationCode set to {}",
-                componentConnection.isAuthorizationOauth2AuthorizationCode());
+            if (logger.isTraceEnabled()) {
+                logger.trace(
+                    "Getting refreshed credentials with oAuth2AuthorizationCode set to {}",
+                    componentConnection.isAuthorizationOauth2AuthorizationCode());
+            }
 
             if (componentConnection.isAuthorizationOauth2AuthorizationCode()) {
                 Authorization.RefreshTokenResponse refreshTokenResponse =
@@ -140,17 +142,23 @@ public class TokenRefreshHelper {
                     }
                 };
 
-                logger.info("Refresh token execution executed");
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Refresh token execution executed");
+                }
             } else {
                 parameters = connectionDefinitionService.executeAcquire(
                     componentConnection.componentName(), componentConnection.version(),
                     Objects.requireNonNull(componentConnection.authorizationType()),
                     componentConnection.getParameters(), context);
 
-                logger.info("Acquire executed");
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Acquire executed");
+                }
             }
 
-            logger.info("Refresh token execution executed");
+            if (logger.isTraceEnabled()) {
+                logger.trace("Refresh token execution executed");
+            }
 
             Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
 
