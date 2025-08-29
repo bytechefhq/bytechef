@@ -27,7 +27,7 @@ import java.util.List;
 public interface VectorStoreDocumentRetrieverComponentDefinition extends ClusterRootComponentDefinition {
 
     @Override
-    default List<ClusterElementType> getClusterElementType() {
+    default List<ClusterElementType> getClusterElementTypes() {
         return List.of(VECTOR_STORE);
     }
 }

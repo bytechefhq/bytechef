@@ -30,7 +30,7 @@ import java.util.List;
 public interface AiAgentComponentDefinition extends ClusterRootComponentDefinition {
 
     @Override
-    default List<ClusterElementType> getClusterElementType() {
+    default List<ClusterElementType> getClusterElementTypes() {
         return List.of(MODEL, CHAT_MEMORY, RAG, TOOLS);
     }
 }

@@ -26,7 +26,7 @@ import java.util.List;
  */
 public interface DocumentEnricherComponentDefinition extends ClusterRootComponentDefinition {
 
-    default List<ClusterElementDefinition.ClusterElementType> getClusterElementType() {
+    default List<ClusterElementDefinition.ClusterElementType> getClusterElementTypes() {
         return List.of(MODEL);
     }
 }

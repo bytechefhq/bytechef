@@ -144,7 +144,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             (ClusterRootComponentDefinition) componentDefinitionRegistry.getComponentDefinition(
                 rootComponentName, rootComponentVersion);
 
-        return rootComponentDefinition.getClusterElementType()
+        return rootComponentDefinition.getClusterElementTypes()
             .stream()
             .filter(curClusterElementType -> clusterElementTypeName.equalsIgnoreCase(curClusterElementType.name()))
             .findFirst()

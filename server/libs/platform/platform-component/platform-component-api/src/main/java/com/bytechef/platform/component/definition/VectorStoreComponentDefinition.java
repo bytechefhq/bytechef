@@ -40,7 +40,7 @@ public interface VectorStoreComponentDefinition extends ClusterRootComponentDefi
     String SEARCH = "search";
 
     @Override
-    default List<ClusterElementType> getClusterElementType() {
+    default List<ClusterElementType> getClusterElementTypes() {
         return List.of(DOCUMENT_READER, DOCUMENT_TRANSFORMER, EMBEDDING);
     }
 

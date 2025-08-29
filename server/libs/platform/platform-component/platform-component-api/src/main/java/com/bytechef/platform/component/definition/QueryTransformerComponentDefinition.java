@@ -27,7 +27,7 @@ import java.util.List;
 public interface QueryTransformerComponentDefinition extends ClusterRootComponentDefinition {
 
     @Override
-    default List<ClusterElementDefinition.ClusterElementType> getClusterElementType() {
+    default List<ClusterElementDefinition.ClusterElementType> getClusterElementTypes() {
         return List.of(MODEL);
     }
 }
