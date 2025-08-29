@@ -38,4 +38,8 @@ public interface ClusterRootComponentDefinition extends PlatformComponentDefinit
     default Map<String, List<String>> getActionClusterElementTypes() {
         return Map.of();
     }
+
+    default Map<String, List<String>> getClusterElementClusterElementTypes() {
+        return Map.of();
+    }
 }

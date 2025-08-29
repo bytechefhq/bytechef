@@ -39,15 +39,44 @@ public interface VectorStoreComponentDefinition extends ClusterRootComponentDefi
      */
     String SEARCH = "search";
 
+    /**
+     *
+     */
+    String VECTOR_STORE = "vectorStore";
+
+    /**
+     * Provides a list of cluster element types associated with the component definition.
+     *
+     * @return a list of {@code ClusterElementType} instances representing the cluster elements such as DOCUMENT_READER,
+     *         DOCUMENT_TRANSFORMER, and EMBEDDING.
+     */
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
         return List.of(DOCUMENT_READER, DOCUMENT_TRANSFORMER, EMBEDDING);
     }
 
+    /**
+     * Retrieves a mapping of actions to their associated cluster element types.
+     *
+     * @return a map where the keys are action names (e.g., "load", "search") and the values are lists of cluster
+     *         element type names (e.g., "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING") corresponding to each
+     *         action.
+     */
     @Override
     default Map<String, List<String>> getActionClusterElementTypes() {
         return Map.of(
             LOAD, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name(), EMBEDDING.name()),
             SEARCH, List.of(EMBEDDING.name()));
+    }
+
+    /**
+     * Retrieves a mapping of root cluster element identifiers to their associated cluster element types.
+     *
+     * @return a map where the keys are cluster element identifiers (e.g., VECTOR_STORE) and the values are lists of
+     *         cluster element type names (e.g., EMBEDDING) associated with each identifier.
+     */
+    @Override
+    default Map<String, List<String>> getClusterElementClusterElementTypes() {
+        return Map.of(VECTOR_STORE, List.of(EMBEDDING.name()));
     }
 }

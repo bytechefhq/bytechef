@@ -43,6 +43,7 @@ public class ComponentDefinition {
     private List<ActionDefinition> actions;
     private List<ComponentCategory> componentCategories;
     private boolean clusterElement;
+    private Map<String, List<String>> clusterElementClusterElementTypes;
     private List<ClusterElementDefinition> clusterElements;
     private List<ClusterElementType> clusterElementTypes;
     private boolean clusterRoot;
@@ -77,6 +78,8 @@ public class ComponentDefinition {
 
         if (componentDefinition instanceof ClusterRootComponentDefinition clusterRootComponentDefinition) {
             this.actionClusterElementTypes = clusterRootComponentDefinition.getActionClusterElementTypes();
+            this.clusterElementClusterElementTypes = clusterRootComponentDefinition
+                .getClusterElementClusterElementTypes();
             this.clusterElementTypes = clusterRootComponentDefinition.getClusterElementTypes();
         } else {
             this.clusterElementTypes = List.of();
@@ -126,6 +129,10 @@ public class ComponentDefinition {
 
     public int getActionsCount() {
         return actions.size();
+    }
+
+    public Map<String, List<String>> getClusterElementClusterElementTypes() {
+        return clusterElementClusterElementTypes;
     }
 
     public List<ClusterElementDefinition> getClusterElements() {
@@ -203,30 +210,30 @@ public class ComponentDefinition {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
         if (!(o instanceof ComponentDefinition that)) {
             return false;
         }
 
-        return Objects.equals(actions, that.actions) && clusterElement == that.clusterElement &&
-            Objects.equals(clusterElements, that.clusterElements) && clusterRoot == that.clusterRoot &&
-            Objects.equals(componentCategories, that.componentCategories) &&
-            Objects.equals(connection, that.connection) && connectionRequired == that.connectionRequired &&
-            Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
-            Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
-            Objects.equals(tags, that.tags) && Objects.equals(triggers, that.triggers) &&
-            Objects.equals(unifiedApiCategory, that.unifiedApiCategory) && Objects.equals(title, that.title) &&
-            version == that.version;
+        return clusterElement == that.clusterElement && clusterRoot == that.clusterRoot &&
+            connectionRequired == that.connectionRequired && version == that.version &&
+            Objects.equals(actionClusterElementTypes, that.actionClusterElementTypes) &&
+            Objects.equals(actions, that.actions) && Objects.equals(componentCategories, that.componentCategories) &&
+            Objects.equals(clusterElementClusterElementTypes, that.clusterElementClusterElementTypes) &&
+            Objects.equals(clusterElements, that.clusterElements) &&
+            Objects.equals(clusterElementTypes, that.clusterElementTypes) &&
+            Objects.equals(connection, that.connection) && Objects.equals(description, that.description) &&
+            Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
+            Objects.equals(resources, that.resources) && Objects.equals(tags, that.tags) &&
+            Objects.equals(triggers, that.triggers) && Objects.equals(title, that.title) &&
+            unifiedApiCategory == that.unifiedApiCategory;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            actions, clusterElement, clusterElements, clusterRoot, componentCategories, connection, connectionRequired,
-            description, icon, name, resources, tags, triggers, title, unifiedApiCategory, version);
+            actionClusterElementTypes, actions, componentCategories, clusterElement, clusterElementClusterElementTypes,
+            clusterElements, clusterElementTypes, clusterRoot, connection, connectionRequired, description, icon, name,
+            resources, tags, triggers, title, unifiedApiCategory, version);
     }
 
     @Override
@@ -235,16 +242,20 @@ public class ComponentDefinition {
             "name='" + name + '\'' +
             ", version=" + version +
             ", title='" + title + '\'' +
+            ", description='" + description + '\'' +
             ", connection=" + connection +
             ", connectionRequired=" + connectionRequired +
-            ", connectionRequired=" + connectionRequired +
-            ", unifiedApiCategory=" + unifiedApiCategory +
-            ", description='" + description + '\'' +
-            ", icon='" + icon + '\'' +
+            ", clusterRoot=" + clusterRoot +
+            ", clusterElement=" + clusterElement +
             ", actions=" + actions +
             ", triggers=" + triggers +
+            ", clusterElementTypes=" + clusterElementTypes +
+            ", actionClusterElementTypes=" + actionClusterElementTypes +
+            ", clusterElementClusterElementTypes=" + clusterElementClusterElementTypes +
             ", clusterElements=" + clusterElements +
-            ", categories='" + componentCategories + '\'' +
+            ", componentCategories=" + componentCategories +
+            ", unifiedApiCategory=" + unifiedApiCategory +
+            ", icon='" + icon + '\'' +
             ", resources=" + resources +
             ", tags=" + tags +
             '}';

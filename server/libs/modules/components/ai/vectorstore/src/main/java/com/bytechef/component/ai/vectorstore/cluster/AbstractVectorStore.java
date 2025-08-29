@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.cluster;
 
-import static com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction.VECTOR_STORE;
+import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.ai.vectorstore.util.VectorStoreUtils;
@@ -46,10 +46,10 @@ public abstract class AbstractVectorStore {
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.vectorStore = vectorStore;
 
-        this.clusterElementDefinition = ComponentDsl.<VectorStoreFunction>clusterElement("vectorStore")
+        this.clusterElementDefinition = ComponentDsl.<VectorStoreFunction>clusterElement(VECTOR_STORE)
             .title("%s VectorStore".formatted(title))
             .description("%s VectorStore.".formatted(title))
-            .type(VECTOR_STORE)
+            .type(VectorStoreFunction.VECTOR_STORE)
             .object(() -> this::apply);
     }
 
