@@ -77,7 +77,7 @@ public class ComponentDefinition {
 
         if (componentDefinition instanceof ClusterRootComponentDefinition clusterRootComponentDefinition) {
             this.actionClusterElementTypes = clusterRootComponentDefinition.getActionClusterElementTypes();
-            this.clusterElementTypes = clusterRootComponentDefinition.getClusterElementType();
+            this.clusterElementTypes = clusterRootComponentDefinition.getClusterElementTypes();
         } else {
             this.clusterElementTypes = List.of();
         }

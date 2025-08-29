@@ -29,7 +29,7 @@ public interface ClusterRootComponentDefinition extends PlatformComponentDefinit
      *
      * @return
      */
-    List<ClusterElementType> getClusterElementType();
+    List<ClusterElementType> getClusterElementTypes();
 
     /**
      *

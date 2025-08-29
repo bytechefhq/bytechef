@@ -31,7 +31,7 @@ import java.util.List;
 public interface ModularRagComponentDefinition extends ClusterRootComponentDefinition {
 
     @Override
-    default List<ClusterElementType> getClusterElementType() {
+    default List<ClusterElementType> getClusterElementTypes() {
         return List.of(DOCUMENT_JOINER, DOCUMENT_RETRIEVER, QUERY_AUGMENTER, QUERY_EXPANDER, QUERY_TRANSFORMER);
     }
 }
