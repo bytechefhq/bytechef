@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.configuration.domain.McpComponent;
 import com.bytechef.platform.configuration.domain.McpServer;
-import com.bytechef.platform.configuration.domain.McpServerOrderBy;
 import com.bytechef.platform.configuration.facade.McpServerFacade;
 import com.bytechef.platform.configuration.service.McpServerService;
 import com.bytechef.platform.constant.Environment;
@@ -87,10 +86,12 @@ public class McpServerGraphQlControllerIntTest {
         List<McpServer> mockServers = List.of(
             createMockMcpServer(1L, "Server 1", ModeType.AUTOMATION, Environment.DEVELOPMENT, true),
             createMockMcpServer(2L, "Server 2", ModeType.AUTOMATION, Environment.PRODUCTION, false));
-        when(mcpServerService.getMcpServers(ModeType.AUTOMATION, McpServerOrderBy.NAME_ASC)).thenReturn(mockServers);
+        when(mcpServerService.getMcpServers(ModeType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC))
+            .thenReturn(mockServers);
 
         // When
-        List<McpServer> result = mcpServerGraphQlController.mcpServers(ModeType.AUTOMATION, McpServerOrderBy.NAME_ASC);
+        List<McpServer> result =
+            mcpServerGraphQlController.mcpServers(ModeType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC);
 
         // Then
         assertNotNull(result);
@@ -99,7 +100,7 @@ public class McpServerGraphQlControllerIntTest {
             .getName());
         assertEquals("Server 2", result.get(1)
             .getName());
-        verify(mcpServerService).getMcpServers(ModeType.AUTOMATION, McpServerOrderBy.NAME_ASC);
+        verify(mcpServerService).getMcpServers(ModeType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC);
     }
 
     @Test

@@ -17,7 +17,6 @@
 package com.bytechef.platform.configuration.service;
 
 import com.bytechef.platform.configuration.domain.McpServer;
-import com.bytechef.platform.configuration.domain.McpServerOrderBy;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import java.util.List;
@@ -27,6 +26,19 @@ import java.util.List;
  * MCP servers.
  */
 public interface McpServerService {
+
+    /**
+     * Enum for ordering MCP servers.
+     */
+    enum McpServerOrderBy {
+
+        NAME_ASC,
+        NAME_DESC,
+        CREATED_DATE_ASC,
+        CREATED_DATE_DESC,
+        LAST_MODIFIED_DATE_ASC,
+        LAST_MODIFIED_DATE_DESC
+    }
 
     /**
      * Creates a new MCP server.

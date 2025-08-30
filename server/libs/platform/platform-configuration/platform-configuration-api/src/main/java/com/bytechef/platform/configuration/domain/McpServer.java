@@ -192,7 +192,7 @@ public final class McpServer {
         this.mcpServerTags = new HashSet<>();
 
         if (!CollectionUtils.isEmpty(tagIds)) {
-            for (Long tagId : tagIds) {
+            for (long tagId : tagIds) {
                 mcpServerTags.add(new McpServerTag(tagId));
             }
         }
