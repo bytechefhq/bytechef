@@ -99,7 +99,9 @@ public class McpServerFacadeIntTest {
     @Test
     public void testCreateMcpComponentWithTools() {
         McpComponent mcpComponent = getMcpComponent();
-        List<McpTool> mcpTools = List.of(getMcpTool("tool1"), getMcpTool("tool2"));
+
+        List<McpTool> mcpTools = List.of(
+            getMcpTool("tool1", mcpComponent.getId()), getMcpTool("tool2", mcpComponent.getId()));
 
         McpComponent createdComponent = mcpServerFacade.create(mcpComponent, mcpTools);
 
@@ -134,13 +136,15 @@ public class McpServerFacadeIntTest {
     @Test
     public void testUpdateMcpComponentWithTools() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
-        McpTool originalTool = getMcpTool("original-tool");
+
+        McpTool originalTool = getMcpTool("original-tool", mcpComponent.getId());
 
         originalTool.setMcpComponentId(mcpComponent.getId());
 
         mcpToolRepository.save(originalTool);
 
-        List<McpTool> newTools = List.of(getMcpTool("new-tool1"), getMcpTool("new-tool2"));
+        List<McpTool> newTools = List.of(
+            getMcpTool("new-tool1", mcpComponent.getId()), getMcpTool("new-tool2", mcpComponent.getId()));
 
         mcpComponent.setComponentName("updated-component");
 
@@ -159,7 +163,8 @@ public class McpServerFacadeIntTest {
     @Test
     public void testDeleteMcpComponent() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
-        McpTool mcpTool = getMcpTool("test-tool");
+
+        McpTool mcpTool = getMcpTool("test-tool", mcpComponent.getId());
 
         mcpTool.setMcpComponentId(mcpComponent.getId());
 
@@ -236,7 +241,7 @@ public class McpServerFacadeIntTest {
         return new McpComponent("test-component", 1, mcpServer.getId(), null);
     }
 
-    private McpTool getMcpTool(String name) {
-        return new McpTool(name, Map.of(), null);
+    private McpTool getMcpTool(String name, long mcpComponentId) {
+        return new McpTool(name, Map.of(), mcpComponentId);
     }
 }

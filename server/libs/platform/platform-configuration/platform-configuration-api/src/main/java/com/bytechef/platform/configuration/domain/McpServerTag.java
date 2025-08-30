@@ -36,8 +36,8 @@ public final class McpServerTag {
     private McpServerTag() {
     }
 
-    public McpServerTag(Long tagId) {
-        this.tagId = tagId == null ? null : AggregateReference.to(tagId);
+    public McpServerTag(long tagId) {
+        this.tagId = AggregateReference.to(tagId);
     }
 
     @Override

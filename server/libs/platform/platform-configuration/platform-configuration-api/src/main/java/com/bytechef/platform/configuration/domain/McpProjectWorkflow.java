@@ -66,7 +66,7 @@ public final class McpProjectWorkflow {
     public McpProjectWorkflow() {
     }
 
-    public McpProjectWorkflow(Long mcpProjectId, Long projectDeploymentWorkflowId) {
+    public McpProjectWorkflow(long mcpProjectId, long projectDeploymentWorkflowId) {
         this.mcpProjectId = mcpProjectId;
         this.projectDeploymentWorkflowId = projectDeploymentWorkflowId;
     }

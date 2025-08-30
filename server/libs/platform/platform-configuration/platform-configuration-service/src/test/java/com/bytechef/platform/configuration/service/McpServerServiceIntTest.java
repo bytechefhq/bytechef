@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfiguration;
 import com.bytechef.platform.configuration.domain.McpServer;
-import com.bytechef.platform.configuration.domain.McpServerOrderBy;
 import com.bytechef.platform.configuration.repository.McpServerRepository;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
@@ -150,8 +149,10 @@ public class McpServerServiceIntTest {
         McpServer server2 = mcpServerRepository.save(
             new McpServer("z-server", ModeType.AUTOMATION, Environment.DEVELOPMENT));
 
-        List<McpServer> serversAsc = mcpServerService.getMcpServers(ModeType.AUTOMATION, McpServerOrderBy.NAME_ASC);
-        List<McpServer> serversDesc = mcpServerService.getMcpServers(ModeType.AUTOMATION, McpServerOrderBy.NAME_DESC);
+        List<McpServer> serversAsc =
+            mcpServerService.getMcpServers(ModeType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC);
+        List<McpServer> serversDesc =
+            mcpServerService.getMcpServers(ModeType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_DESC);
 
         assertThat(serversAsc).hasSize(2);
         assertThat(serversAsc.get(0)).isEqualTo(server1);

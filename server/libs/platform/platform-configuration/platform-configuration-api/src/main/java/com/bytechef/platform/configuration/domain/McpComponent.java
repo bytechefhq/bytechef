@@ -28,6 +28,7 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.lang.Nullable;
 
 /**
  * Domain class representing an MCP component.
@@ -74,14 +75,16 @@ public final class McpComponent {
     public McpComponent() {
     }
 
-    public McpComponent(String componentName, int componentVersion, Long mcpServerId, Long connectionId) {
+    public McpComponent(String componentName, int componentVersion, long mcpServerId, Long connectionId) {
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.mcpServerId = AggregateReference.to(mcpServerId);
         this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
     }
 
-    public McpComponent(String componentName, int componentVersion, Long mcpServerId, Long connectionId, int version) {
+    public McpComponent(
+        String componentName, int componentVersion, long mcpServerId, @Nullable Long connectionId, int version) {
+
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.mcpServerId = AggregateReference.to(mcpServerId);

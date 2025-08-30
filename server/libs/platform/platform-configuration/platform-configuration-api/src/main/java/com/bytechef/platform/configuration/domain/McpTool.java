@@ -72,10 +72,10 @@ public final class McpTool {
     public McpTool() {
     }
 
-    public McpTool(String name, Map<String, String> parameters, Long mcpComponentId) {
+    public McpTool(String name, Map<String, String> parameters, long mcpComponentId) {
         this.name = name;
         this.parameters = new MapWrapper(parameters);
-        this.mcpComponentId = mcpComponentId == null ? null : AggregateReference.to(mcpComponentId);
+        this.mcpComponentId = AggregateReference.to(mcpComponentId);
     }
 
     public McpTool(Long id, String name, Map<String, String> parameters, Long mcpComponentId) {

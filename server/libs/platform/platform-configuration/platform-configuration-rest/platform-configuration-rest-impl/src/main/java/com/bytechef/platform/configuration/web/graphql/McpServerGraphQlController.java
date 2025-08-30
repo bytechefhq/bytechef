@@ -19,7 +19,6 @@ package com.bytechef.platform.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.domain.McpComponent;
 import com.bytechef.platform.configuration.domain.McpServer;
-import com.bytechef.platform.configuration.domain.McpServerOrderBy;
 import com.bytechef.platform.configuration.facade.McpServerFacade;
 import com.bytechef.platform.configuration.service.McpServerService;
 import com.bytechef.platform.constant.Environment;
@@ -58,7 +57,7 @@ public class McpServerGraphQlController {
     }
 
     @QueryMapping
-    public List<McpServer> mcpServers(@Argument ModeType type, @Argument McpServerOrderBy orderBy) {
+    public List<McpServer> mcpServers(@Argument ModeType type, @Argument McpServerService.McpServerOrderBy orderBy) {
         return mcpServerService.getMcpServers(type, orderBy);
     }
 

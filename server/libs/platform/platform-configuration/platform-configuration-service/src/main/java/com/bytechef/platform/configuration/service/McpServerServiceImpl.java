@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.McpServer;
-import com.bytechef.platform.configuration.domain.McpServerOrderBy;
 import com.bytechef.platform.configuration.repository.McpServerRepository;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
