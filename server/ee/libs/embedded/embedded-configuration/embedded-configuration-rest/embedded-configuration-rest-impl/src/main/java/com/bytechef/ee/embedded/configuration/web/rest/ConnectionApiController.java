@@ -97,13 +97,15 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getConnections(
-        String componentName, Integer connectionVersion, EnvironmentModel environment, Long tagId) {
+        String componentName, Integer connectionVersion, EnvironmentModel environmentModel, Long tagId) {
+
+        Environment environment = Environment.valueOf(environmentModel.name());
 
         return ResponseEntity.ok(
             connectionFacade
                 .getConnections(
                     componentName, connectionVersion,
-                    List.of(), tagId, environment == null ? null : Environment.valueOf(environment.name()),
+                    List.of(), tagId, environmentModel == null ? null : environment.ordinal(),
                     ModeType.EMBEDDED)
                 .stream()
                 .map(this::toConnectionModel)

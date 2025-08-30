@@ -70,6 +70,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
             workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
 
         return connectionFacade.getConnections(
-            componentName, connectionVersion, connectionIds, tagId, environment, ModeType.AUTOMATION);
+            componentName, connectionVersion, connectionIds, tagId, environment == null ? null : environment.ordinal(),
+            ModeType.AUTOMATION);
     }
 }

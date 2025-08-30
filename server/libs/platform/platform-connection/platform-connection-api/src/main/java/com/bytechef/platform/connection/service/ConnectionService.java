@@ -18,7 +18,6 @@ package com.bytechef.platform.connection.service;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,7 @@ public interface ConnectionService {
 
     Connection create(
         @Nullable AuthorizationType authorizationType, String componentName, int connectionVersion,
-        Environment environment, String name, Map<String, Object> parameters, ModeType type);
+        int environmentId, String name, Map<String, Object> parameters, ModeType type);
 
     void delete(long id);
 
@@ -44,7 +43,7 @@ public interface ConnectionService {
     List<Connection> getConnections(String componentName, int version, ModeType type);
 
     List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Environment environment, ModeType type);
+        String componentName, Integer connectionVersion, Long tagId, Integer environmentId, ModeType type);
 
     List<Connection> getConnections(List<Long> connectionIds);
 

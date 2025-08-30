@@ -83,7 +83,7 @@ public class McpComponentGraphQlController {
 
         List<McpTool> mcpTools = input.tools()
             .stream()
-            .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters(), null))
+            .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters(), mcpComponent.getId()))
             .toList();
 
         return mcpServerFacade.create(mcpComponent, mcpTools);
@@ -98,7 +98,7 @@ public class McpComponentGraphQlController {
 
         List<McpTool> mcpTools = input.tools()
             .stream()
-            .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters(), null))
+            .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters(), id))
             .toList();
 
         return mcpServerFacade.update(mcpComponent, mcpTools);

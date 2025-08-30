@@ -13,7 +13,7 @@ import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
 import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.ee.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.ee.embedded.unified.pagination.CursorPageable;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 
 /**
  * @version ee

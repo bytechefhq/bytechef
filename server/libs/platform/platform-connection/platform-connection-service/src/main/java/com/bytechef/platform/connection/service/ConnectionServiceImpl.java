@@ -20,7 +20,6 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.FormatUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
@@ -67,11 +66,11 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public Connection create(
         @Nullable AuthorizationType authorizationType, String componentName, int connectionVersion,
-        Environment environment, String name, Map<String, Object> parameters, ModeType type) {
+        int environmentId, String name, Map<String, Object> parameters, ModeType type) {
 
         Assert.hasText(componentName, "'componentName' must not be empty");
         Assert.hasText(name, "'name' must not be empty");
-        Assert.notNull(environment, "'environment' must not be null");
+        Assert.notNull(environmentId, "'environment' must not be null");
         Assert.notNull(parameters, "'parameters' must not be null");
         Assert.notNull(type, "'type' must not be null");
 
@@ -80,7 +79,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setAuthorizationType(authorizationType);
         connection.setComponentName(componentName);
         connection.setConnectionVersion(connectionVersion);
-        connection.setEnvironment(environment);
+        connection.setEnvironmentId(environmentId);
         connection.setName(name);
         connection.setParameters(parameters);
         connection.setType(type);
@@ -118,7 +117,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Environment environment, ModeType type) {
+        String componentName, Integer connectionVersion, Long tagId, Integer environmentId, ModeType type) {
 
         List<Connection> connections;
 
@@ -144,9 +143,9 @@ public class ConnectionServiceImpl implements ConnectionService {
             }
         }
 
-        if (environment != null) {
+        if (environmentId != null) {
             connections = connections.stream()
-                .filter(connection -> connection.getEnvironment() == environment)
+                .filter(connection -> connection.getEnvironmentId() == environmentId)
                 .toList();
         }
 
