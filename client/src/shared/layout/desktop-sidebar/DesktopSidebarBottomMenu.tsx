@@ -12,16 +12,26 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {BlendIcon, DiamondIcon, HelpCircleIcon, SettingsIcon, User2Icon, UserRoundCogIcon} from 'lucide-react';
+import {
+    AudioLinesIcon,
+    BlendIcon,
+    DiamondIcon,
+    HelpCircleIcon,
+    SettingsIcon,
+    User2Icon,
+    UserRoundCogIcon,
+} from 'lucide-react';
 import {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 
@@ -29,6 +39,7 @@ const DesktopSidebarBottomMenu = () => {
     const {application} = useApplicationInfoStore();
     const {account, logout} = useAuthenticationStore();
     const {currentType, setCurrentType} = useModeTypeStore();
+    const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore();
     const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore();
 
     const analytics = useAnalytics();
@@ -42,6 +53,8 @@ const DesktopSidebarBottomMenu = () => {
     const ff_520 = useFeatureFlagsStore()('ff-520');
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+    const {data: environmentsQuery} = useEnvironmentsQuery();
+
     const {data: workspaces} = useGetUserWorkspacesQuery(account?.id!, !!account);
 
     const handleLogOutClick = () => {
@@ -62,11 +75,31 @@ const DesktopSidebarBottomMenu = () => {
         }
     };
 
-    const handleWorkflowValueChange = (value: string) => {
+    const handleEnvironmentValueChange = (value: string) => {
+        setCurrentEnvironmentId(+value);
+    };
+
+    const handleWorkspaceValueChange = (value: string) => {
         setCurrentWorkspaceId(+value);
 
         navigate('/automation/projects');
     };
+
+    useEffect(() => {
+        const environments = environmentsQuery?.environments;
+
+        if (environments && environments.length > 0) {
+            if (currentEnvironmentId) {
+                if (!environments.map((environment) => environment?.id!).find((id) => +id === currentEnvironmentId)) {
+                    if (environments[0]?.id) {
+                        setCurrentEnvironmentId(+environments[0]?.id);
+                    }
+                }
+            } else if (environments[0]?.id && !currentEnvironmentId) {
+                setCurrentEnvironmentId(+environments[0]?.id);
+            }
+        }
+    }, [currentEnvironmentId, environmentsQuery?.environments, setCurrentEnvironmentId]);
 
     useEffect(() => {
         if (workspaces && workspaces.length > 0) {
@@ -92,7 +125,7 @@ const DesktopSidebarBottomMenu = () => {
                 </Avatar>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="start" className="w-64 space-y-2 p-2">
+            <DropdownMenuContent align="start" className="w-72 space-y-2 p-2">
                 <div className="flex items-center space-x-2">
                     <Avatar className="cursor-pointer">
                         <AvatarFallback className="bg-muted">
@@ -130,6 +163,33 @@ const DesktopSidebarBottomMenu = () => {
                             </DropdownMenuSubContent>
                         </DropdownMenuPortal>
                     </DropdownMenuSub>
+                {application?.edition === 'EE' && environmentsQuery?.environments && (
+                    <>
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
+                                <AudioLinesIcon className="size-5" />
+
+                                {`Environment: ${environmentsQuery?.environments.find((w) => +w?.id! === currentEnvironmentId)?.name}`}
+                            </DropdownMenuSubTrigger>
+
+                            <DropdownMenuPortal>
+                                <DropdownMenuSubContent>
+                                    <DropdownMenuRadioGroup
+                                        onValueChange={handleEnvironmentValueChange}
+                                        value={currentEnvironmentId?.toString()}
+                                    >
+                                        {environmentsQuery?.environments.map((environment) => (
+                                            <DropdownMenuRadioItem key={environment?.id} value={environment?.id!}>
+                                                {environment?.name}
+                                            </DropdownMenuRadioItem>
+                                        ))}
+                                    </DropdownMenuRadioGroup>
+                                </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                        </DropdownMenuSub>
+
+                        <DropdownMenuSeparator />
+                    </>
                 )}
 
                 <DropdownMenuSeparator />
