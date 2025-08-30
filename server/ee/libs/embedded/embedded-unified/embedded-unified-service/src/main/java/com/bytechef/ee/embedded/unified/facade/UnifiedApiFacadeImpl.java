@@ -301,7 +301,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        Environment connectionEnvironment = connection.getEnvironment();
+        Environment connectionEnvironment = Environment.values()[connection.getEnvironmentId()];
 
         if (!Objects.equals(connectionEnvironment.name(), environment.name())) {
             throw new ConfigurationException(

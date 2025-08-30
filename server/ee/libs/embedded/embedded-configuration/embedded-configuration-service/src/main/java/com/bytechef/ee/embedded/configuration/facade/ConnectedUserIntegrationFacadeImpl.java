@@ -100,7 +100,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         Connection connection = connectionService.create(
             integrationInstanceConfiguration.getAuthorizationType(), integration.getComponentName(),
-            connectionDefinition.getVersion(), integrationInstanceConfiguration.getEnvironment(),
+            connectionDefinition.getVersion(), environment.ordinal(),
             integrationInstanceConfiguration.getName(), connectionParameters, ModeType.EMBEDDED);
 
         return integrationInstanceService.create(

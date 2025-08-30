@@ -86,7 +86,7 @@ public class ConnectionServiceIntTest {
         ModeType type = ModeType.AUTOMATION;
 
         Connection connection = connectionService.create(
-            authorizationType, componentName, connectionVersion, environment, name, parameters, type);
+            authorizationType, componentName, connectionVersion, environment.ordinal(), name, parameters, type);
 
         assertThat(connection)
             .hasFieldOrPropertyWithValue("authorizationType", authorizationType)
@@ -108,7 +108,7 @@ public class ConnectionServiceIntTest {
         ModeType type = ModeType.AUTOMATION;
 
         Connection connection = connectionService.create(
-            null, componentName, connectionVersion, environment, name, parameters, type);
+            null, componentName, connectionVersion, environment.ordinal(), name, parameters, type);
 
         assertThat(connection)
             .hasFieldOrPropertyWithValue("authorizationType", connection.getAuthorizationType())

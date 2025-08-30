@@ -9,7 +9,6 @@ package com.bytechef.ee.platform.connection.remote.client.fasade;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
@@ -45,7 +44,7 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
 
     @Override
     public List<ConnectionDTO> getConnections(
-        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Environment environment,
+        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Integer environmentId,
         ModeType type) {
 
         throw new UnsupportedOperationException();

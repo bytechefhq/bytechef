@@ -11,7 +11,6 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -41,7 +40,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public Connection create(
-        AuthorizationType authorizationType, String componentName, int connectionVersion, Environment environment,
+        AuthorizationType authorizationType, String componentName, int connectionVersion, int environmentId,
         String name, Map<String, Object> parameters, ModeType type) {
 
         throw new UnsupportedOperationException();
@@ -79,7 +78,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long typeId, Environment environment, ModeType type) {
+        String componentName, Integer connectionVersion, Long typeId, Integer environmentId, ModeType type) {
 
         throw new UnsupportedOperationException();
     }

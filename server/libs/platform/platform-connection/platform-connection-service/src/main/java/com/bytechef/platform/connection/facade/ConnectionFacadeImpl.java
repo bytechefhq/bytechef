@@ -27,7 +27,6 @@ import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -175,12 +174,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @Override
     @Transactional(readOnly = true)
     public List<ConnectionDTO> getConnections(
-        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Environment environment,
+        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Integer environmentId,
         ModeType type) {
 
         List<Connection> connections = CollectionUtils.filter(
             connectionService.getConnections(
-                componentName, connectionVersion, tagId, environment, type),
+                componentName, connectionVersion, tagId, environmentId, type),
             connection -> connectionIds.isEmpty() || connectionIds.contains(connection.getId()));
 
         return getConnections(connections);

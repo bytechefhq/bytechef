@@ -20,7 +20,6 @@ import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -171,8 +170,8 @@ public final class Connection {
         return CredentialStatus.values()[credentialStatus];
     }
 
-    public Environment getEnvironment() {
-        return Environment.values()[environment];
+    public int getEnvironmentId() {
+        return environment;
     }
 
     /**
@@ -248,8 +247,8 @@ public final class Connection {
         this.credentialStatus = credentialStatus.ordinal();
     }
 
-    public void setEnvironment(Environment environment) {
-        this.environment = environment.ordinal();
+    public void setEnvironmentId(int environmentId) {
+        this.environment = environmentId;
     }
 
     public void setId(Long id) {
