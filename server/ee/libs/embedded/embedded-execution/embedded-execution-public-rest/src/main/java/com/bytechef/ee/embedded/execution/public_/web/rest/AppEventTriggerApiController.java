@@ -30,8 +30,8 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentMode
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -46,7 +46,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -71,7 +70,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final WorkflowService workflowService;
-        private final EnvironmentService environmentService;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public AppEventTriggerApiController(

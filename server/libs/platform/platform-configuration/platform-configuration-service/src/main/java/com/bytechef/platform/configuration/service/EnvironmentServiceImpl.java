@@ -38,9 +38,11 @@ public class EnvironmentServiceImpl implements EnvironmentService {
             throw new IllegalArgumentException("Environment name must not be null");
         }
 
-        for (Environment env : Environment.values()) {
-            if (env.name().equalsIgnoreCase(name)) {
-                return env;
+        for (Environment environment : Environment.values()) {
+            String environmentName = environment.name();
+
+            if (environmentName.equalsIgnoreCase(name)) {
+                return environment;
             }
         }
 

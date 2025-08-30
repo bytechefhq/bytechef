@@ -22,7 +22,6 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -45,7 +44,7 @@ public class ActionApiController implements ActionApi {
     private static final String VALUE = "value";
 
     private final ActionFacade actionFacade;
-        private final EnvironmentService environmentService;
+    private final EnvironmentService environmentService;
 
     public ActionApiController(ActionFacade actionFacade, EnvironmentService environmentService) {
         this.actionFacade = actionFacade;
