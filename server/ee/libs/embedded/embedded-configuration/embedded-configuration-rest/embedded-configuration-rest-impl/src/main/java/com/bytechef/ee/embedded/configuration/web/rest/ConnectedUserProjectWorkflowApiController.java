@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.PublishConnectedUserProjectWorkflowRequestModel;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
@@ -34,13 +35,16 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConversionService conversionService;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowApiController(
-        ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService) {
+        ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService,
+        EnvironmentService environmentService) {
 
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.conversionService = conversionService;
+        this.environmentService = environmentService;
     }
 
     @Override
@@ -81,8 +85,8 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
             .build();
     }
 
-    private static Environment getEnvironment(EnvironmentModel xEnvironment) {
+    private Environment getEnvironment(EnvironmentModel xEnvironment) {
         return xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
+            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
     }
 }

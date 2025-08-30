@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -39,14 +40,17 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
 
     private final ConversionService conversionService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationApiController(
         ConversionService conversionService,
-        IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade) {
+        IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
+        EnvironmentService environmentService) {
 
         this.conversionService = conversionService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
+        this.environmentService = environmentService;
     }
 
     @Override
@@ -109,7 +113,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
         return ResponseEntity.ok(
             integrationInstanceConfigurationFacade
                 .getIntegrationInstanceConfigurations(
-                    environment == null ? null : Environment.valueOf(environment.getValue()), integrationId, tagId,
+                    environment == null ? null : environmentService.getEnvironment(environment.getValue()), integrationId, tagId,
                     includeAllFields)
                 .stream()
                 .map(this::toIntegrationInstanceConfigurationModel)
