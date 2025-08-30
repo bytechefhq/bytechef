@@ -3,3 +3,8 @@ enum EnvironmentEnum {
     STAGING
     PRODUCTION
 }
+
+type Environment {
+    id: ID
+    name: String
+}
