@@ -11,7 +11,7 @@ import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.time.Instant;
 import java.util.Collections;

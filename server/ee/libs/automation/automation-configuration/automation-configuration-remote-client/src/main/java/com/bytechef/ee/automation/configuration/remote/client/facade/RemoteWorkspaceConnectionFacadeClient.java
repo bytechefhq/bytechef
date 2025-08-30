@@ -8,7 +8,7 @@
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

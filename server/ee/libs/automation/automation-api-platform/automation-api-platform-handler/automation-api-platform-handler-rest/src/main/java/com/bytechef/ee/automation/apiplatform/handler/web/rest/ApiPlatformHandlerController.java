@@ -25,7 +25,7 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;

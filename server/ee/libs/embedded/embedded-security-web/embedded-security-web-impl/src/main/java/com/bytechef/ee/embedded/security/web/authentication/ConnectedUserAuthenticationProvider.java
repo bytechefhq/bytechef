@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.security.web.authentication;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;

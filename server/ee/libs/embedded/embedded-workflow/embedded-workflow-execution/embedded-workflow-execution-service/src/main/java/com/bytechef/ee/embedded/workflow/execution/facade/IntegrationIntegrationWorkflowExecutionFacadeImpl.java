@@ -43,7 +43,7 @@ import com.bytechef.ee.embedded.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;

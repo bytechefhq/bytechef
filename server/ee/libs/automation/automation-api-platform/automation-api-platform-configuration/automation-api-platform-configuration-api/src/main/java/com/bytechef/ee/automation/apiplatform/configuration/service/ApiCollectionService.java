@@ -8,7 +8,7 @@
 package com.bytechef.ee.automation.apiplatform.configuration.service;
 
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 
 /**

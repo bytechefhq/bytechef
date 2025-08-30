@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;

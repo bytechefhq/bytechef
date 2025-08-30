@@ -17,7 +17,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionModel;
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;

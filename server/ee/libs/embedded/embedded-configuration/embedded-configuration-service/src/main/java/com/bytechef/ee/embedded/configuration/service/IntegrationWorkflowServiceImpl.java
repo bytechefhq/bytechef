@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;

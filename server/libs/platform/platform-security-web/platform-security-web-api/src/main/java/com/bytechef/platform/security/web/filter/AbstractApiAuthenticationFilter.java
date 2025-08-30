@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.security.web.filter;
 
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.web.authentication.AbstractPublicApiAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.ApiKeyAuthenticationToken;
 import com.bytechef.tenant.domain.TenantKey;

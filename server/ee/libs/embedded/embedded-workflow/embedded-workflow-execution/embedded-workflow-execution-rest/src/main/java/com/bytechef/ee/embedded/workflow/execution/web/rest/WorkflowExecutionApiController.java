@@ -13,7 +13,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.workflow.execution.facade.IntegrationWorkflowExecutionFacade;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionModel;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;

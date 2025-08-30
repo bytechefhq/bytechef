@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.execution.facade;
 
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.List;
 import java.util.Map;

@@ -16,8 +16,8 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.constant.Environment;
 import java.util.List;
 
 /**

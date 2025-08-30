@@ -19,11 +19,11 @@ package com.bytechef.platform.connection.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;

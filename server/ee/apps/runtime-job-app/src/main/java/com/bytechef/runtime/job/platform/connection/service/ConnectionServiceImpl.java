@@ -8,9 +8,9 @@
 package com.bytechef.runtime.job.platform.connection.service;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.runtime.job.platform.connection.ConnectionContext;
 import java.util.List;

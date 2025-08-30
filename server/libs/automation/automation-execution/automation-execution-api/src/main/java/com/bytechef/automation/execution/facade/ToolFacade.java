@@ -17,7 +17,7 @@
 package com.bytechef.automation.execution.facade;
 
 import com.bytechef.automation.execution.dto.ToolDTO;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
 

@@ -20,13 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfiguration;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.McpComponent;
 import com.bytechef.platform.configuration.domain.McpServer;
 import com.bytechef.platform.configuration.repository.McpComponentRepository;
 import com.bytechef.platform.configuration.repository.McpServerRepository;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.mail.MailService;
 import java.util.List;

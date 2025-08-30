@@ -10,7 +10,7 @@ package com.bytechef.embedded.ai.mcp.server.config;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.execution.facade.ToolFacade;
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

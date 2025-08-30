@@ -19,7 +19,7 @@ import com.bytechef.ee.embedded.unified.web.rest.accounting.model.AccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreateUpdateAccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreatedModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.ListAccountsPageableParameterModel;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;

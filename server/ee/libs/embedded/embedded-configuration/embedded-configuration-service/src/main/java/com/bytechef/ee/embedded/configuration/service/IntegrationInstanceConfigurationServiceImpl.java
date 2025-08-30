@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;

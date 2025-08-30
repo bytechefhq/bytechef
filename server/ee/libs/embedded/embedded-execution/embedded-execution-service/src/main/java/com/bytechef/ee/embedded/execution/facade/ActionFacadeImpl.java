@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.execution.facade;
 
 import com.bytechef.ee.embedded.execution.util.ConnectionIdHelper;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;

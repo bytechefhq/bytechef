@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.connected.user.service;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.repository.ConnectedUserRepository;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.util.HashMap;
