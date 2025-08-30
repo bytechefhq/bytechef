@@ -1,10 +1,12 @@
 import {useToast} from '@/hooks/use-toast';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEffect, useState} from 'react';
 
 export default function useFetchInterceptor() {
     const {clearAuthentication} = useAuthenticationStore();
+    const {clearCurrentEnvironmentId} = useEnvironmentStore();
     const {clearCurrentWorkspaceId} = useWorkspaceStore();
     const [fetchIntercept, setFetchIntercept] = useState<typeof import('fetch-intercept') | null>(null);
 
@@ -49,6 +51,7 @@ export default function useFetchInterceptor() {
         response: function (response: any) {
             if (response.status === 403 || response.status === 401) {
                 clearAuthentication();
+                clearCurrentEnvironmentId();
                 clearCurrentWorkspaceId();
 
                 return response;
