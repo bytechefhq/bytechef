@@ -14,7 +14,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentMode
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecuteToolRequestModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.FunctionModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolModel;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

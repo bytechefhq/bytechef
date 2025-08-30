@@ -24,7 +24,7 @@ import com.bytechef.automation.configuration.web.rest.model.CreateProjectDeploym
 import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentWorkflowModel;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;

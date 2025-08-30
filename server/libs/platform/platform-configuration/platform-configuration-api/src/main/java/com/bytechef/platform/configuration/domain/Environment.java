@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.constant;
+package com.bytechef.platform.configuration.domain;
 
 /**
  * @author Ivica Cardic

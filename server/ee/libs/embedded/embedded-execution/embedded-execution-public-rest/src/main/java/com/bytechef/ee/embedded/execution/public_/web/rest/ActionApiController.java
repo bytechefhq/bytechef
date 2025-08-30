@@ -17,7 +17,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.converter.CaseInsensi
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecuteActionRequestModel;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;

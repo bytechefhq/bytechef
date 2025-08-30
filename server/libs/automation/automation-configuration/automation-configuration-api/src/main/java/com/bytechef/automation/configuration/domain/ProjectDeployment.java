@@ -17,7 +17,7 @@
 package com.bytechef.automation.configuration.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.time.Instant;
 import java.util.Collections;

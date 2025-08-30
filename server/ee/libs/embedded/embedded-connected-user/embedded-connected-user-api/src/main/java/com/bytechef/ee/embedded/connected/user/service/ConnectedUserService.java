@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.connected.user.service;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;

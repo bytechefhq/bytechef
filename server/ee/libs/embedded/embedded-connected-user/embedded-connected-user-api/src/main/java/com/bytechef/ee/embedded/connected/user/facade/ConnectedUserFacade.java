@@ -8,8 +8,8 @@
 package com.bytechef.ee.embedded.connected.user.facade;
 
 import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserDTO;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
-import com.bytechef.platform.constant.Environment;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 

@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.service;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.McpServer;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import java.util.List;
 

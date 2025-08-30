@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest.util;
 
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import org.apache.commons.lang3.StringUtils;
 
 /**

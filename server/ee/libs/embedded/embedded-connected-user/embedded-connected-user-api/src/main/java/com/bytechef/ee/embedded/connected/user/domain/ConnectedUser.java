@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.connected.user.domain;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;

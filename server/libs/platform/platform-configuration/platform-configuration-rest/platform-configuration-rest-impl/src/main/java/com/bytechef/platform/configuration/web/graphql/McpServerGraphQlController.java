@@ -17,11 +17,11 @@
 package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.McpComponent;
 import com.bytechef.platform.configuration.domain.McpServer;
 import com.bytechef.platform.configuration.facade.McpServerFacade;
 import com.bytechef.platform.configuration.service.McpServerService;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

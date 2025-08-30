@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.embedded.execution.facade;
 
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.Map;
 import org.springframework.lang.Nullable;
 

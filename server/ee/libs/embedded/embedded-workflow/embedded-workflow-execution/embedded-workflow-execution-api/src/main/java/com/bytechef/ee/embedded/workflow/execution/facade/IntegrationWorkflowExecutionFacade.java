@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.ee.embedded.workflow.execution.dto.WorkflowExecutionDTO;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.time.Instant;
 import org.springframework.data.domain.Page;
 
