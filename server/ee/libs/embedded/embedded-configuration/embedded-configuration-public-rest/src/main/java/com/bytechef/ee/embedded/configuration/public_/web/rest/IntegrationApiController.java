@@ -7,14 +7,14 @@
 
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
-import static com.bytechef.ee.embedded.configuration.public_.web.rest.util.EnvironmentUtils.getEnvironment;
-
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationBasicModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -38,13 +38,16 @@ public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;
     private final ConnectedUserIntegrationFacade connectedUserIntegrationFacade;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public IntegrationApiController(
-        ConversionService conversionService, ConnectedUserIntegrationFacade connectedUserIntegrationFacade) {
+        ConversionService conversionService, ConnectedUserIntegrationFacade connectedUserIntegrationFacade,
+        EnvironmentService environmentService) {
 
         this.conversionService = conversionService;
         this.connectedUserIntegrationFacade = connectedUserIntegrationFacade;
+        this.environmentService = environmentService;
     }
 
     @CrossOrigin
@@ -101,5 +104,9 @@ public class IntegrationApiController implements IntegrationApi {
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
+    }
+
+    private Environment getEnvironment(EnvironmentModel xEnvironment) {
+        return xEnvironment == null ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
     }
 }

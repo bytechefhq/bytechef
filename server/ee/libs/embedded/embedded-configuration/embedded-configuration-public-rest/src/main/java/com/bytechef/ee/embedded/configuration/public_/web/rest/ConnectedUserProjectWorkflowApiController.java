@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
-import static com.bytechef.ee.embedded.configuration.public_.web.rest.util.EnvironmentUtils.getEnvironment;
-
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
@@ -17,6 +15,8 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUs
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -40,13 +40,16 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConversionService conversionService;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowApiController(
-        ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService) {
+        ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService,
+        EnvironmentService environmentService) {
 
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.conversionService = conversionService;
+        this.environmentService = environmentService;
     }
 
     @Override
@@ -256,5 +259,9 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
+    }
+
+    private Environment getEnvironment(EnvironmentModel xEnvironment) {
+        return xEnvironment == null ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
     }
 }
