@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
-import static com.bytechef.ee.embedded.configuration.public_.web.rest.util.EnvironmentUtils.getEnvironment;
-
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
@@ -16,6 +14,8 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseIns
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendIntegrationInstanceRequestConnectionModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendIntegrationInstanceRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -37,10 +37,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class IntegrationInstanceApiController implements IntegrationInstanceApi {
 
     private final ConnectedUserIntegrationFacade connectedUserIntegrationFacade;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
-    public IntegrationInstanceApiController(ConnectedUserIntegrationFacade connectedUserIntegrationFacade) {
+    public IntegrationInstanceApiController(ConnectedUserIntegrationFacade connectedUserIntegrationFacade,
+        EnvironmentService environmentService) {
         this.connectedUserIntegrationFacade = connectedUserIntegrationFacade;
+        this.environmentService = environmentService;
     }
 
     @Override
@@ -104,5 +107,9 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
+    }
+
+    private Environment getEnvironment(EnvironmentModel xEnvironment) {
+        return xEnvironment == null ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
     }
 }

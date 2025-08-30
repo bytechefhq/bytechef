@@ -7,11 +7,11 @@
 
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
-import static com.bytechef.ee.embedded.configuration.public_.web.rest.util.EnvironmentUtils.getEnvironment;
-
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -30,10 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConnectedUserApiController implements ConnectedUserApi {
 
     private final ConnectedUserService connectedUserService;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
-    public ConnectedUserApiController(ConnectedUserService connectedUserService) {
+    public ConnectedUserApiController(ConnectedUserService connectedUserService,
+        EnvironmentService environmentService) {
         this.connectedUserService = connectedUserService;
+        this.environmentService = environmentService;
     }
 
     @Override
@@ -58,5 +61,9 @@ public class ConnectedUserApiController implements ConnectedUserApi {
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    private Environment getEnvironment(EnvironmentModel xEnvironment) {
+        return xEnvironment == null ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
     }
 }

@@ -22,8 +22,8 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentMode
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -37,7 +37,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -60,6 +59,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final WorkflowService workflowService;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public RequestTriggerApiController(
@@ -68,7 +68,8 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         HttpServletResponse httpServletResponse, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerDefinitionService triggerDefinitionService, WebhookWorkflowExecutor webhookWorkflowExecutor,
         WorkflowService workflowService, IntegrationInstanceService integrationInstanceService,
-        IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService1) {
+        IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService1,
+        EnvironmentService environmentService) {
 
         super(
             filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
@@ -80,12 +81,13 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         this.integrationInstanceService = integrationInstanceService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.workflowService = workflowService1;
+        this.environmentService = environmentService;
     }
 
     @Override
     public ResponseEntity<Object> executeWorkflow(String workflowReferenceCode, EnvironmentModel xEnvironment) {
         Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
+            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);
