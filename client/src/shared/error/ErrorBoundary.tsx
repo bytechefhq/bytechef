@@ -44,7 +44,7 @@ class ErrorBoundary extends Component<Props, StateI> {
             }
 
             return (
-                <div className="flex h-full flex-col items-center justify-center p-8">
+                <div className="flex size-full flex-col items-center justify-center p-8">
                     <div className="max-w-md space-y-4 text-center">
                         <AlertCircle className="mx-auto size-12 text-destructive" />
 
