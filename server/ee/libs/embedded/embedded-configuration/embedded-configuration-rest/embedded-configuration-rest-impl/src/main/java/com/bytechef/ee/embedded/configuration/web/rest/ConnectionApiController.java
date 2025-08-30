@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionRequestModel;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -42,15 +43,17 @@ public class ConnectionApiController implements ConnectionApi {
     private final ConnectedUserConnectionFacade connectedUserConnectionFacade;
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public ConnectionApiController(
         ConnectedUserConnectionFacade connectedUserConnectionFacade, ConnectionFacade connectionFacade,
-        ConversionService conversionService) {
+        ConversionService conversionService, EnvironmentService environmentService) {
 
         this.connectedUserConnectionFacade = connectedUserConnectionFacade;
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
+        this.environmentService = environmentService;
     }
 
     @Override
@@ -99,7 +102,7 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<List<ConnectionModel>> getConnections(
         String componentName, Integer connectionVersion, EnvironmentModel environmentModel, Long tagId) {
 
-        Environment environment = Environment.valueOf(environmentModel.name());
+        Environment environment = environmentModel == null ? null : environmentService.getEnvironment(environmentModel.name());
 
         return ResponseEntity.ok(
             connectionFacade

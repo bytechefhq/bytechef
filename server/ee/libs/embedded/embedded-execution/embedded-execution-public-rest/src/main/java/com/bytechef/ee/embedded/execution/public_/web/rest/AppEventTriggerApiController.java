@@ -30,6 +30,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentMode
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -70,6 +71,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final WorkflowService workflowService;
+        private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public AppEventTriggerApiController(
@@ -80,7 +82,8 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
-        IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService) {
+        IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService,
+        EnvironmentService environmentService) {
 
         super(
             filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
@@ -94,11 +97,12 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.workflowService = workflowService;
+        this.environmentService = environmentService;
     }
 
     public ResponseEntity<Void> executeWorkflows(EnvironmentModel xEnvironment) {
         Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
+            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);

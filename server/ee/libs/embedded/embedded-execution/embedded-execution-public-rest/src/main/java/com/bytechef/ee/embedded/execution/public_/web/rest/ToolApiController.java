@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecuteToolRequ
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.FunctionModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolModel;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,9 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ToolApiController implements ToolApi {
 
     private final ToolFacade toolFacade;
+        private final EnvironmentService environmentService;
 
-    public ToolApiController(ToolFacade toolFacade) {
+    public ToolApiController(ToolFacade toolFacade, EnvironmentService environmentService) {
         this.toolFacade = toolFacade;
+        this.environmentService = environmentService;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class ToolApiController implements ToolApi {
         Long xInstanceId) {
 
         Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
+            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
 
         return ResponseEntity.ok(
             toolFacade.executeTool(
@@ -59,7 +62,7 @@ public class ToolApiController implements ToolApi {
         List<String> tools) {
 
         Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
+            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
 
         return ResponseEntity.ok(
             toolFacade

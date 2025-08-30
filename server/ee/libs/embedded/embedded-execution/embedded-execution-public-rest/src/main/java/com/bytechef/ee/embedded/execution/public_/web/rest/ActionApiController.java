@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentMode
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecuteActionRequestModel;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -44,9 +45,11 @@ public class ActionApiController implements ActionApi {
     private static final String VALUE = "value";
 
     private final ActionFacade actionFacade;
+        private final EnvironmentService environmentService;
 
-    public ActionApiController(ActionFacade actionFacade) {
+    public ActionApiController(ActionFacade actionFacade, EnvironmentService environmentService) {
         this.actionFacade = actionFacade;
+        this.environmentService = environmentService;
     }
 
     @Override
@@ -55,7 +58,7 @@ public class ActionApiController implements ActionApi {
         ExecuteActionRequestModel executeActionRequestModel, EnvironmentModel xEnvironment, Long xInstanceId) {
 
         Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
+            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
 
         Map<String, Object> inputParameters = new HashMap<>(executeActionRequestModel.getInput());
 
