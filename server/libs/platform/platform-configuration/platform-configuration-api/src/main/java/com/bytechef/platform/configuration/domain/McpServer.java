@@ -128,6 +128,10 @@ public final class McpServer {
         return Environment.values()[environment];
     }
 
+    public long getEnvironmentId() {
+        return environment;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -172,7 +176,9 @@ public final class McpServer {
     }
 
     public void setEnvironment(Environment environment) {
-        this.environment = environment.ordinal();
+        if (environment != null) {
+            this.environment = environment.ordinal();
+        }
     }
 
     public void setEnabled(boolean enabled) {

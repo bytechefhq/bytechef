@@ -78,7 +78,7 @@ public record ConnectionDTO(
         private String createdBy;
         private Instant createdDate;
         private CredentialStatus credentialStatus;
-        private int environment;
+        private int environmentId;
         private Long id;
         private String lastModifiedBy;
         private Instant lastModifiedDate;
@@ -138,8 +138,8 @@ public record ConnectionDTO(
             return this;
         }
 
-        public Builder environment(int environment) {
-            this.environment = environment;
+        public Builder environmentId(int environmentId) {
+            this.environmentId = environmentId;
 
             return this;
         }
@@ -188,7 +188,7 @@ public record ConnectionDTO(
         public ConnectionDTO build() {
             return new ConnectionDTO(
                 active, authorizationType, Map.of(), baseUri, componentName, Map.of(), connectionVersion, createdBy,
-                createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters,
+                createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters,
                 tags, version);
         }
     }

@@ -52,7 +52,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         connectedUserProjectFacade.enableProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode, enable,
-            getEnvironment(xEnvironment));
+            (long) getEnvironment(xEnvironment).ordinal());
 
         return ResponseEntity.noContent()
             .build();
@@ -66,7 +66,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
             conversionService.convert(
                 connectedUserProjectFacade.getConnectedUserProjectWorkflow(
                     OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
-                    getEnvironment(xEnvironment)),
+                    (long) getEnvironment(xEnvironment).ordinal()),
                 ConnectedUserProjectWorkflowModel.class));
     }
 
@@ -78,7 +78,8 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         connectedUserProjectFacade.publishProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
-            publishConnectedUserProjectWorkflowRequestModel.getDescription(), getEnvironment(xEnvironment));
+            publishConnectedUserProjectWorkflowRequestModel.getDescription(),
+            (long) getEnvironment(xEnvironment).ordinal());
 
         return ResponseEntity.noContent()
             .build();

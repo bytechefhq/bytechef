@@ -35,7 +35,7 @@ public interface ConnectionFacade {
     List<ConnectionDTO> getConnections(List<Long> connectionIds, ModeType type);
 
     List<ConnectionDTO> getConnections(
-        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Integer environmentId,
+        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Long environmentId,
         ModeType type);
 
     List<Tag> getConnectionTags(ModeType type);

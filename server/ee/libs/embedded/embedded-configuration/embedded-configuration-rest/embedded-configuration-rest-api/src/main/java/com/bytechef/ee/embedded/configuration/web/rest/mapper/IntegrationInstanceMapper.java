@@ -30,9 +30,9 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstance, IntegrationInstanceBasicModel> {
 
         @Override
-        @Mapping(target = "environment", ignore = true)
+        @Mapping(target = "environmentId", ignore = true)
         @Mapping(target = "lastExecutionDate", ignore = true)
-        IntegrationInstanceBasicModel convert(IntegrationInstance integrationInstanc);
+        IntegrationInstanceBasicModel convert(IntegrationInstance integrationInstance);
     }
 
     @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
@@ -40,7 +40,7 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstance, IntegrationInstanceModel> {
 
         @Override
-        @Mapping(target = "environment", ignore = true)
+        @Mapping(target = "environmentId", ignore = true)
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "integrationInstanceConfiguration", ignore = true)
         @Mapping(target = "integrationInstanceWorkflows", ignore = true)
@@ -56,7 +56,9 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstanceDTO, IntegrationInstanceBasicModel> {
 
         @Override
-        IntegrationInstanceBasicModel convert(IntegrationInstanceDTO integrationInstance);
+        @Mapping(
+            target = "environmentId", expression = "java(Long.valueOf(integrationInstanceDTO.environment().ordinal()))")
+        IntegrationInstanceBasicModel convert(IntegrationInstanceDTO integrationInstanceDTO);
     }
 
     @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
@@ -64,6 +66,8 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstanceDTO, IntegrationInstanceModel> {
 
         @Override
-        IntegrationInstanceModel convert(IntegrationInstanceDTO integrationInstance);
+        @Mapping(
+            target = "environmentId", expression = "java(Long.valueOf(integrationInstanceDTO.environment().ordinal()))")
+        IntegrationInstanceModel convert(IntegrationInstanceDTO integrationInstanceDTO);
     }
 }

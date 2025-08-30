@@ -36,15 +36,19 @@ public class ProjectDeploymentMapper {
     public interface ProjectDeploymentBasicToProjectDeploymentModelMapper
         extends Converter<ProjectDeployment, ProjectDeploymentBasicModel> {
 
+        @Mapping(
+            target = "environmentId", expression = "java(Long.valueOf(projectInstance.getEnvironment().ordinal()))")
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Override
-        ProjectDeploymentBasicModel convert(ProjectDeployment projectInstanc);
+        ProjectDeploymentBasicModel convert(ProjectDeployment projectInstance);
     }
 
     @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
     public interface ProjectDeploymentToProjectDeploymentModelMapper
         extends Converter<ProjectDeployment, ProjectDeploymentModel> {
 
+        @Mapping(
+            target = "environmentId", expression = "java(Long.valueOf(projectDeployment.getEnvironment().ordinal()))")
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "project", ignore = true)
         @Mapping(target = "projectDeploymentWorkflows", ignore = true)
@@ -58,11 +62,16 @@ public class ProjectDeploymentMapper {
         extends Converter<ProjectDeploymentDTO, ProjectDeploymentModel> {
 
         @Override
+        @Mapping(
+            target = "environmentId", expression = "java(Long.valueOf(projectDeploymentDTO.environment().ordinal()))")
         ProjectDeploymentModel convert(ProjectDeploymentDTO projectDeploymentDTO);
 
         @InheritInverseConfiguration
         @DelegatingConverter
         @Mapping(target = "project", ignore = true)
+        @Mapping(
+            target = "environment",
+            expression = "java(projectDeploymentModel.getEnvironmentId() == null ? null : com.bytechef.platform.configuration.domain.Environment.values()[projectDeploymentModel.getEnvironmentId().intValue()])")
         ProjectDeploymentDTO invertConvert(ProjectDeploymentModel projectDeploymentModel);
     }
 }

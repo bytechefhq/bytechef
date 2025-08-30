@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -90,7 +91,7 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     @Override
     public ResponseEntity<Void> saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey,
-        SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel) {
+        @NonNull SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel) {
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey,

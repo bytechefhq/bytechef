@@ -42,10 +42,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * Integration test for {@link McpServerGraphQlController}. This test focuses on testing the GraphQL layer with mocked
- * service dependencies.
- *
- * @author ByteChef
+ * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
 public class McpServerGraphQlControllerIntTest {
@@ -63,8 +60,9 @@ public class McpServerGraphQlControllerIntTest {
     void testGetMcpServerById() {
         // Given
         Long serverId = 1L;
-        McpServer mockServer =
-            createMockMcpServer(serverId, "Test Server", ModeType.AUTOMATION, Environment.DEVELOPMENT, true);
+        McpServer mockServer = createMockMcpServer(
+            serverId, "Test Server", ModeType.AUTOMATION, Environment.DEVELOPMENT, true);
+
         when(mcpServerService.getMcpServer(serverId)).thenReturn(mockServer);
 
         // When
@@ -86,6 +84,7 @@ public class McpServerGraphQlControllerIntTest {
         List<McpServer> mockServers = List.of(
             createMockMcpServer(1L, "Server 1", ModeType.AUTOMATION, Environment.DEVELOPMENT, true),
             createMockMcpServer(2L, "Server 2", ModeType.AUTOMATION, Environment.PRODUCTION, false));
+
         when(mcpServerService.getMcpServers(ModeType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC))
             .thenReturn(mockServers);
 
@@ -106,11 +105,11 @@ public class McpServerGraphQlControllerIntTest {
     @Test
     void testCreateMcpServer() {
         // Given
-        McpServerGraphQlController.McpServerInput input =
-            new McpServerGraphQlController.McpServerInput("New Server", ModeType.AUTOMATION, Environment.DEVELOPMENT,
-                true);
-        McpServer mockServer =
-            createMockMcpServer(1L, "New Server", ModeType.AUTOMATION, Environment.DEVELOPMENT, true);
+        McpServerGraphQlController.McpServerInput input = new McpServerGraphQlController.McpServerInput(
+            "New Server", ModeType.AUTOMATION, Environment.DEVELOPMENT.ordinal(), true);
+        McpServer mockServer = createMockMcpServer(
+            1L, "New Server", ModeType.AUTOMATION, Environment.DEVELOPMENT, true);
+
         when(mcpServerService.create(anyString(), any(ModeType.class), any(Environment.class), any(Boolean.class)))
             .thenReturn(mockServer);
 
@@ -129,11 +128,12 @@ public class McpServerGraphQlControllerIntTest {
     @Test
     void testUpdateMcpServer() {
         // Given
-        Long serverId = 1L;
+        long serverId = 1L;
         McpServerGraphQlController.McpServerUpdateInput input =
             new McpServerGraphQlController.McpServerUpdateInput("Updated Server", false);
         McpServer mockServer =
             createMockMcpServer(serverId, "Updated Server", ModeType.AUTOMATION, Environment.DEVELOPMENT, false);
+
         when(mcpServerService.update(anyLong(), anyString(), any(Boolean.class))).thenReturn(mockServer);
 
         // When
@@ -156,6 +156,7 @@ public class McpServerGraphQlControllerIntTest {
         List<Tag> mockTags = List.of(
             createMockTag(1L, "tag1"),
             createMockTag(2L, "tag2"));
+
         when(mcpServerFacade.updateMcpServerTags(anyLong(), any())).thenReturn(mockTags);
 
         // When
@@ -174,7 +175,7 @@ public class McpServerGraphQlControllerIntTest {
     @Test
     void testDeleteMcpServer() {
         // Given
-        Long serverId = 1L;
+        long serverId = 1L;
 
         // When
         boolean result = mcpServerGraphQlController.deleteMcpServer(serverId);
@@ -192,6 +193,7 @@ public class McpServerGraphQlControllerIntTest {
         List<McpComponent> mockComponents = List.of(
             createMockMcpComponent(1L, "component1", 1));
         Map<McpServer, List<McpComponent>> mockComponentsMap = Map.of(mockServers.get(0), mockComponents);
+
         when(mcpServerFacade.getMcpServerMcpComponents(mockServers)).thenReturn(mockComponentsMap);
 
         // When
@@ -214,6 +216,7 @@ public class McpServerGraphQlControllerIntTest {
         List<Tag> mockTags = List.of(
             createMockTag(1L, "tag1"));
         Map<McpServer, List<Tag>> mockTagsMap = Map.of(mockServers.get(0), mockTags);
+
         when(mcpServerFacade.getMcpServerTags(mockServers)).thenReturn(mockTagsMap);
 
         // When
@@ -228,25 +231,32 @@ public class McpServerGraphQlControllerIntTest {
         verify(mcpServerFacade).getMcpServerTags(mockServers);
     }
 
-    private McpServer
-        createMockMcpServer(Long id, String name, ModeType type, Environment environment, Boolean enabled) {
+    private McpServer createMockMcpServer(
+        Long id, String name, ModeType type, Environment environment, Boolean enabled) {
+
         McpServer server = new McpServer(name, type, environment, enabled);
+
         server.setId(id);
         server.setVersion(1);
+
         return server;
     }
 
     private McpComponent createMockMcpComponent(Long id, String componentName, int componentVersion) {
         McpComponent component = new McpComponent(componentName, componentVersion, 1L, null);
+
         component.setId(id);
         component.setVersion(1);
+
         return component;
     }
 
     private Tag createMockTag(Long id, String name) {
         Tag tag = new Tag();
+
         tag.setId(id);
         tag.setName(name);
+
         return tag;
     }
 }

@@ -30,7 +30,6 @@ import org.springframework.core.convert.converter.Converter;
 public interface WorkspaceConnectionMapper extends Converter<ConnectionDTO, ConnectionModel> {
 
     @Override
-    @Mapping(target = "environment", source = "environmentId")
     @Mapping(target = "workspaceId", ignore = true)
     ConnectionModel convert(ConnectionDTO connectionDTO);
 }

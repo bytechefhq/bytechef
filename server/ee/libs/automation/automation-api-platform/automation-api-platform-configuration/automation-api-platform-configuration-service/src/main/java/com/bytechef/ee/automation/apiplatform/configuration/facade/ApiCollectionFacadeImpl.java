@@ -30,6 +30,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectio
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -70,6 +71,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
     private final ApiCollectionService apiCollectionService;
     private final ApiCollectionEndpointService apiCollectionEndpointService;
+    private final EnvironmentService environmentService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -81,12 +83,14 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     @SuppressFBWarnings("EI")
     public ApiCollectionFacadeImpl(
         ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
-        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
+        EnvironmentService environmentService, ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TagService tagService, WorkflowService workflowService) {
 
         this.apiCollectionService = apiCollectionService;
         this.apiCollectionEndpointService = apiCollectionEndpointService;
+        this.environmentService = environmentService;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
@@ -172,7 +176,9 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
     @Override
     public List<ApiCollectionDTO> getApiCollections(
-        long workspaceId, Environment environment, Long projectId, Long tagId) {
+        long workspaceId, Long environmentId, Long projectId, Long tagId) {
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
 
         return apiCollectionService.getApiCollections(workspaceId, environment, projectId, tagId)
             .stream()

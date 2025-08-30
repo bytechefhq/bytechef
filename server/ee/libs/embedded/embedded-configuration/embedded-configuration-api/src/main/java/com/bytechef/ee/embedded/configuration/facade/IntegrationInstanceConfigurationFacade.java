@@ -43,7 +43,7 @@ public interface IntegrationInstanceConfigurationFacade {
     List<Tag> getIntegrationInstanceConfigurationTags();
 
     List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
-        Environment environment, Long integrationId, Long tagId, boolean includeAllFields);
+        Long environmentId, Long integrationId, Long tagId, boolean includeAllFields);
 
     void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO);

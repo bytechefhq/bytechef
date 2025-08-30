@@ -21,10 +21,8 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.web.rest.model.CreateProjectDeploymentWorkflowJob200ResponseModel;
-import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentWorkflowModel;
-import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -99,13 +97,11 @@ public class ProjectDeploymentApiController implements ProjectDeploymentApi {
 
     @Override
     public ResponseEntity<List<ProjectDeploymentModel>> getWorkspaceProjectDeployments(
-        Long id, EnvironmentModel environment, Long projectId, Long tagId, Boolean includeAllFields) {
+        Long id, Long environmentId, Long projectId, Long tagId, Boolean includeAllFields) {
 
         return ResponseEntity.ok(
             projectDeploymentFacade
-                .getWorkspaceProjectDeployments(
-                    id, environment == null ? null : Environment.valueOf(environment.getValue()), projectId, tagId,
-                    includeAllFields)
+                .getWorkspaceProjectDeployments(id, environmentId, projectId, tagId, includeAllFields)
                 .stream()
                 .map(projectDeployment -> conversionService.convert(projectDeployment, ProjectDeploymentModel.class))
                 .toList());

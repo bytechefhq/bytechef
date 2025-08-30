@@ -46,6 +46,7 @@ import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -81,6 +82,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
+    private final EnvironmentService environmentService;
     private final PrincipalJobFacade principalJobFacade;
     private final PrincipalJobService principalJobService;
     private final JobFacade jobFacade;
@@ -99,7 +101,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentFacadeImpl(
-        ConnectionService connectionService, Evaluator evaluator, PrincipalJobFacade principalJobFacade,
+        ConnectionService connectionService, Evaluator evaluator, EnvironmentService environmentService,
+        PrincipalJobFacade principalJobFacade,
         PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
@@ -110,6 +113,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         this.connectionService = connectionService;
         this.evaluator = evaluator;
+        this.environmentService = environmentService;
         this.principalJobFacade = principalJobFacade;
         this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
@@ -299,7 +303,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     public List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
-        long id, Environment environment, Long projectId, Long tagId, boolean includeAllFields) {
+        long id, Long environmentId, Long projectId, Long tagId, boolean includeAllFields) {
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
 
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
             false, environment, projectId, tagId, id);
@@ -354,7 +360,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @Override
     public void updateProjectDeployment(
         long projectId, int projectVersion, String workflowReferenceCode,
-        List<ProjectDeploymentWorkflowConnection> connections, Environment environment) {
+        List<ProjectDeploymentWorkflowConnection> connections, Long environmentId) {
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
 
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
             projectDeploymentService.getProjectDeploymentId(projectId, environment));

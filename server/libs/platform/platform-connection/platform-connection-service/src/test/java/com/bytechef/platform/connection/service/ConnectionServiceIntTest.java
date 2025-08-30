@@ -92,7 +92,7 @@ public class ConnectionServiceIntTest {
             .hasFieldOrPropertyWithValue("authorizationType", authorizationType)
             .hasFieldOrPropertyWithValue("componentName", componentName)
             .hasFieldOrPropertyWithValue("connectionVersion", connectionVersion)
-            .hasFieldOrPropertyWithValue("environment", environment)
+            .hasFieldOrPropertyWithValue("environment", environment.ordinal())
             .hasFieldOrPropertyWithValue("name", name)
             .hasFieldOrPropertyWithValue("parameters", parameters)
             .hasFieldOrPropertyWithValue("type", type);
@@ -114,7 +114,7 @@ public class ConnectionServiceIntTest {
             .hasFieldOrPropertyWithValue("authorizationType", connection.getAuthorizationType())
             .hasFieldOrPropertyWithValue("componentName", componentName)
             .hasFieldOrPropertyWithValue("connectionVersion", connectionVersion)
-            .hasFieldOrPropertyWithValue("environment", environment)
+            .hasFieldOrPropertyWithValue("environment", environment.ordinal())
             .hasFieldOrPropertyWithValue("name", name)
             .hasFieldOrPropertyWithValue("parameters", parameters)
             .hasFieldOrPropertyWithValue("type", type);

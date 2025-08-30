@@ -128,6 +128,10 @@ public class ProjectDeployment {
         return Environment.values()[environment];
     }
 
+    public long getEnvironmentId() {
+        return environment;
+    }
+
     public Long getId() {
         return id;
     }
@@ -172,7 +176,9 @@ public class ProjectDeployment {
     }
 
     public void setEnvironment(Environment environment) {
-        this.environment = environment.ordinal();
+        if (environment != null) {
+            this.environment = environment.ordinal();
+        }
     }
 
     public void setId(Long id) {

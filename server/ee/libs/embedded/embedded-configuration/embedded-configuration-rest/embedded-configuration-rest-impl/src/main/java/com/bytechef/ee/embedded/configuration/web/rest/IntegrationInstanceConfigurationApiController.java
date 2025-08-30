@@ -14,10 +14,8 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel;
-import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
-import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -39,17 +37,14 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
 
     private final ConversionService conversionService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
-    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationApiController(
         ConversionService conversionService,
-        IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
-        EnvironmentService environmentService) {
+        IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade) {
 
         this.conversionService = conversionService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
-        this.environmentService = environmentService;
     }
 
     @Override
@@ -107,14 +102,11 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
 
     @Override
     public ResponseEntity<List<IntegrationInstanceConfigurationModel>> getIntegrationInstanceConfigurations(
-        EnvironmentModel environment, Long integrationId, Long tagId, Boolean includeAllFields) {
+        Long environmentId, Long integrationId, Long tagId, Boolean includeAllFields) {
 
         return ResponseEntity.ok(
             integrationInstanceConfigurationFacade
-                .getIntegrationInstanceConfigurations(
-                    environment == null ? null : environmentService.getEnvironment(environment.getValue()),
-                    integrationId, tagId,
-                    includeAllFields)
+                .getIntegrationInstanceConfigurations(environmentId, integrationId, tagId, includeAllFields)
                 .stream()
                 .map(this::toIntegrationInstanceConfigurationModel)
                 .toList());

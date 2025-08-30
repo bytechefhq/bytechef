@@ -130,7 +130,8 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.deleteProjectDeployment(projectDeploymentToDelete.id());
 
         List<ProjectDeploymentDTO> workspaceProjectDeployments = projectDeploymentFacade.getWorkspaceProjectDeployments(
-            workspace.getId(), Environment.DEVELOPMENT, projectDeploymentToDelete.projectId(), null, true);
+            workspace.getId(), (long) Environment.DEVELOPMENT.ordinal(), projectDeploymentToDelete.projectId(), null,
+            true);
 
         assertThat(workspaceProjectDeployments).hasSize(0);
     }

@@ -5,26 +5,23 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.automation.configuration.service;
+package com.bytechef.ee.automation.configuration.remote.client.service;
 
-import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import java.util.Arrays;
 import java.util.List;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-@Service
-@ConditionalOnEEVersion
-public class EnvironmentServiceImpl implements EnvironmentService {
+@Component
+public class RemoteEnvironmentServiceClient implements EnvironmentService {
 
     @Override
     public List<Environment> getEnvironments() {
-        return Arrays.asList(Environment.values());
+        throw new UnsupportedOperationException();
     }
 }

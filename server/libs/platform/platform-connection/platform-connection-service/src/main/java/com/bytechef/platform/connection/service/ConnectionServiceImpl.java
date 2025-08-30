@@ -117,7 +117,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Integer environmentId, ModeType type) {
+        String componentName, Integer connectionVersion, Long tagId, Long environmentId, ModeType type) {
 
         List<Connection> connections;
 

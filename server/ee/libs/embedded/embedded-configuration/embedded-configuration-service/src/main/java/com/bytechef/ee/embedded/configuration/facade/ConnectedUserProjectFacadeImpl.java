@@ -41,6 +41,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -82,6 +83,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
+    private final EnvironmentService environmentService;
     private final JobService jobService;
     private final PrincipalJobService principalJobService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
@@ -99,9 +101,9 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public ConnectedUserProjectFacadeImpl(
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
-        ConnectedUserService connectedUserService, ConnectionService connectionService, JobService jobService,
-        PrincipalJobService principalJobService, ProjectDeploymentFacade projectDeploymentFacade,
-        ProjectDeploymentService projectDeploymentService,
+        ConnectedUserService connectedUserService, ConnectionService connectionService,
+        EnvironmentService environmentService, JobService jobService, PrincipalJobService principalJobService,
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectFacade projectFacade,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService, WorkflowFacade workflowFacade,
         WorkflowService workflowService, WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
@@ -111,6 +113,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         this.connectedUserService = connectedUserService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectionService = connectionService;
+        this.environmentService = environmentService;
         this.jobService = jobService;
         this.principalJobService = principalJobService;
         this.projectDeploymentFacade = projectDeploymentFacade;
@@ -179,7 +182,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public void enableProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, boolean enable, Environment environment) {
+        String externalUserId, String workflowReferenceCode, boolean enable, Long environmentId) {
+
+        Environment environment = environmentId == null
+            ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
@@ -194,7 +200,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public ConnectedUserProjectWorkflowDTO getConnectedUserProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, Environment environment) {
+        String externalUserId, String workflowReferenceCode, Long environmentId) {
+
+        Environment environment = environmentId == null
+            ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
@@ -260,7 +269,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public void publishProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, String description, Environment environment) {
+        String externalUserId, String workflowReferenceCode, String description, Long environmentId) {
+
+        Environment environment = environmentId == null
+            ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
@@ -302,7 +314,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         } else {
             projectDeploymentFacade.updateProjectDeployment(
                 connectedUserProject.getProjectId(), newProjectVersion - 1, workflowReferenceCode, connections,
-                environment);
+                environmentId);
         }
 
         connectedUserProjectWorkflowService.incrementWorkflowVersion(

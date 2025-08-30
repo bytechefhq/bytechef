@@ -174,7 +174,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @Override
     @Transactional(readOnly = true)
     public List<ConnectionDTO> getConnections(
-        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Integer environmentId,
+        String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Long environmentId,
         ModeType type) {
 
         List<Connection> connections = CollectionUtils.filter(

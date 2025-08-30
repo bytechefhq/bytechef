@@ -57,13 +57,13 @@ public interface EnvironmentService {
      *
      * @throws IllegalArgumentException if the identifier is out of range
      */
-    default Environment getEnvironment(int environmentId) {
+    default Environment getEnvironment(long environmentId) {
         Environment[] values = Environment.values();
 
         if (environmentId < 0 || environmentId >= values.length) {
             throw new IllegalArgumentException("Environment id out of range: " + environmentId);
         }
 
-        return values[environmentId];
+        return values[(int) environmentId];
     }
 }

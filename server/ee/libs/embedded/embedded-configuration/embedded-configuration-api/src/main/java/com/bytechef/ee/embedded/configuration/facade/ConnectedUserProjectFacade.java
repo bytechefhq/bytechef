@@ -25,10 +25,10 @@ public interface ConnectedUserProjectFacade {
     void deleteProjectWorkflow(String externalUserId, String workflowReferenceCode, Environment environment);
 
     void enableProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, boolean enable, Environment environment);
+        String externalUserId, String workflowReferenceCode, boolean enable, Long environmentId);
 
     ConnectedUserProjectWorkflowDTO getConnectedUserProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, Environment environment);
+        String externalUserId, String workflowReferenceCode, Long environmentId);
 
     List<ConnectedUserProjectWorkflowDTO> getConnectedUserProjectWorkflows(
         String externalUserId, Environment environment);
@@ -36,8 +36,12 @@ public interface ConnectedUserProjectFacade {
     List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment);
 
     void publishProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, String description, Environment environment);
+        String externalUserId, String workflowReferenceCode, String description, Long environmentId);
 
     void updateProjectWorkflow(
         String externalUserId, String workflowReferenceCode, String definition, Environment environment);
+
+    void updateWorkflowConfigurationConnection(
+        String externalUserId, String workflowReferenceCode, String workflowNodeName, String workflowConnectionKey,
+        long connectionId, Environment environment);
 }

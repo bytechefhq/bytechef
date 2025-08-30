@@ -100,7 +100,7 @@ public class ConnectionFacadeIntTest {
             .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(Environment.STAGING.ordinal())
+            .environmentId(Environment.STAGING.ordinal())
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -117,7 +117,7 @@ public class ConnectionFacadeIntTest {
             .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(Environment.STAGING.ordinal())
+            .environmentId(Environment.STAGING.ordinal())
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -128,7 +128,7 @@ public class ConnectionFacadeIntTest {
             .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(Environment.STAGING.ordinal())
+            .environmentId(Environment.STAGING.ordinal())
             .name("name2")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -305,7 +305,7 @@ public class ConnectionFacadeIntTest {
             .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(Environment.STAGING.ordinal())
+            .environmentId(Environment.STAGING.ordinal())
             .name("name")
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();

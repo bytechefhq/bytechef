@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Environment
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
 import com.bytechef.platform.security.util.SecurityUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -65,23 +66,6 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     }
 
     @Override
-    @CrossOrigin
-    public ResponseEntity<Void> updateFrontendIntegrationInstanceWorkflow(
-        Long id, String workflowReferenceCode,
-        UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
-
-        String externalUserId = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
-
-        connectedUserIntegrationInstanceFacade.updateIntegrationInstanceWorkflow(
-            externalUserId, id, workflowReferenceCode,
-            updateFrontendIntegrationInstanceWorkflowRequestModel.getInputs());
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
     public ResponseEntity<Void> disableIntegrationInstanceWorkflow(
         String externalUserId, Long id, String workflowReferenceCode) {
 
@@ -109,9 +93,26 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     }
 
     @Override
+    @CrossOrigin
+    public ResponseEntity<Void> updateFrontendIntegrationInstanceWorkflow(
+        Long id, String workflowReferenceCode,
+        @NonNull UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
+
+        String externalUserId = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+
+        connectedUserIntegrationInstanceFacade.updateIntegrationInstanceWorkflow(
+            externalUserId, id, workflowReferenceCode,
+            updateFrontendIntegrationInstanceWorkflowRequestModel.getInputs());
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     public ResponseEntity<Void> updateIntegrationInstanceWorkflow(
         String externalUserId, Long id, String workflowReferenceCode,
-        UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
+        @NonNull UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
 
         connectedUserIntegrationInstanceFacade.updateIntegrationInstanceWorkflow(
             externalUserId, id, workflowReferenceCode,

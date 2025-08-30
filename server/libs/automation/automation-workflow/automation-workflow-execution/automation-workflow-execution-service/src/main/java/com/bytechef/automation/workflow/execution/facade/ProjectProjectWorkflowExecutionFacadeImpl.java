@@ -41,6 +41,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
@@ -74,6 +75,7 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
     private final Evaluator evaluator;
+    private final EnvironmentService environmentService;
     private final JobService jobService;
     private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
@@ -90,17 +92,17 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
     @SuppressFBWarnings("EI")
     public ProjectProjectWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
-        JobService jobService, PrincipalJobService principalJobService, ProjectFacade projectFacade,
-        ProjectDeploymentService projectDeploymentService,
+        EnvironmentService environmentService, JobService jobService, PrincipalJobService principalJobService,
+        ProjectFacade projectFacade, ProjectDeploymentService projectDeploymentService,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
-        TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
-        WorkflowService workflowService) {
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage, TriggerExecutionService triggerExecutionService,
+        TriggerFileStorage triggerFileStorage, WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.evaluator = evaluator;
+        this.environmentService = environmentService;
         this.jobService = jobService;
         this.principalJobService = principalJobService;
         this.projectFacade = projectFacade;
@@ -143,7 +145,7 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
-        Boolean embedded, Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
         Long projectId, Long projectDeploymentId, String workflowId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();
@@ -166,6 +168,9 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
             if (projectDeploymentId != null) {
                 projectDeploymentIds.add(projectDeploymentId);
             } else {
+                Environment environment =
+                    environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
                 projectDeploymentIds.addAll(
                     projectDeploymentService.getProjectDeployments(embedded, environment, null, null, null)
                         .stream()
