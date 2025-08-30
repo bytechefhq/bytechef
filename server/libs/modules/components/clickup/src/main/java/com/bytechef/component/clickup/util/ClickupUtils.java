@@ -44,16 +44,15 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     public static List<Option<String>> getTaskIdOptions(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            String searchText, Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         String listId = inputParameters.getRequiredString(LIST_ID);
         Map<String, Object> body = context
-                .http(http -> http.get("/list/" + listId + "/task"))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {
-                });
+            .http(http -> http.get("/list/" + listId + "/task"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
         Object tasksObject = body.get("tasks");
@@ -69,8 +68,8 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     public static List<Option<String>> getListIdOptions(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            String searchText, Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         List<Option<String>> options = new ArrayList<>();
         String folderId = inputParameters.getString(FOLDER_ID);
@@ -93,27 +92,27 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     public static List<Option<String>> getFolderIdOptions(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            String searchText, Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         return getOptions(
-                fetchDataFromHttpEndpoint("/space/" + inputParameters.getRequiredString(SPACE_ID) + "/folder", context),
-                "folders");
+            fetchDataFromHttpEndpoint("/space/" + inputParameters.getRequiredString(SPACE_ID) + "/folder", context),
+            "folders");
     }
 
     public static List<Option<String>> getSpaceIdOptions(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            String searchText, Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         return getOptions(
-                fetchDataFromHttpEndpoint("/team/" + inputParameters.getRequiredString(WORKSPACE_ID) + "/space",
-                        context),
-                "spaces");
+            fetchDataFromHttpEndpoint("/team/" + inputParameters.getRequiredString(WORKSPACE_ID) + "/space",
+                context),
+            "spaces");
     }
 
     public static List<Option<String>> getWorkspaceIdOptions(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            String searchText, Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         return getOptions(fetchDataFromHttpEndpoint("/team", context), "teams");
     }
@@ -129,49 +128,45 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     private static Map<String, List<Map<String, Object>>> fetchDataFromHttpEndpoint(
-            String path, Context context) {
+        String path, Context context) {
 
         return context
-                .http(http -> http.get(path))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {
-                });
+            .http(http -> http.get(path))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 
     public static String subscribeWebhook(
-            String webhookUrl, TriggerContext context, String workspaceId, String eventType) {
+        String webhookUrl, TriggerContext context, String workspaceId, String eventType) {
 
         Map<String, Object> body = context.http(http -> http.post("/team/" + workspaceId + "/webhook"))
-                .body(
-                        Http.Body.of(
-                                "endpoint", webhookUrl,
-                                "events", List.of(eventType)))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {
-                });
+            .body(
+                Http.Body.of(
+                    "endpoint", webhookUrl,
+                    "events", List.of(eventType)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
         return (String) body.get(ID);
     }
 
     public static void unsubscribeWebhook(TriggerContext context, String webhookId) {
         context.http(http -> http.delete("/webhook/" + webhookId))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute();
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute();
     }
 
     public static Map<String, Object> getCreatedObject(
-            WebhookBody body, TriggerContext context, String id, String path) {
+        WebhookBody body, TriggerContext context, String id, String path) {
 
-        Map<String, Object> content = body.getContent(new TypeReference<>() {
-        });
+        Map<String, Object> content = body.getContent(new TypeReference<>() {});
 
         return context
-                .http(http -> http.get(path + content.get(id)))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {
-                });
+            .http(http -> http.get(path + content.get(id)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }

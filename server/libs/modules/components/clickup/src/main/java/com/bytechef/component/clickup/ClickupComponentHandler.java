@@ -18,22 +18,16 @@ package com.bytechef.component.clickup;
 
 import static com.bytechef.component.clickup.constant.ClickupConstants.FOLDER_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.FOLDER_ID_PROPERTY;
-import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID;
-import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID_PROPERTY;
-import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID;
-import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID_PROPERTY;
 import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID;
 import static com.bytechef.component.clickup.constant.ClickupConstants.LIST_ID_PROPERTY;
+import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID;
+import static com.bytechef.component.clickup.constant.ClickupConstants.SPACE_ID_PROPERTY;
 import static com.bytechef.component.clickup.constant.ClickupConstants.TASK_ID;
-import com.bytechef.component.clickup.action.ClickupCreateTaskCommentAction;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID;
+import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE_ID_PROPERTY;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.clickup.action.ClickupCreateTaskCommentAction;
 import com.bytechef.component.clickup.trigger.ClickupNewListTrigger;
 import com.bytechef.component.clickup.trigger.ClickupNewTaskTrigger;
 import com.bytechef.component.definition.ActionDefinition;
@@ -45,6 +39,11 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -55,8 +54,8 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
         return List.of(
-                ClickupNewListTrigger.TRIGGER_DEFINITION,
-                ClickupNewTaskTrigger.TRIGGER_DEFINITION);
+            ClickupNewListTrigger.TRIGGER_DEFINITION,
+            ClickupNewTaskTrigger.TRIGGER_DEFINITION);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
 
             if (Objects.equals(modifiableActionDefinition.getName(), ClickupCreateTaskCommentAction.ACTION_NAME)) {
                 properties.addAll(0,
-                        List.of(WORKSPACE_ID_PROPERTY, SPACE_ID_PROPERTY, FOLDER_ID_PROPERTY, LIST_ID_PROPERTY));
+                    List.of(WORKSPACE_ID_PROPERTY, SPACE_ID_PROPERTY, FOLDER_ID_PROPERTY, LIST_ID_PROPERTY));
             } else if (Objects.equals(modifiableActionDefinition.getName(), "createList")) {
                 properties.addAll(0, List.of(WORKSPACE_ID_PROPERTY, SPACE_ID_PROPERTY));
             } else if (Objects.equals(modifiableActionDefinition.getName(), "createTask")) {
@@ -85,27 +84,27 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
-                .customAction(true)
-                .icon("path:assets/clickup.svg")
-                .categories(ComponentCategory.PROJECT_MANAGEMENT);
+            .customAction(true)
+            .icon("path:assets/clickup.svg")
+            .categories(ComponentCategory.PROJECT_MANAGEMENT);
     }
 
     @Override
     public ModifiableProperty<?> modifyProperty(
-            ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
         if (Objects.equals(modifiableProperty.getName(), TASK_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
-                    .optionsLookupDependsOn(LIST_ID, FOLDER_ID, SPACE_ID, WORKSPACE_ID);
+                .optionsLookupDependsOn(LIST_ID, FOLDER_ID, SPACE_ID, WORKSPACE_ID);
         } else if (Objects.equals(modifiableProperty.getName(), LIST_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
-                    .optionsLookupDependsOn(FOLDER_ID, SPACE_ID, WORKSPACE_ID);
+                .optionsLookupDependsOn(FOLDER_ID, SPACE_ID, WORKSPACE_ID);
         } else if (Objects.equals(modifiableProperty.getName(), FOLDER_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
-                    .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID);
+                .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID);
         } else if (Objects.equals(modifiableProperty.getName(), SPACE_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
-                    .optionsLookupDependsOn(WORKSPACE_ID);
+                .optionsLookupDependsOn(WORKSPACE_ID);
         }
 
         return modifiableProperty;

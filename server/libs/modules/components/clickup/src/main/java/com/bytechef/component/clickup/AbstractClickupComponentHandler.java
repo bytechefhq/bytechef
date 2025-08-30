@@ -39,7 +39,8 @@ public abstract class AbstractClickupComponentHandler implements OpenApiComponen
             .description(
                 "ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams."))
                     .actions(modifyActions(ClickupCreateListAction.ACTION_DEFINITION,
-                        ClickupCreateTaskAction.ACTION_DEFINITION, ClickupCreateFolderAction.ACTION_DEFINITION, ClickupCreateTaskCommentAction.ACTION_DEFINITION))
+                        ClickupCreateTaskAction.ACTION_DEFINITION, ClickupCreateFolderAction.ACTION_DEFINITION,
+                        ClickupCreateTaskCommentAction.ACTION_DEFINITION))
                     .connection(modifyConnection(ClickupConnection.CONNECTION_DEFINITION))
                     .clusterElements(modifyClusterElements(tool(ClickupCreateListAction.ACTION_DEFINITION),
                         tool(ClickupCreateTaskAction.ACTION_DEFINITION),
