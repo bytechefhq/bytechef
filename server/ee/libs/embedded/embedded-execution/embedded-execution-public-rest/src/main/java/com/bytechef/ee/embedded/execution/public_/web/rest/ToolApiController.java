@@ -19,7 +19,6 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ToolApiController implements ToolApi {
 
     private final ToolFacade toolFacade;
-        private final EnvironmentService environmentService;
+    private final EnvironmentService environmentService;
 
     public ToolApiController(ToolFacade toolFacade, EnvironmentService environmentService) {
         this.toolFacade = toolFacade;

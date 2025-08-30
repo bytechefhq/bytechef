@@ -14,10 +14,9 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectedUserProjec
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.PublishConnectedUserProjectWorkflowRequestModel;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
