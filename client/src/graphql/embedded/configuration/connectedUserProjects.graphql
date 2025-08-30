@@ -1,4 +1,4 @@
-query connectedUserProjects($connectedUserId: ID, $environment: Environment) {
+query connectedUserProjects($connectedUserId: ID, $environment: EnvironmentEnum) {
     connectedUserProjects(connectedUserId: $connectedUserId, environment: $environment) {
         id
         connectedUser {

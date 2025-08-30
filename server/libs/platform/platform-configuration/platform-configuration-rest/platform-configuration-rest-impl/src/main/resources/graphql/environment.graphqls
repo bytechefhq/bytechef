@@ -1,4 +1,4 @@
-enum Environment {
+enum EnvironmentEnum {
     DEVELOPMENT
     STAGING
     PRODUCTION

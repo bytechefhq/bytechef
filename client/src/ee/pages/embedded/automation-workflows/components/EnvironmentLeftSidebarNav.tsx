@@ -1,12 +1,12 @@
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {Environment} from '@/shared/middleware/graphql';
+import {EnvironmentEnum} from '@/shared/middleware/graphql';
 
 const EnvironmentLeftSidebarNav = ({
     connectedUserId,
     environment,
 }: {
     connectedUserId?: number;
-    environment?: Environment;
+    environment?: EnvironmentEnum;
 }) => {
     return (
         <LeftSidebarNav
