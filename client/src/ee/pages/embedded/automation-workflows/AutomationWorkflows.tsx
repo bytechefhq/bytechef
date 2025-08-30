@@ -7,20 +7,20 @@ import {ConnectedUser, ConnectedUserFromJSON} from '@/ee/shared/middleware/embed
 import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {Environment, InputMaybe, useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
+import {EnvironmentEnum, InputMaybe, useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {Workflow} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
 import ConnectedUsersLeftSidebarNav from './components/ConnectedUsersLeftSidebarNav';
 
-function getEnvironment(environment: number | undefined): Environment | undefined {
+function getEnvironment(environment: number | undefined): EnvironmentEnum | undefined {
     return environment === undefined
         ? undefined
         : environment === 1
-          ? Environment.Development
+          ? EnvironmentEnum.Development
           : environment === 2
-            ? Environment.Staging
-            : Environment.Production;
+            ? EnvironmentEnum.Staging
+            : EnvironmentEnum.Production;
 }
 
 const AutomationWorkflows = () => {
@@ -39,7 +39,7 @@ const AutomationWorkflows = () => {
 
     const {data, isLoading: isConnectedUserProjectsLoading} = useConnectedUserProjectsQuery({
         connectedUserId: connectedUserId?.toString(),
-        environment: environment as InputMaybe<Environment> | undefined,
+        environment: environment as InputMaybe<EnvironmentEnum> | undefined,
     });
 
     const connectedUsers =

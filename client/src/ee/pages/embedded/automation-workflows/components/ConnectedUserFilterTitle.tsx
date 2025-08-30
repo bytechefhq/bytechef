@@ -1,13 +1,13 @@
 import {Badge} from '@/components/ui/badge';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
-import {Environment} from '@/shared/middleware/graphql';
+import {EnvironmentEnum} from '@/shared/middleware/graphql';
 
 const ConnectedUserFilterTitle = ({
     connectedUsers,
     environment,
     filterData,
 }: {
-    environment?: Environment;
+    environment?: EnvironmentEnum;
     filterData: {id?: number};
     connectedUsers?: ConnectedUser[];
 }) => {

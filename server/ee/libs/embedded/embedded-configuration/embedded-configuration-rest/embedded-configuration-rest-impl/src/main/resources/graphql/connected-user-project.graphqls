@@ -1,11 +1,11 @@
 extend type Query {
-    connectedUserProjects(connectedUserId: ID, environment: Environment): [ConnectedUserProject!]!
+    connectedUserProjects(connectedUserId: ID, environment: EnvironmentEnum): [ConnectedUserProject!]!
 }
 
 type ConnectedUserProject {
     id: ID!
     connectedUser: ConnectedUser!
-    environment: Environment
+    environment: EnvironmentEnum
     lastExecutionDate: String
     projectId: ID!
     connectedUserProjectWorkflows: [ConnectedUserProjectWorkflow!]!

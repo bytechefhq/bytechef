@@ -4,7 +4,7 @@ import {Button} from '@/components/ui/button';
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {Environment, ModeType, Tag, useMcpServerTagsQuery, useMcpServersQuery} from '@/shared/middleware/graphql';
+import {EnvironmentEnum, ModeType, Tag, useMcpServerTagsQuery, useMcpServersQuery} from '@/shared/middleware/graphql';
 import {ServerIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -49,10 +49,10 @@ const McpServers = () => {
         if (environment !== undefined) {
             const targetEnvironment =
                 environment === 1
-                    ? Environment.Development
+                    ? EnvironmentEnum.Development
                     : environment === 2
-                      ? Environment.Staging
-                      : Environment.Production;
+                      ? EnvironmentEnum.Staging
+                      : EnvironmentEnum.Production;
 
             if (server.environment !== targetEnvironment) {
                 return false;

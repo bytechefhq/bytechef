@@ -14,7 +14,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {
-    Environment,
+    EnvironmentEnum,
     McpServer,
     ModeType,
     useCreateMcpServerMutation,
@@ -86,7 +86,7 @@ const McpServerDialog = ({
                 {
                     input: {
                         enabled: values.enabled,
-                        environment: values.environment as Environment,
+                        environment: values.environment as EnvironmentEnum,
                         name: values.name,
                         type: ModeType.Automation,
                     },
