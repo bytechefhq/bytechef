@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.service;
+package com.bytechef.ee.automation.configuration.service;
 
-import com.bytechef.platform.annotation.ConditionalOnCEVersion;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import java.util.List;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Service
-@ConditionalOnCEVersion
+@ConditionalOnEEVersion
 public class EnvironmentServiceImpl implements EnvironmentService {
 
     @Override
     public List<Environment> getEnvironments() {
-        return List.of(Environment.PRODUCTION);
+        return Arrays.asList(Environment.values());
     }
 }
