@@ -36,12 +36,34 @@ public interface EnvironmentService {
      *
      * @throws IllegalArgumentException if no environment matches the provided name
      */
-    Environment getEnvironment(String name);
+    default Environment getEnvironment(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Environment name must not be null");
+        }
+
+        for (Environment environment : Environment.values()) {
+            String environmentName = environment.name();
+
+            if (environmentName.equalsIgnoreCase(name)) {
+                return environment;
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown environment name: " + name);
+    }
 
     /**
      * Returns the environment by its numeric identifier (ordinal).
      *
      * @throws IllegalArgumentException if the identifier is out of range
      */
-    Environment getEnvironment(int environmentId);
+    default Environment getEnvironment(int environmentId) {
+        Environment[] values = Environment.values();
+
+        if (environmentId < 0 || environmentId >= values.length) {
+            throw new IllegalArgumentException("Environment id out of range: " + environmentId);
+        }
+
+        return values[environmentId];
+    }
 }
