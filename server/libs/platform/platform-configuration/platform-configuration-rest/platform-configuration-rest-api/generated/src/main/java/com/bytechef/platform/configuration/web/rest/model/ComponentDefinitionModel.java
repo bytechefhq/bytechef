@@ -36,7 +36,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-27T07:07:20.475157591+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:01.494536+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ComponentDefinitionModel {
 
   @Valid
@@ -46,6 +46,9 @@ public class ComponentDefinitionModel {
   private List<@Valid ActionDefinitionBasicModel> actions = new ArrayList<>();
 
   private Boolean clusterElement;
+
+  @Valid
+  private Map<String, List<String>> clusterElementClusterElementTypes = new HashMap<>();
 
   @Valid
   private List<@Valid ClusterElementDefinitionBasicModel> clusterElements = new ArrayList<>();
@@ -171,6 +174,34 @@ public class ComponentDefinitionModel {
 
   public void setClusterElement(Boolean clusterElement) {
     this.clusterElement = clusterElement;
+  }
+
+  public ComponentDefinitionModel clusterElementClusterElementTypes(Map<String, List<String>> clusterElementClusterElementTypes) {
+    this.clusterElementClusterElementTypes = clusterElementClusterElementTypes;
+    return this;
+  }
+
+  public ComponentDefinitionModel putClusterElementClusterElementTypesItem(String key, List<String> clusterElementClusterElementTypesItem) {
+    if (this.clusterElementClusterElementTypes == null) {
+      this.clusterElementClusterElementTypes = new HashMap<>();
+    }
+    this.clusterElementClusterElementTypes.put(key, clusterElementClusterElementTypesItem);
+    return this;
+  }
+
+  /**
+   * The list of cluster element types per root cluster element.
+   * @return clusterElementClusterElementTypes
+   */
+  @Valid 
+  @Schema(name = "clusterElementClusterElementTypes", description = "The list of cluster element types per root cluster element.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterElementClusterElementTypes")
+  public Map<String, List<String>> getClusterElementClusterElementTypes() {
+    return clusterElementClusterElementTypes;
+  }
+
+  public void setClusterElementClusterElementTypes(Map<String, List<String>> clusterElementClusterElementTypes) {
+    this.clusterElementClusterElementTypes = clusterElementClusterElementTypes;
   }
 
   public ComponentDefinitionModel clusterElements(List<@Valid ClusterElementDefinitionBasicModel> clusterElements) {
@@ -525,6 +556,7 @@ public class ComponentDefinitionModel {
     return Objects.equals(this.actionClusterElementTypes, componentDefinition.actionClusterElementTypes) &&
         Objects.equals(this.actions, componentDefinition.actions) &&
         Objects.equals(this.clusterElement, componentDefinition.clusterElement) &&
+        Objects.equals(this.clusterElementClusterElementTypes, componentDefinition.clusterElementClusterElementTypes) &&
         Objects.equals(this.clusterElements, componentDefinition.clusterElements) &&
         Objects.equals(this.clusterElementTypes, componentDefinition.clusterElementTypes) &&
         Objects.equals(this.clusterRoot, componentDefinition.clusterRoot) &&
@@ -544,7 +576,7 @@ public class ComponentDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionClusterElementTypes, actions, clusterElement, clusterElements, clusterElementTypes, clusterRoot, componentCategories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
+    return Objects.hash(actionClusterElementTypes, actions, clusterElement, clusterElementClusterElementTypes, clusterElements, clusterElementTypes, clusterRoot, componentCategories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
   }
 
   @Override
@@ -554,6 +586,7 @@ public class ComponentDefinitionModel {
     sb.append("    actionClusterElementTypes: ").append(toIndentedString(actionClusterElementTypes)).append("\n");
     sb.append("    actions: ").append(toIndentedString(actions)).append("\n");
     sb.append("    clusterElement: ").append(toIndentedString(clusterElement)).append("\n");
+    sb.append("    clusterElementClusterElementTypes: ").append(toIndentedString(clusterElementClusterElementTypes)).append("\n");
     sb.append("    clusterElements: ").append(toIndentedString(clusterElements)).append("\n");
     sb.append("    clusterElementTypes: ").append(toIndentedString(clusterElementTypes)).append("\n");
     sb.append("    clusterRoot: ").append(toIndentedString(clusterRoot)).append("\n");
