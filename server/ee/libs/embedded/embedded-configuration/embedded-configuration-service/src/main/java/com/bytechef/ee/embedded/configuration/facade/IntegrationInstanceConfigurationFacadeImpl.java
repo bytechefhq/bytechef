@@ -46,6 +46,7 @@ import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -84,6 +85,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final ConnectionDefinitionService connectionDefinitionService;
+    private final EnvironmentService environmentService;
     private final PrincipalJobFacade principalJobFacade;
     private final PrincipalJobService principalJobService;
     private final JobFacade jobFacade;
@@ -105,7 +107,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     public IntegrationInstanceConfigurationFacadeImpl(
         CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
         ConnectedUserService connectedUserService, ConnectionService connectionService,
-        ConnectionDefinitionService connectionDefinitionService, PrincipalJobFacade principalJobFacade,
+        ConnectionDefinitionService connectionDefinitionService, EnvironmentService environmentService,
+        PrincipalJobFacade principalJobFacade,
         PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
@@ -120,6 +123,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.connectionDefinitionService = connectionDefinitionService;
+        this.environmentService = environmentService;
         this.principalJobFacade = principalJobFacade;
         this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
@@ -376,7 +380,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     @Override
     @Transactional(readOnly = true)
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
-        Environment environment, Long integrationId, Long tagId, boolean includeAllFields) {
+        Long environmentId, Long integrationId, Long tagId, boolean includeAllFields) {
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(

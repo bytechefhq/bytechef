@@ -43,7 +43,7 @@ public interface ConnectionService {
     List<Connection> getConnections(String componentName, int version, ModeType type);
 
     List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Integer environmentId, ModeType type);
+        String componentName, Integer connectionVersion, Long tagId, Long environmentId, ModeType type);
 
     List<Connection> getConnections(List<Long> connectionIds);
 

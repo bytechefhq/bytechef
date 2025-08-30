@@ -53,13 +53,13 @@ public interface ProjectDeploymentFacade {
     List<Tag> getProjectDeploymentTags();
 
     List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
-        long id, Environment environment, Long projectId, Long tagId, boolean includeAllFields);
+        long id, Long environmentId, Long projectId, Long tagId, boolean includeAllFields);
 
     void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO);
 
     void updateProjectDeployment(
         long projectId, int projectVersion, String workflowReferenceCode,
-        List<ProjectDeploymentWorkflowConnection> connections, Environment environment);
+        List<ProjectDeploymentWorkflowConnection> connections, Long environmentId);
 
     void updateProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,

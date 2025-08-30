@@ -23,6 +23,9 @@ import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Ivica Cardic
+ */
 public class EnvironmentServiceTest {
 
     private final EnvironmentService environmentService = new EnvironmentServiceImpl();
@@ -31,7 +34,7 @@ public class EnvironmentServiceTest {
     public void testGetEnvironments() {
         List<Environment> environments = environmentService.getEnvironments();
 
-        assertThat(environments).containsExactly(Environment.DEVELOPMENT, Environment.STAGING, Environment.PRODUCTION);
+        assertThat(environments).containsExactly(Environment.PRODUCTION);
     }
 
     @Test

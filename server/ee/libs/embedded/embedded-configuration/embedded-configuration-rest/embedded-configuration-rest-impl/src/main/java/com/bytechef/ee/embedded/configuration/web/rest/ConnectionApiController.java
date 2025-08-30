@@ -12,10 +12,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
-import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionRequestModel;
-import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.ModeType;
@@ -43,17 +40,15 @@ public class ConnectionApiController implements ConnectionApi {
     private final ConnectedUserConnectionFacade connectedUserConnectionFacade;
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
-    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public ConnectionApiController(
         ConnectedUserConnectionFacade connectedUserConnectionFacade, ConnectionFacade connectionFacade,
-        ConversionService conversionService, EnvironmentService environmentService) {
+        ConversionService conversionService) {
 
         this.connectedUserConnectionFacade = connectedUserConnectionFacade;
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
-        this.environmentService = environmentService;
     }
 
     @Override
@@ -100,17 +95,11 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getConnections(
-        String componentName, Integer connectionVersion, EnvironmentModel environmentModel, Long tagId) {
-
-        Environment environment =
-            environmentModel == null ? null : environmentService.getEnvironment(environmentModel.name());
+        String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
         return ResponseEntity.ok(
             connectionFacade
-                .getConnections(
-                    componentName, connectionVersion,
-                    List.of(), tagId, environmentModel == null ? null : environment.ordinal(),
-                    ModeType.EMBEDDED)
+                .getConnections(componentName, connectionVersion, List.of(), tagId, environmentId, ModeType.EMBEDDED)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());

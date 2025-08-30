@@ -19,11 +19,9 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
-import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateConnectionRequestModel;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.tag.domain.Tag;
@@ -82,20 +80,19 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getWorkspaceConnections(
-        Long id, String componentName, Integer connectionVersion, EnvironmentModel environmentModel, Long tagId) {
-
-        Environment environment = environmentModel == null ? null : Environment.valueOf(environmentModel.name());
+        Long id, String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
         return ResponseEntity.ok(
             workspaceConnectionFacade
-                .getConnections(id, componentName, connectionVersion, environment, tagId)
+                .getConnections(id, componentName, connectionVersion, environmentId, tagId)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());
     }
 
     @Override
-    public ResponseEntity<Void> updateConnection(Long id, UpdateConnectionRequestModel updateConnectionRequestModel) {
+    public ResponseEntity<Void> updateConnection(
+        Long id, UpdateConnectionRequestModel updateConnectionRequestModel) {
         List<Tag> list = updateConnectionRequestModel.getTags()
             .stream()
             .map(tagModel -> conversionService.convert(tagModel, Tag.class))

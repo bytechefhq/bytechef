@@ -63,7 +63,8 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public McpServer createMcpServer(@Argument McpServerInput input) {
-        return mcpServerService.create(input.name(), input.type(), input.environment(), input.enabled());
+        return mcpServerService.create(
+            input.name(), input.type(), Environment.values()[(int) input.environmentId], input.enabled());
     }
 
     @MutationMapping
@@ -109,7 +110,7 @@ public class McpServerGraphQlController {
     }
 
     @SuppressFBWarnings("EI")
-    public record McpServerInput(String name, ModeType type, Environment environment, Boolean enabled) {
+    public record McpServerInput(String name, ModeType type, long environmentId, Boolean enabled) {
     }
 
     @SuppressFBWarnings("EI")

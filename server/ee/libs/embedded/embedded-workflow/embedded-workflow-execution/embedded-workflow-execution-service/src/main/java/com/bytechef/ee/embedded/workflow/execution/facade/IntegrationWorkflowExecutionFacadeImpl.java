@@ -44,6 +44,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
@@ -70,10 +71,11 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
-public class IntegrationIntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkflowExecutionFacade {
+public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkflowExecutionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
+    private final EnvironmentService environmentService;
     private final Evaluator evaluator;
     private final PrincipalJobService principalJobService;
     private final IntegrationFacade integrationFacade;
@@ -91,9 +93,10 @@ public class IntegrationIntegrationWorkflowExecutionFacadeImpl implements Integr
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public IntegrationIntegrationWorkflowExecutionFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
-        PrincipalJobService principalJobService, IntegrationFacade integrationFacade,
+    public IntegrationWorkflowExecutionFacadeImpl(
+        ComponentDefinitionService componentDefinitionService, ContextService contextService,
+        EnvironmentService environmentService, Evaluator evaluator, PrincipalJobService principalJobService,
+        IntegrationFacade integrationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
@@ -105,6 +108,7 @@ public class IntegrationIntegrationWorkflowExecutionFacadeImpl implements Integr
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
+        this.environmentService = environmentService;
         this.evaluator = evaluator;
         this.principalJobService = principalJobService;
         this.integrationFacade = integrationFacade;
@@ -152,7 +156,7 @@ public class IntegrationIntegrationWorkflowExecutionFacadeImpl implements Integr
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
-        Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
         Long integrationId, Long integrationInstanceConfigurationId, String workflowId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();
@@ -176,6 +180,9 @@ public class IntegrationIntegrationWorkflowExecutionFacadeImpl implements Integr
             if (integrationInstanceConfigurationId != null) {
                 integrationInstanceConfigurationIds.add(integrationInstanceConfigurationId);
             } else {
+                Environment environment =
+                    environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
                 integrationInstanceConfigurationIds.addAll(
                     integrationInstanceConfigurationService
                         .getIntegrationInstanceConfigurations(environment, null, null)

@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,7 +53,7 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
 
     @Override
     public ResponseEntity<CheckWorkflowNodeTestOutputExists200ResponseModel> checkWorkflowNodeTestOutputExists(
-        String id, String workflowNodeName, OffsetDateTime createdDate) {
+        String id, String workflowNodeName, @NonNull OffsetDateTime createdDate) {
 
         return ResponseEntity.ok(
             new CheckWorkflowNodeTestOutputExists200ResponseModel().exists(

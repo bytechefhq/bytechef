@@ -33,6 +33,7 @@ import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -55,8 +56,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     ComponentDefinitionService.class, ConnectionDefinitionService.class, ConnectionFacade.class,
-    ConnectionService.class, ConnectedUserService.class, PrincipalJobFacade.class, PrincipalJobService.class,
-    JobFacade.class, JobService.class, OAuth2Service.class, TriggerDefinitionService.class,
+    ConnectionService.class, ConnectedUserService.class, EnvironmentService.class, PrincipalJobFacade.class,
+    PrincipalJobService.class, JobFacade.class, JobService.class, OAuth2Service.class, TriggerDefinitionService.class,
     TriggerExecutionService.class, TriggerLifecycleFacade.class, ComponentConnectionFacade.class, WorkflowFacade.class,
     WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class,
     OAuth2ParametersFacade.class, ProjectDeploymentFacade.class, ProjectDeploymentService.class,

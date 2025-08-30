@@ -12,8 +12,6 @@ import com.bytechef.ee.embedded.connected.user.facade.ConnectedUserFacade;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.CredentialStatusModel;
-import com.bytechef.ee.embedded.connected.user.web.rest.model.EnvironmentModel;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
@@ -62,24 +60,24 @@ public class ConnectedUserApiController implements ConnectedUserApi {
     }
 
     @Override
-    public ResponseEntity<Page> getConnectedUsers(
-        EnvironmentModel environment, CredentialStatusModel credentialStatus, LocalDate createDateFrom,
-        LocalDate createDateTo, Long integrationId, Integer pageNumber, String search) {
-
-        return ResponseEntity.ok(
-            connectedUserFacade
-                .getConnectedUsers(
-                    environment == null ? null : Environment.valueOf(environment.name()),
-                    search, credentialStatus == null ? null : CredentialStatus.valueOf(credentialStatus.name()),
-                    createDateFrom, createDateTo, integrationId, pageNumber)
-                .map(connectedUser -> conversionService.convert(connectedUser, ConnectedUserModel.class)));
-    }
-
-    @Override
     public ResponseEntity<Void> enableConnectedUser(Long id, Boolean enable) {
         connectedUserFacade.enableConnectedUser(id, enable);
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @Override
+    public ResponseEntity<Page> getConnectedUsers(
+        Long environmentId, CredentialStatusModel credentialStatus, LocalDate createDateFrom,
+        LocalDate createDateTo, Long integrationId, Integer pageNumber, String search) {
+
+        return ResponseEntity.ok(
+            connectedUserFacade
+                .getConnectedUsers(
+                    environmentId, search,
+                    credentialStatus == null ? null : CredentialStatus.valueOf(credentialStatus.name()),
+                    createDateFrom, createDateTo, integrationId, pageNumber)
+                .map(connectedUser -> conversionService.convert(connectedUser, ConnectedUserModel.class)));
     }
 }

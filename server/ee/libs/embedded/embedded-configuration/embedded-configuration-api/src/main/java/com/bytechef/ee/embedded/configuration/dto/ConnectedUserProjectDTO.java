@@ -23,7 +23,7 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record ConnectedUserProjectDTO(
     long id, ConnectedUser connectedUser, List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflows,
-    Environment environment, Instant lastExecutionDate, long projectId, int projectVersion,
+    Environment environment, long environmentId, Instant lastExecutionDate, long projectId, int projectVersion,
     String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate, int version) {
 
     public ConnectedUserProjectDTO(
@@ -33,9 +33,10 @@ public record ConnectedUserProjectDTO(
 
         this(
             connectedUserProject.getId(), connectedUser, connectedUserProjectWorkflows,
-            projectDeployment.getEnvironment(), lastExecutionDate, connectedUserProject.getProjectId(),
-            projectDeployment.getProjectVersion(), connectedUserProject.getCreatedBy(),
-            connectedUserProject.getCreatedDate(), connectedUserProject.getLastModifiedBy(),
-            connectedUserProject.getLastModifiedDate(), connectedUserProject.getVersion());
+            projectDeployment.getEnvironment(), projectDeployment.getEnvironmentId(), lastExecutionDate,
+            connectedUserProject.getProjectId(), projectDeployment.getProjectVersion(),
+            connectedUserProject.getCreatedBy(), connectedUserProject.getCreatedDate(),
+            connectedUserProject.getLastModifiedBy(), connectedUserProject.getLastModifiedDate(),
+            connectedUserProject.getVersion());
     }
 }

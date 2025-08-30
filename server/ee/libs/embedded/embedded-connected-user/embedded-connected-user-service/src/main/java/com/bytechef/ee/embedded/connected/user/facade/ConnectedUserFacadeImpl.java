@@ -19,6 +19,7 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserDTO;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -43,6 +44,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     private final ConnectionService connectionService;
     private final ConnectedUserService connectedUserService;
+    private final EnvironmentService environmentService;
     private final IntegrationInstanceFacade integrationInstanceFacade;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -51,12 +53,14 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     @SuppressFBWarnings("EI")
     public ConnectedUserFacadeImpl(
         ConnectionService connectionService, ConnectedUserService connectedUserService,
-        IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
+        EnvironmentService environmentService, IntegrationInstanceFacade integrationInstanceFacade,
+        IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService) {
 
         this.connectionService = connectionService;
         this.connectedUserService = connectedUserService;
+        this.environmentService = environmentService;
         this.integrationInstanceFacade = integrationInstanceFacade;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -101,8 +105,10 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     @Override
     @Transactional(readOnly = true)
     public Page<ConnectedUserDTO> getConnectedUsers(
-        Environment environment, String search, CredentialStatus credentialStatus, LocalDate createDateFrom,
+        Long environmentId, String search, CredentialStatus credentialStatus, LocalDate createDateFrom,
         LocalDate createDateTo, Long integrationId, int pageNumber) {
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
 
         Page<ConnectedUser> connectedUsers = connectedUserService.getConnectedUsers(
             environment, search, createDateFrom, createDateTo, integrationId, pageNumber);

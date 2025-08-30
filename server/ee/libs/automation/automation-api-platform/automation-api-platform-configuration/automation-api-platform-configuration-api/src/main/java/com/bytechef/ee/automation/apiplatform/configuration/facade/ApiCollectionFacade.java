@@ -10,7 +10,6 @@ package com.bytechef.ee.automation.apiplatform.configuration.facade;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public interface ApiCollectionFacade {
 
     ApiCollectionDTO getApiCollection(long id);
 
-    List<ApiCollectionDTO> getApiCollections(long workspaceId, Environment environment, Long projectId, Long tagId);
+    List<ApiCollectionDTO> getApiCollections(long workspaceId, Long environmentId, Long projectId, Long tagId);
 
     List<Tag> getApiCollectionTags();
 

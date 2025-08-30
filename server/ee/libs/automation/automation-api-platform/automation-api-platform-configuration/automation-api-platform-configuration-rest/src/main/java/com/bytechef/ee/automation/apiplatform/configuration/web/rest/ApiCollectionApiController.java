@@ -8,7 +8,6 @@
 package com.bytechef.ee.automation.apiplatform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
@@ -17,7 +16,6 @@ import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionModel;
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -99,12 +97,11 @@ public class ApiCollectionApiController implements ApiCollectionApi {
 
     @Override
     public ResponseEntity<List<ApiCollectionModel>> getWorkspaceApiCollections(
-        Long id, EnvironmentModel environment, Long projectId, Long tagId) {
+        Long id, Long environmentId, Long projectId, Long tagId) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
-                apiCollectionFacade.getApiCollections(
-                    id, environment == null ? null : Environment.valueOf(environment.getValue()), projectId, tagId),
+                apiCollectionFacade.getApiCollections(id, environmentId, projectId, tagId),
                 openApiCollection -> conversionService.convert(openApiCollection, ApiCollectionModel.class)));
     }
 

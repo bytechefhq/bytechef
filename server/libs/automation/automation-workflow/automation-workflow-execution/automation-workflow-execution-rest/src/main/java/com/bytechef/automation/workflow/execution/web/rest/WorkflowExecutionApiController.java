@@ -18,11 +18,9 @@ package com.bytechef.automation.workflow.execution.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
-import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
@@ -59,14 +57,13 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
 
     @Override
     public ResponseEntity<Page> getWorkflowExecutionsPage(
-        Boolean embedded, EnvironmentModel environment, String jobStatus, OffsetDateTime jobStartDate,
+        Boolean embedded, Long environmentId, String jobStatus, OffsetDateTime jobStartDate,
         OffsetDateTime jobEndDate, Long projectId, Long projectDeploymentId, String workflowId, Integer pageNumber) {
 
         return ResponseEntity.ok(
             projectWorkflowExecutionFacade
                 .getWorkflowExecutions(
-                    embedded, environment == null ? null : Environment.valueOf(environment.name()),
-                    jobStatus == null ? null : Status.valueOf(jobStatus),
+                    embedded, environmentId, jobStatus == null ? null : Status.valueOf(jobStatus),
                     jobStartDate == null ? null : jobStartDate.toInstant(),
                     jobEndDate == null ? null : jobEndDate.toInstant(), projectId, projectDeploymentId,
                     workflowId, pageNumber)

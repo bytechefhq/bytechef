@@ -183,7 +183,9 @@ public class IntegrationInstanceConfiguration {
     }
 
     public void setEnvironment(Environment environment) {
-        this.environment = environment.ordinal();
+        if (environment != null) {
+            this.environment = environment.ordinal();
+        }
     }
 
     public void setId(Long id) {

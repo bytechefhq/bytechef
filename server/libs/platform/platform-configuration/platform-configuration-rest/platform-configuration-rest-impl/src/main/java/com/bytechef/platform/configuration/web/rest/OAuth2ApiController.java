@@ -57,7 +57,8 @@ public class OAuth2ApiController implements Oauth2Api {
     public ResponseEntity<OAuth2AuthorizationParametersModel> getOAuth2AuthorizationParameters(
         GetOAuth2AuthorizationParametersRequestModel parametersRequestModel) {
 
-        AuthorizationTypeModel authorizationType = parametersRequestModel.getAuthorizationType();
+        AuthorizationTypeModel authorizationType =
+            Objects.requireNonNull(parametersRequestModel.getAuthorizationType());
 
         return ResponseEntity.ok(
             conversionService.convert(

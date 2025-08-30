@@ -129,6 +129,10 @@ public class ConnectedUser {
         return Environment.values()[environment];
     }
 
+    public long getEnvironmentId() {
+        return environment;
+    }
+
     public String getExternalId() {
         return externalId;
     }
@@ -179,7 +183,9 @@ public class ConnectedUser {
     }
 
     public void setEnvironment(Environment environment) {
-        this.environment = environment.ordinal();
+        if (environment != null) {
+            this.environment = environment.ordinal();
+        }
     }
 
     public void setExternalId(String externalId) {

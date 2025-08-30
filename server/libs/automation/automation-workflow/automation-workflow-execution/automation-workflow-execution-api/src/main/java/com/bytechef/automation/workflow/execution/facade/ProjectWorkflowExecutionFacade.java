@@ -18,7 +18,6 @@ package com.bytechef.automation.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
-import com.bytechef.platform.configuration.domain.Environment;
 import java.time.Instant;
 import org.springframework.data.domain.Page;
 
@@ -30,7 +29,6 @@ public interface ProjectWorkflowExecutionFacade {
     WorkflowExecutionDTO getWorkflowExecution(long id);
 
     Page<WorkflowExecutionDTO> getWorkflowExecutions(
-        Boolean embedded, Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
-        Long projectId,
-        Long projectDeploymentId, String workflowId, int pageNumber);
+        Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId, Long projectDeploymentId, String workflowId, int pageNumber);
 }

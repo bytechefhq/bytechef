@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserDTO;
 import com.bytechef.ee.embedded.connected.user.web.rest.mapper.config.EmbeddedConnectedUserMapperSpringConfig;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -22,5 +23,6 @@ import org.springframework.core.convert.converter.Converter;
 public interface ConnectedUserMapper extends Converter<ConnectedUserDTO, ConnectedUserModel> {
 
     @Override
+    @Mapping(target = "environmentId", expression = "java(Long.valueOf(connectedUserDTO.environment().ordinal()))")
     ConnectedUserModel convert(ConnectedUserDTO connectedUserDTO);
 }
