@@ -48,7 +48,7 @@ export type ConnectedUser = {
   __typename?: 'ConnectedUser';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
-  environment: Environment;
+  environment: EnvironmentEnum;
   externalId: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
@@ -71,7 +71,7 @@ export type ConnectedUserProject = {
   connectedUserProjectWorkflows: Array<ConnectedUserProjectWorkflow>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
-  environment?: Maybe<Environment>;
+  environment?: Maybe<EnvironmentEnum>;
   id: Scalars['ID']['output'];
   lastExecutionDate?: Maybe<Scalars['String']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
@@ -105,7 +105,13 @@ export type CreateMcpProjectWithWorkflowsInput = {
   selectedWorkflowIds: Array<Scalars['String']['input']>;
 };
 
-export enum Environment {
+export type Environment = {
+  __typename?: 'Environment';
+  id?: Maybe<Scalars['ID']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export enum EnvironmentEnum {
   Development = 'DEVELOPMENT',
   Production = 'PRODUCTION',
   Staging = 'STAGING'
@@ -192,7 +198,7 @@ export type McpServer = {
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
   enabled: Scalars['Boolean']['output'];
-  environment: Environment;
+  environment: EnvironmentEnum;
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
@@ -205,7 +211,7 @@ export type McpServer = {
 
 export type McpServerInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
-  environment: Environment;
+  environment: EnvironmentEnum;
   name: Scalars['String']['input'];
   type: ModeType;
 };
@@ -374,6 +380,7 @@ export type Query = {
   connectedUser?: Maybe<ConnectedUser>;
   connectedUserProjects: Array<ConnectedUserProject>;
   connectedUsers?: Maybe<ConnectedUserPage>;
+  environments?: Maybe<Array<Maybe<Environment>>>;
   integration?: Maybe<Integration>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
@@ -403,7 +410,7 @@ export type QueryConnectedUserArgs = {
 
 export type QueryConnectedUserProjectsArgs = {
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
-  environment?: InputMaybe<Environment>;
+  environment?: InputMaybe<EnvironmentEnum>;
 };
 
 
@@ -523,6 +530,11 @@ export type DeleteMcpProjectMutationVariables = Exact<{
 
 export type DeleteMcpProjectMutation = { __typename?: 'Mutation', deleteMcpProject?: boolean | null };
 
+export type EnvironmentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type EnvironmentsQuery = { __typename?: 'Query', environments?: Array<{ __typename?: 'Environment', id?: string | null, name?: string | null } | null> | null };
+
 export type McpProjectsByServerIdQueryVariables = Exact<{
   mcpServerId: Scalars['ID']['input'];
 }>;
@@ -555,11 +567,11 @@ export type UpdateMcpServerTagsMutation = { __typename?: 'Mutation', updateMcpSe
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
-  environment?: InputMaybe<Environment>;
+  environment?: InputMaybe<EnvironmentEnum>;
 }>;
 
 
-export type ConnectedUserProjectsQuery = { __typename?: 'Query', connectedUserProjects: Array<{ __typename?: 'ConnectedUserProject', id: string, environment?: Environment | null, lastExecutionDate?: string | null, projectId: string, projectVersion?: number | null, connectedUser: { __typename?: 'ConnectedUser', id: string, environment: Environment, externalId: string }, connectedUserProjectWorkflows: Array<{ __typename?: 'ConnectedUserProjectWorkflow', id: string, connectedUserId: string, enabled: boolean, lastExecutionDate?: string | null, projectId: string, workflowReferenceCode: string, workflowVersion: number, workflow: { __typename?: 'Workflow', id: string, label: string } }> }> };
+export type ConnectedUserProjectsQuery = { __typename?: 'Query', connectedUserProjects: Array<{ __typename?: 'ConnectedUserProject', id: string, environment?: EnvironmentEnum | null, lastExecutionDate?: string | null, projectId: string, projectVersion?: number | null, connectedUser: { __typename?: 'ConnectedUser', id: string, environment: EnvironmentEnum, externalId: string }, connectedUserProjectWorkflows: Array<{ __typename?: 'ConnectedUserProjectWorkflow', id: string, connectedUserId: string, enabled: boolean, lastExecutionDate?: string | null, projectId: string, workflowReferenceCode: string, workflowVersion: number, workflow: { __typename?: 'Workflow', id: string, label: string } }> }> };
 
 export type IntegrationByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -587,7 +599,7 @@ export type CreateMcpServerMutationVariables = Exact<{
 }>;
 
 
-export type CreateMcpServerMutation = { __typename?: 'Mutation', createMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: ModeType, environment: Environment, enabled: boolean } | null };
+export type CreateMcpServerMutation = { __typename?: 'Mutation', createMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: ModeType, environment: EnvironmentEnum, enabled: boolean } | null };
 
 export type CreateMcpToolMutationVariables = Exact<{
   input: McpToolInput;
@@ -629,7 +641,7 @@ export type McpServersQueryVariables = Exact<{
 }>;
 
 
-export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environment: Environment, enabled: boolean, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environment: EnvironmentEnum, enabled: boolean, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type McpToolsByComponentIdQueryVariables = Exact<{
   mcpComponentId: Scalars['ID']['input'];
@@ -687,6 +699,31 @@ export const useDeleteMcpProjectMutation = <
       {
     mutationKey: ['deleteMcpProject'],
     mutationFn: (variables?: DeleteMcpProjectMutationVariables) => fetcher<DeleteMcpProjectMutation, DeleteMcpProjectMutationVariables>(DeleteMcpProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnvironmentsDocument = `
+    query environments {
+  environments {
+    id
+    name
+  }
+}
+    `;
+
+export const useEnvironmentsQuery = <
+      TData = EnvironmentsQuery,
+      TError = unknown
+    >(
+      variables?: EnvironmentsQueryVariables,
+      options?: Omit<UseQueryOptions<EnvironmentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EnvironmentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EnvironmentsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['environments'] : ['environments', variables],
+    queryFn: fetcher<EnvironmentsQuery, EnvironmentsQueryVariables>(EnvironmentsDocument, variables),
     ...options
   }
     )};
@@ -825,7 +862,7 @@ export const useUpdateMcpServerTagsMutation = <
     )};
 
 export const ConnectedUserProjectsDocument = `
-    query connectedUserProjects($connectedUserId: ID, $environment: Environment) {
+    query connectedUserProjects($connectedUserId: ID, $environment: EnvironmentEnum) {
   connectedUserProjects(
     connectedUserId: $connectedUserId
     environment: $environment
