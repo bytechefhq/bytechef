@@ -33,16 +33,17 @@ public interface WorkflowNodeParameterFacade {
 
     DisplayConditionResultDTO getClusterElementDisplayConditions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName);
+        String clusterElementWorkflowNodeName, long environmentId);
 
-    DisplayConditionResultDTO getWorkflowNodeDisplayConditions(String workflowId, String workflowNodeName);
+    DisplayConditionResultDTO
+        getWorkflowNodeDisplayConditions(String workflowId, String workflowNodeName, long environmentId);
 
     UpdateParameterResultDTO updateClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
-        boolean includeInMetadata);
+        boolean includeInMetadata, long environmentId);
 
     UpdateParameterResultDTO updateWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,
-        boolean includeInMetadata);
+        boolean includeInMetadata, long environmentId);
 }

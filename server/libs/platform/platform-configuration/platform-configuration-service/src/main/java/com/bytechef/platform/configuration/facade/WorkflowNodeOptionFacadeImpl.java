@@ -76,18 +76,20 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     public List<Option> getClusterElementNodeOptions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
-        @Nullable String searchText) {
+        @Nullable String searchText, long environmentId) {
 
         Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfiguration(workflowId)
+            .fetchWorkflowTestConfiguration(workflowId, environmentId)
             .stream()
-            .flatMap(workflowTestConfiguration -> CollectionUtils.stream(workflowTestConfiguration.getConnections()))
+            .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
+                workflowTestConfiguration.getConnections()))
             .filter(workflowTestConfigurationConnection -> Objects.equals(
                 workflowTestConfigurationConnection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
             .findFirst()
             .map(WorkflowTestConfigurationConnection::getConnectionId)
             .orElse(null);
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
@@ -95,7 +97,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName());
+            workflowId, workflowTask.getName(), environmentId);
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
 
@@ -121,12 +123,13 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     @SuppressWarnings("unchecked")
     public List<Option> getWorkflowNodeOptions(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
-        @Nullable String searchText) {
+        @Nullable String searchText, long environmentId) {
 
         Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName, environmentId)
             .orElse(null);
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return WorkflowTrigger
@@ -144,7 +147,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                     WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
                     Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-                        workflowId, workflowTask.getName());
+                        workflowId, workflowTask.getName(), environmentId);
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
                     return actionDefinitionFacade.executeOptions(

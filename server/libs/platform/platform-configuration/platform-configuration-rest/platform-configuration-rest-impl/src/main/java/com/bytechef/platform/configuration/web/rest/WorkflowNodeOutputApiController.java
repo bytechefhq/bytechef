@@ -46,32 +46,36 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
 
     @Override
     public ResponseEntity<WorkflowNodeOutputModel> getClusterElementOutput(
-        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementName) {
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementName,
+        Long environmentId) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowNodeOutputFacade.getClusterElementOutput(
-                    workflowId, workflowNodeName, clusterElementType, clusterElementName),
+                    workflowId, workflowNodeName, clusterElementType, clusterElementName, environmentId),
                 WorkflowNodeOutputModel.class));
     }
 
     @Override
-    public ResponseEntity<WorkflowNodeOutputModel> getWorkflowNodeOutput(String workflowId, String workflowNodeName) {
+    public ResponseEntity<WorkflowNodeOutputModel> getWorkflowNodeOutput(
+        String workflowId, String workflowNodeName, Long environmentId) {
+
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowNodeOutputFacade.getWorkflowNodeOutput(workflowId, workflowNodeName),
+                workflowNodeOutputFacade.getWorkflowNodeOutput(workflowId, workflowNodeName, environmentId),
                 WorkflowNodeOutputModel.class));
     }
 
     @Override
     public ResponseEntity<List<WorkflowNodeOutputModel>> getPreviousWorkflowNodeOutputs(
-        String workflowId, String lastWorkflowNodeName) {
+        String workflowId, Long environmentId, String lastWorkflowNodeName) {
 
         workflowNodeOutputFacade.checkWorkflowCache(workflowId, lastWorkflowNodeName);
 
         return ResponseEntity.ok(
             CollectionUtils.map(
-                workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName),
+                workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+                    workflowId, lastWorkflowNodeName, environmentId),
                 workflowNodeOutputDTO -> conversionService.convert(
                     workflowNodeOutputDTO, WorkflowNodeOutputModel.class)));
     }

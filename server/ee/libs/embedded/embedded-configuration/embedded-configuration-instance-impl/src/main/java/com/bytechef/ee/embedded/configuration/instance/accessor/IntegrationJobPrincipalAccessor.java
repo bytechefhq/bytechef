@@ -7,12 +7,14 @@
 
 package com.bytechef.ee.embedded.configuration.instance.accessor;
 
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -58,6 +60,16 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
         }
 
         return workflowEnabled;
+    }
+
+    @Override
+    public long getEnvironmentId(long jobPrincipalId) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(jobPrincipalId);
+
+        Environment environment = integrationInstanceConfiguration.getEnvironment();
+
+        return environment.ordinal();
     }
 
     @Override

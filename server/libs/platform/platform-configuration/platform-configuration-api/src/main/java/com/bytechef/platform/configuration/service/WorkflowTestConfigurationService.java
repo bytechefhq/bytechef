@@ -29,25 +29,31 @@ public interface WorkflowTestConfigurationService {
 
     void delete(String workflowId);
 
+    void delete(String workflowId, long environmentId);
+
     void delete(List<String> workflowIds);
 
-    Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId);
+    Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId, long environmentId);
 
-    Optional<Long> fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName);
+    Optional<Long> fetchWorkflowTestConfigurationConnectionId(
+        String workflowId, String workflowNodeName, long environmentId);
 
     List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
-        String workflowId, String workflowNodeName);
+        String workflowId, String workflowNodeName, long environmentId);
 
-    Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId);
+    List<WorkflowTestConfiguration> getWorkflowTestConfigurations(String workflowId);
+
+    Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId, long environmentId);
 
     boolean isConnectionUsed(long connectionId);
 
     WorkflowTestConfiguration saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
     void saveWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String key, long connectionId, boolean workflowNodeTrigger);
+        String workflowId, String workflowNodeName, String key, long connectionId, boolean workflowNodeTrigger,
+        long environmentId);
 
-    void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value);
+    void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value, long environmentId);
 
     void updateWorkflowId(String oldWorkflowId, String newWorkflowId);
 }

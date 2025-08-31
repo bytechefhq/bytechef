@@ -145,7 +145,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         List<Connection> connections = connectionService.getConnections(ModeType.EMBEDDED);
         Map<String, ?> workflowMap = JsonUtils.readMap(definition);
 
-        checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow);
+        checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
 
         return projectWorkflow.getWorkflowReferenceCode();
     }
@@ -285,13 +285,20 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
         List<ProjectDeploymentWorkflowConnection> connections = workflowTestConfigurationService
-            .fetchWorkflowTestConfiguration(workflowId)
+            .fetchWorkflowTestConfiguration(workflowId, environment.ordinal())
             .map(WorkflowTestConfiguration::getConnections)
             .orElse(List.of())
             .stream()
-            .map(connection -> new ProjectDeploymentWorkflowConnection(
-                connection.getConnectionId(), connection.getWorkflowConnectionKey(),
-                connection.getWorkflowNodeName()))
+            .filter(workflowTestConfigurationConnection -> {
+                Connection connection = connectionService.getConnection(
+                    workflowTestConfigurationConnection.getConnectionId());
+
+                return connection.getEnvironmentId() == environment.ordinal();
+            })
+            .map(workflowTestConfigurationConnection -> new ProjectDeploymentWorkflowConnection(
+                workflowTestConfigurationConnection.getConnectionId(),
+                workflowTestConfigurationConnection.getWorkflowConnectionKey(),
+                workflowTestConfigurationConnection.getWorkflowNodeName()))
             .toList();
 
         int newProjectVersion = projectFacade.publishProject(connectedUserProject.getProjectId(), description, false);
@@ -335,6 +342,23 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         workflowService.update(projectWorkflow.getWorkflowId(), definition, oldWorkflow.getVersion());
     }
 
+    @Override
+    public void updateWorkflowConfigurationConnection(
+        String externalUserId, String workflowReferenceCode, String workflowNodeName, String workflowConnectionKey,
+        long connectionId, Environment environment) {
+
+        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
+
+        String workflowId = projectWorkflowService
+            .fetchLatestProjectWorkflowId(connectedUserProject.getProjectId(), workflowReferenceCode)
+            .orElseThrow(() -> new ConfigurationException(
+                "Workflow with workflowReferenceCode: %s not exist".formatted(workflowReferenceCode),
+                WorkflowErrorType.WORKFLOW_NOT_FOUND));
+
+        workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
+            workflowId, workflowNodeName, workflowConnectionKey, connectionId, environment.ordinal());
+    }
+
     private ConnectedUserProject checkConnectedUserProject(String externalUserId, Environment environment) {
         return connectUserProjectService
             .fetchConnectUserProject(externalUserId, environment)
@@ -353,7 +377,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     private void checkWorkflowNodeConnection(
-        String map, List<Connection> connections, ProjectWorkflow projectWorkflow, String workflowNodeName) {
+        String map, List<Connection> connections, ProjectWorkflow projectWorkflow, String workflowNodeName,
+        long environmentId) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(map);
 
@@ -362,25 +387,26 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .findFirst()
             .ifPresent(connection -> workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
                 projectWorkflow.getWorkflowId(), workflowNodeName, workflowNodeType.name(),
-                connection.getId()));
+                connection.getId(), environmentId));
     }
 
     private void checkWorkflowNodeConnections(
-        Map<String, ?> workflowMap, List<Connection> connections, ProjectWorkflow projectWorkflow) {
+        Map<String, ?> workflowMap, List<Connection> connections, ProjectWorkflow projectWorkflow, long environmentId) {
 
         List<Map<String, ?>> triggers = MapUtils.getList(workflowMap, "triggers", new TypeReference<>() {}, List.of());
 
         for (Map<String, ?> triggerMap : triggers) {
             checkWorkflowNodeConnection(
                 MapUtils.getString(triggerMap, "type"), connections, projectWorkflow,
-                MapUtils.getString(triggerMap, "name"));
+                MapUtils.getString(triggerMap, "name"), environmentId);
         }
 
         List<Map<String, ?>> tasks = MapUtils.getList(workflowMap, "tasks", new TypeReference<>() {}, List.of());
 
         for (Map<String, ?> taskMap : tasks) {
             checkWorkflowNodeConnection(
-                MapUtils.getString(taskMap, "type"), connections, projectWorkflow, MapUtils.getString(taskMap, "name"));
+                MapUtils.getString(taskMap, "type"), connections, projectWorkflow, MapUtils.getString(taskMap, "name"),
+                environmentId);
         }
     }
 

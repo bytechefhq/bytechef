@@ -43,10 +43,12 @@ public class WorkflowNodeScriptApiController implements WorkflowNodeScriptApi {
     }
 
     @Override
-    public ResponseEntity<ScriptTestExecutionModel> testWorkflowNodeScript(String id, String workflowNodeName) {
+    public ResponseEntity<ScriptTestExecutionModel> testWorkflowNodeScript(
+        String id, String workflowNodeName, Long environmentId) {
+
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowNodeScriptFacade.testWorkflowNodeScript(id, workflowNodeName),
+                workflowNodeScriptFacade.testWorkflowNodeScript(id, workflowNodeName, environmentId),
                 ScriptTestExecutionModel.class));
     }
 }

@@ -344,6 +344,11 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
+                public long getEnvironmentId(long jobPrincipalId) {
+                    return 0;
+                }
+
+                @Override
                 public Map<String, ?> getInputMap(long jobPrincipalId, String workflowReferenceCode) {
                     return Map.of();
                 }

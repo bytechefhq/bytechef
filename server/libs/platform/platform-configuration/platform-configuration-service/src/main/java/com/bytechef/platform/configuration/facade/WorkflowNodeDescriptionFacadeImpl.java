@@ -63,9 +63,10 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     }
 
     @Override
-    public String getWorkflowNodeDescription(String workflowId, String workflowNodeName) {
+    public String getWorkflowNodeDescription(String workflowId, String workflowNodeName, long environmentId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
 
         String description;
 

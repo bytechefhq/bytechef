@@ -28,6 +28,8 @@ public interface JobPrincipalAccessor {
 
     boolean isWorkflowEnabled(long jobPrincipalId, String workflowReferenceCode);
 
+    long getEnvironmentId(long jobPrincipalId);
+
     Map<String, ?> getInputMap(long jobPrincipalId, String workflowReferenceCode);
 
     ModeType getType();

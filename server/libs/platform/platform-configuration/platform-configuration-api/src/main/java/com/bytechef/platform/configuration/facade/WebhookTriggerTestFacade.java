@@ -26,11 +26,12 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
  */
 public interface WebhookTriggerTestFacade {
 
-    void disableTrigger(String workflowId, ModeType type);
+    void disableTrigger(String workflowId, long environmentId, ModeType type);
 
-    String enableTrigger(String workflowId, ModeType type);
+    String enableTrigger(String workflowId, long environmentId, ModeType type);
 
     boolean isWorkflowEnabled(WorkflowExecutionId workflowExecutionId);
 
-    WebhookValidateResponse validateOnEnable(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    WebhookValidateResponse validateOnEnable(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, long environmentId);
 }

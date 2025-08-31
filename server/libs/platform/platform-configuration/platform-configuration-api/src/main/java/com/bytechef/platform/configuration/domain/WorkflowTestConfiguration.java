@@ -48,6 +48,9 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
     @CreatedDate
     private Instant createdDate;
 
+    @Column("environment")
+    private Long environmentId;
+
     @Column
     private MapWrapper inputs = new MapWrapper();
 
@@ -75,11 +78,13 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
     }
 
     public WorkflowTestConfiguration(
-        List<WorkflowTestConfigurationConnection> connections, Map<String, Object> inputs, String workflowId) {
+        long environmentId, Map<String, Object> inputs, String workflowId,
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections) {
 
-        this.workflowTestConfigurationConnections = new HashSet<>(connections);
+        this.environmentId = environmentId;
         this.inputs = new MapWrapper(inputs);
         this.workflowId = workflowId;
+        this.workflowTestConfigurationConnections = new HashSet<>(workflowTestConfigurationConnections);
     }
 
     @Override
@@ -110,12 +115,24 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
         return List.copyOf(workflowTestConfigurationConnections);
     }
 
+//    public List<WorkflowTestConfigurationConnection> getConnections(long environmentId) {
+//        return List.copyOf(
+//            workflowTestConfigurationConnections.stream()
+//                .filter(workflowTestConfigurationConnection -> Objects.equals(
+//                    workflowTestConfigurationConnection.getEnvironmentId(), environmentId))
+//                .toList());
+//    }
+
     public String getCreatedBy() {
         return createdBy;
     }
 
     public Instant getCreatedDate() {
         return createdDate;
+    }
+
+    public Long getEnvironmentId() {
+        return environmentId;
     }
 
     @SuppressWarnings("unchecked")
@@ -149,6 +166,10 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
         }
     }
 
+    public void setEnvironmentId(long environmentId) {
+        this.environmentId = environmentId;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -170,15 +191,16 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
     @Override
     public String toString() {
         return "WorkflowTestConfiguration{" +
-            "createdBy='" + createdBy + '\'' +
-            ", createdDate=" + createdDate +
+            "id=" + id +
+            ", workflowId='" + workflowId + '\'' +
+            ", environmentId=" + environmentId +
             ", inputs=" + inputs +
-            ", id=" + id +
+            ", workflowTestConfigurationConnections=" + workflowTestConfigurationConnections +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
-            ", workflowTestConfigurationConnections=" + workflowTestConfigurationConnections +
             ", version=" + version +
-            ", workflowId='" + workflowId + '\'' +
             '}';
     }
 }

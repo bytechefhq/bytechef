@@ -23,5 +23,5 @@ import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
  */
 public interface WorkflowNodeScriptFacade {
 
-    ScriptTestExecutionDTO testWorkflowNodeScript(String workflowId, String workflowNodeName);
+    ScriptTestExecutionDTO testWorkflowNodeScript(String workflowId, String workflowNodeName, long environmentId);
 }
