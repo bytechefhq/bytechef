@@ -28,17 +28,28 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstance", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:22:57.251757+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:43.457725+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceModel {
 
   private @Nullable Long id;
 
   private @Nullable CredentialStatusModel credentialStatus;
 
-  private @Nullable Boolean enabled;
+  private Boolean enabled;
 
   @Valid
   private List<@Valid IntegrationInstanceWorkflowModel> workflows = new ArrayList<>();
+
+  public IntegrationInstanceModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public IntegrationInstanceModel(Boolean enabled) {
+    this.enabled = enabled;
+  }
 
   public IntegrationInstanceModel id(@Nullable Long id) {
     this.id = id;
@@ -80,7 +91,7 @@ public class IntegrationInstanceModel {
     this.credentialStatus = credentialStatus;
   }
 
-  public IntegrationInstanceModel enabled(@Nullable Boolean enabled) {
+  public IntegrationInstanceModel enabled(Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
@@ -89,14 +100,14 @@ public class IntegrationInstanceModel {
    * If an integration instance is enabled or not
    * @return enabled
    */
-  
-  @Schema(name = "enabled", description = "If an integration instance is enabled or not", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "enabled", description = "If an integration instance is enabled or not", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("enabled")
-  public @Nullable Boolean getEnabled() {
+  public Boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(@Nullable Boolean enabled) {
+  public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
   }
 

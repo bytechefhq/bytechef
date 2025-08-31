@@ -2,7 +2,6 @@ package org.openapitools.configuration;
 
 import com.bytechef.automation.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.automation.configuration.web.rest.model.CredentialStatusModel;
-import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel;
 
 import org.springframework.context.annotation.Bean;
@@ -27,15 +26,6 @@ public class EnumConverterConfiguration {
             @Override
             public CredentialStatusModel convert(String source) {
                 return CredentialStatusModel.fromValue(source);
-            }
-        };
-    }
-    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.environmentConverter")
-    Converter<String, EnvironmentModel> environmentConverter() {
-        return new Converter<String, EnvironmentModel>() {
-            @Override
-            public EnvironmentModel convert(String source) {
-                return EnvironmentModel.fromValue(source);
             }
         };
     }

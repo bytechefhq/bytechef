@@ -2,7 +2,10 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -13,46 +16,107 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.*;
 import jakarta.annotation.Generated;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
 /**
- * The environment of a project.
+ * The environment.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:01.494536+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
-public enum EnvironmentModel {
-  
-  DEVELOPMENT("DEVELOPMENT"),
-  
-  STAGING("STAGING"),
-  
-  PRODUCTION("PRODUCTION");
+@Schema(name = "Environment", description = "The environment.")
+@JsonTypeName("Environment")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+public class EnvironmentModel {
 
-  private final String value;
+  private @Nullable Long id;
 
-  EnvironmentModel(String value) {
-    this.value = value;
+  private String name;
+
+  public EnvironmentModel() {
+    super();
   }
 
-  @JsonValue
-  public String getValue() {
-    return value;
+  /**
+   * Constructor with only required parameters
+   */
+  public EnvironmentModel(String name) {
+    this.name = name;
+  }
+
+  public EnvironmentModel id(@Nullable Long id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * The environment id.
+   * @return id
+   */
+  
+  @Schema(name = "id", description = "The environment id.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
+  public @Nullable Long getId() {
+    return id;
+  }
+
+  public void setId(@Nullable Long id) {
+    this.id = id;
+  }
+
+  public EnvironmentModel name(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * The environment name.
+   * @return name
+   */
+  @NotNull 
+  @Schema(name = "name", description = "The environment name.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    EnvironmentModel environment = (EnvironmentModel) o;
+    return Objects.equals(this.id, environment.id) &&
+        Objects.equals(this.name, environment.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name);
   }
 
   @Override
   public String toString() {
-    return String.valueOf(value);
+    StringBuilder sb = new StringBuilder();
+    sb.append("class EnvironmentModel {\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("}");
+    return sb.toString();
   }
 
-  @JsonCreator
-  public static EnvironmentModel fromValue(String value) {
-    for (EnvironmentModel b : EnvironmentModel.values()) {
-      if (b.value.equals(value)) {
-        return b;
-      }
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(Object o) {
+    if (o == null) {
+      return "null";
     }
-    throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    return o.toString().replace("\n", "\n    ");
   }
 }
 

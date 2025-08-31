@@ -5,5 +5,4 @@ src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/ConnectedUserApi.
 src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/model/ConnectedUserIntegrationInstanceModel.java
 src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/model/ConnectedUserModel.java
 src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/model/CredentialStatusModel.java
-src/main/java/com/bytechef/ee/embedded/connected/user/web/rest/model/EnvironmentModel.java
 src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

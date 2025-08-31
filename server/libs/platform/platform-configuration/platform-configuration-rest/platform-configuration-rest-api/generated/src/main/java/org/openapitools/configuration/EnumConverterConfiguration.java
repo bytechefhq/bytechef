@@ -3,7 +3,6 @@ package org.openapitools.configuration;
 import com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.ControlTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.CredentialStatusModel;
-import com.bytechef.platform.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.UnifiedApiCategoryModel;
@@ -40,15 +39,6 @@ public class EnumConverterConfiguration {
             @Override
             public CredentialStatusModel convert(String source) {
                 return CredentialStatusModel.fromValue(source);
-            }
-        };
-    }
-    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.environmentConverter")
-    Converter<String, EnvironmentModel> environmentConverter() {
-        return new Converter<String, EnvironmentModel>() {
-            @Override
-            public EnvironmentModel convert(String source) {
-                return EnvironmentModel.fromValue(source);
             }
         };
     }

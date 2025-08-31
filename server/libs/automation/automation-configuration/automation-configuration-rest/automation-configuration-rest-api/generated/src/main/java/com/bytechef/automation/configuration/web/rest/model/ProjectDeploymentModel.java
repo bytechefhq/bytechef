@@ -2,13 +2,11 @@ package com.bytechef.automation.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentWorkflowModel;
 import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeployment", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectDeployment")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:22:59.503398+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:45.050915+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ProjectDeploymentModel {
 
   private @Nullable String createdBy;
@@ -43,7 +41,7 @@ public class ProjectDeploymentModel {
 
   private @Nullable Boolean enabled;
 
-  private @Nullable EnvironmentModel environment;
+  private @Nullable Long environmentId;
 
   private @Nullable Long id;
 
@@ -162,24 +160,24 @@ public class ProjectDeploymentModel {
     this.enabled = enabled;
   }
 
-  public ProjectDeploymentModel environment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public ProjectDeploymentModel environmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
     return this;
   }
 
   /**
-   * Get environment
-   * @return environment
+   * The id of an environment.
+   * @return environmentId
    */
-  @Valid 
-  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("environment")
-  public @Nullable EnvironmentModel getEnvironment() {
-    return environment;
+  
+  @Schema(name = "environmentId", description = "The id of an environment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environmentId")
+  public @Nullable Long getEnvironmentId() {
+    return environmentId;
   }
 
-  public void setEnvironment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public void setEnvironmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
   }
 
   public ProjectDeploymentModel id(@Nullable Long id) {
@@ -431,7 +429,7 @@ public class ProjectDeploymentModel {
         Objects.equals(this.createdDate, projectDeployment.createdDate) &&
         Objects.equals(this.description, projectDeployment.description) &&
         Objects.equals(this.enabled, projectDeployment.enabled) &&
-        Objects.equals(this.environment, projectDeployment.environment) &&
+        Objects.equals(this.environmentId, projectDeployment.environmentId) &&
         Objects.equals(this.id, projectDeployment.id) &&
         Objects.equals(this.lastExecutionDate, projectDeployment.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, projectDeployment.lastModifiedBy) &&
@@ -447,7 +445,7 @@ public class ProjectDeploymentModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion, project, projectDeploymentWorkflows, tags, version);
+    return Objects.hash(createdBy, createdDate, description, enabled, environmentId, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion, project, projectDeploymentWorkflows, tags, version);
   }
 
   @Override
@@ -458,7 +456,7 @@ public class ProjectDeploymentModel {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    environmentId: ").append(toIndentedString(environmentId)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");

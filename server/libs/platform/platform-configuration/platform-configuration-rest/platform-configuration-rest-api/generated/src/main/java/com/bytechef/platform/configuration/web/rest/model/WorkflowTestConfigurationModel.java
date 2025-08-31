@@ -30,19 +30,21 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfiguration", description = "Contains configuration and connections required for the test execution of a particular workflow.")
 @JsonTypeName("WorkflowTestConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:01.494536+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowTestConfigurationModel {
+
+  @Valid
+  private List<@Valid WorkflowTestConfigurationConnectionModel> connections = new ArrayList<>();
 
   private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime createdDate;
 
-  @Valid
-  private Map<String, String> inputs = new HashMap<>();
+  private Long environmentId;
 
   @Valid
-  private List<@Valid WorkflowTestConfigurationConnectionModel> connections = new ArrayList<>();
+  private Map<String, String> inputs = new HashMap<>();
 
   private @Nullable String lastModifiedBy;
 
@@ -52,6 +54,45 @@ public class WorkflowTestConfigurationModel {
   private @Nullable String workflowId;
 
   private @Nullable Integer version;
+
+  public WorkflowTestConfigurationModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public WorkflowTestConfigurationModel(Long environmentId) {
+    this.environmentId = environmentId;
+  }
+
+  public WorkflowTestConfigurationModel connections(List<@Valid WorkflowTestConfigurationConnectionModel> connections) {
+    this.connections = connections;
+    return this;
+  }
+
+  public WorkflowTestConfigurationModel addConnectionsItem(WorkflowTestConfigurationConnectionModel connectionsItem) {
+    if (this.connections == null) {
+      this.connections = new ArrayList<>();
+    }
+    this.connections.add(connectionsItem);
+    return this;
+  }
+
+  /**
+   * The connections used by workflow test.
+   * @return connections
+   */
+  @Valid 
+  @Schema(name = "connections", description = "The connections used by workflow test.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connections")
+  public List<@Valid WorkflowTestConfigurationConnectionModel> getConnections() {
+    return connections;
+  }
+
+  public void setConnections(List<@Valid WorkflowTestConfigurationConnectionModel> connections) {
+    this.connections = connections;
+  }
 
   public WorkflowTestConfigurationModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
@@ -93,6 +134,26 @@ public class WorkflowTestConfigurationModel {
     this.createdDate = createdDate;
   }
 
+  public WorkflowTestConfigurationModel environmentId(Long environmentId) {
+    this.environmentId = environmentId;
+    return this;
+  }
+
+  /**
+   * The id of an environment.
+   * @return environmentId
+   */
+  @NotNull 
+  @Schema(name = "environmentId", description = "The id of an environment.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("environmentId")
+  public Long getEnvironmentId() {
+    return environmentId;
+  }
+
+  public void setEnvironmentId(Long environmentId) {
+    this.environmentId = environmentId;
+  }
+
   public WorkflowTestConfigurationModel inputs(Map<String, String> inputs) {
     this.inputs = inputs;
     return this;
@@ -119,34 +180,6 @@ public class WorkflowTestConfigurationModel {
 
   public void setInputs(Map<String, String> inputs) {
     this.inputs = inputs;
-  }
-
-  public WorkflowTestConfigurationModel connections(List<@Valid WorkflowTestConfigurationConnectionModel> connections) {
-    this.connections = connections;
-    return this;
-  }
-
-  public WorkflowTestConfigurationModel addConnectionsItem(WorkflowTestConfigurationConnectionModel connectionsItem) {
-    if (this.connections == null) {
-      this.connections = new ArrayList<>();
-    }
-    this.connections.add(connectionsItem);
-    return this;
-  }
-
-  /**
-   * The connections used by workflow test.
-   * @return connections
-   */
-  @Valid 
-  @Schema(name = "connections", description = "The connections used by workflow test.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connections")
-  public List<@Valid WorkflowTestConfigurationConnectionModel> getConnections() {
-    return connections;
-  }
-
-  public void setConnections(List<@Valid WorkflowTestConfigurationConnectionModel> connections) {
-    this.connections = connections;
   }
 
   public WorkflowTestConfigurationModel lastModifiedBy(@Nullable String lastModifiedBy) {
@@ -238,10 +271,11 @@ public class WorkflowTestConfigurationModel {
       return false;
     }
     WorkflowTestConfigurationModel workflowTestConfiguration = (WorkflowTestConfigurationModel) o;
-    return Objects.equals(this.createdBy, workflowTestConfiguration.createdBy) &&
+    return Objects.equals(this.connections, workflowTestConfiguration.connections) &&
+        Objects.equals(this.createdBy, workflowTestConfiguration.createdBy) &&
         Objects.equals(this.createdDate, workflowTestConfiguration.createdDate) &&
+        Objects.equals(this.environmentId, workflowTestConfiguration.environmentId) &&
         Objects.equals(this.inputs, workflowTestConfiguration.inputs) &&
-        Objects.equals(this.connections, workflowTestConfiguration.connections) &&
         Objects.equals(this.lastModifiedBy, workflowTestConfiguration.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, workflowTestConfiguration.lastModifiedDate) &&
         Objects.equals(this.workflowId, workflowTestConfiguration.workflowId) &&
@@ -250,17 +284,18 @@ public class WorkflowTestConfigurationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, connections, lastModifiedBy, lastModifiedDate, workflowId, version);
+    return Objects.hash(connections, createdBy, createdDate, environmentId, inputs, lastModifiedBy, lastModifiedDate, workflowId, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowTestConfigurationModel {\n");
+    sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    environmentId: ").append(toIndentedString(environmentId)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
-    sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");

@@ -2,11 +2,9 @@ package com.bytechef.ee.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
@@ -26,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceBasic", description = "Contains configurations and connections required for the execution of integration workflows for a connected user.")
 @JsonTypeName("IntegrationInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:04.480158+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:47.972179+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceBasicModel {
 
   private Long connectionId;
@@ -40,7 +38,7 @@ public class IntegrationInstanceBasicModel {
 
   private @Nullable Boolean enabled;
 
-  private @Nullable EnvironmentModel environment;
+  private @Nullable Long environmentId;
 
   private @Nullable Long id;
 
@@ -165,24 +163,24 @@ public class IntegrationInstanceBasicModel {
     this.enabled = enabled;
   }
 
-  public IntegrationInstanceBasicModel environment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public IntegrationInstanceBasicModel environmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
     return this;
   }
 
   /**
-   * Get environment
-   * @return environment
+   * The id of an environment.
+   * @return environmentId
    */
-  @Valid 
-  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("environment")
-  public @Nullable EnvironmentModel getEnvironment() {
-    return environment;
+  
+  @Schema(name = "environmentId", description = "The id of an environment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environmentId")
+  public @Nullable Long getEnvironmentId() {
+    return environmentId;
   }
 
-  public void setEnvironment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public void setEnvironmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
   }
 
   public IntegrationInstanceBasicModel id(@Nullable Long id) {
@@ -299,7 +297,7 @@ public class IntegrationInstanceBasicModel {
         Objects.equals(this.createdBy, integrationInstanceBasic.createdBy) &&
         Objects.equals(this.createdDate, integrationInstanceBasic.createdDate) &&
         Objects.equals(this.enabled, integrationInstanceBasic.enabled) &&
-        Objects.equals(this.environment, integrationInstanceBasic.environment) &&
+        Objects.equals(this.environmentId, integrationInstanceBasic.environmentId) &&
         Objects.equals(this.id, integrationInstanceBasic.id) &&
         Objects.equals(this.lastExecutionDate, integrationInstanceBasic.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, integrationInstanceBasic.lastModifiedBy) &&
@@ -309,7 +307,7 @@ public class IntegrationInstanceBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId, connectedUserId, createdBy, createdDate, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, integrationInstanceConfigurationId);
+    return Objects.hash(connectionId, connectedUserId, createdBy, createdDate, enabled, environmentId, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, integrationInstanceConfigurationId);
   }
 
   @Override
@@ -321,7 +319,7 @@ public class IntegrationInstanceBasicModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    environmentId: ").append(toIndentedString(environmentId)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");

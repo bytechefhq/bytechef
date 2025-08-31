@@ -5,6 +5,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ClusterElementDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ComponentDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ConnectionDefinitionApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/EnvironmentApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/NotificationApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/NotificationEventApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/Oauth2Api.java
