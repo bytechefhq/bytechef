@@ -1,3 +1,4 @@
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
@@ -268,6 +269,7 @@ export default function handleDeleteTask({
             onSuccess: () => {
                 queryClient.invalidateQueries({
                     queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                        environmentId: useEnvironmentStore.getState().currentEnvironmentId,
                         id: workflow.id!,
                         lastWorkflowNodeName: currentNode?.name,
                     }),

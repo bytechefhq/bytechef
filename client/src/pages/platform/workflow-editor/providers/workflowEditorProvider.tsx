@@ -57,10 +57,12 @@ export interface RequestI {
 }
 
 export interface StartWebhookTriggerTestRequestI {
+    environmentId: number;
     workflowId: string;
 }
 
 export interface StopWebhookTriggerTestRequestI {
+    environmentId: number;
     workflowId: string;
 }
 

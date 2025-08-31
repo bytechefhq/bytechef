@@ -4,6 +4,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import DialogLoader from '@/shared/components/DialogLoader';
 import {TriggerType} from '@/shared/middleware/platform/configuration';
@@ -42,6 +43,8 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
     const [startWebhookTestDate, setStartWebhookTestDate] = useState(new Date());
     const [webhookTestUrl, setWebhookTestUrl] = useState<string | undefined>(undefined);
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
     const startWebhookTestRef = useRef(false);
 
     const [copiedValue, copyToClipboard] = useCopyToClipboard();
@@ -54,6 +57,7 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
         isFetching: workflowNodeOutputIsFetching,
         refetch: workflowNodeOutputRefetch,
     } = useGetWorkflowNodeOutputQuery({
+        environmentId: currentEnvironmentId,
         id: workflowId!,
         workflowNodeName: currentNode?.name as string,
     });
@@ -114,6 +118,7 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
     const handleTestOperationClick = useCallback(() => {
         if (!currentNode.trigger || (currentNode.trigger && currentNode?.triggerType === TriggerType.Polling)) {
             saveWorkflowNodeTestOutputMutation.mutate({
+                environmentId: currentEnvironmentId,
                 id: workflowId,
                 workflowNodeName: currentNode.name,
             });
@@ -123,6 +128,7 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
 
             webhookTriggerTestApi!
                 .startWebhookTriggerTest({
+                    environmentId: currentEnvironmentId,
                     workflowId,
                 })
                 .then((response) => {
@@ -140,6 +146,7 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
                                     queryClient.invalidateQueries({
                                         queryKey: [
                                             ...WorkflowNodeOutputKeys.workflowNodeOutput({
+                                                environmentId: currentEnvironmentId,
                                                 id: workflowId,
                                                 workflowNodeName: currentNode.name,
                                             }),
@@ -163,6 +170,7 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
                 });
         }
     }, [
+        currentEnvironmentId,
         currentNode.name,
         currentNode.trigger,
         currentNode?.triggerType,
@@ -181,9 +189,10 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
         setWebhookTestCancelEnabled(false);
 
         webhookTriggerTestApi!.stopWebhookTriggerTest({
+            environmentId: currentEnvironmentId,
             workflowId,
         });
-    }, [webhookTriggerTestApi, workflowId, workflowNodeOutputRefetch]);
+    }, [currentEnvironmentId, webhookTriggerTestApi, workflowId, workflowNodeOutputRefetch]);
 
     const testing = saveWorkflowNodeTestOutputMutation.isPending || startWebhookTest;
 

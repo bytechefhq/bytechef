@@ -1,3 +1,4 @@
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {SPACE} from '@/shared/constants';
 import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
@@ -27,6 +28,7 @@ export default function useWorkflowInputs({
     const queryClient = useQueryClient();
     const {updateWorkflowMutation} = useWorkflowEditor();
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {setWorkflow, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             setWorkflow: state.setWorkflow,
@@ -212,6 +214,7 @@ export default function useWorkflowInputs({
                     }
 
                     saveWorkflowTestConfigurationInputsMutation.mutate({
+                        environmentId: currentEnvironmentId,
                         saveWorkflowTestConfigurationInputsRequest: {
                             key: input.name,
                             value: getValues().testValue!,

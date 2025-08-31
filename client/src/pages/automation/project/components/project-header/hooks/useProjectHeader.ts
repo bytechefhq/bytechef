@@ -1,4 +1,5 @@
 import {useToast} from '@/hooks/use-toast';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -28,6 +29,7 @@ interface UseProjectHeaderProps {
 
 export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectId}: UseProjectHeaderProps) => {
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const {setShowBottomPanelOpen, setWorkflowIsRunning, setWorkflowTestExecution, showBottomPanel} =
         useWorkflowEditorStore(
@@ -135,6 +137,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
 
                 workflowTestApi
                     .testWorkflow({
+                        environmentId: currentEnvironmentId,
                         id: workflow.id,
                     })
                     .then((workflowTestExecution) => {

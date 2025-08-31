@@ -24,6 +24,7 @@ import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.q
 import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -75,6 +76,7 @@ const IntegrationHeader = ({
             workflowIsRunning: state.workflowIsRunning,
         }))
     );
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const setCurrentNode = useWorkflowNodeDetailsPanelStore((state) => state.setCurrentNode);
 
@@ -189,6 +191,7 @@ const IntegrationHeader = ({
 
             workflowTestApi
                 .testWorkflow({
+                    environmentId: currentEnvironmentId,
                     id: workflow.id,
                 })
                 .then((workflowTestExecution) => {

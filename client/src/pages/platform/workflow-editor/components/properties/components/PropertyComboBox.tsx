@@ -5,6 +5,7 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {CaretSortIcon, CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {FocusEventHandler, ReactNode, useEffect, useMemo, useState} from 'react';
@@ -81,6 +82,7 @@ const PropertyComboBox = ({
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(initialValue !== undefined ? initialValue.toString() : defaultValue);
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
     const path = useMemo(() => {
@@ -115,6 +117,7 @@ const PropertyComboBox = ({
         () => ({
             loadDependencyValueKey: lookupDependsOnValuesKey,
             request: {
+                environmentId: currentEnvironmentId,
                 id: workflowId,
                 lookupDependsOnPaths,
                 propertyName: path!,

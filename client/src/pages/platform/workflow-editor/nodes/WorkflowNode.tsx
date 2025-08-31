@@ -1,5 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {NODE_WIDTH, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
@@ -33,6 +34,7 @@ import styles from './NodeTypes.module.css';
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentNode: state.currentNode,
@@ -72,6 +74,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
+            environmentId: currentEnvironmentId,
             id: workflow.id!,
             workflowNodeName: hoveredNodeName!,
         },

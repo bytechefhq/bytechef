@@ -1,4 +1,5 @@
 import {Skeleton} from '@/components/ui/skeleton';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Property as PropertyModel} from '@/shared/middleware/platform/configuration';
@@ -31,6 +32,7 @@ const PropertyDynamicProperties = ({
     const [subProperties, setSubProperties] = useState<PropertyModel[]>([]);
     const [lastProcessedKey, setLastProcessedKey] = useState('');
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
@@ -40,12 +42,13 @@ const PropertyDynamicProperties = ({
         () => ({
             lookupDependsOnValuesKey,
             request: {
+                environmentId: currentEnvironmentId,
                 id: workflow.id!,
                 propertyName: name!,
                 workflowNodeName: currentNode?.name ?? '',
             },
         }),
-        [lookupDependsOnValuesKey, workflow.id, name, currentNode?.name]
+        [currentEnvironmentId, lookupDependsOnValuesKey, workflow.id, name, currentNode?.name]
     );
 
     const queryEnabled = useMemo(

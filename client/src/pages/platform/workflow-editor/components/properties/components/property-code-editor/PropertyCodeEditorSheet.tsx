@@ -3,6 +3,7 @@ import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import PropertyCodeEditorSheetRightPanel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanel';
 import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
@@ -40,6 +41,7 @@ const PropertyCodeEditorSheet = ({
     const [scriptTestExecution, setScriptTestExecution] = useState<ScriptTestExecution | undefined>();
 
     const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === workflowNodeName);
 
@@ -48,6 +50,7 @@ const PropertyCodeEditorSheet = ({
 
         workflowNodeScriptApi
             .testWorkflowNodeScript({
+                environmentId: currentEnvironmentId!,
                 id: workflow!.id!,
                 workflowNodeName,
             })

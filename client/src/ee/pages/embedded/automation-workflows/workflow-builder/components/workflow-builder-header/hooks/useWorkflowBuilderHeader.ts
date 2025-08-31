@@ -1,6 +1,7 @@
 import {usePublishConnectedUserProjectWorkflowMutation} from '@/ee/shared/mutations/embedded/connectedUserProjectWorkflows.mutations';
 import {ConnectedUserProjectWorkflowKeys} from '@/ee/shared/queries/embedded/connectedUserProjectWorkflows.queries';
 import {useToast} from '@/hooks/use-toast';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -24,6 +25,7 @@ interface UseProjectHeaderProps {
 
 export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, projectId}: UseProjectHeaderProps) => {
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const {setShowBottomPanelOpen, setWorkflowIsRunning, setWorkflowTestExecution, showBottomPanel} =
         useWorkflowEditorStore(
@@ -117,6 +119,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
 
                 workflowTestApi
                     .testWorkflow({
+                        environmentId: currentEnvironmentId,
                         id: workflow.id,
                     })
                     .then((workflowTestExecution) => {
