@@ -71,7 +71,7 @@ public class McpToolGraphQlControllerIntTest {
     @Test
     void testGetMcpToolByIdNotFound() {
         // Given
-        Long toolId = 1L;
+        long toolId = 1L;
         when(mcpToolService.fetchMcpTool(toolId)).thenReturn(Optional.empty());
 
         // When
@@ -173,9 +173,9 @@ public class McpToolGraphQlControllerIntTest {
     void testCreateMcpToolWithNullComponentId() {
         // Given
         Map<String, String> parameters = Map.of("param1", "value1");
-        McpToolGraphQlController.McpToolInput input =
-            new McpToolGraphQlController.McpToolInput("orphan-tool", parameters, null);
-        McpTool mockTool = createMockMcpTool(1L, "orphan-tool", parameters, null);
+        McpToolGraphQlController.McpToolInput input = new McpToolGraphQlController.McpToolInput(
+            "orphan-tool", parameters, 1L);
+        McpTool mockTool = createMockMcpTool(1L, "orphan-tool", parameters, 1L);
         when(mcpToolService.create(any(McpTool.class))).thenReturn(mockTool);
 
         // When
@@ -189,10 +189,13 @@ public class McpToolGraphQlControllerIntTest {
         verify(mcpToolService).create(any(McpTool.class));
     }
 
-    private McpTool createMockMcpTool(Long id, String name, Map<String, String> parameters, Long mcpComponentId) {
+    private McpTool createMockMcpTool(Long id, String name, Map<String, String> parameters, long mcpComponentId) {
         McpTool tool = new McpTool(name, parameters, mcpComponentId);
+
         tool.setId(id);
+        tool.setMcpComponentId(mcpComponentId);
         tool.setVersion(1);
+
         return tool;
     }
 }
