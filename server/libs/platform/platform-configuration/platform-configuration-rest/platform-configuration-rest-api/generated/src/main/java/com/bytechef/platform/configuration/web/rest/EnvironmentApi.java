@@ -5,7 +5,7 @@
  */
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.configuration.web.rest.model.ScriptTestExecutionModel;
+import com.bytechef.platform.configuration.web.rest.model.EnvironmentModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,48 +36,43 @@ import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
-@Tag(name = "workflow-node-script", description = "The Platform Workflow Node Script Internal API")
-public interface WorkflowNodeScriptApi {
+@Tag(name = "environment", description = "The Platform Environment Internal API")
+public interface EnvironmentApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * POST /workflows/{id}/workflow-nodes/{workflowNodeName}/scripts : Execute a script for testing purposes
-     * Execute a script for testing purposes.
+     * GET /environments : Retrieves oauth2 authorization parameters
+     * Retrieves environments.
      *
-     * @param id The id of a workflow. (required)
-     * @param workflowNodeName The name of a workflow node which uses the script component. (required)
-     * @param environmentId The id of an environment. (required)
-     * @return The script test execution object. (status code 200)
+     * @return The list of Environment objects. (status code 200)
      */
     @Operation(
-        operationId = "testWorkflowNodeScript",
-        summary = "Execute a script for testing purposes",
-        description = "Execute a script for testing purposes.",
-        tags = { "workflow-node-script" },
+        operationId = "getEnvironments",
+        summary = "Retrieves oauth2 authorization parameters",
+        description = "Retrieves environments.",
+        tags = { "environment" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The script test execution object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ScriptTestExecutionModel.class))
+            @ApiResponse(responseCode = "200", description = "The list of Environment objects.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EnvironmentModel.class)))
             })
         }
     )
     @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/workflows/{id}/workflow-nodes/{workflowNodeName}/scripts",
+        method = RequestMethod.GET,
+        value = "/environments",
         produces = { "application/json" }
     )
     
-    default ResponseEntity<ScriptTestExecutionModel> testWorkflowNodeScript(
-        @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @Parameter(name = "workflowNodeName", description = "The name of a workflow node which uses the script component.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
-        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
+    default ResponseEntity<List<EnvironmentModel>> getEnvironments(
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"output\" : \"{}\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" } }";
+                    String exampleString = "[ { \"name\" : \"name\", \"id\" : 0 }, { \"name\" : \"name\", \"id\" : 0 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

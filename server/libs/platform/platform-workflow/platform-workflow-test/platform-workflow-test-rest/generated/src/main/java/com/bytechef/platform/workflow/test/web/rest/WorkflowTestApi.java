@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:03.819400+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:47.523790+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "workflow-test", description = "The Platform Workflow Test Internal API")
 public interface WorkflowTestApi {
@@ -49,6 +49,7 @@ public interface WorkflowTestApi {
      * Execute a workflow synchronously for testing purposes.
      *
      * @param id Id of the workflow to execute. (required)
+     * @param environmentId The id of an environment. (required)
      * @param testWorkflowRequestModel  (optional)
      * @return The output expected by the workflow. (status code 200)
      */
@@ -72,6 +73,7 @@ public interface WorkflowTestApi {
     
     default ResponseEntity<WorkflowTestExecutionModel> testWorkflow(
         @Parameter(name = "id", description = "Id of the workflow to execute.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
         @Parameter(name = "TestWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable TestWorkflowRequestModel testWorkflowRequestModel
     ) {
         getRequest().ifPresent(request -> {

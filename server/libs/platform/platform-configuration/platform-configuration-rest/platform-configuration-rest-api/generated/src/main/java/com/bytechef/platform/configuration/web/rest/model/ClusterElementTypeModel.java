@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementType", description = "A type of a cluster element.")
 @JsonTypeName("ClusterElementType")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:01.494536+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ClusterElementTypeModel {
 
   private @Nullable String name;

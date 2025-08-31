@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:01.494536+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "workflow-node-description", description = "The Platform Workflow Node Description Internal API")
 public interface WorkflowNodeDescriptionApi {
@@ -49,6 +49,7 @@ public interface WorkflowNodeDescriptionApi {
      *
      * @param id The workflow id (required)
      * @param workflowNodeName The name of an workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
+     * @param environmentId The id of an environment. (required)
      * @return The editor description. (status code 200)
      */
     @Operation(
@@ -70,7 +71,8 @@ public interface WorkflowNodeDescriptionApi {
     
     default ResponseEntity<GetWorkflowNodeDescription200ResponseModel> getWorkflowNodeDescription(
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @Parameter(name = "workflowNodeName", description = "The name of an workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
+        @Parameter(name = "workflowNodeName", description = "The name of an workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

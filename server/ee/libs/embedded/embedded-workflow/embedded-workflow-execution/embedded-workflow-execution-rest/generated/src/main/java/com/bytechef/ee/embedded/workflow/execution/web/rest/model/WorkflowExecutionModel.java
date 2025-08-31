@@ -22,24 +22,40 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:06.091291+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:48.817489+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowExecutionModel {
 
-  private @Nullable Long id;
+  private Long id;
 
-  private @Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel integration;
+  private com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel integration;
 
-  private @Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration;
+  private com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration;
 
-  private @Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance;
+  private com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance;
 
-  private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
+  private com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
 
   private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
 
-  private @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow;
+  private com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow;
 
-  public WorkflowExecutionModel id(@Nullable Long id) {
+  public WorkflowExecutionModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public WorkflowExecutionModel(Long id, com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel integration, com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration, com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance, com.bytechef.platform.workflow.execution.web.rest.model.JobModel job, com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
+    this.id = id;
+    this.integration = integration;
+    this.integrationInstanceConfiguration = integrationInstanceConfiguration;
+    this.integrationInstance = integrationInstance;
+    this.job = job;
+    this.workflow = workflow;
+  }
+
+  public WorkflowExecutionModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -49,17 +65,17 @@ public class WorkflowExecutionModel {
    * @return id
    */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow execution.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("id")
-  public @Nullable Long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(@Nullable Long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
-  public WorkflowExecutionModel integration(@Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel integration) {
+  public WorkflowExecutionModel integration(com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel integration) {
     this.integration = integration;
     return this;
   }
@@ -68,18 +84,18 @@ public class WorkflowExecutionModel {
    * Get integration
    * @return integration
    */
-  @Valid 
-  @Schema(name = "integration", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "integration", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("integration")
-  public @Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel getIntegration() {
+  public com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel getIntegration() {
     return integration;
   }
 
-  public void setIntegration(@Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel integration) {
+  public void setIntegration(com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel integration) {
     this.integration = integration;
   }
 
-  public WorkflowExecutionModel integrationInstanceConfiguration(@Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration) {
+  public WorkflowExecutionModel integrationInstanceConfiguration(com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration) {
     this.integrationInstanceConfiguration = integrationInstanceConfiguration;
     return this;
   }
@@ -88,18 +104,18 @@ public class WorkflowExecutionModel {
    * Get integrationInstanceConfiguration
    * @return integrationInstanceConfiguration
    */
-  @Valid 
-  @Schema(name = "integrationInstanceConfiguration", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "integrationInstanceConfiguration", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("integrationInstanceConfiguration")
-  public @Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel getIntegrationInstanceConfiguration() {
+  public com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel getIntegrationInstanceConfiguration() {
     return integrationInstanceConfiguration;
   }
 
-  public void setIntegrationInstanceConfiguration(@Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration) {
+  public void setIntegrationInstanceConfiguration(com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration) {
     this.integrationInstanceConfiguration = integrationInstanceConfiguration;
   }
 
-  public WorkflowExecutionModel integrationInstance(@Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance) {
+  public WorkflowExecutionModel integrationInstance(com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance) {
     this.integrationInstance = integrationInstance;
     return this;
   }
@@ -108,18 +124,18 @@ public class WorkflowExecutionModel {
    * Get integrationInstance
    * @return integrationInstance
    */
-  @Valid 
-  @Schema(name = "integrationInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "integrationInstance", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("integrationInstance")
-  public @Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel getIntegrationInstance() {
+  public com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel getIntegrationInstance() {
     return integrationInstance;
   }
 
-  public void setIntegrationInstance(@Nullable com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance) {
+  public void setIntegrationInstance(com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance) {
     this.integrationInstance = integrationInstance;
   }
 
-  public WorkflowExecutionModel job(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
+  public WorkflowExecutionModel job(com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
     this.job = job;
     return this;
   }
@@ -128,14 +144,14 @@ public class WorkflowExecutionModel {
    * Get job
    * @return job
    */
-  @Valid 
-  @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "job", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("job")
-  public @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel getJob() {
+  public com.bytechef.platform.workflow.execution.web.rest.model.JobModel getJob() {
     return job;
   }
 
-  public void setJob(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
+  public void setJob(com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
     this.job = job;
   }
 
@@ -159,7 +175,7 @@ public class WorkflowExecutionModel {
     this.triggerExecution = triggerExecution;
   }
 
-  public WorkflowExecutionModel workflow(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
+  public WorkflowExecutionModel workflow(com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -168,14 +184,14 @@ public class WorkflowExecutionModel {
    * Get workflow
    * @return workflow
    */
-  @Valid 
-  @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "workflow", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workflow")
-  public @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel getWorkflow() {
+  public com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel getWorkflow() {
     return workflow;
   }
 
-  public void setWorkflow(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
+  public void setWorkflow(com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.workflow = workflow;
   }
 

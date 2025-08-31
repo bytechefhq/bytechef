@@ -3,7 +3,6 @@ package com.bytechef.ee.embedded.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.web.rest.model.AuthorizationTypeModel;
-import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationBasic", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfigurationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:04.480158+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:47.972179+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceConfigurationBasicModel {
 
   private @Nullable String createdBy;
@@ -39,7 +38,7 @@ public class IntegrationInstanceConfigurationBasicModel {
 
   private @Nullable Boolean enabled;
 
-  private @Nullable EnvironmentModel environment;
+  private @Nullable Long environmentId;
 
   private @Nullable Long id;
 
@@ -147,24 +146,24 @@ public class IntegrationInstanceConfigurationBasicModel {
     this.enabled = enabled;
   }
 
-  public IntegrationInstanceConfigurationBasicModel environment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public IntegrationInstanceConfigurationBasicModel environmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
     return this;
   }
 
   /**
-   * Get environment
-   * @return environment
+   * The id of an environment.
+   * @return environmentId
    */
-  @Valid 
-  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("environment")
-  public @Nullable EnvironmentModel getEnvironment() {
-    return environment;
+  
+  @Schema(name = "environmentId", description = "The id of an environment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environmentId")
+  public @Nullable Long getEnvironmentId() {
+    return environmentId;
   }
 
-  public void setEnvironment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public void setEnvironmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
   }
 
   public IntegrationInstanceConfigurationBasicModel id(@Nullable Long id) {
@@ -320,7 +319,7 @@ public class IntegrationInstanceConfigurationBasicModel {
         Objects.equals(this.createdDate, integrationInstanceConfigurationBasic.createdDate) &&
         Objects.equals(this.description, integrationInstanceConfigurationBasic.description) &&
         Objects.equals(this.enabled, integrationInstanceConfigurationBasic.enabled) &&
-        Objects.equals(this.environment, integrationInstanceConfigurationBasic.environment) &&
+        Objects.equals(this.environmentId, integrationInstanceConfigurationBasic.environmentId) &&
         Objects.equals(this.id, integrationInstanceConfigurationBasic.id) &&
         Objects.equals(this.integrationId, integrationInstanceConfigurationBasic.integrationId) &&
         Objects.equals(this.integrationVersion, integrationInstanceConfigurationBasic.integrationVersion) &&
@@ -332,7 +331,7 @@ public class IntegrationInstanceConfigurationBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, authorizationType);
+    return Objects.hash(createdBy, createdDate, description, enabled, environmentId, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, authorizationType);
   }
 
   @Override
@@ -343,7 +342,7 @@ public class IntegrationInstanceConfigurationBasicModel {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    environmentId: ").append(toIndentedString(environmentId)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationId: ").append(toIndentedString(integrationId)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");

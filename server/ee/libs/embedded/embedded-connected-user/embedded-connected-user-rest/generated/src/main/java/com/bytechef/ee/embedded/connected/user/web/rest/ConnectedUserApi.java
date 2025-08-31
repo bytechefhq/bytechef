@@ -8,7 +8,6 @@ package com.bytechef.ee.embedded.connected.user.web.rest;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.CredentialStatusModel;
 import org.springframework.format.annotation.DateTimeFormat;
-import com.bytechef.ee.embedded.connected.user.web.rest.model.EnvironmentModel;
 import java.time.LocalDate;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:22:57.709581+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:43.926852+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "connected-user", description = "The Embedded Connected User Internal API")
 public interface ConnectedUserApi {
@@ -137,7 +136,7 @@ public interface ConnectedUserApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"metadata\" : { \"key\" : \"\" }, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"externalId\" : \"externalId\", \"integrationInstances\" : [ { \"integrationInstanceConfigurationId\" : 5, \"integrationVersion\" : 5, \"integrationId\" : 1, \"connectionId\" : 2, \"componentName\" : \"componentName\", \"id\" : 6, \"enabled\" : true, \"credentialStatus\" : \"VALID\" }, { \"integrationInstanceConfigurationId\" : 5, \"integrationVersion\" : 5, \"integrationId\" : 1, \"connectionId\" : 2, \"componentName\" : \"componentName\", \"id\" : 6, \"enabled\" : true, \"credentialStatus\" : \"VALID\" } ], \"enabled\" : true, \"__version\" : 7, \"environment\" : \"DEVELOPMENT\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 0, \"email\" : \"email\" }";
+                    String exampleString = "{ \"metadata\" : { \"key\" : \"\" }, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"externalId\" : \"externalId\", \"integrationInstances\" : [ { \"integrationInstanceConfigurationId\" : 5, \"integrationVersion\" : 2, \"integrationId\" : 5, \"connectionId\" : 7, \"componentName\" : \"componentName\", \"id\" : 1, \"enabled\" : true, \"credentialStatus\" : \"VALID\" }, { \"integrationInstanceConfigurationId\" : 5, \"integrationVersion\" : 2, \"integrationId\" : 5, \"connectionId\" : 7, \"componentName\" : \"componentName\", \"id\" : 1, \"enabled\" : true, \"credentialStatus\" : \"VALID\" } ], \"enabled\" : true, \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 0, \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"email\" : \"email\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -152,7 +151,7 @@ public interface ConnectedUserApi {
      * GET /connected-users : Get all connected users
      * Get all connected users.
      *
-     * @param environment The environment. (optional)
+     * @param environmentId The environment id. (optional)
      * @param credentialStatus The id of an integration instance. (optional)
      * @param createDateFrom The start range of a create date. (optional)
      * @param createDateTo The end range of a create date . (optional)
@@ -179,7 +178,7 @@ public interface ConnectedUserApi {
     )
     
     default ResponseEntity<org.springframework.data.domain.Page> getConnectedUsers(
-        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) @Nullable EnvironmentModel environment,
+        @Parameter(name = "environmentId", description = "The environment id.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = false) @Nullable Long environmentId,
         @Parameter(name = "credentialStatus", description = "The id of an integration instance.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "credentialStatus", required = false) @Nullable CredentialStatusModel credentialStatus,
         @Parameter(name = "createDateFrom", description = "The start range of a create date.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "createDateFrom", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Nullable LocalDate createDateFrom,
         @Parameter(name = "createDateTo", description = "The end range of a create date .", in = ParameterIn.QUERY) @Valid @RequestParam(value = "createDateTo", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Nullable LocalDate createDateTo,

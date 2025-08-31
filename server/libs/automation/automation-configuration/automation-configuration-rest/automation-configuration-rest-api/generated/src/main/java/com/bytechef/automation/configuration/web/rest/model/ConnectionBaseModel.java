@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.automation.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.automation.configuration.web.rest.model.CredentialStatusModel;
-import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -34,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "connection_base", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("connection_base")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:22:59.503398+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:45.050915+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectionBaseModel {
 
   private @Nullable Boolean active;
@@ -60,7 +59,7 @@ public class ConnectionBaseModel {
 
   private @Nullable CredentialStatusModel credentialStatus;
 
-  private @Nullable EnvironmentModel environment;
+  private @Nullable Long environmentId;
 
   private @Nullable Long id;
 
@@ -309,24 +308,24 @@ public class ConnectionBaseModel {
     this.credentialStatus = credentialStatus;
   }
 
-  public ConnectionBaseModel environment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public ConnectionBaseModel environmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
     return this;
   }
 
   /**
-   * Get environment
-   * @return environment
+   * The id of an environment.
+   * @return environmentId
    */
-  @Valid 
-  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("environment")
-  public @Nullable EnvironmentModel getEnvironment() {
-    return environment;
+  
+  @Schema(name = "environmentId", description = "The id of an environment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environmentId")
+  public @Nullable Long getEnvironmentId() {
+    return environmentId;
   }
 
-  public void setEnvironment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public void setEnvironmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
   }
 
   public ConnectionBaseModel id(@Nullable Long id) {
@@ -504,7 +503,7 @@ public class ConnectionBaseModel {
         Objects.equals(this.createdBy, connectionBase.createdBy) &&
         Objects.equals(this.createdDate, connectionBase.createdDate) &&
         Objects.equals(this.credentialStatus, connectionBase.credentialStatus) &&
-        Objects.equals(this.environment, connectionBase.environment) &&
+        Objects.equals(this.environmentId, connectionBase.environmentId) &&
         Objects.equals(this.id, connectionBase.id) &&
         Objects.equals(this.lastModifiedBy, connectionBase.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, connectionBase.lastModifiedDate) &&
@@ -516,7 +515,7 @@ public class ConnectionBaseModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
+    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
   }
 
   @Override
@@ -533,7 +532,7 @@ public class ConnectionBaseModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
-    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    environmentId: ").append(toIndentedString(environmentId)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");

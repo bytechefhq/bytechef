@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:01.494536+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "workflow-node-output", description = "The Platform Workflow Node Output Internal API")
 public interface WorkflowNodeOutputApi {
@@ -51,6 +51,7 @@ public interface WorkflowNodeOutputApi {
      * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
      * @param clusterElementType The name of a cluster element type. (required)
      * @param clusterElementWorkflowNodeName The name of a cluster element workflow node. (required)
+     * @param environmentId The id of an environment. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -74,7 +75,8 @@ public interface WorkflowNodeOutputApi {
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "clusterElementType", description = "The name of a cluster element type.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementType") String clusterElementType,
-        @Parameter(name = "clusterElementWorkflowNodeName", description = "The name of a cluster element workflow node.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementWorkflowNodeName") String clusterElementWorkflowNodeName
+        @Parameter(name = "clusterElementWorkflowNodeName", description = "The name of a cluster element workflow node.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementWorkflowNodeName") String clusterElementWorkflowNodeName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -95,6 +97,7 @@ public interface WorkflowNodeOutputApi {
      * Get all workflow node outputs used in a workflow.
      *
      * @param id The workflow id for which to return all used action definitions (required)
+     * @param environmentId The id of an environment. (required)
      * @param lastWorkflowNodeName The name of the last workflow node (action task or trigger) up to which include the output schema (E.g. mailchimp_1, airtable_3) (optional)
      * @return Successful operation. (status code 200)
      */
@@ -117,6 +120,7 @@ public interface WorkflowNodeOutputApi {
     
     default ResponseEntity<List<WorkflowNodeOutputModel>> getPreviousWorkflowNodeOutputs(
         @Parameter(name = "id", description = "The workflow id for which to return all used action definitions", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
         @Parameter(name = "lastWorkflowNodeName", description = "The name of the last workflow node (action task or trigger) up to which include the output schema (E.g. mailchimp_1, airtable_3)", in = ParameterIn.QUERY) @Valid @RequestParam(value = "lastWorkflowNodeName", required = false) @Nullable String lastWorkflowNodeName
     ) {
         getRequest().ifPresent(request -> {
@@ -139,6 +143,7 @@ public interface WorkflowNodeOutputApi {
      *
      * @param id The workflow id (required)
      * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
+     * @param environmentId The id of an environment. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -160,7 +165,8 @@ public interface WorkflowNodeOutputApi {
     
     default ResponseEntity<WorkflowNodeOutputModel> getWorkflowNodeOutput(
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

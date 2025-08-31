@@ -21,12 +21,23 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("saveWorkflowTestConfigurationConnection_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:01.494536+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class SaveWorkflowTestConfigurationConnectionRequestModel {
 
-  private @Nullable Long connectionId;
+  private Long connectionId;
 
-  public SaveWorkflowTestConfigurationConnectionRequestModel connectionId(@Nullable Long connectionId) {
+  public SaveWorkflowTestConfigurationConnectionRequestModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public SaveWorkflowTestConfigurationConnectionRequestModel(Long connectionId) {
+    this.connectionId = connectionId;
+  }
+
+  public SaveWorkflowTestConfigurationConnectionRequestModel connectionId(Long connectionId) {
     this.connectionId = connectionId;
     return this;
   }
@@ -35,14 +46,14 @@ public class SaveWorkflowTestConfigurationConnectionRequestModel {
    * Get connectionId
    * @return connectionId
    */
-  
-  @Schema(name = "connectionId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "connectionId", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("connectionId")
-  public @Nullable Long getConnectionId() {
+  public Long getConnectionId() {
     return connectionId;
   }
 
-  public void setConnectionId(@Nullable Long connectionId) {
+  public void setConnectionId(Long connectionId) {
     this.connectionId = connectionId;
   }
 

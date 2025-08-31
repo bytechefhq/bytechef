@@ -3,7 +3,6 @@ package com.bytechef.ee.embedded.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.web.rest.model.AuthorizationTypeModel;
-import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
@@ -35,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:04.480158+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:47.972179+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceConfigurationModel {
 
   private @Nullable String createdBy;
@@ -47,7 +46,7 @@ public class IntegrationInstanceConfigurationModel {
 
   private @Nullable Boolean enabled;
 
-  private @Nullable EnvironmentModel environment;
+  private @Nullable Long environmentId;
 
   private @Nullable Long id;
 
@@ -174,24 +173,24 @@ public class IntegrationInstanceConfigurationModel {
     this.enabled = enabled;
   }
 
-  public IntegrationInstanceConfigurationModel environment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public IntegrationInstanceConfigurationModel environmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
     return this;
   }
 
   /**
-   * Get environment
-   * @return environment
+   * The id of an environment.
+   * @return environmentId
    */
-  @Valid 
-  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("environment")
-  public @Nullable EnvironmentModel getEnvironment() {
-    return environment;
+  
+  @Schema(name = "environmentId", description = "The id of an environment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environmentId")
+  public @Nullable Long getEnvironmentId() {
+    return environmentId;
   }
 
-  public void setEnvironment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public void setEnvironmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
   }
 
   public IntegrationInstanceConfigurationModel id(@Nullable Long id) {
@@ -527,7 +526,7 @@ public class IntegrationInstanceConfigurationModel {
         Objects.equals(this.createdDate, integrationInstanceConfiguration.createdDate) &&
         Objects.equals(this.description, integrationInstanceConfiguration.description) &&
         Objects.equals(this.enabled, integrationInstanceConfiguration.enabled) &&
-        Objects.equals(this.environment, integrationInstanceConfiguration.environment) &&
+        Objects.equals(this.environmentId, integrationInstanceConfiguration.environmentId) &&
         Objects.equals(this.id, integrationInstanceConfiguration.id) &&
         Objects.equals(this.integrationId, integrationInstanceConfiguration.integrationId) &&
         Objects.equals(this.integrationVersion, integrationInstanceConfiguration.integrationVersion) &&
@@ -546,7 +545,7 @@ public class IntegrationInstanceConfigurationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, authorizationType, connectionAuthorizationParameters, connectionConnectionParameters, connectionParameters, integration, integrationInstanceConfigurationWorkflows, tags, version);
+    return Objects.hash(createdBy, createdDate, description, enabled, environmentId, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, authorizationType, connectionAuthorizationParameters, connectionConnectionParameters, connectionParameters, integration, integrationInstanceConfigurationWorkflows, tags, version);
   }
 
   @Override
@@ -557,7 +556,7 @@ public class IntegrationInstanceConfigurationModel {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    environmentId: ").append(toIndentedString(environmentId)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationId: ").append(toIndentedString(integrationId)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");

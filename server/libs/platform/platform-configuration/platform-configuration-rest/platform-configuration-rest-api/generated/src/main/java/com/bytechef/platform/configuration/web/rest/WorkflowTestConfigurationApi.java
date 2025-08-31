@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:01.494536+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "workflow-test-configuration", description = "The Platform Workflow Test Configuration Internal API")
 public interface WorkflowTestConfigurationApi {
@@ -51,6 +51,7 @@ public interface WorkflowTestConfigurationApi {
      * Get a workflow test configuration.
      *
      * @param workflowId The id of a workflow. (required)
+     * @param environmentId The id of an environment. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -71,12 +72,13 @@ public interface WorkflowTestConfigurationApi {
     )
     
     default ResponseEntity<WorkflowTestConfigurationModel> getWorkflowTestConfiguration(
-        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
+        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -93,6 +95,7 @@ public interface WorkflowTestConfigurationApi {
      *
      * @param workflowId The id of a testing workflow. (required)
      * @param workflowNodeName The action/trigger name defined in the workflow. (required)
+     * @param environmentId The id of an environment. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -114,7 +117,8 @@ public interface WorkflowTestConfigurationApi {
     
     default ResponseEntity<List<WorkflowTestConfigurationConnectionModel>> getWorkflowTestConfigurationConnections(
         @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
-        @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
+        @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -163,7 +167,7 @@ public interface WorkflowTestConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -181,6 +185,7 @@ public interface WorkflowTestConfigurationApi {
      * @param workflowId The id of a testing workflow. (required)
      * @param workflowNodeName The action/trigger name defined in the workflow. (required)
      * @param workflowConnectionKey The key of a connection. (required)
+     * @param environmentId The id of an environment. (required)
      * @param saveWorkflowTestConfigurationConnectionRequestModel  (required)
      * @return Successful operation. (status code 204)
      */
@@ -203,6 +208,7 @@ public interface WorkflowTestConfigurationApi {
         @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
         @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "workflowConnectionKey", description = "The key of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("workflowConnectionKey") String workflowConnectionKey,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
         @Parameter(name = "SaveWorkflowTestConfigurationConnectionRequestModel", description = "", required = true) @Valid @RequestBody SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -215,6 +221,7 @@ public interface WorkflowTestConfigurationApi {
      * Save a workflow test configuration inputs.
      *
      * @param workflowId The id of a testing workflow. (required)
+     * @param environmentId The id of an environment. (required)
      * @param saveWorkflowTestConfigurationInputsRequestModel  (required)
      * @return Successful operation. (status code 204)
      */
@@ -235,6 +242,7 @@ public interface WorkflowTestConfigurationApi {
     
     default ResponseEntity<Void> saveWorkflowTestConfigurationInputs(
         @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
         @Parameter(name = "SaveWorkflowTestConfigurationInputsRequestModel", description = "", required = true) @Valid @RequestBody SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

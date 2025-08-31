@@ -3,11 +3,9 @@ package com.bytechef.ee.embedded.connected.user.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.ConnectedUserIntegrationInstanceModel;
-import com.bytechef.ee.embedded.connected.user.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +29,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUser")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:22:57.709581+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:43.926852+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectedUserModel {
 
   private @Nullable String createdBy;
@@ -43,7 +41,7 @@ public class ConnectedUserModel {
 
   private @Nullable Boolean enabled;
 
-  private @Nullable EnvironmentModel environment;
+  private @Nullable Long environmentId;
 
   private String externalId;
 
@@ -155,24 +153,24 @@ public class ConnectedUserModel {
     this.enabled = enabled;
   }
 
-  public ConnectedUserModel environment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public ConnectedUserModel environmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
     return this;
   }
 
   /**
-   * Get environment
-   * @return environment
+   * The id of an environment.
+   * @return environmentId
    */
-  @Valid 
-  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("environment")
-  public @Nullable EnvironmentModel getEnvironment() {
-    return environment;
+  
+  @Schema(name = "environmentId", description = "The id of an environment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environmentId")
+  public @Nullable Long getEnvironmentId() {
+    return environmentId;
   }
 
-  public void setEnvironment(@Nullable EnvironmentModel environment) {
-    this.environment = environment;
+  public void setEnvironmentId(@Nullable Long environmentId) {
+    this.environmentId = environmentId;
   }
 
   public ConnectedUserModel externalId(String externalId) {
@@ -364,7 +362,7 @@ public class ConnectedUserModel {
         Objects.equals(this.createdDate, connectedUser.createdDate) &&
         Objects.equals(this.email, connectedUser.email) &&
         Objects.equals(this.enabled, connectedUser.enabled) &&
-        Objects.equals(this.environment, connectedUser.environment) &&
+        Objects.equals(this.environmentId, connectedUser.environmentId) &&
         Objects.equals(this.externalId, connectedUser.externalId) &&
         Objects.equals(this.id, connectedUser.id) &&
         Objects.equals(this.integrationInstances, connectedUser.integrationInstances) &&
@@ -377,7 +375,7 @@ public class ConnectedUserModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, email, enabled, environment, externalId, id, integrationInstances, metadata, name, lastModifiedBy, lastModifiedDate, version);
+    return Objects.hash(createdBy, createdDate, email, enabled, environmentId, externalId, id, integrationInstances, metadata, name, lastModifiedBy, lastModifiedDate, version);
   }
 
   @Override
@@ -388,7 +386,7 @@ public class ConnectedUserModel {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    environmentId: ").append(toIndentedString(environmentId)).append("\n");
     sb.append("    externalId: ").append(toIndentedString(externalId)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationInstances: ").append(toIndentedString(integrationInstances)).append("\n");
