@@ -3,6 +3,7 @@ import {JobBasic, WorkflowExecution} from '@/ee/shared/middleware/embedded/workf
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
@@ -20,6 +21,13 @@ const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>)
 const columnHelper = createColumnHelper<WorkflowExecution>();
 
 const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
+    const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore(
+        useShallow((state) => ({
+            setWorkflowExecutionId: state.setWorkflowExecutionId,
+            setWorkflowExecutionSheetOpen: state.setWorkflowExecutionSheetOpen,
+        }))
+    );
+
     const {data: environmentsQuery} = useEnvironmentsQuery();
 
     const reactTable = useReactTable<WorkflowExecution>({
@@ -70,8 +78,6 @@ const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) =>
         data,
         getCoreRowModel: getCoreRowModel(),
     });
-
-    const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore();
 
     const headerGroups = reactTable.getHeaderGroups();
     const rows = reactTable.getRowModel().rows;

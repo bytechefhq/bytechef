@@ -35,7 +35,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
 }: IntegrationInstanceConfigurationDialogWorkflowsStepItemConnectionProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: componentConnection.componentName,

@@ -92,7 +92,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             null
         );
 
-        const {currentNode} = useWorkflowNodeDetailsPanelStore();
+        const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
         const getComponentIcon = useCallback(
             (mentionValue: string) => {

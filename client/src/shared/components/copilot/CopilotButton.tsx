@@ -4,6 +4,7 @@ import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCop
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {SparklesIcon} from 'lucide-react';
+import {useShallow} from 'zustand/react/shallow';
 
 export interface CopilotButtonProps {
     source: Source;
@@ -12,8 +13,14 @@ export interface CopilotButtonProps {
 }
 
 const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
-    const {ai} = useApplicationInfoStore();
-    const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore();
+    const ai = useApplicationInfoStore((state) => state.ai);
+    const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore(
+        useShallow((state) => ({
+            copilotPanelOpen: state.copilotPanelOpen,
+            setContext: state.setContext,
+            setCopilotPanelOpen: state.setCopilotPanelOpen,
+        }))
+    );
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 

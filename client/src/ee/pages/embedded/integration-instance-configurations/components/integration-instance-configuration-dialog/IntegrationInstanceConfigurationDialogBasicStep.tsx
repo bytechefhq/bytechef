@@ -35,7 +35,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
     setValue,
     updateIntegrationVersion = false,
 }: IntegrationInstanceConfigurationDialogBasicStepProps) => {
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
     return (

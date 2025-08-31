@@ -9,9 +9,15 @@ import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrati
 import {FilterIcon, PanelLeftIcon} from 'lucide-react';
 import * as React from 'react';
 import {useSearchParams} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 const IntegrationsSidebarHeader = () => {
-    const {leftSidebarOpen, setLeftSidebarOpen} = useIntegrationsLeftSidebarStore();
+    const {leftSidebarOpen, setLeftSidebarOpen} = useIntegrationsLeftSidebarStore(
+        useShallow((state) => ({
+            leftSidebarOpen: state.leftSidebarOpen,
+            setLeftSidebarOpen: state.setLeftSidebarOpen,
+        }))
+    );
 
     const [searchParams] = useSearchParams();
 

@@ -56,7 +56,7 @@ const WorkflowEditor = ({
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: WorkflowEditorPropsType & ConditionalWorkflowEditorPropsType) => {
-    let {workflow} = useWorkflowDataStore();
+    let workflow = useWorkflowDataStore((state) => state.workflow);
 
     if (!workflow.tasks && readOnlyWorkflow) {
         workflow = {...workflow, ...readOnlyWorkflow};
@@ -70,11 +70,13 @@ const WorkflowEditor = ({
             onNodesChange: state.onNodesChange,
         }))
     );
-    const {copilotPanelOpen} = useCopilotStore();
-    const {dataPillPanelOpen} = useDataPillPanelStore();
-    const {rightSidebarOpen} = useRightSidebarStore();
-    const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {workflowTestChatPanelOpen} = useWorkflowTestChatStore();
+    const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
+    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
+    const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
+    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
+        (state) => state.workflowNodeDetailsPanelOpen
+    );
+    const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
 
     const {setViewport} = useReactFlow();
 

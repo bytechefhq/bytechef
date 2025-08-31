@@ -15,10 +15,20 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {useShallow} from 'zustand/react/shallow';
 
 const WorkflowBuilder = () => {
-    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
-    const {workflow} = useWorkflowDataStore();
+    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            workflowIsRunning: state.workflowIsRunning,
+            workflowTestExecution: state.workflowTestExecution,
+        }))
+    );
+    const {workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            workflow: state.workflow,
+        }))
+    );
 
     const {
         bottomResizablePanelRef,

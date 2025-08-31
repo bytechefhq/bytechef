@@ -24,8 +24,8 @@ export enum Type {
 }
 
 const Projects = () => {
-    const {application} = useApplicationInfoStore();
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const application = useApplicationInfoStore((state) => state.application);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const [searchParams] = useSearchParams();
 

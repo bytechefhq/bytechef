@@ -8,6 +8,7 @@ import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import useDataPillPanelStore from '../../stores/useDataPillPanelStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
@@ -21,9 +22,14 @@ interface DataPillPanelProps {
 const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOutputs}: DataPillPanelProps) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
-    const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {workflow} = useWorkflowDataStore();
-    const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const workflow = useWorkflowDataStore((state) => state.workflow);
+    const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentNode: state.currentNode,
+            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+        }))
+    );
 
     const validWorkflowNodeOutputs = workflowNodeOutputs.filter((workflowNodeOutput) => {
         const {actionDefinition, taskDispatcherDefinition, triggerDefinition, workflowNodeName} = workflowNodeOutput;

@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 const user = {
     email: 'emily.selman@example.com',
@@ -114,16 +115,35 @@ const platformNavigation = [
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const {ai, getApplicationInfo, loading} = useApplicationInfoStore();
+    const {ai, getApplicationInfo, loading} = useApplicationInfoStore(
+        useShallow((state) => ({
+            ai: state.ai,
+            getApplicationInfo: state.getApplicationInfo,
+            loading: state.loading,
+        }))
+    );
     const {
         account,
         authenticated,
         getAccount,
         reset: resetAuthentication,
         sessionHasBeenFetched,
-    } = useAuthenticationStore();
-    const {copilotPanelOpen} = useCopilotStore();
-    const {currentType, setCurrentType} = useModeTypeStore();
+    } = useAuthenticationStore(
+        useShallow((state) => ({
+            account: state.account,
+            authenticated: state.authenticated,
+            getAccount: state.getAccount,
+            reset: state.reset,
+            sessionHasBeenFetched: state.sessionHasBeenFetched,
+        }))
+    );
+    const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
+    const {currentType, setCurrentType} = useModeTypeStore(
+        useShallow((state) => ({
+            currentType: state.currentType,
+            setCurrentType: state.setCurrentType,
+        }))
+    );
 
     const analytics = useAnalytics();
 

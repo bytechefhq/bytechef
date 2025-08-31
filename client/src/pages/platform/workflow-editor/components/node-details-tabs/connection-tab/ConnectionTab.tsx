@@ -1,6 +1,7 @@
 import ConnectionTabConnectionFieldset from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTabConnectionFieldset';
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 import {Cross2Icon} from '@radix-ui/react-icons';
+import {useShallow} from 'zustand/react/shallow';
 
 import {useConnectionNoteStore} from '../../../stores/useConnectionNoteStore';
 
@@ -17,7 +18,12 @@ const ConnectionTab = ({
     workflowNodeName,
     workflowTestConfigurationConnections,
 }: ConnectionTabPropsType) => {
-    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
+    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore(
+        useShallow((state) => ({
+            setShowConnectionNote: state.setShowConnectionNote,
+            showConnectionNote: state.showConnectionNote,
+        }))
+    );
 
     return (
         <div className="flex h-full flex-col gap-6 overflow-auto p-4">

@@ -34,7 +34,7 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const {account} = useAuthenticationStore();
+    const account = useAuthenticationStore((state) => state.account);
 
     const queryClient = useQueryClient();
 

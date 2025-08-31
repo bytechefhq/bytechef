@@ -40,13 +40,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
         }))
     );
-
     const {workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             workflow: state.workflow,
         }))
     );
-
     const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
         useWorkflowEditorStore(
             useShallow((state) => ({

@@ -5,11 +5,18 @@ import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {CircleCheckBig} from 'lucide-react';
 import {useEffect} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 import {useActivateStore} from './stores/useActivateStore';
 
 const RegisterSuccess = () => {
-    const {activate, activationFailure, loading} = useActivateStore();
+    const {activate, activationFailure, loading} = useActivateStore(
+        useShallow((state) => ({
+            activate: state.activate,
+            activationFailure: state.activationFailure,
+            loading: state.loading,
+        }))
+    );
 
     const navigate = useNavigate();
 

@@ -11,6 +11,7 @@ import {useForm} from 'react-hook-form';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {z} from 'zod';
+import {useShallow} from 'zustand/react/shallow';
 
 import PasswordResetSuccessful from './PasswordResetSuccessful';
 
@@ -54,7 +55,12 @@ const formSchema = z
 const PasswordResetFinish = () => {
     const [showPassword, setShowPassword] = useState(false);
 
-    const {resetPasswordFinish, resetPasswordSuccess} = usePasswordResetStore();
+    const {resetPasswordFinish, resetPasswordSuccess} = usePasswordResetStore(
+        useShallow((state) => ({
+            resetPasswordFinish: state.resetPasswordFinish,
+            resetPasswordSuccess: state.resetPasswordSuccess,
+        }))
+    );
 
     const [searchParams] = useSearchParams();
     const key = searchParams.get('key');

@@ -5,6 +5,7 @@ import {AppendMessage, AssistantRuntimeProvider, ThreadMessageLike, useExternalS
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
 import {useParams} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
     return message;
@@ -17,8 +18,16 @@ export function CopilotRuntimeProvider({
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
-    const {addMessage, appendToLastAssistantMessage, context, conversationId, messages} = useCopilotStore();
-    const {workflow} = useWorkflowDataStore();
+    const {addMessage, appendToLastAssistantMessage, context, conversationId, messages} = useCopilotStore(
+        useShallow((state) => ({
+            addMessage: state.addMessage,
+            appendToLastAssistantMessage: state.appendToLastAssistantMessage,
+            context: state.context,
+            conversationId: state.conversationId,
+            messages: state.messages,
+        }))
+    );
+    const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {projectId, projectWorkflowId} = useParams();
 

@@ -81,7 +81,7 @@ const PropertyComboBox = ({
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(initialValue !== undefined ? initialValue.toString() : defaultValue);
 
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
     const path = useMemo(() => {
         let updatedPath = initialPath;
@@ -121,7 +121,7 @@ const PropertyComboBox = ({
                 workflowNodeName,
             },
         }),
-        [lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
+        [currentEnvironmentId, lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
     );
 
     const queryEnabled = useMemo(

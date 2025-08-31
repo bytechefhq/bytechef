@@ -39,7 +39,7 @@ const PropertyCodeEditorSheet = ({
     const [scriptIsRunning, setScriptIsRunning] = useState(false);
     const [scriptTestExecution, setScriptTestExecution] = useState<ScriptTestExecution | undefined>();
 
-    const {copilotPanelOpen} = useCopilotStore();
+    const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === workflowNodeName);
 

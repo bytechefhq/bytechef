@@ -16,7 +16,7 @@ import {useState} from 'react';
 const ApiClients = () => {
     const [showEditDialog, setShowEditDialog] = useState(false);
 
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {data: apiKeys, error: apiKeysError, isLoading: apiKeysLoading} = useGetApiClientsQuery();
 

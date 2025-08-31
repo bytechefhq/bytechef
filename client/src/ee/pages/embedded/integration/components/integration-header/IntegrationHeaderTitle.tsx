@@ -5,9 +5,15 @@ import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/sto
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {PanelLeftIcon} from 'lucide-react';
 import * as React from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 const IntegrationHeaderTitle = ({integration}: {integration: Integration}) => {
-    const {leftSidebarOpen, setLeftSidebarOpen} = useIntegrationsLeftSidebarStore();
+    const {leftSidebarOpen, setLeftSidebarOpen} = useIntegrationsLeftSidebarStore(
+        useShallow((state) => ({
+            leftSidebarOpen: state.leftSidebarOpen,
+            setLeftSidebarOpen: state.setLeftSidebarOpen,
+        }))
+    );
 
     return (
         <div className="flex items-center space-x-2">

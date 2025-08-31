@@ -21,6 +21,7 @@ import {EllipsisVerticalIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 const columnHelper = createColumnHelper<ConnectedUser>();
 
@@ -32,7 +33,13 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
     const [currentConnectedUserId, setCurrentConnectedUserId] = useState(0);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const {setConnectedUserId, setConnectedUserSheetOpen} = useConnectedUserSheetStore();
+    const {setConnectedUserId, setConnectedUserSheetOpen} = useConnectedUserSheetStore(
+        useShallow((state) => ({
+            setConnectedUserId: state.setConnectedUserId,
+            setConnectedUserSheetOpen: state.setConnectedUserSheetOpen,
+        }))
+    );
+
     const {data: environmentsQuery} = useEnvironmentsQuery();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({

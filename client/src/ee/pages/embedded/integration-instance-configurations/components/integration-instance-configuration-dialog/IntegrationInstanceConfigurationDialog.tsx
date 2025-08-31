@@ -63,7 +63,7 @@ const IntegrationInstanceConfigurationDialog = ({
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
     );

@@ -3,13 +3,20 @@ import WorkflowExecutionSheetWorkflowPanel from '@/ee/pages/embedded/workflow-ex
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationWorkflowExecutionQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionSheetAccordion from './WorkflowExecutionSheetAccordion';
 
 const WorkflowExecutionSheet = () => {
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
-        useWorkflowExecutionSheetStore();
+        useWorkflowExecutionSheetStore(
+            useShallow((state) => ({
+                setWorkflowExecutionSheetOpen: state.setWorkflowExecutionSheetOpen,
+                workflowExecutionId: state.workflowExecutionId,
+                workflowExecutionSheetOpen: state.workflowExecutionSheetOpen,
+            }))
+        );
 
     const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetIntegrationWorkflowExecutionQuery(
         {

@@ -30,6 +30,7 @@ import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
+import {useShallow} from 'zustand/react/shallow';
 
 import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
 import {FieldsetSkeleton} from '../WorkflowEditorSkeletons';
@@ -164,9 +165,16 @@ const Property = ({
     const isSavingRef = useRef(false);
 
     const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
-    const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {workflow} = useWorkflowDataStore();
+        useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                currentComponent: state.currentComponent,
+                currentNode: state.currentNode,
+                setFocusedInput: state.setFocusedInput,
+                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+            }))
+        );
+    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {isFetchedAfterMount: isDisplayConditionsFetched, isPending: isDisplayConditionsPending} =
         displayConditionsQuery ?? {

@@ -15,7 +15,7 @@ import McpServersLeftSidebarNav from './components/McpServersLeftSidebarNav';
 import McpServerList from './components/mcp-server-list/McpServerList';
 
 const McpServers = () => {
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const [searchParams] = useSearchParams();
 

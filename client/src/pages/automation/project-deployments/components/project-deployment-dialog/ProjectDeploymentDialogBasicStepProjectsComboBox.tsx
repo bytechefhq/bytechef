@@ -23,7 +23,7 @@ const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
     onChange: (item?: ComboBoxItemType) => void;
     value?: number;
 }) => {
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {data: projects} = useGetWorkspaceProjectsQuery({
         apiCollections,

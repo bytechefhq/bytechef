@@ -3,10 +3,16 @@ import {WorkflowTestChatRuntimeProvider} from '@/pages/platform/workflow-editor/
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useEffect} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 const WorkflowTestChatPanel = () => {
-    const {generateConversationId, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} =
-        useWorkflowTestChatStore();
+    const {generateConversationId, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} = useWorkflowTestChatStore(
+        useShallow((state) => ({
+            generateConversationId: state.generateConversationId,
+            setWorkflowTestChatPanelOpen: state.setWorkflowTestChatPanelOpen,
+            workflowTestChatPanelOpen: state.workflowTestChatPanelOpen,
+        }))
+    );
 
     const handlePanelClose = () => {
         setWorkflowTestChatPanelOpen(false);

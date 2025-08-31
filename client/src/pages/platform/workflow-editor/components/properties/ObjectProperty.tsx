@@ -33,8 +33,9 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     );
     const [parameterObject, setParameterObject] = useState<{[key: string]: object[] | undefined}>({});
 
-    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
-    const {workflow} = useWorkflowDataStore();
+    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+    const workflow = useWorkflowDataStore((state) => state.workflow);
+
     const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
     const {additionalProperties, label, name, placeholder, properties} = property;

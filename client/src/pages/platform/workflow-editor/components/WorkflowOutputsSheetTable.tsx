@@ -27,9 +27,9 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const {updateWorkflowMutation} = useWorkflowEditor();
+    const componentDefinitions = useWorkflowDataStore((state) => state.componentDefinitions);
 
-    const {componentDefinitions} = useWorkflowDataStore();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     function handleDelete(input: WorkflowInput) {
         const definitionObject: WorkflowDefinitionType = JSON.parse(workflow.definition!);

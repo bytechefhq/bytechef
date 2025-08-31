@@ -10,7 +10,7 @@ const STORAGE_KEY_PREFIX = 'verifyEmail_';
 const VerifyEmail = () => {
     const {countdown, disabled, startCountdown} = useResendEmail(STORAGE_KEY_PREFIX, 60);
 
-    const {register} = useRegisterStore();
+    const register = useRegisterStore((state) => state.register);
 
     const location = useLocation();
 

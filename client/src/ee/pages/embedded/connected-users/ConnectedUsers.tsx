@@ -105,7 +105,7 @@ const ConnectedUsers = () => {
         searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined
     );
 
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const navigate = useNavigate();
 

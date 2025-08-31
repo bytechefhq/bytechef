@@ -26,7 +26,14 @@ interface DescriptionTabProps {
 }
 
 const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkflowMutation}: DescriptionTabProps) => {
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentComponent: state.currentComponent,
+            currentNode: state.currentNode,
+            setCurrentComponent: state.setCurrentComponent,
+            setCurrentNode: state.setCurrentNode,
+        }))
+    );
     const {nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,

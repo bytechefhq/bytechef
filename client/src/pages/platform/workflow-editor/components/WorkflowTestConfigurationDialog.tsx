@@ -153,7 +153,7 @@ const WorkflowTestConfigurationDialog = ({
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
     const [componentConnection, setComponentConnection] = useState<ComponentConnection | undefined>();
 
-    const {connectionDialogAllowed} = useWorkflowNodeDetailsPanelStore();
+    const connectionDialogAllowed = useWorkflowNodeDetailsPanelStore((state) => state.connectionDialogAllowed);
 
     const {
         ConnectionKeys,

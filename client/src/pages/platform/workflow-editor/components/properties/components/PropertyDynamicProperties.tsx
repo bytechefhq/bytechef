@@ -31,8 +31,8 @@ const PropertyDynamicProperties = ({
     const [subProperties, setSubProperties] = useState<PropertyModel[]>([]);
     const [lastProcessedKey, setLastProcessedKey] = useState('');
 
-    const {workflow} = useWorkflowDataStore();
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
+    const workflow = useWorkflowDataStore((state) => state.workflow);
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
     const lookupDependsOnValuesKey = getFormattedDependencyKey(lookupDependsOnValues);
 

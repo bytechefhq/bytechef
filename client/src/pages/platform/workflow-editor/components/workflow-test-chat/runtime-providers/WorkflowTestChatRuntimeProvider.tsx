@@ -12,6 +12,7 @@ import {
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
 import {ReactNode, useState} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -26,9 +27,20 @@ export function WorkflowTestChatRuntimeProvider({
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
-    const {setWorkflowIsRunning, setWorkflowTestExecution} = useWorkflowEditorStore();
-    const {workflow} = useWorkflowDataStore();
-    const {conversationId, messages, setMessage} = useWorkflowTestChatStore();
+    const {setWorkflowIsRunning, setWorkflowTestExecution} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            setWorkflowIsRunning: state.setWorkflowIsRunning,
+            setWorkflowTestExecution: state.setWorkflowTestExecution,
+        }))
+    );
+    const workflow = useWorkflowDataStore((state) => state.workflow!);
+    const {conversationId, messages, setMessage} = useWorkflowTestChatStore(
+        useShallow((state) => ({
+            conversationId: state.conversationId,
+            messages: state.messages,
+            setMessage: state.setMessage,
+        }))
+    );
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {

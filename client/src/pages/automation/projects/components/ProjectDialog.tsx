@@ -34,7 +34,7 @@ interface ProjectDialogProps {
 const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {captureProjectCreated} = useAnalytics();
 

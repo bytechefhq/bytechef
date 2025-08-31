@@ -6,7 +6,7 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import React from 'react';
 
 const GitConfiguration = () => {
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {data: gitConfiguration} = useGetWorkspaceGitConfigurationQuery(currentWorkspaceId!);
 

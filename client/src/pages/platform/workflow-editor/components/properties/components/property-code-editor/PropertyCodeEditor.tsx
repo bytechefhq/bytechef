@@ -8,6 +8,7 @@ import {Workflow} from '@/shared/middleware/platform/configuration';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/shallow';
 
 interface PropertyCodeEditorProps {
     defaultValue?: string;
@@ -44,7 +45,12 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
         },
         ref
     ) => {
-        const {setShowPropertyCodeEditorSheet, showPropertyCodeEditorSheet} = useWorkflowEditorStore();
+        const {setShowPropertyCodeEditorSheet, showPropertyCodeEditorSheet} = useWorkflowEditorStore(
+            useShallow((state) => ({
+                setShowPropertyCodeEditorSheet: state.setShowPropertyCodeEditorSheet,
+                showPropertyCodeEditorSheet: state.showPropertyCodeEditorSheet,
+            }))
+        );
 
         return (
             <>

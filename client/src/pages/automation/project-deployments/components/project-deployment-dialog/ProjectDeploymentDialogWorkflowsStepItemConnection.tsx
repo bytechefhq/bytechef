@@ -35,8 +35,8 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
 }: ProjectDeploymentDialogWorkflowsStepItemConnectionProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
-    const {currentEnvironmentId} = useEnvironmentStore();
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: componentConnection.componentName,

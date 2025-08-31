@@ -11,22 +11,56 @@ import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/ta
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEffect, useMemo} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 export const useWorkflowLayout = (includeComponents?: string[]) => {
-    const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore();
-    const {dataPillPanelOpen} = useDataPillPanelStore();
-    const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
-    const {setComponentDefinitions, setTaskDispatcherDefinitions, workflow, workflowNodes} = useWorkflowDataStore();
+    const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore(
+        useShallow((state) => ({
+            copilotPanelOpen: state.copilotPanelOpen,
+            setContext: state.setContext,
+            setCopilotPanelOpen: state.setCopilotPanelOpen,
+        }))
+    );
+    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
+    const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore(
+        useShallow((state) => ({
+            rightSidebarOpen: state.rightSidebarOpen,
+            setRightSidebarOpen: state.setRightSidebarOpen,
+        }))
+    );
+    const {setComponentDefinitions, setTaskDispatcherDefinitions, workflow, workflowNodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            setComponentDefinitions: state.setComponentDefinitions,
+            setTaskDispatcherDefinitions: state.setTaskDispatcherDefinitions,
+            workflow: state.workflow,
+            workflowNodes: state.workflowNodes,
+        }))
+    );
     const {
         clusterElementsCanvasOpen,
         setShowWorkflowCodeEditorSheet,
         setShowWorkflowInputsSheet,
         setShowWorkflowOutputsSheet,
-    } = useWorkflowEditorStore();
-    const {currentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
+    } = useWorkflowEditorStore(
+        useShallow((state) => ({
+            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+            setShowWorkflowCodeEditorSheet: state.setShowWorkflowCodeEditorSheet,
+            setShowWorkflowInputsSheet: state.setShowWorkflowInputsSheet,
+            setShowWorkflowOutputsSheet: state.setShowWorkflowOutputsSheet,
+        }))
+    );
+    const {currentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentNode: state.currentNode,
+            setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
+        }))
+    );
+    const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
 
-    const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow.id!});
+    const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({
+        environmentId: currentEnvironmentId,
+        workflowId: workflow.id!,
+    });
 
     const testConfigurationDisabled = useMemo(() => {
         const noInputs = (workflow?.inputs ?? []).length === 0;

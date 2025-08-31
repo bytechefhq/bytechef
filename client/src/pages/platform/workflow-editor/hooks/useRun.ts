@@ -3,9 +3,10 @@ import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/wo
 import {useMemo} from 'react';
 
 export const useRun = () => {
-    const {workflow} = useWorkflowDataStore();
 
-    const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow.id!});
+    const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({
+        workflowId: workflow.id!,
+    });
 
     const workflowTestConfigurationConnections = useMemo(
         () =>

@@ -15,6 +15,7 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import {LinkIcon} from 'lucide-react';
 import {useState} from 'react';
 import {z} from 'zod';
+import {useShallow} from 'zustand/react/shallow';
 
 const SPACE = 4;
 
@@ -29,7 +30,12 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
 }) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
-    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
+    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore(
+        useShallow((state) => ({
+            setShowConnectionNote: state.setShowConnectionNote,
+            showConnectionNote: state.showConnectionNote,
+        }))
+    );
 
     const {
         ConnectionKeys,

@@ -104,7 +104,7 @@ const ConnectionDialog = ({
     >(componentDefinition);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {toast} = useToast();
 

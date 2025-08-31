@@ -2,6 +2,7 @@ import {Alert, AlertDescription} from '@/components/ui/alert';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {ReactNode} from 'react';
 import {Navigate, useLocation} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 interface IOwnProps {
     hasAnyAuthorities?: string[];
@@ -9,7 +10,13 @@ interface IOwnProps {
 }
 
 const PrivateRoute = ({children, hasAnyAuthorities = [], ...rest}: IOwnProps) => {
-    const {account, authenticated, sessionHasBeenFetched} = useAuthenticationStore();
+    const {account, authenticated, sessionHasBeenFetched} = useAuthenticationStore(
+        useShallow((state) => ({
+            account: state.account,
+            authenticated: state.authenticated,
+            sessionHasBeenFetched: state.sessionHasBeenFetched,
+        }))
+    );
 
     const isAuthorized = hasAnyAuthority(account?.authorities || [], hasAnyAuthorities);
     const pageLocation = useLocation();

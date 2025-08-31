@@ -34,13 +34,34 @@ import {
 } from 'lucide-react';
 import {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 const DesktopSidebarBottomMenu = () => {
-    const {application} = useApplicationInfoStore();
-    const {account, logout} = useAuthenticationStore();
-    const {currentType, setCurrentType} = useModeTypeStore();
-    const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore();
-    const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore();
+    const application = useApplicationInfoStore((state) => state.application);
+    const {account, logout} = useAuthenticationStore(
+        useShallow((state) => ({
+            account: state.account,
+            logout: state.logout,
+        }))
+    );
+    const {currentType, setCurrentType} = useModeTypeStore(
+        useShallow((state) => ({
+            currentType: state.currentType,
+            setCurrentType: state.setCurrentType,
+        }))
+    );
+    const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
+        useShallow((state) => ({
+            currentEnvironmentId: state.currentEnvironmentId,
+            setCurrentEnvironmentId: state.setCurrentEnvironmentId,
+        }))
+    );
+    const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore(
+        useShallow((state) => ({
+            currentWorkspaceId: state.currentWorkspaceId,
+            setCurrentWorkspaceId: state.setCurrentWorkspaceId,
+        }))
+    );
 
     const analytics = useAnalytics();
 

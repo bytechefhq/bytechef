@@ -9,6 +9,7 @@ import {
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
 import {ReactNode, useState} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
     return message;
@@ -25,7 +26,13 @@ export function WorkflowTestChatRuntimeProvider({
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
-    const {conversationId, messages, setMessage} = useWorkflowChatStore();
+    const {conversationId, messages, setMessage} = useWorkflowChatStore(
+        useShallow((state) => ({
+            conversationId: state.conversationId,
+            messages: state.messages,
+            setMessage: state.setMessage,
+        }))
+    );
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {

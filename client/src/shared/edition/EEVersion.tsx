@@ -3,7 +3,7 @@ import {Building2Icon} from 'lucide-react';
 import {ReactNode} from 'react';
 
 const EEVersion = ({children, hidden = false}: {children: ReactNode; hidden?: boolean}) => {
-    const {application} = useApplicationInfoStore();
+    const application = useApplicationInfoStore((state) => state.application);
 
     if (application?.edition === 'EE') {
         return <>{children}</>;

@@ -12,6 +12,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useCallback, useEffect} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -22,13 +23,32 @@ interface UseProjectHeaderProps {
 }
 
 export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, projectId}: UseProjectHeaderProps) => {
-    const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {workflow} = useWorkflowDataStore();
+    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const workflow = useWorkflowDataStore((state) => state.workflow);
     const {setShowBottomPanelOpen, setWorkflowIsRunning, setWorkflowTestExecution, showBottomPanel} =
-        useWorkflowEditorStore();
+        useWorkflowEditorStore(
+            useShallow((state) => ({
+                setShowBottomPanelOpen: state.setShowBottomPanelOpen,
+                setWorkflowIsRunning: state.setWorkflowIsRunning,
+                setWorkflowTestExecution: state.setWorkflowTestExecution,
+                showBottomPanel: state.showBottomPanel,
+            }))
+        );
     const {setCurrentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
-    const {resetMessages, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} = useWorkflowTestChatStore();
+        useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                setCurrentNode: state.setCurrentNode,
+                setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
+                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+            }))
+        );
+    const {resetMessages, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} = useWorkflowTestChatStore(
+        useShallow((state) => ({
+            resetMessages: state.resetMessages,
+            setWorkflowTestChatPanelOpen: state.setWorkflowTestChatPanelOpen,
+            workflowTestChatPanelOpen: state.workflowTestChatPanelOpen,
+        }))
+    );
 
     const {captureProjectPublished, captureProjectWorkflowTested} = useAnalytics();
     const navigate = useNavigate();

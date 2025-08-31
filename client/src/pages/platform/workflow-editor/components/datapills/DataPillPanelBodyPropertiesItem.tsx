@@ -42,8 +42,12 @@ const DataPillPanelBodyPropertiesItem = ({
     operation,
     sampleOutput,
 }: DataPillPanelBodyPropertiesItemProps) => {
-    const {componentDefinitions, workflowNodes} = useWorkflowDataStore();
-
+    const {componentDefinitions, workflowNodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            componentDefinitions: state.componentDefinitions,
+            workflowNodes: state.workflowNodes,
+        }))
+    );
     const {nodes} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,

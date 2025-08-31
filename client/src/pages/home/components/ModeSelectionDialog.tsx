@@ -16,6 +16,7 @@ import {BotIcon, CodeIcon} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import {ModeType, useModeTypeStore} from '../stores/useModeTypeStore';
 
@@ -27,7 +28,12 @@ interface ModeSelectionDialogProps {
 const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDialogProps) => {
     const [selectedType, setSelectedType] = useState<ModeType | undefined>(undefined);
 
-    const {currentType, setCurrentType} = useModeTypeStore();
+    const {currentType, setCurrentType} = useModeTypeStore(
+        useShallow((state) => ({
+            currentType: state.currentType,
+            setCurrentType: state.setCurrentType,
+        }))
+    );
 
     const navigate = useNavigate();
 

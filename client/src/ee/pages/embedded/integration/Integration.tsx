@@ -22,10 +22,20 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {useParams} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 const Integration = () => {
-    const {leftSidebarOpen} = useIntegrationsLeftSidebarStore();
-    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
+    const {leftSidebarOpen} = useIntegrationsLeftSidebarStore(
+        useShallow((state) => ({
+            leftSidebarOpen: state.leftSidebarOpen,
+        }))
+    );
+    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            workflowIsRunning: state.workflowIsRunning,
+            workflowTestExecution: state.workflowTestExecution,
+        }))
+    );
 
     const {integrationId, integrationWorkflowId} = useParams();
 

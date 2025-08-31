@@ -15,6 +15,7 @@ import {useForm} from 'react-hook-form';
 import {Link, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {z} from 'zod';
+import {useShallow} from 'zustand/react/shallow';
 
 import githubLogo from '../images/github-logo.svg';
 import googleLogo from '../images/google-logo.svg';
@@ -58,7 +59,14 @@ const Register = () => {
     const [emailIsValid, setEmailIsValid] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const {register, registerErrorMessage, registerSuccess, reset} = useRegisterStore();
+    const {register, registerErrorMessage, registerSuccess, reset} = useRegisterStore(
+        useShallow((state) => ({
+            register: state.register,
+            registerErrorMessage: state.registerErrorMessage,
+            registerSuccess: state.registerSuccess,
+            reset: state.reset,
+        }))
+    );
 
     const {
         signUp: {activationRequired},

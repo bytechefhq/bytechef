@@ -21,6 +21,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 type ConnectionTabConnectionSelectPropsType = {
     componentConnection: ComponentConnection;
@@ -44,7 +45,15 @@ const ConnectionTabConnectionSelect = ({
     const [showConnectionDialog, setShowConnectionDialog] = useState<boolean>(false);
 
     const {connectionDialogAllowed, currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
-        useWorkflowNodeDetailsPanelStore();
+        useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                connectionDialogAllowed: state.connectionDialogAllowed,
+                currentComponent: state.currentComponent,
+                currentNode: state.currentNode,
+                setCurrentComponent: state.setCurrentComponent,
+                setCurrentNode: state.setCurrentNode,
+            }))
+        );
 
     const {
         ConnectionKeys,

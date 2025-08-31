@@ -6,9 +6,18 @@ import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStor
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {BotMessageSquareIcon, MessageSquareOffIcon} from 'lucide-react';
 import {useEffect} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 const CopilotPanel = () => {
-    const {context, generateConversationId, resetMessages, setContext, setCopilotPanelOpen} = useCopilotStore();
+    const {context, generateConversationId, resetMessages, setContext, setCopilotPanelOpen} = useCopilotStore(
+        useShallow((state) => ({
+            context: state.context,
+            generateConversationId: state.generateConversationId,
+            resetMessages: state.resetMessages,
+            setContext: state.setContext,
+            setCopilotPanelOpen: state.setCopilotPanelOpen,
+        }))
+    );
 
     const handleCleanMessages = () => {
         resetMessages();

@@ -5,6 +5,7 @@ import {Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 interface WorkflowsListItemProps {
     calculateTimeDifference: (date: string) => string;
@@ -23,7 +24,12 @@ const WorkflowsListItem = ({
     setSelectedProjectId,
     workflow,
 }: WorkflowsListItemProps) => {
-    const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();
+    const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore(
+        useShallow((state) => ({
+            componentDefinitions: state.componentDefinitions,
+            taskDispatcherDefinitions: state.taskDispatcherDefinitions,
+        }))
+    );
 
     const {filteredComponentNames, workflowComponentDefinitions, workflowTaskDispatcherDefinitions} = useMemo(() => {
         const componentNames = [

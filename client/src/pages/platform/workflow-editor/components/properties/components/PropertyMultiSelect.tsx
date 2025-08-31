@@ -46,9 +46,9 @@ const PropertyMultiSelect = ({
     value,
     workflowId,
 }: PropertyMultiSelectProps) => {
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
-    const {description, label, name, placeholder, required} = property;
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
+    const {description, label, name, placeholder, required} = property;
     const workflowNodeName = currentNode?.name;
 
     const connectionRequirementMet = useMemo(() => {

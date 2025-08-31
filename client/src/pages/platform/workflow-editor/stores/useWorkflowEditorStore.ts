@@ -17,8 +17,8 @@ interface WorkflowEditorI {
     showEditWorkflowDialog: boolean;
     setShowEditWorkflowDialog: (showEditWorkflowDialog: boolean) => void;
 
-    setShowPropertyCodeEditorSheet: (showPropertyCodeEditorSheet: boolean) => void;
     showWorkflowCodeEditorSheet: boolean;
+    setShowPropertyCodeEditorSheet: (showPropertyCodeEditorSheet: boolean) => void;
 
     setShowWorkflowCodeEditorSheet: (showWorkflowCodeEditorSheet: boolean) => void;
     workflowIsRunning: boolean;
