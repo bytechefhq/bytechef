@@ -33,8 +33,9 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         useState<Array<{label: string; value: string}>>(initialAvailablePropertyTypes);
     const [newPropertyType, setNewPropertyType] = useState<string>();
 
-    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
-    const {workflow} = useWorkflowDataStore();
+    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+    const workflow = useWorkflowDataStore((state) => state.workflow);
+
     const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
     const {additionalProperties, name} = property;

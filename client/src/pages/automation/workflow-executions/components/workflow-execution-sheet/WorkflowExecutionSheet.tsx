@@ -2,6 +2,7 @@ import {Sheet, SheetContent} from '@/components/ui/sheet';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
+import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionSheetAccordion from './WorkflowExecutionSheetAccordion';
@@ -9,7 +10,13 @@ import WorkflowExecutionSheetWorkflowPanel from './WorkflowExecutionSheetWorkflo
 
 const WorkflowExecutionSheet = () => {
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
-        useWorkflowExecutionSheetStore();
+        useWorkflowExecutionSheetStore(
+            useShallow((state) => ({
+                setWorkflowExecutionSheetOpen: state.setWorkflowExecutionSheetOpen,
+                workflowExecutionId: state.workflowExecutionId,
+                workflowExecutionSheetOpen: state.workflowExecutionSheetOpen,
+            }))
+        );
 
     const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetProjectWorkflowExecutionQuery(
         {

@@ -53,7 +53,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
         const [isFocused, setIsFocused] = useState(false);
         const [localValue, setLocalValue] = useState(value);
 
-        const {setFocusedInput} = useWorkflowNodeDetailsPanelStore();
+        const setFocusedInput = useWorkflowNodeDetailsPanelStore((state) => state.setFocusedInput);
 
         const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
             setLocalValue(event.target.value);

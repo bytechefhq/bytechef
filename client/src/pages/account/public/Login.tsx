@@ -14,6 +14,7 @@ import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
+import {useShallow} from 'zustand/react/shallow';
 
 import githubLogo from '../images/github-logo.svg';
 import googleLogo from '../images/google-logo.svg';
@@ -27,7 +28,14 @@ const formSchema = z.object({
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
-    const {authenticated, login, loginError, reset} = useAuthenticationStore();
+    const {authenticated, login, loginError, reset} = useAuthenticationStore(
+        useShallow((state) => ({
+            authenticated: state.authenticated,
+            login: state.login,
+            loginError: state.loginError,
+            reset: state.reset,
+        }))
+    );
 
     const ff_1874 = useFeatureFlagsStore()('ff-1874');
 

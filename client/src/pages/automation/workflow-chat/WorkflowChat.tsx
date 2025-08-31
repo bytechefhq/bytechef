@@ -7,7 +7,7 @@ import {useParams} from 'react-router-dom';
 const WorkflowChat = () => {
     const {environment, workflowExecutionId} = useParams();
 
-    const {generateConversationId} = useWorkflowChatStore();
+    const generateConversationId = useWorkflowChatStore((state) => state.generateConversationId);
 
     useEffect(() => {
         generateConversationId();

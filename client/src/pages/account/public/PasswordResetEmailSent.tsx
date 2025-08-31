@@ -5,11 +5,18 @@ import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {MailCheck} from 'lucide-react';
 import {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 const STORAGE_KEY_PREFIX = 'passwordReset_';
 
 const PasswordResetEmailSent = () => {
-    const {reset, resetPasswordFailure, resetPasswordInit} = usePasswordResetStore();
+    const {reset, resetPasswordFailure, resetPasswordInit} = usePasswordResetStore(
+        useShallow((state) => ({
+            reset: state.reset,
+            resetPasswordFailure: state.resetPasswordFailure,
+            resetPasswordInit: state.resetPasswordInit,
+        }))
+    );
 
     const {countdown, disabled, startCountdown} = useResendEmail(STORAGE_KEY_PREFIX, 60);
 

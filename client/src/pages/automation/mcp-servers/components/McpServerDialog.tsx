@@ -40,7 +40,7 @@ const McpServerDialog = ({
 }) => {
     const [internalOpen, setInternalOpen] = useState(false);
 
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     // Use external state if provided, otherwise use internal state
     const open = externalOpen !== undefined ? externalOpen : internalOpen;

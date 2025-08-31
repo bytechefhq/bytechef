@@ -61,7 +61,7 @@ const ProjectLabel = ({project}: {project: Project}) => (
 );
 
 export const WorkflowExecutions = () => {
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const [searchParams] = useSearchParams();
 
@@ -85,7 +85,7 @@ export const WorkflowExecutions = () => {
     );
     const [filterWorkflowId, setFilterWorkflowId] = useState<string | undefined>();
 
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const navigate = useNavigate();
 

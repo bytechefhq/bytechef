@@ -45,12 +45,16 @@ interface WorkflowEditorLayoutProps {
 }
 
 const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInputs}: WorkflowEditorLayoutProps) => {
-    const {copilotPanelOpen} = useCopilotStore();
-    const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore();
-    const {rightSidebarOpen} = useRightSidebarStore();
-    const {workflow} = useWorkflowDataStore();
-    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore();
-
+    const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
+    const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
+    const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
+    const workflow = useWorkflowDataStore((state) => state.workflow);
+    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentComponent: state.currentComponent,
+            currentNode: state.currentNode,
+        }))
+    );
     const {
         clusterElementsCanvasOpen,
         setClusterElementsCanvasOpen,
@@ -61,13 +65,20 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
         showWorkflowCodeEditorSheet,
         showWorkflowInputsSheet,
         showWorkflowOutputsSheet,
-    } = useWorkflowEditorStore();
-
-    const {dataPillPanelOpen} = useDataPillPanelStore(
+    } = useWorkflowEditorStore(
         useShallow((state) => ({
-            dataPillPanelOpen: state.dataPillPanelOpen,
+            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+            setClusterElementsCanvasOpen: state.setClusterElementsCanvasOpen,
+            setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+            setShowWorkflowCodeEditorSheet: state.setShowWorkflowCodeEditorSheet,
+            setShowWorkflowInputsSheet: state.setShowWorkflowInputsSheet,
+            setShowWorkflowOutputsSheet: state.setShowWorkflowOutputsSheet,
+            showWorkflowCodeEditorSheet: state.showWorkflowCodeEditorSheet,
+            showWorkflowInputsSheet: state.showWorkflowInputsSheet,
+            showWorkflowOutputsSheet: state.showWorkflowOutputsSheet,
         }))
     );
+    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
     const {
         componentDefinitions,

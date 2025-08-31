@@ -39,8 +39,8 @@ const McpComponentDialogToolSelectionStep = ({
     selectedConnection,
     selectedTools,
 }: ToolSelectionStepProps) => {
-    const {currentEnvironmentId} = useEnvironmentStore();
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
 

@@ -3,9 +3,16 @@ import ConnectedUserSheetPanel from '@/ee/pages/embedded/connected-users/compone
 import ConnectedUserSheetTitle from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetTitle';
 import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
 import {useGetConnectedUserQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {useShallow} from 'zustand/react/shallow';
 
 const ConnectedUserSheet = () => {
-    const {connectedUserId, connectedUserSheetOpen, setConnectedUserSheetOpen} = useConnectedUserSheetStore();
+    const {connectedUserId, connectedUserSheetOpen, setConnectedUserSheetOpen} = useConnectedUserSheetStore(
+        useShallow((state) => ({
+            connectedUserId: state.connectedUserId,
+            connectedUserSheetOpen: state.connectedUserSheetOpen,
+            setConnectedUserSheetOpen: state.setConnectedUserSheetOpen,
+        }))
+    );
 
     const {data: connectedUser, isLoading: connectedUserLoading} = useGetConnectedUserQuery(
         connectedUserId,

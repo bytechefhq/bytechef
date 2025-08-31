@@ -56,8 +56,8 @@ const ProjectDeploymentDialog = ({
     const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
-    const {currentEnvironmentId} = useEnvironmentStore();
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
     );

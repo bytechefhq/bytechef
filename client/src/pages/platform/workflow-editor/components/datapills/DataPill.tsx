@@ -7,6 +7,7 @@ import {Editor} from '@tiptap/react';
 import resolvePath from 'object-resolve-path';
 import {MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import {encodePath, transformPathForObjectAccess} from '../../utils/encodingUtils';
 
@@ -58,7 +59,12 @@ const DataPill = ({
     sampleOutput,
     workflowNodeName,
 }: DataPillProps) => {
-    const {currentComponent, focusedInput} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, focusedInput} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentComponent: state.currentComponent,
+            focusedInput: state.focusedInput,
+        }))
+    );
 
     const mentionInput: Editor | null = focusedInput;
 

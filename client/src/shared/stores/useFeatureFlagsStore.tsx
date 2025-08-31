@@ -2,6 +2,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useRef} from 'react';
 import {createStore, useStore} from 'zustand';
 import {devtools} from 'zustand/middleware';
+import {useShallow} from 'zustand/react/shallow';
 
 export interface FeatureFlagsI {
     featureFlags: Record<string, boolean>;
@@ -33,11 +34,16 @@ const featureFlagsStore = createStore<FeatureFlagsI>()(
 );
 
 export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
-    const loadingRef = useRef(false);
-
     const {featureFlags, setFeatureFlag} = useStore(featureFlagsStore, (state) => state);
 
-    const {analytics, featureFlags: localFeatureFlags} = useApplicationInfoStore();
+    const {analytics, featureFlags: localFeatureFlags} = useApplicationInfoStore(
+        useShallow((state) => ({
+            analytics: state.analytics,
+            featureFlags: state.featureFlags,
+        }))
+    );
+
+    const loadingRef = useRef(false);
 
     return (featureFlag: string): boolean => {
         if (loadingRef.current) {

@@ -58,7 +58,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
     const [curProjectId, setCurProjectId] = useState<number | undefined>(apiCollection?.projectId);
     const [curProjectVersion, setCurProjectVersion] = useState<number | undefined>(apiCollection?.projectVersion);
 
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {

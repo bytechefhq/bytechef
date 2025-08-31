@@ -14,7 +14,7 @@ import {useSearchParams} from 'react-router-dom';
 import ConnectedUsersLeftSidebarNav from './components/ConnectedUsersLeftSidebarNav';
 
 const AutomationWorkflows = () => {
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const [searchParams] = useSearchParams();
 

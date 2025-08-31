@@ -36,6 +36,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -64,9 +65,18 @@ const IntegrationHeader = ({
         setWorkflowTestExecution,
         showEditWorkflowDialog,
         workflowIsRunning,
-    } = useWorkflowEditorStore();
-    const {workflow} = useWorkflowDataStore();
-    const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+    } = useWorkflowEditorStore(
+        useShallow((state) => ({
+            setShowBottomPanelOpen: state.setShowBottomPanelOpen,
+            setShowEditWorkflowDialog: state.setShowEditWorkflowDialog,
+            setWorkflowIsRunning: state.setWorkflowIsRunning,
+            setWorkflowTestExecution: state.setWorkflowTestExecution,
+            showEditWorkflowDialog: state.showEditWorkflowDialog,
+            workflowIsRunning: state.workflowIsRunning,
+        }))
+    );
+    const workflow = useWorkflowDataStore((state) => state.workflow);
+    const setCurrentNode = useWorkflowNodeDetailsPanelStore((state) => state.setCurrentNode);
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowTested} = useAnalytics();
 

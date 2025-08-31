@@ -15,11 +15,25 @@ import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/compo
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
+import {useShallow} from 'zustand/react/shallow';
 
 const Project = () => {
-    const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore();
-    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
-    const {workflow} = useWorkflowDataStore();
+    const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore(
+        useShallow((state) => ({
+            projectLeftSidebarOpen: state.projectLeftSidebarOpen,
+        }))
+    );
+    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            workflowIsRunning: state.workflowIsRunning,
+            workflowTestExecution: state.workflowTestExecution,
+        }))
+    );
+    const {workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            workflow: state.workflow,
+        }))
+    );
 
     const {
         bottomResizablePanelRef,

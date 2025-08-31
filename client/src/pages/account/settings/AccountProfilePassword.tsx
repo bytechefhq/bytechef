@@ -7,6 +7,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
+import {useShallow} from 'zustand/react/shallow';
 
 export const formSchema = z.object({
     currentPassword: z.string().min(4, 'Password is required').max(50),
@@ -14,7 +15,13 @@ export const formSchema = z.object({
 });
 
 const AccountProfilePassword = () => {
-    const {changePassword, reset, updateSuccess} = usePasswordStore();
+    const {changePassword, reset, updateSuccess} = usePasswordStore(
+        useShallow((state) => ({
+            changePassword: state.changePassword,
+            reset: state.reset,
+            updateSuccess: state.updateSuccess,
+        }))
+    );
 
     const {toast} = useToast();
 

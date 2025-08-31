@@ -15,6 +15,7 @@ import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {RefObject} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
+import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
@@ -33,9 +34,22 @@ const ProjectHeader = ({
     runDisabled,
     updateWorkflowMutation,
 }: ProjectHeaderProps) => {
-    const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore();
-    const {workflowIsRunning} = useWorkflowEditorStore();
-    const {workflow} = useWorkflowDataStore();
+    const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore(
+        useShallow((state) => ({
+            projectLeftSidebarOpen: state.projectLeftSidebarOpen,
+            setProjectLeftSidebarOpen: state.setProjectLeftSidebarOpen,
+        }))
+    );
+    const {workflowIsRunning} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            workflowIsRunning: state.workflowIsRunning,
+        }))
+    );
+    const {workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            workflow: state.workflow,
+        }))
+    );
 
     const isFetching = useIsFetching();
     const {

@@ -27,6 +27,7 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Editor} from '@tiptap/react';
 import {EqualIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import PropertyMentionsInputEditorFacade from './PropertyMentionsInputEditorFacade';
 
@@ -88,9 +89,22 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         const [isFocused, setIsFocused] = useState(false);
         const isInitialLoadRef = useRef(true);
 
-        const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
-        const {focusedInput, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-        const {setDataPillPanelOpen} = useDataPillPanelStore();
+        const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
+            useShallow((state) => ({
+                componentDefinitions: state.componentDefinitions,
+                dataPills: state.dataPills,
+                taskDispatcherDefinitions: state.taskDispatcherDefinitions,
+                workflow: state.workflow,
+            }))
+        );
+        const {focusedInput, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                focusedInput: state.focusedInput,
+                setFocusedInput: state.setFocusedInput,
+                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+            }))
+        );
+        const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
 
         const onFocus = (editor: Editor) => {
             setFocusedInput(editor);

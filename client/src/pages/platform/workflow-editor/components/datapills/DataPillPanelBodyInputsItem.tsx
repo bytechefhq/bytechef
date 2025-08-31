@@ -6,7 +6,7 @@ import {ChevronDownIcon, FormInputIcon} from 'lucide-react';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 
 const DataPillPanelBodyInputsItem = () => {
-    const {workflow} = useWorkflowDataStore();
+    const workflow = useWorkflowDataStore((state) => state.workflow);
 
     if (!workflow.inputs || workflow.inputs.length === 0) {
         return <p className="text-sm">No defined inputs.</p>;

@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {ClusterElementItemType, NodeDataType} from '@/shared/types';
 import {HoverCardPortal} from '@radix-ui/react-hover-card';
@@ -12,6 +13,7 @@ import {memo, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
@@ -36,9 +38,14 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
     const [hasIcons, setHasIcons] = useState(false);
 
-    const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {workflow} = useWorkflowDataStore();
-    const {clusterElementsCanvasOpen} = useWorkflowEditorStore();
+    const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentNode: state.currentNode,
+            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+        }))
+    );
+    const workflow = useWorkflowDataStore((state) => state.workflow);
+    const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
 
     const iconsList = useMemo(() => {
         const existingElements: Array<{icon: string; label: string}> = [];

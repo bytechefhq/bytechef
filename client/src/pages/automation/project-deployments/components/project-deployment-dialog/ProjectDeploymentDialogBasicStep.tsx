@@ -30,7 +30,7 @@ const ProjectDeploymentDialogBasicStep = ({
     const [curProjectId, setCurProjectId] = useState(getValues('projectId'));
     const [curProjectVersion, setCurProjectVersion] = useState<number | undefined>(getValues('projectVersion'));
 
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
     return (

@@ -9,13 +9,21 @@ import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
+import {useShallow} from 'zustand/react/shallow';
 
 const formSchema = z.object({
     email: z.string().min(5, {message: 'Email is required'}).max(254),
 });
 
 export const PasswordResetInit = () => {
-    const {reset, resetPasswordFailure, resetPasswordInit, resetPasswordSuccess} = usePasswordResetStore();
+    const {reset, resetPasswordFailure, resetPasswordInit, resetPasswordSuccess} = usePasswordResetStore(
+        useShallow((state) => ({
+            reset: state.reset,
+            resetPasswordFailure: state.resetPasswordFailure,
+            resetPasswordInit: state.resetPasswordInit,
+            resetPasswordSuccess: state.resetPasswordSuccess,
+        }))
+    );
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {

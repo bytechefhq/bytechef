@@ -4,13 +4,19 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import {SquareChevronRightIcon} from 'lucide-react';
 import {RefObject} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
+import {useShallow} from 'zustand/react/shallow';
 
 const IntegrationHeaderOutputButton = ({
     bottomResizablePanelRef,
 }: {
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
 }) => {
-    const {setShowBottomPanelOpen, showBottomPanel} = useWorkflowEditorStore();
+    const {setShowBottomPanelOpen, showBottomPanel} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            setShowBottomPanelOpen: state.setShowBottomPanelOpen,
+            showBottomPanel: state.showBottomPanel,
+        }))
+    );
 
     return (
         <Tooltip>

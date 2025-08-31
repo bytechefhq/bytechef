@@ -56,8 +56,12 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             Array<ComponentDefinitionBasic>
         >([]);
 
-        const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();
-
+        const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore(
+            useShallow((state) => ({
+                componentDefinitions: state.componentDefinitions,
+                taskDispatcherDefinitions: state.taskDispatcherDefinitions,
+            }))
+        );
         const {nodes} = useWorkflowDataStore(useShallow((state) => ({nodes: state.nodes})));
 
         const ff_797 = useFeatureFlagsStore()('ff-797');

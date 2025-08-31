@@ -51,7 +51,7 @@ const ProjectsLeftSidebar = ({
             projectId,
         });
 
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {data: projects, refetch: refetchProjects} = useGetWorkspaceProjectsQuery({
         id: currentWorkspaceId!,

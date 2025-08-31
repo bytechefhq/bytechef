@@ -7,6 +7,7 @@ import {WorkflowDefinitionType, WorkflowInputType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
 
@@ -26,7 +27,12 @@ export default function useWorkflowInputs({
     const queryClient = useQueryClient();
     const {updateWorkflowMutation} = useWorkflowEditor();
 
-    const {setWorkflow, workflow} = useWorkflowDataStore();
+    const {setWorkflow, workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            setWorkflow: state.setWorkflow,
+            workflow: state.workflow,
+        }))
+    );
 
     const nameInputRef = useRef<HTMLInputElement>(null);
 

@@ -49,16 +49,14 @@ const WorkflowNodesPopoverMenu = ({
 
     const {invalidateWorkflowQueries} = useWorkflowEditor();
 
-    const {workflow} = useWorkflowDataStore();
-
+    const workflow = useWorkflowDataStore((state) => state.workflow);
     const {edges, nodes} = useWorkflowDataStore(
         useShallow((state) => ({
             edges: state.edges,
             nodes: state.nodes,
         }))
     );
-
-    const {rootClusterElementNodeData} = useWorkflowEditorStore();
+    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
     const {updateWorkflowMutation} = useWorkflowEditor();
 

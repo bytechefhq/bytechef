@@ -25,7 +25,7 @@ const formSchema = z.object({
 });
 
 const GitConfigurationForm = ({gitConfiguration}: {gitConfiguration?: GitConfiguration}) => {
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {

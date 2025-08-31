@@ -17,6 +17,7 @@ import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {SettingsIcon} from 'lucide-react';
 import {ChangeEvent, useState} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderSettingsMenuProps {
     project: Project;
@@ -32,7 +33,12 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
 
-    const {setShowEditWorkflowDialog, showEditWorkflowDialog} = useWorkflowEditorStore();
+    const {setShowEditWorkflowDialog, showEditWorkflowDialog} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            setShowEditWorkflowDialog: state.setShowEditWorkflowDialog,
+            showEditWorkflowDialog: state.showEditWorkflowDialog,
+        }))
+    );
 
     const {
         handleDeleteProjectAlertDialogClick,

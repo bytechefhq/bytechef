@@ -9,10 +9,21 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {ShellIcon} from 'lucide-react';
 import {useEffect} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 const Sessions = () => {
-    const {account} = useAuthenticationStore();
-    const {getSessions, invalidateSession, loading, reset, sessions, updateFailure, updateSuccess} = useSessionsStore();
+    const account = useAuthenticationStore((state) => state.account);
+    const {getSessions, invalidateSession, loading, reset, sessions, updateFailure, updateSuccess} = useSessionsStore(
+        useShallow((state) => ({
+            getSessions: state.getSessions,
+            invalidateSession: state.invalidateSession,
+            loading: state.loading,
+            reset: state.reset,
+            sessions: state.sessions,
+            updateFailure: state.updateFailure,
+            updateSuccess: state.updateSuccess,
+        }))
+    );
 
     const {toast} = useToast();
 

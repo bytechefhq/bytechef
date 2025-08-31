@@ -11,8 +11,9 @@ interface ConditionalPostHogProviderProps {
 const PostHogFallback = ({children}: {children: ReactNode}) => <>{children}</>;
 
 export const ConditionalPostHogProvider = ({children}: ConditionalPostHogProviderProps) => {
-    const {analytics} = useApplicationInfoStore();
     const [posthog, setPosthog] = useState<PostHog | null>(null);
+
+    const analytics = useApplicationInfoStore((state) => state.analytics);
 
     useEffect(() => {
         if (analytics.enabled && analytics.postHog.apiKey && analytics.postHog.host) {

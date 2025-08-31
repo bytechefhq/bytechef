@@ -40,7 +40,7 @@ interface WorkspaceDialogProps {
 const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
-    const {account} = useAuthenticationStore();
+    const account = useAuthenticationStore((state) => state.account);
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {

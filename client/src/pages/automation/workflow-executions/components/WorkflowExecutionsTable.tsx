@@ -3,6 +3,7 @@ import WorkflowExecutionBadge from '@/shared/components/workflow-executions/Work
 import {JobBasic, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
@@ -71,7 +72,12 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
         getCoreRowModel: getCoreRowModel(),
     });
 
-    const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore();
+    const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore(
+        useShallow((state) => ({
+            setWorkflowExecutionId: state.setWorkflowExecutionId,
+            setWorkflowExecutionSheetOpen: state.setWorkflowExecutionSheetOpen,
+        }))
+    );
 
     const headerGroups = reactTable.getHeaderGroups();
     const rows = reactTable.getRowModel().rows;

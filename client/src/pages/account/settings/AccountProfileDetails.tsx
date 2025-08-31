@@ -8,6 +8,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
+import {useShallow} from 'zustand/react/shallow';
 
 export const formSchema = z.object({
     email: z.string().email().min(5, 'Email is required').max(254),
@@ -16,8 +17,19 @@ export const formSchema = z.object({
 });
 
 const AccountProfileDetails = () => {
-    const {reset, updateAccount, updateSuccess} = useAccountStore();
-    const {account, getAccount} = useAuthenticationStore();
+    const {reset, updateAccount, updateSuccess} = useAccountStore(
+        useShallow((state) => ({
+            reset: state.reset,
+            updateAccount: state.updateAccount,
+            updateSuccess: state.updateSuccess,
+        }))
+    );
+    const {account, getAccount} = useAuthenticationStore(
+        useShallow((state) => ({
+            account: state.account,
+            getAccount: state.getAccount,
+        }))
+    );
 
     const {toast} = useToast();
 

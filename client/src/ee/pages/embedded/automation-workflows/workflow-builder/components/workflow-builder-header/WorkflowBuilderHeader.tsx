@@ -14,6 +14,7 @@ import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {EditIcon} from 'lucide-react';
 import {RefObject} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
+import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
@@ -32,8 +33,14 @@ const WorkflowBuilderHeader = ({
     updateWorkflowMutation,
     workflowVersion,
 }: ProjectHeaderProps) => {
-    const {setShowEditWorkflowDialog, showEditWorkflowDialog, workflowIsRunning} = useWorkflowEditorStore();
-    const {workflow} = useWorkflowDataStore();
+    const {setShowEditWorkflowDialog, showEditWorkflowDialog, workflowIsRunning} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            setShowEditWorkflowDialog: state.setShowEditWorkflowDialog,
+            showEditWorkflowDialog: state.showEditWorkflowDialog,
+            workflowIsRunning: state.workflowIsRunning,
+        }))
+    );
+    const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const isFetching = useIsFetching();
     const {

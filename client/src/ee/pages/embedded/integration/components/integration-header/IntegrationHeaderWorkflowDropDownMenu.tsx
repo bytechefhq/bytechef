@@ -9,6 +9,7 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {EllipsisVerticalIcon} from 'lucide-react';
+import {useShallow} from 'zustand/react/shallow';
 
 const IntegrationHeaderWorkflowDropDownMenu = ({
     onShowDeleteWorkflowAlertDialog,
@@ -17,7 +18,11 @@ const IntegrationHeaderWorkflowDropDownMenu = ({
     onShowDeleteWorkflowAlertDialog: () => void;
     workflowId: string;
 }) => {
-    const {setShowEditWorkflowDialog} = useWorkflowEditorStore();
+    const {setShowEditWorkflowDialog} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            setShowEditWorkflowDialog: state.setShowEditWorkflowDialog,
+        }))
+    );
 
     return (
         <DropdownMenu>

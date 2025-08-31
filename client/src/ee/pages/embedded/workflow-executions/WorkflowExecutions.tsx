@@ -75,7 +75,7 @@ const IntegrationLabel = ({integration}: {integration: Integration}) => (
 );
 
 export const WorkflowExecutions = () => {
-    const {currentEnvironmentId} = useEnvironmentStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const [searchParams] = useSearchParams();
 

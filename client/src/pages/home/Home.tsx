@@ -8,7 +8,7 @@ import ModeSelectionDialog from './components/ModeSelectionDialog';
 const Home = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const {currentType} = useModeTypeStore();
+    const currentType = useModeTypeStore((state) => state.currentType);
 
     const navigate = useNavigate();
 

@@ -33,8 +33,9 @@ const ClusterElementsWorkflowEditor = () => {
             setIsDragging: state.setIsDragging,
         }))
     );
+    const workflow = useWorkflowDataStore((state) => state.workflow);
+
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
-    const {workflow} = useWorkflowDataStore();
 
     const previousNodePositionsRef = useRef<Record<string, {x: number; y: number}>>({});
 

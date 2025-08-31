@@ -32,7 +32,7 @@ const Properties = ({
     path,
     properties,
 }: PropertiesProps) => {
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
     const advancedProperties = properties.filter((property) => {
         const {advancedOption, hidden, name} = property;

@@ -60,25 +60,37 @@ const WorkflowNodesPopoverMenuOperationList = ({
     sourceNodeId,
     trigger,
 }: WorkflowNodesPopoverMenuOperationListProps) => {
-    const {setLatestComponentDefinition, workflow} = useWorkflowDataStore();
-
+    const {setLatestComponentDefinition, workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            setLatestComponentDefinition: state.setLatestComponentDefinition,
+            workflow: state.workflow,
+        }))
+    );
     const {edges, nodes} = useWorkflowDataStore(
         useShallow((state) => ({
             edges: state.edges,
             nodes: state.nodes,
         }))
     );
-
     const {nodes: clusterElementNodes} = useClusterElementsDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
         }))
     );
-
     const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
-        useWorkflowEditorStore();
-
-    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+        useWorkflowEditorStore(
+            useShallow((state) => ({
+                clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+                rootClusterElementNodeData: state.rootClusterElementNodeData,
+                setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+            }))
+        );
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentNode: state.currentNode,
+            setCurrentNode: state.setCurrentNode,
+        }))
+    );
 
     const {captureComponentUsed} = useAnalytics();
 

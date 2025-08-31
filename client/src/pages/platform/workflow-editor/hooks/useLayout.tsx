@@ -46,7 +46,7 @@ export default function useLayout({
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: UseLayoutProps) {
-    let {workflow} = useWorkflowDataStore();
+    let workflow = useWorkflowDataStore((state) => state.workflow);
 
     if (!workflow.tasks && readOnlyWorkflow) {
         workflow = {...workflow, ...readOnlyWorkflow};
