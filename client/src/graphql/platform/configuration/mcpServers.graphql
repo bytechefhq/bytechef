@@ -3,7 +3,7 @@ query mcpServers($type: ModeType!) {
         id
         name
         type
-        environment
+        environmentId
         enabled
         mcpComponents {
             id

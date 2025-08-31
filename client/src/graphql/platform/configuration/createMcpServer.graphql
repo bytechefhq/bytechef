@@ -3,7 +3,7 @@ mutation createMcpServer($input: McpServerInput!) {
         id
         name
         type
-        environment
+        environmentId
         enabled
     }
 }
