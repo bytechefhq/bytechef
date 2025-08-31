@@ -39,6 +39,7 @@ export interface DeleteWorkflowNodeTestOutputRequest {
 export interface SaveWorkflowNodeTestOutputRequest {
     id: string;
     workflowNodeName: string;
+    environmentId: number;
 }
 
 export interface UploadWorkflowNodeSampleOutputRequest {
@@ -168,7 +169,18 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling saveWorkflowNodeTestOutput().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

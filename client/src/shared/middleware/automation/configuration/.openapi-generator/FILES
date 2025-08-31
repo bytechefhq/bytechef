@@ -20,7 +20,6 @@ models/Connection.ts
 models/ConnectionBase.ts
 models/CreateProjectDeploymentWorkflowJob200Response.ts
 models/CredentialStatus.ts
-models/Environment.ts
 models/Project.ts
 models/ProjectBasic.ts
 models/ProjectDeployment.ts

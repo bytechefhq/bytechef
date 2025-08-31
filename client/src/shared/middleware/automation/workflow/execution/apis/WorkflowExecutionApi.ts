@@ -15,13 +15,10 @@
 
 import * as runtime from '../runtime';
 import type {
-  Environment,
   Page,
   WorkflowExecution,
 } from '../models/index';
 import {
-    EnvironmentFromJSON,
-    EnvironmentToJSON,
     PageFromJSON,
     PageToJSON,
     WorkflowExecutionFromJSON,
@@ -34,7 +31,7 @@ export interface GetWorkflowExecutionRequest {
 
 export interface GetWorkflowExecutionsPageRequest {
     embedded?: boolean;
-    environment?: Environment;
+    environmentId?: number;
     jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
     jobStartDate?: Date;
     jobEndDate?: Date;
@@ -99,8 +96,8 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
             queryParameters['embedded'] = requestParameters['embedded'];
         }
 
-        if (requestParameters['environment'] != null) {
-            queryParameters['environment'] = requestParameters['environment'];
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         if (requestParameters['jobStatus'] != null) {

@@ -16,14 +16,11 @@
 import * as runtime from '../runtime';
 import type {
   Connection,
-  Environment,
   UpdateConnectionRequest,
 } from '../models/index';
 import {
     ConnectionFromJSON,
     ConnectionToJSON,
-    EnvironmentFromJSON,
-    EnvironmentToJSON,
     UpdateConnectionRequestFromJSON,
     UpdateConnectionRequestToJSON,
 } from '../models/index';
@@ -44,7 +41,7 @@ export interface GetWorkspaceConnectionsRequest {
     id: number;
     componentName?: string;
     connectionVersion?: number;
-    environment?: Environment;
+    environmentId?: number;
     tagId?: number;
 }
 
@@ -202,8 +199,8 @@ export class ConnectionApi extends runtime.BaseAPI {
             queryParameters['connectionVersion'] = requestParameters['connectionVersion'];
         }
 
-        if (requestParameters['environment'] != null) {
-            queryParameters['environment'] = requestParameters['environment'];
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         if (requestParameters['tagId'] != null) {

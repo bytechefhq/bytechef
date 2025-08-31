@@ -13,13 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Environment } from './Environment';
-import {
-    EnvironmentFromJSON,
-    EnvironmentFromJSONTyped,
-    EnvironmentToJSON,
-    EnvironmentToJSONTyped,
-} from './Environment';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
@@ -66,11 +59,11 @@ export interface ProjectDeployment {
      */
     enabled?: boolean;
     /**
-     * 
-     * @type {Environment}
+     * The id of an environment.
+     * @type {number}
      * @memberof ProjectDeployment
      */
-    environment?: Environment;
+    environmentId?: number;
     /**
      * The id of a project deployment.
      * @type {number}
@@ -139,8 +132,6 @@ export interface ProjectDeployment {
     version?: number;
 }
 
-
-
 /**
  * Check if a given object implements the ProjectDeployment interface.
  */
@@ -163,7 +154,7 @@ export function ProjectDeploymentFromJSONTyped(json: any, ignoreDiscriminator: b
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
-        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
+        'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -191,7 +182,7 @@ export function ProjectDeploymentToJSONTyped(value?: Omit<ProjectDeployment, 'cr
         
         'description': value['description'],
         'enabled': value['enabled'],
-        'environment': EnvironmentToJSON(value['environment']),
+        'environmentId': value['environmentId'],
         'name': value['name'],
         'projectId': value['projectId'],
         'projectVersion': value['projectVersion'],

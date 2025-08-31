@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Environment } from './Environment';
-import {
-    EnvironmentFromJSON,
-    EnvironmentFromJSONTyped,
-    EnvironmentToJSON,
-    EnvironmentToJSONTyped,
-} from './Environment';
-
 /**
  * Contains configurations and connections required for the execution of project workflows.
  * @export
@@ -52,11 +44,11 @@ export interface ProjectDeploymentBasic {
      */
     enabled?: boolean;
     /**
-     * 
-     * @type {Environment}
+     * The id of an environment.
+     * @type {number}
      * @memberof ProjectDeploymentBasic
      */
-    environment?: Environment;
+    environmentId?: number;
     /**
      * The id of a project deployment.
      * @type {number}
@@ -101,8 +93,6 @@ export interface ProjectDeploymentBasic {
     projectVersion?: number;
 }
 
-
-
 /**
  * Check if a given object implements the ProjectDeploymentBasic interface.
  */
@@ -125,7 +115,7 @@ export function ProjectDeploymentBasicFromJSONTyped(json: any, ignoreDiscriminat
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
-        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
+        'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -149,7 +139,7 @@ export function ProjectDeploymentBasicToJSONTyped(value?: Omit<ProjectDeployment
         
         'description': value['description'],
         'enabled': value['enabled'],
-        'environment': EnvironmentToJSON(value['environment']),
+        'environmentId': value['environmentId'],
         'name': value['name'],
         'projectId': value['projectId'],
         'projectVersion': value['projectVersion'],

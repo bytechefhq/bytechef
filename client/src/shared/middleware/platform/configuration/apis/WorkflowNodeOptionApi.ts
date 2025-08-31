@@ -28,6 +28,7 @@ export interface GetClusterElementNodeOptionsRequest {
     clusterElementType: string;
     clusterElementWorkflowNodeName: string;
     propertyName: string;
+    environmentId: number;
     lookupDependsOnPaths?: Array<string>;
     searchText?: string;
 }
@@ -36,6 +37,7 @@ export interface GetWorkflowNodeOptionsRequest {
     id: string;
     workflowNodeName: string;
     propertyName: string;
+    environmentId: number;
     lookupDependsOnPaths?: Array<string>;
     searchText?: string;
 }
@@ -85,6 +87,13 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getClusterElementNodeOptions().'
+            );
+        }
+
         const queryParameters: any = {};
 
         if (requestParameters['lookupDependsOnPaths'] != null) {
@@ -93,6 +102,10 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
 
         if (requestParameters['searchText'] != null) {
             queryParameters['searchText'] = requestParameters['searchText'];
+        }
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -150,6 +163,13 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getWorkflowNodeOptions().'
+            );
+        }
+
         const queryParameters: any = {};
 
         if (requestParameters['lookupDependsOnPaths'] != null) {
@@ -158,6 +178,10 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
 
         if (requestParameters['searchText'] != null) {
             queryParameters['searchText'] = requestParameters['searchText'];
+        }
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

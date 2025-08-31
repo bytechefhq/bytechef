@@ -16,15 +16,12 @@
 import * as runtime from '../runtime';
 import type {
   CreateIntegrationInstanceConfigurationWorkflowJob200Response,
-  Environment,
   IntegrationInstanceConfiguration,
   IntegrationInstanceConfigurationWorkflow,
 } from '../models/index';
 import {
     CreateIntegrationInstanceConfigurationWorkflowJob200ResponseFromJSON,
     CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSON,
-    EnvironmentFromJSON,
-    EnvironmentToJSON,
     IntegrationInstanceConfigurationFromJSON,
     IntegrationInstanceConfigurationToJSON,
     IntegrationInstanceConfigurationWorkflowFromJSON,
@@ -60,7 +57,7 @@ export interface GetIntegrationInstanceConfigurationRequest {
 }
 
 export interface GetIntegrationInstanceConfigurationsRequest {
-    environment?: Environment;
+    environmentId?: number;
     integrationId?: number;
     tagId?: number;
     includeAllFields?: boolean;
@@ -358,8 +355,8 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     async getIntegrationInstanceConfigurationsRaw(requestParameters: GetIntegrationInstanceConfigurationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationInstanceConfiguration>>> {
         const queryParameters: any = {};
 
-        if (requestParameters['environment'] != null) {
-            queryParameters['environment'] = requestParameters['environment'];
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         if (requestParameters['integrationId'] != null) {

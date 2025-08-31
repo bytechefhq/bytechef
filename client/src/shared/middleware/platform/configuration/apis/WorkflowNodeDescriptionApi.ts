@@ -25,6 +25,7 @@ import {
 export interface GetWorkflowNodeDescriptionRequest {
     id: string;
     workflowNodeName: string;
+    environmentId: number;
 }
 
 /**
@@ -51,7 +52,18 @@ export class WorkflowNodeDescriptionApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getWorkflowNodeDescription().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

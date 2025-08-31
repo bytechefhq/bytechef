@@ -8,7 +8,6 @@ models/ApiClient.ts
 models/ApiCollection.ts
 models/ApiCollectionEndpoint.ts
 models/CreateApiClient200Response.ts
-models/Environment.ts
 models/HttpMethod.ts
 models/ProjectBasic.ts
 models/ProjectDeploymentBasic.ts

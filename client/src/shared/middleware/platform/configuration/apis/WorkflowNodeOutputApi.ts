@@ -27,16 +27,19 @@ export interface GetClusterElementOutputRequest {
     workflowNodeName: string;
     clusterElementType: string;
     clusterElementWorkflowNodeName: string;
+    environmentId: number;
 }
 
 export interface GetPreviousWorkflowNodeOutputsRequest {
     id: string;
+    environmentId: number;
     lastWorkflowNodeName?: string;
 }
 
 export interface GetWorkflowNodeOutputRequest {
     id: string;
     workflowNodeName: string;
+    environmentId: number;
 }
 
 /**
@@ -77,7 +80,18 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getClusterElementOutput().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -119,10 +133,21 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getPreviousWorkflowNodeOutputs().'
+            );
+        }
+
         const queryParameters: any = {};
 
         if (requestParameters['lastWorkflowNodeName'] != null) {
             queryParameters['lastWorkflowNodeName'] = requestParameters['lastWorkflowNodeName'];
+        }
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -169,7 +194,18 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getWorkflowNodeOutput().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

@@ -60,25 +60,25 @@ export interface WorkflowExecution {
      * @type {number}
      * @memberof WorkflowExecution
      */
-    readonly id?: number;
+    readonly id: number;
     /**
      * 
      * @type {Job}
      * @memberof WorkflowExecution
      */
-    job?: Job;
+    job: Job;
     /**
      * 
      * @type {ProjectBasic}
      * @memberof WorkflowExecution
      */
-    project?: ProjectBasic;
+    project: ProjectBasic;
     /**
      * 
      * @type {ProjectDeploymentBasic}
      * @memberof WorkflowExecution
      */
-    projectDeployment?: ProjectDeploymentBasic;
+    projectDeployment: ProjectDeploymentBasic;
     /**
      * 
      * @type {TriggerExecution}
@@ -90,13 +90,18 @@ export interface WorkflowExecution {
      * @type {WorkflowBasic}
      * @memberof WorkflowExecution
      */
-    workflow?: WorkflowBasic;
+    workflow: WorkflowBasic;
 }
 
 /**
  * Check if a given object implements the WorkflowExecution interface.
  */
 export function instanceOfWorkflowExecution(value: object): value is WorkflowExecution {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('job' in value) || value['job'] === undefined) return false;
+    if (!('project' in value) || value['project'] === undefined) return false;
+    if (!('projectDeployment' in value) || value['projectDeployment'] === undefined) return false;
+    if (!('workflow' in value) || value['workflow'] === undefined) return false;
     return true;
 }
 
@@ -110,12 +115,12 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'id': json['id'] == null ? undefined : json['id'],
-        'job': json['job'] == null ? undefined : JobFromJSON(json['job']),
-        'project': json['project'] == null ? undefined : ProjectBasicFromJSON(json['project']),
-        'projectDeployment': json['projectDeployment'] == null ? undefined : ProjectDeploymentBasicFromJSON(json['projectDeployment']),
+        'id': json['id'],
+        'job': JobFromJSON(json['job']),
+        'project': ProjectBasicFromJSON(json['project']),
+        'projectDeployment': ProjectDeploymentBasicFromJSON(json['projectDeployment']),
         'triggerExecution': json['triggerExecution'] == null ? undefined : TriggerExecutionFromJSON(json['triggerExecution']),
-        'workflow': json['workflow'] == null ? undefined : WorkflowBasicFromJSON(json['workflow']),
+        'workflow': WorkflowBasicFromJSON(json['workflow']),
     };
 }
 

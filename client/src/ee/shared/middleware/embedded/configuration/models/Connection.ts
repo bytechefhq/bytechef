@@ -20,13 +20,6 @@ import {
     CredentialStatusToJSON,
     CredentialStatusToJSONTyped,
 } from './CredentialStatus';
-import type { Environment } from './Environment';
-import {
-    EnvironmentFromJSON,
-    EnvironmentFromJSONTyped,
-    EnvironmentToJSON,
-    EnvironmentToJSONTyped,
-} from './Environment';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
@@ -109,11 +102,11 @@ export interface Connection {
      */
     credentialStatus?: CredentialStatus;
     /**
-     * 
-     * @type {Environment}
+     * The id of an environment.
+     * @type {number}
      * @memberof Connection
      */
-    environment?: Environment;
+    environmentId?: number;
     /**
      * The id of a connection.
      * @type {number}
@@ -191,7 +184,7 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
-        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
+        'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
@@ -218,7 +211,7 @@ export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authori
         'componentName': value['componentName'],
         'connectionVersion': value['connectionVersion'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),
-        'environment': EnvironmentToJSON(value['environment']),
+        'environmentId': value['environmentId'],
         'name': value['name'],
         'parameters': value['parameters'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),

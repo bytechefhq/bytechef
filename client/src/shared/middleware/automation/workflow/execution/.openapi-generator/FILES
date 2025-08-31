@@ -2,7 +2,6 @@ apis/WorkflowExecutionApi.ts
 apis/index.ts
 index.ts
 models/ComponentConnection.ts
-models/Environment.ts
 models/ExecutionError.ts
 models/Job.ts
 models/JobBasic.ts

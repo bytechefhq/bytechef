@@ -2,7 +2,6 @@
 /* eslint-disable */
 export * from './AuthorizationType';
 export * from './ComponentConnection';
-export * from './Environment';
 export * from './ExecutionError';
 export * from './IntegrationBasic';
 export * from './IntegrationInstanceBasic';

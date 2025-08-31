@@ -20,13 +20,6 @@ import {
     ConnectedUserIntegrationInstanceToJSON,
     ConnectedUserIntegrationInstanceToJSONTyped,
 } from './ConnectedUserIntegrationInstance';
-import type { Environment } from './Environment';
-import {
-    EnvironmentFromJSON,
-    EnvironmentFromJSONTyped,
-    EnvironmentToJSON,
-    EnvironmentToJSONTyped,
-} from './Environment';
 
 /**
  * 
@@ -59,11 +52,11 @@ export interface ConnectedUser {
      */
     enabled?: boolean;
     /**
-     * 
-     * @type {Environment}
+     * The id of an environment.
+     * @type {number}
      * @memberof ConnectedUser
      */
-    environment?: Environment;
+    environmentId?: number;
     /**
      * The connected user external id.
      * @type {string}
@@ -114,8 +107,6 @@ export interface ConnectedUser {
     version?: number;
 }
 
-
-
 /**
  * Check if a given object implements the ConnectedUser interface.
  */
@@ -138,7 +129,7 @@ export function ConnectedUserFromJSONTyped(json: any, ignoreDiscriminator: boole
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'email': json['email'] == null ? undefined : json['email'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
-        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
+        'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'externalId': json['externalId'],
         'id': json['id'] == null ? undefined : json['id'],
         'integrationInstances': json['integrationInstances'] == null ? undefined : ((json['integrationInstances'] as Array<any>).map(ConnectedUserIntegrationInstanceFromJSON)),
@@ -163,7 +154,7 @@ export function ConnectedUserToJSONTyped(value?: Omit<ConnectedUser, 'createdBy'
         
         'email': value['email'],
         'enabled': value['enabled'],
-        'environment': EnvironmentToJSON(value['environment']),
+        'environmentId': value['environmentId'],
         'integrationInstances': value['integrationInstances'] == null ? undefined : ((value['integrationInstances'] as Array<any>).map(ConnectedUserIntegrationInstanceToJSON)),
         'name': value['name'],
         '__version': value['version'],

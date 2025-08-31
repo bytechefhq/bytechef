@@ -60,43 +60,49 @@ export interface WorkflowExecutionBasic {
      * @type {number}
      * @memberof WorkflowExecutionBasic
      */
-    readonly id?: number;
+    readonly id: number;
     /**
      * 
      * @type {IntegrationBasic}
      * @memberof WorkflowExecutionBasic
      */
-    integration?: IntegrationBasic;
+    integration: IntegrationBasic;
     /**
      * 
      * @type {IntegrationInstanceConfigurationBasic}
      * @memberof WorkflowExecutionBasic
      */
-    integrationInstanceConfiguration?: IntegrationInstanceConfigurationBasic;
+    integrationInstanceConfiguration: IntegrationInstanceConfigurationBasic;
     /**
      * 
      * @type {IntegrationInstanceBasic}
      * @memberof WorkflowExecutionBasic
      */
-    integrationInstance?: IntegrationInstanceBasic;
+    integrationInstance: IntegrationInstanceBasic;
     /**
      * 
      * @type {JobBasic}
      * @memberof WorkflowExecutionBasic
      */
-    job?: JobBasic;
+    job: JobBasic;
     /**
      * 
      * @type {WorkflowBasic}
      * @memberof WorkflowExecutionBasic
      */
-    workflow?: WorkflowBasic;
+    workflow: WorkflowBasic;
 }
 
 /**
  * Check if a given object implements the WorkflowExecutionBasic interface.
  */
 export function instanceOfWorkflowExecutionBasic(value: object): value is WorkflowExecutionBasic {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('integration' in value) || value['integration'] === undefined) return false;
+    if (!('integrationInstanceConfiguration' in value) || value['integrationInstanceConfiguration'] === undefined) return false;
+    if (!('integrationInstance' in value) || value['integrationInstance'] === undefined) return false;
+    if (!('job' in value) || value['job'] === undefined) return false;
+    if (!('workflow' in value) || value['workflow'] === undefined) return false;
     return true;
 }
 
@@ -110,12 +116,12 @@ export function WorkflowExecutionBasicFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
-        'id': json['id'] == null ? undefined : json['id'],
-        'integration': json['integration'] == null ? undefined : IntegrationBasicFromJSON(json['integration']),
-        'integrationInstanceConfiguration': json['integrationInstanceConfiguration'] == null ? undefined : IntegrationInstanceConfigurationBasicFromJSON(json['integrationInstanceConfiguration']),
-        'integrationInstance': json['integrationInstance'] == null ? undefined : IntegrationInstanceBasicFromJSON(json['integrationInstance']),
-        'job': json['job'] == null ? undefined : JobBasicFromJSON(json['job']),
-        'workflow': json['workflow'] == null ? undefined : WorkflowBasicFromJSON(json['workflow']),
+        'id': json['id'],
+        'integration': IntegrationBasicFromJSON(json['integration']),
+        'integrationInstanceConfiguration': IntegrationInstanceConfigurationBasicFromJSON(json['integrationInstanceConfiguration']),
+        'integrationInstance': IntegrationInstanceBasicFromJSON(json['integrationInstance']),
+        'job': JobBasicFromJSON(json['job']),
+        'workflow': WorkflowBasicFromJSON(json['workflow']),
     };
 }
 
