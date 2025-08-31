@@ -149,7 +149,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     @Override
     public DisplayConditionResultDTO getClusterElementDisplayConditions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName) {
+        String clusterElementWorkflowNodeName, long environmentId) {
 
         Map<String, Boolean> displayConditionMap = new HashMap<>();
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -161,13 +161,15 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Set<String> keySet = workflowNodeStructure.parameterMap.keySet();
 
-        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
+        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflow.getId(), environmentId);
 
         for (String parameterName : new HashSet<>(keySet)) {
             displayConditionMap.putAll(
                 checkDisplayConditionsAndParameters(
                     parameterName, workflowNodeName, workflow, workflowNodeStructure.operationType,
-                    workflowNodeStructure.parameterMap, inputMap, Map.of(), workflowNodeStructure.properties, false));
+                    workflowNodeStructure.parameterMap, inputMap, Map.of(), workflowNodeStructure.properties, false,
+                    environmentId));
         }
 
         return new DisplayConditionResultDTO(
@@ -175,7 +177,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
-    public DisplayConditionResultDTO getWorkflowNodeDisplayConditions(String workflowId, String workflowNodeName) {
+    public DisplayConditionResultDTO getWorkflowNodeDisplayConditions(
+        String workflowId, String workflowNodeName, long environmentId) {
+
         Map<String, Boolean> displayConditionMap = new HashMap<>();
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -187,13 +191,15 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Set<String> keySet = workflowNodeStructure.parameterMap.keySet();
 
-        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
+        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflow.getId(), environmentId);
 
         for (String parameterName : new HashSet<>(keySet)) {
             displayConditionMap.putAll(
                 checkDisplayConditionsAndParameters(
                     parameterName, workflowNodeName, workflow, workflowNodeStructure.operationType,
-                    workflowNodeStructure.parameterMap, inputMap, Map.of(), workflowNodeStructure.properties, false));
+                    workflowNodeStructure.parameterMap, inputMap, Map.of(), workflowNodeStructure.properties, false,
+                    environmentId));
         }
 
         return new DisplayConditionResultDTO(
@@ -204,7 +210,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     public UpdateParameterResultDTO updateClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
-        boolean includeInMetadata) {
+        boolean includeInMetadata, long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -229,12 +235,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             dynamicPropertyTypesMap);
 
         Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflow.getId());
+            workflow.getId(), environmentId);
 
         Map<String, Boolean> displayConditionMap = checkDisplayConditionsAndParameters(
             parameterPath, workflowNodeName, workflow, workflowNodeStructure.operationType,
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
-            true);
+            true, environmentId);
 
         if (includeInMetadata) {
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
@@ -251,7 +257,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     @Override
     public UpdateParameterResultDTO updateWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,
-        boolean includeInMetadata) {
+        boolean includeInMetadata, long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -275,12 +281,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             dynamicPropertyTypesMap);
 
         Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflow.getId());
+            workflow.getId(), environmentId);
 
         Map<String, Boolean> displayConditionMap = checkDisplayConditionsAndParameters(
             parameterPath, workflowNodeName, workflow, workflowNodeStructure.operationType,
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
-            true);
+            true, environmentId);
 
         if (includeInMetadata) {
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
@@ -418,13 +424,13 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String parameterPath, String workflowNodeName, Workflow workflow,
         WorkflowNodeStructure.OperationType operationType,
         Map<String, ?> parameterMap, Map<String, ?> inputMap, Map<String, ?> dynamicPropertyTypesMap,
-        List<? extends BaseProperty> properties, boolean removeParameters) {
+        List<? extends BaseProperty> properties, boolean removeParameters, long environmentId) {
 
         Map<String, String> displayConditionMap = new HashMap<>();
 
         checkDisplayConditionsAndParameters(
             parameterPath, workflowNodeName, workflow, operationType, parameterMap, inputMap,
-            displayConditionMap, dynamicPropertyTypesMap, properties, removeParameters);
+            displayConditionMap, dynamicPropertyTypesMap, properties, removeParameters, environmentId);
 
         return MapUtils.toMap(displayConditionMap, Map.Entry::getKey, entry -> true);
     }
@@ -434,7 +440,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String parameterPath, String workflowNodeName, Workflow workflow,
         WorkflowNodeStructure.OperationType operationType,
         Map<String, ?> parameterMap, Map<String, ?> inputMap, Map<String, String> displayConditionMap,
-        Map<String, ?> dynamicPropertyTypesMap, List<? extends BaseProperty> properties, boolean removeParameters) {
+        Map<String, ?> dynamicPropertyTypesMap, List<? extends BaseProperty> properties, boolean removeParameters,
+        long environmentId) {
 
         for (BaseProperty property : properties) {
             switch (property) {
@@ -442,50 +449,50 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     checkDisplayConditionsAndParameters(
                         parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                         (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty,
-                        removeParameters);
+                        removeParameters, environmentId);
 
                     checkDisplayConditionsAndParameters(
                         parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                         inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty.getItems(),
-                        removeParameters);
+                        removeParameters, environmentId);
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty -> {
                     checkDisplayConditionsAndParameters(
                         parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                         (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty,
-                        removeParameters);
+                        removeParameters, environmentId);
 
                     checkDisplayConditionsAndParameters(
                         parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                         inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty.getItems(),
-                        removeParameters);
+                        removeParameters, environmentId);
                 }
                 case ObjectProperty objectProperty -> {
                     checkDisplayConditionsAndParameters(
                         parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                         (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty,
-                        removeParameters);
+                        removeParameters, environmentId);
 
                     checkDisplayConditionsAndParameters(
                         parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                         inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty.getProperties(),
-                        removeParameters);
+                        removeParameters, environmentId);
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty -> {
                     checkDisplayConditionsAndParameters(
                         parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                         (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty,
-                        removeParameters);
+                        removeParameters, environmentId);
 
                     checkDisplayConditionsAndParameters(
                         parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                         inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty.getProperties(),
-                        removeParameters);
+                        removeParameters, environmentId);
                 }
                 default -> checkDisplayConditionsAndParameters(
                     parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, property,
-                    removeParameters);
+                    removeParameters, environmentId);
             }
         }
     }
@@ -495,7 +502,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String parameterPath, String workflowNodeName, Workflow workflow,
         WorkflowNodeStructure.OperationType operationType,
         Map<String, ?> parameterMap, Map<String, Object> inputMap, Map<String, String> displayConditionMap,
-        Map<String, ?> dynamicPropertyTypesMap, BaseProperty property, boolean removeParameters) {
+        Map<String, ?> dynamicPropertyTypesMap, BaseProperty property, boolean removeParameters, long environmentId) {
 
         if (property.getDisplayCondition() == null) {
             return;
@@ -510,7 +517,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
             Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-                workflow.getId(), workflowTask.getName());
+                workflow.getId(), workflowTask.getName(), environmentId);
 
             if (displayCondition.contains("[index]")) {
                 evaluateArray(

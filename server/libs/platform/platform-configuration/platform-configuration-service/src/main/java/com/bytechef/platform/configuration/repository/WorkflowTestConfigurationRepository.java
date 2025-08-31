@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.repository;
 
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -30,7 +31,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WorkflowTestConfigurationRepository extends ListCrudRepository<WorkflowTestConfiguration, Long> {
 
-    Optional<WorkflowTestConfiguration> findByWorkflowId(String workflowId);
+    List<WorkflowTestConfiguration> findAllByWorkflowId(String workflowId);
+
+    Optional<WorkflowTestConfiguration> findByWorkflowIdAndEnvironmentId(String workflowId, long environmentId);
 
     @Modifying
     @Query("UPDATE workflow_test_configuration SET workflow_id = :newWorkflowId WHERE workflow_id = :oldWorkflowId")

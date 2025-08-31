@@ -68,8 +68,10 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
         method = {
             RequestMethod.HEAD, RequestMethod.GET, RequestMethod.POST
         },
-        value = "/webhooks/{id}/test")
-    public ResponseEntity<?> executeWorkflow(@PathVariable String id, HttpServletRequest httpServletRequest) {
+        value = "/webhooks/{id}/test/environments/{environmentId}")
+    public ResponseEntity<?> executeWorkflow(
+        @PathVariable String id, @PathVariable long environmentId, HttpServletRequest httpServletRequest) {
+
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
         return TenantUtils.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
@@ -88,13 +90,14 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
                 isWorkflowDisabled(workflowExecutionId)) {
 
                 if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
-                    responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest);
+                    responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest, environmentId);
                 } else {
                     responseEntity = ResponseEntity.ok()
                         .build();
                 }
             } else {
-                workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(workflowExecutionId, webhookRequest);
+                workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
+                    workflowExecutionId, environmentId, webhookRequest);
 
                 responseEntity = ResponseEntity.ok()
                     .build();
@@ -110,10 +113,10 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
     }
 
     private ResponseEntity<?> doValidateOnEnable(
-        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, long environmentId) {
 
         WebhookValidateResponse response = webhookTriggerTestFacade.validateOnEnable(
-            workflowExecutionId, webhookRequest);
+            workflowExecutionId, webhookRequest, environmentId);
 
         return ResponseEntity.status(response.status())
             .headers(

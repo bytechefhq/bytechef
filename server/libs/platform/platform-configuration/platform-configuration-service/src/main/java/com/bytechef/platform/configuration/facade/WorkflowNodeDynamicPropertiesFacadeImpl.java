@@ -69,12 +69,12 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     @SuppressWarnings("unchecked")
     public List<Property> getClusterElementDynamicProperties(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths) {
+        String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
+        long environmentId) {
 
-        Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
-            .orElse(null);
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Long connectionId = getConnectionId(workflowId, workflowNodeName, environmentId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
@@ -82,7 +82,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowNodeType.name());
+            workflowId, workflowNodeType.name(), environmentId);
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
 
@@ -105,12 +105,12 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     @Override
     @SuppressWarnings("unchecked")
     public List<Property> getWorkflowNodeDynamicProperties(
-        String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths) {
+        String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
+        long environmentId) {
 
-        Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
-            .orElse(null);
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Long connectionId = getConnectionId(workflowId, workflowNodeName, environmentId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return WorkflowTrigger
@@ -127,7 +127,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
                 Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-                    workflowId, workflowTask.getName());
+                    workflowId, workflowTask.getName(), environmentId);
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
                 return actionDefinitionFacade.executeDynamicProperties(
@@ -137,5 +137,11 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                         MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
                     lookupDependsOnPaths, connectionId);
             });
+    }
+
+    private Long getConnectionId(String workflowId, String workflowNodeName, long environmentId) {
+        return workflowTestConfigurationService
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName, environmentId)
+            .orElse(null);
     }
 }

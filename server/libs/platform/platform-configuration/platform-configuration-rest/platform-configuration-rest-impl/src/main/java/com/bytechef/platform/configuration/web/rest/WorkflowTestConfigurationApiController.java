@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -28,10 +27,8 @@ import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurat
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -58,20 +55,23 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
-    public ResponseEntity<WorkflowTestConfigurationModel> getWorkflowTestConfiguration(String workflowId) {
+    public ResponseEntity<WorkflowTestConfigurationModel> getWorkflowTestConfiguration(
+        String workflowId, Long environmentId) {
         return ResponseEntity.ok(
             conversionService.convert(
-                OptionalUtils.orElse(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId), null),
+                workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId)
+                    .orElse(null),
                 WorkflowTestConfigurationModel.class));
     }
 
     @Override
     public ResponseEntity<List<WorkflowTestConfigurationConnectionModel>> getWorkflowTestConfigurationConnections(
-        String workflowId, String workflowNodeName) {
+        String workflowId, String workflowNodeName, Long environmentId) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
-                workflowTestConfigurationService.getWorkflowTestConfigurationConnections(workflowId, workflowNodeName),
+                workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                    workflowId, workflowNodeName, environmentId),
                 workflowTestConfigurationConnection -> conversionService.convert(
                     workflowTestConfigurationConnection, WorkflowTestConfigurationConnectionModel.class)));
     }
@@ -90,12 +90,12 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
 
     @Override
     public ResponseEntity<Void> saveWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String workflowConnectionKey,
-        @NonNull SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel) {
+        String workflowId, String workflowNodeName, String workflowConnectionKey, Long environmentId,
+        SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel) {
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey,
-            Objects.requireNonNull(saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId()));
+            saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId(), environmentId);
 
         return ResponseEntity.noContent()
             .build();
@@ -103,12 +103,12 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
 
     @Override
     public ResponseEntity<Void> saveWorkflowTestConfigurationInputs(
-        String workflowId,
+        String workflowId, Long environmentId,
         SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequestModel) {
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationInputs(
             workflowId, saveWorkflowTestConfigurationInputsRequestModel.getKey(),
-            saveWorkflowTestConfigurationInputsRequestModel.getValue());
+            saveWorkflowTestConfigurationInputsRequestModel.getValue(), environmentId);
 
         return ResponseEntity.noContent()
             .build();

@@ -63,7 +63,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
     @Override
     public ResponseEntity<WorkflowTestExecutionModel> testWorkflow(
-        String id, TestWorkflowRequestModel testWorkflowRequestModel) {
+        String id, Long environmentId, TestWorkflowRequestModel testWorkflowRequestModel) {
 
         Map<String, Object> inputs = testWorkflowRequestModel == null ? Map.of() : testWorkflowRequestModel.getInputs();
 
@@ -80,7 +80,8 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         }
 
         return ResponseEntity.ok(
-            conversionService.convert(workflowTestFacade.testWorkflow(id, inputs), WorkflowTestExecutionModel.class));
+            conversionService.convert(
+                workflowTestFacade.testWorkflow(id, inputs, environmentId), WorkflowTestExecutionModel.class));
     }
 
     private List<FileEntry> getFileEntries(Map<String, Object> trigger1) {

@@ -72,11 +72,11 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
 
     @Override
     public ResponseEntity<WorkflowNodeTestOutputModel> saveWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName) {
+        String workflowId, String workflowNodeName, Long environmentId) {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(workflowId, workflowNodeName),
+                workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(workflowId, workflowNodeName, environmentId),
                 WorkflowNodeTestOutputModel.class));
     }
 
@@ -86,8 +86,7 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
 
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                    workflowId, workflowNodeName, body),
+                workflowNodeTestOutputFacade.saveWorkflowNodeSampleOutput(workflowId, workflowNodeName, body),
                 WorkflowNodeTestOutputModel.class));
     }
 }

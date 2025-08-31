@@ -29,14 +29,16 @@ import org.springframework.stereotype.Repository;
 public interface WorkflowTestConfigurationConnectionRepository
     extends org.springframework.data.repository.Repository<WorkflowTestConfigurationConnection, Long> {
 
-    List<WorkflowTestConfigurationConnection> findByConnectionId(long connectionId);
+    List<WorkflowTestConfigurationConnection> findAllByConnectionId(long connectionId);
 
     @Query("""
             SELECT workflow_test_configuration_connection.* FROM workflow_test_configuration_connection
             JOIN workflow_test_configuration ON workflow_test_configuration_connection.workflow_test_configuration_id = workflow_test_configuration.id
             WHERE workflow_test_configuration.workflow_id = :workflowId
             AND workflow_test_configuration_connection.workflow_node_name = :workflowNodeName
+            AND workflow_test_configuration.environment = :environmentId
         """)
-    List<WorkflowTestConfigurationConnection> findByWorkflowIdAndWorkflowNodeName(
-        @Param("workflowId") String workflowId, @Param("workflowNodeName") String workflowNodeName);
+    List<WorkflowTestConfigurationConnection> findByWorkflowIdAndWorkflowNodeNameAndEnvironmentId(
+        @Param("workflowId") String workflowId, @Param("workflowNodeName") String workflowNodeName,
+        @Param("environmentId") long environmentId);
 }

@@ -75,14 +75,16 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
     }
 
     @SuppressWarnings("unchecked")
-    public WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs) {
+    public WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs, long environmentId) {
         Optional<WorkflowTestConfiguration> workflowTestConfigurationOptional =
-            workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId);
+            workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId);
 
         Map<String, Map<String, Long>> connectionIdsMap = new HashMap<>();
 
-        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections = OptionalUtils.mapOrElse(
-            workflowTestConfigurationOptional, WorkflowTestConfiguration::getConnections, List.of());
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
+            workflowTestConfigurationOptional
+                .map(WorkflowTestConfiguration::getConnections)
+                .orElse(List.of());
 
         for (WorkflowTestConfigurationConnection connection : workflowTestConfigurationConnections) {
             Map<String, Long> connectionIdMap = connectionIdsMap.computeIfAbsent(
@@ -108,7 +110,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
-                workflowId, workflowTrigger.getName());
+                workflowId, workflowTrigger.getName(), environmentId);
 
             Object sampleOutput = workflowNodeOutputDTO.getSampleOutput();
 

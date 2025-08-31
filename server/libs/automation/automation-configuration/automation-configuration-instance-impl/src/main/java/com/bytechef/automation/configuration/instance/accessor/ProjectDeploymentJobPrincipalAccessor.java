@@ -16,12 +16,14 @@
 
 package com.bytechef.automation.configuration.instance.accessor;
 
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -65,6 +67,15 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
         }
 
         return workflowEnabled;
+    }
+
+    @Override
+    public long getEnvironmentId(long jobPrincipalId) {
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(jobPrincipalId);
+
+        Environment environment = projectDeployment.getEnvironment();
+
+        return environment.ordinal();
     }
 
     @Override

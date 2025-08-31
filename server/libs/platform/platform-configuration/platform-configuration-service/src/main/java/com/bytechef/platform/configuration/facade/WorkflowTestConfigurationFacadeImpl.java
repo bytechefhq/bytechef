@@ -61,22 +61,23 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
     @Override
     public void removeUnusedWorkflowTestConfigurationConnections(Workflow workflow) {
-        workflowTestConfigurationService
-            .fetchWorkflowTestConfiguration(Validate.notNull(workflow.getId(), "id"))
-            .ifPresent(workflowTestConfiguration -> {
-                workflowTestConfiguration.setInputs(getInputs(workflow, workflowTestConfiguration));
+        List<WorkflowTestConfiguration> workflowTestConfigurations = workflowTestConfigurationService
+            .getWorkflowTestConfigurations(Validate.notNull(workflow.getId(), "id"));
 
-                List<ComponentConnection> taskComponentConnections = CollectionUtils.flatMap(
-                    workflow.getTasks(true), componentConnectionFacade::getComponentConnections);
-                List<ComponentConnection> triggerComponentConnections = CollectionUtils.flatMap(
-                    WorkflowTrigger.of(workflow), componentConnectionFacade::getComponentConnections);
+        for (WorkflowTestConfiguration workflowTestConfiguration : workflowTestConfigurations) {
+            workflowTestConfiguration.setInputs(getInputs(workflow, workflowTestConfiguration));
 
-                workflowTestConfiguration.setConnections(
-                    getWorkflowTestConfigurationConnections(
-                        taskComponentConnections, triggerComponentConnections, workflowTestConfiguration));
+            List<ComponentConnection> taskComponentConnections = CollectionUtils.flatMap(
+                workflow.getTasks(true), componentConnectionFacade::getComponentConnections);
+            List<ComponentConnection> triggerComponentConnections = CollectionUtils.flatMap(
+                WorkflowTrigger.of(workflow), componentConnectionFacade::getComponentConnections);
 
-                workflowTestConfigurationService.saveWorkflowTestConfiguration(workflowTestConfiguration);
-            });
+            workflowTestConfiguration.setConnections(
+                getWorkflowTestConfigurationConnections(
+                    taskComponentConnections, triggerComponentConnections, workflowTestConfiguration));
+
+            workflowTestConfigurationService.saveWorkflowTestConfiguration(workflowTestConfiguration);
+        }
     }
 
     @Override
@@ -93,7 +94,8 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
     @Override
     public void saveWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId) {
+        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
+        long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -103,14 +105,14 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
             .isPresent();
 
         workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, workflowConnectionKey, connectionId, workflowNodeTrigger);
+            workflowId, workflowNodeName, workflowConnectionKey, connectionId, workflowNodeTrigger, environmentId);
     }
 
     @Override
-    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value) {
+    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value, long environmentId) {
         Validate.notEmpty(key, "Missing required param: " + key);
 
-        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(workflowId, key, value);
+        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(workflowId, key, value, environmentId);
     }
 
     private static Map<String, String> getInputs(

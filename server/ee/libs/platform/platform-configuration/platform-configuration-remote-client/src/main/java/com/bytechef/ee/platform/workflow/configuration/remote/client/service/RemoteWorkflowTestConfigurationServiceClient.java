@@ -42,24 +42,36 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
     }
 
     @Override
+    public void delete(String workflowId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void delete(List<String> workflowIds) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId) {
+    public Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<Long> fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName) {
+    public Optional<Long> fetchWorkflowTestConfigurationConnectionId(
+        String workflowId, String workflowNodeName, long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
-        String workflowId, String workflowNodeName) {
+        String workflowId, String workflowNodeName, long environmentId) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<WorkflowTestConfiguration> getWorkflowTestConfigurations(String workflowId) {
         throw new UnsupportedOperationException();
     }
 
@@ -81,19 +93,20 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
     }
 
     @Override
-    public Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId) {
+    public Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId, long environmentId) {
         return null;
     }
 
     @Override
     public void saveWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String key, long connectionId, boolean workflowNodeTrigger) {
+        String workflowId, String workflowNodeName, String key, long connectionId, boolean workflowNodeTrigger,
+        long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value) {
+    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

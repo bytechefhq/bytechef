@@ -107,7 +107,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     public ClusterElementOutputDTO getClusterElementOutput(
-        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName) {
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
+        long environmentId) {
 
         ClusterElementOutputDTO clusterElementOutputDTO = null;
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -117,7 +118,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         for (WorkflowTask workflowTask : workflowTasks) {
             if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
                 clusterElementOutputDTO = getClusterElementOutputDTO(
-                    workflowId, workflowTask, clusterElementType, clusterElementWorkflowNodeName);
+                    workflowId, workflowTask, clusterElementType, clusterElementWorkflowNodeName, environmentId);
 
                 break;
             }
@@ -127,7 +128,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
-    public WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName) {
+    public WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName, long environmentId) {
         WorkflowNodeOutputDTO workflowNodeOutputDTO = null;
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -135,7 +136,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             if (Objects.equals(workflowTrigger.getName(), workflowNodeName)) {
-                workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTrigger);
+                workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTrigger, environmentId);
 
                 break;
             }
@@ -146,7 +147,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
             for (WorkflowTask workflowTask : workflowTasks) {
                 if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
-                    workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTask, null);
+                    workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTask, null, environmentId);
 
                     break;
                 }
@@ -158,14 +159,18 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     @Cacheable(value = PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE)
-    public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName) {
-        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName);
+    public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(
+        String workflowId, String lastWorkflowNodeName, long environmentId) {
+
+        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId);
     }
 
     @Override
     @Cacheable(value = PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE)
-    public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
-        return doGetPreviousWorkflowNodeSampleOutputs(workflowId, lastWorkflowNodeName);
+    public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(
+        String workflowId, String lastWorkflowNodeName, long environmentId) {
+
+        return doGetPreviousWorkflowNodeSampleOutputs(workflowId, lastWorkflowNodeName, environmentId);
     }
 
     @Override
@@ -250,7 +255,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private List<WorkflowNodeOutputDTO> doGetPreviousWorkflowNodeOutputs(
-        String workflowId, String lastWorkflowNodeName) {
+        String workflowId, String lastWorkflowNodeName, long environmentId) {
 
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
 
@@ -263,7 +268,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 break;
             }
 
-            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTrigger));
+            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTrigger, environmentId));
         }
 
         List<WorkflowTask> workflowTasks = workflow.getTasks(lastWorkflowNodeName);
@@ -284,18 +289,21 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     .toList();
 
                 if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
-                    workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, false));
+                    workflowNodeOutputDTOs.add(
+                        getWorkflowNodeOutputDTO(workflowId, workflowTask, false, environmentId));
                 }
             } else {
-                workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, true));
+                workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId));
             }
         }
 
         return workflowNodeOutputDTOs;
     }
 
-    private Map<String, ?> doGetPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
-        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
+    private Map<String, ?> doGetPreviousWorkflowNodeSampleOutputs(
+        String workflowId, String lastWorkflowNodeName, long environmentId) {
+
+        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId)
             .stream()
             .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.getSampleOutput() != null ||
                 workflowNodeOutputDTO.getVariableSampleOutput() != null)
@@ -313,7 +321,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     private ClusterElementOutputDTO getClusterElementOutputDTO(
         String workflowId, WorkflowTask workflowTask, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName) {
+        String clusterElementWorkflowNodeName, long environmentId) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
@@ -338,7 +346,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, clusterElementWorkflowNodeName)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
-            .or(() -> getClusterElementDynamicOutputResponse(workflowId, workflowTask, clusterElement))
+            .or(() -> getClusterElementDynamicOutputResponse(workflowId, workflowTask, clusterElement, environmentId))
             .orElse(null);
 
         if (outputResponse == null) {
@@ -350,21 +358,26 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @SuppressWarnings("unchecked")
     private Optional<OutputResponse> getClusterElementDynamicOutputResponse(
-        String workflowId, WorkflowTask workflowTask, ClusterElement clusterElement) {
+        String workflowId, WorkflowTask workflowTask, ClusterElement clusterElement, long environmentId) {
 
         OutputResponse outputResponse;
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
-        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
+        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(
+            workflowId, workflowTask.getName(), environmentId);
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
 
-        Map<String, Long> connectionIds = MapUtils.toMap(
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
             workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                workflowId, clusterElement.getWorkflowNodeName()),
+                workflowId, clusterElement.getWorkflowNodeName(), environmentId);
+
+        Map<String, Long> connectionIds = MapUtils.toMap(
+            workflowTestConfigurationConnections,
             WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
             WorkflowTestConfigurationConnection::getConnectionId);
 
@@ -377,7 +390,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
-        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput) {
+        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
@@ -405,7 +418,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         if (outputResponse == null) {
             if (workflowNodeType.operation() == null) {
                 WorkflowTaskDispatcherDynamicOutputResponse workflowTaskDispatcherDynamicOutputResponse =
-                    getWorkflowTaskDispatcherDynamicOutputResponse(workflowId, workflowTask, taskDispatcherOutput);
+                    getWorkflowTaskDispatcherDynamicOutputResponse(
+                        workflowId, workflowTask, taskDispatcherOutput, environmentId);
 
                 if (workflowTaskDispatcherDynamicOutputResponse == null) {
                     outputResponse = taskDispatcherDefinition.getOutputResponse();
@@ -418,7 +432,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 outputResponse = checkOutputSchemaIsFileEntryProperty(actionDefinition.getOutputResponse());
 
                 if (outputResponse == null) {
-                    outputResponse = getWorkflowTaskDynamicOutputResponse(workflowId, workflowTask);
+                    outputResponse = getWorkflowTaskDynamicOutputResponse(workflowId, workflowTask, environmentId);
                 }
             }
         } else {
@@ -437,7 +451,9 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             variableOutputResponse, workflowTask.getName());
     }
 
-    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTrigger workflowTrigger) {
+    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
+        String workflowId, WorkflowTrigger workflowTrigger, long environmentId) {
+
         boolean testoutputResponse = false;
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
@@ -450,7 +466,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
-            .or(() -> getWorkflowTriggerDynamicOutputResponse(workflowId, workflowTrigger))
+            .or(() -> getWorkflowTriggerDynamicOutputResponse(workflowId, workflowTrigger, environmentId))
             .orElse(null);
 
         if (outputResponse == null) {
@@ -466,8 +482,11 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @SuppressWarnings("unchecked")
-    private OutputResponse getWorkflowTaskDynamicOutputResponse(String workflowId, WorkflowTask workflowTask) {
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+    private OutputResponse getWorkflowTaskDynamicOutputResponse(
+        String workflowId, WorkflowTask workflowTask, long environmentId) {
+
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
         OutputResponse outputResponse;
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
@@ -478,14 +497,18 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             return null;
         }
 
-        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
+        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(
+            workflowId, workflowTask.getName(), environmentId);
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
 
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
+            workflowTestConfigurationService
+                .getWorkflowTestConfigurationConnections(workflowId, workflowTask.getName(), environmentId);
+
         Map<String, Long> connectionIds = MapUtils.toMap(
-            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                workflowId, workflowTask.getName()),
+            workflowTestConfigurationConnections,
             WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
             WorkflowTestConfigurationConnection::getConnectionId);
 
@@ -498,9 +521,10 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @SuppressWarnings("unchecked")
     private WorkflowTaskDispatcherDynamicOutputResponse getWorkflowTaskDispatcherDynamicOutputResponse(
-        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput) {
+        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId) {
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
         OutputResponse outputResponse = null;
         OutputResponse variableOutputResponse = null;
 
@@ -512,7 +536,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             return null;
         }
 
-        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
+        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(
+            workflowId, workflowTask.getName(), environmentId);
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
@@ -549,15 +574,16 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private Optional<OutputResponse> getWorkflowTriggerDynamicOutputResponse(
-        String workflowId, WorkflowTrigger workflowTrigger) {
+        String workflowId, WorkflowTrigger workflowTrigger, long environmentId) {
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
         Map<String, ?> inputParameters = workflowTrigger.evaluateParameters(inputs, evaluator);
 
         Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName())
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName(), environmentId)
             .orElse(null);
 
         return Optional.ofNullable(

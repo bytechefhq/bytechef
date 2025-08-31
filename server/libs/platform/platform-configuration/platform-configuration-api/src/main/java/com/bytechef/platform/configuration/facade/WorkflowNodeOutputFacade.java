@@ -30,13 +30,16 @@ public interface WorkflowNodeOutputFacade {
     String PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE = "WorkflowNodeOutputFacade.previousWorkflowNodeSampleOutputs";
 
     ClusterElementOutputDTO getClusterElementOutput(
-        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName);
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
+        long environmentId);
 
-    WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName);
+    WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName, long environmentId);
 
-    List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName);
+    List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(
+        String workflowId, String lastWorkflowNodeName, long environmentId);
 
-    Map<String, ?> getPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName);
+    Map<String, ?> getPreviousWorkflowNodeSampleOutputs(
+        String workflowId, String lastWorkflowNodeName, long environmentId);
 
     void checkWorkflowCache(String workflowId, String lastWorkflowNodeName);
 }

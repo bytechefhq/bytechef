@@ -47,25 +47,26 @@ public class WorkflowNodeDynamicPropertiesApiController implements WorkflowNodeD
     @Override
     public ResponseEntity<List<PropertyModel>> getClusterElementDynamicProperties(
         String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
-        String propertyName, List<String> lookupDependsOnPaths) {
+        String propertyName, Long environmentId, List<String> lookupDependsOnPaths) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
                 workflowNodeDynamicPropertiesFacade.getClusterElementDynamicProperties(
                     workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, propertyName,
-                    lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths),
+                    lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, environmentId),
                 property -> conversionService.convert(property, PropertyModel.class)));
     }
 
     @Override
     public ResponseEntity<List<PropertyModel>> getWorkflowNodeDynamicProperties(
-        String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths) {
+        String workflowId, String workflowNodeName, String propertyName, Long environmentId,
+        List<String> lookupDependsOnPaths) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
                 workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
                     workflowId, workflowNodeName, propertyName,
-                    lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths),
+                    lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, environmentId),
                 property -> conversionService.convert(property, PropertyModel.class)));
     }
 }

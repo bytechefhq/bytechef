@@ -42,13 +42,15 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     }
 
     @Override
-    public ScriptTestExecutionDTO testWorkflowNodeScript(String workflowId, String workflowNodeName) {
+    public ScriptTestExecutionDTO testWorkflowNodeScript(
+        String workflowId, String workflowNodeName, long environmentId) {
+
         ExecutionError executionError = null;
         WorkflowNodeTestOutput workflowNodeTestOutput = null;
 
         try {
             workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                workflowId, workflowNodeName);
+                workflowId, workflowNodeName, environmentId);
         } catch (Exception exception) {
             if (logger.isDebugEnabled()) {
                 logger.debug(exception.getMessage(), exception);

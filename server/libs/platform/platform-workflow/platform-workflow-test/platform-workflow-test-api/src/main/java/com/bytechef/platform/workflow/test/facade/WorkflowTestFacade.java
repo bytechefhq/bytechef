@@ -24,5 +24,5 @@ import java.util.Map;
  */
 public interface WorkflowTestFacade {
 
-    WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs);
+    WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs, long environmentId);
 }

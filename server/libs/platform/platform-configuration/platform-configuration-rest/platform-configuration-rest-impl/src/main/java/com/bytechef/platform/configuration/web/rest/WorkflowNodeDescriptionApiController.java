@@ -39,10 +39,10 @@ public class WorkflowNodeDescriptionApiController implements WorkflowNodeDescrip
 
     @Override
     public ResponseEntity<GetWorkflowNodeDescription200ResponseModel> getWorkflowNodeDescription(
-        String workflowId, String workflowNodeName) {
+        String workflowId, String workflowNodeName, Long environmentId) {
 
         return ResponseEntity.ok(
             new GetWorkflowNodeDescription200ResponseModel().description(
-                workflowNodeDescriptionFacade.getWorkflowNodeDescription(workflowId, workflowNodeName)));
+                workflowNodeDescriptionFacade.getWorkflowNodeDescription(workflowId, workflowNodeName, environmentId)));
     }
 }

@@ -29,7 +29,8 @@ public interface WorkflowTestConfigurationFacade {
     WorkflowTestConfiguration saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
     void saveWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId);
+        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
+        long environmentId);
 
-    void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value);
+    void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value, long environmentId);
 }

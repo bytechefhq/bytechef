@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -654,12 +655,12 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
             when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
                 .thenReturn(Map.of());
 
             // When
             DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(
-                workflowId, workflowNodeName);
+                workflowId, workflowNodeName, 0);
 
             // Then
             assertNotNull(result);
@@ -721,12 +722,12 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
             when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(clusterElementDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
                 .thenReturn(Map.of());
 
             // When
             DisplayConditionResultDTO result = workflowNodeParameterFacade.getClusterElementDisplayConditions(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName);
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, 0);
 
             // Then
             assertNotNull(result);
@@ -843,7 +844,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(actionDefinition.getProperties()).thenReturn((List) properties);
         when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(actionDefinition);
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -875,7 +876,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(
-                workflowId, workflowNodeName);
+                workflowId, workflowNodeName, 0);
 
             // Then
             assertNotNull(result);
@@ -898,7 +899,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(actionDefinition);
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -930,7 +931,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(
-                workflowId, workflowNodeName);
+                workflowId, workflowNodeName, 0);
 
             // Then
             assertNotNull(result);
@@ -951,7 +952,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(triggerDefinition);
 
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -981,7 +982,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(
-                workflowId, workflowNodeName);
+                workflowId, workflowNodeName, 0);
 
             // Then
             assertNotNull(result);
@@ -1036,12 +1037,12 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
             when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
                 .thenReturn(Map.of());
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata);
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1092,12 +1093,12 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
             when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
                 .thenReturn(Map.of());
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata);
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1122,7 +1123,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(actionDefinition);
 
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -1156,7 +1157,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata);
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1225,13 +1226,13 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
             when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(clusterElementDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
                 .thenReturn(Map.of());
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
-                parameterPath, value, type, includeInMetadata);
+                parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1260,7 +1261,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(actionDefinition);
 
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -1294,7 +1295,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata);
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1313,10 +1314,10 @@ public class WorkflowNodeParameterFacadeTest {
 
         when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(actionDefinition);
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
-        when(workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(anyString(), anyString()))
+        when(workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(anyString(), anyString(), anyLong()))
             .thenReturn(Map.of());
 
         // Mock evaluator to return proper boolean values
@@ -1363,7 +1364,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(
-                workflowId, workflowNodeName);
+                workflowId, workflowNodeName, 0);
 
             // Then
             assertNotNull(result);
@@ -1381,7 +1382,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(actionDefinition);
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -1413,7 +1414,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(
-                workflowId, workflowNodeName);
+                workflowId, workflowNodeName, 0);
 
             // Then
             assertNotNull(result);
@@ -1468,12 +1469,12 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
             when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
                 .thenReturn(Map.of());
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata);
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1544,13 +1545,13 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
             when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(clusterElementDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
                 .thenReturn(Map.of());
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
-                parameterPath, value, type, includeInMetadata);
+                parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1607,12 +1608,12 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
             when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
                 .thenReturn(Map.of());
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata);
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1636,7 +1637,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(triggerDefinition);
 
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -1669,7 +1670,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata);
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1723,12 +1724,12 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
             when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
                 .thenReturn(Map.of());
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata);
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1867,12 +1868,12 @@ public class WorkflowNodeParameterFacadeTest {
             when(actionDefinition.getProperties()).thenReturn(List.of());
             when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(any()))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(any(), anyLong()))
                 .thenReturn(Map.of());
 
             // When
             DisplayConditionResultDTO result =
-                workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(workflowId, workflowNodeName);
+                workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(workflowId, workflowNodeName, 0);
 
             // Then
             assertNotNull(result);
@@ -1935,7 +1936,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             DisplayConditionResultDTO result = workflowNodeParameterFacade.getClusterElementDisplayConditions(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName);
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, 0);
 
             // Then
             assertNotNull(result);
@@ -2003,13 +2004,13 @@ public class WorkflowNodeParameterFacadeTest {
             when(clusterElementDefinition.getProperties()).thenReturn(List.of());
             when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(clusterElementDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(any()))
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(any(), anyLong()))
                 .thenReturn(Map.of());
 
             // When
             UpdateParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
-                parameterPath, value, type, includeInMetadata);
+                parameterPath, value, type, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);

@@ -26,8 +26,10 @@ public interface WorkflowNodeDynamicPropertiesFacade {
 
     List<Property> getClusterElementDynamicProperties(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPath);
+        String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPath,
+        long environmentId);
 
     List<Property> getWorkflowNodeDynamicProperties(
-        String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths);
+        String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
+        long environmentId);
 }

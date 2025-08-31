@@ -25,9 +25,11 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
  */
 public interface WorkflowNodeTestOutputFacade {
 
-    WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName);
+    WorkflowNodeTestOutput saveWorkflowNodeSampleOutput(
+        String workflowId, String workflowNodeName, Object sampleOutput);
 
-    WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName, Object sampleOutput);
+    WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName, long environmentId);
 
-    void saveWorkflowNodeTestOutput(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    void saveWorkflowNodeTestOutput(
+        WorkflowExecutionId workflowExecutionId, long environmentId, WebhookRequest webhookRequest);
 }
