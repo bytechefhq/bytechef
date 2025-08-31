@@ -107,6 +107,6 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     private Environment getEnvironment(EnvironmentModel xEnvironment) {
-        return xEnvironment == null ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
+        return environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
     }
 }

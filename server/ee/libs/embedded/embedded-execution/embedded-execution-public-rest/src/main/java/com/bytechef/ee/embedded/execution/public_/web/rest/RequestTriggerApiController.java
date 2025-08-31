@@ -86,8 +86,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
 
     @Override
     public ResponseEntity<Object> executeWorkflow(String workflowReferenceCode, EnvironmentModel xEnvironment) {
-        Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
+        Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), environment);

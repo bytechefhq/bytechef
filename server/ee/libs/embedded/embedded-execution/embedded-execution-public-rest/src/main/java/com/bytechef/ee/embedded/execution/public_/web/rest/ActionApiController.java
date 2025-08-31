@@ -56,8 +56,7 @@ public class ActionApiController implements ActionApi {
         String externalUserId, String componentName, Integer componentVersion, String actionName,
         ExecuteActionRequestModel executeActionRequestModel, EnvironmentModel xEnvironment, Long xInstanceId) {
 
-        Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
+        Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
         Map<String, Object> inputParameters = new HashMap<>(executeActionRequestModel.getInput());
 

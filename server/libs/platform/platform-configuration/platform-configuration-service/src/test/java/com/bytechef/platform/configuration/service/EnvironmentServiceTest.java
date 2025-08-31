@@ -42,6 +42,7 @@ public class EnvironmentServiceTest {
         assertThat(environmentService.getEnvironment("development")).isEqualTo(Environment.DEVELOPMENT);
         assertThat(environmentService.getEnvironment("STAGING")).isEqualTo(Environment.STAGING);
         assertThat(environmentService.getEnvironment("Production")).isEqualTo(Environment.PRODUCTION);
+        assertThat(environmentService.getEnvironment(null)).isEqualTo(Environment.PRODUCTION);
     }
 
     @Test

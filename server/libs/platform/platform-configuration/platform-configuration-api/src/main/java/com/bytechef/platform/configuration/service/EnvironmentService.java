@@ -38,7 +38,7 @@ public interface EnvironmentService {
      */
     default Environment getEnvironment(String name) {
         if (name == null) {
-            throw new IllegalArgumentException("Environment name must not be null");
+            return Environment.PRODUCTION;
         }
 
         for (Environment environment : Environment.values()) {
