@@ -1,3 +1,4 @@
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
@@ -27,6 +28,7 @@ export function WorkflowTestChatRuntimeProvider({
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {setWorkflowIsRunning, setWorkflowTestExecution} = useWorkflowEditorStore(
         useShallow((state) => ({
             setWorkflowIsRunning: state.setWorkflowIsRunning,
@@ -55,6 +57,7 @@ export function WorkflowTestChatRuntimeProvider({
 
         const workflowTestExecution = await workflowTestApi
             .testWorkflow({
+                environmentId: currentEnvironmentId,
                 id: workflow.id!,
                 testWorkflowRequest: {
                     inputs: {

@@ -4,6 +4,7 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
 import {
     ActionDefinition,
@@ -131,6 +132,8 @@ const WorkflowNodeDetailsPanel = ({
         []
     );
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
     const {
         activeTab,
         currentComponent,
@@ -181,6 +184,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery(
         {
+            environmentId: currentEnvironmentId,
             workflowId: workflow.id as string,
             workflowNodeName: currentNode?.workflowNodeName as string,
         },
@@ -336,6 +340,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const displayConditionsQuery = useGetWorkflowNodeParameterDisplayConditionsQuery(
         {
+            environmentId: currentEnvironmentId,
             id: workflow.id!,
             workflowNodeName: currentNodeName!,
         },

@@ -2,6 +2,7 @@ import {MultiSelect, MultiSelectOptionType} from '@/components/MultiSelect/Multi
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {OptionsDataSource} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {PropertyAllType} from '@/shared/types';
@@ -46,6 +47,7 @@ const PropertyMultiSelect = ({
     value,
     workflowId,
 }: PropertyMultiSelectProps) => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
     const {description, label, name, placeholder, required} = property;
@@ -65,13 +67,14 @@ const PropertyMultiSelect = ({
         () => ({
             loadDependencyValueKey: lookupDependsOnValuesKey,
             request: {
+                environmentId: currentEnvironmentId,
                 id: workflowId,
                 lookupDependsOnPaths,
                 propertyName: path!,
                 workflowNodeName: workflowNodeName!,
             },
         }),
-        [lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
+        [currentEnvironmentId, lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
     );
 
     const queryEnabled = useMemo(

@@ -1,5 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
@@ -24,6 +25,8 @@ const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
     workflowTestConfigurationConnection,
 }: PropertyCodeEditorSheetRightPanelConnectionsSelectProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
+
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {
         ConnectionKeys,
@@ -69,6 +72,7 @@ const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
 
     const handleValueChange = (connectionId: number, workflowConnectionKey: string) => {
         saveWorkflowTestConfigurationConnectionMutation.mutate({
+            environmentId: currentEnvironmentId,
             saveWorkflowTestConfigurationConnectionRequest: {
                 connectionId,
             },

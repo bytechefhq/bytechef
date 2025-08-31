@@ -1,10 +1,14 @@
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useMemo} from 'react';
 
 export const useRun = () => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({
+        environmentId: currentEnvironmentId,
         workflowId: workflow.id!,
     });
 

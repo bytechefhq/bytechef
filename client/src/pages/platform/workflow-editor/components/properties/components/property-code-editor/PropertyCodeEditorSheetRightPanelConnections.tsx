@@ -1,5 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import PropertyCodeEditorSheetRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsLabel';
 import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
     connectionFormSchema,
@@ -36,6 +37,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
             showConnectionNote: state.showConnectionNote,
         }))
     );
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {
         ConnectionKeys,
@@ -48,6 +50,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
+        environmentId: currentEnvironmentId,
         workflowId: workflow.id!,
         workflowNodeName,
     });

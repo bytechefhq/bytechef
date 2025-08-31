@@ -38,6 +38,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
     const [hasIcons, setHasIcons] = useState(false);
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentNode: state.currentNode,
@@ -99,6 +100,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
+            environmentId: currentEnvironmentId,
             id: workflow.id!,
             workflowNodeName: hoveredNodeName!,
         },

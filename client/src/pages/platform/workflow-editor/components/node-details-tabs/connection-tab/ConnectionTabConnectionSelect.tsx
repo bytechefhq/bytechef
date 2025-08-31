@@ -2,6 +2,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -44,6 +45,7 @@ const ConnectionTabConnectionSelect = ({
     const [currentConnection, setCurrentConnection] = useState<ConnectionI>();
     const [showConnectionDialog, setShowConnectionDialog] = useState<boolean>(false);
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {connectionDialogAllowed, currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
         useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
@@ -103,6 +105,7 @@ const ConnectionTabConnectionSelect = ({
             }
 
             saveWorkflowTestConfigurationConnectionMutation.mutate({
+                environmentId: currentEnvironmentId,
                 saveWorkflowTestConfigurationConnectionRequest: {
                     connectionId,
                 },
@@ -131,6 +134,7 @@ const ConnectionTabConnectionSelect = ({
         },
         [
             currentComponent,
+            currentEnvironmentId,
             currentNode,
             queryClient,
             saveWorkflowTestConfigurationConnectionMutation,

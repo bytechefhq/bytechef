@@ -1,3 +1,4 @@
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -24,6 +25,7 @@ export default function handleComponentAddedSuccess({
 
     queryClient.invalidateQueries({
         queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+            environmentId: useEnvironmentStore.getState().currentEnvironmentId,
             id: workflow.id!,
             lastWorkflowNodeName: currentNode?.name,
         }),

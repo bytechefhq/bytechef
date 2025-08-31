@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -36,6 +37,8 @@ const WorkflowCodeEditorSheetContent = ({
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
     const {updateWorkflowMutation} = useWorkflowEditor();
 
     const handleRunClick = () => {
@@ -45,6 +48,7 @@ const WorkflowCodeEditorSheetContent = ({
         if (workflow?.id) {
             workflowTestApi
                 .testWorkflow({
+                    environmentId: currentEnvironmentId,
                     id: workflow?.id,
                 })
                 .then((workflowTestExecution) => {

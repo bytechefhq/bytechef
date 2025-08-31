@@ -1,3 +1,4 @@
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
@@ -22,6 +23,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         }))
     );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore(
         useShallow((state) => ({
             rightSidebarOpen: state.rightSidebarOpen,
@@ -99,6 +101,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
 
     const {data: workflowNodeOutputs, isPending: isWorkflowNodeOutputsPending} = useGetPreviousWorkflowNodeOutputsQuery(
         {
+            environmentId: currentEnvironmentId,
             id: workflow.id!,
             lastWorkflowNodeName: currentNode?.name,
         },
