@@ -46,8 +46,7 @@ public class ToolApiController implements ToolApi {
         String externalUserId, ExecuteToolRequestModel executeToolRequestModel, EnvironmentModel xEnvironment,
         Long xInstanceId) {
 
-        Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
+        Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
         return ResponseEntity.ok(
             toolFacade.executeTool(
@@ -60,8 +59,7 @@ public class ToolApiController implements ToolApi {
         String externalUserId, EnvironmentModel xEnvironment, List<String> categories, List<String> components,
         List<String> tools) {
 
-        Environment environment = xEnvironment == null
-            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
+        Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
         return ResponseEntity.ok(
             toolFacade
