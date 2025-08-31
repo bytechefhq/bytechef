@@ -2,6 +2,7 @@ apis/ActionDefinitionApi.ts
 apis/ClusterElementDefinitionApi.ts
 apis/ComponentDefinitionApi.ts
 apis/ConnectionDefinitionApi.ts
+apis/EnvironmentApi.ts
 apis/NotificationApi.ts
 apis/NotificationEventApi.ts
 apis/Oauth2Api.ts

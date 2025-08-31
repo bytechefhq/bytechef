@@ -28,6 +28,7 @@ export interface GetClusterElementDynamicPropertiesRequest {
     clusterElementType: string;
     clusterElementWorkflowNodeName: string;
     propertyName: string;
+    environmentId: number;
     lookupDependsOnPaths?: Array<string>;
 }
 
@@ -35,6 +36,7 @@ export interface GetWorkflowNodeDynamicPropertiesRequest {
     id: string;
     workflowNodeName: string;
     propertyName: string;
+    environmentId: number;
     lookupDependsOnPaths?: Array<string>;
 }
 
@@ -83,10 +85,21 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getClusterElementDynamicProperties().'
+            );
+        }
+
         const queryParameters: any = {};
 
         if (requestParameters['lookupDependsOnPaths'] != null) {
             queryParameters['lookupDependsOnPaths'] = requestParameters['lookupDependsOnPaths'];
+        }
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -144,10 +157,21 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getWorkflowNodeDynamicProperties().'
+            );
+        }
+
         const queryParameters: any = {};
 
         if (requestParameters['lookupDependsOnPaths'] != null) {
             queryParameters['lookupDependsOnPaths'] = requestParameters['lookupDependsOnPaths'];
+        }
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

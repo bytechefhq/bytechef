@@ -13,13 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Environment } from './Environment';
-import {
-    EnvironmentFromJSON,
-    EnvironmentFromJSONTyped,
-    EnvironmentToJSON,
-    EnvironmentToJSONTyped,
-} from './Environment';
 import type { AuthorizationType } from './AuthorizationType';
 import {
     AuthorizationTypeFromJSON,
@@ -59,11 +52,11 @@ export interface IntegrationInstanceConfigurationBasic {
      */
     enabled?: boolean;
     /**
-     * 
-     * @type {Environment}
+     * The id of an environment.
+     * @type {number}
      * @memberof IntegrationInstanceConfigurationBasic
      */
-    environment?: Environment;
+    environmentId?: number;
     /**
      * The id of an integration instance configuration.
      * @type {number}
@@ -132,7 +125,7 @@ export function IntegrationInstanceConfigurationBasicFromJSONTyped(json: any, ig
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
-        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
+        'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
         'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
@@ -156,7 +149,7 @@ export function IntegrationInstanceConfigurationBasicToJSONTyped(value?: Omit<In
         
         'description': value['description'],
         'enabled': value['enabled'],
-        'environment': EnvironmentToJSON(value['environment']),
+        'environmentId': value['environmentId'],
         'integrationId': value['integrationId'],
         'integrationVersion': value['integrationVersion'],
         'name': value['name'],

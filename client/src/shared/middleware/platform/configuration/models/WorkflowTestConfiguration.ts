@@ -28,6 +28,12 @@ import {
  */
 export interface WorkflowTestConfiguration {
     /**
+     * The connections used by workflow test.
+     * @type {Array<WorkflowTestConfigurationConnection>}
+     * @memberof WorkflowTestConfiguration
+     */
+    connections?: Array<WorkflowTestConfigurationConnection>;
+    /**
      * The created by.
      * @type {string}
      * @memberof WorkflowTestConfiguration
@@ -40,17 +46,17 @@ export interface WorkflowTestConfiguration {
      */
     readonly createdDate?: Date;
     /**
+     * The id of an environment.
+     * @type {number}
+     * @memberof WorkflowTestConfiguration
+     */
+    environmentId: number;
+    /**
      * The input parameters used as workflow input values.
      * @type {{ [key: string]: string; }}
      * @memberof WorkflowTestConfiguration
      */
     inputs?: { [key: string]: string; };
-    /**
-     * The connections used by workflow test.
-     * @type {Array<WorkflowTestConfigurationConnection>}
-     * @memberof WorkflowTestConfiguration
-     */
-    connections?: Array<WorkflowTestConfigurationConnection>;
     /**
      * The last modified by.
      * @type {string}
@@ -81,6 +87,7 @@ export interface WorkflowTestConfiguration {
  * Check if a given object implements the WorkflowTestConfiguration interface.
  */
 export function instanceOfWorkflowTestConfiguration(value: object): value is WorkflowTestConfiguration {
+    if (!('environmentId' in value) || value['environmentId'] === undefined) return false;
     return true;
 }
 
@@ -94,10 +101,11 @@ export function WorkflowTestConfigurationFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
+        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowTestConfigurationConnectionFromJSON)),
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'environmentId': json['environmentId'],
         'inputs': json['inputs'] == null ? undefined : json['inputs'],
-        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowTestConfigurationConnectionFromJSON)),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
@@ -116,8 +124,9 @@ export function WorkflowTestConfigurationToJSONTyped(value?: Omit<WorkflowTestCo
 
     return {
         
-        'inputs': value['inputs'],
         'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(WorkflowTestConfigurationConnectionToJSON)),
+        'environmentId': value['environmentId'],
+        'inputs': value['inputs'],
         '__version': value['version'],
     };
 }

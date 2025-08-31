@@ -53,37 +53,42 @@ export interface WorkflowExecutionBasic {
      * @type {number}
      * @memberof WorkflowExecutionBasic
      */
-    readonly id?: number;
+    readonly id: number;
     /**
      * 
      * @type {ProjectBasic}
      * @memberof WorkflowExecutionBasic
      */
-    project?: ProjectBasic;
+    project: ProjectBasic;
     /**
      * 
      * @type {ProjectDeploymentBasic}
      * @memberof WorkflowExecutionBasic
      */
-    projectDeployment?: ProjectDeploymentBasic;
+    projectDeployment: ProjectDeploymentBasic;
     /**
      * 
      * @type {JobBasic}
      * @memberof WorkflowExecutionBasic
      */
-    job?: JobBasic;
+    job: JobBasic;
     /**
      * 
      * @type {WorkflowBasic}
      * @memberof WorkflowExecutionBasic
      */
-    workflow?: WorkflowBasic;
+    workflow: WorkflowBasic;
 }
 
 /**
  * Check if a given object implements the WorkflowExecutionBasic interface.
  */
 export function instanceOfWorkflowExecutionBasic(value: object): value is WorkflowExecutionBasic {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('project' in value) || value['project'] === undefined) return false;
+    if (!('projectDeployment' in value) || value['projectDeployment'] === undefined) return false;
+    if (!('job' in value) || value['job'] === undefined) return false;
+    if (!('workflow' in value) || value['workflow'] === undefined) return false;
     return true;
 }
 
@@ -97,11 +102,11 @@ export function WorkflowExecutionBasicFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
-        'id': json['id'] == null ? undefined : json['id'],
-        'project': json['project'] == null ? undefined : ProjectBasicFromJSON(json['project']),
-        'projectDeployment': json['projectDeployment'] == null ? undefined : ProjectDeploymentBasicFromJSON(json['projectDeployment']),
-        'job': json['job'] == null ? undefined : JobBasicFromJSON(json['job']),
-        'workflow': json['workflow'] == null ? undefined : WorkflowBasicFromJSON(json['workflow']),
+        'id': json['id'],
+        'project': ProjectBasicFromJSON(json['project']),
+        'projectDeployment': ProjectDeploymentBasicFromJSON(json['projectDeployment']),
+        'job': JobBasicFromJSON(json['job']),
+        'workflow': WorkflowBasicFromJSON(json['workflow']),
     };
 }
 

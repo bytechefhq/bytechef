@@ -17,7 +17,6 @@ import * as runtime from '../runtime';
 import type {
   ConnectedUser,
   CredentialStatus,
-  Environment,
   Page,
 } from '../models/index';
 import {
@@ -25,8 +24,6 @@ import {
     ConnectedUserToJSON,
     CredentialStatusFromJSON,
     CredentialStatusToJSON,
-    EnvironmentFromJSON,
-    EnvironmentToJSON,
     PageFromJSON,
     PageToJSON,
 } from '../models/index';
@@ -45,7 +42,7 @@ export interface GetConnectedUserRequest {
 }
 
 export interface GetConnectedUsersRequest {
-    environment?: Environment;
+    environmentId?: number;
     credentialStatus?: CredentialStatus;
     createDateFrom?: Date;
     createDateTo?: Date;
@@ -189,8 +186,8 @@ export class ConnectedUserApi extends runtime.BaseAPI {
     async getConnectedUsersRaw(requestParameters: GetConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
         const queryParameters: any = {};
 
-        if (requestParameters['environment'] != null) {
-            queryParameters['environment'] = requestParameters['environment'];
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         if (requestParameters['credentialStatus'] != null) {

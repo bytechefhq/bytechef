@@ -16,15 +16,12 @@
 import * as runtime from '../runtime';
 import type {
   CreateProjectDeploymentWorkflowJob200Response,
-  Environment,
   ProjectDeployment,
   ProjectDeploymentWorkflow,
 } from '../models/index';
 import {
     CreateProjectDeploymentWorkflowJob200ResponseFromJSON,
     CreateProjectDeploymentWorkflowJob200ResponseToJSON,
-    EnvironmentFromJSON,
-    EnvironmentToJSON,
     ProjectDeploymentFromJSON,
     ProjectDeploymentToJSON,
     ProjectDeploymentWorkflowFromJSON,
@@ -61,7 +58,7 @@ export interface GetProjectDeploymentRequest {
 
 export interface GetWorkspaceProjectDeploymentsRequest {
     id: number;
-    environment?: Environment;
+    environmentId?: number;
     projectId?: number;
     tagId?: number;
     includeAllFields?: boolean;
@@ -366,8 +363,8 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
-        if (requestParameters['environment'] != null) {
-            queryParameters['environment'] = requestParameters['environment'];
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         if (requestParameters['projectId'] != null) {

@@ -24,10 +24,12 @@ import {
 
 export interface StartWebhookTriggerTestRequest {
     workflowId: string;
+    environmentId: number;
 }
 
 export interface StopWebhookTriggerTestRequest {
     workflowId: string;
+    environmentId: number;
 }
 
 /**
@@ -47,7 +49,18 @@ export class WebhookTriggerTestApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling startWebhookTriggerTest().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -86,7 +99,18 @@ export class WebhookTriggerTestApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling stopWebhookTriggerTest().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

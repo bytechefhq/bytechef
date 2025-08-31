@@ -27,6 +27,7 @@ import {
 
 export interface TestWorkflowOperationRequest {
     id: string;
+    environmentId: number;
     testWorkflowRequest?: TestWorkflowRequest;
 }
 
@@ -47,7 +48,18 @@ export class WorkflowTestApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling testWorkflow().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

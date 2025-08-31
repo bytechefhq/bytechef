@@ -12,28 +12,33 @@
  * Do not edit the class manually.
  */
 
+import { mapValues } from '../runtime';
+/**
+ * The environment.
+ * @export
+ * @interface Environment
+ */
+export interface Environment {
+    /**
+     * The environment id.
+     * @type {number}
+     * @memberof Environment
+     */
+    id?: number;
+    /**
+     * The environment name.
+     * @type {string}
+     * @memberof Environment
+     */
+    name: string;
+}
 
 /**
- * The environment of a project.
- * @export
+ * Check if a given object implements the Environment interface.
  */
-export const Environment = {
-    Development: 'DEVELOPMENT',
-    Staging: 'STAGING',
-    Production: 'PRODUCTION'
-} as const;
-export type Environment = typeof Environment[keyof typeof Environment];
-
-
-export function instanceOfEnvironment(value: any): boolean {
-    for (const key in Environment) {
-        if (Object.prototype.hasOwnProperty.call(Environment, key)) {
-            if (Environment[key as keyof typeof Environment] === value) {
-                return true;
-            }
-        }
-    }
-    return false;
+export function instanceOfEnvironment(value: object): value is Environment {
+    if (!('name' in value) || value['name'] === undefined) return false;
+    return true;
 }
 
 export function EnvironmentFromJSON(json: any): Environment {
@@ -41,14 +46,29 @@ export function EnvironmentFromJSON(json: any): Environment {
 }
 
 export function EnvironmentFromJSONTyped(json: any, ignoreDiscriminator: boolean): Environment {
-    return json as Environment;
+    if (json == null) {
+        return json;
+    }
+    return {
+        
+        'id': json['id'] == null ? undefined : json['id'],
+        'name': json['name'],
+    };
 }
 
-export function EnvironmentToJSON(value?: Environment | null): any {
-    return value as any;
+export function EnvironmentToJSON(json: any): Environment {
+    return EnvironmentToJSONTyped(json, false);
 }
 
-export function EnvironmentToJSONTyped(value: any, ignoreDiscriminator: boolean): Environment {
-    return value as Environment;
+export function EnvironmentToJSONTyped(value?: Environment | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
+    }
+
+    return {
+        
+        'id': value['id'],
+        'name': value['name'],
+    };
 }
 

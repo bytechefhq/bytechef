@@ -4,7 +4,6 @@ index.ts
 models/ConnectedUser.ts
 models/ConnectedUserIntegrationInstance.ts
 models/CredentialStatus.ts
-models/Environment.ts
 models/Page.ts
 models/index.ts
 runtime.ts

@@ -24,13 +24,14 @@ export interface SaveWorkflowTestConfigurationConnectionRequest {
      * @type {number}
      * @memberof SaveWorkflowTestConfigurationConnectionRequest
      */
-    connectionId?: number;
+    connectionId: number;
 }
 
 /**
  * Check if a given object implements the SaveWorkflowTestConfigurationConnectionRequest interface.
  */
 export function instanceOfSaveWorkflowTestConfigurationConnectionRequest(value: object): value is SaveWorkflowTestConfigurationConnectionRequest {
+    if (!('connectionId' in value) || value['connectionId'] === undefined) return false;
     return true;
 }
 
@@ -44,7 +45,7 @@ export function SaveWorkflowTestConfigurationConnectionRequestFromJSONTyped(json
     }
     return {
         
-        'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
+        'connectionId': json['connectionId'],
     };
 }
 

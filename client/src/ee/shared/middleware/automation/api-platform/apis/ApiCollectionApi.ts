@@ -16,13 +16,10 @@
 import * as runtime from '../runtime';
 import type {
   ApiCollection,
-  Environment,
 } from '../models/index';
 import {
     ApiCollectionFromJSON,
     ApiCollectionToJSON,
-    EnvironmentFromJSON,
-    EnvironmentToJSON,
 } from '../models/index';
 
 export interface CreateApiCollectionRequest {
@@ -39,7 +36,7 @@ export interface GetApiCollectionRequest {
 
 export interface GetWorkspaceApiCollectionsRequest {
     id: number;
-    environment?: Environment;
+    environmentId?: number;
     projectId?: number;
     tagId?: number;
 }
@@ -186,8 +183,8 @@ export class ApiCollectionApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
-        if (requestParameters['environment'] != null) {
-            queryParameters['environment'] = requestParameters['environment'];
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         if (requestParameters['projectId'] != null) {
