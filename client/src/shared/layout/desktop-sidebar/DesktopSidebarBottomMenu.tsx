@@ -77,6 +77,12 @@ const DesktopSidebarBottomMenu = () => {
 
     const handleEnvironmentValueChange = (value: string) => {
         setCurrentEnvironmentId(+value);
+
+        if (currentType === ModeType.AUTOMATION) {
+            navigate('/automation');
+        } else if (currentType === ModeType.EMBEDDED) {
+            navigate('/embedded');
+        }
     };
 
     const handleWorkspaceValueChange = (value: string) => {
