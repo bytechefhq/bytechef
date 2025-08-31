@@ -23,6 +23,13 @@ paths:
           schema:
             type: "string"
           required: true
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:
