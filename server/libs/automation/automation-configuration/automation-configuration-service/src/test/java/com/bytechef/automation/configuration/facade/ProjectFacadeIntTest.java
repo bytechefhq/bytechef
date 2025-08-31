@@ -117,6 +117,11 @@ public class ProjectFacadeIntTest {
     public void afterEach() {
         projectWorkflowRepository.deleteAll();
         projectRepository.deleteAll();
+
+        // Clean up workflow records by finding all and deleting individually
+        workflowRepository.findAll()
+            .forEach(workflow -> workflowRepository.deleteById(workflow.getId()));
+
         workspaceRepository.deleteAll();
 
         categoryRepository.deleteAll();
@@ -166,20 +171,68 @@ public class ProjectFacadeIntTest {
     @Test
     public void testDelete() {
         ProjectDTO projectDTO1 = projectFacadeInstanceHelper.createProject(workspace.getId());
-
         ProjectDTO projectDTO2 = projectFacadeInstanceHelper.createProject(workspace.getId());
 
+        // Add workflows to both projects to test workflow deletion cascade
+        ProjectWorkflowDTO projectWorkflowDTO1 = projectFacadeInstanceHelper.addTestWorkflow(projectDTO1);
+        ProjectWorkflowDTO projectWorkflowDTO2 = projectFacadeInstanceHelper.addTestWorkflow(projectDTO2);
+
+        // Extract workflow IDs and project workflow IDs for specific verification
+        String workflowId1 = projectWorkflowDTO1.getId();
+        String workflowId2 = projectWorkflowDTO2.getId();
+
+        Long projectWorkflowId1 = projectWorkflowDTO1.getProjectWorkflowId();
+        Long projectWorkflowId2 = projectWorkflowDTO2.getProjectWorkflowId();
+
+        // Verify initial state - both workflow and project_workflow tables have records
         assertThat(projectRepository.count()).isEqualTo(2);
         assertThat(tagRepository.count()).isEqualTo(6);
+        assertThat(workflowRepository.findAll()
+            .size()).isEqualTo(2);
+        assertThat(projectWorkflowRepository.count()).isEqualTo(2);
 
+        // Verify specific workflow records exist in workflow table
+        assertThat(workflowRepository.findById(workflowId1)).isPresent();
+        assertThat(workflowRepository.findById(workflowId2)).isPresent();
+
+        // Verify specific project workflow records exist in project_workflow table
+        assertThat(projectWorkflowRepository.findById(projectWorkflowId1)).isPresent();
+        assertThat(projectWorkflowRepository.findById(projectWorkflowId2)).isPresent();
+
+        // Delete first project and verify specific workflow records are deleted from both tables
         projectFacade.deleteProject(projectDTO1.id());
 
         assertThat(projectRepository.count()).isEqualTo(1);
+        assertThat(workflowRepository.findAll()
+            .size()).isEqualTo(1);
+        assertThat(projectWorkflowRepository.count()).isEqualTo(1);
 
+        // Verify specific records for project1 are deleted from workflow table
+        assertThat(workflowRepository.findById(workflowId1)).isEmpty();
+        // Verify project2 workflow record still exists in workflow table
+        assertThat(workflowRepository.findById(workflowId2)).isPresent();
+
+        // Verify specific records for project1 are deleted from project_workflow table
+        assertThat(projectWorkflowRepository.findById(projectWorkflowId1)).isEmpty();
+        // Verify project2 project workflow record still exists in project_workflow table
+        assertThat(projectWorkflowRepository.findById(projectWorkflowId2)).isPresent();
+
+        // Delete second project and verify all records are cleaned up from both tables
         projectFacade.deleteProject(projectDTO2.id());
 
         assertThat(projectRepository.count()).isEqualTo(0);
-        assertThat(tagRepository.count()).isEqualTo(6);
+        assertThat(tagRepository.count()).isEqualTo(6); // Tags are not deleted
+        assertThat(workflowRepository.findAll()
+            .size()).isEqualTo(0);
+        assertThat(projectWorkflowRepository.count()).isEqualTo(0);
+
+        // Verify all specific workflow records are deleted from workflow table
+        assertThat(workflowRepository.findById(workflowId1)).isEmpty();
+        assertThat(workflowRepository.findById(workflowId2)).isEmpty();
+
+        // Verify all specific project workflow records are deleted from project_workflow table
+        assertThat(projectWorkflowRepository.findById(projectWorkflowId1)).isEmpty();
+        assertThat(projectWorkflowRepository.findById(projectWorkflowId2)).isEmpty();
     }
 
     @Test
