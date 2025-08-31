@@ -638,6 +638,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "Successful operation."
@@ -685,6 +692,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:
@@ -725,11 +739,20 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:
             schema:
               type: "object"
+              required:
+                - "connectionId"
               properties:
                 connectionId:
                   type: "integer"
@@ -758,6 +781,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "Successful operation."
@@ -787,6 +817,13 @@ paths:
           required: false
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "Successful operation."
@@ -828,6 +865,13 @@ paths:
           in: "path"
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The workflow node parameter display conditions."
@@ -890,6 +934,13 @@ paths:
             type: "array"
             items:
               type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of options."
@@ -950,6 +1001,13 @@ paths:
           in: "query"
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of options."
@@ -991,6 +1049,13 @@ paths:
           in: "path"
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "Successful operation."
@@ -1084,6 +1149,13 @@ paths:
           in: "path"
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:
@@ -1152,6 +1224,13 @@ paths:
           in: "path"
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The editor description."
@@ -1182,6 +1261,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The workflow node parameter display conditions."
@@ -1232,6 +1318,13 @@ paths:
             type: "array"
             items:
               type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of options."
@@ -1280,6 +1373,13 @@ paths:
           in: "query"
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of options."
@@ -1309,6 +1409,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "Successful operation."
@@ -1378,6 +1485,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:
@@ -1446,6 +1560,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The script test execution object."
@@ -1495,6 +1616,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The workflow node test output object."
@@ -3028,8 +3156,14 @@ components:
       description: "Contains configuration and connections required for the test execution of a particular workflow."
       type: "object"
       required:
+        - "environmentId"
         - "name"
       properties:
+        connections:
+          description: "The connections used by workflow test."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
         createdBy:
           description: "The created by."
           type: "string"
@@ -3039,17 +3173,16 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        environmentId:
+          description: "The id of an environment."
+          type: "integer"
+          format: "int64"
         inputs:
           description: "The input parameters used as workflow\
             \ input values."
           type: "object"
           additionalProperties:
             type: "string"
-        connections:
-          description: "The connections used by workflow test."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
         lastModifiedBy:
           description: "The last modified by."
           type: "string"

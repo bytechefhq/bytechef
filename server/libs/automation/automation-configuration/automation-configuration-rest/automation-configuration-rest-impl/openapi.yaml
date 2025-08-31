@@ -807,6 +807,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "Returns the webhook URL."
@@ -832,6 +839,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "204":
           description: "Successful operation."
