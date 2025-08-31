@@ -1,9 +1,9 @@
-query connectedUserProjects($connectedUserId: ID, $environment: EnvironmentEnum) {
-    connectedUserProjects(connectedUserId: $connectedUserId, environment: $environment) {
+query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
+    connectedUserProjects(connectedUserId: $connectedUserId, environmentId: $environmentId) {
         id
         connectedUser {
             id,
-            environment
+            environmentId
             externalId
         }
         connectedUserProjectWorkflows {
@@ -19,7 +19,7 @@ query connectedUserProjects($connectedUserId: ID, $environment: EnvironmentEnum)
                 label
             }
         }
-        environment
+        environmentId
         lastExecutionDate
         projectId
         projectVersion

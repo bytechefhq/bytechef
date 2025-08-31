@@ -14,7 +14,7 @@ type McpServer {
     id: ID!
     name: String!
     type: ModeType!
-    environment: EnvironmentEnum!
+    environmentId: ID!
     enabled: Boolean!
     mcpComponents: [McpComponent]
     tags: [Tag]
@@ -28,7 +28,7 @@ type McpServer {
 input McpServerInput {
     name: String!
     type: ModeType!
-    environment: EnvironmentEnum!
+    environmentId: ID!
     enabled: Boolean
 }
 
