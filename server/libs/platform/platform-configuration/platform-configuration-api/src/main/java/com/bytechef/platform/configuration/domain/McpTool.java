@@ -72,6 +72,11 @@ public final class McpTool {
     public McpTool() {
     }
 
+    public McpTool(String name, Map<String, String> parameters) {
+        this.name = name;
+        this.parameters = new MapWrapper(parameters);
+    }
+
     public McpTool(String name, Map<String, String> parameters, long mcpComponentId) {
         this.name = name;
         this.parameters = new MapWrapper(parameters);

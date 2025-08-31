@@ -100,8 +100,7 @@ public class McpServerFacadeIntTest {
     public void testCreateMcpComponentWithTools() {
         McpComponent mcpComponent = getMcpComponent();
 
-        List<McpTool> mcpTools = List.of(
-            getMcpTool("tool1", mcpComponent.getId()), getMcpTool("tool2", mcpComponent.getId()));
+        List<McpTool> mcpTools = List.of(getMcpTool("tool1"), getMcpTool("tool2"));
 
         McpComponent createdComponent = mcpServerFacade.create(mcpComponent, mcpTools);
 
@@ -239,6 +238,10 @@ public class McpServerFacadeIntTest {
 
     private McpComponent getMcpComponent() {
         return new McpComponent("test-component", 1, mcpServer.getId(), null);
+    }
+
+    private McpTool getMcpTool(String name) {
+        return new McpTool(name, Map.of());
     }
 
     private McpTool getMcpTool(String name, long mcpComponentId) {
