@@ -219,12 +219,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             {isClusterElement && (
                 <div
                     className={twMerge(
-                        'invisible absolute left-[-40px] z-50 flex gap-1 pr-4 group-hover:visible',
+                        'invisible absolute left-[-40px] z-50 grid grid-cols-2 gap-1 pr-4 group-hover:visible',
                         (hasSavedClusterElementPosition || !data.multipleClusterElementsNode) && '-left-[80px]'
                     )}
                 >
                     <Button
-                        className="self-center bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
+                        className="row-span-2 self-center bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
                         onClick={() => handleDeleteNodeClick(data)}
                         title="Delete a node"
                         variant="outline"
@@ -232,37 +232,35 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         <TrashIcon className="size-4" />
                     </Button>
 
-                    <div className="mr-16 flex flex-col gap-1">
-                        {!data.multipleClusterElementsNode && currentNode && (
-                            <WorkflowNodesPopoverMenu
-                                clusterElementType={data.clusterElementType}
-                                hideActionComponents={!!data.clusterElementType}
-                                hideClusterElementComponents={!data.clusterElementType}
-                                hideTaskDispatchers={!!data.clusterElementType}
-                                hideTriggerComponents
-                                sourceNodeId={data.clusterElementType ? parentClusterRootId : id}
-                            >
-                                <Button
-                                    className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
-                                    title={`Change ${data.clusterElementType} component`}
-                                    variant="outline"
-                                >
-                                    <ArrowLeftRightIcon className="size-4" />
-                                </Button>
-                            </WorkflowNodesPopoverMenu>
-                        )}
-
-                        {hasSavedClusterElementPosition && (
+                    {!data.multipleClusterElementsNode && (
+                        <WorkflowNodesPopoverMenu
+                            clusterElementType={data.clusterElementType}
+                            hideActionComponents={!!data.clusterElementType}
+                            hideClusterElementComponents={!data.clusterElementType}
+                            hideTaskDispatchers={!!data.clusterElementType}
+                            hideTriggerComponents
+                            sourceNodeId={data.clusterElementType ? parentClusterRootId : id}
+                        >
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
-                                onClick={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
-                                title="Remove saved node position"
+                                title={`Change ${data.clusterElementType} component`}
                                 variant="outline"
                             >
-                                <PinOff className="size-4" />
+                                <ArrowLeftRightIcon className="size-4" />
                             </Button>
-                        )}
-                    </div>
+                        </WorkflowNodesPopoverMenu>
+                    )}
+
+                    {hasSavedClusterElementPosition && (
+                        <Button
+                            className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
+                            onClick={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
+                            title="Remove saved node position"
+                            variant="outline"
+                        >
+                            <PinOff className="size-4" />
+                        </Button>
+                    )}
                 </div>
             )}
 
