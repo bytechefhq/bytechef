@@ -42,6 +42,8 @@ public interface ProjectFacade {
 
     String duplicateWorkflow(long id, String workflowId);
 
+    byte[] exportProject(long id);
+
     ProjectDTO getProject(long id);
 
     List<Category> getProjectCategories();
@@ -64,6 +66,8 @@ public interface ProjectFacade {
     List<ProjectDTO> getWorkspaceProjects(
         Boolean apiCollections, @Nullable Long categoryId, boolean includeAllFields, Boolean projectDeployments,
         @Nullable Status status, @Nullable Long tagId, long workspaceId);
+
+    long importProject(byte[] projectData, long workspaceId);
 
     int publishProject(long id, @Nullable String description, boolean syncWithGit);
 

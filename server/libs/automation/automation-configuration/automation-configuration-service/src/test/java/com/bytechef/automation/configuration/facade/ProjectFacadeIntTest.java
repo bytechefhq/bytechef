@@ -38,19 +38,23 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -236,6 +240,48 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
+    public void testExportProject() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        byte[] exportedData = projectFacade.exportProject(projectDTO.id());
+
+        assertThat(exportedData).isNotNull();
+        assertThat(exportedData.length).isGreaterThan(0);
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(exportedData))) {
+            ZipEntry zipEntry;
+            boolean foundProjectJson = false;
+            boolean foundWorkflowFile = false;
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                String name = zipEntry.getName();
+
+                if ("project.json".equals(name)) {
+                    foundProjectJson = true;
+                } else if (name.startsWith("workflow-")) {
+                    foundWorkflowFile = true;
+                }
+
+                zipInputStream.closeEntry();
+            }
+
+            assertThat(foundProjectJson).isTrue();
+            assertThat(foundWorkflowFile).isTrue();
+        } catch (Exception e) {
+            Assertions.fail("Failed to read exported ZIP file", e);
+        }
+    }
+
+    @Test
+    public void testExportProjectInvalidId() {
+        Assertions.assertThrows(
+            Exception.class,
+            () -> projectFacade.exportProject(999999L));
+    }
+
+    @Test
     public void testGetProject() {
         Project project = new Project();
 
@@ -313,7 +359,8 @@ public class ProjectFacadeIntTest {
         project.setName("name2");
         project.setWorkspaceId(workspace.getId());
 
-        tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
+        tag1 = tagRepository.findById(Validate.notNull(tag1.getId(), "id"))
+            .orElseThrow(() -> new RuntimeException("Tag not found"));
 
         project.setTags(List.of(tag1, tagRepository.save(new Tag("tag3"))));
 
@@ -359,6 +406,78 @@ public class ProjectFacadeIntTest {
             .toList();
 
         assertThat(ids).contains(workflow.getId());
+    }
+
+    @Test
+    public void testImportProject() throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
+
+        ZipEntry projectEntry = new ZipEntry("project.json");
+
+        zipOutputStream.putNextEntry(projectEntry);
+
+        String projectJson = "{\"name\":\"Imported Project\",\"description\":\"Test imported project\"}";
+
+        zipOutputStream.write(projectJson.getBytes());
+
+        zipOutputStream.closeEntry();
+
+        // Add a workflow file
+        ZipEntry workflowEntry = new ZipEntry("workflow-test.json");
+
+        zipOutputStream.putNextEntry(workflowEntry);
+
+        String workflowJson = "{\"label\":\"Test Workflow\",\"tasks\":[]}";
+
+        zipOutputStream.write(workflowJson.getBytes());
+
+        zipOutputStream.closeEntry();
+
+        zipOutputStream.finish();
+
+        byte[] zipData = byteArrayOutputStream.toByteArray();
+
+        // Import the project
+        long importedProjectId = projectFacade.importProject(zipData, workspace.getId());
+
+        // Verify the imported project
+        assertThat(importedProjectId).isGreaterThan(0);
+
+        ProjectDTO importedProject = projectFacade.getProject(importedProjectId);
+        assertThat(importedProject.name()).isEqualTo("Imported Project");
+        assertThat(importedProject.description()).isEqualTo("Test imported project");
+
+        // Verify workflows were imported
+        List<ProjectWorkflowDTO> workflows = projectFacade.getProjectWorkflows(importedProjectId);
+
+        assertThat(workflows).hasSize(1);
+    }
+
+    @Test
+    public void testImportProjectWithoutProjectJson() {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+            ZipEntry zipEntry = new ZipEntry("workflow-test.json");
+
+            zipOutputStream.putNextEntry(zipEntry);
+
+            zipOutputStream.write("{\"label\":\"Test Workflow\",\"tasks\":[]}".getBytes());
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+        } catch (Exception e) {
+            Assertions.fail("Failed to create test ZIP", e);
+        }
+
+        byte[] zipData = byteArrayOutputStream.toByteArray();
+
+        // Import should fail without project.json
+        RuntimeException exception = Assertions.assertThrows(
+            RuntimeException.class,
+            () -> projectFacade.importProject(zipData, workspace.getId()));
+
+        assertThat(exception.getMessage()).contains("project.json not found");
     }
 
     @Test

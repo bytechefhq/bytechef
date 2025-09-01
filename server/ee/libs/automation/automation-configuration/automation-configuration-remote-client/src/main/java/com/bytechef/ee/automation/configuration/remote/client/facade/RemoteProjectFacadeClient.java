@@ -56,6 +56,11 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
+    public byte[] exportProject(long id) {
+        return new byte[0];
+    }
+
+    @Override
     public ProjectDTO getProject(long id) {
         throw new UnsupportedOperationException();
     }
@@ -106,6 +111,11 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
         Long tagId, long workspaceId) {
 
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long importProject(byte[] projectData, long workspaceId) {
+        return 0;
     }
 
     @Override

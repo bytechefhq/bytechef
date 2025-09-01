@@ -18,17 +18,20 @@ package com.bytechef.automation.configuration.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestTestConfiguration;
 import com.bytechef.automation.configuration.web.rest.mapper.ProjectMapper;
@@ -40,27 +43,29 @@ import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.domain.Tag;
+import jakarta.servlet.ServletException;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 /**
  * @author Ivica Cardic
  */
-@Disabled
 @ContextConfiguration(classes = AutomationConfigurationRestTestConfiguration.class)
 @WebMvcTest(value = ProjectApiController.class)
 @AutomationConfigurationRestConfigurationSharedMocks
@@ -77,6 +82,15 @@ public class ProjectApiControllerIntTest {
 
     @MockitoBean
     private ProjectFacade projectFacade;
+
+    @MockitoBean
+    private ProjectService projectService;
+
+    @MockitoBean
+    private WorkflowService workflowService;
+
+    @MockitoBean
+    private WorkspaceFacade workspaceFacade;
 
     @Autowired
     private ProjectMapper.ProjectDTOToProjectModelMapper projectMapper;
@@ -140,7 +154,7 @@ public class ProjectApiControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/categories")
+                .uri("/internal/projects/categories")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -181,8 +195,10 @@ public class ProjectApiControllerIntTest {
     @Test
     public void testGetProjectWorkflows() {
         try {
+            ProjectWorkflow projectWorkflow = new ProjectWorkflow(1L);
+
             ProjectWorkflowDTO workflow =
-                new ProjectWorkflowDTO(new Workflow("workflow1", "{}", Format.JSON), new ProjectWorkflow());
+                new ProjectWorkflowDTO(new Workflow("workflow1", "{}", Format.JSON), projectWorkflow);
 
             when(projectFacade.getProjectWorkflows(1L))
                 .thenReturn(List.of(workflow));
@@ -206,12 +222,12 @@ public class ProjectApiControllerIntTest {
     public void testGetProjects() {
         ProjectDTO projectDTO = getProjectDTO();
 
-        when(projectFacade.getProjects(null, false, null, null))
+        when(projectFacade.getWorkspaceProjects(null, null, true, null, null, null, 1L))
             .thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
-            .uri("/internal/projects")
+            .uri("/internal/workspaces/1/projects")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -220,12 +236,13 @@ public class ProjectApiControllerIntTest {
             .contains(projectMapper.convert(projectDTO))
             .hasSize(1);
 
-        when(projectFacade.getProjects(1L, false, null, null))
+        // Test with categoryId parameter
+        when(projectFacade.getWorkspaceProjects(null, 1L, true, null, null, null, 1L))
             .thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
-            .uri("/internal/projects?categoryIds=1")
+            .uri("/internal/workspaces/1/projects?categoryId=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -233,29 +250,19 @@ public class ProjectApiControllerIntTest {
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
 
-        when(projectFacade.getProjects(null, false, 1L, null))
+        // Test with tagId parameter
+        when(projectFacade.getWorkspaceProjects(null, null, true, null, null, 1L, 1L))
             .thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
-            .uri("/internal/projects?tagIds=1")
+            .uri("/internal/workspaces/1/projects?tagId=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
             .isOk()
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
-
-        when(projectFacade.getProjects(1L, false, 1L, null))
-            .thenReturn(List.of(projectDTO));
-
-        this.webTestClient
-            .get()
-            .uri("/internal/projects?categoryIds=1&tagIds=1")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful();
     }
 
     @Test
@@ -275,7 +282,7 @@ public class ProjectApiControllerIntTest {
                 .bodyValue(projectModel)
                 .exchange()
                 .expectStatus()
-                .isNoContent();
+                .isOk();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -286,52 +293,33 @@ public class ProjectApiControllerIntTest {
 
         ProjectDTO capturedProjectDTO = integrationDTOArgumentCaptor.getValue();
 
-        Assertions.assertEquals(capturedProjectDTO.name(), "name");
-        Assertions.assertEquals(capturedProjectDTO.description(), "description");
+        Assertions.assertEquals("name", capturedProjectDTO.name());
+        Assertions.assertEquals("description", capturedProjectDTO.description());
     }
 
     @Test
-    public void testPostIntegrationWorkflows() {
+    public void testPostProjectWorkflows() {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
-        ProjectWorkflow projectWorkflow = new ProjectWorkflow();
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(1L);
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
-
-        ProjectWorkflowDTO projectWorkflowDTO =
-            new ProjectWorkflowDTO(new Workflow("id", definition, Format.JSON), projectWorkflow);
 
         when(projectFacade.addWorkflow(anyLong(), any()))
             .thenReturn(projectWorkflow);
 
-        try {
-            this.webTestClient
-                .post()
-                .uri("/internal/projects/1/workflows")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(workflowModel)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.description")
-                .isEqualTo("My description")
-                .jsonPath("$.id")
-                .isEqualTo(Validate.notNull(projectWorkflowDTO.getId(), "id"))
-                .jsonPath("$.label")
-                .isEqualTo("New Workflow");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .post()
+            .uri("/internal/projects/1/workflows")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(workflowModel)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(Long.class)
+            .isEqualTo(1L);
 
-        ArgumentCaptor<String> nameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> descriptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
-
-        verify(projectFacade).addWorkflow(
-            any(), isNull());
-
-        Assertions.assertEquals("workflowLabel", nameArgumentCaptor.getValue());
-        Assertions.assertEquals("workflowDescription", descriptionArgumentCaptor.getValue());
+        verify(projectFacade).addWorkflow(anyLong(), any());
     }
 
     @Test
@@ -385,6 +373,166 @@ public class ProjectApiControllerIntTest {
         Assertions.assertEquals("tag1", capturedTag.getName());
     }
 
+    @Test
+    public void testExportProject() {
+        try {
+            ProjectDTO projectDTO = getProjectDTO();
+            byte[] mockProjectData = "mock zip data".getBytes();
+
+            when(projectFacade.exportProject(1L))
+                .thenReturn(mockProjectData);
+
+            Project project = new Project();
+
+            project.setId(1L);
+            project.setName(projectDTO.name());
+
+            when(projectService.getProject(1L))
+                .thenReturn(project);
+
+            this.webTestClient
+                .get()
+                .uri("/internal/projects/1/export")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .valueEquals("Content-Disposition", "attachment; filename=\"name.zip\"")
+                .expectBody(byte[].class)
+                .isEqualTo(mockProjectData);
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+
+        verify(projectFacade).exportProject(1L);
+    }
+
+    @Test
+    public void testExportProjectNotFound() {
+        when(projectFacade.exportProject(999L))
+            .thenThrow(new RuntimeException("Project not found"));
+
+        try {
+            this.webTestClient
+                .get()
+                .uri("/internal/projects/999/export")
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
+            Assertions.fail("Expected WebClientRequestException to be thrown");
+        } catch (WebClientRequestException e) {
+            Assertions.assertInstanceOf(ServletException.class, e.getCause());
+        }
+
+        verify(projectFacade).exportProject(999L);
+    }
+
+    @Test
+    public void testImportProject() {
+        try {
+            byte[] mockProjectData = "mock zip data".getBytes();
+            MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "project.zip",
+                "application/zip",
+                mockProjectData);
+
+            when(projectFacade.importProject(mockProjectData, 1L))
+                .thenReturn(123L);
+
+            this.webTestClient
+                .post()
+                .uri("/internal/workspaces/1/projects/import")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", mockFile.getResource()))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Long.class)
+                .isEqualTo(123L);
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+
+        ArgumentCaptor<byte[]> dataArgumentCaptor = ArgumentCaptor.forClass(byte[].class);
+        ArgumentCaptor<Long> workspaceIdArgumentCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(projectFacade).importProject(dataArgumentCaptor.capture(), workspaceIdArgumentCaptor.capture());
+
+        Assertions.assertEquals("mock zip data", new String(dataArgumentCaptor.getValue()));
+        Assertions.assertEquals(1L, workspaceIdArgumentCaptor.getValue());
+    }
+
+    @Test
+    public void testImportProjectWithInvalidFile() {
+        byte[] invalidData = "invalid data".getBytes();
+        MockMultipartFile mockFile = new MockMultipartFile(
+            "file",
+            "project.txt",
+            "text/plain",
+            invalidData);
+
+        when(projectFacade.importProject(invalidData, 1L))
+            .thenThrow(new RuntimeException("Invalid project file"));
+
+        try {
+            this.webTestClient
+                .post()
+                .uri("/internal/workspaces/1/projects/import")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", mockFile.getResource()))
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
+            Assertions.fail("Expected WebClientRequestException to be thrown");
+        } catch (WebClientRequestException e) {
+            Assertions.assertInstanceOf(ServletException.class, e.getCause());
+        }
+
+        ArgumentCaptor<byte[]> dataArgumentCaptor = ArgumentCaptor.forClass(byte[].class);
+        ArgumentCaptor<Long> workspaceIdArgumentCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(projectFacade).importProject(dataArgumentCaptor.capture(), workspaceIdArgumentCaptor.capture());
+
+        Assertions.assertEquals("invalid data", new String(dataArgumentCaptor.getValue()));
+        Assertions.assertEquals(1L, workspaceIdArgumentCaptor.getValue());
+    }
+
+    @Test
+    public void testImportProjectWithEmptyFile() {
+        byte[] emptyData = new byte[0];
+        MockMultipartFile mockFile = new MockMultipartFile(
+            "file",
+            "empty.zip",
+            "application/zip",
+            emptyData);
+
+        when(projectFacade.importProject(emptyData, 1L))
+            .thenThrow(new RuntimeException("Empty project file"));
+
+        try {
+            this.webTestClient
+                .post()
+                .uri("/internal/workspaces/1/projects/import")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", mockFile.getResource()))
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
+            Assertions.fail("Expected WebClientRequestException to be thrown");
+        } catch (WebClientRequestException e) {
+            Assertions.assertInstanceOf(ServletException.class, e.getCause());
+        }
+
+        ArgumentCaptor<byte[]> dataArgumentCaptor = ArgumentCaptor.forClass(byte[].class);
+        ArgumentCaptor<Long> workspaceIdArgumentCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(projectFacade).importProject(dataArgumentCaptor.capture(), workspaceIdArgumentCaptor.capture());
+
+        Assertions.assertEquals(0, dataArgumentCaptor.getValue().length);
+        Assertions.assertEquals(1L, workspaceIdArgumentCaptor.getValue());
+    }
+
     private static ProjectDTO getProjectDTO() {
         return ProjectDTO.builder()
             .category(new Category(1L, "category"))
@@ -395,5 +543,4 @@ public class ProjectApiControllerIntTest {
             .projectWorkflowIds(List.of(1L))
             .build();
     }
-
 }
