@@ -50,14 +50,14 @@ public class LiferayHeadlessAction {
             .configuration(Context.Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
             .execute();
 
-        return inputParameters.getRequiredString("endpoint");
-    }
+        if ((response.getStatusCode() >= 200) && (response.getStatusCode() < 300)) {
+            return String.valueOf(response.getBody());
+        }
 
-    private Context.OutputSchema createSchema() {
-        // This is how to set schema. Update output on completed perform method
-        // Call this from perform method
-        // context.outputSchema(outputSchema -> outputSchema.getOutputSchema());
-        return null;
+        context.log(
+            log -> log.warn("Received response code {}, from endpoint {}", response.getStatusCode(), endpointUri));
+
+        return inputParameters.getRequiredString("endpoint");
     }
 
 }
