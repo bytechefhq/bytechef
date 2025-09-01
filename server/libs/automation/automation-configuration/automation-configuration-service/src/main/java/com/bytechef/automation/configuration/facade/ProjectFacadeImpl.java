@@ -35,6 +35,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
@@ -48,11 +49,17 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -242,6 +249,56 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    public byte[] exportProject(long id) {
+        Project project = projectService.getProject(id);
+        List<ProjectWorkflow> projectWorkflows =
+            projectWorkflowService.getProjectWorkflows(id, project.getLastVersion());
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ZipOutputStream zos = new ZipOutputStream(baos)) {
+
+            // Create project.json with name and description
+            Map<String, Object> projectData = new HashMap<>();
+
+            projectData.put("name", project.getName());
+            projectData.put("description", project.getDescription());
+
+            ZipEntry projectEntry = new ZipEntry("project.json");
+
+            zos.putNextEntry(projectEntry);
+            zos.write(JsonUtils.write(projectData)
+                .getBytes());
+
+            zos.closeEntry();
+
+            // Add all workflows
+            for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+                Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+                Format format = workflow.getFormat();
+
+                String name = format.name();
+
+                String fileName = String.format(
+                    "workflow-%s.%s.json",
+                    projectWorkflow.getWorkflowReferenceCode(), StringUtils.sanitize(name.toLowerCase(), 100));
+
+                ZipEntry workflowEntry = new ZipEntry(fileName);
+
+                zos.putNextEntry(workflowEntry);
+                zos.write(workflow.getDefinition()
+                    .getBytes());
+                zos.closeEntry();
+            }
+
+            zos.finish();
+
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to export project", e);
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProjectDTO getProject(long id) {
         Project project = projectService.getProject(id);
@@ -344,6 +401,54 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         return getProjects(
             apiCollections, categoryId, tagId, projectDeployments, status, includeAllFields, workspaceId);
+    }
+
+    @Override
+    public long importProject(byte[] projectData, long workspaceId) {
+        try (ZipInputStream zis = new ZipInputStream(new java.io.ByteArrayInputStream(projectData))) {
+            Map<String, String> projectInfo = null;
+            List<String> workflowDefinitions = new ArrayList<>();
+
+            ZipEntry entry;
+
+            while ((entry = zis.getNextEntry()) != null) {
+                byte[] entryData = zis.readAllBytes();
+
+                if ("project.json".equals(entry.getName())) {
+                    projectInfo = JsonUtils.read(new String(entryData), new TypeReference<Map<String, String>>() {});
+                } else if (entry.getName()
+                    .startsWith("workflow-")) {
+                    workflowDefinitions.add(new String(entryData));
+                }
+
+                zis.closeEntry();
+            }
+
+            if (projectInfo == null) {
+                throw new RuntimeException("project.json not found in import file");
+            }
+
+            // Create project
+            Project project = new Project();
+
+            project.setName(projectInfo.get("name"));
+            project.setDescription(projectInfo.get("description"));
+            project.setWorkspaceId(workspaceId);
+
+            ProjectDTO projectDTO = new ProjectDTO(project);
+
+            long projectId = createProject(projectDTO);
+
+            // Add workflows
+            for (String workflowDefinition : workflowDefinitions) {
+                addWorkflow(projectId, workflowDefinition);
+            }
+
+            return projectId;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to import project", e);
+        }
     }
 
     @Override

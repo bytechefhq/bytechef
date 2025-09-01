@@ -33,4 +33,28 @@ public class StringUtils {
 
         return string;
     }
+
+    public static String sanitize(String name, int lengthLimit) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(name)) {
+            return "";
+        }
+
+        String sanitized = name.trim()
+            .replaceAll("[\\\\/:*?\"<>|]", "_") // Windows forbidden characters
+            .replaceAll("\\s+", "_") // Replace whitespace with underscores
+            .replaceAll("_{2,}", "_"); // Replace multiple underscores with single
+
+        if (lengthLimit != -1 && sanitized.length() > lengthLimit) {
+            sanitized = sanitized.substring(0, lengthLimit);
+        }
+
+        // Remove trailing underscores or dots
+        sanitized = sanitized.replaceAll("[_.]+$", "");
+
+        if (sanitized.isEmpty()) {
+            return "";
+        }
+
+        return sanitized;
+    }
 }

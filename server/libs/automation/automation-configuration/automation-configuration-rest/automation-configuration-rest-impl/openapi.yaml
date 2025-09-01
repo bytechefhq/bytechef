@@ -604,6 +604,29 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /projects/{id}/export:
+    get:
+      description: "Export project as a zip file."
+      summary: "Export project."
+      tags:
+        - "project"
+      operationId: "exportProject"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The project export file."
+          content:
+            application/octet-stream:
+              schema:
+                type: "string"
+                format: "binary"
   /projects/{id}/versions:
     get:
       description: "Get a project versions."
@@ -1111,6 +1134,40 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Project"
+  /workspaces/{workspaceId}/projects/import:
+    post:
+      description: "Import project from a zip file."
+      summary: "Import project."
+      tags:
+        - "project"
+      operationId: "importProject"
+      parameters:
+        - name: "workspaceId"
+          description: "The id of the workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                file:
+                  type: "string"
+                  format: "binary"
+              required:
+                - "file"
+      responses:
+        "200":
+          description: "The imported project id."
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
 components:
   schemas:
     Category:

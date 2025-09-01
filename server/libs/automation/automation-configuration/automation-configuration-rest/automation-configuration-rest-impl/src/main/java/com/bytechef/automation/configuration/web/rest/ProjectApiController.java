@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -29,9 +30,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Ivica Cardic
@@ -75,6 +82,17 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
+    @ResponseBody
+    public ResponseEntity<Resource> exportProject(@PathVariable("id") Long id) {
+        byte[] projectData = projectFacade.exportProject(id);
+        Project project = projectService.getProject(id);
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + project.getName() + ".zip" + "\"")
+            .body(new org.springframework.core.io.ByteArrayResource(projectData));
+    }
+
+    @Override
     public ResponseEntity<ProjectModel> getProject(Long id) {
         return ResponseEntity.ok(conversionService.convert(projectFacade.getProject(id), ProjectModel.class));
     }
@@ -101,6 +119,21 @@ public class ProjectApiController implements ProjectApi {
                 .stream()
                 .map(project -> conversionService.convert(project, ProjectModel.class))
                 .toList());
+    }
+
+    @Override
+    public ResponseEntity<Long> importProject(
+        @PathVariable("workspaceId") Long workspaceId, @RequestParam("file") MultipartFile file) {
+
+        try {
+            byte[] projectData = file.getBytes();
+
+            long projectId = projectFacade.importProject(projectData, workspaceId);
+
+            return ResponseEntity.ok(projectId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to import project", e);
+        }
     }
 
     @Override
