@@ -193,8 +193,13 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
                 id, workflowId);
 
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
+
         return principalJobFacade.createJob(
-            new JobParametersDTO(workflowId, projectDeploymentWorkflow.getInputs()), id, ModeType.AUTOMATION);
+            new JobParametersDTO(
+                workflowId, projectDeploymentWorkflow.getInputs(),
+                Map.of("projectVersion", projectDeployment.getProjectVersion())),
+            id, ModeType.AUTOMATION);
     }
 
     @Override
