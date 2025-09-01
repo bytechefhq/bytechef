@@ -237,6 +237,69 @@ Type: OBJECT
 ```
 
 
+### Create Task Comment
+Name: createTaskComment
+
+`Create a new comment for specified class.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING |  | true |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> |  | true |
+| folderId | Folder ID | STRING <details> <summary> Depends On </summary> spaceId, workspaceId </details> |  | false |
+| listId | List ID | STRING <details> <summary> Depends On </summary> folderId, spaceId, workspaceId </details> |  | true |
+| taskId | Task ID | STRING <details> <summary> Depends On </summary> listId, folderId, spaceId, workspaceId </details> | ID of the task to which the comment will be added. | true |
+| comment_text | Comment Text | STRING | Text of the comment to be added to the task. | true |
+| notifty_all | Notify All | BOOLEAN <details> <summary> Options </summary> true, false </details> | Flag indicating whether notifications should be sent to all participants, including the creator of the comment. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task Comment",
+  "name" : "createTaskComment",
+  "parameters" : {
+    "workspaceId" : "",
+    "spaceId" : "",
+    "folderId" : "",
+    "listId" : "",
+    "taskId" : "",
+    "comment_text" : "",
+    "notifty_all" : false
+  },
+  "type" : "clickup/v1/createTaskComment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of newly created comment. |
+| hist_id | STRING | The hist ID of newly created comment. |
+| date | INTEGER | The date of the newly created comment. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "hist_id" : "",
+  "date" : 1
+}
+```
+
+
 
 ## Triggers
 
