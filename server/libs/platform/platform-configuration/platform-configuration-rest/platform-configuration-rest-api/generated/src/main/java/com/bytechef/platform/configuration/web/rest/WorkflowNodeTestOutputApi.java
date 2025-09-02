@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T08:24:03.555464+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output Internal API")
 public interface WorkflowNodeTestOutputApi {
@@ -52,6 +52,7 @@ public interface WorkflowNodeTestOutputApi {
      *
      * @param id The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
+     * @param environmentId The id of an environment. (required)
      * @param createdDate Check if a test output exists after a specific date. (optional)
      * @return Successful operation. (status code 200)
      */
@@ -75,6 +76,7 @@ public interface WorkflowNodeTestOutputApi {
     default ResponseEntity<CheckWorkflowNodeTestOutputExists200ResponseModel> checkWorkflowNodeTestOutputExists(
         @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
         @Parameter(name = "createdDate", description = "Check if a test output exists after a specific date.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "createdDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime createdDate
     ) {
         getRequest().ifPresent(request -> {
@@ -97,6 +99,7 @@ public interface WorkflowNodeTestOutputApi {
      *
      * @param id The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
+     * @param environmentId The id of an environment. (required)
      * @return Successful operation. (status code 204)
      */
     @Operation(
@@ -115,7 +118,8 @@ public interface WorkflowNodeTestOutputApi {
     
     default ResponseEntity<Void> deleteWorkflowNodeTestOutput(
         @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -173,6 +177,7 @@ public interface WorkflowNodeTestOutputApi {
      *
      * @param id The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
+     * @param environmentId The id of an environment. (required)
      * @param body  (required)
      * @return The workflow node test output object. (status code 200)
      */
@@ -197,6 +202,7 @@ public interface WorkflowNodeTestOutputApi {
     default ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleOutput(
         @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
         @Parameter(name = "body", description = "", required = true) @Valid @RequestBody Object body
     ) {
         getRequest().ifPresent(request -> {
