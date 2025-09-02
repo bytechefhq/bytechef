@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -25,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
 @JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:06.626791+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T13:45:45.940949840+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class JobBasicModel {
 
   private @Nullable String createdBy;
@@ -44,6 +46,9 @@ public class JobBasicModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastModifiedDate;
+
+  @Valid
+  private Map<String, Object> metadata = new HashMap<>();
 
   private Integer priority;
 
@@ -248,6 +253,34 @@ public class JobBasicModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public JobBasicModel metadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+    return this;
+  }
+
+  public JobBasicModel putMetadataItem(String key, Object metadataItem) {
+    if (this.metadata == null) {
+      this.metadata = new HashMap<>();
+    }
+    this.metadata.put(key, metadataItem);
+    return this;
+  }
+
+  /**
+   * Key-value map of metadata.
+   * @return metadata
+   */
+  
+  @Schema(name = "metadata", accessMode = Schema.AccessMode.READ_ONLY, description = "Key-value map of metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("metadata")
+  public Map<String, Object> getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+  }
+
   public JobBasicModel priority(Integer priority) {
     this.priority = priority;
     return this;
@@ -344,6 +377,7 @@ public class JobBasicModel {
         Objects.equals(this.label, jobBasic.label) &&
         Objects.equals(this.lastModifiedBy, jobBasic.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, jobBasic.lastModifiedDate) &&
+        Objects.equals(this.metadata, jobBasic.metadata) &&
         Objects.equals(this.priority, jobBasic.priority) &&
         Objects.equals(this.startDate, jobBasic.startDate) &&
         Objects.equals(this.status, jobBasic.status) &&
@@ -352,7 +386,7 @@ public class JobBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, id, label, lastModifiedBy, lastModifiedDate, priority, startDate, status, workflowId);
+    return Objects.hash(createdBy, createdDate, endDate, id, label, lastModifiedBy, lastModifiedDate, metadata, priority, startDate, status, workflowId);
   }
 
   @Override
@@ -366,6 +400,7 @@ public class JobBasicModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
     sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");

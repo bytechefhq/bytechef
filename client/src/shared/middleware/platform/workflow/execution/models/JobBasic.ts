@@ -62,6 +62,12 @@ export interface JobBasic {
      */
     readonly lastModifiedDate?: Date;
     /**
+     * Key-value map of metadata.
+     * @type {{ [key: string]: any; }}
+     * @memberof JobBasic
+     */
+    readonly metadata?: { [key: string]: any; };
+    /**
      * The priority value.
      * @type {number}
      * @memberof JobBasic
@@ -128,6 +134,7 @@ export function JobBasicFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'label': json['label'] == null ? undefined : json['label'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'priority': json['priority'],
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
@@ -139,7 +146,7 @@ export function JobBasicToJSON(json: any): JobBasic {
     return JobBasicToJSONTyped(json, false);
 }
 
-export function JobBasicToJSONTyped(value?: Omit<JobBasic, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'|'priority'|'startDate'|'status'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
+export function JobBasicToJSONTyped(value?: Omit<JobBasic, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'|'metadata'|'priority'|'startDate'|'status'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

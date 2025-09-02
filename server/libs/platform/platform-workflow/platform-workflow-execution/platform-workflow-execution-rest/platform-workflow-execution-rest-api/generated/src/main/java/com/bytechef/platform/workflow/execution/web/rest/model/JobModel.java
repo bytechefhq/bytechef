@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:23:06.626791+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T13:45:45.940949840+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class JobModel {
 
   private @Nullable String createdBy;
@@ -59,6 +59,9 @@ public class JobModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastModifiedDate;
+
+  @Valid
+  private Map<String, Object> metadata = new HashMap<>();
 
   @Valid
   private Map<String, Object> outputs = new HashMap<>();
@@ -342,6 +345,34 @@ public class JobModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public JobModel metadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+    return this;
+  }
+
+  public JobModel putMetadataItem(String key, Object metadataItem) {
+    if (this.metadata == null) {
+      this.metadata = new HashMap<>();
+    }
+    this.metadata.put(key, metadataItem);
+    return this;
+  }
+
+  /**
+   * Key-value map of metadata.
+   * @return metadata
+   */
+  
+  @Schema(name = "metadata", accessMode = Schema.AccessMode.READ_ONLY, description = "Key-value map of metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("metadata")
+  public Map<String, Object> getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+  }
+
   public JobModel outputs(Map<String, Object> outputs) {
     this.outputs = outputs;
     return this;
@@ -545,6 +576,7 @@ public class JobModel {
         Objects.equals(this.label, job.label) &&
         Objects.equals(this.lastModifiedBy, job.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, job.lastModifiedDate) &&
+        Objects.equals(this.metadata, job.metadata) &&
         Objects.equals(this.outputs, job.outputs) &&
         Objects.equals(this.parentTaskExecutionId, job.parentTaskExecutionId) &&
         Objects.equals(this.priority, job.priority) &&
@@ -557,7 +589,7 @@ public class JobModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, currentTask, endDate, error, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, parentTaskExecutionId, priority, startDate, status, taskExecutions, webhooks, workflowId);
+    return Objects.hash(createdBy, createdDate, currentTask, endDate, error, id, inputs, label, lastModifiedBy, lastModifiedDate, metadata, outputs, parentTaskExecutionId, priority, startDate, status, taskExecutions, webhooks, workflowId);
   }
 
   @Override
@@ -574,6 +606,7 @@ public class JobModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
     sb.append("    parentTaskExecutionId: ").append(toIndentedString(parentTaskExecutionId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");

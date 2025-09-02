@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "GitConfiguration", description = "The git configuration.")
 @JsonTypeName("GitConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-30T08:22:59.127764+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T13:45:38.996989931+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class GitConfigurationModel {
 
   private String url;

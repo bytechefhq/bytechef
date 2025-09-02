@@ -102,6 +102,12 @@ export interface Job {
      */
     readonly lastModifiedDate?: Date;
     /**
+     * Key-value map of metadata.
+     * @type {{ [key: string]: any; }}
+     * @memberof Job
+     */
+    readonly metadata?: { [key: string]: any; };
+    /**
      * The key-value map of the outputs returned.
      * @type {{ [key: string]: any; }}
      * @memberof Job
@@ -195,6 +201,7 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
         'label': json['label'] == null ? undefined : json['label'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'outputs': json['outputs'] == null ? undefined : json['outputs'],
         'parentTaskExecutionId': json['parentTaskExecutionId'] == null ? undefined : json['parentTaskExecutionId'],
         'priority': json['priority'],
@@ -210,7 +217,7 @@ export function JobToJSON(json: any): Job {
     return JobToJSONTyped(json, false);
 }
 
-export function JobToJSONTyped(value?: Omit<Job, 'createdBy'|'createdDate'|'currentTask'|'id'|'inputs'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'parentTaskExecutionId'|'priority'|'startDate'|'status'|'webhooks'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
+export function JobToJSONTyped(value?: Omit<Job, 'createdBy'|'createdDate'|'currentTask'|'id'|'inputs'|'label'|'lastModifiedBy'|'lastModifiedDate'|'metadata'|'outputs'|'parentTaskExecutionId'|'priority'|'startDate'|'status'|'webhooks'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
