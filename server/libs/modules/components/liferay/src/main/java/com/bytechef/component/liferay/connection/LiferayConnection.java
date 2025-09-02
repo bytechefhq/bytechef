@@ -29,49 +29,52 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
 
 import com.bytechef.component.definition.Authorization;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Authorization.ApiTokenLocation;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 /**
  * @author Igor Beslic
  */
 public class LiferayConnection {
-    public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION =
-        connection().properties(
+
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .properties(
             string(BASE_URI)
                 .label("Base URI")
                 .description("If set, it will be combined Liferay API Endpoint attribute value."))
-            .authorizationRequired(true)
-            .authorizations(
-                authorization(Authorization.AuthorizationType.API_KEY)
-                    .title("API Key")
-                    .properties(
-                        string(KEY)
-                            .label("Key")
-                            .required(true)
-                            .defaultValue(Authorization.API_TOKEN),
-                        string(VALUE).label("Value")
-                            .required(true),
-                        string(ADD_TO)
-                            .label("Add to")
-                            .required(true)
-                            .options(
-                                option(
-                                    "Header", Authorization.ApiTokenLocation.HEADER.name()),
-                                option(
-                                    "QueryParams",
-                                    Authorization.ApiTokenLocation.QUERY_PARAMETERS.name()))),
-                authorization(Authorization.AuthorizationType.BEARER_TOKEN)
-                    .title("Bearer Token")
-                    .properties(
-                        string(TOKEN)
-                            .label("Token")
-                            .required(true)),
-                authorization(Authorization.AuthorizationType.BASIC_AUTH)
-                    .title("Basic Auth")
-                    .properties(
-                        string(USERNAME).label("Username")
-                            .required(true),
-                        string(PASSWORD).label("Password")
-                            .required(true)));
+        .authorizationRequired(true)
+        .authorizations(
+            authorization(AuthorizationType.API_KEY)
+                .title("API Key")
+                .properties(
+                    string(KEY)
+                        .label("Key")
+                        .required(true)
+                        .defaultValue(Authorization.API_TOKEN),
+                    string(VALUE)
+                        .label("Value")
+                        .required(true),
+                    string(ADD_TO)
+                        .label("Add to")
+                        .required(true)
+                        .options(
+                            option("Header", ApiTokenLocation.HEADER.name()),
+                            option("QueryParams", ApiTokenLocation.QUERY_PARAMETERS.name()))),
+            authorization(AuthorizationType.BEARER_TOKEN)
+                .title("Bearer Token")
+                .properties(
+                    string(TOKEN)
+                        .label("Token")
+                        .required(true)),
+            authorization(AuthorizationType.BASIC_AUTH)
+                .title("Basic Auth")
+                .properties(
+                    string(USERNAME)
+                        .label("Username")
+                        .required(true),
+                    string(PASSWORD)
+                        .label("Password")
+                        .required(true)));
 
 }

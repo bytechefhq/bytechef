@@ -34,7 +34,8 @@ public class LiferayComponentHandler implements ComponentHandler {
     public static final ComponentDefinition COMPONENT_DEFINITION = component("liferay")
         .title("Liferay")
         .description(
-            "Liferay is an open-source digital experience platform for enterprise content management (ECM) and portal development.")
+            "Liferay is an open-source digital experience platform for enterprise content management (ECM) and " +
+                "portal development.")
         .icon("path:assets/liferay.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(LiferayConnection.CONNECTION_DEFINITION)

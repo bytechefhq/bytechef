@@ -20,8 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
 
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import java.time.Duration;
 
@@ -30,34 +31,38 @@ import java.time.Duration;
  */
 public class LiferayHeadlessAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("headless")
+    public static final String ENDPOINT = "endpoint";
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("headless")
         .title("Headless Api")
         .description("The Headless endpoint to use.")
         .properties(
-            string("endpoint")
+            string(ENDPOINT)
                 .label("Endpoint")
                 .required(true)
                 .placeholder("headless-portal/v1.0)"))
         .output()
         .perform(LiferayHeadlessAction::perform);
 
-    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String baseUri = connectionParameters.getRequiredString(BASE_URI);
-        String endpointUri = baseUri + "/" + inputParameters.getRequiredString("endpoint");
+        String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
-        Context.Http.Response response = context.http(
-            http -> http.exchange(endpointUri, Context.Http.RequestMethod.GET))
-            .configuration(Context.Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
+        String endpointUri = baseUri + "/" + endpoint;
+
+        Http.Response response = context.http(http -> http.get(endpointUri))
+            .configuration(Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
             .execute();
 
-        if ((response.getStatusCode() >= 200) && (response.getStatusCode() < 300)) {
-            return String.valueOf(response.getBody());
+        int statusCode = response.getStatusCode();
+
+        if ((statusCode >= 200) && (statusCode < 300)) {
+            return response.getBody();
         }
 
-        context.log(
-            log -> log.warn("Received response code {}, from endpoint {}", response.getStatusCode(), endpointUri));
+        context.log(log -> log.warn("Received response code {}, from endpoint {}", statusCode, endpointUri));
 
-        return inputParameters.getRequiredString("endpoint");
+        return endpoint;
     }
 
 }
