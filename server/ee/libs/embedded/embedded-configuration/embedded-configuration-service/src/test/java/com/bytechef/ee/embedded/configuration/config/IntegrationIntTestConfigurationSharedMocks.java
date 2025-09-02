@@ -28,6 +28,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
@@ -62,7 +63,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class,
     OAuth2ParametersFacade.class, ProjectDeploymentFacade.class, ProjectDeploymentService.class,
     ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectService.class, ProjectWorkflowService.class,
-    WorkflowTestConfigurationFacade.class
+    WorkflowCacheManager.class, WorkflowTestConfigurationFacade.class
 })
 public @interface IntegrationIntTestConfigurationSharedMocks {
 }
