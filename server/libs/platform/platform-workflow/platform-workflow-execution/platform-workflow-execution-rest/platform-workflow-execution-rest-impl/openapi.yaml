@@ -232,6 +232,11 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        metadata:
+          description: "Key-value map of metadata."
+          type: "object"
+          additionalProperties: true
+          readOnly: true
         outputs:
           description: "The key-value map of the outputs returned."
           type: "object"
@@ -314,6 +319,11 @@ components:
           description: "The last modified date."
           type: "string"
           format: "date-time"
+          readOnly: true
+        metadata:
+          description: "Key-value map of metadata."
+          type: "object"
+          additionalProperties: true
           readOnly: true
         priority:
           description: "The priority value."
