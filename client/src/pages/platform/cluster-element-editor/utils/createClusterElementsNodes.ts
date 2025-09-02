@@ -26,7 +26,11 @@ export default function createClusterElementNodes({
 
     const createdNodes: Node[] = [];
 
-    // Filter cluster element types based on actionClusterElementTypes object and operationName chosen by the user in the main editor
+    /**
+     * If current cluster root component has actionClusterElementTypes object in its definition,
+     * filter cluster element types based on the action (operationName) chosen by the user in the operations popover menu,
+     * if not then return all cluster element types from definition
+     */
     const filteredClusterElementTypes = currentRootComponentDefinition.clusterElementTypes.filter((elementType) => {
         if (!operationName) {
             return true;
@@ -58,15 +62,16 @@ export default function createClusterElementNodes({
         if (isMultipleClusterElementsNode) {
             if (Array.isArray(clusterElementValue) && clusterElementValue.length) {
                 clusterElementValue.forEach((element) => {
+                    const clusterElementTypesCount = getClusterElementTypesCount({
+                        clusterRootComponentDefinition: nestedClusterRootsDefinitions[element.type?.split('/')[0]],
+                    });
+
                     // Create the multiple element node
                     const multipleElementsNode = createMultipleElementsNode({
                         clusterElementTypeName,
                         clusterRootId,
                         currentNestedRootElementTypesCount: element.clusterElements
-                            ? getClusterElementTypesCount({
-                                  clusterRootComponentDefinition:
-                                      nestedClusterRootsDefinitions[element.type?.split('/')[0]],
-                              })
+                            ? clusterElementTypesCount
                             : undefined,
                         element,
                         isMultipleClusterElementsNode,
@@ -111,6 +116,11 @@ export default function createClusterElementNodes({
             createdNodes.push(placeholderNode);
         } else {
             if (clusterElementValue && isPlainObject(clusterElementValue)) {
+                const clusterElementTypesCount = getClusterElementTypesCount({
+                    clusterRootComponentDefinition:
+                        nestedClusterRootsDefinitions[clusterElementValue.type?.split('/')[0]],
+                });
+
                 // Create the single element node
                 const singleElementNode = createSingleElementsNode({
                     clusterElementItem: clusterElementValue,
@@ -118,10 +128,7 @@ export default function createClusterElementNodes({
                     clusterElementTypeName,
                     clusterRootId,
                     currentNestedRootElementTypesCount: clusterElementValue.clusterElements
-                        ? getClusterElementTypesCount({
-                              clusterRootComponentDefinition:
-                                  nestedClusterRootsDefinitions[clusterElementValue.type?.split('/')[0]],
-                          })
+                        ? clusterElementTypesCount
                         : undefined,
                 });
 

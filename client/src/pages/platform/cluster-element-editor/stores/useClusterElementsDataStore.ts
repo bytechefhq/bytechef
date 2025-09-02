@@ -16,8 +16,9 @@ interface ClusterElementsDataStoreI {
     setNodes: (nodes: Node[]) => void;
     onNodesChange: OnNodesChange;
 
-    isDragging: boolean;
-    setIsDragging: (isDragging: boolean) => void;
+    isNodeDragging: boolean;
+    setIsNodeDragging: (isNodeDragging: boolean) => void;
+
     draggingNodeId: string | null;
     setDraggingNodeId: (nodeId: string | null) => void;
 
@@ -48,10 +49,11 @@ const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
                 });
             },
 
-            isDragging: false,
-            setIsDragging: (isDragging) => {
-                set({isDragging});
+            isNodeDragging: false,
+            setIsNodeDragging: (isNodeDragging) => {
+                set({isNodeDragging});
             },
+
             draggingNodeId: null,
             setDraggingNodeId: (draggingNodeId) => {
                 set({draggingNodeId});

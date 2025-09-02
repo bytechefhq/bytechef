@@ -23,16 +23,17 @@ import useClusterElementsLayout from '../hooks/useClusterElementsLayout';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
 const ClusterElementsWorkflowEditor = () => {
-    const {edges, nodes, onEdgesChange, onNodesChange, setDraggingNodeId, setIsDragging} = useClusterElementsDataStore(
-        useShallow((state) => ({
-            edges: state.edges,
-            nodes: state.nodes,
-            onEdgesChange: state.onEdgesChange,
-            onNodesChange: state.onNodesChange,
-            setDraggingNodeId: state.setDraggingNodeId,
-            setIsDragging: state.setIsDragging,
-        }))
-    );
+    const {edges, nodes, onEdgesChange, onNodesChange, setDraggingNodeId, setIsNodeDragging} =
+        useClusterElementsDataStore(
+            useShallow((state) => ({
+                edges: state.edges,
+                nodes: state.nodes,
+                onEdgesChange: state.onEdgesChange,
+                onNodesChange: state.onNodesChange,
+                setDraggingNodeId: state.setDraggingNodeId,
+                setIsNodeDragging: state.setIsNodeDragging,
+            }))
+        );
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
@@ -40,11 +41,11 @@ const ClusterElementsWorkflowEditor = () => {
     const previousNodePositionsRef = useRef<Record<string, {x: number; y: number}>>({});
 
     const currentPositions = useMemo(() => {
-        const positions: Record<string, {x: number; y: number}> = {};
+        const positions = nodes.reduce<Record<string, {x: number; y: number}>>((nodesPositions, node) => {
+            nodesPositions[node.id] = {x: node.position.x, y: node.position.y};
 
-        nodes.forEach((node) => {
-            positions[node.id] = {x: node.position.x, y: node.position.y};
-        });
+            return nodesPositions;
+        }, {});
 
         return positions;
     }, [nodes]);
@@ -52,10 +53,9 @@ const ClusterElementsWorkflowEditor = () => {
     const handleNodesChange: OnNodesChange<Node> = (changes) => {
         onNodesChange(changes);
 
-        // Track dragging state and node being dragged currently
         changes.forEach((change) => {
             if (change.type === 'position') {
-                setIsDragging(change.dragging ?? false);
+                setIsNodeDragging(change.dragging ?? false);
 
                 if (change.dragging) {
                     setDraggingNodeId(change.id);
@@ -65,31 +65,25 @@ const ClusterElementsWorkflowEditor = () => {
             }
         });
 
-        // Find the new position of the node that was dragged
         changes.forEach((change) => {
             if (change.type === 'position' && change.dragging === false) {
-                // Get the positions of the node that was dragged
                 const changedPositions: Record<string, {x: number; y: number}> = {};
                 const previousPositions = previousNodePositionsRef.current;
 
-                // Check if the node that was dragged has actually changed position
-                Object.entries(currentPositions).forEach(([nodeId, currentPos]) => {
+                Object.entries(currentPositions).forEach(([nodeId, currentPosition]) => {
                     const previousPosition = previousPositions[nodeId];
 
-                    // If position of the node that was dragged changed or node is newly added then record the position for that node
-                    if (
-                        !previousPosition ||
-                        previousPosition.x !== currentPos.x ||
-                        previousPosition.y !== currentPos.y
-                    ) {
-                        changedPositions[nodeId] = currentPos;
+                    const nodeAdded = !previousPosition && currentPosition;
+                    const nodePositionChanged =
+                        previousPosition?.x !== currentPosition.x || previousPosition?.y !== currentPosition.y;
+
+                    if (nodeAdded || nodePositionChanged) {
+                        changedPositions[nodeId] = currentPosition;
                     }
                 });
 
                 if (Object.keys(changedPositions).length > 0) {
-                    // Prevent race conditions with layout
                     setTimeout(() => {
-                        // Save the nodes new positions
                         saveClusterElementNodesPosition({
                             invalidateWorkflowQueries,
                             movedClusterElementId: change.id,
@@ -99,7 +93,6 @@ const ClusterElementsWorkflowEditor = () => {
                     }, 100);
                 }
 
-                // Update the previous positions reference for future comparison
                 previousNodePositionsRef.current = {...currentPositions};
             }
         });

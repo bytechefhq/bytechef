@@ -25,9 +25,9 @@ const useClusterElementsLayout = () => {
 
     const {rootClusterElementNodeData} = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
-    const {isDragging, isPositionSaving} = useClusterElementsDataStore(
+    const {isNodeDragging, isPositionSaving} = useClusterElementsDataStore(
         useShallow((state) => ({
-            isDragging: state.isDragging,
+            isNodeDragging: state.isNodeDragging,
             isPositionSaving: state.isPositionSaving,
         }))
     );
@@ -208,8 +208,7 @@ const useClusterElementsLayout = () => {
     ]);
 
     useEffect(() => {
-        // Do not recalculate layout during dragging or position saving
-        if (isDragging || isPositionSaving) {
+        if (isNodeDragging || isPositionSaving) {
             return;
         }
 

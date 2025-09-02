@@ -27,8 +27,8 @@ import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import {findAndRemoveSavedClusterElementPosition} from '../utils/findAndRemoveSavedClusterElementPosition';
 import handleDeleteTask from '../utils/handleDeleteTask';
+import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
 import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
@@ -67,10 +67,10 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const isSelected = currentNode?.name === data.name;
 
     const isMainRootClusterElement = !!data.clusterRoot && !data.isNestedClusterRoot;
-    const isClusterElement = !!data.clusterElementType;
-    const isNestedClusterRoot = !!data.isNestedClusterRoot;
+    const isClusterElement = data.clusterElementType;
+    const isNestedClusterRoot = data.isNestedClusterRoot;
     const parentClusterRootId = data.parentClusterRootId || id.split('-')[0];
-    const hasSavedClusterElementPosition = !!data.metadata?.ui?.nodePosition;
+    const hasSavedClusterElementPosition = data.metadata?.ui?.nodePosition;
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
@@ -161,11 +161,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             return;
         }
 
-        findAndRemoveSavedClusterElementPosition({
+        saveClusterElementNodesPosition({
             clickedNodeName,
             invalidateWorkflowQueries,
-            rootClusterElementNodeData,
-            setRootClusterElementNodeData,
             updateWorkflowMutation,
             workflow,
         });
