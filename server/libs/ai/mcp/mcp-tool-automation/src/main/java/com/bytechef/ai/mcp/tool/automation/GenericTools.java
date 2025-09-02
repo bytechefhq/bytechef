@@ -368,7 +368,7 @@ public class GenericTools {
             WorkflowValidator.validateTaskStructure(task, errors);
 
             // Get the task definition for property validation
-            String taskDefinition = getTaskDefinition(type, name, componentName, version);
+            List<ToolUtils.PropertyInfo> taskDefinition = getTaskProperties(type, name, componentName, version);
 
             // Extract task properties from the provided task JSON
             JsonNode taskNode = objectMapper.readTree(task);
