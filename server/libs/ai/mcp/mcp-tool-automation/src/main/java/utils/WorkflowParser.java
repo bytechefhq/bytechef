@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package utils;
 
 import com.bytechef.ai.mcp.tool.automation.ToolUtils;
@@ -32,7 +48,8 @@ public class WorkflowParser {
             return processMetadataObjectsRecursively(taskDefinition, parametersNode);
         } catch (RuntimeException e) {
             // Re-throw runtime exceptions from invalid display conditions
-            if (e.getMessage() != null && e.getMessage().startsWith("Invalid logic for display condition:")) {
+            if (e.getMessage() != null && e.getMessage()
+                .startsWith("Invalid logic for display condition:")) {
                 throw e;
             }
             return taskDefinition;
@@ -59,14 +76,14 @@ public class WorkflowParser {
 
         StringBuilder json = new StringBuilder();
         json.append("{ \"parameters\": {");
-        
+
         for (int i = 0; i < propertyInfos.size(); i++) {
             if (i > 0) {
                 json.append(", ");
             }
             json.append(convertSinglePropertyToJson(propertyInfos.get(i)));
         }
-        
+
         json.append("} }");
         return json.toString();
     }
@@ -74,68 +91,86 @@ public class WorkflowParser {
     private static String convertSinglePropertyToJson(ToolUtils.PropertyInfo propertyInfo) {
         StringBuilder json = new StringBuilder();
         String propertyName = propertyInfo.name();
-        
-        json.append("\"").append(propertyName).append("\": ");
-        
-        if (propertyInfo.nestedProperties() != null && !propertyInfo.nestedProperties().isEmpty()) {
+
+        json.append("\"")
+            .append(propertyName)
+            .append("\": ");
+
+        if (propertyInfo.nestedProperties() != null && !propertyInfo.nestedProperties()
+            .isEmpty()) {
             if ("ARRAY".equalsIgnoreCase(propertyInfo.type())) {
                 // Array type with nested item definitions
                 json.append("[ ");
-                
-                for (int i = 0; i < propertyInfo.nestedProperties().size(); i++) {
+
+                for (int i = 0; i < propertyInfo.nestedProperties()
+                    .size(); i++) {
                     if (i > 0) {
                         json.append(", ");
                     }
                     // For array items, just generate the type string without property name
-                    ToolUtils.PropertyInfo itemInfo = propertyInfo.nestedProperties().get(i);
+                    ToolUtils.PropertyInfo itemInfo = propertyInfo.nestedProperties()
+                        .get(i);
                     String typeString = buildTypeString(itemInfo);
-                    json.append("\"").append(typeString).append("\"");
+                    json.append("\"")
+                        .append(typeString)
+                        .append("\"");
                 }
-                
+
                 json.append(" ]");
             } else {
                 // Object type with nested properties
                 json.append("{");
-                
+
                 // Add metadata if there's a display condition
-                if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition().isEmpty()) {
-                    json.append("\"metadata\": \"").append(propertyInfo.displayCondition()).append("\", ");
+                if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition()
+                    .isEmpty()) {
+                    json.append("\"metadata\": \"")
+                        .append(propertyInfo.displayCondition())
+                        .append("\", ");
                 }
-                
+
                 // Add nested properties
-                for (int i = 0; i < propertyInfo.nestedProperties().size(); i++) {
+                for (int i = 0; i < propertyInfo.nestedProperties()
+                    .size(); i++) {
                     if (i > 0) {
                         json.append(", ");
                     }
-                    json.append(convertSinglePropertyToJson(propertyInfo.nestedProperties().get(i)));
+                    json.append(convertSinglePropertyToJson(propertyInfo.nestedProperties()
+                        .get(i)));
                 }
-                
+
                 json.append("}");
             }
         } else {
             // Simple property type
             String typeString = buildTypeString(propertyInfo);
-            json.append("\"").append(typeString).append("\"");
+            json.append("\"")
+                .append(typeString)
+                .append("\"");
         }
-        
+
         return json.toString();
     }
 
     private static String buildTypeString(ToolUtils.PropertyInfo propertyInfo) {
         StringBuilder typeString = new StringBuilder();
-        
-        typeString.append(propertyInfo.type().toLowerCase());
-        
+
+        typeString.append(propertyInfo.type()
+            .toLowerCase());
+
         // Add display condition if present (inline condition)
-        if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition().isEmpty()) {
-            typeString.append(" @").append(propertyInfo.displayCondition()).append("@");
+        if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition()
+            .isEmpty()) {
+            typeString.append(" @")
+                .append(propertyInfo.displayCondition())
+                .append("@");
         }
-        
+
         // Add required indicator
         if (propertyInfo.required()) {
             typeString.append(" (required)");
         }
-        
+
         return typeString.toString();
     }
 
@@ -188,13 +223,20 @@ public class WorkflowParser {
     }
 
     public static String getJsonNodeType(JsonNode node) {
-        if (node.isTextual()) return "string";
-        if (node.isFloatingPointNumber()) return "float";
-        if (node.isIntegralNumber()) return "integer";
-        if (node.isBoolean()) return "boolean";
-        if (node.isArray()) return "array";
-        if (node.isObject()) return "object";
-        if (node.isNull()) return "null";
+        if (node.isTextual())
+            return "string";
+        if (node.isFloatingPointNumber())
+            return "float";
+        if (node.isIntegralNumber())
+            return "integer";
+        if (node.isBoolean())
+            return "boolean";
+        if (node.isArray())
+            return "array";
+        if (node.isObject())
+            return "object";
+        if (node.isNull())
+            return "null";
         return "unknown";
     }
 
@@ -225,9 +267,9 @@ public class WorkflowParser {
         }
     }
 
-
     private static String processMetadataObjectsRecursively(String jsonString, JsonNode actualParameters) {
-        Pattern combinedPattern = Pattern.compile("\"([^\"]+)\"\\s*:\\s*(?:(\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\"metadata\"(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\})|\"([^\"]*?@[^@]+@[^\"]*?)\")");
+        Pattern combinedPattern = Pattern.compile(
+            "\"([^\"]+)\"\\s*:\\s*(?:(\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\"metadata\"(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\})|\"([^\"]*?@[^@]+@[^\"]*?)\")");
         Matcher matcher = combinedPattern.matcher(jsonString);
 
         Map<String, List<PropertyMatch>> propertyGroups = new HashMap<>();
@@ -236,11 +278,11 @@ public class WorkflowParser {
             String objectValue = matcher.group(2);
             String inlineValue = matcher.group(3);
 
-
             String value = objectValue != null ? objectValue : inlineValue;
 
             PropertyMatch match = new PropertyMatch(matcher.start(), matcher.end(), propertyName, value);
-            propertyGroups.computeIfAbsent(propertyName, k -> new ArrayList<>()).add(match);
+            propertyGroups.computeIfAbsent(propertyName, k -> new ArrayList<>())
+                .add(match);
         }
 
         if (propertyGroups.isEmpty()) {
@@ -276,17 +318,26 @@ public class WorkflowParser {
 
             if (selectedMatch != null) {
                 if (selectedMatch.objectValue.startsWith("{")) {
-                    String processedContent = processMetadataObjectsRecursively(selectedMatch.objectValue, actualParameters);
+                    String processedContent =
+                        processMetadataObjectsRecursively(selectedMatch.objectValue, actualParameters);
                     String cleanedObject = removeMetadataFromObjectString(processedContent);
-                    result.append("\"").append(selectedMatch.propertyName).append("\": ").append(cleanedObject);
+                    result.append("\"")
+                        .append(selectedMatch.propertyName)
+                        .append("\": ")
+                        .append(cleanedObject);
                 } else {
-                    String cleanedValue = selectedMatch.objectValue.replaceAll("@[^@]+@", "").trim();
+                    String cleanedValue = selectedMatch.objectValue.replaceAll("@[^@]+@", "")
+                        .trim();
                     // If the property had an inline condition and we got here, it means the condition was true
                     // So we should mark it as required
                     if (selectedMatch.objectValue.contains("@") && !cleanedValue.contains("(required)")) {
                         cleanedValue += " (required)";
                     }
-                    result.append("\"").append(selectedMatch.propertyName).append("\": \"").append(cleanedValue).append("\"");
+                    result.append("\"")
+                        .append(selectedMatch.propertyName)
+                        .append("\": \"")
+                        .append(cleanedValue)
+                        .append("\"");
                 }
                 lastEnd = selectedMatch.end;
             } else {
@@ -328,23 +379,27 @@ public class WorkflowParser {
     }
 
     private static int getLastEndOfDuplicates(List<PropertyMatch> duplicates) {
-        return duplicates.stream().mapToInt(m -> m.end).max().orElse(0);
+        return duplicates.stream()
+            .mapToInt(m -> m.end)
+            .max()
+            .orElse(0);
     }
 
     private static boolean shouldIncludePropertyWithCondition(String propertyValue, JsonNode actualParameters) {
         // For inline property conditions, extract the condition from @...@ pattern
         Pattern pattern = Pattern.compile("@([^@]+)@");
         Matcher matcher = pattern.matcher(propertyValue);
-        
+
         if (matcher.find()) {
-            String condition = matcher.group(1).trim();
+            String condition = matcher.group(1)
+                .trim();
             try {
                 return evaluateCondition(condition, actualParameters);
             } catch (IllegalArgumentException e) {
                 throw new RuntimeException("Invalid logic for display condition: '@" + condition + "@'");
             }
         }
-        
+
         // For object metadata conditions (no @...@ pattern), evaluate directly
         try {
             return evaluateCondition(propertyValue, actualParameters);
@@ -354,7 +409,8 @@ public class WorkflowParser {
     }
 
     public static boolean extractAndEvaluateCondition(String text, JsonNode actualParameters) {
-        if (text == null || text.trim().isEmpty()) {
+        if (text == null || text.trim()
+            .isEmpty()) {
             return true;
         }
 
@@ -365,7 +421,8 @@ public class WorkflowParser {
             return true;
         }
 
-        String condition = matcher.group(1).trim();
+        String condition = matcher.group(1)
+            .trim();
         try {
             return evaluateCondition(condition, actualParameters);
         } catch (IllegalArgumentException e) {
@@ -401,7 +458,9 @@ public class WorkflowParser {
                 return evaluateContainsFunction(condition, actualParameters);
             }
 
-            String[] operatorChecks = {"<=", ">=", "==", "<", ">"};
+            String[] operatorChecks = {
+                "<=", ">=", "==", "<", ">"
+            };
             String operator = null;
             String[] parts = null;
 
@@ -415,7 +474,8 @@ public class WorkflowParser {
 
             if (parts == null || parts.length != 2) {
                 // If condition is not empty and doesn't have valid operators, it's likely invalid
-                if (condition.trim().length() > 0) {
+                if (condition.trim()
+                    .length() > 0) {
                     throw new IllegalArgumentException("Invalid condition syntax");
                 }
                 return true;
@@ -448,20 +508,22 @@ public class WorkflowParser {
         // Pattern to match contains({'val1','val2'}, fieldName) or contains({'val1','val2'}, 'literal')
         Pattern containsPattern = Pattern.compile("contains\\s*\\(\\s*\\{([^}]+)\\}\\s*,\\s*([^)]+)\\s*\\)");
         Matcher matcher = containsPattern.matcher(condition);
-        
+
         if (!matcher.find()) {
             throw new IllegalArgumentException("Invalid contains function syntax");
         }
-        
-        String arrayValues = matcher.group(1).trim();
-        String checkValue = matcher.group(2).trim();
-        
+
+        String arrayValues = matcher.group(1)
+            .trim();
+        String checkValue = matcher.group(2)
+            .trim();
+
         // Parse the array values
         String[] values = arrayValues.split(",");
         for (int i = 0; i < values.length; i++) {
             values[i] = cleanQuotes(values[i].trim());
         }
-        
+
         // Get the value to check
         String valueToCheck;
         JsonNode fieldNode = findField(actualParameters, checkValue);
@@ -470,7 +532,7 @@ public class WorkflowParser {
         } else {
             valueToCheck = cleanQuotes(checkValue);
         }
-        
+
         // Check if valueToCheck is in the array
         for (String value : values) {
             if (value.equals(valueToCheck)) {
@@ -481,8 +543,7 @@ public class WorkflowParser {
     }
 
     private static String cleanQuotes(String value) {
-        return (value.startsWith("'") && value.endsWith("'")) ?
-               value.substring(1, value.length() - 1) : value;
+        return (value.startsWith("'") && value.endsWith("'")) ? value.substring(1, value.length() - 1) : value;
     }
 
     private static JsonNode findField(JsonNode parameters, String fieldName) {
@@ -493,11 +554,14 @@ public class WorkflowParser {
         return field;
     }
 
-    private static boolean performComparison(JsonNode fieldNode, String expectedValue, String operator, boolean fieldOnLeft) {
+    private static boolean
+        performComparison(JsonNode fieldNode, String expectedValue, String operator, boolean fieldOnLeft) {
         try {
-            if ("==".equals(operator) && ("true".equalsIgnoreCase(expectedValue) || "false".equalsIgnoreCase(expectedValue))) {
+            if ("==".equals(operator)
+                && ("true".equalsIgnoreCase(expectedValue) || "false".equalsIgnoreCase(expectedValue))) {
                 boolean expectedBool = Boolean.parseBoolean(expectedValue);
-                boolean actualBool = fieldNode.isBoolean() ? fieldNode.asBoolean() : Boolean.parseBoolean(fieldNode.asText());
+                boolean actualBool =
+                    fieldNode.isBoolean() ? fieldNode.asBoolean() : Boolean.parseBoolean(fieldNode.asText());
                 return expectedBool == actualBool;
             }
 
@@ -552,5 +616,6 @@ public class WorkflowParser {
         }
     }
 
-    private record PropertyMatch(int start, int end, String propertyName, String objectValue) {}
+    private record PropertyMatch(int start, int end, String propertyName, String objectValue) {
+    }
 }
