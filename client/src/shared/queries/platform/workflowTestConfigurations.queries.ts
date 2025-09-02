@@ -19,6 +19,7 @@ export const WorkflowTestConfigurationKeys = {
         ...WorkflowTestConfigurationKeys.workflowTestConfigurations,
         request.workflowId,
         request.workflowNodeName,
+        request.environmentId,
     ],
 };
 

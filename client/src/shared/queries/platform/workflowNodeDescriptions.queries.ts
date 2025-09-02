@@ -12,6 +12,7 @@ export const WorkflowNodeDescriptionKeys = {
         ...WorkflowNodeDescriptionKeys.workflowNodeDescriptions,
         request.id,
         request.workflowNodeName,
+        request.environmentId,
     ],
     workflowNodeDescriptions: ['workflowNodeDescriptions'] as const,
 };

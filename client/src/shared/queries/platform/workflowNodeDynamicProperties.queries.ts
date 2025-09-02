@@ -16,6 +16,7 @@ export const WorkflowNodeDynamicPropertyKeys = {
         request.workflowNodeName,
         request.propertyName,
         lookupDependsOnValues,
+        request.environmentId,
     ],
     workflowNodeDynamicProperties: ['workflowNodeDynamicProperties'] as const,
 };
