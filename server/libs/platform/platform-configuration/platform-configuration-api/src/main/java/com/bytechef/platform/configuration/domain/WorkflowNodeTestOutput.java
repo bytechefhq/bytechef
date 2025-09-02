@@ -62,6 +62,9 @@ public class WorkflowNodeTestOutput {
     @Column("workflow_id")
     private String workflowId;
 
+    @Column("environment")
+    private Long environmentId;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -120,6 +123,10 @@ public class WorkflowNodeTestOutput {
         return createdDate;
     }
 
+    public Long getEnvironmentId() {
+        return environmentId;
+    }
+
     public Long getId() {
         return id;
     }
@@ -156,16 +163,8 @@ public class WorkflowNodeTestOutput {
         return workflowNodeName;
     }
 
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
-    public void setTypeOperationName(String typeOperationName) {
-        this.typeOperationName = typeOperationName;
-    }
-
-    public void setTypeVersion(int typeVersion) {
-        this.typeVersion = typeVersion;
+    public void setEnvironmentId(Long environmentId) {
+        this.environmentId = environmentId;
     }
 
     public void setId(Long id) {
@@ -178,6 +177,18 @@ public class WorkflowNodeTestOutput {
 
     public void setSampleOutput(Object sampleOutput) {
         this.sampleOutput = new MapWrapper(Map.of("sampleOutput", sampleOutput));
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public void setTypeOperationName(String typeOperationName) {
+        this.typeOperationName = typeOperationName;
+    }
+
+    public void setTypeVersion(int typeVersion) {
+        this.typeVersion = typeVersion;
     }
 
     public void setVersion(int version) {
@@ -195,19 +206,20 @@ public class WorkflowNodeTestOutput {
     @Override
     public String toString() {
         return "WorkflowTestNodeOutput{" +
-            "typeName='" + typeName + '\'' +
+            "id=" + id +
+            ", workflowId='" + workflowId + '\'' +
+            ", workflowNodeName='" + workflowNodeName + '\'' +
+            ", environmentId=" + environmentId +
+            ", typeName='" + typeName + '\'' +
             ", typeOperationName='" + typeOperationName + '\'' +
             ", typeVersion=" + typeVersion +
-            ", createdBy='" + createdBy + '\'' +
-            ", createdDate=" + createdDate +
-            ", id=" + id +
-            ", lastModifiedBy='" + lastModifiedBy + '\'' +
-            ", lastModifiedDate=" + lastModifiedDate +
             ", outputSchema=" + outputSchema +
             ", sampleOutput=" + sampleOutput +
-            ", workflowNodeName='" + workflowNodeName + '\'' +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
-            ", workflowId='" + workflowId + '\'' +
             '}';
     }
 }

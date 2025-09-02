@@ -115,14 +115,6 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
         return List.copyOf(workflowTestConfigurationConnections);
     }
 
-//    public List<WorkflowTestConfigurationConnection> getConnections(long environmentId) {
-//        return List.copyOf(
-//            workflowTestConfigurationConnections.stream()
-//                .filter(workflowTestConfigurationConnection -> Objects.equals(
-//                    workflowTestConfigurationConnection.getEnvironmentId(), environmentId))
-//                .toList());
-//    }
-
     public String getCreatedBy() {
         return createdBy;
     }

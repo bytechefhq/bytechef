@@ -39,10 +39,16 @@ public @interface WorkflowCacheEvict {
     String[] cacheNames();
 
     /**
-     * The name of the parameter that contains the workflow ID. If not specified, the aspect will try to find a
-     * parameter named "workflowId" or a method "getId()" on a parameter named "workflow".
+     * The name of the parameter that contains the environment ID.
      *
      * @return the name of the parameter that contains the workflow ID
      */
-    String workflowIdParam() default "";
+    String environmentIdParam();
+
+    /**
+     * The name of the parameter that contains the workflow ID.
+     *
+     * @return the name of the parameter that contains the workflow ID
+     */
+    String workflowIdParam();
 }

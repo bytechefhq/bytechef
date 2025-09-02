@@ -26,9 +26,11 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
+import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -51,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class IntegrationFacadeImpl implements IntegrationFacade {
 
+    private final EnvironmentService environmentService;
     private final CategoryService categoryService;
     private final ComponentDefinitionService componentDefinitionService;
     private final IntegrationService integrationService;
@@ -59,6 +62,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final TagService tagService;
+    private final WorkflowCacheManager workflowCacheManager;
     private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -66,15 +70,18 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @SuppressFBWarnings("EI2")
     public IntegrationFacadeImpl(
-        CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
-        IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
+        EnvironmentService environmentService, CategoryService categoryService,
+        ComponentDefinitionService componentDefinitionService, IntegrationService integrationService,
+        IntegrationWorkflowService integrationWorkflowService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        TagService tagService, WorkflowFacade workflowFacade, WorkflowService workflowService,
+        TagService tagService, WorkflowCacheManager workflowCacheManager, WorkflowFacade workflowFacade,
+        WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
+        this.environmentService = environmentService;
         this.categoryService = categoryService;
         this.componentDefinitionService = componentDefinitionService;
         this.integrationService = integrationService;
@@ -83,6 +90,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.tagService = tagService;
+        this.workflowCacheManager = workflowCacheManager;
         this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
@@ -397,12 +405,14 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    @WorkflowCacheEvict(cacheNames = {
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
-    })
     public void updateWorkflow(String workflowId, String definition, int version) {
         workflowService.update(workflowId, definition, version);
+
+        for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
+            for (Environment environment : environmentService.getEnvironments()) {
+                workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName, environment.ordinal());
+            }
+        }
     }
 
     private Category getCategory(Integration integration) {

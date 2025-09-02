@@ -87,9 +87,11 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @WorkflowCacheEvict(cacheNames = {
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
-    })
+    },
+        environmentIdParam = "environmentId",
+        workflowIdParam = "workflowId")
     public WorkflowNodeTestOutput saveWorkflowNodeSampleOutput(
-        String workflowId, String workflowNodeName, Object sampleOutput) {
+        String workflowId, String workflowNodeName, Object sampleOutput, long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -108,14 +110,17 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 sampleOutput, PropertyFactory.PROPERTY_FACTORY));
 
         return workflowNodeTestOutputService.save(
-            workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput));
+            workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput),
+            environmentId);
     }
 
     @Override
     @WorkflowCacheEvict(cacheNames = {
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
-    })
+    },
+        environmentIdParam = "environmentId",
+        workflowIdParam = "workflowId")
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, long environmentId) {
 
@@ -186,7 +191,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             connectionId, true);
 
         if (triggerOutput != null && triggerOutput.value() != null) {
-            saveWorkflowNodeSampleOutput(workflowId, workflowTrigger.getName(), triggerOutput.value());
+            saveWorkflowNodeSampleOutput(
+                workflowId, workflowTrigger.getName(), triggerOutput.value(), environmentId);
 
             webhookTriggerTestFacade.disableTrigger(workflowId, environmentId, workflowExecutionId.getType());
         }
@@ -224,7 +230,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         }
 
         return workflowNodeTestOutputService.save(
-            Validate.notNull(workflow.getId(), "id"), workflowNodeName, workflowNodeType, outputResponse);
+            Validate.notNull(workflow.getId(), "id"), workflowNodeName, workflowNodeType, outputResponse,
+            environmentId);
     }
 
     @SuppressFBWarnings("NP")
@@ -259,6 +266,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             return null;
         }
 
-        return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, outputResponse);
+        return workflowNodeTestOutputService.save(
+            workflowId, workflowNodeName, workflowNodeType, outputResponse, environmentId);
     }
 }

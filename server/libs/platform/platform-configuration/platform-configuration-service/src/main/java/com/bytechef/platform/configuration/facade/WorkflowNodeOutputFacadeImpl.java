@@ -67,9 +67,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
-    private static final List<String> CACHE_NAMES = List.of(
-        PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE);
-
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ActionDefinitionService actionDefinitionService;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -174,7 +171,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
-    public void checkWorkflowCache(String workflowId, String lastWorkflowNodeName) {
+    public void checkWorkflowCache(String workflowId, String lastWorkflowNodeName, long environmentId) {
         boolean dynamicOutputDefined = false;
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -212,8 +209,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         if (dynamicOutputDefined) {
-            for (String cacheName : CACHE_NAMES) {
-                workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName);
+            for (String cacheName : WORKFLOW_CACHE_NAMES) {
+                workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName, environmentId);
             }
         }
     }
@@ -344,7 +341,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
 
         OutputResponse outputResponse = workflowNodeTestOutputService
-            .fetchWorkflowTestNodeOutput(workflowId, clusterElementWorkflowNodeName)
+            .fetchWorkflowTestNodeOutput(workflowId, clusterElementWorkflowNodeName, environmentId)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .or(() -> getClusterElementDynamicOutputResponse(workflowId, workflowTask, clusterElement, environmentId))
             .orElse(null);
@@ -403,7 +400,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
 
         OutputResponse outputResponse = workflowNodeTestOutputService
-            .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
+            .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName(), environmentId)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .orElse(null);
 
@@ -464,7 +461,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             workflowNodeType.operation());
 
         OutputResponse outputResponse = workflowNodeTestOutputService
-            .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
+            .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName(), environmentId)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .or(() -> getWorkflowTriggerDynamicOutputResponse(workflowId, workflowTrigger, environmentId))
             .orElse(null);

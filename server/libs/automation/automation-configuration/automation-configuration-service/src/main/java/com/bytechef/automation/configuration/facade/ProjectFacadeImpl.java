@@ -37,9 +37,11 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
+import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -62,6 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectFacadeImpl implements ProjectFacade {
 
+    private final EnvironmentService environmentService;
     private final CategoryService categoryService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
@@ -69,6 +72,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final TagService tagService;
+    private final WorkflowCacheManager workflowCacheManager;
     private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -76,14 +80,15 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        CategoryService categoryService, ProjectWorkflowService projectWorkflowService,
-        ProjectDeploymentService projectDeploymentService, ProjectService projectService,
-        ProjectDeploymentFacade projectDeploymentFacade,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        TagService tagService, WorkflowFacade workflowFacade, WorkflowService workflowService,
+        EnvironmentService environmentService, CategoryService categoryService,
+        ProjectWorkflowService projectWorkflowService, ProjectDeploymentService projectDeploymentService,
+        ProjectService projectService, ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, TagService tagService,
+        WorkflowCacheManager workflowCacheManager, WorkflowFacade workflowFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
+        this.environmentService = environmentService;
         this.categoryService = categoryService;
         this.projectWorkflowService = projectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
@@ -91,6 +96,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.tagService = tagService;
+        this.workflowCacheManager = workflowCacheManager;
         this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
@@ -397,12 +403,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    @WorkflowCacheEvict(cacheNames = {
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
-    })
     public void updateWorkflow(String workflowId, String definition, int version) {
         workflowService.update(workflowId, definition, version);
+
+        for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
+            for (Environment environment : environmentService.getEnvironments()) {
+                workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName, environment.ordinal());
+            }
+        }
     }
 
     private List<Tag> checkTags(List<Tag> tags) {

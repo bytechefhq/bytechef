@@ -29,18 +29,19 @@ import javax.annotation.Nullable;
  */
 public interface WorkflowNodeTestOutputService {
 
-    void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName);
+    void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName, long environmentId);
 
     boolean checkWorkflowNodeTestOutputExists(
-        String workflowId, String workflowNodeName, @Nullable Instant createdDate);
+        String workflowId, String workflowNodeName, @Nullable Instant createdDate, long environmentId);
 
     Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(
-        String workflowId, String workflowNodeName);
+        String workflowId, String workflowNodeName, long environmentId);
 
     void removeUnusedNodeTestOutputs(Workflow workflow);
 
     WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, OutputResponse outputResponse);
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, OutputResponse outputResponse,
+        long environmentId);
 
     void updateWorkflowId(String oldWorkflowId, String newWorkflowId);
 }
