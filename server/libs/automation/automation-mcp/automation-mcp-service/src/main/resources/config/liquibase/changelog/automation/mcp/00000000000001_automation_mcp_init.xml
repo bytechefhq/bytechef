@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
-    <changeSet id="20240604153111" author="Ivica Cardic">
+    <changeSet id="00000000000001" author="Ivica Cardic">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="mcp_project"/>
@@ -38,6 +38,35 @@
         </createTable>
 
         <addUniqueConstraint constraintName="uk_mcp_project_project_deployment_server" tableName="mcp_project" columnNames="project_deployment_id,mcp_server_id" />
+
+        <createTable tableName="mcp_project_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_project_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_project_workflow_mcp_project" references="mcp_project(id)"/>
+            </column>
+            <column name="project_deployment_workflow_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_project_workflow_project_deployment_workflow" references="project_deployment_workflow(id)"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_mcp_project_workflow_project_deployment_workflow" tableName="mcp_project_workflow" columnNames="mcp_project_id,project_deployment_workflow_id" />
     </changeSet>
 
     <changeSet id="20240604153111-1" author="Ivica Cardic" contextFilter="mono">

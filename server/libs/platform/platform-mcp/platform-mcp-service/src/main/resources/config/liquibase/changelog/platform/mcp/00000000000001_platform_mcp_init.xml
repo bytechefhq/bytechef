@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
-    <changeSet id="20250313170121" author="Ivica Cardic">
+    <changeSet id="00000000000001" author="Ivica Cardic">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="mcp_server"/>
@@ -80,12 +80,12 @@
 
         <addUniqueConstraint constraintName="uk_mcp_component_name_version_server" tableName="mcp_component" columnNames="component_name,component_version,mcp_server_id" />
 
-        <createTable tableName="mcp_action">
+        <createTable tableName="mcp_tool">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="mcp_component_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_mcp_action_mcp_component_id" references="mcp_component(id)"/>
+                <constraints nullable="false" foreignKeyName="fk_mcp_tool_mcp_component_id" references="mcp_component(id)"/>
             </column>
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
@@ -110,7 +110,7 @@
             </column>
         </createTable>
 
-        <addUniqueConstraint constraintName="uk_mcp_action_name_component" tableName="mcp_action" columnNames="name,mcp_component_id" />
+        <addUniqueConstraint constraintName="uk_mcp_tool_name_component" tableName="mcp_tool" columnNames="name,mcp_component_id" />
 
         <createTable tableName="mcp_server_tag">
             <column name="mcp_server_id" type="BIGINT">
