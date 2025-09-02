@@ -28,12 +28,14 @@ import {
 export interface CheckWorkflowNodeTestOutputExistsRequest {
     id: string;
     workflowNodeName: string;
+    environmentId: number;
     createdDate?: Date;
 }
 
 export interface DeleteWorkflowNodeTestOutputRequest {
     id: string;
     workflowNodeName: string;
+    environmentId: number;
 }
 
 export interface SaveWorkflowNodeTestOutputRequest {
@@ -45,6 +47,7 @@ export interface SaveWorkflowNodeTestOutputRequest {
 export interface UploadWorkflowNodeSampleOutputRequest {
     id: string;
     workflowNodeName: string;
+    environmentId: number;
     body: object;
 }
 
@@ -72,10 +75,21 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling checkWorkflowNodeTestOutputExists().'
+            );
+        }
+
         const queryParameters: any = {};
 
         if (requestParameters['createdDate'] != null) {
             queryParameters['createdDate'] = (requestParameters['createdDate'] as any).toISOString();
+        }
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -123,7 +137,18 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling deleteWorkflowNodeTestOutput().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -227,6 +252,13 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling uploadWorkflowNodeSampleOutput().'
+            );
+        }
+
         if (requestParameters['body'] == null) {
             throw new runtime.RequiredError(
                 'body',
@@ -235,6 +267,10 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
