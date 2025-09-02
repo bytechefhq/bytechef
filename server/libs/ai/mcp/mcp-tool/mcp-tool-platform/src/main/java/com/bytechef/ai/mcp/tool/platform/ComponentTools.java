@@ -24,7 +24,6 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -88,7 +87,8 @@ public class ComponentTools {
         """;
 
     @SuppressFBWarnings("EI")
-    public ComponentTools(ComponentDefinitionService componentDefinitionService, ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade) {
+    public ComponentTools(ComponentDefinitionService componentDefinitionService,
+        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade) {
         this.componentDefinitionService = componentDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -505,18 +505,21 @@ public class ComponentTools {
                     if (trigger.isOutputSchemaDefined()) {
                         outputResponse = trigger.getOutputResponse();
                     } else if (trigger.isOutputFunctionDefined()) {
-                        outputResponse = triggerDefinitionFacade.executeOutput(componentDefinition.getName(), componentDefinition.getVersion(), trigger.getName(), Map.of(), null);
+                        outputResponse = triggerDefinitionFacade.executeOutput(componentDefinition.getName(),
+                            componentDefinition.getVersion(), trigger.getName(), Map.of(), null);
                     }
 
                     if (outputResponse == null) {
                         try {
-                            var output = triggerDefinitionFacade.executeTrigger(componentDefinition.getName(), componentDefinition.getVersion(), trigger.getName(), null, null, null, null, null, null, null, true);
+                            var output = triggerDefinitionFacade.executeTrigger(componentDefinition.getName(),
+                                componentDefinition.getVersion(), trigger.getName(), null, null, null, null, null, null,
+                                null, true);
                             if (output != null) {
-                                outputResponse = SchemaUtils.toOutput(output, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+                                outputResponse = SchemaUtils.toOutput(output, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
+                                    PropertyFactory.PROPERTY_FACTORY);
                             }
-                        }
-                        catch (Exception e) {
-                           throw new Exception("Please make a " + componentDefinition.getName() + " connector");
+                        } catch (Exception e) {
+                            throw new Exception("Please make a " + componentDefinition.getName() + " connector");
                         }
                     }
                 }
@@ -535,13 +538,17 @@ public class ComponentTools {
                         if (action.isOutputSchemaDefined()) {
                             outputResponse = action.getOutputResponse();
                         } else if (action.isOutputFunctionDefined()) {
-                            outputResponse = actionDefinitionFacade.executeOutput(componentDefinition.getName(), componentDefinition.getVersion(), action.getName(), Map.of(), null);
+                            outputResponse = actionDefinitionFacade.executeOutput(componentDefinition.getName(),
+                                componentDefinition.getVersion(), action.getName(), Map.of(), null);
                         }
                         if (outputResponse == null) {
                             try {
-                                var output = actionDefinitionFacade.executePerform(componentDefinition.getName(), componentDefinition.getVersion(), action.getName(), null, null, null, null, null, null, null, null, true);
+                                var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
+                                    componentDefinition.getVersion(), action.getName(), null, null, null, null, null,
+                                    null, null, null, true);
                                 if (output != null) {
-                                    outputResponse = SchemaUtils.toOutput(output, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+                                    outputResponse = SchemaUtils.toOutput(output,
+                                        PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
                                 }
                             } catch (Exception e) {
                                 throw new Exception("Please make a " + componentDefinition.getName() + " connector");
