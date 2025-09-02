@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateClusterElementParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-08-31T22:15:46.157032+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T08:24:03.555464+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class UpdateClusterElementParameterRequestModel {
 
   private Boolean includeInMetadata = false;
