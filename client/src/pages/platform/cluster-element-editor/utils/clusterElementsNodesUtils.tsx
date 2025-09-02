@@ -84,7 +84,7 @@ export function createSingleElementsNode({
         data: {
             ...clusterElementItem,
             clusterElementLabel: clusterElementTypeLabel,
-            clusterElementName: clusterElementTypeName,
+            clusterElementName: typeSegments[2],
             clusterElementType: clusterElementTypeName,
             clusterElementTypesCount: currentNestedRootElementTypesCount,
             componentName: typeSegments[0],
