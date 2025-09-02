@@ -59,8 +59,7 @@ class ToolUtilsTest {
         List<PropertyDecorator> properties = List.of(
             new PropertyDecorator(property1),
             new PropertyDecorator(property2),
-            new PropertyDecorator(property3)
-        );
+            new PropertyDecorator(property3));
 
         Map<String, List<String>> result = ToolUtils.listDisplayConditions(properties);
 
@@ -86,8 +85,7 @@ class ToolUtilsTest {
         List<PropertyDecorator> properties = List.of(
             new PropertyDecorator(property1),
             new PropertyDecorator(property2),
-            new PropertyDecorator(property3)
-        );
+            new PropertyDecorator(property3));
 
         Map<String, List<String>> result = ToolUtils.listDisplayConditions(properties);
 
@@ -182,8 +180,7 @@ class ToolUtilsTest {
 
         List<PropertyDecorator> properties = List.of(
             new PropertyDecorator(prop1),
-            new PropertyDecorator(objectProp)
-        );
+            new PropertyDecorator(objectProp));
 
         Map<String, List<String>> result = ToolUtils.listDisplayConditions(properties);
 
@@ -244,12 +241,13 @@ class ToolUtilsTest {
         List<PropertyDecorator> properties = List.of(
             new PropertyDecorator(stringProp),
             new PropertyDecorator(boolProp),
-            new PropertyDecorator(intProp)
-        );
+            new PropertyDecorator(intProp));
 
         String result = ToolUtils.generateObjectValue(properties, "", "\"");
 
-        assertEquals("{ \"metadata\": \"\", \"name\": \"string (required)\", \"active\": \"boolean\", \"count\": \"integer (required)\" }", result);
+        assertEquals(
+            "{ \"metadata\": \"\", \"name\": \"string (required)\", \"active\": \"boolean\", \"count\": \"integer (required)\" }",
+            result);
     }
 
     @Test
@@ -267,7 +265,9 @@ class ToolUtilsTest {
 
         String result = ToolUtils.generateObjectValue(properties, "", "\"");
 
-        assertEquals("{ \"metadata\": \"\", \"nested\": { \"metadata\": \"\", \"nestedField\": \"string (required)\" } }", result);
+        assertEquals(
+            "{ \"metadata\": \"\", \"nested\": { \"metadata\": \"\", \"nestedField\": \"string (required)\" } }",
+            result);
     }
 
     @Test
@@ -331,10 +331,12 @@ class ToolUtilsTest {
 
         String result = ToolUtils.generateObjectValue(properties, "", "\"");
 
-        String expected = "{ \"metadata\": \"\", \"body\": { \"metadata\": \"\", \"bodyContentType\": \"string\", \"bodyContent\": { \"metadata\": \"@bodyContentType == true@\", \"extension\": \"string (required)\", \"mimeType\": \"string (required)\", \"name\": \"string (required)\", \"url\": \"string (required)\" }, \"bodyContent\": { \"metadata\": \"@bodyContentType == false@\" } } }";
+        String expected =
+            "{ \"metadata\": \"\", \"body\": { \"metadata\": \"\", \"bodyContentType\": \"string\", \"bodyContent\": { \"metadata\": \"@bodyContentType == true@\", \"extension\": \"string (required)\", \"mimeType\": \"string (required)\", \"name\": \"string (required)\", \"url\": \"string (required)\" }, \"bodyContent\": { \"metadata\": \"@bodyContentType == false@\" } } }";
         assertEquals(expected, result);
 
-        Map<String, List<String>> displayConditions = ToolUtils.listDisplayConditions(List.of(new PropertyDecorator(body)));
+        Map<String, List<String>> displayConditions =
+            ToolUtils.listDisplayConditions(List.of(new PropertyDecorator(body)));
         assertEquals(2, displayConditions.size());
         assertEquals(List.of("body.bodyContent"), displayConditions.get("bodyContentType == true"));
         assertEquals(List.of("body.bodyContent"), displayConditions.get("bodyContentType == false"));
@@ -362,11 +364,12 @@ class ToolUtilsTest {
 
         List<PropertyDecorator> properties = List.of(
             new PropertyDecorator(level1Array),
-            new PropertyDecorator(siblingProp)
-        );
+            new PropertyDecorator(siblingProp));
 
         String result = ToolUtils.generateObjectValue(properties, "", "\"");
 
-        assertEquals("{ \"metadata\": \"\", \"level1Array\": [ { \"metadata\": \"\", \"deepProperty\": \"string (required)\" } ], \"sibling\": \"string\" }", result);
+        assertEquals(
+            "{ \"metadata\": \"\", \"level1Array\": [ { \"metadata\": \"\", \"deepProperty\": \"string (required)\" } ], \"sibling\": \"string\" }",
+            result);
     }
 }

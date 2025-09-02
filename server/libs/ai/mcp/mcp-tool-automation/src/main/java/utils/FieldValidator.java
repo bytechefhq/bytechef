@@ -1,12 +1,27 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.regex.Pattern;
 
 /**
- * Utility class for validating individual fields and their properties.
- * Contains validation logic for required fields, field types, and field patterns.
+ * Utility class for validating individual fields and their properties. Contains validation logic for required fields,
+ * field types, and field patterns.
  */
 public class FieldValidator {
 
@@ -16,7 +31,7 @@ public class FieldValidator {
     private FieldValidator() {
         // Utility class
     }
-    
+
     /**
      * Checks if a string value is a data pill expression (e.g., "${taskName.property}").
      */
@@ -30,7 +45,8 @@ public class FieldValidator {
     public static void validateRequiredStringField(JsonNode node, String fieldName, StringBuilder errors) {
         if (!node.has(fieldName)) {
             ValidationErrorBuilder.appendWithNewline(errors, "Missing required field: " + fieldName);
-        } else if (!node.get(fieldName).isTextual()) {
+        } else if (!node.get(fieldName)
+            .isTextual()) {
             ValidationErrorBuilder.appendWithNewline(errors, "Field '" + fieldName + "' must be a string");
         }
     }
@@ -41,7 +57,8 @@ public class FieldValidator {
     public static void validateRequiredArrayField(JsonNode node, String fieldName, StringBuilder errors) {
         if (!node.has(fieldName)) {
             ValidationErrorBuilder.appendWithNewline(errors, "Missing required field: " + fieldName);
-        } else if (!node.get(fieldName).isArray()) {
+        } else if (!node.get(fieldName)
+            .isArray()) {
             ValidationErrorBuilder.appendWithNewline(errors, "Field '" + fieldName + "' must be an array");
         }
     }
@@ -52,7 +69,8 @@ public class FieldValidator {
     public static void validateRequiredObjectField(JsonNode node, String fieldName, StringBuilder errors) {
         if (!node.has(fieldName)) {
             ValidationErrorBuilder.appendWithNewline(errors, "Missing required field: " + fieldName);
-        } else if (!node.get(fieldName).isObject()) {
+        } else if (!node.get(fieldName)
+            .isObject()) {
             ValidationErrorBuilder.appendWithNewline(errors, "Field '" + fieldName + "' must be an object");
         }
     }
@@ -69,7 +87,8 @@ public class FieldValidator {
                 ValidationErrorBuilder.appendWithNewline(errors, "Field 'triggers' must be an array");
             } else if (triggers.size() != 1) {
                 ValidationErrorBuilder.appendWithNewline(errors, "Field 'triggers' must contain exactly one object");
-            } else if (!triggers.get(0).isObject()) {
+            } else if (!triggers.get(0)
+                .isObject()) {
                 ValidationErrorBuilder.appendWithNewline(errors, "Trigger must be an object");
             }
         }
@@ -81,11 +100,14 @@ public class FieldValidator {
     public static void validateTaskType(JsonNode taskNode, StringBuilder errors) {
         if (!taskNode.has("type")) {
             ValidationErrorBuilder.appendWithNewline(errors, "Missing required field: type");
-        } else if (!taskNode.get("type").isTextual()) {
+        } else if (!taskNode.get("type")
+            .isTextual()) {
             ValidationErrorBuilder.appendWithNewline(errors, "Field 'type' must be a string");
         } else {
-            String typeValue = taskNode.get("type").asText();
-            if (!TYPE_PATTERN.matcher(typeValue).matches()) {
+            String typeValue = taskNode.get("type")
+                .asText();
+            if (!TYPE_PATTERN.matcher(typeValue)
+                .matches()) {
                 ValidationErrorBuilder.appendWithNewline(errors,
                     "Field 'type' must match pattern: (alphanumeric)+/v(numeric)+(/(alphanumeric)+)?");
             }
@@ -95,13 +117,14 @@ public class FieldValidator {
     /**
      * Validates a property definition and its value, handling required properties and type checking.
      */
-    public static void validateStringTypeDefinition(JsonNode currentNode, String propertyName, String propertyDef,
-                                                   String propertyPath, StringBuilder errors, StringBuilder warnings,
-                                                   String originalTaskDefinition, String originalCurrentParams) {
+    public static void validateStringTypeDefinition(
+        JsonNode currentNode, String propertyName, String propertyDef,
+        String propertyPath, StringBuilder errors, StringBuilder warnings,
+        String originalTaskDefinition, String originalCurrentParams) {
         // Check for inline display conditions
         if (propertyDef.contains("@") && propertyDef.contains("@")) {
             try {
-                boolean shouldInclude = WorkflowParser.extractAndEvaluateCondition(propertyDef, 
+                boolean shouldInclude = WorkflowParser.extractAndEvaluateCondition(propertyDef,
                     WorkflowParser.parseJsonString(originalCurrentParams));
                 if (!shouldInclude) {
                     return; // Skip validation if condition is false
@@ -112,10 +135,12 @@ public class FieldValidator {
         }
 
         boolean isRequired = propertyDef.contains(REQUIRED_MARKER);
-        String expectedType = propertyDef.replace(REQUIRED_MARKER, "").trim();
-        
+        String expectedType = propertyDef.replace(REQUIRED_MARKER, "")
+            .trim();
+
         // Remove inline conditions from type definition
-        expectedType = expectedType.replaceAll("@[^@]+@", "").trim();
+        expectedType = expectedType.replaceAll("@[^@]+@", "")
+            .trim();
 
         if (isRequired && !currentNode.has(propertyName)) {
             ValidationErrorBuilder.appendWithNewline(errors, ValidationErrorBuilder.missingProperty(propertyPath));
@@ -132,10 +157,11 @@ public class FieldValidator {
                 // Data pill expressions will be validated separately by validateTaskDataPills
                 return;
             }
-            
+
             if (!isTypeValid(currentValue, expectedType)) {
                 String actualType = WorkflowParser.getJsonNodeType(currentValue);
-                ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(propertyPath, expectedType, actualType));
+                ValidationErrorBuilder.append(errors,
+                    ValidationErrorBuilder.typeError(propertyPath, expectedType, actualType));
             }
         }
     }
@@ -143,8 +169,10 @@ public class FieldValidator {
     /**
      * Validates array property and its elements.
      */
-    public static void validateArrayProperty(JsonNode currentNode, String propertyName, JsonNode defValue, String propertyPath, StringBuilder errors) {
-        if (!currentNode.has(propertyName)) return;
+    public static void validateArrayProperty(
+        JsonNode currentNode, String propertyName, JsonNode defValue, String propertyPath, StringBuilder errors) {
+        if (!currentNode.has(propertyName))
+            return;
 
         JsonNode currentValue = currentNode.get(propertyName);
         if (!currentValue.isArray()) {
@@ -154,7 +182,8 @@ public class FieldValidator {
         }
 
         JsonNode arrayElementDef = defValue.get(0);
-        if (!arrayElementDef.isTextual()) return;
+        if (!arrayElementDef.isTextual())
+            return;
 
         String expectedElementType = arrayElementDef.asText();
         for (int i = 0; i < currentValue.size(); i++) {
@@ -188,16 +217,20 @@ public class FieldValidator {
     /**
      * Validates missing object properties that have required fields.
      */
-    public static void validateMissingObjectWithRequiredFields(JsonNode defValue, String propertyPath, StringBuilder errors) {
-        defValue.fieldNames().forEachRemaining(fieldName -> {
-            JsonNode fieldDef = defValue.get(fieldName);
-            String fullFieldPath = WorkflowParser.buildPropertyPath(propertyPath, fieldName);
+    public static void
+        validateMissingObjectWithRequiredFields(JsonNode defValue, String propertyPath, StringBuilder errors) {
+        defValue.fieldNames()
+            .forEachRemaining(fieldName -> {
+                JsonNode fieldDef = defValue.get(fieldName);
+                String fullFieldPath = WorkflowParser.buildPropertyPath(propertyPath, fieldName);
 
-            if (fieldDef.isTextual() && fieldDef.asText().contains(REQUIRED_MARKER)) {
-                ValidationErrorBuilder.appendWithNewline(errors, ValidationErrorBuilder.missingProperty(fullFieldPath));
-            } else if (fieldDef.isObject()) {
-                validateMissingObjectWithRequiredFields(fieldDef, fullFieldPath, errors);
-            }
-        });
+                if (fieldDef.isTextual() && fieldDef.asText()
+                    .contains(REQUIRED_MARKER)) {
+                    ValidationErrorBuilder.appendWithNewline(errors,
+                        ValidationErrorBuilder.missingProperty(fullFieldPath));
+                } else if (fieldDef.isObject()) {
+                    validateMissingObjectWithRequiredFields(fieldDef, fullFieldPath, errors);
+                }
+            });
     }
 }
