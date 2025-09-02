@@ -1,7 +1,7 @@
+.openapi-generator-ignore
 apis/SigningKeyApi.ts
 apis/index.ts
 index.ts
-models/ApiKey.ts
 models/CreateSigningKey200Response.ts
 models/SigningKey.ts
 models/index.ts
