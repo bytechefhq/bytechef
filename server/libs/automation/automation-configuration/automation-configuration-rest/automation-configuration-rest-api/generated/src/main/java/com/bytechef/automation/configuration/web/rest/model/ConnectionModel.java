@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T08:24:02.278022+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T13:45:39.340746924+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectionModel {
 
   private @Nullable Boolean active;
