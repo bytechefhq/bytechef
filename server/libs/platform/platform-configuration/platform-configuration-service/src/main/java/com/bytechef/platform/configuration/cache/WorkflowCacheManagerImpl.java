@@ -29,29 +29,22 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 /**
- * Service responsible for managing cache cleaning operations.
- *
  * @author Ivica Cardic
  */
 @Component
-public class WorkflowCacheManager {
+public class WorkflowCacheManagerImpl implements WorkflowCacheManager {
 
     private final CacheManager cacheManager;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public WorkflowCacheManager(CacheManager cacheManager, WorkflowService workflowService) {
+    public WorkflowCacheManagerImpl(CacheManager cacheManager, WorkflowService workflowService) {
         this.cacheManager = cacheManager;
         this.workflowService = workflowService;
     }
 
-    /**
-     * Clears cache entries for a specific workflow.
-     *
-     * @param workflowId the ID of the workflow
-     * @param cacheName  the name of the cache
-     */
-    public void clearCacheForWorkflow(String workflowId, String cacheName) {
+    @Override
+    public void clearCacheForWorkflow(String workflowId, String cacheName, long environmentId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         List<String> workflowNodeNames = new ArrayList<>();
@@ -68,7 +61,7 @@ public class WorkflowCacheManager {
             workflowNodeNames.add(workflowTask.getName());
         }
 
-        clearCache(cacheName, workflowId, workflowNodeNames);
+        clearCache(cacheName, workflowId, workflowNodeNames, environmentId);
     }
 
     /**
@@ -77,13 +70,14 @@ public class WorkflowCacheManager {
      * @param cacheName         the name of the cache
      * @param workflowId        the ID of the workflow
      * @param workflowNodeNames the list of workflow node names
+     * @param environmentId     the environment id
      */
-    private void clearCache(String cacheName, String workflowId, List<String> workflowNodeNames) {
+    private void clearCache(String cacheName, String workflowId, List<String> workflowNodeNames, long environmentId) {
         Cache cache = cacheManager.getCache(cacheName);
 
         if (cache != null) {
             for (String workflowNodeName : workflowNodeNames) {
-                cache.evict(TenantCacheKeyUtils.getKey(workflowId, workflowNodeName));
+                cache.evict(TenantCacheKeyUtils.getKey(workflowId, workflowNodeName, environmentId));
             }
         }
     }

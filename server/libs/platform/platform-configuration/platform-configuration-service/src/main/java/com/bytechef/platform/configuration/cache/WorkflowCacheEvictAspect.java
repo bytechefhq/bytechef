@@ -16,11 +16,11 @@
 
 package com.bytechef.platform.configuration.cache;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Objects;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -52,12 +52,10 @@ public class WorkflowCacheEvictAspect {
      */
     @AfterReturning(pointcut = "@annotation(workflowCacheEvict)", returning = "result")
     public void clearCache(JoinPoint joinPoint, Object result, WorkflowCacheEvict workflowCacheEvict) {
-        String workflowId = extractWorkflowId(joinPoint, workflowCacheEvict);
+        Arguments arguments = extractArguments(joinPoint, workflowCacheEvict);
 
-        if (workflowId != null) {
-            for (String cacheName : workflowCacheEvict.cacheNames()) {
-                workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName);
-            }
+        for (String cacheName : workflowCacheEvict.cacheNames()) {
+            workflowCacheManager.clearCacheForWorkflow(arguments.workflowId, cacheName, arguments.environmentId);
         }
     }
 
@@ -68,41 +66,31 @@ public class WorkflowCacheEvictAspect {
      * @param workflowCacheEvict the annotation
      * @return the workflow ID or null if not found
      */
-    private String extractWorkflowId(JoinPoint joinPoint, WorkflowCacheEvict workflowCacheEvict) {
+    private Arguments extractArguments(JoinPoint joinPoint, WorkflowCacheEvict workflowCacheEvict) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Object[] args = joinPoint.getArgs();
-        String workflowId = workflowCacheEvict.workflowIdParam();
 
         Method method = methodSignature.getMethod();
 
         Parameter[] parameters = method.getParameters();
 
-        if (!workflowId.isEmpty()) {
-            for (int i = 0; i < parameters.length; i++) {
-                String name = parameters[i].getName();
+        return new Arguments(
+            (Long) Objects.requireNonNull(extractArgument(workflowCacheEvict.environmentIdParam(), args, parameters)),
+            (String) extractArgument(workflowCacheEvict.workflowIdParam(), args, parameters));
+    }
 
-                if (name.equals(workflowId) && args[i] instanceof String) {
-                    return (String) args[i];
-                }
-            }
-        }
-
+    private Object extractArgument(String paramName, Object[] args, Parameter[] parameters) {
         for (int i = 0; i < parameters.length; i++) {
             String name = parameters[i].getName();
 
-            if (name.equals("workflowId") && args[i] instanceof String) {
-                return (String) args[i];
-            }
-        }
-
-        for (int i = 0; i < parameters.length; i++) {
-            String name = parameters[i].getName();
-
-            if (name.equals("workflow") && args[i] instanceof Workflow workflow) {
-                return workflow.getId();
+            if (name.equals(paramName)) {
+                return args[i];
             }
         }
 
         return null;
+    }
+
+    private record Arguments(long environmentId, String workflowId) {
     }
 }

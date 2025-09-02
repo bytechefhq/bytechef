@@ -25,7 +25,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,17 +52,19 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
 
     @Override
     public ResponseEntity<CheckWorkflowNodeTestOutputExists200ResponseModel> checkWorkflowNodeTestOutputExists(
-        String id, String workflowNodeName, @NonNull OffsetDateTime createdDate) {
+        String id, String workflowNodeName, Long environmentId, OffsetDateTime createdDate) {
 
         return ResponseEntity.ok(
             new CheckWorkflowNodeTestOutputExists200ResponseModel().exists(
                 workflowNodeTestOutputService.checkWorkflowNodeTestOutputExists(
-                    id, workflowNodeName, createdDate == null ? null : createdDate.toInstant())));
+                    id, workflowNodeName, createdDate == null ? null : createdDate.toInstant(), environmentId)));
     }
 
     @Override
-    public ResponseEntity<Void> deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
-        workflowNodeTestOutputService.deleteWorkflowNodeTestOutput(workflowId, workflowNodeName);
+    public ResponseEntity<Void> deleteWorkflowNodeTestOutput(
+        String workflowId, String workflowNodeName, Long environmentId) {
+
+        workflowNodeTestOutputService.deleteWorkflowNodeTestOutput(workflowId, workflowNodeName, environmentId);
 
         return ResponseEntity
             .noContent()
@@ -82,11 +83,12 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
 
     @Override
     public ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleOutput(
-        String workflowId, String workflowNodeName, Object body) {
+        String workflowId, String workflowNodeName, Long environmentId, Object body) {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowNodeTestOutputFacade.saveWorkflowNodeSampleOutput(workflowId, workflowNodeName, body),
+                workflowNodeTestOutputFacade.saveWorkflowNodeSampleOutput(
+                    workflowId, workflowNodeName, body, environmentId),
                 WorkflowNodeTestOutputModel.class));
     }
 }

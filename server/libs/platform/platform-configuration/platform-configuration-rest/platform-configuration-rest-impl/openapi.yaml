@@ -1594,6 +1594,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "204":
           description: "Successful operation."
@@ -1657,6 +1664,13 @@ paths:
           schema:
             type: "string"
             format: "date-time"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "Successful operation."
@@ -1689,6 +1703,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:

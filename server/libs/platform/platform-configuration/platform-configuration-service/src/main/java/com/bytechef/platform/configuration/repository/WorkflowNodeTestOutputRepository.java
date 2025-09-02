@@ -40,7 +40,8 @@ public interface WorkflowNodeTestOutputRepository
 
     List<WorkflowNodeTestOutput> findByWorkflowId(String workflowId);
 
-    Optional<WorkflowNodeTestOutput> findByWorkflowIdAndWorkflowNodeName(String workflowId, String workflowNodeName);
+    Optional<WorkflowNodeTestOutput> findByWorkflowIdAndWorkflowNodeNameAndEnvironmentId(
+        String workflowId, String workflowNodeName, long environmentId);
 
     @Modifying
     @Query("UPDATE workflow_node_test_output SET workflow_id = :newWorkflowId WHERE workflow_id = :oldWorkflowId")
