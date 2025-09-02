@@ -16,27 +16,28 @@ export default function updateClusterElementsPositions({
     const updatedClusterElements: ClusterElementsType = {};
 
     Object.entries(clusterElements).forEach(([elementKey, elementValue]) => {
+        let isMovedElement;
+
         if (Array.isArray(elementValue)) {
             updatedClusterElements[elementKey] = elementValue.map((element) => {
-                const isMovedElement = element.name === movedClusterElementId;
+                isMovedElement = element.name === movedClusterElementId;
 
                 const elementPosition = isMovedElement ? nodePositions[element.name] : undefined;
 
                 const updatedElement: ClusterElementItemType = {
                     ...element,
-                    ...(isMovedElement &&
-                        elementPosition && {
-                            metadata: {
-                                ...element?.metadata,
-                                ui: {
-                                    ...element?.metadata?.ui,
-                                    nodePosition: elementPosition,
-                                },
-                            },
-                        }),
                 };
 
-                // Process nested elements if needed
+                if (isMovedElement && elementPosition) {
+                    updatedElement.metadata = {
+                        ...element?.metadata,
+                        ui: {
+                            ...element?.metadata?.ui,
+                            nodePosition: elementPosition,
+                        },
+                    };
+                }
+
                 if (element.clusterElements) {
                     const updatedNestedClusterElements = updateClusterElementsPositions({
                         clusterElements: element.clusterElements,
@@ -51,26 +52,25 @@ export default function updateClusterElementsPositions({
 
                 return updatedElement;
             });
-        } else if (elementValue && isPlainObject(elementValue)) {
-            const isMovedElement = elementValue.name === movedClusterElementId;
+        } else if (isPlainObject(elementValue)) {
+            isMovedElement = elementValue.name === movedClusterElementId;
 
             const elementPosition = isMovedElement ? nodePositions[elementValue.name] : undefined;
 
-            const updatedElement = {
+            const updatedElement: ClusterElementItemType = {
                 ...elementValue,
-                ...(isMovedElement &&
-                    elementPosition && {
-                        metadata: {
-                            ...elementValue?.metadata,
-                            ui: {
-                                ...elementValue?.metadata?.ui,
-                                nodePosition: elementPosition,
-                            },
-                        },
-                    }),
             };
 
-            // Process nested elements if needed
+            if (isMovedElement && elementPosition) {
+                updatedElement.metadata = {
+                    ...elementValue?.metadata,
+                    ui: {
+                        ...elementValue?.metadata?.ui,
+                        nodePosition: elementPosition,
+                    },
+                };
+            }
+
             if (elementValue.clusterElements) {
                 const updatedNestedClusterElements = updateClusterElementsPositions({
                     clusterElements: elementValue.clusterElements,

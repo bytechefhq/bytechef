@@ -159,15 +159,15 @@ export const getLayoutedElements = async ({
                         value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
                 );
 
-            if (hasValidClusterElements && !isClusterElementsCanvas) {
-                dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
-            }
+            let edgeLength = 1;
 
             if (isClusterElementsCanvas) {
-                dagreGraph.setEdge(edge.source, edge.target, {minlen: 1.5});
+                edgeLength = 1.5;
+            } else if (hasValidClusterElements) {
+                edgeLength = 2;
             }
 
-            dagreGraph.setEdge(edge.source, edge.target);
+            dagreGraph.setEdge(edge.source, edge.target, {minlen: edgeLength});
         }
     });
 
@@ -186,7 +186,7 @@ export const getLayoutedElements = async ({
         const placeholderNodes = allNodes.filter((node) => node.type === 'placeholder');
         const clusterElementWorkflowNodes = allNodes.filter((node) => node.type !== 'placeholder');
 
-        let positionedNodes = [] as Node[];
+        let processedClusterElementNodes = [] as Node[];
         let centeredMainRootNode = [] as Node[];
 
         if (mainRootNode) {
@@ -209,44 +209,44 @@ export const getLayoutedElements = async ({
 
             // Position child nodes relative to their own parent root nodes
             if (clusterElementWorkflowNodes.length > 0) {
-                positionedNodes = [
-                    ...positionedNodes,
-                    ...clusterElementWorkflowNodes.map((clusterElementNode) => {
-                        const childDagreNode = dagreGraph.node(clusterElementNode.id);
-                        const parentRootNode = clusterElementNode.parentId
-                            ? nodes.find((node) => node.id === clusterElementNode.parentId)
-                            : mainRootNode;
+                const positionedClusterElementNodes = clusterElementWorkflowNodes.map((clusterElementNode) => {
+                    const childDagreNode = dagreGraph.node(clusterElementNode.id);
+                    const parentRootNode = clusterElementNode.parentId
+                        ? nodes.find((node) => node.id === clusterElementNode.parentId)
+                        : mainRootNode;
 
-                        if (!parentRootNode) {
-                            return clusterElementNode;
-                        }
+                    if (!parentRootNode) {
+                        console.error('Parent root node not found');
 
-                        const parentRootDagreNode = dagreGraph.node(parentRootNode.id);
+                        return clusterElementNode;
+                    }
 
-                        const parentRootLeftEdge =
-                            parentRootDagreNode.x - parentRootDagreNode.width / 2 + centeringOffsetX;
-                        const childNodeLeftEdge = childDagreNode.x - childDagreNode.width / 2 + centeringOffsetX;
+                    const parentRootDagreNode = dagreGraph.node(parentRootNode.id);
 
-                        const relativeX = childNodeLeftEdge - parentRootLeftEdge;
-                        const relativeY = childDagreNode.y - parentRootDagreNode.y;
+                    const parentRootLeftEdge = parentRootDagreNode.x - parentRootDagreNode.width / 2 + centeringOffsetX;
+                    const childNodeLeftEdge = childDagreNode.x - childDagreNode.width / 2 + centeringOffsetX;
 
-                        const defaultPosition = {
-                            x: relativeX,
-                            y: relativeY,
-                        };
+                    const relativeX = childNodeLeftEdge - parentRootLeftEdge;
+                    const relativeY = childDagreNode.y - parentRootDagreNode.y;
 
-                        return {
-                            ...clusterElementNode,
-                            position: containsNodePosition(clusterElementNode.data.metadata)
-                                ? clusterElementNode.data.metadata.ui.nodePosition
-                                : defaultPosition,
-                        };
-                    }),
-                ];
+                    const defaultPosition = {
+                        x: relativeX,
+                        y: relativeY,
+                    };
+
+                    return {
+                        ...clusterElementNode,
+                        position: containsNodePosition(clusterElementNode.data.metadata)
+                            ? clusterElementNode.data.metadata.ui.nodePosition
+                            : defaultPosition,
+                    };
+                });
+
+                processedClusterElementNodes = [...positionedClusterElementNodes];
             }
         }
 
-        positionedNodes = [...positionedNodes, ...centeredMainRootNode, ...placeholderNodes];
+        const positionedNodes = [...processedClusterElementNodes, ...centeredMainRootNode, ...placeholderNodes];
 
         return {
             edges,
