@@ -12,6 +12,7 @@ export const WorkflowNodeTestOutputKeys = {
         ...WorkflowNodeTestOutputKeys.workflowNodeTestOutputs,
         request.id,
         request.workflowNodeName,
+        request.environmentId,
     ],
     workflowNodeTestOutputs: ['workflowNodeTestOutputs'] as const,
 };

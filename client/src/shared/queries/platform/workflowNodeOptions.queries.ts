@@ -14,6 +14,7 @@ export const WorkflowNodeOptionKeys = {
         request.propertyName,
         request.searchText,
         loadDependencyValueKey,
+        request.environmentId,
     ],
     workflowNodeOptions: ['workflowNodeOptions'] as const,
 };

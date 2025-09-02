@@ -14,6 +14,7 @@ export const WorkflowNodeParameterKeys = {
         request.id,
         request.workflowNodeName,
         'displayConditions',
+        request.environmentId,
     ],
     workflowNodeParameters: ['workflowNodeParameters'] as const,
 };

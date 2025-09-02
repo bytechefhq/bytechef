@@ -13,11 +13,13 @@ export const WorkflowNodeOutputKeys = {
         request.id,
         'previousWorkflowNodeOutputs',
         request.lastWorkflowNodeName,
+        request.environmentId,
     ],
     workflowNodeOutput: (request: GetWorkflowNodeOutputRequest) => [
         ...WorkflowNodeOutputKeys.workflowNodeOutputs,
         request.id,
         request.workflowNodeName,
+        request.environmentId,
     ],
     workflowNodeOutputs: ['workflowNodeOutputs'] as const,
 };
