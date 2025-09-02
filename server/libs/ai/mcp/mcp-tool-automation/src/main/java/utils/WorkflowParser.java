@@ -1,5 +1,6 @@
 package utils;
 
+import com.bytechef.ai.mcp.tool.automation.ToolUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +39,104 @@ public class WorkflowParser {
         } catch (Exception e) {
             return taskDefinition;
         }
+    }
+
+    public static String processDisplayConditions(List<ToolUtils.PropertyInfo> taskDefinition, String taskParameters) {
+        if (taskDefinition == null || taskParameters == null) {
+            return convertPropertyInfoToJson(taskDefinition);
+        }
+
+        String jsonTaskDefinition = convertPropertyInfoToJson(taskDefinition);
+        return processDisplayConditions(jsonTaskDefinition, taskParameters);
+    }
+
+    public static String convertPropertyInfoToJson(List<ToolUtils.PropertyInfo> propertyInfos) {
+        if (propertyInfos == null || propertyInfos.isEmpty()) {
+            return "{ \"parameters\": {} }";
+        }
+
+        // Remove the special case that flattens single object properties
+
+        StringBuilder json = new StringBuilder();
+        json.append("{ \"parameters\": {");
+        
+        for (int i = 0; i < propertyInfos.size(); i++) {
+            if (i > 0) {
+                json.append(", ");
+            }
+            json.append(convertSinglePropertyToJson(propertyInfos.get(i)));
+        }
+        
+        json.append("} }");
+        return json.toString();
+    }
+
+    private static String convertSinglePropertyToJson(ToolUtils.PropertyInfo propertyInfo) {
+        StringBuilder json = new StringBuilder();
+        String propertyName = propertyInfo.name();
+        
+        json.append("\"").append(propertyName).append("\": ");
+        
+        if (propertyInfo.nestedProperties() != null && !propertyInfo.nestedProperties().isEmpty()) {
+            if ("ARRAY".equalsIgnoreCase(propertyInfo.type())) {
+                // Array type with nested item definitions
+                json.append("[ ");
+                
+                for (int i = 0; i < propertyInfo.nestedProperties().size(); i++) {
+                    if (i > 0) {
+                        json.append(", ");
+                    }
+                    // For array items, just generate the type string without property name
+                    ToolUtils.PropertyInfo itemInfo = propertyInfo.nestedProperties().get(i);
+                    String typeString = buildTypeString(itemInfo);
+                    json.append("\"").append(typeString).append("\"");
+                }
+                
+                json.append(" ]");
+            } else {
+                // Object type with nested properties
+                json.append("{");
+                
+                // Add metadata if there's a display condition
+                if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition().isEmpty()) {
+                    json.append("\"metadata\": \"").append(propertyInfo.displayCondition()).append("\", ");
+                }
+                
+                // Add nested properties
+                for (int i = 0; i < propertyInfo.nestedProperties().size(); i++) {
+                    if (i > 0) {
+                        json.append(", ");
+                    }
+                    json.append(convertSinglePropertyToJson(propertyInfo.nestedProperties().get(i)));
+                }
+                
+                json.append("}");
+            }
+        } else {
+            // Simple property type
+            String typeString = buildTypeString(propertyInfo);
+            json.append("\"").append(typeString).append("\"");
+        }
+        
+        return json.toString();
+    }
+
+    private static String buildTypeString(ToolUtils.PropertyInfo propertyInfo) {
+        StringBuilder typeString = new StringBuilder();
+        
+        typeString.append(propertyInfo.type().toLowerCase());
+        
+        // Add display condition if present (inline condition)
+        if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition().isEmpty()) {
+            typeString.append(" @").append(propertyInfo.displayCondition()).append("@");
+        }
+        
+        // Add required indicator
+        if (propertyInfo.required()) {
+            typeString.append(" (required)");
+        }
+        
+        return typeString.toString();
     }
 
     public static String cleanupJsonSyntax(String jsonString) {
@@ -137,6 +236,7 @@ public class WorkflowParser {
             String objectValue = matcher.group(2);
             String inlineValue = matcher.group(3);
 
+
             String value = objectValue != null ? objectValue : inlineValue;
 
             PropertyMatch match = new PropertyMatch(matcher.start(), matcher.end(), propertyName, value);
@@ -181,6 +281,11 @@ public class WorkflowParser {
                     result.append("\"").append(selectedMatch.propertyName).append("\": ").append(cleanedObject);
                 } else {
                     String cleanedValue = selectedMatch.objectValue.replaceAll("@[^@]+@", "").trim();
+                    // If the property had an inline condition and we got here, it means the condition was true
+                    // So we should mark it as required
+                    if (selectedMatch.objectValue.contains("@") && !cleanedValue.contains("(required)")) {
+                        cleanedValue += " (required)";
+                    }
                     result.append("\"").append(selectedMatch.propertyName).append("\": \"").append(cleanedValue).append("\"");
                 }
                 lastEnd = selectedMatch.end;
@@ -227,7 +332,25 @@ public class WorkflowParser {
     }
 
     private static boolean shouldIncludePropertyWithCondition(String propertyValue, JsonNode actualParameters) {
-        return extractAndEvaluateCondition(propertyValue, actualParameters);
+        // For inline property conditions, extract the condition from @...@ pattern
+        Pattern pattern = Pattern.compile("@([^@]+)@");
+        Matcher matcher = pattern.matcher(propertyValue);
+        
+        if (matcher.find()) {
+            String condition = matcher.group(1).trim();
+            try {
+                return evaluateCondition(condition, actualParameters);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid logic for display condition: '@" + condition + "@'");
+            }
+        }
+        
+        // For object metadata conditions (no @...@ pattern), evaluate directly
+        try {
+            return evaluateCondition(propertyValue, actualParameters);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid logic for display condition: '" + propertyValue + "'");
+        }
     }
 
     public static boolean extractAndEvaluateCondition(String text, JsonNode actualParameters) {
