@@ -41,8 +41,14 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
                 cell: (info) => `${info.getValue()?.name}`,
                 header: 'Deployment',
             }),
-            columnHelper.accessor('projectDeployment', {
-                cell: (info) => `V${info.getValue()?.projectVersion}`,
+            columnHelper.accessor((row) => row.job, {
+                cell: (info) => {
+                    /* eslint-disable @typescript-eslint/no-explicit-any */
+                    const metadata = info.getValue()?.metadata as {[key: string]: any} | undefined;
+                    const pv = metadata?.projectVersion;
+
+                    return pv != null ? `V${pv}` : '';
+                },
                 header: 'Version',
             }),
             columnHelper.accessor('projectDeployment', {
