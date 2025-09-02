@@ -16,10 +16,8 @@
 
 package com.bytechef.ai.mcp.tool.automation;
 
-import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
-import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,7 +26,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -110,8 +107,8 @@ public class FlowTools {
             String taskProperties = ToolUtils.generateParametersJson(taskDispatcherDefinition.getTaskProperties());
 
             String outputPropertiesJson = null;
-            OutputResponse outputResponse = taskDispatcherDefinition.isOutputDefined() ? taskDispatcherDefinition.getOutputResponse() : null;
-
+            OutputResponse outputResponse =
+                taskDispatcherDefinition.isOutputDefined() ? taskDispatcherDefinition.getOutputResponse() : null;
 
             if (outputResponse != null && outputResponse.outputSchema() != null) {
                 outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
@@ -234,14 +231,15 @@ public class FlowTools {
         try {
             TaskDispatcherDefinition taskDispatcherDefinition = getTaskDispatcherDefinition(name, version);
 
-            //fix it
+            // fix it
             OutputResponse outputResponse = null;
 
             if (taskDispatcherDefinition.isOutputDefined()) {
                 if (taskDispatcherDefinition.isOutputSchemaDefined()) {
                     outputResponse = taskDispatcherDefinition.getOutputResponse();
                 } else if (taskDispatcherDefinition.isOutputFunctionDefined()) {
-                    outputResponse = taskDispatcherDefinitionService.executeOutput(taskDispatcherDefinition.getName(), taskDispatcherDefinition.getVersion(), Map.of());
+                    outputResponse = taskDispatcherDefinitionService.executeOutput(taskDispatcherDefinition.getName(),
+                        taskDispatcherDefinition.getVersion(), Map.of());
                 }
             }
 

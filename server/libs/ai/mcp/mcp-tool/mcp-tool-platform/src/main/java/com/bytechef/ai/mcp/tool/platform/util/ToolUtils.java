@@ -398,7 +398,8 @@ public final class ToolUtils {
      * @param properties the list of property decorators
      * @return JSON object string representation
      */
-    public static String generateObjectValue(List<PropertyDecorator> properties, String displayCondition, String required) {
+    public static String
+        generateObjectValue(List<PropertyDecorator> properties, String displayCondition, String required) {
         StringBuilder parameters = new StringBuilder();
 
         parameters.append("{ ")
@@ -424,8 +425,8 @@ public final class ToolUtils {
     }
 
     /**
-     * Creates a map of display conditions to property names that have those conditions.
-     * Recursively searches through nested properties (objects, arrays, file entries).
+     * Creates a map of display conditions to property names that have those conditions. Recursively searches through
+     * nested properties (objects, arrays, file entries).
      *
      * @param properties the list of properties to analyze
      * @return map where key is display condition and value is list of property names with that condition
@@ -436,22 +437,28 @@ public final class ToolUtils {
         return displayConditionsMap;
     }
 
-    private static void collectDisplayConditions(List<PropertyDecorator> properties,
-                                               Map<String, List<String>> displayConditionsMap,
-                                               String parentPath) {
+    private static void collectDisplayConditions(
+        List<PropertyDecorator> properties,
+        Map<String, List<String>> displayConditionsMap,
+        String parentPath) {
         for (PropertyDecorator property : properties) {
             String propertyPath = parentPath.isEmpty() ? property.getName() : parentPath + "." + property.getName();
             String displayCondition = property.property.getDisplayCondition();
 
-            if (displayCondition != null && !displayCondition.trim().isEmpty()) {
-                displayConditionsMap.computeIfAbsent(displayCondition, k -> new ArrayList<>()).add(propertyPath);
+            if (displayCondition != null && !displayCondition.trim()
+                .isEmpty()) {
+                displayConditionsMap.computeIfAbsent(displayCondition, k -> new ArrayList<>())
+                    .add(propertyPath);
             }
 
             switch (property.getType()) {
-                case OBJECT -> collectDisplayConditions(property.getObjectProperties(), displayConditionsMap, propertyPath);
+                case OBJECT ->
+                    collectDisplayConditions(property.getObjectProperties(), displayConditionsMap, propertyPath);
                 case ARRAY -> collectDisplayConditions(property.getItems(), displayConditionsMap, propertyPath);
-                case FILE_ENTRY -> collectDisplayConditions(property.getFileEntryProperties(), displayConditionsMap, propertyPath);
-                default -> { }
+                case FILE_ENTRY ->
+                    collectDisplayConditions(property.getFileEntryProperties(), displayConditionsMap, propertyPath);
+                default -> {
+                }
             }
         }
     }

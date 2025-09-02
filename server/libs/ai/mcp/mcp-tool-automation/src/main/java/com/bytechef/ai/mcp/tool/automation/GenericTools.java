@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -69,9 +68,11 @@ public class GenericTools {
         @ToolParam(description = "The version (optional)") Integer version) {
 
         try {
-            return switch (type.toLowerCase().trim()) {
+            return switch (type.toLowerCase()
+                .trim()) {
                 case "action" -> {
-                    if (componentName == null || componentName.trim().isEmpty()) {
+                    if (componentName == null || componentName.trim()
+                        .isEmpty()) {
                         throw new IllegalArgumentException("componentName is required for action type");
                     }
                     ActionDetailedInfo actionInfo = componentTools.getAction(componentName, name, version);
@@ -85,7 +86,8 @@ public class GenericTools {
                         actionInfo.outputProperties());
                 }
                 case "trigger" -> {
-                    if (componentName == null || componentName.trim().isEmpty()) {
+                    if (componentName == null || componentName.trim()
+                        .isEmpty()) {
                         throw new IllegalArgumentException("componentName is required for trigger type");
                     }
                     TriggerDetailedInfo triggerInfo = componentTools.getTrigger(componentName, name, version);
@@ -120,12 +122,14 @@ public class GenericTools {
     @Tool(
         description = "List tasks in the project. Returns a list with their basic information. Can filter by type and limit results")
     public List<TaskMinimalInfo> listTasks(
-        @ToolParam(description = "Type filter: 'action', 'trigger', 'flow', or null for all types (optional)") String type,
+        @ToolParam(
+            description = "Type filter: 'action', 'trigger', 'flow', or null for all types (optional)") String type,
         @ToolParam(description = "Limit on number of results returned (optional)") Integer limit) {
 
         try {
             List<TaskMinimalInfo> allTasks = new ArrayList<>();
-            String normalizedType = type != null ? type.toLowerCase().trim() : null;
+            String normalizedType = type != null ? type.toLowerCase()
+                .trim() : null;
 
             // Determine which types to include
             boolean includeActions = normalizedType == null || "action".equals(normalizedType);
@@ -196,12 +200,14 @@ public class GenericTools {
         description = "Search tasks across types (actions, triggers, and flows). Returns a combined list matching the search query. Can filter by type and limit results")
     public List<TaskMinimalInfo> searchTasks(
         @ToolParam(description = "The search query to match against task names and descriptions") String query,
-        @ToolParam(description = "Type filter: 'action', 'trigger', 'flow', or null for all types (optional)") String type,
+        @ToolParam(
+            description = "Type filter: 'action', 'trigger', 'flow', or null for all types (optional)") String type,
         @ToolParam(description = "Limit on number of results returned (optional, defaults to 20)") Integer limit) {
 
         try {
             List<TaskMinimalInfo> matchingTasks = new ArrayList<>();
-            String normalizedType = type != null ? type.toLowerCase().trim() : null;
+            String normalizedType = type != null ? type.toLowerCase()
+                .trim() : null;
             int effectiveLimit = limit != null ? limit : 20;
 
             // Determine which types to include
@@ -278,9 +284,11 @@ public class GenericTools {
         @ToolParam(description = "The version (optional)") Integer version) {
 
         try {
-            return switch (type.toLowerCase().trim()) {
+            return switch (type.toLowerCase()
+                .trim()) {
                 case "action", "trigger" -> {
-                    if (componentName == null || componentName.trim().isEmpty()) {
+                    if (componentName == null || componentName.trim()
+                        .isEmpty()) {
                         throw new IllegalArgumentException("componentName is required for " + type + " type");
                     }
                     yield componentTools.getProperties(componentName, name, version);
@@ -299,13 +307,16 @@ public class GenericTools {
     public ToolUtils.PropertyInfo getTaskOutputProperty(
         @ToolParam(description = "The type of task: 'action', 'trigger', or 'flow'") String type,
         @ToolParam(description = "The name of the task to retrieve output properties for") String name,
-        @ToolParam(description = "For actions/triggers: the component name. Not used for flows (optional)") String componentName,
+        @ToolParam(
+            description = "For actions/triggers: the component name. Not used for flows (optional)") String componentName,
         @ToolParam(description = "The version (optional)") Integer version) {
 
         try {
-            return switch (type.toLowerCase().trim()) {
+            return switch (type.toLowerCase()
+                .trim()) {
                 case "action", "trigger" -> {
-                    if (componentName == null || componentName.trim().isEmpty()) {
+                    if (componentName == null || componentName.trim()
+                        .isEmpty()) {
                         throw new IllegalArgumentException("componentName is required for " + type + " type");
                     }
                     yield componentTools.getOutputProperty(componentName, name, version);
@@ -328,15 +339,18 @@ public class GenericTools {
         @ToolParam(description = "The version (optional)") Integer version) {
 
         try {
-            return switch (type.toLowerCase().trim()) {
+            return switch (type.toLowerCase()
+                .trim()) {
                 case "action" -> {
-                    if (componentName == null || componentName.trim().isEmpty()) {
+                    if (componentName == null || componentName.trim()
+                        .isEmpty()) {
                         throw new IllegalArgumentException("componentName is required for action type");
                     }
                     yield componentTools.getActionDefinition(componentName, name, version);
                 }
                 case "trigger" -> {
-                    if (componentName == null || componentName.trim().isEmpty()) {
+                    if (componentName == null || componentName.trim()
+                        .isEmpty()) {
                         throw new IllegalArgumentException("componentName is required for trigger type");
                     }
                     yield componentTools.getTriggerDefinition(componentName, name, version);
@@ -374,15 +388,20 @@ public class GenericTools {
             JsonNode taskNode = objectMapper.readTree(task);
             String taskParameters = "";
 
-            if (taskNode.has("parameters") && taskNode.get("parameters").isObject()) {
+            if (taskNode.has("parameters") && taskNode.get("parameters")
+                .isObject()) {
                 taskParameters = objectMapper.writeValueAsString(taskNode.get("parameters"));
             }
 
             // Validate task properties against the definition (display condition processing happens inside)
             WorkflowValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
-            String errorMessages = errors.append("]").toString().trim();
-            String warningMessages = warnings.append("]").toString().trim();
+            String errorMessages = errors.append("]")
+                .toString()
+                .trim();
+            String warningMessages = warnings.append("]")
+                .toString()
+                .trim();
             boolean isValid = errorMessages.equals("[]");
 
             if (logger.isDebugEnabled()) {
@@ -433,18 +452,14 @@ public class GenericTools {
         @JsonProperty("warnings") @JsonPropertyDescription("Warning details that give additional information") String warnings) {
     }
 
-
-
     public String getTaskDefinition(String type, String taskType) {
         String[] split = type.split("/");
         int version = Integer.parseInt(split[1].substring(1));
-        if(split.length == 2){
+        if (split.length == 2) {
             return getTaskDefinition("flow", split[0], split[0], version);
-        }
-        else if(taskType.equals("trigger")){
+        } else if (taskType.equals("trigger")) {
             return getTaskDefinition(taskType, split[2], split[0], version);
-        }
-        else {
+        } else {
             return getTaskDefinition("action", split[2], split[0], version);
         }
     }

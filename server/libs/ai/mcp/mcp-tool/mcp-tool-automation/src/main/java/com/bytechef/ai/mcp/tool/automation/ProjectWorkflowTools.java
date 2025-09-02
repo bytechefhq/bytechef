@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -269,36 +268,54 @@ public class ProjectWorkflowTools {
             Map<String, String> taskDefinitions = new HashMap<>();
             Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
 
-            if (workflowNode.has("triggers") && workflowNode.get("triggers").isArray()) {
-                workflowNode.get("triggers").elements().forEachRemaining(task -> {
-                    tasks.add(task);
-                    taskDefinitions.putIfAbsent(
-                        task.get("type").asText(),
-                        genericTools.getTaskDefinition(task.get("type").asText(), "trigger"));
+            if (workflowNode.has("triggers") && workflowNode.get("triggers")
+                .isArray()) {
+                workflowNode.get("triggers")
+                    .elements()
+                    .forEachRemaining(task -> {
+                        tasks.add(task);
+                        taskDefinitions.putIfAbsent(
+                            task.get("type")
+                                .asText(),
+                            genericTools.getTaskDefinition(task.get("type")
+                                .asText(), "trigger"));
 
-                    taskOutputs.putIfAbsent(
-                        task.get("type").asText(),
-                        genericTools.getTaskOutputProperty(task.get("type").asText(), "trigger", warnings));
-                });
+                        taskOutputs.putIfAbsent(
+                            task.get("type")
+                                .asText(),
+                            genericTools.getTaskOutputProperty(task.get("type")
+                                .asText(), "trigger", warnings));
+                    });
             }
 
-            if (workflowNode.has("tasks") && workflowNode.get("tasks").isArray()) {
-                workflowNode.get("tasks").elements().forEachRemaining(task -> {
-                    tasks.add(task);
-                    taskDefinitions.putIfAbsent(
-                        task.get("type").asText(),
-                        genericTools.getTaskDefinition(task.get("type").asText(), ""));
+            if (workflowNode.has("tasks") && workflowNode.get("tasks")
+                .isArray()) {
+                workflowNode.get("tasks")
+                    .elements()
+                    .forEachRemaining(task -> {
+                        tasks.add(task);
+                        taskDefinitions.putIfAbsent(
+                            task.get("type")
+                                .asText(),
+                            genericTools.getTaskDefinition(task.get("type")
+                                .asText(), ""));
 
-                    taskOutputs.putIfAbsent(
-                        task.get("type").asText(),
-                        genericTools.getTaskOutputProperty(task.get("type").asText(), "", warnings));
-                });
+                        taskOutputs.putIfAbsent(
+                            task.get("type")
+                                .asText(),
+                            genericTools.getTaskOutputProperty(task.get("type")
+                                .asText(), "", warnings));
+                    });
             }
 
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
-            String errorMessages = errors.append("]").toString().trim();
-            String warningMessages = warnings.append("]").toString().trim();
+            String errorMessages = errors.append("]")
+                .toString()
+                .trim();
+            String warningMessages = warnings.append("]")
+                .toString()
+                .trim();
             boolean isValid = errorMessages.equals("[]");
 
             if (logger.isDebugEnabled()) {
@@ -313,7 +330,6 @@ public class ProjectWorkflowTools {
             throw ToolUtils.createOperationException("Failed to validate task", e);
         }
     }
-
 
     /**
      * Project workflow information record for the response.

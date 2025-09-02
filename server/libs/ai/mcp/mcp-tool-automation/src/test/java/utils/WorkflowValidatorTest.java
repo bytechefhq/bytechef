@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,20 +29,22 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class WorkflowValidatorTest {
-    private static final ToolUtils.PropertyInfo trigger1 = new ToolUtils.PropertyInfo("propString", "STRING", null, false, true, null, null);
-    private static final ToolUtils.PropertyInfo action1 = new ToolUtils.PropertyInfo("propBool", "BOOLEAN", null, false, true, null, null);
-    private static final ToolUtils.PropertyInfo action2 = new ToolUtils.PropertyInfo("propNumber", "NUMBER", null, false, true, null, null);
-    private static final ToolUtils.PropertyInfo action3 = new ToolUtils.PropertyInfo("propInteger", "INTEGER", null, false, true, null, null);
+    private static final ToolUtils.PropertyInfo trigger1 =
+        new ToolUtils.PropertyInfo("propString", "STRING", null, false, true, null, null);
+    private static final ToolUtils.PropertyInfo action1 =
+        new ToolUtils.PropertyInfo("propBool", "BOOLEAN", null, false, true, null, null);
+    private static final ToolUtils.PropertyInfo action2 =
+        new ToolUtils.PropertyInfo("propNumber", "NUMBER", null, false, true, null, null);
+    private static final ToolUtils.PropertyInfo action3 =
+        new ToolUtils.PropertyInfo("propInteger", "INTEGER", null, false, true, null, null);
     private static final ToolUtils.PropertyInfo actionObj = new ToolUtils.PropertyInfo(
         "item", "OBJECT", null, false, true, null, List.of(
-            action1, action2, action3
-    ));
+            action1, action2, action3));
     private static final ToolUtils.PropertyInfo actionArr = new ToolUtils.PropertyInfo(
         "items", "ARRAY", null, false, true, null, List.of(
-            //unnamed objects don't have to be referenced
-        new ToolUtils.PropertyInfo(null, "OBJECT", null, false, true, null, List.of(
-        action1, action2, action3
-    ))));
+            // unnamed objects don't have to be referenced
+            new ToolUtils.PropertyInfo(null, "OBJECT", null, false, true, null, List.of(
+                action1, action2, action3))));
 
     @Test
     void validateWorkflowStructure_validWorkflow_noErrors() {
@@ -55,19 +73,19 @@ class WorkflowValidatorTest {
     @Test
     void validateWorkflowStructure_missingLabel_addsError() {
         String invalidWorkflow = """
-        {
-            "description": "workflowDescription",
-            "inputs": [],
-            "triggers": [
-                {
-                    "label": "Manual",
-                    "name": "trigger_1",
-                    "type": "manual/v1/manual"
-                }
-            ],
-            "tasks": []
-        }
-        """;
+            {
+                "description": "workflowDescription",
+                "inputs": [],
+                "triggers": [
+                    {
+                        "label": "Manual",
+                        "name": "trigger_1",
+                        "type": "manual/v1/manual"
+                    }
+                ],
+                "tasks": []
+            }
+            """;
 
         StringBuilder errors = new StringBuilder();
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
@@ -284,7 +302,8 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
-        assertTrue(errors.toString().contains("Workflow must be an object"));
+        assertTrue(errors.toString()
+            .contains("Workflow must be an object"));
     }
 
     @Test
@@ -294,7 +313,8 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
-        assertTrue(errors.toString().contains("Invalid JSON format:"), errors.toString());
+        assertTrue(errors.toString()
+            .contains("Invalid JSON format:"), errors.toString());
     }
 
     @Test
@@ -427,7 +447,8 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         WorkflowValidator.validateTaskStructure(invalidTask, errors);
 
-        assertTrue(errors.toString().contains("Field 'type' must match pattern:"), errors.toString());
+        assertTrue(errors.toString()
+            .contains("Field 'type' must match pattern:"), errors.toString());
     }
 
     @Test
@@ -505,7 +526,8 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         WorkflowValidator.validateTaskStructure(invalidTask, errors);
 
-        assertTrue(errors.toString().contains("Invalid JSON format:"), errors.toString());
+        assertTrue(errors.toString()
+            .contains("Invalid JSON format:"), errors.toString());
     }
 
     @Test
@@ -521,8 +543,7 @@ class WorkflowValidatorTest {
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
             new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
             new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -542,8 +563,7 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -562,9 +582,8 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -585,10 +604,9 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -615,15 +633,12 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("obj", "OBJECT", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null),
-                    new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
-                    new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
-                        new ToolUtils.PropertyInfo(null, "INTEGER", null, false, true, null, null)
-                    ))
-                ))
-            );
+            new ToolUtils.PropertyInfo("obj", "OBJECT", null, false, true, null, List.of(
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null),
+                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
+                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
+                    new ToolUtils.PropertyInfo(null, "INTEGER", null, false, true, null, null))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -634,7 +649,8 @@ class WorkflowValidatorTest {
             Property 'obj.age' has incorrect type. Expected: integer, but got: string
             Property 'obj.active' has incorrect type. Expected: boolean, but got: string
             Value 'John' has incorrect type in property 'items'. Expected: integer, but got: string
-            Value 'Porky' has incorrect type in property 'items'. Expected: integer, but got: string""", errors.toString());
+            Value 'Porky' has incorrect type in property 'items'. Expected: integer, but got: string""",
+            errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -648,9 +664,8 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("config", "OBJECT", null, false, true, null, null)
-            );
+            new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("config", "OBJECT", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -672,9 +687,8 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("items", "ARRAY", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config", "OBJECT", null, false, true, null, null)
-            );
+            new ToolUtils.PropertyInfo("items", "ARRAY", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("config", "OBJECT", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -727,7 +741,8 @@ class WorkflowValidatorTest {
         StringBuilder warnings = new StringBuilder();
         WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
-        assertTrue(errors.toString().contains("Invalid JSON format:"), errors.toString());
+        assertTrue(errors.toString()
+            .contains("Invalid JSON format:"), errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -740,8 +755,7 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("nullable", "STRING", null, false, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("nullable", "STRING", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -762,10 +776,9 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("validString", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("invalidNumber", "INTEGER", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("missingRequired", "BOOLEAN", null, true, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("validString", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("invalidNumber", "INTEGER", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("missingRequired", "BOOLEAN", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -804,8 +817,7 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("upperCaseType", "STRING", null, true, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("upperCaseType", "STRING", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -829,12 +841,10 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("enableFeature", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "enableFeature == true", List.of(
-                    new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null)
-                ))
-            );
+            new ToolUtils.PropertyInfo("enableFeature", "BOOLEAN", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "enableFeature == true", List.of(
+                new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -857,12 +867,10 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("enableFeature", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "true == enableFeature", List.of(
-                    new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null)
-                ))
-        );
+            new ToolUtils.PropertyInfo("enableFeature", "BOOLEAN", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "true == enableFeature", List.of(
+                new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -885,12 +893,10 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "enableFeature == 'true'", List.of(
-                    new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null)
-                ))
-        );
+            new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "enableFeature == 'true'", List.of(
+                new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -913,12 +919,11 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "contains({'true','True','1'}, enableFeature)", List.of(
+            new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true,
+                "contains({'true','True','1'}, enableFeature)", List.of(
                     new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null)
-                ))
-        );
+                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -941,12 +946,11 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "contains({'true','True','1'}, enableFeature)", List.of(
+            new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true,
+                "contains({'true','True','1'}, enableFeature)", List.of(
                     new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null)
-                ))
-        );
+                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -972,12 +976,11 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "gndfknskgn / sflakdjdkf 3", List.of(
+            new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "gndfknskgn / sflakdjdkf 3",
+                List.of(
                     new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null)
-                ))
-        );
+                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1003,12 +1006,11 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("enableFeature", "INTEGER", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "enableFeature <= 5.87546", List.of(
+            new ToolUtils.PropertyInfo("enableFeature", "INTEGER", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "enableFeature <= 5.87546",
+                List.of(
                     new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null)
-                ))
-        );
+                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1030,12 +1032,10 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("enableFeature", "FLOAT", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "50 > enableFeature", List.of(
-                    new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null)
-                ))
-        );
+            new ToolUtils.PropertyInfo("enableFeature", "FLOAT", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "50 > enableFeature", List.of(
+                new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1057,15 +1057,12 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("mode", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("basicConfig", "OBJECT", null, false, true, "mode == 'basic'", List.of(
-                    new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)
-                )),
-                new ToolUtils.PropertyInfo("advancedConfig", "OBJECT", null, false, true, "mode == 'advanced'", List.of(
-                    new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("extra", "STRING", null, false, true, null, null)
-                ))
-        );
+            new ToolUtils.PropertyInfo("mode", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("basicConfig", "OBJECT", null, false, true, "mode == 'basic'", List.of(
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null))),
+            new ToolUtils.PropertyInfo("advancedConfig", "OBJECT", null, false, true, "mode == 'advanced'", List.of(
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("extra", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1092,15 +1089,14 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == true", List.of(
-                    new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null)
-                )),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false", List.of())
-        );
+            new ToolUtils.PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == true", List.of(
+                new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null))),
+            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false",
+                List.of()));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1122,17 +1118,14 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == true", List.of(
-                    new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null)
-                )),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false", List.of(
-                    new ToolUtils.PropertyInfo("simpleProperty", "STRING", null, false, true, null, null)
-                ))
-        );
+            new ToolUtils.PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == true", List.of(
+                new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null))),
+            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false", List.of(
+                new ToolUtils.PropertyInfo("simpleProperty", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1154,17 +1147,14 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == true", List.of(
-                    new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null)
-                )),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false", List.of(
-                    new ToolUtils.PropertyInfo("simpleProperty", "STRING", null, false, true, null, null)
-                ))
-        );
+            new ToolUtils.PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == true", List.of(
+                new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null))),
+            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false", List.of(
+                new ToolUtils.PropertyInfo("simpleProperty", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1192,14 +1182,11 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("parentEnabled", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("parent", "OBJECT", null, false, true, "parentEnabled == true", List.of(
-                    new ToolUtils.PropertyInfo("childEnabled", "BOOLEAN", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("child", "OBJECT", null, false, true, "childEnabled == true", List.of(
-                        new ToolUtils.PropertyInfo("value", "STRING", null, true, true, null, null)
-                    ))
-                ))
-        );
+            new ToolUtils.PropertyInfo("parentEnabled", "BOOLEAN", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("parent", "OBJECT", null, false, true, "parentEnabled == true", List.of(
+                new ToolUtils.PropertyInfo("childEnabled", "BOOLEAN", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("child", "OBJECT", null, false, true, "childEnabled == true", List.of(
+                    new ToolUtils.PropertyInfo("value", "STRING", null, true, true, null, null))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1221,14 +1208,11 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("format", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("jsonConfig", "OBJECT", null, false, true, "format == 'json'", List.of(
-                    new ToolUtils.PropertyInfo("indent", "INTEGER", null, false, true, null, null)
-                )),
-                new ToolUtils.PropertyInfo("xmlConfig", "OBJECT", null, false, true, "format == 'xml'", List.of(
-                    new ToolUtils.PropertyInfo("schema", "STRING", null, false, true, null, null)
-                ))
-        );
+            new ToolUtils.PropertyInfo("format", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("jsonConfig", "OBJECT", null, false, true, "format == 'json'", List.of(
+                new ToolUtils.PropertyInfo("indent", "INTEGER", null, false, true, null, null))),
+            new ToolUtils.PropertyInfo("xmlConfig", "OBJECT", null, false, true, "format == 'xml'", List.of(
+                new ToolUtils.PropertyInfo("schema", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1247,11 +1231,9 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("advancedConfig", "OBJECT", null, false, true, "enableAdvanced == true", List.of(
-                    new ToolUtils.PropertyInfo("setting", "STRING", null, true, true, null, null)
-                ))
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("advancedConfig", "OBJECT", null, false, true, "enableAdvanced == true", List.of(
+                new ToolUtils.PropertyInfo("setting", "STRING", null, true, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1279,17 +1261,13 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, "level1 == 'enabled'", List.of(
-                    new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, "level2 == 'active'", List.of(
-                        new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, "level3 == true", List.of(
-                            new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, null, null)
-                        ))
-                    ))
-                ))
-        );
+            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, "level1 == 'enabled'", List.of(
+                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, "level2 == 'active'", List.of(
+                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
+                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, "level3 == true", List.of(
+                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1317,24 +1295,21 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, "level2 == 'active'", List.of(
-                        new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, "level3 == true", List.of(
-                            new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, null, null)
-                        ))
-                    ))
-                ))
-        );
+            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
+                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, "level2 == 'active'", List.of(
+                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
+                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, "level3 == true", List.of(
+                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
         WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: config1.config2.config3.finalValue", errors.toString());
-        assertEquals("Property 'config1.config2.config3.randomValue' is not defined in task definition", warnings.toString());
+        assertEquals("Property 'config1.config2.config3.randomValue' is not defined in task definition",
+            warnings.toString());
     }
 
     @Test
@@ -1355,17 +1330,13 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config1", "OBJECT", "", false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, "level2 == 'active'", List.of(
-                        new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, "level3 == true", List.of(
-                            new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, null, null)
-                        ))
-                    ))
-                ))
-        );
+            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("config1", "OBJECT", "", false, true, null, List.of(
+                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, null, null),
+                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, "level2 == 'active'", List.of(
+                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
+                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, "level3 == true", List.of(
+                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1387,10 +1358,9 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced == true", null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced == true", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1411,10 +1381,9 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "true == enableAdvanced", null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "true == enableAdvanced", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1434,10 +1403,9 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced == true", null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced == true", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1457,10 +1425,9 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("enableAdvanced", "FLOAT", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced >= 4", null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("enableAdvanced", "FLOAT", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced >= 4", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1480,10 +1447,9 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("enableAdvanced", "INTEGER", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "4.1 < enableAdvanced", null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("enableAdvanced", "INTEGER", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "4.1 < enableAdvanced", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1504,10 +1470,10 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("enableAdvanced", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "contains({'Donald_B2rbara','True','true'}, enableAdvanced)", null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("enableAdvanced", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true,
+                "contains({'Donald_B2rbara','True','true'}, enableAdvanced)", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1535,17 +1501,14 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
-                    new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, null, List.of(
-                        new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, "'active' == level2", null),
-                        new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
-                            new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, "level3 == true", null)
-                        ))
-                    ))
-                ))
-        );
+            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
+                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
+                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, null, List.of(
+                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, "'active' == level2", null),
+                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
+                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, "level3 == true",
+                            null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1570,17 +1533,14 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
-                    new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, null, List.of(
-                        new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, "'enabled' == level1", null),
-                        new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
-                            new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, "level1 == 'enabled'", null)
-                        ))
-                    ))
-                ))
-        );
+            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
+                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
+                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, null, List.of(
+                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, "'enabled' == level1", null),
+                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
+                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, "level1 == 'enabled'",
+                            null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1608,17 +1568,14 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
-                    new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, null, List.of(
-                        new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, "'enabled' == level1", null),
-                        new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
-                            new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, "level1 == 'enabled'", null)
-                        ))
-                    ))
-                ))
-        );
+            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
+                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
+                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, null, List.of(
+                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, "'enabled' == level1", null),
+                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
+                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, "level1 == 'enabled'",
+                            null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1657,35 +1614,41 @@ class WorkflowValidatorTest {
             """;
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-                new ToolUtils.PropertyInfo("uri", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("allowUnauthorizedCerts", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("responseType", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("responseFilename", "STRING", null, false, true, "responseType == 'BINARY'", null),
-                new ToolUtils.PropertyInfo("headers", "OBJECT", "", false, true, null, null),
-                new ToolUtils.PropertyInfo("queryParameters", "OBJECT", "", false, true, null, null),
-                new ToolUtils.PropertyInfo("body", "OBJECT", "", false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("bodyContentType", "STRING", null, false, true, null, null),
-                    new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'JSON'", null),
-                    new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'XML'", null),
-                    new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'FORM_DATA'", null),
-                    new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'FORM_URL_ENCODED'", null),
-                    new ToolUtils.PropertyInfo("bodyContent", "STRING", null, false, true, "body.bodyContentType == 'RAW'", null),
-                    new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'BINARY'", List.of(
+            new ToolUtils.PropertyInfo("uri", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("allowUnauthorizedCerts", "BOOLEAN", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("responseType", "STRING", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("responseFilename", "STRING", null, false, true, "responseType == 'BINARY'",
+                null),
+            new ToolUtils.PropertyInfo("headers", "OBJECT", "", false, true, null, null),
+            new ToolUtils.PropertyInfo("queryParameters", "OBJECT", "", false, true, null, null),
+            new ToolUtils.PropertyInfo("body", "OBJECT", "", false, true, null, List.of(
+                new ToolUtils.PropertyInfo("bodyContentType", "STRING", null, false, true, null, null),
+                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'JSON'",
+                    null),
+                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'XML'",
+                    null),
+                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true,
+                    "body.bodyContentType == 'FORM_DATA'", null),
+                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true,
+                    "body.bodyContentType == 'FORM_URL_ENCODED'", null),
+                new ToolUtils.PropertyInfo("bodyContent", "STRING", null, false, true, "body.bodyContentType == 'RAW'",
+                    null),
+                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true,
+                    "body.bodyContentType == 'BINARY'", List.of(
                         new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null)
-                    )),
-                    new ToolUtils.PropertyInfo("bodyContentMimeType", "STRING", null, false, true, "'BINARY' == body.bodyContentType", null),
-                    new ToolUtils.PropertyInfo("bodyContentMimeType", "STRING", null, false, true, "'RAW' == body.bodyContentType", null)
-                )),
-                new ToolUtils.PropertyInfo("fullResponse", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("followAllRedirects", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("followRedirect", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("ignoreResponseCode", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("proxy", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("timeout", "INTEGER", null, false, true, null, null)
-        );
+                        new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null))),
+                new ToolUtils.PropertyInfo("bodyContentMimeType", "STRING", null, false, true,
+                    "'BINARY' == body.bodyContentType", null),
+                new ToolUtils.PropertyInfo("bodyContentMimeType", "STRING", null, false, true,
+                    "'RAW' == body.bodyContentType", null))),
+            new ToolUtils.PropertyInfo("fullResponse", "BOOLEAN", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("followAllRedirects", "BOOLEAN", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("followRedirect", "BOOLEAN", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("ignoreResponseCode", "BOOLEAN", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("proxy", "STRING", null, false, true, null, null),
+            new ToolUtils.PropertyInfo("timeout", "INTEGER", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1734,7 +1697,7 @@ class WorkflowValidatorTest {
                 }
                 """,
             "component/v1/action1",
-                """
+            """
                 {
                     "parameters": {
                         "active": "boolean (required)",
@@ -1786,8 +1749,7 @@ class WorkflowValidatorTest {
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1",
-            new ToolUtils.PropertyInfo("testTask1", "component/v1/action", "", true, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("testTask1", "component/v1/action", "", true, true, null, null));
 
         try {
             JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
@@ -1824,7 +1786,7 @@ class WorkflowValidatorTest {
 
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1",
-                """
+            """
                 {
                     "parameters": {
                         "name": "string (required)",
@@ -1893,13 +1855,13 @@ class WorkflowValidatorTest {
                 """,
             "component/v1/action1",
             """
-            {
-                "parameters": {
-                    "active": "boolean (required)",
-                    "name": "string (required)"
+                {
+                    "parameters": {
+                        "active": "boolean (required)",
+                        "name": "string (required)"
+                    }
                 }
-            }
-            """);
+                """);
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action1);
@@ -1916,7 +1878,8 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
             assertEquals("", errors.toString());
-            assertEquals("Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'", warnings.toString());
+            assertEquals("Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'",
+                warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception for valid tasks: " + e.getMessage());
         }
@@ -1959,13 +1922,13 @@ class WorkflowValidatorTest {
                 """,
             "component/v1/action1",
             """
-            {
-                "parameters": {
-                    "active": "boolean (required)",
-                    "name": "string (required)"
+                {
+                    "parameters": {
+                        "active": "boolean (required)",
+                        "name": "string (required)"
+                    }
                 }
-            }
-            """);
+                """);
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action1);
@@ -1981,7 +1944,9 @@ class WorkflowValidatorTest {
 
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
-            assertEquals("Property 'testTask1.propString' in output of 'component/v1/trigger1' is of type string, not boolean", errors.toString());
+            assertEquals(
+                "Property 'testTask1.propString' in output of 'component/v1/trigger1' is of type string, not boolean",
+                errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception for valid tasks: " + e.getMessage());
@@ -2025,31 +1990,31 @@ class WorkflowValidatorTest {
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1",
             """
-            {
-                "parameters": {
-                    "name": "string (required)",
-                    "age": "integer"
+                {
+                    "parameters": {
+                        "name": "string (required)",
+                        "age": "integer"
+                    }
                 }
-            }
-            """,
+                """,
             "component/v1/action1",
             """
-            {
-                "parameters": {
-                    "active": "boolean (required)",
-                    "name": "string (required)"
+                {
+                    "parameters": {
+                        "active": "boolean (required)",
+                        "name": "string (required)"
+                    }
                 }
-            }
-            """,
+                """,
             "component/v1/action2",
             """
-            {
-                "parameters": {
-                    "active": "boolean (required)",
-                    "name": "string (required)"
+                {
+                    "parameters": {
+                        "active": "boolean (required)",
+                        "name": "string (required)"
+                    }
                 }
-            }
-            """);
+                """);
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action1);
@@ -2065,7 +2030,8 @@ class WorkflowValidatorTest {
 
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
-            assertEquals("Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2.", errors.toString());
+            assertEquals("Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2.",
+                errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception for valid tasks: " + e.getMessage());
@@ -2108,7 +2074,8 @@ class WorkflowValidatorTest {
             assertFalse(errors.isEmpty(), "Should have errors when task definition is missing");
         } catch (Exception e) {
             // It's acceptable for this to throw an exception when task definition is null
-            assertFalse(e.getMessage().isEmpty(),
+            assertFalse(e.getMessage()
+                .isEmpty(),
                 "Exception should be related to missing task definition: " + e.getMessage());
         }
     }
@@ -2189,8 +2156,10 @@ class WorkflowValidatorTest {
 
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
-            assertTrue(errors.toString().contains("Missing required field: parameters") ||
-                errors.toString().contains("Task definition must have a 'parameters' object"));
+            assertTrue(errors.toString()
+                .contains("Missing required field: parameters") ||
+                errors.toString()
+                    .contains("Task definition must have a 'parameters' object"));
         } catch (Exception e) {
             fail("Should handle missing parameters field: " + e.getMessage());
         }
@@ -2228,7 +2197,7 @@ class WorkflowValidatorTest {
                 }
                 """,
             "component/v1/action1",
-                """
+            """
                 {
                     "parameters": {
                         "age": "integer (required)"
@@ -2252,8 +2221,10 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
             // Should contain errors from both task validation and parameter validation
-            assertTrue(errors.toString().contains("Missing required field: label"));
-            assertTrue(errors.toString().contains("Property 'age' has incorrect type"));
+            assertTrue(errors.toString()
+                .contains("Missing required field: label"));
+            assertTrue(errors.toString()
+                .contains("Property 'age' has incorrect type"));
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -2284,12 +2255,10 @@ class WorkflowValidatorTest {
 
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
-            "component/v1/action1", "{ \"parameters\": { \"items\": [\"string\"] } }"
-        );
+            "component/v1/action1", "{ \"parameters\": { \"items\": [\"string\"] } }");
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
-            "component/v1/trigger1", trigger1
-        );
+            "component/v1/trigger1", trigger1);
 
         try {
             JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
@@ -2342,13 +2311,11 @@ class WorkflowValidatorTest {
 
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
-            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\", \"active\": \"boolean\" } }"
-        );
+            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\", \"active\": \"boolean\" } }");
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1,
-            "component/v1/action1", action1
-        );
+            "component/v1/action1", action1);
 
         try {
             JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
@@ -2395,12 +2362,10 @@ class WorkflowValidatorTest {
 
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
-            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\", \"active\": \"boolean\" } }"
-        );
+            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\", \"active\": \"boolean\" } }");
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
-            "component/v1/trigger1", trigger1
-        );
+            "component/v1/trigger1", trigger1);
 
         try {
             JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
@@ -2413,7 +2378,7 @@ class WorkflowValidatorTest {
 
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
-            //check this
+            // check this
             assertEquals("Task 'invalidformat' doesn't exits.", errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -2446,8 +2411,7 @@ class WorkflowValidatorTest {
 
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
-            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\" } }"
-        );
+            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\" } }");
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of();
 
@@ -2463,7 +2427,8 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
             assertEquals("", errors.toString());
-            assertEquals("Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'", warnings.toString());
+            assertEquals("Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'",
+                warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -2496,12 +2461,11 @@ class WorkflowValidatorTest {
 
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
-            "component/v1/action1", "{ \"parameters\": { \"active\": \"boolean\", \"height\": \"float\", \"age\": \"integer\" } }"
-        );
+            "component/v1/action1",
+            "{ \"parameters\": { \"active\": \"boolean\", \"height\": \"float\", \"age\": \"integer\" } }");
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
-            "component/v1/trigger1", actionObj
-        );
+            "component/v1/trigger1", actionObj);
 
         try {
             JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
@@ -2548,12 +2512,11 @@ class WorkflowValidatorTest {
 
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
-            "component/v1/action1", "{ \"parameters\": { \"active\": \"boolean\", \"height\": \"float\", \"age\": \"integer\" } }"
-        );
+            "component/v1/action1",
+            "{ \"parameters\": { \"active\": \"boolean\", \"height\": \"float\", \"age\": \"integer\" } }");
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
-            "component/v1/trigger1", actionArr
-        );
+            "component/v1/trigger1", actionArr);
 
         try {
             JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
@@ -2607,12 +2570,10 @@ class WorkflowValidatorTest {
 
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
-            "component/v1/action1", "{ \"parameters\": { \"configs\": \"array\" } }"
-        );
+            "component/v1/action1", "{ \"parameters\": { \"configs\": \"array\" } }");
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
-            "component/v1/trigger1", trigger1
-        );
+            "component/v1/trigger1", trigger1);
 
         try {
             JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
@@ -2626,7 +2587,8 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
             assertEquals("", errors.toString());
-            assertEquals("Property 'task1.propInvalid' might not exist in the output of 'component/v1/trigger1'", warnings.toString());
+            assertEquals("Property 'task1.propInvalid' might not exist in the output of 'component/v1/trigger1'",
+                warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -2659,12 +2621,11 @@ class WorkflowValidatorTest {
 
         Map<String, String> taskDefinitions = Map.of(
             "component/v1/trigger1", "{ \"parameters\": { \"name\": \"string\" } }",
-            "component/v1/action1", "{ \"parameters\": { \"name\": \"string\", \"active\": \"boolean\", \"value\": \"string\" } }"
-        );
+            "component/v1/action1",
+            "{ \"parameters\": { \"name\": \"string\", \"active\": \"boolean\", \"value\": \"string\" } }");
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
-            "component/v1/trigger1", trigger1
-        );
+            "component/v1/trigger1", trigger1);
 
         try {
             JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
