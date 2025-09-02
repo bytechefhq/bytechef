@@ -69,6 +69,54 @@ public class WorkflowValidator {
                 return errors;
             }
 
+            JsonNode taskDefNode = WorkflowParser.parseJsonString(taskDefinition);
+
+            if (!taskDefNode.isObject()) {
+                errors.append("Task definition must be an object");
+                return errors;
+            }
+
+            JsonNode parametersNode = taskDefNode.get("parameters");
+            if (parametersNode == null || !parametersNode.isObject()) {
+                errors.append("Task definition must have a 'parameters' object");
+                return errors;
+            }
+
+            PropertyValidator.validatePropertiesRecursively(currentPropsNode, parametersNode, "", errors, warnings, taskDefinition, currentTaskParameters);
+
+        } catch (JsonProcessingException e) {
+            errors.append(INVALID_JSON_FORMAT).append(e.getMessage()).append("\n");
+        }
+
+        return errors;
+    }
+
+    public static StringBuilder validateTaskParameters(String currentTaskParameters, ToolUtils.PropertyInfo taskDefinition, StringBuilder errors, StringBuilder warnings) {
+        if (taskDefinition == null) {
+            errors.append("Task definition must not be null");
+            return errors;
+        }
+        
+        // Check if taskDefinition is an object type (should represent the root parameters object)
+        if (!"OBJECT".equalsIgnoreCase(taskDefinition.type())) {
+            errors.append("Task definition must be an object");
+            return errors;
+        }
+        
+        // Convert single PropertyInfo to List and delegate to the existing method
+        List<ToolUtils.PropertyInfo> taskDefinitionList = List.of(taskDefinition);
+        return validateTaskParameters(currentTaskParameters, taskDefinitionList, errors, warnings);
+    }
+
+    public static StringBuilder validateTaskParameters(String currentTaskParameters, List<ToolUtils.PropertyInfo> taskDefinition, StringBuilder errors, StringBuilder warnings) {
+        try {
+            JsonNode currentPropsNode = WorkflowParser.parseJsonString(currentTaskParameters);
+
+            if (!currentPropsNode.isObject()) {
+                errors.append("Current task parameters must be an object");
+                return errors;
+            }
+
             String processedTaskDefinition = WorkflowParser.processDisplayConditions(taskDefinition, currentTaskParameters);
             JsonNode taskDefNode = WorkflowParser.parseJsonString(processedTaskDefinition);
 
@@ -83,7 +131,7 @@ public class WorkflowValidator {
                 return errors;
             }
 
-            PropertyValidator.validatePropertiesRecursively(currentPropsNode, parametersNode, "", errors, warnings, taskDefinition, currentTaskParameters);
+            PropertyValidator.validatePropertiesRecursively(currentPropsNode, parametersNode, "", errors, warnings, processedTaskDefinition, currentTaskParameters);
 
         } catch (RuntimeException e) {
             // Handle invalid display condition errors
@@ -480,8 +528,8 @@ public class WorkflowValidator {
         try {
             String result = taskDefinition;
 
-            // Remove objects that have metadata with @ symbols (display conditions)
-            result = result.replaceAll("\"[^\"]+\"\\s*:\\s*\\{[^{}]*\"metadata\"\\s*:\\s*\"[^\"]*@[^@]*@[^\"]*\"[^{}]*\\}", "");
+            // Remove objects that have metadata (display conditions)
+            result = result.replaceAll("\"[^\"]+\"\\s*:\\s*\\{[^{}]*\"metadata\"\\s*:\\s*\"[^\"]*\"[^{}]*\\}", "");
 
             // Clean up any resulting JSON syntax issues
             result = WorkflowParser.cleanupJsonSyntax(result);
@@ -490,6 +538,11 @@ public class WorkflowValidator {
         } catch (Exception e) {
             return taskDefinition; // Return original if cleaning fails
         }
+    }
+
+    private static String removeObjectsWithInvalidConditions(List<ToolUtils.PropertyInfo> taskDefinition) {
+        String jsonTaskDefinition = WorkflowParser.convertPropertyInfoToJson(taskDefinition);
+        return removeObjectsWithInvalidConditions(jsonTaskDefinition);
     }
 
 
