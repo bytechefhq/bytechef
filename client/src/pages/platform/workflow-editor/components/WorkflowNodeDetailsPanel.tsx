@@ -613,6 +613,7 @@ const WorkflowNodeDetailsPanel = ({
             }
 
             await deleteWorkflowNodeTestOutputMutation.mutateAsync({
+                environmentId: currentEnvironmentId,
                 id: workflow.id!,
                 workflowNodeName: currentNode!.name,
             });
@@ -710,6 +711,7 @@ const WorkflowNodeDetailsPanel = ({
             });
         },
         [
+            currentEnvironmentId,
             currentOperationName,
             currentComponentDefinition,
             currentComponent,

@@ -67,6 +67,7 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
 
     const {refetch: workflowNodeTestOutputExistsRefetch} = useCheckWorkflowNodeTestOutputExistsQuery({
         createdDate: startWebhookTestDate,
+        environmentId: currentEnvironmentId,
         id: workflowId!,
         workflowNodeName: currentNode?.name as string,
     });
@@ -99,20 +100,22 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
 
     const handlePredefinedOutputSchemaClick = useCallback(() => {
         deleteWorkflowNodeTestOutputMutation.mutate({
+            environmentId: currentEnvironmentId,
             id: workflowId,
             workflowNodeName: currentNode.name,
         });
-    }, [currentNode.name, deleteWorkflowNodeTestOutputMutation, workflowId]);
+    }, [currentEnvironmentId, currentNode.name, deleteWorkflowNodeTestOutputMutation, workflowId]);
 
     const handleSampleDataDialogUpload = useCallback(
         (value: string) => {
             uploadSampleOutputRequestMutation.mutate({
                 body: JSON.parse(value),
+                environmentId: currentEnvironmentId,
                 id: workflowId,
                 workflowNodeName: currentNode.name,
             });
         },
-        [currentNode.name, uploadSampleOutputRequestMutation, workflowId]
+        [currentEnvironmentId, currentNode.name, uploadSampleOutputRequestMutation, workflowId]
     );
 
     const handleTestOperationClick = useCallback(() => {
