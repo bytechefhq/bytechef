@@ -4,22 +4,55 @@ title: "Action"
 
 ## Action [toc]
 
-The action definition is used to specify the properties of an action. Below is an explanation of each method that can be used in the action definition:
+The action definition is used to specify the behavior and UI of an action inside a component. Below is an explanation of each method that can be used in the action definition:
 
-- `action(String name)` - Builds new `ModifiableActionDefinition` with the specified name. The name defines the action key (backend ID).
-- `description(String description)` - Provides a short description of the action.
-- `perform(SingleConnectionPerformFunction perform)` - The function that store logic for the action.
-  Perform method has the following arguments:
-    - `Parameters inputParameters` - Acts as a getter for action properties.
-    - `Parameters connectionParameters` - Acts as a getter for connection properties.
-    - `ActionContext actionContext`
-        - `encoder` - Used to encode data.
-        - `file` - Works with files stored in temporary memory, usually outputs a FileEntry type.
-        - `data`- Works with data that can be stored in permanent memory.
-        - `logger` - Creates logs.
-        - `json` - Mainly reads JSONs.
-        - `http` - Sends HTTP requests.
-        - `event` - Can publish an event.
-- `output` - Defines the output of the action.
-- `properties(P... properties)` - Lists the properties that the action needs to perform its task. Properties will be shown in the Properties tab. For more information, refer to the [Property](/developer-guide/component-specification/property).
-- `title(String title)` - Sets the name of the action in Chicago Style that will be displayed in the UI.
+- `action(String name)` - Builds a new `ModifiableActionDefinition` with the specified backend ID. The name is the action ID used internally and in workflow JSON.
+- `title(String title)` - Sets the display name of the action (shown in the UI).
+- `description(String description)` - Provides a short description of the action (shown in the UI and tooltips).
+- `deprecated(boolean deprecated)` - Marks the action as deprecated. Deprecated actions should not be used in new integrations.
+- `perform(SingleConnectionPerformFunction perform)` - Defines the action logic with access to the configured connection.
+  Perform functions receive:
+  - `Parameters inputParameters` — Getter for action properties (values set by the user in the Properties tab).
+  - `Parameters connectionParameters` — Getter for connection properties (if the action uses a connection).
+  - `ActionContext actionContext` — Utilities for implementing logic:
+    - `encoder` — Encode/decode data.
+    - `file` — Work with temporary files (produces/consumes FileEntry).
+    - `data` — Read/write persistent action data between runs.
+    - `logger` — Structured logging.
+    - `json` — JSON read/write helpers.
+    - `http` — HTTP client for external calls.
+    - `event` — Publish platform events when needed.
+- `help(String body)` / `help(String body, String learnMoreUrl)` - Adds help text (and optional *Learn more* link) displayed in the UI.
+- `properties(P... properties)` - Lists the properties that the action needs to perform its task. Properties are shown in the Properties tab. See [Property](/developer-guide/component-specification/property).
+
+### Defining the output
+There are several ways to describe what the action returns. The Output tab in the UI uses this to assist mapping in subsequent steps.
+
+- `output()` - Fully dynamic output. No schema is declared up front; users will see the shape only after running the action (schema is inferred from the first execution result).
+- `output(OutputSchema<P> outputSchema)` - Declares a static output schema. The schema can be a primitive (string, number, boolean, fileEntry, integer) or a complex type (object, array). The Output tab will display the fields and auto-generate sample values.
+- `output(SampleOutput sampleOutput)` - Provides just a sample result (useful for quick mapping without executing). The Output tab will show the sample.
+- `output(Placeholder placeholder)` - Defines a structure that will be shown in the dialog for uploading sample output data.
+- `output(OutputSchema<P> outputSchema, SampleOutput sampleOutput)` - Declares both schema and sample. The Output tab shows the declared fields populated with the provided sample values.
+- `output(BaseOutputFunction output)` / `output(OutputFunction output)` - Advanced: compute the output schema and/or sample dynamically based on current inputs or connection parameters. Use these when the output shape depends on user selections.
+
+### Example
+
+```java
+public static final ModifiableActionDefinition ACTION_DEFINITION = action("upperCase")
+        .title("Upper Case")
+        .description("Convert a string to upper case.")
+        .properties(
+            string("text")
+        .label("Text")
+        .controlType(ControlType.TEXT_AREA)
+        .required(true))
+        .perform((inputParameters, connectionParameters, context) -> {
+            String text = inputParameters.getRequiredString("text");
+
+            return text.toUpperCase();
+        })
+        .output(
+            outputSchema(string().description("Upper case string.")),
+            sampleOutput("HELLO WORLD")
+        );
+```
