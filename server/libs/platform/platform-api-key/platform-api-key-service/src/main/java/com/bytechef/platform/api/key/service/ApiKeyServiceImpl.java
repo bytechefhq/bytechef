@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
+package com.bytechef.platform.api.key.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.user.domain.ApiKey;
-import com.bytechef.platform.user.repository.ApiKeyRepository;
+import com.bytechef.platform.api.key.domain.ApiKey;
+import com.bytechef.platform.api.key.repository.ApiKeyRepository;
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.Optional;

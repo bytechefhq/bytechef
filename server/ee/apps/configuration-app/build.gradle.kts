@@ -45,6 +45,8 @@ dependencies {
     implementation(project(":server:libs:core:encryption:encryption-property"))
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
     implementation(project(":server:libs:core:rest:rest-impl"))
+    implementation(project(":server:libs:platform:platform-api-key:platform-api-key-rest"))
+    implementation(project(":server:libs:platform:platform-api-key:platform-api-key-service"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.domain;
+package com.bytechef.platform.api.key.domain;
 
 import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.user.domain.User;
 import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;

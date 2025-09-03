@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.web.rest;
+package com.bytechef.platform.api.key.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.platform.user.domain.ApiKey;
-import com.bytechef.platform.user.facade.ApiKeyFacade;
-import com.bytechef.platform.user.service.ApiKeyService;
-import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
-import com.bytechef.platform.user.web.rest.model.CreateApiKey200ResponseModel;
+import com.bytechef.platform.api.key.domain.ApiKey;
+import com.bytechef.platform.api.key.facade.ApiKeyFacade;
+import com.bytechef.platform.api.key.service.ApiKeyService;
+import com.bytechef.platform.api.key.web.rest.model.ApiKeyModel;
+import com.bytechef.platform.api.key.web.rest.model.CreateApiKey200ResponseModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.facade;
+package com.bytechef.platform.api.key.facade;
 
+import com.bytechef.platform.api.key.domain.ApiKey;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.user.domain.ApiKey;
 
 /**
  * @author Ivica Cardic
