@@ -1,4 +1,5 @@
 {
+  "title": "Build Component",
   "pages": [
     "initial-setup",
     "create-component-definition",
