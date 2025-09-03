@@ -65,7 +65,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
             array(CONDITIONS)
                 .label("OR Conditions")
                 .placeholder("Add OR Condition")
-                .description("The type of values to compare.")
+                .description("OR Condition array that contains AND Condition arrays")
                 .expressionEnabled(false)
                 .displayCondition("%s == false".formatted(RAW_EXPRESSION))
                 .items(
@@ -73,6 +73,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                         .label("AND condition")
                         .placeholder("Add AND Condition")
                         .expressionEnabled(false)
+                        .description("AND Condition array that contains expression items")
                         .items(
                             object("boolean")
                                 .label("Boolean Expression")
