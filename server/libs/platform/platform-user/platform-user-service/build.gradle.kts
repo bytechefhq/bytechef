@@ -1,6 +1,4 @@
 dependencies {
-    api(project(":server:libs:platform:platform-user:platform-user-api"))
-
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.commons.validator)
     implementation("org.springframework:spring-context-support")
@@ -12,6 +10,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation(project(":server:libs:config:jdbc-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
