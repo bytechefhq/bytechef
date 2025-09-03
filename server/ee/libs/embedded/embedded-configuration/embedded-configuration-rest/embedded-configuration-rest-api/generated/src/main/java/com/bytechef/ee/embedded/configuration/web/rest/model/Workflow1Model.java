@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow_1", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow_1")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T21:01:15.179580+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-03T18:18:51.818531+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class Workflow1Model implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
   private @Nullable String createdBy;

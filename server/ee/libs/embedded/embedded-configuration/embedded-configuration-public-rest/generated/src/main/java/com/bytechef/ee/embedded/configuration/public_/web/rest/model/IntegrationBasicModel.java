@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration for a particular service represented by component.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T21:01:10.790359+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-03T18:18:48.431637+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationBasicModel {
 
   private String componentName;

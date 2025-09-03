@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AiProvider", description = "An AI provider.")
 @JsonTypeName("AiProvider")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-02T21:01:11.975854+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-03T18:18:49.365161+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class AiProviderModel {
 
   private @Nullable Integer id;
