@@ -16,7 +16,6 @@
 
 package com.bytechef.ai.mcp.tool.automation;
 
-import com.bytechef.component.definition.Property.Type;
 import com.bytechef.platform.domain.BaseProperty;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -106,17 +105,17 @@ public final class ToolUtils {
 
         List<PropertyInfo> nestedProperties = null;
 
-        if (decorator.getType() == Type.OBJECT) {
+        if (decorator.getType() == PropertyDecorator.Type.OBJECT) {
             nestedProperties = convertToPropertyInfoList(decorator.getObjectProperties()
                 .stream()
                 .map(pd -> pd.property)
                 .toList());
-        } else if (decorator.getType() == Type.ARRAY) {
+        } else if (decorator.getType() == PropertyDecorator.Type.ARRAY) {
             nestedProperties = convertToPropertyInfoList(decorator.getItems()
                 .stream()
                 .map(pd -> pd.property)
                 .toList());
-        } else if (decorator.getType() == Type.FILE_ENTRY) {
+        } else if (decorator.getType() == PropertyDecorator.Type.FILE_ENTRY) {
             nestedProperties = convertToPropertyInfoList(decorator.getFileEntryProperties()
                 .stream()
                 .map(pd -> pd.property)
@@ -153,6 +152,22 @@ public final class ToolUtils {
         public enum Location {
             COMPONENT,
             TASK_DISPATCHER
+        }
+
+        public enum Type {
+            ARRAY,
+            BOOLEAN,
+            DATE,
+            DATE_TIME,
+            DYNAMIC_PROPERTIES,
+            FILE_ENTRY,
+            INTEGER,
+            NULL,
+            NUMBER,
+            OBJECT,
+            STRING,
+            TIME,
+            TASK
         }
 
         private final BaseProperty property;
@@ -230,6 +245,10 @@ public final class ToolUtils {
                 case com.bytechef.platform.component.domain.NumberProperty ignored -> {
                     this.type = Type.NUMBER;
                     this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.TaskProperty ignored -> {
+                    this.type = Type.TASK;
+                    this.location = Location.TASK_DISPATCHER;
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty ignored -> {
                     this.type = Type.OBJECT;
@@ -354,16 +373,17 @@ public final class ToolUtils {
         String displayCondition = property.getDisplayCondition() == null ? "" : " @" + property.displayCondition + "@";
 
         return switch (property.getType()) {
-            case Type.ARRAY -> generateArrayValue(property.getItems());
-            case Type.BOOLEAN -> "\"boolean" + displayCondition + required;
-            case Type.DATE -> "\"date" + displayCondition + required;
-            case Type.DATE_TIME -> "\"datetime" + displayCondition + required;
-            case Type.DYNAMIC_PROPERTIES -> "{}" + displayCondition + required;
-            case Type.INTEGER -> "\"integer" + displayCondition + required;
-            case Type.NUMBER -> "\"float" + displayCondition + required;
-            case Type.OBJECT -> generateObjectValue(property.getObjectProperties(), displayCondition, required);
-            case Type.FILE_ENTRY -> generateObjectValue(property.getFileEntryProperties(), displayCondition, required);
-            case Type.TIME -> "\"time" + displayCondition + required;
+            case PropertyDecorator.Type.ARRAY -> generateArrayValue(property.getItems());
+            case PropertyDecorator.Type.BOOLEAN -> "\"boolean" + displayCondition + required;
+            case PropertyDecorator.Type.DATE -> "\"date" + displayCondition + required;
+            case PropertyDecorator.Type.DATE_TIME -> "\"datetime" + displayCondition + required;
+            case PropertyDecorator.Type.DYNAMIC_PROPERTIES -> "{}" + displayCondition + required;
+            case PropertyDecorator.Type.INTEGER -> "\"integer" + displayCondition + required;
+            case PropertyDecorator.Type.NUMBER -> "\"float" + displayCondition + required;
+            case PropertyDecorator.Type.OBJECT -> generateObjectValue(property.getObjectProperties(), displayCondition, required);
+            case PropertyDecorator.Type.FILE_ENTRY -> generateObjectValue(property.getFileEntryProperties(), displayCondition, required);
+            case PropertyDecorator.Type.TIME -> "\"time" + displayCondition + required;
+            case PropertyDecorator.Type.TASK -> "\"task" + displayCondition + required;
             default -> "\"string" + displayCondition + required;
         };
     }
@@ -462,13 +482,4 @@ public final class ToolUtils {
             }
         }
     }
-
-//    /**
-//     * Definition response record that contains both the structure and conditional parameters.
-//     */
-//    @SuppressFBWarnings("EI")
-//    public record DefinitionResponse(
-//        @JsonProperty("structure") @JsonPropertyDescription("The JSON structure/template for the flow definition") String structure,
-//        @JsonProperty("conditionalParameters") @JsonPropertyDescription("Map of display conditions to property paths that have those conditions") Map<String, List<String>> conditionalParameters) {
-//    }
 }

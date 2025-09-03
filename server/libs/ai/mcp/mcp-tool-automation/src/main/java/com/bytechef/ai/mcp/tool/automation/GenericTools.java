@@ -24,8 +24,6 @@ import com.bytechef.ai.mcp.tool.automation.FlowTools.FlowInfo;
 import com.bytechef.ai.mcp.tool.automation.FlowTools.FlowMinimalInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -374,27 +372,15 @@ public class GenericTools {
         @ToolParam(description = "The version (optional)") Integer version) {
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             StringBuilder errors = new StringBuilder("[");
             StringBuilder warnings = new StringBuilder("[");
 
-            // First validate the basic task structure
-            WorkflowValidator.validateTaskStructure(task, errors);
+            // Create a task definition provider that gets the task properties for validation
+            WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> 
+                getTaskProperties(type, name, componentName, version);
 
-            // Get the task definition for property validation
-            List<ToolUtils.PropertyInfo> taskDefinition = getTaskProperties(type, name, componentName, version);
-
-            // Extract task properties from the provided task JSON
-            JsonNode taskNode = objectMapper.readTree(task);
-            String taskParameters = "";
-
-            if (taskNode.has("parameters") && taskNode.get("parameters")
-                .isObject()) {
-                taskParameters = objectMapper.writeValueAsString(taskNode.get("parameters"));
-            }
-
-            // Validate task properties against the definition (display condition processing happens inside)
-            WorkflowValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+            // Use the refactored WorkflowValidator for single task validation
+            WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);
 
             String errorMessages = errors.append("]")
                 .toString()
@@ -452,15 +438,15 @@ public class GenericTools {
         @JsonProperty("warnings") @JsonPropertyDescription("Warning details that give additional information") String warnings) {
     }
 
-    public String getTaskDefinition(String type, String taskType) {
+    public List<ToolUtils.PropertyInfo> getTaskProperties(String type, String taskType) {
         String[] split = type.split("/");
         int version = Integer.parseInt(split[1].substring(1));
         if (split.length == 2) {
-            return getTaskDefinition("flow", split[0], split[0], version);
+            return getTaskProperties("flow", split[0], split[0], version);
         } else if (taskType.equals("trigger")) {
-            return getTaskDefinition(taskType, split[2], split[0], version);
+            return getTaskProperties(taskType, split[2], split[0], version);
         } else {
-            return getTaskDefinition("action", split[2], split[0], version);
+            return getTaskProperties("action", split[2], split[0], version);
         }
     }
 

@@ -18,10 +18,12 @@ package utils;
 
 import com.bytechef.ai.mcp.tool.automation.ToolUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,8 +41,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class WorkflowValidator {
-
-    // ==================== WORKFLOW VALIDATION ====================
 
     /**
      * Validates the overall structure of a workflow JSON.
@@ -78,26 +78,23 @@ public class WorkflowValidator {
      * @param warnings        StringBuilder to collect validation warnings
      */
     public static void validateWorkflowTasks(
-        List<JsonNode> tasks, Map<String, String> taskDefinitions,
+        List<JsonNode> tasks, Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions,
         Map<String, ToolUtils.PropertyInfo> taskOutput,
         StringBuilder errors, StringBuilder warnings) {
         List<String> taskNames = new ArrayList<>();
         Map<String, String> taskNameToTypeMap = new java.util.HashMap<>();
 
         for (JsonNode task : tasks) {
-            if (processTaskValidation(task, taskDefinitions, taskNames, taskNameToTypeMap, taskOutput, errors,
-                warnings)) {
+            if (processTaskValidation(task, taskDefinitions, taskNames, taskNameToTypeMap, taskOutput, errors, warnings)) {
                 break; // Stop if task order errors occurred
             }
         }
     }
 
-    // ==================== TASK VALIDATION ====================
-
     /**
      * Validates the structure of a single task JSON.
      *
-     * @param task   the task JSON string to validate
+     * @param task the task JSON string to validate
      * @param errors StringBuilder to collect validation errors
      * @return the errors StringBuilder for method chaining
      */
@@ -117,42 +114,6 @@ public class WorkflowValidator {
         FieldValidator.validateTaskType(taskNode, errors);
         FieldValidator.validateRequiredObjectField(taskNode, "parameters", errors);
 
-        return errors;
-    }
-
-    // ==================== TASK PARAMETER VALIDATION ====================
-
-    /**
-     * Validates task parameters against a string-based task definition.
-     *
-     * @param currentTaskParameters the current task parameters JSON
-     * @param taskDefinition        the task definition JSON
-     * @param errors                StringBuilder to collect validation errors
-     * @param warnings              StringBuilder to collect validation warnings
-     * @return the errors StringBuilder for method chaining
-     */
-    public static StringBuilder validateTaskParameters(
-        String currentTaskParameters, String taskDefinition,
-        StringBuilder errors, StringBuilder warnings) {
-        JsonNode currentPropsNode = JsonProcessingHelper.parseJsonWithErrorHandling(currentTaskParameters, errors);
-        if (currentPropsNode == null
-            || !JsonProcessingHelper.validateNodeIsObject(currentPropsNode, "Current task parameters", errors)) {
-            return errors;
-        }
-
-        JsonNode taskDefNode = JsonProcessingHelper.parseJsonWithErrorHandling(taskDefinition, errors);
-        if (taskDefNode == null || !JsonProcessingHelper.validateNodeIsObject(taskDefNode, "Task definition", errors)) {
-            return errors;
-        }
-
-        JsonNode parametersNode = taskDefNode.get("parameters");
-        if (parametersNode == null || !parametersNode.isObject()) {
-            errors.append("Task definition must have a 'parameters' object");
-            return errors;
-        }
-
-        PropertyValidator.validatePropertiesRecursively(currentPropsNode, parametersNode, "",
-            errors, warnings, taskDefinition, currentTaskParameters);
         return errors;
     }
 
@@ -201,17 +162,16 @@ public class WorkflowValidator {
         }
 
         try {
+            String originalTaskDefinition = WorkflowParser.convertPropertyInfoToJson(taskDefinition);
             String processedTaskDefinition =
                 WorkflowParser.processDisplayConditions(taskDefinition, currentTaskParameters);
-            return validateProcessedTaskDefinition(currentPropsNode, processedTaskDefinition, errors, warnings,
+            return validateProcessedTaskDefinitionWithArraySupport(currentPropsNode, processedTaskDefinition, originalTaskDefinition, errors, warnings,
                 currentTaskParameters);
 
         } catch (RuntimeException e) {
             return handleDisplayConditionError(e, taskDefinition, currentTaskParameters, errors, warnings);
         }
     }
-
-    // ==================== DATA PILL VALIDATION ====================
 
     /**
      * Validates data pill expressions in task parameters. Delegates to DataPillValidator for the actual validation
@@ -233,18 +193,6 @@ public class WorkflowValidator {
             warnings);
     }
 
-    // ==================== UTILITY METHODS ====================
-
-    /**
-     * Handles JsonProcessingException with context-aware error messages. Delegates to JsonProcessingHelper for
-     * standardized error handling.
-     */
-    public static void handleJsonProcessingException(JsonProcessingException e, String workflow, StringBuilder errors) {
-        JsonProcessingHelper.handleJsonProcessingException(e, workflow, errors);
-    }
-
-    // ==================== PRIVATE HELPER METHODS ====================
-
     private static StringBuilder validateProcessedTaskDefinition(
         JsonNode currentPropsNode, String processedTaskDefinition,
         StringBuilder errors, StringBuilder warnings, String currentTaskParameters) {
@@ -262,6 +210,31 @@ public class WorkflowValidator {
 
             PropertyValidator.validatePropertiesRecursively(currentPropsNode, parametersNode, "",
                 errors, warnings, processedTaskDefinition, currentTaskParameters);
+            return errors;
+        } catch (JsonProcessingException e) {
+            JsonProcessingHelper.handleJsonProcessingException(e, processedTaskDefinition, errors);
+            return errors;
+        }
+    }
+
+    private static StringBuilder validateProcessedTaskDefinitionWithArraySupport(
+        JsonNode currentPropsNode, String processedTaskDefinition, String originalTaskDefinition,
+        StringBuilder errors, StringBuilder warnings, String currentTaskParameters) {
+        try {
+            JsonNode taskDefNode = WorkflowParser.parseJsonString(processedTaskDefinition);
+            if (!JsonProcessingHelper.validateNodeIsObject(taskDefNode, "Task definition", errors)) {
+                return errors;
+            }
+
+            JsonNode parametersNode = taskDefNode.get("parameters");
+            if (parametersNode == null || !parametersNode.isObject()) {
+                errors.append("Task definition must have a 'parameters' object");
+                return errors;
+            }
+
+            // For array validation with display conditions, use original definition
+            PropertyValidator.validatePropertiesRecursivelyWithArraySupport(currentPropsNode, parametersNode, "",
+                errors, warnings, processedTaskDefinition, originalTaskDefinition, currentTaskParameters);
             return errors;
         } catch (JsonProcessingException e) {
             JsonProcessingHelper.handleJsonProcessingException(e, processedTaskDefinition, errors);
@@ -297,13 +270,13 @@ public class WorkflowValidator {
     }
 
     private static boolean processTaskValidation(
-        JsonNode task, Map<String, String> taskDefinitions,
+        JsonNode task, Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions,
         List<String> taskNames, Map<String, String> taskNameToTypeMap,
         Map<String, ToolUtils.PropertyInfo> taskOutput,
         StringBuilder errors, StringBuilder warnings) {
         String taskType = task.get("type")
             .asText();
-        String taskDefinition = taskDefinitions.get(taskType);
+        List<ToolUtils.PropertyInfo> taskDefinition = taskDefinitions.get(taskType);
 
         validateTaskStructure(task.toString(), errors);
 
@@ -321,5 +294,207 @@ public class WorkflowValidator {
         taskNameToTypeMap.put(taskName, taskType);
 
         return validateTaskDataPills(task, taskOutput, taskNames, taskNameToTypeMap, errors, warnings);
+    }
+
+    /**
+     * Validates a complete workflow including structure, tasks, and parameters.
+     *
+     * @param workflow the workflow JSON string to validate
+     * @param taskDefinitionProvider function to get task definitions for a given task type and kind
+     * @param taskOutputProvider function to get task output properties for a given task type and kind
+     * @param errors StringBuilder to collect validation errors
+     * @param warnings StringBuilder to collect validation warnings
+     */
+    public static void validateCompleteWorkflow(
+            String workflow,
+            TaskDefinitionProvider taskDefinitionProvider,
+            TaskOutputProvider taskOutputProvider,
+            StringBuilder errors,
+            StringBuilder warnings) {
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // First validate the basic workflow structure
+            validateWorkflowStructure(workflow, errors);
+
+            // Extract task properties from the provided workflow JSON
+            JsonNode workflowNode = objectMapper.readTree(workflow);
+
+            java.util.List<JsonNode> tasks = new java.util.ArrayList<>();
+            java.util.Map<String, java.util.List<ToolUtils.PropertyInfo>> taskDefinitions = new java.util.HashMap<>();
+            java.util.Map<String, ToolUtils.PropertyInfo> taskOutputs = new java.util.HashMap<>();
+
+            // Process triggers
+            if (workflowNode.has("triggers") && workflowNode.get("triggers").isArray()) {
+                workflowNode.get("triggers").elements().forEachRemaining(task -> {
+                    if (tasks.isEmpty()) {
+                        tasks.add(task);
+                        String taskType = task.get("type").asText();
+                        taskDefinitions.putIfAbsent(taskType, taskDefinitionProvider.getTaskProperties(taskType, "trigger"));
+                        taskOutputs.putIfAbsent(taskType, taskOutputProvider.getTaskOutputProperty(taskType, "trigger", warnings));
+                    } else {
+                        errors.append("There can only be one trigger in the workflow");
+                    }
+                });
+            }
+
+            // Process tasks
+            if (workflowNode.has("tasks") && workflowNode.get("tasks").isArray()) {
+                workflowNode.get("tasks").elements().forEachRemaining(task -> {
+                    if (tasks.stream().anyMatch(previousTask -> previousTask.get("name").equals(task.get("name")))) {
+                        errors.append("Tasks cannot have repeating names: ").append(task.get("name").asText());
+                    }
+                    tasks.add(task);
+                    String taskType = task.get("type").asText();
+                    taskDefinitions.putIfAbsent(taskType, taskDefinitionProvider.getTaskProperties(taskType, ""));
+                    taskOutputs.putIfAbsent(taskType, taskOutputProvider.getTaskOutputProperty(taskType, "", warnings));
+
+                    // Handle nested TASK type properties by recursively processing them
+                    processNestedTasks(task, taskDefinitions, taskDefinitions, taskOutputs, errors, warnings);
+                });
+            }
+
+            validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+        } catch (Exception e) {
+            errors.append("Failed to validate workflow: ").append(e.getMessage());
+        }
+    }
+
+    /**
+     * Validates a single task including structure and parameters.
+     *
+     * @param task the task JSON string to validate
+     * @param taskDefinitionProvider function to get task definitions for a given task type and kind
+     * @param errors StringBuilder to collect validation errors
+     * @param warnings StringBuilder to collect validation warnings
+     */
+    public static void validateSingleTask(
+            String task,
+            TaskDefinitionProvider taskDefinitionProvider,
+            StringBuilder errors,
+            StringBuilder warnings) {
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // First validate the basic task structure
+            validateTaskStructure(task, errors);
+
+            // Extract task properties from the provided task JSON
+            JsonNode taskNode = objectMapper.readTree(task);
+            String taskType = taskNode.get("type").asText();
+
+            // Get the task definition for property validation
+            java.util.List<ToolUtils.PropertyInfo> taskDefinition =
+                taskDefinitionProvider.getTaskProperties(taskType, "");
+
+            String taskParameters = "{}";
+            if (taskNode.has("parameters") && taskNode.get("parameters").isObject()) {
+                taskParameters = objectMapper.writeValueAsString(taskNode.get("parameters"));
+            }
+
+            // Validate task properties against the definition
+            validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+
+        } catch (Exception e) {
+            errors.append("Failed to validate task: ").append(e.getMessage());
+        }
+    }
+
+    /**
+     * Processes nested TASK type properties within a task, extracting and validating inner tasks.
+     */
+    private static void processNestedTasks(
+            JsonNode task,
+            java.util.Map<String, java.util.List<ToolUtils.PropertyInfo>> mainTaskDefinitions,
+            java.util.Map<String, java.util.List<ToolUtils.PropertyInfo>> allTaskDefinitions,
+            java.util.Map<String, ToolUtils.PropertyInfo> taskOutputs,
+            StringBuilder errors,
+            StringBuilder warnings) {
+
+        if (!task.has("parameters")) {
+            return;
+        }
+
+        JsonNode parameters = task.get("parameters");
+        String taskType = task.get("type").asText();
+        java.util.List<ToolUtils.PropertyInfo> taskDef = mainTaskDefinitions.get(taskType);
+
+        if (taskDef != null) {
+            extractNestedTasksFromParameters(parameters, taskDef, allTaskDefinitions, taskOutputs, errors, warnings);
+        }
+    }
+
+    /**
+     * Recursively extracts and processes nested tasks from parameters that have TASK type properties.
+     */
+    private static void extractNestedTasksFromParameters(
+            JsonNode parameters,
+            java.util.List<ToolUtils.PropertyInfo> taskDefinition,
+            java.util.Map<String, java.util.List<ToolUtils.PropertyInfo>> allTaskDefinitions,
+            java.util.Map<String, ToolUtils.PropertyInfo> taskOutputs,
+            StringBuilder errors,
+            StringBuilder warnings) {
+
+        for (ToolUtils.PropertyInfo propertyInfo : taskDefinition) {
+            String propertyName = propertyInfo.name();
+
+            // Check if this is a TASK type array
+            if ("ARRAY".equalsIgnoreCase(propertyInfo.type()) &&
+                propertyInfo.nestedProperties() != null &&
+                propertyInfo.nestedProperties().size() == 1 &&
+                "TASK".equalsIgnoreCase(propertyInfo.nestedProperties().get(0).type())) {
+
+                if (parameters.has(propertyName) && parameters.get(propertyName).isArray()) {
+                    JsonNode taskArray = parameters.get(propertyName);
+
+                    // Process each nested task in the array
+                    for (int i = 0; i < taskArray.size(); i++) {
+                        JsonNode nestedTask = taskArray.get(i);
+
+                        if (nestedTask.has("type")) {
+                            String nestedTaskType = nestedTask.get("type").asText();
+
+                            // Add task definition for the nested task if not already present
+                            if (!allTaskDefinitions.containsKey(nestedTaskType)) {
+                                // This would need to be provided by the caller - for now we'll skip detailed validation
+                                // allTaskDefinitions.put(nestedTaskType, getTaskDefinition(nestedTaskType));
+                            }
+
+                            // Validate the nested task structure
+                            validateTaskStructure(nestedTask.toString(), errors);
+
+                            // Recursively process nested tasks within this task
+                            if (nestedTask.has("parameters")) {
+                                java.util.List<ToolUtils.PropertyInfo> nestedTaskDef =
+                                    allTaskDefinitions.get(nestedTaskType);
+                                if (nestedTaskDef != null) {
+                                    extractNestedTasksFromParameters(nestedTask.get("parameters"), nestedTaskDef,
+                                        allTaskDefinitions, taskOutputs, errors, warnings);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Functional interface for providing task definitions.
+     */
+    @FunctionalInterface
+    public interface TaskDefinitionProvider {
+        java.util.List<ToolUtils.PropertyInfo> getTaskProperties(String taskType, String kind);
+    }
+
+    /**
+     * Functional interface for providing task output properties.
+     */
+    @FunctionalInterface
+    public interface TaskOutputProvider {
+        ToolUtils.PropertyInfo getTaskOutputProperty(String taskType, String kind, StringBuilder warnings);
     }
 }
