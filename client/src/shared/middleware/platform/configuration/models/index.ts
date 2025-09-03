@@ -31,8 +31,6 @@ export * from './GetOAuth2AuthorizationParametersRequest';
 export * from './GetWorkflowNodeDescription200Response';
 export * from './Help';
 export * from './IntegerProperty';
-export * from './Notification';
-export * from './NotificationEvent';
 export * from './NullProperty';
 export * from './NumberProperty';
 export * from './OAuth2AuthorizationParameters';
