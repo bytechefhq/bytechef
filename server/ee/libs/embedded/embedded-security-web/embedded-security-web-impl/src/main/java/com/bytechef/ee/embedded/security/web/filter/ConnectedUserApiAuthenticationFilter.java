@@ -8,8 +8,8 @@
 package com.bytechef.ee.embedded.security.web.filter;
 
 import com.bytechef.ee.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
+import com.bytechef.ee.embedded.signing.key.service.SigningKeyService;
 import com.bytechef.platform.security.web.filter.AbstractApiAuthenticationFilter;
-import com.bytechef.platform.user.service.SigningKeyService;
 import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

@@ -72,6 +72,8 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client"))
+    implementation(project(":server:ee:libs:embedded:embedded-signing-key:embedded-signing-key-rest"))
+    implementation(project(":server:ee:libs:embedded:embedded-signing-key:embedded-signing-key-service"))
     implementation(project(":server:ee:libs:embedded:embedded-swagger"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
