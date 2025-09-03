@@ -1,0 +1,87 @@
+---
+title: "Write Tests"
+description: "How to write tests for your component."
+---
+
+## Overview
+
+When you build a component, add tests to validate both:
+- The component definition (actions, triggers, properties, connection) stays consistent over time.
+- The business logic in your actions and triggers behaves as expected.
+
+## Component Handler Test
+
+This test serializes your component definition to JSON and compares it with a snapshot file under your module's test resources. If the file is missing, it will be auto-created.
+
+- Location: `src/test/resources/definition/<component>_v<version>.json`
+- Naming: Use your component name and version (for example: notion_v1.json)
+- Purpose: Catch unintentional breaking changes to your component definition (titles, properties, output schemas, etc.).
+
+Example:
+
+```java
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
+
+class MyComponentHandlerTest {
+
+    @Test
+    void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/my-component_v1.json", new MyComponentHandler().getDefinition());
+    }
+}
+```
+
+How it works:
+- JsonFileAssert.assertEquals writes the file if it doesn't exist, and on subsequent runs performs a strict JSON comparison.
+
+- To intentionally update the snapshot: delete `src/test/resources/definition/<file>.json` and re-run the test to regenerate it, then commit the change. See contributing guide instructions.
+
+Tip: Every component module should have one ComponentHandlerTest like this.
+
+## Unit Testing Actions
+
+Action logic lives in perform(...). You can unit test it by providing Parameters via MockParametersFactory and mocking ActionContext with Mockito.
+
+Example (simplified boolean computation):
+
+```java
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class MyActionTest {
+    private final ActionContext actionContext = mock(ActionContext.class);
+
+    @Test
+    void testPerform() {
+        Parameters input = MockParametersFactory.create(Map.of("text", "hello"));
+
+        Object result = MyAction.perform(input, input, actionContext);
+
+        assertEquals("HELLO", result);
+    }
+}
+```
+
+Notes:
+- Use MockParametersFactory.create(Map.of(...)) to build Parameters quickly for inputs and, if needed, connection parameters.
+- Mock ActionContext and verify interactions if your code uses context.http(), context.file(), context.data(), etc.
+
+## Unit Testing Triggers
+
+For polling triggers, test the poll(...) function by mocking TriggerContext and its HTTP executor.
+
+For webhook triggers, write small tests around enable/disable/request handlers by mocking ctx.http() calls and asserting returned data structures.
+
+Remember:
+
+If you change your component definition, remember to update the snapshot JSON:
+
+- Delete `src/test/resources/definition/<component>_v<version>.json`
+- Re-run the Component Handler Test to regenerate
