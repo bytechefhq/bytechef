@@ -52,7 +52,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
-    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-rest:platform-user-rest-api"))
 
     testImplementation("com.zaxxer:HikariCP")

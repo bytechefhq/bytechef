@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.web.rest.mapper;
+package com.bytechef.platform.api.key.web.rest.mapper;
 
-import com.bytechef.platform.user.domain.ApiKey;
-import com.bytechef.platform.user.web.rest.mapper.config.PlatformUserMapperSpringConfig;
-import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
+import com.bytechef.platform.api.key.domain.ApiKey;
+import com.bytechef.platform.api.key.web.rest.mapper.config.ApiKeyMapperSpringConfig;
+import com.bytechef.platform.api.key.web.rest.model.ApiKeyModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformUserMapperSpringConfig.class)
+@Mapper(config = ApiKeyMapperSpringConfig.class)
 public interface ApiKeyMapper extends Converter<ApiKey, ApiKeyModel> {
 
     @Override

@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-mail"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))

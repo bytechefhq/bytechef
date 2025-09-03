@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.repository;
+package com.bytechef.platform.api.key.repository;
 
-import com.bytechef.platform.user.domain.ApiKey;
+import com.bytechef.platform.api.key.domain.ApiKey;
 import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;

@@ -1,9 +1,9 @@
 dependencies {
-    compileOnly("jakarta.servlet:jakarta.servlet-api")
-
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api-key:platform-api-key-api"))
-    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 }
