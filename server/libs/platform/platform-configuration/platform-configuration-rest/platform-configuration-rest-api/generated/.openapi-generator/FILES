@@ -6,8 +6,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/ClusterElementDefinit
 src/main/java/com/bytechef/platform/configuration/web/rest/ComponentDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ConnectionDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/EnvironmentApi.java
-src/main/java/com/bytechef/platform/configuration/web/rest/NotificationApi.java
-src/main/java/com/bytechef/platform/configuration/web/rest/NotificationEventApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/Oauth2Api.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TaskDispatcherDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TriggerDefinitionApi.java
@@ -50,8 +48,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/GetOAuth2Author
 src/main/java/com/bytechef/platform/configuration/web/rest/model/GetWorkflowNodeDescription200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/HelpModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/IntegerPropertyModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/NotificationEventModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/NotificationModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/NullPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/NumberPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/OAuth2AuthorizationParametersModel.java
