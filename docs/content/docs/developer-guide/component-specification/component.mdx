@@ -4,16 +4,29 @@ title: "Component"
 
 ## Component [toc]
 
-The component definition is used to specify the properties of a component. Below is an explanation of each method that can be used in the component definition:
+The component definition describes a reusable integration component (its metadata, actions, triggers, and optional connection). Below is an explanation of each method you can use when building a component with the DSL:
 
-- `component(String name)` - Builds new `ModifiableComponentDefinition` with the specified name. The name defines the component key (backend ID).
-- [`actions(A... actionDefinitions)`](/developer-guide/component-specification/action) - Specifies the actions that the component can perform.
-- `categories(ComponentCategory... category)` - Defines the category or categories that the component belongs to, used to group components together in the UI. Available categories can be found in [ComponentCategory](https://github.com/bytechefhq/bytechef/blob/master/sdks/backend/java/component-api/src/main/java/com/bytechef/component/definition/ComponentCategory.java).
-- [`connection(ModifiableConnectionDefinition connectionDefinition)`](/developer-guide/component-specification/connection)  - Sets the connection definition for the component.
-- `connectionRequired(boolean connectionRequired)` - Indicates whether the component requires a connection to be configured before it can be used.
-- `customAction(boolean customAction)` - Indicates if the component is REST-based.
-- `description(String description)` - Provides a short description of the component.
-- `icon(String icon)` - Specifies the path to the icon that will be displayed in the UI.
-- `title(String title)` - Sets the name of the component in Chicago Style that will be displayed in the UI.
-- [`triggers(T... triggerDefinitions)`](/developer-guide/component-specification/trigger) - Lists the triggers that the component can listen to.
-- `version(int version)` - Specifies the version number of the component.
+- `component(String name)` - Builds a new `ModifiableComponentDefinition` with the specified backend ID. The name is the component ID used internally and in workflow JSON.
+- [`actions(A... actionDefinitions)`](/developer-guide/component-specification/action) - Declares the actions exposed by this component.
+- `categories(ComponentCategory... category)` / `categories(List<ComponentCategory> categories)` - Assigns UI categories for grouping and discovery in the catalog. See [ComponentCategory](https://github.com/bytechefhq/bytechef/blob/master/sdks/backend/java/component-api/src/main/java/com/bytechef/component/definition/ComponentCategory.java).
+- [`connection(ModifiableConnectionDefinition connectionDefinition)`](/developer-guide/component-specification/connection) - Defines the connection used by actions/triggers. If not set, actions can still run without a connection if they don't require one.
+- `customAction(boolean customAction)` - If true, enables the Custom Action feature in the UI (typically for REST/OpenAPI‑based connectors).
+- `customActionHelp(Help customActionHelp)` - Adds help text for the Custom Action. Displayed as a popup in the UI next to the Custom Action.
+- `description(String description)` - Short description shown in the catalog and tooltips.
+- `icon(String icon)` - Path or resource name of the SVG icon shown in the UI.
+- `resources(String documentationUrl)` / `resources(String documentationUrl, Map<String, String> additionalUrls)` - Links to product documentation and optional additional resources (e.g., FAQ, blog posts, templates).
+- `title(String title)` - Human‑readable display name (Chicago style) shown in the UI.
+- [`triggers(T... triggerDefinitions)`](/developer-guide/component-specification/trigger) - Declares triggers available on this component.
+- `clusterElements(ClusterElementDefinition<?>... clusterElements)` - Declares reusable cluster elements (e.g., AI tools) that the component may expose.
+- `version(int version)` - Component version number. Increment this when you make breaking changes so existing workflows can continue to use older versions.
+
+### Example
+
+```java
+private static final ComponentDefinition COMPONENT_DEFINITION = component("textHelper")
+        .title("Text Helper")
+        .description("Helper component which contains operations to help you work with text.")
+        .icon("path:assets/text-helper.svg")
+        .categories(ComponentCategory.HELPERS)
+        .actions(TextHelperUpperCaseAction.ACTION_DEFINITION);
+```
