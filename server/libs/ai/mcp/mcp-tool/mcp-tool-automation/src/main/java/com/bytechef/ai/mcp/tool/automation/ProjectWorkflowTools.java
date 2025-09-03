@@ -254,61 +254,16 @@ public class ProjectWorkflowTools {
         @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             StringBuilder errors = new StringBuilder("[");
             StringBuilder warnings = new StringBuilder("[");
 
-            // First validate the basic workflow structure
-            WorkflowValidator.validateWorkflowStructure(workflow, errors);
-
-            // Extract task properties from the provided task JSON
-            JsonNode workflowNode = objectMapper.readTree(workflow);
-
-            List<JsonNode> tasks = new ArrayList<>();
-            Map<String, String> taskDefinitions = new HashMap<>();
-            Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
-
-            if (workflowNode.has("triggers") && workflowNode.get("triggers")
-                .isArray()) {
-                workflowNode.get("triggers")
-                    .elements()
-                    .forEachRemaining(task -> {
-                        tasks.add(task);
-                        taskDefinitions.putIfAbsent(
-                            task.get("type")
-                                .asText(),
-                            genericTools.getTaskDefinition(task.get("type")
-                                .asText(), "trigger"));
-
-                        taskOutputs.putIfAbsent(
-                            task.get("type")
-                                .asText(),
-                            genericTools.getTaskOutputProperty(task.get("type")
-                                .asText(), "trigger", warnings));
-                    });
-            }
-
-            if (workflowNode.has("tasks") && workflowNode.get("tasks")
-                .isArray()) {
-                workflowNode.get("tasks")
-                    .elements()
-                    .forEachRemaining(task -> {
-                        tasks.add(task);
-                        taskDefinitions.putIfAbsent(
-                            task.get("type")
-                                .asText(),
-                            genericTools.getTaskDefinition(task.get("type")
-                                .asText(), ""));
-
-                        taskOutputs.putIfAbsent(
-                            task.get("type")
-                                .asText(),
-                            genericTools.getTaskOutputProperty(task.get("type")
-                                .asText(), "", warnings));
-                    });
-            }
-
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateCompleteWorkflow(
+                workflow,
+                genericTools::getTaskProperties,
+                genericTools::getTaskOutputProperty,
+                errors,
+                warnings
+            );
 
             String errorMessages = errors.append("]")
                 .toString()
@@ -326,8 +281,8 @@ public class ProjectWorkflowTools {
             return new WorkflowValidationResult(isValid, errorMessages, warningMessages);
 
         } catch (Exception e) {
-            logger.error("Failed to workflow", e);
-            throw ToolUtils.createOperationException("Failed to validate task", e);
+            logger.error("Failed to validate workflow", e);
+            throw ToolUtils.createOperationException("Failed to validate workflow", e);
         }
     }
 
