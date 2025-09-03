@@ -12,7 +12,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {SigningKey} from '@/ee/shared/middleware/embedded/user';
+import {SigningKey} from '@/ee/shared/middleware/embedded/signing-key';
 import {
     useCreateSigningKeyMutation,
     useUpdateSigningKeyMutation,

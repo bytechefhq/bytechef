@@ -11,7 +11,7 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ApiKeyDialog from '@/pages/platform/settings/api-keys/components/ApiKeyDialog';
-import {ApiKey} from '@/shared/middleware/platform/user';
+import {ApiKey} from '@/shared/middleware/platform/api-key';
 import {useDeleteApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
 import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';

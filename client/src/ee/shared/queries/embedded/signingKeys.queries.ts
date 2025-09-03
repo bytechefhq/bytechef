@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys */
 
-import {SigningKey, SigningKeyApi} from '@/ee/shared/middleware/embedded/user';
+import {SigningKey, SigningKeyApi} from '@/ee/shared/middleware/embedded/signing-key';
 import {useQuery} from '@tanstack/react-query';
 
 export const SigningKeyKeys = {
