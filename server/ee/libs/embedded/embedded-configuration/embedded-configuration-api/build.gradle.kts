@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
 }
