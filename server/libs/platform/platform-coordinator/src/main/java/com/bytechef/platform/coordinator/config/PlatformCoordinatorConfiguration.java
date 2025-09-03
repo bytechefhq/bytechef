@@ -21,7 +21,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.configuration.notification.NotificationHandlerRegistry;
 import com.bytechef.platform.configuration.notification.NotificationSenderRegistry;
 import com.bytechef.platform.configuration.service.NotificationService;
-import com.bytechef.platform.coordinator.event.listener.JobStatusApplicationEventListener;
+import com.bytechef.platform.coordinator.event.listener.NotificationJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookTaskStartedApplicationEventListener;
 import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
@@ -72,10 +72,10 @@ public class PlatformCoordinatorConfiguration {
     }
 
     @Bean
-    JobStatusApplicationEventListener jobStatusApplicationEventListener(
+    NotificationJobStatusApplicationEventListener jobStatusApplicationEventListener(
         Optional<JobExecutionCounter> jobExecutionCounter) {
 
-        return new JobStatusApplicationEventListener(
+        return new NotificationJobStatusApplicationEventListener(
             jobExecutionCounter, jobService, notificationHandlerRegistry, notificationSenderRegistry,
             notificationService);
     }
