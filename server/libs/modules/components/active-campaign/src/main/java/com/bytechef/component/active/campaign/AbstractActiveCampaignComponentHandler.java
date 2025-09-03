@@ -33,7 +33,7 @@ import com.bytechef.component.definition.ComponentDefinition;
  */
 public abstract class AbstractActiveCampaignComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
-        component("active-campaign")
+        component("activeCampaign")
             .title("ActiveCampaign")
             .description(
                 "ActiveCampaign is a customer experience automation platform that offers email marketing, marketing automation, sales automation, and CRM tools."))
