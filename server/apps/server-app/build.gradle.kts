@@ -101,7 +101,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
     implementation(project(":server:libs:platform:platform-swagger"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
-    implementation(project(":server:libs:platform:platform-user:platform-user-rest:platform-user-rest-impl"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-rest"))
     implementation(project(":server:libs:platform:platform-user:platform-user-service"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-impl"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-impl"))
