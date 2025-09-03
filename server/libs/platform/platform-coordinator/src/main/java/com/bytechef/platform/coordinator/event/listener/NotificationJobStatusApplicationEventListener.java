@@ -37,7 +37,7 @@ import java.util.Optional;
 /**
  * @author Matija Petanjek
  */
-public class JobStatusApplicationEventListener implements ApplicationEventListener {
+public class NotificationJobStatusApplicationEventListener implements ApplicationEventListener {
 
     private final Optional<JobExecutionCounter> jobExecutionCounter;
     private final JobService jobService;
@@ -46,7 +46,7 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
     private final NotificationService notificationService;
 
     @SuppressFBWarnings("EI")
-    public JobStatusApplicationEventListener(
+    public NotificationJobStatusApplicationEventListener(
         Optional<JobExecutionCounter> jobExecutionCounter, JobService jobService,
         NotificationHandlerRegistry notificationHandlerRegistry,
         NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
