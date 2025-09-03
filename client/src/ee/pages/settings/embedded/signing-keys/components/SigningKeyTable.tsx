@@ -11,7 +11,7 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import SigningKeyDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
-import {SigningKey} from '@/ee/shared/middleware/embedded/user';
+import {SigningKey} from '@/ee/shared/middleware/embedded/signing-key';
 import {useDeleteSigningKeyMutation} from '@/ee/shared/mutations/embedded/signingKeys.mutations';
 import {SigningKeyKeys} from '@/ee/shared/queries/embedded/signingKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';

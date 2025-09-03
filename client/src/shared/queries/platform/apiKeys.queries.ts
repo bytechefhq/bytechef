@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {ApiKey, ApiKeyApi} from '@/shared/middleware/platform/user';
+import {ApiKey, ApiKeyApi} from '@/shared/middleware/platform/api-key';
 import {useQuery} from '@tanstack/react-query';
 
 export const ApiKeyKeys = {
