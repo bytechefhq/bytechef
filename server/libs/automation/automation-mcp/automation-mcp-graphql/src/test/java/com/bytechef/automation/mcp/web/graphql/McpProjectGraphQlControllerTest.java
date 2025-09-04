@@ -46,7 +46,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author ByteChef
  */
 @ExtendWith(MockitoExtension.class)
-public class McpProjectGraphQlControllerIntTest {
+public class McpProjectGraphQlControllerTest {
 
     @Mock
     private McpProjectFacade mcpProjectFacade;
