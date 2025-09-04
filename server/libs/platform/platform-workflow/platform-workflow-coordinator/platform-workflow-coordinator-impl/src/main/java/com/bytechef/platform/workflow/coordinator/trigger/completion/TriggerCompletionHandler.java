@@ -95,7 +95,7 @@ public class TriggerCompletionHandler {
                 createJob(
                     workflowId,
                     MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), Map.of())),
-                    workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType(), metadataMap));
+                    workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
         } else {
             Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
 
@@ -105,14 +105,14 @@ public class TriggerCompletionHandler {
                         createJob(
                             workflowId,
                             MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
-                            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType(), metadataMap));
+                            workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
                 }
             } else {
                 triggerExecution.addJobId(
                     createJob(
                         workflowId,
                         MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
-                        workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType(), metadataMap));
+                        workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
             }
         }
 
@@ -126,7 +126,7 @@ public class TriggerCompletionHandler {
     }
 
     private long createJob(
-        String workflowId, Map<String, ?> inputMap, long jobPrincipalId, ModeType type, Map<String, ?> metadataMap) {
+        String workflowId, Map<String, ?> inputMap, long jobPrincipalId, Map<String, ?> metadataMap, ModeType type) {
 
         return principalJobFacade.createJob(
             new JobParametersDTO(workflowId, inputMap, metadataMap), jobPrincipalId, type);
@@ -141,16 +141,16 @@ public class TriggerCompletionHandler {
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor =
-            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private Map<String, ?> getMetadataMap(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor =
-            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getMetadataMap(workflowExecutionId.getJobPrincipalId());
     }
