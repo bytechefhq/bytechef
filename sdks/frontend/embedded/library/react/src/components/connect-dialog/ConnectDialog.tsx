@@ -9,7 +9,8 @@ import {
     PropertyType,
     RegisterFormSubmitFunction,
     WorkflowInputType,
-    WorkflowType,
+    IntegrationInstanceType,
+    MergedWorkflowType,
 } from './types';
 
 interface ToggleProps {
@@ -41,8 +42,9 @@ const Toggle = ({id, pressed, onPressedChange}: ToggleProps) => (
 );
 
 interface DialogProps {
+    integrationInstance?: IntegrationInstanceType;
     closeDialog: () => void;
-    edit?: boolean;
+    workflowsView?: boolean;
     form?: FormType;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
@@ -53,11 +55,13 @@ interface DialogProps {
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
     selectedWorkflows: string[];
+    mergedWorkflows: MergedWorkflowType[];
 }
 
 const ConnectDialog = ({
+    integrationInstance,
     closeDialog,
-    edit = false,
+    workflowsView = false,
     form,
     handleClick,
     handleWorkflowToggle,
@@ -68,6 +72,7 @@ const ConnectDialog = ({
     properties,
     registerFormSubmit,
     selectedWorkflows,
+    mergedWorkflows,
 }: DialogProps) => {
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -92,19 +97,21 @@ const ConnectDialog = ({
     return (
         <div className={styles.dialogOverlay} data-testid="dialog-overlay" onClick={closeDialog}>
             <div className={styles.dialogContainer} onClick={(event) => event.stopPropagation()}>
-                <DialogHeader closeDialog={closeDialog} edit={edit} integration={integration} />
+                <DialogHeader closeDialog={closeDialog} integration={integration} />
 
                 {integration ? (
                     <DialogContent
                         closeDialog={closeDialog}
-                        edit={false}
+                        workflowsView={workflowsView}
                         form={form}
                         handleWorkflowToggle={handleWorkflowToggle}
                         handleWorkflowInputChange={handleWorkflowInputChange}
                         integration={integration}
+                        integrationInstance={integrationInstance}
                         properties={properties}
                         registerFormSubmit={registerFormSubmit}
                         selectedWorkflows={selectedWorkflows}
+                        mergedWorkflows={mergedWorkflows}
                     />
                 ) : (
                     <main className={styles.dialogContentFallback}>
@@ -118,7 +125,9 @@ const ConnectDialog = ({
                     </main>
                 )}
 
-                {integration && <DialogFooter edit={false} handleClick={handleClick} isOAuth2={isOAuth2} />}
+                {integration && (
+                    <DialogFooter workflowsView={workflowsView} handleClick={handleClick} isOAuth2={isOAuth2} />
+                )}
 
                 <DialogPoweredBy />
             </div>
@@ -151,75 +160,79 @@ interface DialogWorkflowsContainerProps {
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
     selectedWorkflows: string[];
-    workflows: WorkflowType[];
+    mergedWorkflows: MergedWorkflowType[];
 }
 
 const DialogWorkflowsContainer = ({
     handleWorkflowToggle,
     handleWorkflowInputChange,
+    mergedWorkflows,
     selectedWorkflows,
-    workflows,
-}: DialogWorkflowsContainerProps) => (
-    <div data-testid="workflows-container" className={styles.workflowsContainer}>
-        {workflows?.length === 0 && <p>No workflows available for this integration.</p>}
+}: DialogWorkflowsContainerProps) => {
+    return (
+        <div data-testid="workflows-container" className={styles.workflowsContainer}>
+            {mergedWorkflows?.length > 0 ? (
+                <p>Enable, disable and manage your workflows below</p>
+            ) : (
+                <p>No workflows available for this integration.</p>
+            )}
 
-        <ul className={styles.workflowsList}>
-            {workflows.map((workflow) => {
-                const {inputs, label, workflowReferenceCode} = workflow;
+            <ul className={styles.workflowsList}>
+                {mergedWorkflows.map((mergedWorkflow) => {
+                    const {inputs, workflowReferenceCode, label} = mergedWorkflow;
 
-                if (!workflowReferenceCode) {
-                    return null;
-                }
+                    return (
+                        <li key={workflowReferenceCode}>
+                            <div>
+                                <span>{label}</span>
 
-                return (
-                    <li key={workflowReferenceCode}>
-                        <div>
-                            <span>{label}</span>
-
-                            <Toggle
-                                id={workflowReferenceCode}
-                                pressed={selectedWorkflows.includes(workflowReferenceCode)}
-                                onPressedChange={(pressed) => handleWorkflowToggle(workflowReferenceCode, pressed)}
-                            />
-                        </div>
-
-                        {selectedWorkflows.includes(workflowReferenceCode) && (
-                            <div className={styles.workflowInputsContainer}>
-                                <span>INPUTS</span>
-
-                                {inputs?.length === 0 ? (
-                                    <p className={styles.noInputsMessage}>No inputs defined for this workflow.</p>
-                                ) : (
-                                    <ul>
-                                        {inputs?.map((input: WorkflowInputType) => (
-                                            <li key={input.name}>
-                                                <DialogInputField
-                                                    onChange={(event) =>
-                                                        handleWorkflowInputChange(
-                                                            workflowReferenceCode,
-                                                            input.name,
-                                                            event.target.value
-                                                        )
-                                                    }
-                                                    label={input.label}
-                                                    name={input.name}
-                                                />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
+                                <Toggle
+                                    id={workflowReferenceCode}
+                                    pressed={selectedWorkflows.includes(workflowReferenceCode)}
+                                    onPressedChange={(pressed) => handleWorkflowToggle(workflowReferenceCode, pressed)}
+                                />
                             </div>
-                        )}
-                    </li>
-                );
-            })}
-        </ul>
-    </div>
-);
+
+                            {selectedWorkflows.includes(workflowReferenceCode) && (
+                                <div className={styles.workflowInputsContainer}>
+                                    <span>INPUTS</span>
+
+                                    {inputs?.length === 0 ? (
+                                        <p className={styles.noInputsMessage}>No inputs defined for this workflow.</p>
+                                    ) : (
+                                        <ul>
+                                            {inputs?.map((input: WorkflowInputType) => (
+                                                <li key={input.name}>
+                                                    <DialogInputField
+                                                        onChange={(event) =>
+                                                            handleWorkflowInputChange(
+                                                                workflowReferenceCode,
+                                                                input.name,
+                                                                event.target.value
+                                                            )
+                                                        }
+                                                        label={input.label}
+                                                        name={input.name}
+                                                        field={{value: input.value}}
+                                                    />
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            )}
+                        </li>
+                    );
+                })}
+            </ul>
+        </div>
+    );
+};
 
 interface DialogContentProps {
     closeDialog: () => void;
-    edit?: boolean;
+    integrationInstance?: IntegrationInstanceType;
+    workflowsView?: boolean;
     form?: FormType;
     handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
@@ -227,10 +240,12 @@ interface DialogContentProps {
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
     selectedWorkflows: string[];
+    mergedWorkflows: MergedWorkflowType[];
 }
 
 const DialogContent = ({
-    edit = false,
+    integrationInstance,
+    workflowsView = false,
     form,
     handleWorkflowToggle,
     handleWorkflowInputChange,
@@ -238,6 +253,7 @@ const DialogContent = ({
     properties,
     registerFormSubmit,
     selectedWorkflows,
+    mergedWorkflows,
 }: DialogContentProps) => {
     // Register the form's submit handler when the component mounts
     useEffect(() => {
@@ -248,9 +264,9 @@ const DialogContent = ({
 
     return (
         <main className={styles.dialogContent}>
-            <p>{integration.description}</p>
+            {!workflowsView && <p>{integration.description}</p>}
 
-            {!edit && form && (
+            {!workflowsView && form && (
                 <form id="form" onSubmit={form.handleSubmit}>
                     {properties?.map((property) => {
                         const field = form.register(property.name);
@@ -273,12 +289,12 @@ const DialogContent = ({
                 </form>
             )}
 
-            {edit && !!integration.workflows?.length && (
+            {workflowsView && !!integrationInstance?.workflows?.length && (
                 <DialogWorkflowsContainer
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
+                    mergedWorkflows={mergedWorkflows}
                     selectedWorkflows={selectedWorkflows}
-                    workflows={integration.workflows}
                 />
             )}
         </main>
@@ -286,31 +302,31 @@ const DialogContent = ({
 };
 
 interface DialogFooterProps {
-    edit?: boolean;
+    workflowsView?: boolean;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     isOAuth2?: boolean;
 }
 
-const DialogFooter = ({edit = false, handleClick, isOAuth2 = false}: DialogFooterProps) => (
+const DialogFooter = ({workflowsView = false, handleClick, isOAuth2 = false}: DialogFooterProps) => (
     <footer className={styles.dialogFooter}>
-        {edit && (
-            <button name="disconnectButton" onClick={handleClick} className={styles.destructiveButton} type="button">
+        {workflowsView && (
+            <button name="disconnectButton" onClick={handleClick} className={styles.buttonDestructive} type="button">
                 Disconnect
             </button>
         )}
 
-        <button autoFocus onClick={handleClick} className={styles.buttonPrimary} type="button" form="form">
-            {!edit && isOAuth2 && (
-                <span>
-                    Authorize
-                    <img data-testid="authorize-icon" src={SquareArrowOutUpRightIcon} />
-                </span>
-            )}
-
-            {!edit && !isOAuth2 && 'Connect'}
-
-            {edit && 'Update'}
-        </button>
+        {!workflowsView && (
+            <button autoFocus onClick={handleClick} className={styles.buttonPrimary} type="button" form="form">
+                {isOAuth2 ? (
+                    <span>
+                        Authorize
+                        <img data-testid="authorize-icon" src={SquareArrowOutUpRightIcon} />
+                    </span>
+                ) : (
+                    'Connect'
+                )}
+            </button>
+        )}
     </footer>
 );
 

@@ -129,12 +129,8 @@ const useOAuth2 = ({
             loading: true,
         });
 
-        console.log('useOAuth2 getAuth called');
-
         // 2. Generate and save state
         const state = generateState();
-
-        console.log('state: ', state);
 
         saveState(state);
 
@@ -155,8 +151,6 @@ const useOAuth2 = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         async function handleMessageListener(message: MessageEvent<any>) {
             const type = message?.data?.type;
-
-            console.log('handleMessageListener: ', message);
 
             if (type !== OAUTH_RESPONSE || currentStateRef.current === message?.data?.payload?.state) {
                 return;
@@ -223,8 +217,6 @@ const useOAuth2 = ({
                 cleanup(intervalRef, popupRef, handleMessageListener);
             }
         }
-
-        console.log('adding message listener');
 
         window.addEventListener('message', handleMessageListener);
 

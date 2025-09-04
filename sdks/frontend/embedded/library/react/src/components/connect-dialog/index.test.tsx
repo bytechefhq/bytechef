@@ -20,6 +20,7 @@ const defaultConnectDialogProps = {
     jwtToken: 'ey',
     integrationId: '1234',
     baseUrl: 'https://api.example.com',
+    environment: 'DEVELOPMENT',
 };
 
 describe('useConnectDialog', () => {
@@ -92,46 +93,50 @@ describe('useConnectDialog - API Configuration', () => {
         vi.restoreAllMocks();
     });
 
-    // it('configures API requests properly', async () => {
-    //     global.fetch = vi.fn().mockResolvedValue({
-    //         ok: true,
-    //         json: vi.fn().mockResolvedValue({}),
-    //     });
+    it('configures API requests properly', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                name: 'Test Integration',
+                workflows: [],
+                integrationInstances: [],
+            }),
+        });
 
-    //     const customBaseUrl = 'https://custom-api.example.com';
-    //     const customId = '1234';
+        const customBaseUrl = 'https://custom-api.example.com';
+        const customId = '1234';
 
-    //     const {result: customResult} = renderHook(() =>
-    //         useConnectDialog({
-    //             baseUrl: customBaseUrl,
-    //             integrationId: customId,
-    //             jwtToken: 'ey',
-    //         })
-    //     );
+        const {result: customResult} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: customBaseUrl,
+                integrationId: customId,
+                jwtToken: 'ey',
+            })
+        );
 
-    //     await act(async () => customResult.current.openDialog());
+        await act(async () => customResult.current.openDialog());
 
-    //     expect(global.fetch).toHaveBeenCalledWith(
-    //         `${customBaseUrl}/api/embedded/v1/integrations/${customId}`,
-    //         expect.any(Object)
-    //     );
+        expect(global.fetch).toHaveBeenCalledWith(
+            `${customBaseUrl}/api/embedded/v1/integrations/${customId}`,
+            expect.any(Object)
+        );
 
-    //     vi.clearAllMocks();
+        vi.clearAllMocks();
 
-    //     const {result: defaultResult} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
+        const {result: defaultResult} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
 
-    //     await act(async () => defaultResult.current.openDialog());
+        await act(async () => defaultResult.current.openDialog());
 
-    //     expect(global.fetch).toHaveBeenCalledWith(
-    //         expect.any(String),
-    //         expect.objectContaining({
-    //             headers: expect.objectContaining({
-    //                 Authorization: expect.stringContaining('Bearer ey'),
-    //                 'x-environment': 'development',
-    //             }),
-    //         })
-    //     );
-    // });
+        expect(global.fetch).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.objectContaining({
+                headers: expect.objectContaining({
+                    Authorization: expect.stringContaining('Bearer ey'),
+                    'X-Environment': 'DEVELOPMENT',
+                }),
+            })
+        );
+    });
 });
 
 describe('useConnectDialog - Dialog State Management', () => {
@@ -164,6 +169,37 @@ describe('useConnectDialog - Dialog State Management', () => {
         await act(async () => result.current.openDialog());
 
         expect(global.fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('sets workflowsView to true when integrationInstanceId is provided', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                name: 'Test Integration',
+                workflows: [],
+                integrationInstances: [],
+            }),
+        });
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                ...defaultConnectDialogProps,
+                integrationInstanceId: '123',
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        const renderedProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        expect(renderedProps.workflowsView).toBe(true);
     });
 });
 
@@ -234,45 +270,6 @@ describe('useConnectDialog - Navigation', () => {
 
     afterEach(() => {
         vi.restoreAllMocks();
-    });
-
-    it('follows the correct navigation path based on dialog steps', async () => {
-        global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: vi.fn().mockResolvedValue({
-                name: 'Test Integration',
-                connectionConfig: {
-                    authorizationType: 'API_KEY',
-                },
-            }),
-        });
-
-        const renderMock = vi.fn();
-        vi.mocked(createRoot).mockReturnValue({
-            render: renderMock,
-            unmount: vi.fn(),
-        });
-
-        const {result} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
-
-        await act(async () => result.current.openDialog());
-
-        const initialProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
-        expect(initialProps.dialogStep.key).toBe('initial');
-
-        await act(async () => {
-            initialProps.handleClick({target: {}} as React.MouseEvent<HTMLButtonElement>);
-        });
-
-        const workflowsProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
-        expect(workflowsProps.dialogStep.key).toBe('workflows');
-
-        await act(async () => {
-            workflowsProps.handleClick({target: {}} as React.MouseEvent<HTMLButtonElement>);
-        });
-
-        const formProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
-        expect(formProps.dialogStep.key).toBe('form');
     });
 
     it('makes correct API calls when toggling workflows', async () => {

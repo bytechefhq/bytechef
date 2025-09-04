@@ -6,15 +6,20 @@ import {
     CodePayloadI,
     FormSubmitHandler,
     FormType,
+    IntegrationInstanceType,
     IntegrationType,
+    MergedWorkflowType,
     PropertyType,
     RegisterFormSubmitFunction,
     TokenPayloadI,
-    WorkflowInputType,
-    WorkflowType,
 } from './types';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
+
+interface ValidationRuleType {
+    required: boolean;
+    requiredMessage?: string;
+}
 
 interface ConnectionDialogHookReturnType {
     closeDialog: () => void;
@@ -53,7 +58,13 @@ function createApiClient(baseUrl: string, environment: string, jwtToken: string)
 
                 // Only try to parse JSON if we expect a response body
                 if (method === 'GET' || response.headers.get('content-length') !== '0') {
-                    return await response.json();
+                    try {
+                        return await response.json();
+                    } catch (error: unknown) {
+                        console.warn('Empty or non-JSON response : ', (error as Error).message);
+
+                        return {} as T;
+                    }
                 }
 
                 return {} as T;
@@ -86,6 +97,7 @@ interface UseConnectDialogProps {
     baseUrl?: string;
     environment?: string;
     integrationId: string;
+    integrationInstanceId?: string;
     jwtToken: string;
 }
 
@@ -93,6 +105,7 @@ export default function useConnectDialog({
     baseUrl = 'https://app.bytechef.io',
     environment = 'PRODUCTION',
     integrationId,
+    integrationInstanceId,
     jwtToken,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
     const [integration, setIntegration] = useState<IntegrationType | undefined>(undefined);
@@ -101,6 +114,10 @@ export default function useConnectDialog({
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
     const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([]);
+    const [workflowsView, setWorkflowsView] = useState(!!integrationInstanceId);
+    const [currentIntegrationInstanceId, setCurrentIntegrationInstanceId] = useState<number | undefined>(
+        integrationInstanceId ? Number(integrationInstanceId) : undefined
+    );
 
     const inputRefs = useRef<Record<string, HTMLInputElement>>({});
     const portalContainerRef = useRef<HTMLElement | null>(null);
@@ -109,40 +126,93 @@ export default function useConnectDialog({
 
     const {fetch} = useMemo(() => createApiClient(baseUrl, environment, jwtToken), [baseUrl, environment, jwtToken]);
 
+    // Merge integration workflows with instance workflows to get complete workflow data, because the backend is incomplete
+    const mergedWorkflows: MergedWorkflowType[] = useMemo(() => {
+        if (!integration?.workflows || !integration?.integrationInstances) {
+            return [];
+        }
+
+        const integrationInstance = integration.integrationInstances.find(
+            (instance: IntegrationInstanceType) => instance.id === currentIntegrationInstanceId
+        );
+
+        if (!integrationInstance?.workflows) {
+            return [];
+        }
+
+        const mergedWorkflows: MergedWorkflowType[] = integration.workflows.map((integrationWorkflow) => {
+            const instanceWorkflow = integrationInstance.workflows.find(
+                (instance) => instance.workflowReferenceCode === integrationWorkflow.workflowReferenceCode
+            );
+
+            if (instanceWorkflow) {
+                return {
+                    ...integrationWorkflow,
+                    enabled: instanceWorkflow.enabled || false,
+                    inputs:
+                        integrationWorkflow.inputs?.map((inputDef) => ({
+                            ...inputDef,
+                            value: (instanceWorkflow.inputs as Record<string, string>)?.[inputDef.name] || '',
+                        })) || [],
+                };
+            }
+
+            return {
+                ...integrationWorkflow,
+                enabled: false,
+                inputs:
+                    integrationWorkflow.inputs?.map((inputDef) => ({
+                        ...inputDef,
+                        value: '',
+                    })) || [],
+            };
+        });
+
+        return mergedWorkflows;
+    }, [integration, currentIntegrationInstanceId]);
+
     const registerFormSubmit = useCallback<RegisterFormSubmitFunction>((submitFn) => {
         formSubmitRef.current = submitFn;
     }, []);
 
     const saveOAuth2Connection = useCallback(
         async (payload: CodePayloadI | TokenPayloadI) => {
-            await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
-                method: 'POST',
-                body: {
-                    connection: {
-                        parameters: payload
-                    }
-                },
-            });
+            const newIntegrationInstanceId: number = await fetch(
+                `/api/embedded/v1/integrations/${integrationId}/instances`,
+                {
+                    method: 'POST',
+                    body: {
+                        connection: {
+                            parameters: payload,
+                        },
+                    },
+                }
+            );
 
-            closeDialog();
+            setCurrentIntegrationInstanceId(newIntegrationInstanceId);
+
+            setWorkflowsView(true);
         },
         [fetch, integrationId]
     );
 
     const saveNonOAuth2Connection = useCallback(
         async (formData: Record<string, string>) => {
-            console.log('saveNonOAuth2Connection called with payload: ', formData);
+            const newIntegrationInstanceId: number = await fetch(
+                `/api/embedded/v1/integrations/${integrationId}/instances`,
+                {
+                    method: 'POST',
+                    body: {
+                        connection: {
+                            parameters: formData,
+                        },
+                    },
+                }
+            );
 
-            await fetch(`/api/embedded/v1/integrations/${integrationId}/instances`, {
-                method: 'POST',
-                body: {
-                    connection: {
-                        parameters: formData
-                    }
-                },
-            });
+            setCurrentIntegrationInstanceId(newIntegrationInstanceId);
 
-            closeDialog();
+            setWorkflowsView(true);
         },
         [fetch, integrationId]
     );
@@ -156,21 +226,32 @@ export default function useConnectDialog({
     }, [formValues, saveNonOAuth2Connection]);
 
     const handleWorkflowToggle = useCallback(
-        (workflowId: string, isSelected: boolean) => {
-            if (isSelected) {
-                setSelectedWorkflows((selectedWorkflows) => [...selectedWorkflows, workflowId]);
+        async (workflowId: string, isSelected: boolean) => {
+            try {
+                if (isSelected) {
+                    await fetch(
+                        `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/workflows/${workflowId}/enable`,
+                        {
+                            method: 'POST',
+                        }
+                    );
 
-                fetch(`/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowId}/enable`, {
-                    method: 'POST',
-                });
-            } else {
-                fetch(`/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowId}/enable`, {
-                    method: 'DELETE',
-                });
-                setSelectedWorkflows((selectedWorkflows) => selectedWorkflows.filter((id) => id !== workflowId));
+                    setSelectedWorkflows((selectedWorkflows) => [...selectedWorkflows, workflowId]);
+                } else {
+                    await fetch(
+                        `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/workflows/${workflowId}/enable`,
+                        {
+                            method: 'DELETE',
+                        }
+                    );
+
+                    setSelectedWorkflows((selectedWorkflows) => selectedWorkflows.filter((id) => id !== workflowId));
+                }
+            } catch (error) {
+                console.error('Failed to toggle workflow:', error);
             }
         },
-        [fetch, integrationId]
+        [fetch, currentIntegrationInstanceId]
     );
 
     const isOAuth2AuthorizationType = useMemo(
@@ -267,7 +348,7 @@ export default function useConnectDialog({
                 onInput: (event: React.FormEvent<HTMLInputElement>) => {
                     const value = event.currentTarget.value;
 
-                    setFormValues((prev: CodePayloadI) => ({...prev, [name]: value}));
+                    setFormValues((prev: Record<string, string>) => ({...prev, [name]: value}));
                 },
             }),
             handleSubmit: (callback: (data: {[key: string]: unknown}) => void) => (event?: React.FormEvent) => {
@@ -304,11 +385,6 @@ export default function useConnectDialog({
         };
     }, [formErrors, formValues, validateForm, validationRules]);
 
-    interface ValidationRuleType {
-        required: boolean;
-        requiredMessage?: string;
-    }
-
     const openDialog = async () => {
         setIsOpen(true);
 
@@ -318,48 +394,46 @@ export default function useConnectDialog({
     };
 
     const closeDialog = () => {
+        setWorkflowsView(false);
+
         setIsOpen(false);
     };
+
+    const handleDisconnect = useCallback(async () => {
+        await fetch(`/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}`, {
+            method: 'DELETE',
+        });
+
+        setFormValues({});
+
+        setWorkflowsView(false);
+    }, [fetch, currentIntegrationInstanceId]);
 
     const handleClick = useCallback(
         (event: React.MouseEvent<HTMLButtonElement>) => {
             if ((event.target as HTMLButtonElement).name === 'disconnectButton') {
+                handleDisconnect();
+
                 return;
             }
 
             if (isOAuth2) {
-                console.log('invoking getAuth for OAuth2 flow');
                 getAuth();
             } else {
                 handleSubmit();
             }
         },
-        [isOAuth2, getAuth, handleSubmit]
+        [isOAuth2, handleDisconnect, getAuth, handleSubmit]
     );
 
     const debouncedFetchesRef = useRef<Record<string, (...args: unknown[]) => void>>({});
 
     const handleWorkflowInputChange = useCallback(
         (workflowReferenceCode: string, inputName: string, value: string) => {
-            const matchingWorkflow = integration?.workflows?.find(
-                (workflow: WorkflowType) => workflow.workflowReferenceCode === workflowReferenceCode
-            );
-
-            const matchingWorkflowInput = matchingWorkflow?.inputs?.find(
-                (input: WorkflowInputType) => input.name === inputName
-            );
-
             const body = {
-                ...matchingWorkflow,
-                inputs: [
-                    ...(matchingWorkflow?.inputs as WorkflowInputType[]).filter(
-                        (input: WorkflowInputType) => input.name !== inputName
-                    ),
-                    {
-                        ...matchingWorkflowInput,
-                        value: value,
-                    },
-                ],
+                inputs: {
+                    [inputName]: value,
+                },
             };
 
             const debouncedFetchKey = `${workflowReferenceCode}_${inputName}`;
@@ -367,7 +441,7 @@ export default function useConnectDialog({
             if (!debouncedFetchesRef.current[debouncedFetchKey]) {
                 debouncedFetchesRef.current[debouncedFetchKey] = debounce((payload) => {
                     fetch(
-                        `/api/embedded/v1/integration-instances/${integrationId}/workflows/${workflowReferenceCode}`,
+                        `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/workflows/${workflowReferenceCode}`,
                         {
                             body: payload as object,
                             method: 'PUT',
@@ -378,7 +452,7 @@ export default function useConnectDialog({
 
             debouncedFetchesRef.current[debouncedFetchKey](body);
         },
-        [fetch, integration?.workflows, integrationId]
+        [fetch, currentIntegrationInstanceId]
     );
 
     // Create portal container only once
@@ -411,6 +485,7 @@ export default function useConnectDialog({
 
                 rootRef.current = null;
             }
+
             return;
         }
 
@@ -421,20 +496,26 @@ export default function useConnectDialog({
 
         // Always render with current state
         if (rootRef.current) {
+            const integrationInstance: IntegrationInstanceType | undefined = integration?.integrationInstances?.find(
+                (instance: IntegrationInstanceType) => instance.id === currentIntegrationInstanceId
+            );
+
             rootRef.current.render(
                 <ConnectDialog
                     closeDialog={closeDialog}
-                    edit={false}
                     form={form}
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
                     handleClick={handleClick}
                     integration={integration}
+                    integrationInstance={integrationInstance}
                     isOAuth2={isOAuth2}
                     isOpen={isOpen}
                     properties={integration?.connectionConfig?.inputs}
                     registerFormSubmit={registerFormSubmit}
                     selectedWorkflows={selectedWorkflows}
+                    workflowsView={workflowsView}
+                    mergedWorkflows={mergedWorkflows}
                 />
             );
         }
@@ -449,6 +530,10 @@ export default function useConnectDialog({
         handleWorkflowToggle,
         selectedWorkflows,
         handleWorkflowInputChange,
+        integrationInstanceId,
+        workflowsView,
+        mergedWorkflows,
+        currentIntegrationInstanceId,
     ]);
 
     useEffect(() => {

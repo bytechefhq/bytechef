@@ -96,7 +96,7 @@ p {
     width: 100%;
     max-width: 32rem;
     transform: translate(-50%, -50%);
-    gap: 2rem;
+    gap: 1rem;
     border: 1px solid #e5e7eb;
     background-color: #fff;
     padding: 1.5rem;
@@ -253,8 +253,7 @@ p {
     height: 1rem;
 }
 
-.backButton {
-    composes: buttonSecondary;
+.dialogFooter .buttonDestructive {
     margin-right: auto;
 }
 
@@ -291,6 +290,12 @@ p {
 }
 
 /* Workflows Container */
+.workflowsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .workflowsList,
 .workflowsList ul {
     list-style: none;
@@ -317,6 +322,10 @@ p {
     justify-content: space-between;
     gap: 1rem;
     width: 100%;
+}
+
+.workflowsList li span {
+    font-weight: bold;
 }
 
 .workflowInputsContainer {
