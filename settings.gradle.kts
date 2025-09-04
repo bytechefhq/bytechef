@@ -66,7 +66,6 @@ include("server:libs:automation:automation-configuration:automation-configuratio
 include("server:libs:automation:automation-configuration:automation-configuration-service")
 include("server:libs:automation:automation-execution:automation-execution-api")
 include("server:libs:automation:automation-execution:automation-execution-service")
-include("server:libs:automation:automation-security-web:automation-security-web-impl")
 include("server:libs:automation:automation-swagger")
 include("server:libs:automation:automation-workflow:automation-workflow-coordinator")
 include("server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api")
