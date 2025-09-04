@@ -13,6 +13,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {McpServer, ModeType, useCreateMcpServerMutation, useUpdateMcpServerMutation} from '@/shared/middleware/graphql';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
@@ -41,6 +42,7 @@ const McpServerDialog = ({
     const [internalOpen, setInternalOpen] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     // Use external state if provided, otherwise use internal state
     const open = externalOpen !== undefined ? externalOpen : internalOpen;
@@ -83,11 +85,12 @@ const McpServerDialog = ({
                         environmentId: currentEnvironmentId!.toString(),
                         name: values.name,
                         type: ModeType.Automation,
+                        workspaceId: currentWorkspaceId + '',
                     },
                 },
                 {
                     onSuccess: () => {
-                        queryClient.invalidateQueries({queryKey: ['mcpServers']});
+                        queryClient.invalidateQueries({queryKey: ['mcpServersByWorkspace']});
                         setOpen(false);
                     },
                 }
