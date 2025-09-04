@@ -216,14 +216,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             )}
 
             {isClusterElement && (
-                <div
-                    className={twMerge(
-                        'invisible absolute left-[-40px] z-50 grid grid-cols-2 gap-1 pr-4 group-hover:visible',
-                        (hasSavedClusterElementPosition || !data.multipleClusterElementsNode) && '-left-[80px]'
-                    )}
-                >
+                <div className="invisible absolute left-[-80px] z-50 grid grid-cols-2 gap-1 pr-8 group-hover:visible">
                     <Button
-                        className="row-span-2 self-center bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
+                        className={twMerge(
+                            'col-start-1 row-span-2 self-center bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm',
+                            data.multipleClusterElementsNode && !hasSavedClusterElementPosition && 'col-start-2'
+                        )}
                         onClick={() => handleDeleteNodeClick(data)}
                         title="Delete a node"
                         variant="outline"
