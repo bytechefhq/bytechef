@@ -38,7 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
-public class McpToolGraphQlControllerIntTest {
+public class McpToolGraphQlControllerTest {
 
     @Mock
     private McpToolService mcpToolService;
