@@ -105,6 +105,14 @@ export type CreateMcpProjectWithWorkflowsInput = {
   selectedWorkflowIds: Array<Scalars['String']['input']>;
 };
 
+export type CreateMcpServerForWorkspaceInput = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  environmentId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  type: ModeType;
+  workspaceId: Scalars['ID']['input'];
+};
+
 export type Environment = {
   __typename?: 'Environment';
   id?: Maybe<Scalars['ID']['output']>;
@@ -267,11 +275,13 @@ export type Mutation = {
   createMcpProjectWithWorkflows?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpServer?: Maybe<McpServer>;
+  createMcpServerForWorkspace?: Maybe<McpServer>;
   createMcpTool?: Maybe<McpTool>;
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProject?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  deleteMcpServerFromWorkspace?: Maybe<Scalars['Boolean']['output']>;
   updateMcpComponentWithTools?: Maybe<McpComponent>;
   updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   updateMcpServer?: Maybe<McpServer>;
@@ -304,6 +314,11 @@ export type MutationCreateMcpServerArgs = {
 };
 
 
+export type MutationCreateMcpServerForWorkspaceArgs = {
+  input: CreateMcpServerForWorkspaceInput;
+};
+
+
 export type MutationCreateMcpToolArgs = {
   input: McpToolInput;
 };
@@ -326,6 +341,11 @@ export type MutationDeleteMcpProjectWorkflowArgs = {
 
 export type MutationDeleteMcpServerArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteMcpServerFromWorkspaceArgs = {
+  mcpServerId: Scalars['ID']['input'];
 };
 
 
@@ -395,6 +415,7 @@ export type Query = {
   mcpServer?: Maybe<McpServer>;
   mcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   mcpServers?: Maybe<Array<Maybe<McpServer>>>;
+  mcpServersByWorkspace?: Maybe<Array<Maybe<McpServer>>>;
   mcpTool?: Maybe<McpTool>;
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
@@ -480,6 +501,11 @@ export type QueryMcpServersArgs = {
 };
 
 
+export type QueryMcpServersByWorkspaceArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryMcpToolArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -523,6 +549,13 @@ export type CreateMcpProjectWithWorkflowsMutationVariables = Exact<{
 
 export type CreateMcpProjectWithWorkflowsMutation = { __typename?: 'Mutation', createMcpProjectWithWorkflows?: { __typename?: 'McpProject', id: string, mcpServerId: string, projectDeploymentId: string, projectVersion?: number | null } | null };
 
+export type CreateMcpServerMutationVariables = Exact<{
+  input: CreateMcpServerForWorkspaceInput;
+}>;
+
+
+export type CreateMcpServerMutation = { __typename?: 'Mutation', createMcpServerForWorkspace?: { __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean } | null };
+
 export type DeleteMcpProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -530,12 +563,26 @@ export type DeleteMcpProjectMutationVariables = Exact<{
 
 export type DeleteMcpProjectMutation = { __typename?: 'Mutation', deleteMcpProject?: boolean | null };
 
+export type DeleteMcpServerMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteMcpServerMutation = { __typename?: 'Mutation', deleteMcpServerFromWorkspace?: boolean | null };
+
 export type McpProjectsByServerIdQueryVariables = Exact<{
   mcpServerId: Scalars['ID']['input'];
 }>;
 
 
 export type McpProjectsByServerIdQuery = { __typename?: 'Query', mcpProjectsByServerId?: Array<{ __typename?: 'McpProject', id: string, projectDeploymentId: string, mcpServerId: string, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectVersion?: number | null, project?: { __typename?: 'Project', id: string, name: string, category?: { __typename?: 'Category', id?: string | null, name?: string | null } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null, mcpProjectWorkflows?: Array<{ __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', id: string, projectDeploymentId: any, inputs?: any | null, workflowId: string } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
+
+export type McpServersByWorkspaceQueryVariables = Exact<{
+  workspaceId: Scalars['ID']['input'];
+}>;
+
+
+export type McpServersByWorkspaceQuery = { __typename?: 'Query', mcpServersByWorkspace?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type ProjectByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -589,13 +636,6 @@ export type CreateMcpComponentWithToolsMutationVariables = Exact<{
 
 export type CreateMcpComponentWithToolsMutation = { __typename?: 'Mutation', createMcpComponentWithTools?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, mcpServerId: string, connectionId?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
 
-export type CreateMcpServerMutationVariables = Exact<{
-  input: McpServerInput;
-}>;
-
-
-export type CreateMcpServerMutation = { __typename?: 'Mutation', createMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean } | null };
-
 export type CreateMcpToolMutationVariables = Exact<{
   input: McpToolInput;
 }>;
@@ -609,13 +649,6 @@ export type DeleteMcpComponentMutationVariables = Exact<{
 
 
 export type DeleteMcpComponentMutation = { __typename?: 'Mutation', deleteMcpComponent?: boolean | null };
-
-export type DeleteMcpServerMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteMcpServerMutation = { __typename?: 'Mutation', deleteMcpServer?: boolean | null };
 
 export type EnvironmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -684,6 +717,31 @@ export const useCreateMcpProjectWithWorkflowsMutation = <
   }
     )};
 
+export const CreateMcpServerDocument = `
+    mutation createMcpServer($input: CreateMcpServerForWorkspaceInput!) {
+  createMcpServerForWorkspace(input: $input) {
+    id
+    name
+    type
+    environmentId
+    enabled
+  }
+}
+    `;
+
+export const useCreateMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['createMcpServer'],
+    mutationFn: (variables?: CreateMcpServerMutationVariables) => fetcher<CreateMcpServerMutation, CreateMcpServerMutationVariables>(CreateMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const DeleteMcpProjectDocument = `
     mutation deleteMcpProject($id: ID!) {
   deleteMcpProject(id: $id)
@@ -699,6 +757,25 @@ export const useDeleteMcpProjectMutation = <
       {
     mutationKey: ['deleteMcpProject'],
     mutationFn: (variables?: DeleteMcpProjectMutationVariables) => fetcher<DeleteMcpProjectMutation, DeleteMcpProjectMutationVariables>(DeleteMcpProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteMcpServerDocument = `
+    mutation deleteMcpServer($id: ID!) {
+  deleteMcpServerFromWorkspace(mcpServerId: $id)
+}
+    `;
+
+export const useDeleteMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteMcpServerMutation, TError, DeleteMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteMcpServerMutation, TError, DeleteMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteMcpServer'],
+    mutationFn: (variables?: DeleteMcpServerMutationVariables) => fetcher<DeleteMcpServerMutation, DeleteMcpServerMutationVariables>(DeleteMcpServerDocument, variables)(),
     ...options
   }
     )};
@@ -763,6 +840,45 @@ export const useMcpProjectsByServerIdQuery = <
       {
     queryKey: ['mcpProjectsByServerId', variables],
     queryFn: fetcher<McpProjectsByServerIdQuery, McpProjectsByServerIdQueryVariables>(McpProjectsByServerIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const McpServersByWorkspaceDocument = `
+    query mcpServersByWorkspace($workspaceId: ID!) {
+  mcpServersByWorkspace(workspaceId: $workspaceId) {
+    id
+    name
+    type
+    environmentId
+    enabled
+    mcpComponents {
+      id
+      mcpServerId
+      componentName
+      componentVersion
+    }
+    tags {
+      id
+      name
+    }
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useMcpServersByWorkspaceQuery = <
+      TData = McpServersByWorkspaceQuery,
+      TError = unknown
+    >(
+      variables: McpServersByWorkspaceQueryVariables,
+      options?: Omit<UseQueryOptions<McpServersByWorkspaceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServersByWorkspaceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpServersByWorkspaceQuery, TError, TData>(
+      {
+    queryKey: ['mcpServersByWorkspace', variables],
+    queryFn: fetcher<McpServersByWorkspaceQuery, McpServersByWorkspaceQueryVariables>(McpServersByWorkspaceDocument, variables),
     ...options
   }
     )};
@@ -965,31 +1081,6 @@ export const useCreateMcpComponentWithToolsMutation = <
   }
     )};
 
-export const CreateMcpServerDocument = `
-    mutation createMcpServer($input: McpServerInput!) {
-  createMcpServer(input: $input) {
-    id
-    name
-    type
-    environmentId
-    enabled
-  }
-}
-    `;
-
-export const useCreateMcpServerMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>) => {
-    
-    return useMutation<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>(
-      {
-    mutationKey: ['createMcpServer'],
-    mutationFn: (variables?: CreateMcpServerMutationVariables) => fetcher<CreateMcpServerMutation, CreateMcpServerMutationVariables>(CreateMcpServerDocument, variables)(),
-    ...options
-  }
-    )};
-
 export const CreateMcpToolDocument = `
     mutation createMcpTool($input: McpToolInput!) {
   createMcpTool(input: $input) {
@@ -1029,25 +1120,6 @@ export const useDeleteMcpComponentMutation = <
       {
     mutationKey: ['deleteMcpComponent'],
     mutationFn: (variables?: DeleteMcpComponentMutationVariables) => fetcher<DeleteMcpComponentMutation, DeleteMcpComponentMutationVariables>(DeleteMcpComponentDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DeleteMcpServerDocument = `
-    mutation deleteMcpServer($id: ID!) {
-  deleteMcpServer(id: $id)
-}
-    `;
-
-export const useDeleteMcpServerMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DeleteMcpServerMutation, TError, DeleteMcpServerMutationVariables, TContext>) => {
-    
-    return useMutation<DeleteMcpServerMutation, TError, DeleteMcpServerMutationVariables, TContext>(
-      {
-    mutationKey: ['deleteMcpServer'],
-    mutationFn: (variables?: DeleteMcpServerMutationVariables) => fetcher<DeleteMcpServerMutation, DeleteMcpServerMutationVariables>(DeleteMcpServerDocument, variables)(),
     ...options
   }
     )};
