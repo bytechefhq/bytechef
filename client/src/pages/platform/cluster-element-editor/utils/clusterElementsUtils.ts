@@ -165,6 +165,65 @@ export function extractClusterElementComponentOperations(
     }, existingClusterElementsOperations);
 }
 
+export function getClusterElementByName(clusterElements: ClusterElementsType, elementName: string) {
+    if (!clusterElements) {
+        console.error('Cluster elements not found');
+
+        return undefined;
+    }
+
+    const elements = Object.values(clusterElements);
+    let matchingElement: ClusterElementItemType | undefined;
+
+    elements.forEach((element) => {
+        if (matchingElement) {
+            return;
+        }
+
+        if (Array.isArray(element)) {
+            element.forEach((element) => {
+                if (matchingElement) {
+                    return;
+                }
+
+                if (element.name === elementName) {
+                    matchingElement = element;
+
+                    return;
+                }
+
+                if (element.clusterElements) {
+                    const matchingNestedElement = getClusterElementByName(element.clusterElements, elementName);
+
+                    if (matchingNestedElement) {
+                        matchingElement = matchingNestedElement;
+                    }
+                }
+            });
+        } else if (isPlainObject(element)) {
+            if (matchingElement) {
+                return;
+            }
+
+            if (element.name === elementName) {
+                matchingElement = element as ClusterElementItemType;
+
+                return;
+            }
+
+            if (element.clusterElements) {
+                const matchingNestedElement = getClusterElementByName(element.clusterElements, elementName);
+
+                if (matchingNestedElement) {
+                    matchingElement = matchingNestedElement;
+                }
+            }
+        }
+    });
+
+    return matchingElement;
+}
+
 interface GetClusterElementTypesCountProps {
     clusterRootComponentDefinition: ComponentDefinition;
     operationName?: string;
