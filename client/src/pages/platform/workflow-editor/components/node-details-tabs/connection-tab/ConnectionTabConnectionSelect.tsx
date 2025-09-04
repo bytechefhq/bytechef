@@ -24,6 +24,8 @@ import {useCallback, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
+
 type ConnectionTabConnectionSelectPropsType = {
     componentConnection: ComponentConnection;
     componentConnectionsCount: number;
@@ -64,6 +66,12 @@ const ConnectionTabConnectionSelect = ({
         useGetConnectionTagsQuery,
         useGetConnectionsQuery,
     } = useWorkflowEditor();
+
+    const {rootClusterElementNodeData} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+        }))
+    );
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
@@ -111,7 +119,7 @@ const ConnectionTabConnectionSelect = ({
                 },
                 workflowConnectionKey,
                 workflowId,
-                workflowNodeName,
+                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
             });
 
             setConnectionId(connectionId);
@@ -131,12 +139,17 @@ const ConnectionTabConnectionSelect = ({
             queryClient.removeQueries({
                 queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, workflowId],
             });
+
+            queryClient.removeQueries({
+                queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions, workflowId],
+            });
         },
         [
             currentComponent,
             currentEnvironmentId,
             currentNode,
             queryClient,
+            rootClusterElementNodeData?.workflowNodeName,
             saveWorkflowTestConfigurationConnectionMutation,
             setCurrentComponent,
             setCurrentNode,

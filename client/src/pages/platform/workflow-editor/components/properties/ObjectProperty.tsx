@@ -36,7 +36,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const {updateWorkflowNodeParameterMutation} = useWorkflowEditor();
+    const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
     const {additionalProperties, label, name, placeholder, properties} = property;
 
@@ -93,11 +93,12 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
         setNewPropertyName('');
 
-        if (updateWorkflowNodeParameterMutation) {
+        if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
             saveProperty({
                 includeInMetadata: true,
                 path: `${path}.${newPropertyName}`,
                 type: newPropertyType,
+                updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
                 workflowId: workflow.id!,
             });
@@ -107,6 +108,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         newPropertyName,
         newPropertyType,
         path,
+        updateClusterElementParameterMutation,
         updateWorkflowNodeParameterMutation,
         workflow.id,
     ]);
@@ -211,7 +213,13 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     // set default values for subProperties when they are created
     useEffect(() => {
-        if (!subProperties || !path || !currentComponent || !updateWorkflowNodeParameterMutation || !workflow.id) {
+        if (
+            !subProperties ||
+            !path ||
+            !currentComponent ||
+            !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
+            !workflow.id
+        ) {
             return;
         }
 
@@ -250,6 +258,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             saveProperty({
                 path,
                 type: 'OBJECT',
+                updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
                 value: defaultValueObject,
                 workflowId: workflow.id!,

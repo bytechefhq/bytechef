@@ -38,7 +38,10 @@ import {
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
+import {
+    useGetClusterElementParameterDisplayConditionsQuery,
+    useGetWorkflowNodeParameterDisplayConditionsQuery,
+} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
     BranchCaseType,
@@ -186,7 +189,9 @@ const WorkflowNodeDetailsPanel = ({
         {
             environmentId: currentEnvironmentId,
             workflowId: workflow.id as string,
-            workflowNodeName: currentNode?.workflowNodeName as string,
+            workflowNodeName: currentNode?.clusterElementType
+                ? (rootClusterElementNodeData?.workflowNodeName as string)
+                : (currentNode?.workflowNodeName as string),
         },
         !!workflow.id && !!currentNode
     );
@@ -344,10 +349,28 @@ const WorkflowNodeDetailsPanel = ({
             id: workflow.id!,
             workflowNodeName: currentNodeName!,
         },
-        !!currentNodeName && currentNodeName !== 'manual' && currentNodeName !== currentClusterElementName
+        !!currentNodeName &&
+            currentNodeName !== 'manual' &&
+            currentNodeName !== currentClusterElementName &&
+            !currentNode?.clusterElementType
+    );
+
+    const clusterElementDisplayConditionsQuery = useGetClusterElementParameterDisplayConditionsQuery(
+        {
+            clusterElementType: currentNode?.clusterElementType || '',
+            clusterElementWorkflowNodeName: currentNode?.workflowNodeName || '',
+            environmentId: currentEnvironmentId,
+            id: workflow.id!,
+            workflowNodeName: rootClusterElementNodeData?.workflowNodeName as string,
+        },
+        !!currentNode &&
+            currentNodeName !== 'manual' &&
+            currentNodeName === currentClusterElementName &&
+            !!currentNode?.clusterElementType
     );
 
     const {data: workflowNodeParameterDisplayConditions} = displayConditionsQuery;
+    const {data: clusterElementParameterDisplayConditions} = clusterElementDisplayConditionsQuery;
 
     const currentOperationDefinition = useMemo(() => {
         if (currentNode?.trigger) {
@@ -394,9 +417,30 @@ const WorkflowNodeDetailsPanel = ({
         [workflow.tasks, currentNode]
     );
 
+    const currentClusterElementsConnections = useMemo(() => {
+        const mainClusterRootTask = workflow.tasks?.find(
+            (task) => task.name === rootClusterElementNodeData?.workflowNodeName
+        );
+
+        if (mainClusterRootTask?.connections && currentNode?.clusterElementType) {
+            return mainClusterRootTask.connections.filter(
+                (connection) => connection.key === currentNode?.workflowNodeName
+            );
+        }
+    }, [
+        currentNode?.clusterElementType,
+        currentNode?.workflowNodeName,
+        rootClusterElementNodeData?.workflowNodeName,
+        workflow.tasks,
+    ]);
+
     const currentWorkflowNodeConnections: ComponentConnection[] = useMemo(
-        () => currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [],
-        [currentWorkflowTask, currentWorkflowTrigger]
+        () =>
+            currentWorkflowTask?.connections ||
+            currentWorkflowTrigger?.connections ||
+            currentClusterElementsConnections ||
+            [],
+        [currentWorkflowTask?.connections, currentWorkflowTrigger?.connections, currentClusterElementsConnections]
     );
 
     const nodeTabs = useMemo(
@@ -945,23 +989,39 @@ const WorkflowNodeDetailsPanel = ({
 
     // Update display conditions when currentNode changes
     useEffect(() => {
-        if (currentNode && workflowNodeParameterDisplayConditions?.displayConditions) {
+        if (
+            currentNode &&
+            (workflowNodeParameterDisplayConditions?.displayConditions ||
+                clusterElementParameterDisplayConditions?.displayConditions)
+        ) {
             setCurrentNode({
                 ...currentNode,
-                displayConditions: workflowNodeParameterDisplayConditions.displayConditions,
+                displayConditions:
+                    workflowNodeParameterDisplayConditions?.displayConditions ||
+                    clusterElementParameterDisplayConditions?.displayConditions,
             });
         }
 
-        if (currentComponent && workflowNodeParameterDisplayConditions?.displayConditions) {
+        if (
+            currentComponent &&
+            (workflowNodeParameterDisplayConditions?.displayConditions ||
+                clusterElementParameterDisplayConditions?.displayConditions)
+        ) {
             if (currentComponent.workflowNodeName === currentNode?.name) {
                 setCurrentComponent({
                     ...currentComponent,
-                    displayConditions: workflowNodeParameterDisplayConditions.displayConditions,
+                    displayConditions:
+                        workflowNodeParameterDisplayConditions?.displayConditions ||
+                        clusterElementParameterDisplayConditions?.displayConditions,
                 });
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowNodeParameterDisplayConditions?.displayConditions, currentNode?.name]);
+    }, [
+        clusterElementParameterDisplayConditions?.displayConditions,
+        currentNode?.name,
+        workflowNodeParameterDisplayConditions?.displayConditions,
+    ]);
 
     // Fetch current action definition when operation changes
     useEffect(() => {

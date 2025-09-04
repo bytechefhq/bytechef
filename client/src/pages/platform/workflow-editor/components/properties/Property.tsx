@@ -4,6 +4,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import ArrayProperty from '@/pages/platform/workflow-editor/components/properties/ArrayProperty';
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
@@ -18,7 +19,7 @@ import {
     GetClusterElementParameterDisplayConditions200Response,
     Option,
 } from '@/shared/middleware/platform/configuration';
-import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
+import {ArrayPropertyType, ClusterElementItemType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
@@ -32,6 +33,7 @@ import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
+import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
 import {FieldsetSkeleton} from '../WorkflowEditorSkeletons';
 
@@ -242,7 +244,18 @@ const Property = ({
         return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
     }, [controlType, property.items, type]);
 
-    const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
+    const {
+        deleteClusterElementParameterMutation,
+        deleteWorkflowNodeParameterMutation,
+        updateClusterElementParameterMutation,
+        updateWorkflowNodeParameterMutation,
+    } = useWorkflowEditor();
+
+    const {rootClusterElementNodeData} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+        }))
+    );
 
     if (!path && name) {
         path = name;
@@ -279,7 +292,13 @@ const Property = ({
     }
 
     const saveInputValue = useDebouncedCallback(() => {
-        if (!currentComponent || !workflow || !name || !path || !updateWorkflowNodeParameterMutation) {
+        if (
+            !currentComponent ||
+            !workflow ||
+            !name ||
+            !path ||
+            !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
+        ) {
             return;
         }
 
@@ -292,6 +311,7 @@ const Property = ({
             path,
             successCallback: () => (isSavingRef.current = false),
             type,
+            updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
             value: isNumericalInput ? parseFloat(valueToSave as string) : valueToSave,
             workflowId: workflow.id!,
@@ -299,7 +319,13 @@ const Property = ({
     }, 300);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
-        if (!currentComponent || !name || !path || !updateWorkflowNodeParameterMutation || !workflow.id) {
+        if (
+            !currentComponent ||
+            !name ||
+            !path ||
+            !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
+            !workflow.id
+        ) {
             return;
         }
 
@@ -307,6 +333,7 @@ const Property = ({
             includeInMetadata: custom,
             path,
             type,
+            updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
             value,
             workflowId: workflow.id,
@@ -315,13 +342,24 @@ const Property = ({
 
     const handleDeleteCustomPropertyClick = useCallback(
         (path: string) => {
-            deleteProperty(workflow.id!, path!, deleteWorkflowNodeParameterMutation!);
+            deleteProperty(
+                workflow.id!,
+                path!,
+                deleteWorkflowNodeParameterMutation!,
+                deleteClusterElementParameterMutation
+            );
         },
-        [deleteWorkflowNodeParameterMutation, workflow.id]
+        [deleteWorkflowNodeParameterMutation, deleteClusterElementParameterMutation, workflow.id]
     );
 
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
-        if (!currentComponent || !name || !path || !updateWorkflowNodeParameterMutation || !workflow.id) {
+        if (
+            !currentComponent ||
+            !name ||
+            !path ||
+            !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
+            !workflow.id
+        ) {
             return;
         }
 
@@ -330,6 +368,7 @@ const Property = ({
             path,
             successCallback: () => setInputValue(JSON.stringify(value)),
             type,
+            updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
             value: JSON.stringify(value),
             workflowId: workflow.id,
@@ -428,7 +467,13 @@ const Property = ({
             }, 50);
         }
 
-        if (!currentComponent || !name || !path || !updateWorkflowNodeParameterMutation || !workflow.id) {
+        if (
+            !currentComponent ||
+            !name ||
+            !path ||
+            !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
+            !workflow.id
+        ) {
             return;
         }
 
@@ -463,7 +508,13 @@ const Property = ({
 
     const handleSelectChange = useCallback(
         (value: string, name: string) => {
-            if (!currentComponent || !workflow.id || !name || !path || !updateWorkflowNodeParameterMutation) {
+            if (
+                !currentComponent ||
+                !workflow.id ||
+                !name ||
+                !path ||
+                !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
+            ) {
                 return;
             }
 
@@ -490,6 +541,7 @@ const Property = ({
                 includeInMetadata: custom,
                 path,
                 type,
+                updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
                 value: actualValue,
                 workflowId: workflow.id,
@@ -502,6 +554,7 @@ const Property = ({
             path,
             propertyParameterValue,
             type,
+            updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
             workflow.id,
         ]
@@ -509,7 +562,12 @@ const Property = ({
 
     const handleMultiSelectChange = useCallback(
         (value: string[]) => {
-            if (!currentComponent || !workflow.id || !path || !updateWorkflowNodeParameterMutation) {
+            if (
+                !currentComponent ||
+                !workflow.id ||
+                !path ||
+                !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
+            ) {
                 return;
             }
 
@@ -527,12 +585,22 @@ const Property = ({
                 includeInMetadata: custom,
                 path,
                 type,
+                updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
                 value,
                 workflowId: workflow.id,
             });
         },
-        [currentComponent, custom, path, propertyParameterValue, type, updateWorkflowNodeParameterMutation, workflow.id]
+        [
+            currentComponent,
+            custom,
+            path,
+            propertyParameterValue,
+            type,
+            updateClusterElementParameterMutation,
+            updateWorkflowNodeParameterMutation,
+            workflow.id,
+        ]
     );
 
     const memoizedWorkflowTask = useMemo(() => {
@@ -540,6 +608,24 @@ const Property = ({
             (node) => node.name === currentNode?.name
         );
     }, [workflow.triggers, workflow.tasks, currentNode?.name]);
+
+    const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
+        if (!currentNode?.name || !workflow.definition) {
+            return undefined;
+        }
+
+        if (currentNode.clusterElementType) {
+            const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+
+            const mainClusterRootTask = workflowDefinitionTasks?.find(
+                (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
+            );
+
+            if (mainClusterRootTask?.clusterElements) {
+                return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
+            }
+        }
+    }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
     // set default mentionInput state
     useEffect(() => {
@@ -638,13 +724,14 @@ const Property = ({
             currentComponent &&
             path &&
             objectName === undefined &&
-            updateWorkflowNodeParameterMutation &&
+            (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
             resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
         ) {
             const saveDefaultValue = () => {
                 saveProperty({
                     path,
                     type,
+                    updateClusterElementParameterMutation,
                     updateWorkflowNodeParameterMutation,
                     value: defaultValue,
                     workflowId: workflow.id!,
@@ -795,7 +882,10 @@ const Property = ({
             return;
         }
 
-        const encodedParameters = encodeParameters(memoizedWorkflowTask?.parameters ?? {});
+        const encodedParameters = encodeParameters(
+            (memoizedWorkflowTask?.parameters || memoizedClusterElementTask?.parameters) ?? {}
+        );
+
         const encodedPath = encodePath(path);
 
         setPropertyParameterValue(resolvePath(encodedParameters, encodedPath));
@@ -828,13 +918,14 @@ const Property = ({
             propertyParameterValue === undefined &&
             currentComponent &&
             path &&
-            updateWorkflowNodeParameterMutation
+            (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
         ) {
             const saveDefaultValue = () => {
                 saveProperty({
                     includeInMetadata: custom,
                     path,
                     type,
+                    updateClusterElementParameterMutation,
                     updateWorkflowNodeParameterMutation,
                     value: null,
                     workflowId: workflow.id!,

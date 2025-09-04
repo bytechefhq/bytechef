@@ -43,8 +43,10 @@ const Integration = () => {
 
     const {
         bottomResizablePanelRef,
+        deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
+        updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
@@ -81,12 +83,14 @@ const Integration = () => {
                         <WorkflowEditorProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,
+                                deleteClusterElementParameterMutation,
                                 deleteWorkflowNodeParameterMutation,
                                 invalidateWorkflowQueries: () => {
                                     queryClient.invalidateQueries({
                                         queryKey: IntegrationWorkflowKeys.integrationWorkflows(+integrationId!),
                                     });
                                 },
+                                updateClusterElementParameterMutation,
                                 updateWorkflowMutation: updateWorkflowEditorMutation,
                                 updateWorkflowNodeParameterMutation,
                                 useCreateConnectionMutation: useCreateConnectionMutation,
