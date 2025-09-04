@@ -1,7 +1,9 @@
 import {
     DeleteClusterElementParameter200Response,
+    DeleteClusterElementParameterOperationRequest,
     DeleteWorkflowNodeParameterRequest,
     UpdateClusterElementParameter200Response,
+    UpdateClusterElementParameterOperationRequest,
     UpdateWorkflowNodeParameterRequest,
     WorkflowNodeParameterApi,
 } from '@/shared/middleware/platform/configuration';
@@ -24,6 +26,23 @@ export const useDeleteWorkflowNodeParameterMutation = (mutationProps?: DeleteWor
         onSuccess: mutationProps?.onSuccess,
     });
 
+interface DeleteClusterElementParameterProps {
+    onSuccess?: (
+        result: DeleteClusterElementParameter200Response,
+        variables: DeleteClusterElementParameterOperationRequest
+    ) => void;
+    onError?: (error: Error, variables: DeleteClusterElementParameterOperationRequest) => void;
+}
+
+export const useDeleteClusterElementParameterMutation = (mutationProps?: DeleteClusterElementParameterProps) =>
+    useMutation({
+        mutationFn: (request: DeleteClusterElementParameterOperationRequest) => {
+            return new WorkflowNodeParameterApi().deleteClusterElementParameter(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
 interface UpdateWorkflowNodeParameterProps {
     onSuccess?: (
         result: UpdateClusterElementParameter200Response,
@@ -36,6 +55,23 @@ export const useUpdateWorkflowNodeParameterMutation = (mutationProps?: UpdateWor
     useMutation({
         mutationFn: (request: UpdateWorkflowNodeParameterRequest) => {
             return new WorkflowNodeParameterApi().updateWorkflowNodeParameter(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface UpdateClusterElementParameterProps {
+    onSuccess?: (
+        result: UpdateClusterElementParameter200Response,
+        variables: UpdateClusterElementParameterOperationRequest
+    ) => void;
+    onError?: (error: Error, variables: UpdateClusterElementParameterOperationRequest) => void;
+}
+
+export const useUpdateClusterElementParameterMutation = (mutationProps?: UpdateClusterElementParameterProps) =>
+    useMutation({
+        mutationFn: (request: UpdateClusterElementParameterOperationRequest) => {
+            return new WorkflowNodeParameterApi().updateClusterElementParameter(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
