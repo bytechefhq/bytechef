@@ -88,6 +88,13 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
     }
 
     @Override
+    public Map<String, ?> getMetadataMap(long jobPrincipalId) {
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(jobPrincipalId);
+
+        return Map.of("projectVersion", projectDeployment.getProjectVersion());
+    }
+
+    @Override
     public ModeType getType() {
         return ModeType.AUTOMATION;
     }
