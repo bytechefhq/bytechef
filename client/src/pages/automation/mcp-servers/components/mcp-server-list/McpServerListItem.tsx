@@ -75,7 +75,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['mcpServers']});
+                    queryClient.invalidateQueries({queryKey: ['mcpServersByWorkspace']});
                     setShowDeleteDialog(false);
                 },
             }

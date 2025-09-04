@@ -3,9 +3,10 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {ModeType, Tag, useMcpServerTagsQuery, useMcpServersQuery} from '@/shared/middleware/graphql';
+import {ModeType, Tag, useMcpServerTagsQuery, useMcpServersByWorkspaceQuery} from '@/shared/middleware/graphql';
 import {ServerIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -16,6 +17,7 @@ import McpServerList from './components/mcp-server-list/McpServerList';
 
 const McpServers = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const [searchParams] = useSearchParams();
 
@@ -30,7 +32,7 @@ const McpServers = () => {
         data,
         error: mcpServersError,
         isLoading: mcpServersIsLoading,
-    } = useMcpServersQuery({type: ModeType.Automation});
+    } = useMcpServersByWorkspaceQuery({workspaceId: currentWorkspaceId + ''});
 
     const {
         data: tagsData,
@@ -38,11 +40,11 @@ const McpServers = () => {
         isLoading: tagsIsLoading,
     } = useMcpServerTagsQuery({type: ModeType.Automation});
 
-    if (!data || !data.mcpServers) {
+    if (!data || !data.mcpServersByWorkspace) {
         return <></>;
     }
 
-    const validMcpServers = data.mcpServers.filter((server) => server !== null);
+    const validMcpServers = data.mcpServersByWorkspace.filter((server) => server !== null);
     const tags = tagsData?.mcpServerTags as Tag[] | undefined;
 
     // Filter servers based on environment and/or tagId
