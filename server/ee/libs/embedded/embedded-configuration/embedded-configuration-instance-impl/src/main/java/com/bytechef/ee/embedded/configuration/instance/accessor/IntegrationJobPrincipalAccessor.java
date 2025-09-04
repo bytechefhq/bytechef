@@ -84,6 +84,11 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
+    public Map<String, ?> getMetadataMap(long jobPrincipalId) {
+        return Map.of();
+    }
+
+    @Override
     public ModeType getType() {
         return ModeType.EMBEDDED;
     }

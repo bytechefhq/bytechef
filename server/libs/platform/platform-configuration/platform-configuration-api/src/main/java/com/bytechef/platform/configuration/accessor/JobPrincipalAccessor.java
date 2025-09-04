@@ -32,6 +32,8 @@ public interface JobPrincipalAccessor {
 
     Map<String, ?> getInputMap(long jobPrincipalId, String workflowReferenceCode);
 
+    Map<String, ?> getMetadataMap(long jobPrincipalId);
+
     ModeType getType();
 
     String getWorkflowId(long jobPrincipalId, String workflowReferenceCode);
