@@ -53,6 +53,15 @@
     ```
     This adds the package from your local Yalc store to the project.
 
+#### Suggested workflow steps
+
+1. In the Bytechef `DesktopSidebar` component initialize the dialog with `const {openDialog} = useConnectDialog({options})`
+   a. `options` are described in `UseConnectDialogProps`
+2. `cd ~/.../bytechef/sdks/frontend/embedded/library/react`
+3. Run `npm run dev:yalc`
+4. On change inside the `sdk/index.tsx` the Bytechef dev server needs to be restarted to see the changes
+   a. This is because of Vite's caching
+
 ## 🤖 Scripts
 
 |      Script       | Function                                                                                                                               |

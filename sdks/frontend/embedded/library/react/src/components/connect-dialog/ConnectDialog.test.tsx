@@ -4,15 +4,61 @@ import ConnectDialog from './ConnectDialog';
 import {IntegrationType, PropertyType, WorkflowInputType} from './types';
 
 describe('ConnectDialog', () => {
-    const minimalProps = {
+    const createConnectionProps = {
         closeDialog: vi.fn(),
-        dialogStep: {key: 'initial' as const, label: 'Description'},
         handleClick: vi.fn(),
         handleWorkflowToggle: vi.fn(),
         handleWorkflowInputChange: vi.fn(),
         integration: undefined,
         isOpen: true,
         selectedWorkflows: [],
+        mergedWorkflows: [],
+        workflowsView: false,
+    };
+
+    const editConnectionProps = {
+        ...createConnectionProps,
+        workflowsView: true,
+        integration: {
+            name: 'Test Integration',
+            description: 'Integration description',
+            workflows: [
+                {
+                    label: 'Test Workflow',
+                    workflowReferenceCode: 'workflow-123',
+                    inputs: [],
+                },
+            ],
+        },
+        integrationInstance: {
+            id: 123,
+            enabled: true,
+            credentialStatus: 'VALID',
+            workflows: [
+                {
+                    workflowReferenceCode: 'workflow-123',
+                    enabled: true,
+                    inputs: {
+                        input1: 'test value',
+                    },
+                },
+            ],
+        },
+        mergedWorkflows: [
+            {
+                label: 'Test Workflow',
+                workflowReferenceCode: 'workflow-123',
+                enabled: true,
+                inputs: [
+                    {
+                        name: 'input1',
+                        label: 'Input 1',
+                        type: 'string' as const,
+                        value: 'test value',
+                    },
+                ],
+            },
+        ],
     };
 
     const createFormMock = (
@@ -48,7 +94,7 @@ describe('ConnectDialog', () => {
         });
 
         it('renders correctly with minimal props', () => {
-            const {container} = render(<ConnectDialog {...minimalProps} />);
+            const {container} = render(<ConnectDialog {...createConnectionProps} />);
 
             expect(screen.getByTestId('dialog-overlay')).toBeInTheDocument();
 
@@ -63,7 +109,7 @@ describe('ConnectDialog', () => {
         });
 
         it('renders with proper accessibility attributes', () => {
-            render(<ConnectDialog {...minimalProps} />);
+            render(<ConnectDialog {...createConnectionProps} />);
 
             const closeButton = screen.getByRole('button', {name: /close dialog/i});
 
@@ -80,11 +126,11 @@ describe('ConnectDialog', () => {
 
             overlay.click();
 
-            expect(minimalProps.closeDialog).toHaveBeenCalled();
+            expect(createConnectionProps.closeDialog).toHaveBeenCalled();
         });
 
         it('displays error state when integration is null', () => {
-            render(<ConnectDialog {...minimalProps} />);
+            render(<ConnectDialog {...createConnectionProps} />);
 
             expect(screen.getByText('Unable to Load Integration')).toBeInTheDocument();
 
@@ -99,7 +145,7 @@ describe('ConnectDialog', () => {
 
         it('displays integration content when data is available', () => {
             const propsWithIntegration = {
-                ...minimalProps,
+                ...createConnectionProps,
                 integration: {
                     name: 'Test Integration',
                     description: 'This is a test integration',
@@ -112,10 +158,9 @@ describe('ConnectDialog', () => {
 
             render(<ConnectDialog {...propsWithIntegration} />);
 
-            expect(screen.getByText('Create Connection | Description')).toBeInTheDocument();
             expect(screen.getByText('This is a test integration')).toBeInTheDocument();
 
-            const primaryButton = screen.getByRole('button', {name: /continue/i});
+            const primaryButton = screen.getByRole('button', {name: /connect/i});
 
             expect(primaryButton).toBeInTheDocument();
             expect(primaryButton).toBeEnabled();
@@ -123,7 +168,7 @@ describe('ConnectDialog', () => {
 
         it('does not render when isOpen is false', () => {
             const closedProps = {
-                ...minimalProps,
+                ...createConnectionProps,
                 isOpen: false,
             };
 
@@ -138,7 +183,7 @@ describe('ConnectDialog', () => {
     describe('Component Composition Tests', () => {
         it('shows DialogContent when integration is available', () => {
             const props = {
-                ...minimalProps,
+                ...createConnectionProps,
                 integration: {name: 'Test Integration', description: 'Description'},
             };
             render(<ConnectDialog {...props} />);
@@ -147,20 +192,13 @@ describe('ConnectDialog', () => {
             expect(screen.queryByText('Unable to Load Integration')).not.toBeInTheDocument();
         });
 
-        it('shows different content based on dialogStep', () => {
-            const workflowsProps = {
-                ...minimalProps,
-                integration: {
-                    name: 'Test',
-                    description: 'Test',
-                    workflows: [{label: 'Workflow 1', workflowReferenceCode: 'workflow1'}],
-                },
-                dialogStep: {key: 'workflows' as const, label: 'Workflows'},
-            };
+        it('shows different content if we are editing instead of creating', () => {
+            render(<ConnectDialog {...editConnectionProps} />);
 
-            render(<ConnectDialog {...workflowsProps} />);
+            expect(screen.getByText('Disconnect')).toBeInTheDocument();
 
-            expect(screen.getByText('Workflow 1')).toBeInTheDocument();
+            expect(screen.getByTestId('workflows-container')).toBeInTheDocument();
+            expect(screen.getByText('Enable, disable and manage your workflows below')).toBeInTheDocument();
         });
     });
 
@@ -168,7 +206,7 @@ describe('ConnectDialog', () => {
         it('calls closeDialog when escape key is pressed', () => {
             const closeMock = vi.fn();
 
-            render(<ConnectDialog {...minimalProps} closeDialog={closeMock} />);
+            render(<ConnectDialog {...createConnectionProps} closeDialog={closeMock} />);
 
             fireEvent.keyDown(window, {key: 'Escape'});
 
@@ -178,7 +216,7 @@ describe('ConnectDialog', () => {
         it('prevents event propagation when clicking inside dialog', () => {
             const closeMock = vi.fn();
 
-            render(<ConnectDialog {...minimalProps} closeDialog={closeMock} />);
+            render(<ConnectDialog {...createConnectionProps} closeDialog={closeMock} />);
 
             fireEvent.click(screen.getByText('Unable to Load Integration'));
 
@@ -189,70 +227,40 @@ describe('ConnectDialog', () => {
     describe('Workflow Management UI Tests', () => {
         it('toggles workflow when switch is clicked', () => {
             const toggleMock = vi.fn();
-
-            const props = {
-                ...minimalProps,
-                integration: {
-                    workflows: [{label: 'Workflow 1', workflowReferenceCode: 'workflow1', inputs: []}],
-                },
-                dialogStep: {key: 'workflows' as const, label: 'Workflows'},
+            const propsWithToggle = {
+                ...editConnectionProps,
                 handleWorkflowToggle: toggleMock,
             };
 
-            render(<ConnectDialog {...props} />);
+            render(<ConnectDialog {...propsWithToggle} />);
 
-            const workflowItem = screen.getByText('Workflow 1').closest('li');
+            const workflowItem = screen.getByText('Test Workflow').closest('li');
             const toggleLabel = workflowItem?.querySelector('label[class*="toggleLabel"]');
 
             expect(toggleLabel).toBeInTheDocument();
 
             fireEvent.click(toggleLabel as Element);
 
-            expect(toggleMock).toHaveBeenCalledWith('workflow1', true);
+            expect(toggleMock).toHaveBeenCalledWith('workflow-123', true);
         });
 
         it('shows input fields when workflow is selected', () => {
-            const props = {
-                ...minimalProps,
-                integration: {
-                    workflows: [
-                        {
-                            label: 'Workflow 1',
-                            workflowReferenceCode: 'workflow1',
-                            inputs: [{name: 'input1', label: 'Input 1'} as WorkflowInputType],
-                        },
-                    ],
-                },
-                dialogStep: {key: 'workflows' as const, label: 'Workflows'},
-                selectedWorkflows: ['workflow1'],
+            const propsWithEnabledWorkflow = {
+                ...editConnectionProps,
+                selectedWorkflows: ['workflow-123'],
             };
 
-            render(<ConnectDialog {...props} />);
+            render(<ConnectDialog {...propsWithEnabledWorkflow} />);
 
             expect(screen.getByText('INPUTS')).toBeInTheDocument();
             expect(screen.getByLabelText('Input 1')).toBeInTheDocument();
-        });
-
-        it('ignores workflows without reference codes', () => {
-            const props = {
-                ...minimalProps,
-                integration: {
-                    workflows: [{label: 'Valid Workflow', workflowReferenceCode: 'valid'}, {label: 'Invalid Workflow'}],
-                },
-                dialogStep: {key: 'workflows' as const, label: 'Workflows'},
-            };
-
-            render(<ConnectDialog {...props} />);
-
-            expect(screen.getByText('Valid Workflow')).toBeInTheDocument();
-            expect(screen.queryByText('Invalid Workflow')).not.toBeInTheDocument();
         });
     });
 
     describe('Form Validation UI Tests', () => {
         it('displays validation errors when form has errors', () => {
             const props = {
-                ...minimalProps,
+                ...createConnectionProps,
                 integration: {
                     name: 'Test Integration',
                     connectionConfig: {
@@ -260,7 +268,6 @@ describe('ConnectDialog', () => {
                         inputs: [{name: 'apiKey', label: 'API Key', required: true} as WorkflowInputType],
                     },
                 } as IntegrationType,
-                dialogStep: {key: 'form' as const, label: 'Custom Data'},
                 properties: [{name: 'apiKey', label: 'API Key', required: true}] as PropertyType[],
                 form: createFormMock({
                     errors: {
@@ -288,9 +295,8 @@ describe('ConnectDialog', () => {
 
         it('renders select dropdowns correctly when options are provided', () => {
             const props = {
-                ...minimalProps,
+                ...createConnectionProps,
                 integration: {name: 'Test'} as IntegrationType,
-                dialogStep: {key: 'form' as const, label: 'Custom Data'},
                 properties: [
                     {
                         name: 'country',
@@ -314,9 +320,8 @@ describe('ConnectDialog', () => {
 
         it('displays required field indicators for required fields', () => {
             const props = {
-                ...minimalProps,
+                ...createConnectionProps,
                 integration: {name: 'Test'} as IntegrationType,
-                dialogStep: {key: 'form' as const, label: 'Custom Data'},
                 properties: [
                     {name: 'required', label: 'Required Field', required: true},
                     {name: 'optional', label: 'Optional Field', required: false},
@@ -338,11 +343,11 @@ describe('ConnectDialog', () => {
     });
 
     describe('Button Text and Icon Tests', () => {
-        it('displays correct button text based on dialogStep and isOAuth2', () => {
+        it('displays correct button text based on workflowsView and isOAuth2', () => {
             const oauth2Props = {
-                ...minimalProps,
+                ...createConnectionProps,
                 integration: {name: 'Test'} as IntegrationType,
-                dialogStep: {key: 'workflows' as const, label: 'Workflows'},
+                workflowsView: false,
                 isOAuth2: true,
             };
 
@@ -356,12 +361,24 @@ describe('ConnectDialog', () => {
                     {...{
                         ...oauth2Props,
                         isOAuth2: false,
-                        dialogStep: {key: 'form', label: 'Custom Data'},
+                        workflowsView: false,
                     }}
                 />
             );
 
             expect(screen.getByText('Connect')).toBeInTheDocument();
+
+            rerender(
+                <ConnectDialog
+                    {...{
+                        ...oauth2Props,
+                        isOAuth2: false,
+                        workflowsView: true,
+                    }}
+                />
+            );
+
+            expect(screen.getByText('Disconnect')).toBeInTheDocument();
         });
     });
 
@@ -370,9 +387,8 @@ describe('ConnectDialog', () => {
             const handleClickMock = vi.fn();
 
             const props = {
-                ...minimalProps,
+                ...createConnectionProps,
                 integration: {name: 'Test Integration'} as IntegrationType,
-                dialogStep: {key: 'form' as const, label: 'Custom Data'},
                 properties: [{name: 'field1', label: 'Field 1', type: 'string'} as PropertyType],
                 form: createFormMock(),
                 handleClick: handleClickMock,

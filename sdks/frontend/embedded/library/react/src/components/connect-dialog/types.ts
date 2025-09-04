@@ -10,16 +10,38 @@ export interface IntegrationType {
             clientId: string;
         };
     };
+    integrationInstances?: IntegrationInstanceType[];
     icon?: string;
     id?: number;
     name?: string;
-    workflows?: WorkflowType[];
+    workflows?: IntegrationWorkflowType[];
 }
 
-export interface WorkflowType {
+export interface MergedWorkflowType {
+    description?: string;
+    inputs?: WorkflowInputType[];
+    enabled?: boolean;
+    label?: string;
+    workflowReferenceCode: string;
+}
+
+export interface IntegrationInstanceType {
+    id: number;
+    enabled: boolean;
+    credentialStatus: string;
+    workflows: IntegrationInstanceWorkflowType[];
+}
+
+export interface IntegrationInstanceWorkflowType {
+    enabled?: boolean;
+    inputs?: Record<string, unknown>;
+    workflowReferenceCode: string;
+}
+
+export interface IntegrationWorkflowType {
     inputs?: WorkflowInputType[];
     label?: string;
-    workflowReferenceCode?: string;
+    workflowReferenceCode: string;
 }
 
 export interface PropertyType {
