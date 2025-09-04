@@ -53,7 +53,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     basePackages = {
         "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.automation.configuration",
         "com.bytechef.automation.mcp", "com.bytechef.commons.util", "com.bytechef.jackson.config",
-        "com.bytechef.platform.category", "com.bytechef.platform.connection", "com.bytechef.platform.tag"
+        "com.bytechef.platform.category", "com.bytechef.platform.connection", "com.bytechef.platform.mcp",
+        "com.bytechef.platform.tag"
     })
 @EnableAutoConfiguration
 @EnableCaching
