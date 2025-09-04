@@ -10,7 +10,9 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {
+    useDeleteClusterElementParameterMutation,
     useDeleteWorkflowNodeParameterMutation,
+    useUpdateClusterElementParameterMutation,
     useUpdateWorkflowNodeParameterMutation,
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
@@ -48,6 +50,18 @@ export const useIntegration = ({
         },
     });
 
+    const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: IntegrationKeys.integration(integrationId),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
+        },
+    });
+
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
         useUpdateWorkflowMutation: useUpdateWorkflowMutation,
         workflowId: workflow.id!,
@@ -72,6 +86,18 @@ export const useIntegration = ({
     });
 
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: IntegrationKeys.integration(integrationId),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
+        },
+    });
+
+    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integration(integrationId),
@@ -126,8 +152,10 @@ export const useIntegration = ({
 
     return {
         bottomResizablePanelRef,
+        deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
+        updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,

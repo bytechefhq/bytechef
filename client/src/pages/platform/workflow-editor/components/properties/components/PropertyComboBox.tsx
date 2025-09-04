@@ -6,17 +6,23 @@ import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
-import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {
+    useGetClusterElementNodeOptionsQuery,
+    useGetWorkflowNodeOptionsQuery,
+} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {CaretSortIcon, CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {FocusEventHandler, ReactNode, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/shallow';
 
+import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
 import type {
+    GetClusterElementNodeOptionsRequest,
     GetWorkflowNodeOptionsRequest,
     Option,
     OptionsDataSource,
@@ -84,6 +90,11 @@ const PropertyComboBox = ({
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const {rootClusterElementNodeData} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+        }))
+    );
 
     const path = useMemo(() => {
         let updatedPath = initialPath;
@@ -127,6 +138,34 @@ const PropertyComboBox = ({
         [currentEnvironmentId, lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
     );
 
+    const clusterElementQueryOptions: {
+        loadDependencyValueKey: string;
+        request: GetClusterElementNodeOptionsRequest;
+    } = useMemo(
+        () => ({
+            loadDependencyValueKey: lookupDependsOnValuesKey,
+            request: {
+                clusterElementType: currentNode?.clusterElementType || '',
+                clusterElementWorkflowNodeName: currentNode?.workflowNodeName || '',
+                environmentId: currentEnvironmentId,
+                id: workflowId,
+                lookupDependsOnPaths,
+                propertyName: path!,
+                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
+            },
+        }),
+        [
+            lookupDependsOnValuesKey,
+            currentEnvironmentId,
+            currentNode?.clusterElementType,
+            currentNode?.workflowNodeName,
+            workflowId,
+            lookupDependsOnPaths,
+            path,
+            rootClusterElementNodeData?.workflowNodeName,
+        ]
+    );
+
     const queryEnabled = useMemo(
         () =>
             !!currentNode &&
@@ -142,11 +181,26 @@ const PropertyComboBox = ({
         data: optionsData,
         isLoading,
         isRefetching,
-    } = useGetWorkflowNodeOptionsQuery(queryOptions, Boolean(queryEnabled));
+    } = useGetWorkflowNodeOptionsQuery(queryOptions, Boolean(queryEnabled && !currentNode?.clusterElementType));
+
+    const {
+        data: clusterElementOptionsData,
+        isLoading: isClusterElementOptionsLoading,
+        isRefetching: isClusterElementOptionsRefetching,
+    } = useGetClusterElementNodeOptionsQuery(
+        clusterElementQueryOptions,
+        Boolean(queryEnabled && currentNode?.clusterElementType)
+    );
 
     const options = useMemo(() => {
         if (optionsData) {
             return optionsData.map((option) => ({
+                description: option.description,
+                label: option.label ?? option.value,
+                value: option.value.toString(),
+            }));
+        } else if (clusterElementOptionsData) {
+            return clusterElementOptionsData.map((option) => ({
                 description: option.description,
                 label: option.label ?? option.value,
                 value: option.value.toString(),
@@ -157,7 +211,7 @@ const PropertyComboBox = ({
             ...option,
             value: option.value?.toString() || '',
         }));
-    }, [optionsData, initialOptions]);
+    }, [optionsData, clusterElementOptionsData, initialOptions]);
 
     const currentOption = useMemo(
         () => (options as Array<ComboBoxItemType>)?.find((option) => String(option.value) === String(value)),
@@ -290,7 +344,11 @@ const PropertyComboBox = ({
                         )}
                         disabled={
                             !options.length &&
-                            (isRefetching || noOptionsAvailable || !!missingConnection || !connectionRequirementMet)
+                            (isRefetching ||
+                                isClusterElementOptionsRefetching ||
+                                noOptionsAvailable ||
+                                !!missingConnection ||
+                                !connectionRequirementMet)
                         }
                         name={name}
                         role="combobox"
@@ -302,19 +360,22 @@ const PropertyComboBox = ({
                             </div>
                         )}
 
-                        {lookupDependsOnValues && isRefetching && !currentOption?.label && (
-                            <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
-                                <LoadingIcon /> Refetching...
-                            </span>
-                        )}
+                        {lookupDependsOnValues &&
+                            (isRefetching || isClusterElementOptionsRefetching) &&
+                            !currentOption?.label && (
+                                <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
+                                    <LoadingIcon /> Refetching...
+                                </span>
+                            )}
 
-                        {lookupDependsOnValues && isLoading && (
+                        {lookupDependsOnValues && (isLoading || isClusterElementOptionsLoading) && (
                             <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Loading...
                             </span>
                         )}
 
-                        {((lookupDependsOnValues && !isLoading) || !lookupDependsOnValues) && (
+                        {((lookupDependsOnValues && !(isLoading || isClusterElementOptionsLoading)) ||
+                            !lookupDependsOnValues) && (
                             <>
                                 {currentOption ? (
                                     <span
@@ -330,7 +391,9 @@ const PropertyComboBox = ({
                                         {currentOption?.label}
                                     </span>
                                 ) : (
-                                    !isRefetching && <span className={placeholderClassName}>{memoizedPlaceholder}</span>
+                                    !(isRefetching || isClusterElementOptionsRefetching) && (
+                                        <span className={placeholderClassName}>{memoizedPlaceholder}</span>
+                                    )
                                 )}
                             </>
                         )}

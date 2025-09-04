@@ -33,11 +33,13 @@ const WorkflowBuilder = () => {
     const {
         bottomResizablePanelRef,
         connectedUserProjectWorkflow,
+        deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
         includeComponents,
         projectId,
         sharedConnectionIds,
+        updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
@@ -69,8 +71,10 @@ const WorkflowBuilder = () => {
                         <WorkflowEditorProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,
+                                deleteClusterElementParameterMutation,
                                 deleteWorkflowNodeParameterMutation,
                                 invalidateWorkflowQueries: () => {},
+                                updateClusterElementParameterMutation,
                                 updateWorkflowMutation: updateWorkflowEditorMutation,
                                 updateWorkflowNodeParameterMutation,
                                 useCreateConnectionMutation: getCreateConnectedUserProjectWorkflowConnection(
