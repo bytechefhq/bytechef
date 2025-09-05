@@ -28,6 +28,7 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.worker.event.CancelControlTriggerEvent;
 import com.bytechef.platform.workflow.worker.event.TriggerExecutionEvent;
+import com.bytechef.platform.workflow.worker.exception.TriggerExecutionException;
 import com.bytechef.platform.workflow.worker.executor.TriggerWorkerExecutor;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerResolver;
@@ -87,9 +88,12 @@ public class TriggerWorker {
                 eventPublisher.publishEvent(
                     new TriggerStartedApplicationEvent(Validate.notNull(triggerExecution.getId(), "id")));
 
-                TriggerExecution completedTriggerExecution = doExecuteTrigger(triggerExecution);
+                TriggerExecution execution = doExecuteTrigger(triggerExecution);
 
-                eventPublisher.publishEvent(new TriggerExecutionCompleteEvent(completedTriggerExecution));
+                if (execution.getStatus()
+                    .equals(TriggerExecution.Status.COMPLETED)) {
+                    eventPublisher.publishEvent(new TriggerExecutionCompleteEvent(execution));
+                }
             } catch (InterruptedException e) {
                 if (logger.isTraceEnabled()) {
                     logger.trace(e.getMessage(), e);
@@ -145,11 +149,22 @@ public class TriggerWorker {
     }
 
     private TriggerExecution doExecuteTrigger(TriggerExecution triggerExecution) throws Exception {
-        long startTime = System.currentTimeMillis();
+        Instant startDate = Instant.now();
+        long startTime = startDate.toEpochMilli();
+
+        triggerExecution.setStartDate(startDate);
 
         TriggerHandler triggerHandler = triggerHandlerResolver.resolve(triggerExecution);
 
-        TriggerOutput triggerOutput = triggerHandler.handle(triggerExecution.clone());
+        TriggerOutput triggerOutput;
+        try {
+            triggerOutput = triggerHandler.handle(triggerExecution.clone());
+        } catch (TriggerExecutionException exception) {
+
+            handleException(triggerExecution, exception);
+
+            return triggerExecution;
+        }
 
         if (triggerOutput == null) {
             triggerExecution.setState(null);
@@ -189,9 +204,14 @@ public class TriggerWorker {
     private void handleException(TriggerExecution triggerExecution, Exception exception) {
         logger.error(exception.getMessage(), exception);
 
+        Instant endDate = Instant.now();
+        Instant startDate = triggerExecution.getStartDate();
+
         triggerExecution.setError(
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
         triggerExecution.setStatus(TriggerExecution.Status.FAILED);
+        triggerExecution.setEndDate(endDate);
+        triggerExecution.setExecutionTime(endDate.toEpochMilli() - startDate.toEpochMilli());
 
         eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
     }

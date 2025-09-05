@@ -240,10 +240,7 @@ public class TriggerCoordinator {
         try {
             triggerDispatcher.dispatch(triggerExecution);
         } catch (Exception e) {
-            triggerExecution.setError(
-                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
-
-            eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
+            publishTriggerError(triggerExecution, e);
         }
     }
 
@@ -251,11 +248,13 @@ public class TriggerCoordinator {
         try {
             triggerCompletionHandler.handle(triggerExecution);
         } catch (Exception e) {
-            triggerExecution.setError(
-                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
-
-            eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
+            publishTriggerError(triggerExecution, e);
         }
+    }
+
+    private void publishTriggerError(TriggerExecution triggerExecution, Exception e) {
+        triggerExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+        eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
     }
 
     private WorkflowTrigger getWorkflowTrigger(WorkflowExecutionId workflowExecutionId) {
