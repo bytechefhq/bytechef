@@ -216,5 +216,4 @@ public class WorkspaceMcpServerFacadeIntTest {
         assertEquals(1, assignments2.size()); // Only the second server remains in second workspace
         assertEquals(1, mcpServerRepository.count()); // Only the second server still exists
     }
-
 }

@@ -50,7 +50,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     AuthorityService.class, ComponentConnectionFacade.class, ComponentDefinitionService.class, ConnectionFacade.class,
     ConnectionService.class, EnvironmentService.class, JobFacade.class, JobService.class, PrincipalJobFacade.class,
     PrincipalJobService.class, TaskExecutionService.class, TriggerDefinitionService.class,
-    PrincipalJobService.class, TaskExecutionService.class, TriggerDefinitionService.class,
     TriggerExecutionService.class, TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class,
     WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class
 })
