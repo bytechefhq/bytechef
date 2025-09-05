@@ -60,6 +60,6 @@ public class TriggerWorkerConfiguration {
         TriggerWorkerExecutor triggerWorkerExecutor, TriggerHandlerResolver triggerHandlerResolver) {
 
         return new TriggerWorker(
-            eventPublisher, triggerFileStorage, triggerWorkerExecutor, triggerHandlerResolver);
+            eventPublisher, triggerFileStorage, triggerHandlerResolver, triggerWorkerExecutor);
     }
 }
