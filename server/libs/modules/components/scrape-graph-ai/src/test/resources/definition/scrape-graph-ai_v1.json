@@ -1156,7 +1156,7 @@
   "description" : "ScrapeGraphAI is a web scraping python library that uses LLM and direct graph logic to create scraping pipelines for websites and local documents.",
   "icon" : "path:assets/scrape-graph-ai.svg",
   "metadata" : null,
-  "name" : "scrape-graph-ai",
+  "name" : "scrapeGraphAi",
   "resources" : null,
   "tags" : null,
   "title" : "ScrapeGraphAI",
