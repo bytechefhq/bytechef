@@ -26,21 +26,30 @@ public class TypeCompatibilityChecker {
     }
 
     /**
-     * Determines the expected type of a field based on its path.
-     */
-    public static String getExpectedTypeFromFieldPath(String fieldPath) {
-        String fieldName = extractFieldNameFromPath(fieldPath);
-        return getExpectedTypeFromFieldName(fieldName);
-    }
-
-    /**
      * Checks if two types are compatible for data pill assignments.
      */
     public static boolean isTypeCompatible(String expectedType, String actualType) {
         if (expectedType == null || actualType == null) {
             return true;
         }
-        return expectedType.equalsIgnoreCase(actualType);
+
+        // Exact match
+        if (expectedType.equalsIgnoreCase(actualType)) {
+            return true;
+        }
+
+        // Integer and number types are compatible
+        if ((expectedType.equalsIgnoreCase("integer") && actualType.equalsIgnoreCase("number")) ||
+            (expectedType.equalsIgnoreCase("number") && actualType.equalsIgnoreCase("integer"))) {
+            return true;
+        }
+
+        // Any type can be converted to string
+        if ("string".equalsIgnoreCase(expectedType)) {
+            return true;
+        }
+
+        return false;
     }
 
     private static String extractFieldNameFromPath(String fieldPath) {
@@ -49,13 +58,5 @@ public class TypeCompatibilityChecker {
             return parts[parts.length - 1];
         }
         return fieldPath;
-    }
-
-    private static String getExpectedTypeFromFieldName(String fieldName) {
-        return switch (fieldName) {
-            case "active" -> "boolean";
-            case "name" -> "string";
-            default -> null;
-        };
     }
 }
