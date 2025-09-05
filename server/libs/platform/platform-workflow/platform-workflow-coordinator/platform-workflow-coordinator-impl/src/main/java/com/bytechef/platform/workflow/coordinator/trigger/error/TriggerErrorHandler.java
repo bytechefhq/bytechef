@@ -72,7 +72,7 @@ public class TriggerErrorHandler {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
         Map<String, ?> inputMap = MapUtils.concat(
-            getInputMap(workflowExecutionId), Map.of(triggerExecution.getName(), Map.of()));
+            (Map<String, Object>) getInputMap(workflowExecutionId), Map.of(triggerExecution.getName(), Map.of()));
 
         triggerExecution.addJobId(
             createFailedJob(
