@@ -1,10 +1,10 @@
 import {Accordion, AccordionContent, AccordionItem} from '@/components/ui/accordion';
 import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
+import AiProviderForm from '@/ee/pages/settings/platform/ai-providers/components/AiProviderForm';
 import {AiProvider} from '@/ee/shared/middleware/platform/configuration';
 import {useEnableAiProviderMutation} from '@/ee/shared/mutations/platform/aiProvider.mutations';
 import {AiProviderKeys} from '@/ee/shared/queries/platform/aiProviders.queries';
-import AiProviderForm from '@/pages/platform/settings/ai-providers/components/AiProviderForm';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import {useQueryClient} from '@tanstack/react-query';

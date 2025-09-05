@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-03T18:18:48.338953+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-05T21:43:44.621264+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "workspace", description = "The Automation Workspace Internal API")
 public interface WorkspaceApi {
@@ -108,47 +108,6 @@ public interface WorkspaceApi {
     default ResponseEntity<Void> deleteWorkspace(
         @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * GET /users/{id}/workspaces : Get all user workspaces
-     * Get all user workspaces.
-     *
-     * @param id The id of a user. (required)
-     * @return The list of user workspaces. (status code 200)
-     */
-    @Operation(
-        operationId = "getUserWorkspaces",
-        summary = "Get all user workspaces",
-        description = "Get all user workspaces.",
-        tags = { "workspace" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The list of user workspaces.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.automation.configuration.web.rest.model.WorkspaceModel.class)))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/users/{id}/workspaces",
-        produces = { "application/json" }
-    )
-    
-    default ResponseEntity<List<com.bytechef.automation.configuration.web.rest.model.WorkspaceModel>> getUserWorkspaces(
-        @Parameter(name = "id", description = "The id of a user.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

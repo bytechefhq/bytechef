@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("testWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-03T18:18:51.483512+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-05T21:43:48.363729+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class TestWorkflowRequestModel {
 
   @Valid

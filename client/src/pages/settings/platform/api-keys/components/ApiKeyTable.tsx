@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
-import ApiKeyDialog from '@/pages/platform/settings/api-keys/components/ApiKeyDialog';
+import ApiKeyDialog from '@/pages/settings/platform/api-keys/components/ApiKeyDialog';
 import {ApiKey} from '@/shared/middleware/platform/api-key';
 import {useDeleteApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
 import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';

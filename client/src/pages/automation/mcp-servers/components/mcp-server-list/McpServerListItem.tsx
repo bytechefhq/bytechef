@@ -1,5 +1,4 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import TagList from '@/components/TagList';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -9,6 +8,7 @@ import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-co
 import McpServerListItemAlertDialog from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemAlertDialog';
 import McpServerListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import TagList from '@/shared/components/TagList';
 import {
     McpProjectWorkflow,
     McpServer,

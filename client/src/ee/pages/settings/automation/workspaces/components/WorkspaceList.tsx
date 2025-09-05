@@ -1,4 +1,4 @@
-import WorkspaceListItem from '@/pages/settings/automation/workspaces/components/WorkspaceListItem';
+import WorkspaceListItem from '@/ee/pages/settings/automation/workspaces/components/WorkspaceListItem';
 import {Workspace} from '@/shared/middleware/automation/configuration';
 
 const WorkspaceList = ({workspaces}: {workspaces: Workspace[]}) => {

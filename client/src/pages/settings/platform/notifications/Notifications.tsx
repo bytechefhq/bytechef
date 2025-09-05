@@ -1,8 +1,8 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
-import NotificationDialog from '@/pages/platform/settings/notifications/components/NotificationDialog';
-import NotificationsTable from '@/pages/platform/settings/notifications/components/NotificationsTable';
+import NotificationDialog from '@/pages/settings/platform/notifications/components/NotificationDialog';
+import NotificationsTable from '@/pages/settings/platform/notifications/components/NotificationsTable';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Link2Icon, PlusIcon} from 'lucide-react';

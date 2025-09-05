@@ -1,5 +1,4 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import TagList from '@/components/TagList';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -28,6 +27,7 @@ import {
 } from '@/ee/shared/mutations/embedded/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {

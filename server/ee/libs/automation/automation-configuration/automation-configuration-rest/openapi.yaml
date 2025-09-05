@@ -98,30 +98,6 @@ paths:
       responses:
         "204":
           description: "Successful operation."
-  /users/{id}/workspaces:
-    get:
-      description: "Get all user workspaces."
-      summary: "Get all user workspaces"
-      tags:
-        - "workspace"
-      operationId: "getUserWorkspaces"
-      parameters:
-        - name: "id"
-          description: "The id of a user."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "The list of user workspaces."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Workspace"
   /workspaces:
     get:
       description: "Get workspaces."

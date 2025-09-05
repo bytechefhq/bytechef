@@ -20,7 +20,7 @@ import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
-import TagList from '../../../../../components/TagList';
+import TagList from '../../../../../shared/components/TagList';
 import ProjectDeploymentDialog from '../project-deployment-dialog/ProjectDeploymentDialog';
 
 interface ProjectDeploymentListItemProps {

@@ -38,7 +38,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
-import TagList from '../../../../../components/TagList';
+import TagList from '../../../../../shared/components/TagList';
 
 interface ConnectionListItemProps {
     componentDefinitions: ComponentDefinitionBasic[];

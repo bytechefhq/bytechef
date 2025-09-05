@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createFrontendIntegrationInstance_request_connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-03T18:18:48.431637+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-05T21:43:44.815051+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class CreateFrontendIntegrationInstanceRequestConnectionModel {
 
   @Valid

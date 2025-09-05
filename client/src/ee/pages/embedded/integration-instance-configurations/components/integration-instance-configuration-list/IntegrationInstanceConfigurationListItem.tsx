@@ -1,5 +1,4 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import TagList from '@/components/TagList';
 import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
@@ -16,6 +15,7 @@ import {
 import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';

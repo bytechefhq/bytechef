@@ -4,7 +4,6 @@ import {Workspace, WorkspaceApi} from '@/ee/shared/middleware/automation/configu
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkspaceKeys = {
-    userWorkspaces: (userId: number) => ['users', userId, WorkspaceKeys.workspaces] as const,
     workspaces: ['workspaces'] as const,
 };
 
