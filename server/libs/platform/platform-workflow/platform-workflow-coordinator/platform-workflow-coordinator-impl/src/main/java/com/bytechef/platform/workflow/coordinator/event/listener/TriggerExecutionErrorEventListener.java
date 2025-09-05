@@ -19,10 +19,10 @@ package com.bytechef.platform.workflow.coordinator.event.listener;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.workflow.coordinator.event.ErrorEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionErrorEvent;
+import com.bytechef.platform.workflow.coordinator.trigger.error.TriggerErrorHandler;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.Instant;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +37,14 @@ public class TriggerExecutionErrorEventListener implements ErrorEventListener {
     private static final Logger logger = LoggerFactory.getLogger(TriggerExecutionErrorEventListener.class);
 
     private final TriggerExecutionService triggerExecutionService;
+    private final TriggerErrorHandler triggerErrorHandler;
 
     @SuppressFBWarnings("EI")
-    public TriggerExecutionErrorEventListener(TriggerExecutionService triggerExecutionService) {
+    public TriggerExecutionErrorEventListener(
+        TriggerExecutionService triggerExecutionService, TriggerErrorHandler triggerErrorHandler) {
+
         this.triggerExecutionService = triggerExecutionService;
+        this.triggerErrorHandler = triggerErrorHandler;
     }
 
     public void onErrorEvent(ErrorEvent errorEvent) {
@@ -52,10 +56,11 @@ public class TriggerExecutionErrorEventListener implements ErrorEventListener {
                 "Trigger id={}: message={}\nstackTrace={}", triggerExecution.getId(), error.getMessage(),
                 error.getStackTrace());
 
-            // set task status to FAILED and persist
-
-            triggerExecution.setEndDate(Instant.now());
-            triggerExecution.setStatus(TriggerExecution.Status.FAILED);
+            try {
+                triggerErrorHandler.handleError(triggerExecution);
+            } catch (Exception ex) {
+                logger.debug("Job creation during trigger error handling failed: {}", ex.getMessage(), ex);
+            }
 
             triggerExecutionService.update(triggerExecution);
         }
