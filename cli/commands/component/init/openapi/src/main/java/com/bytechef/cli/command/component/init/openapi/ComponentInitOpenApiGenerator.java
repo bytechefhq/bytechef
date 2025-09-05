@@ -1245,6 +1245,8 @@ public class ComponentInitOpenApiGenerator {
             title = getComponentClassName(componentName);
         }
 
+        String name = getComponentClassName(componentName);
+
         builder.add(
             """
                 modifyComponent(
@@ -1254,7 +1256,10 @@ public class ComponentInitOpenApiGenerator {
                     )
                     .actions(modifyActions($L))
                 """,
-            componentName, title, info.getDescription(), getActionsCodeBlock(componentHandlerDirPath, openAPI));
+
+            StringUtils.uncapitalize(name),
+            title, info.getDescription(),
+            getActionsCodeBlock(componentHandlerDirPath, openAPI));
 
         CodeBlock codeBlock = getConnectionCodeBlock(openAPI, componentHandlerDirPath);
 
