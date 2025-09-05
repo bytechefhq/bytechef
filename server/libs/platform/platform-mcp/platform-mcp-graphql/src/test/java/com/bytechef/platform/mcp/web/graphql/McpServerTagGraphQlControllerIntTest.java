@@ -40,7 +40,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
-public class McpServerTagGraphQlControllerTest {
+public class McpServerTagGraphQlControllerIntTest {
 
     @Mock
     private McpServerService mcpServerService;
