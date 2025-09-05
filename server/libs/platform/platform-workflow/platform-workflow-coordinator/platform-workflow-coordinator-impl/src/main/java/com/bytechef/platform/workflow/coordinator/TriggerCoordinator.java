@@ -19,7 +19,6 @@ package com.bytechef.platform.workflow.coordinator;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -78,11 +77,11 @@ public class TriggerCoordinator {
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
         List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
-        Evaluator evaluator,
-        ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
-        TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
-        TriggerStateService triggerStateService, WorkflowService workflowService) {
+        Evaluator evaluator, ApplicationEventPublisher eventPublisher,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerCompletionHandler triggerCompletionHandler,
+        TriggerDispatcher triggerDispatcher, TriggerExecutionService triggerExecutionService,
+        TriggerFileStorage triggerFileStorage, TriggerStateService triggerStateService,
+        WorkflowService workflowService) {
 
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;
@@ -235,7 +234,9 @@ public class TriggerCoordinator {
                     workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode()),
                 evaluator));
 
-        triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
+        triggerExecution.setState(
+            triggerStateService.fetchValue(workflowExecutionId)
+                .orElse(null));
 
         try {
             triggerDispatcher.dispatch(triggerExecution);
@@ -254,6 +255,7 @@ public class TriggerCoordinator {
 
     private void publishTriggerError(TriggerExecution triggerExecution, Exception e) {
         triggerExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+
         eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
     }
 

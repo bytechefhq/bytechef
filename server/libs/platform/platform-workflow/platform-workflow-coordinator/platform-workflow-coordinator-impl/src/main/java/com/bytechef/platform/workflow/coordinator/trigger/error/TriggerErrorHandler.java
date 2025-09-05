@@ -45,21 +45,20 @@ public class TriggerErrorHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerErrorHandler.class);
 
-    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
-    private final PrincipalJobFacade principalJobFacade;
-    private final JobService jobService;
     private final ApplicationEventPublisher eventPublisher;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private final JobService jobService;
+    private final PrincipalJobFacade principalJobFacade;
 
     @SuppressFBWarnings("EI")
     public TriggerErrorHandler(
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
-        JobService jobService,
-        ApplicationEventPublisher eventPublisher) {
+        ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        JobService jobService, PrincipalJobFacade principalJobFacade) {
 
-        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
-        this.principalJobFacade = principalJobFacade;
-        this.jobService = jobService;
         this.eventPublisher = eventPublisher;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.jobService = jobService;
+        this.principalJobFacade = principalJobFacade;
     }
 
     public void handleError(TriggerExecution triggerExecution) {
@@ -72,20 +71,14 @@ public class TriggerErrorHandler {
 
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        @SuppressWarnings("unchecked")
-        Map<String, Object> inputMap = (Map<String, Object>) getInputMap(workflowExecutionId);
-        String workflowId = getWorkflowId(workflowExecutionId);
-        Map<String, ?> metadataMap = getMetadataMap(workflowExecutionId);
-
-        Instant startDate = triggerExecution.getStartDate();
-        Instant endDate = triggerExecution.getEndDate();
+        Map<String, ?> inputMap = MapUtils.concat(
+            getInputMap(workflowExecutionId), Map.of(triggerExecution.getName(), Map.of()));
 
         triggerExecution.addJobId(
             createFailedJob(
-                workflowId,
-                MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), Map.of())),
-                workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType(), startDate,
-                endDate));
+                getWorkflowId(workflowExecutionId), inputMap, workflowExecutionId.getJobPrincipalId(),
+                getMetadataMap(workflowExecutionId), workflowExecutionId.getType(), triggerExecution.getStartDate(),
+                triggerExecution.getEndDate()));
     }
 
     private long createFailedJob(
@@ -95,9 +88,9 @@ public class TriggerErrorHandler {
         Job job = principalJobFacade.createSyncJob(
             new JobParametersDTO(workflowId, inputMap, metadataMap), jobPrincipalId, type);
 
+        job.setEndDate(endDate);
         job.setStartDate(startDate);
         job.setStatus(Job.Status.FAILED);
-        job.setEndDate(endDate);
 
         job = jobService.update(job);
 
@@ -109,8 +102,8 @@ public class TriggerErrorHandler {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor =
-            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());

@@ -60,19 +60,19 @@ public class TriggerWorker {
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
     private final ApplicationEventPublisher eventPublisher;
-    private final TriggerFileStorage triggerFileStorage;
-    private final TriggerWorkerExecutor triggerWorkerExecutor;
     private final Map<WorkflowExecutionId, TriggerExecutionFuture<?>> triggerExecutions = new ConcurrentHashMap<>();
+    private final TriggerFileStorage triggerFileStorage;
     private final TriggerHandlerResolver triggerHandlerResolver;
+    private final TriggerWorkerExecutor triggerWorkerExecutor;
 
     public TriggerWorker(
         ApplicationEventPublisher eventPublisher, TriggerFileStorage triggerFileStorage,
-        TriggerWorkerExecutor executorService, TriggerHandlerResolver triggerHandlerResolver) {
+        TriggerHandlerResolver triggerHandlerResolver, TriggerWorkerExecutor triggerWorkerExecutor) {
 
         this.eventPublisher = eventPublisher;
         this.triggerFileStorage = triggerFileStorage;
-        this.triggerWorkerExecutor = executorService;
         this.triggerHandlerResolver = triggerHandlerResolver;
+        this.triggerWorkerExecutor = triggerWorkerExecutor;
     }
 
     public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
@@ -90,8 +90,9 @@ public class TriggerWorker {
 
                 TriggerExecution execution = doExecuteTrigger(triggerExecution);
 
-                if (execution.getStatus()
-                    .equals(TriggerExecution.Status.COMPLETED)) {
+                TriggerExecution.Status status = execution.getStatus();
+
+                if (status.equals(TriggerExecution.Status.COMPLETED)) {
                     eventPublisher.publishEvent(new TriggerExecutionCompleteEvent(execution));
                 }
             } catch (InterruptedException e) {
@@ -111,7 +112,7 @@ public class TriggerWorker {
         });
 
         triggerExecutions.put(
-            triggerExecution.getWorkflowExecutionId(), new TriggerExecutionFuture<>(triggerExecution, future));
+            triggerExecution.getWorkflowExecutionId(), new TriggerExecutionFuture<>(future, triggerExecution));
 
         try {
             future.get(calculateTimeout(triggerExecution), TimeUnit.MILLISECONDS);
@@ -150,6 +151,7 @@ public class TriggerWorker {
 
     private TriggerExecution doExecuteTrigger(TriggerExecution triggerExecution) throws Exception {
         Instant startDate = Instant.now();
+
         long startTime = startDate.toEpochMilli();
 
         triggerExecution.setStartDate(startDate);
@@ -157,10 +159,10 @@ public class TriggerWorker {
         TriggerHandler triggerHandler = triggerHandlerResolver.resolve(triggerExecution);
 
         TriggerOutput triggerOutput;
+
         try {
             triggerOutput = triggerHandler.handle(triggerExecution.clone());
         } catch (TriggerExecutionException exception) {
-
             handleException(triggerExecution, exception);
 
             return triggerExecution;
@@ -207,18 +209,18 @@ public class TriggerWorker {
         Instant endDate = Instant.now();
         Instant startDate = triggerExecution.getStartDate();
 
+        triggerExecution.setEndDate(endDate);
         triggerExecution.setError(
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
-        triggerExecution.setStatus(TriggerExecution.Status.FAILED);
-        triggerExecution.setEndDate(endDate);
         triggerExecution.setExecutionTime(endDate.toEpochMilli() - startDate.toEpochMilli());
+        triggerExecution.setStatus(TriggerExecution.Status.FAILED);
 
         eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
     }
 
-    private record TriggerExecutionFuture<T>(TriggerExecution triggerExecution, Future<T> future) implements Future<T> {
+    private record TriggerExecutionFuture<T>(Future<T> future, TriggerExecution triggerExecution) implements Future<T> {
 
-        private TriggerExecutionFuture(TriggerExecution triggerExecution, Future<T> future) {
+        private TriggerExecutionFuture(Future<T> future, TriggerExecution triggerExecution) {
             this.triggerExecution = Validate.notNull(triggerExecution, "triggerExecution");
             this.future = Validate.notNull(future, "future");
         }
