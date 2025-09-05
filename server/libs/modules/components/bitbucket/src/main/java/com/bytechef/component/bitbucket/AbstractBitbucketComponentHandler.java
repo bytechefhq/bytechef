@@ -17,6 +17,7 @@
 package com.bytechef.component.bitbucket;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.bitbucket.action.BitbucketCreateProjectAction;
@@ -38,6 +39,8 @@ public abstract class AbstractBitbucketComponentHandler implements OpenApiCompon
                     .actions(modifyActions(BitbucketCreateRepositoryAction.ACTION_DEFINITION,
                         BitbucketCreateProjectAction.ACTION_DEFINITION))
                     .connection(modifyConnection(BitbucketConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(BitbucketCreateRepositoryAction.ACTION_DEFINITION),
+                        tool(BitbucketCreateProjectAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override
