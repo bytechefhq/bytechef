@@ -76,7 +76,7 @@ public class PropertyValidator {
      * Validates array property with warnings support.
      */
     private static void validateArrayProperty(
-        JsonNode currentNode, String propertyName, JsonNode defValue, String propertyPath, 
+        JsonNode currentNode, String propertyName, JsonNode defValue, String propertyPath,
         StringBuilder errors, StringBuilder warnings) {
         if (!currentNode.has(propertyName)) {
             return;
@@ -92,7 +92,7 @@ public class PropertyValidator {
         // Check if this is a union type or object array
         JsonNode firstElement = defValue.get(0);
         boolean isUnionType = false;
-        
+
         if (firstElement.isTextual()) {
             // Check if all elements are simple text types (union)
             isUnionType = true;
@@ -103,7 +103,7 @@ public class PropertyValidator {
                 }
             }
         }
-        
+
         if (isUnionType) {
             // Array of simple types - use existing validation without warnings
             FieldValidator.validateArrayProperty(currentNode, propertyName, defValue, propertyPath, errors);
@@ -185,11 +185,11 @@ public class PropertyValidator {
         FieldValidator.validateStringTypeDefinition(currentNode, propertyName, defValue.asText(),
             propertyPath, errors, warnings, originalTaskDefinition, originalCurrentParams);
     }
-    
+
     /**
      * Recursively validates properties with array support for display conditions.
      */
-    public static void validatePropertiesRecursivelyWithArraySupport(
+    public static void validatePropertiesRecursively(
         JsonNode currentNode, JsonNode definitionNode, String path,
         StringBuilder errors, StringBuilder warnings,
         String originalTaskDefinition, String originalTaskDefinitionForArrays, String originalCurrentParams) {
@@ -222,18 +222,18 @@ public class PropertyValidator {
                     handleTextualProperty(currentNode, propertyName, defValue, propertyPath,
                         errors, warnings, originalTaskDefinition, originalCurrentParams);
                 } else if (defValue.isObject()) {
-                    validateNestedObjectWithArraySupport(currentNode, propertyName, defValue, propertyPath,
+                    validateNestedObject(currentNode, propertyName, defValue, propertyPath,
                         errors, warnings, originalTaskDefinition, originalTaskDefinitionForArrays, originalCurrentParams);
                 } else if (defValue.isArray() && defValue.size() > 0) {
                     validateArrayPropertyWithArraySupport(currentNode, propertyName, defValue, propertyPath, errors, warnings, originalTaskDefinitionForArrays, originalCurrentParams);
                 }
             });
     }
-    
+
     /**
      * Validates nested object properties with array support.
      */
-    private static void validateNestedObjectWithArraySupport(
+    private static void validateNestedObject(
         JsonNode currentNode, String propertyName, JsonNode defValue,
         String propertyPath, StringBuilder errors, StringBuilder warnings,
         String originalTaskDefinition, String originalTaskDefinitionForArrays, String originalCurrentParams) {
@@ -244,7 +244,7 @@ public class PropertyValidator {
 
         JsonNode currentValue = currentNode.get(propertyName);
         if (currentValue.isObject()) {
-            validatePropertiesRecursivelyWithArraySupport(currentValue, defValue, propertyPath,
+            validatePropertiesRecursively(currentValue, defValue, propertyPath,
                 errors, warnings, originalTaskDefinition, originalTaskDefinitionForArrays, originalCurrentParams);
         } else {
             String actualType = WorkflowParser.getJsonNodeType(currentValue);
@@ -252,12 +252,12 @@ public class PropertyValidator {
                 ValidationErrorBuilder.typeError(propertyPath, "object", actualType));
         }
     }
-    
+
     /**
      * Validates array property with array support for display conditions.
      */
     private static void validateArrayPropertyWithArraySupport(
-        JsonNode currentNode, String propertyName, JsonNode defValue, String propertyPath, 
+        JsonNode currentNode, String propertyName, JsonNode defValue, String propertyPath,
         StringBuilder errors, StringBuilder warnings, String originalTaskDefinitionForArrays, String originalCurrentParams) {
         if (!currentNode.has(propertyName)) {
             return;
@@ -272,10 +272,10 @@ public class PropertyValidator {
 
         // Check if this is a union type (array of simple types) or object array
         boolean isUnionType = false;
-        
+
         if (defValue.size() > 0) {
             JsonNode firstElement = defValue.get(0);
-            
+
             if (firstElement.isTextual()) {
                 // Check if all elements are simple text types (union type)
                 isUnionType = true;
@@ -287,10 +287,10 @@ public class PropertyValidator {
                 }
             }
         }
-        
+
         if (isUnionType) {
             // Check if this is a TASK type array first
-            if (defValue.size() == 1 && defValue.get(0).isTextual() && 
+            if (defValue.size() == 1 && defValue.get(0).isTextual() &&
                 "task".equalsIgnoreCase(defValue.get(0).asText())) {
                 // Handle TASK type arrays specially
                 validateTaskArray(currentValue, propertyPath, errors, warnings);
@@ -300,27 +300,27 @@ public class PropertyValidator {
             FieldValidator.validateArrayProperty(currentNode, propertyName, defValue, propertyPath, errors);
         } else if (defValue.size() > 0) {
             JsonNode arrayElementDef = defValue.get(0);
-            
+
             // Check if this is a TASK type array
             if (arrayElementDef.isTextual() && "task".equalsIgnoreCase(arrayElementDef.asText())) {
                 // Handle TASK type arrays specially
                 validateTaskArray(currentValue, propertyPath, errors, warnings);
                 return;
             }
-            
+
             // Check if this is an array of arrays (nested arrays)
             if (arrayElementDef.isArray()) {
                 // Handle array of arrays - validate each sub-array
                 for (int i = 0; i < currentValue.size(); i++) {
                     JsonNode subArray = currentValue.get(i);
                     String subArrayPath = propertyPath + "[" + i + "]";
-                    
+
                     if (!subArray.isArray()) {
                         String actualType = WorkflowParser.getJsonNodeType(subArray);
                         ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(subArrayPath, "array", actualType));
                         continue;
                     }
-                    
+
                     // Recursively validate the sub-array using the array element definition
                     try {
                         JsonNode originalTaskDefNode = WorkflowParser.parseJsonString(originalTaskDefinitionForArrays);
@@ -334,7 +334,7 @@ public class PropertyValidator {
                             validateDiscriminatedUnionArray(subArray, arrayElementDef, subArrayPath, errors, warnings);
                         }
                     } catch (Exception e) {
-                        // Fallback to processed definition  
+                        // Fallback to processed definition
                         validateDiscriminatedUnionArray(subArray, arrayElementDef, subArrayPath, errors, warnings);
                     }
                 }
@@ -366,24 +366,24 @@ public class PropertyValidator {
         for (int i = 0; i < arrayValue.size(); i++) {
             JsonNode taskElement = arrayValue.get(i);
             String elementPath = propertyPath + "[" + i + "]";
-            
+
             if (!taskElement.isObject()) {
                 String actualType = WorkflowParser.getJsonNodeType(taskElement);
                 ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(elementPath, "object", actualType));
                 continue;
             }
-            
+
             // Validate task structure using WorkflowValidator.validateTaskStructure
             WorkflowValidator.validateTaskStructure(taskElement.toString(), errors);
-            
+
             // If task has parameters, validate them recursively if we have the task type
             if (taskElement.has("parameters") && taskElement.has("type")) {
                 JsonNode parameters = taskElement.get("parameters");
                 String taskType = taskElement.get("type").asText();
-                
+
                 // For now, we'll skip detailed parameter validation since we don't have task definitions
                 // This could be enhanced in the future to lookup task definitions and validate parameters
-                
+
                 // Basic parameter structure validation
                 if (!parameters.isObject()) {
                     String actualType = WorkflowParser.getJsonNodeType(parameters);
@@ -400,34 +400,34 @@ public class PropertyValidator {
         for (int i = 0; i < arrayValue.size(); i++) {
             JsonNode element = arrayValue.get(i);
             String elementPath = propertyPath + "[" + i + "]";
-            
+
             if (!element.isObject()) {
                 String actualType = WorkflowParser.getJsonNodeType(element);
                 ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(elementPath, "object", actualType));
                 continue;
             }
-            
+
             // Find the matching schema based on discriminator field (typically "type")
             boolean foundMatch = false;
             if (element.has("type")) {
                 String typeValue = element.get("type").asText();
-                
+
                 // Look for a schema that matches this type
                 if (unionDef.has(typeValue)) {
                     JsonNode schema = unionDef.get(typeValue);
                     if (schema.isObject()) {
                         // Create a single-element array for validation
-                        com.fasterxml.jackson.databind.node.ArrayNode singleElementArray = 
+                        com.fasterxml.jackson.databind.node.ArrayNode singleElementArray =
                             com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.arrayNode();
                         singleElementArray.add(element);
-                        
+
                         // Validate this element against the matching schema
                         FieldValidator.validateObjectArrayElementsWithWarnings(singleElementArray, schema, elementPath.substring(0, elementPath.lastIndexOf('[')), errors, warnings);
                         foundMatch = true;
                     }
                 }
             }
-            
+
             if (!foundMatch) {
                 // No matching schema found, but since this is a discriminated union with non-required elements,
                 // we'll be lenient and not generate warnings. This allows for flexible validation of union types.

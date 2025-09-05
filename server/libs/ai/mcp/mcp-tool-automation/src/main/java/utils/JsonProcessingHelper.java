@@ -67,8 +67,7 @@ public class JsonProcessingHelper {
         }
 
         if (!node.isObject()) {
-            errors.append(nodeType)
-                .append(" must be an object");
+            errors.append(nodeType).append(" must be an object");
             return false;
         }
 
