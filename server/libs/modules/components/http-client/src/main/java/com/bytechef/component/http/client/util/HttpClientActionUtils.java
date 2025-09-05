@@ -41,6 +41,7 @@ import static com.bytechef.component.http.client.constant.HttpClientComponentCon
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.IGNORE_RESPONSE_CODE;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.PROXY;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.QUERY_PARAMETERS;
+import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.RESPONSE_CONTENT_TYPE;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.RESPONSE_FILENAME;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.TIMEOUT;
@@ -270,7 +271,18 @@ public class HttpClientActionUtils {
     }
 
     private static ResponseType getResponseType(Parameters inputParameters) {
-        return inputParameters.containsKey(RESPONSE_FORMAT)
-            ? Http.ResponseType.valueOf(inputParameters.getString(RESPONSE_FORMAT)) : ResponseType.JSON;
+        if (inputParameters.containsKey(RESPONSE_FORMAT)) {
+            String responseFormat = inputParameters.getString(RESPONSE_FORMAT);
+
+            if (responseFormat.equals(String.valueOf(ResponseType.BINARY.getType()))) {
+                String responseContentType = inputParameters.getString(RESPONSE_CONTENT_TYPE);
+
+                return ResponseType.binary(responseContentType);
+            } else {
+                return Http.ResponseType.valueOf(responseFormat);
+            }
+        } else {
+            return ResponseType.JSON;
+        }
     }
 }

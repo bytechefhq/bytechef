@@ -45,6 +45,7 @@ public class HttpClientComponentConstants {
     public static final String IGNORE_RESPONSE_CODE = "ignoreResponseCode";
     public static final String PROXY = "proxy";
     public static final String QUERY_PARAMETERS = "queryParameters";
+    public static final String RESPONSE_CONTENT_TYPE = "responseContentType";
     public static final String RESPONSE_FILENAME = "responseFilename";
     public static final String RESPONSE_FORMAT = "responseType";
     public static final String TIMEOUT = "timeout";
@@ -86,6 +87,11 @@ public class HttpClientComponentConstants {
                         "File", String.valueOf(ResponseType.BINARY.getType()),
                         "The response is returned as a file object."))
                 .defaultValue(String.valueOf(ResponseType.JSON.getType())),
+            string(RESPONSE_CONTENT_TYPE)
+                .label("Content Type")
+                .defaultValue("application/octet-stream")
+                .displayCondition("%s == '%s'".formatted(RESPONSE_FORMAT, ResponseType.BINARY.getType()))
+                .required(true),
             string(RESPONSE_FILENAME)
                 .label("Response Filename")
                 .description("The name of the file if the response is returned as a file object.")
