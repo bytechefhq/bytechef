@@ -18085,9 +18085,12 @@
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Use the scan ID to retrieve the screenshot for a scan once the scan has finished.",
+    "description" : "Use the scan UUID to retrieve the screenshot for a scan once the scan has finished.",
     "help" : null,
-    "metadata" : null,
+    "metadata" : {
+      "method" : "GET",
+      "path" : "/screenshots/{scanId}.png"
+    },
     "name" : "screenshot",
     "outputDefinition" : {
       "output" : null,
@@ -18096,13 +18099,18 @@
           "advancedOption" : null,
           "controlType" : "FILE_ENTRY",
           "defaultValue" : null,
-          "description" : "Screenshot that was created.",
+          "description" : null,
           "displayCondition" : null,
           "exampleValue" : null,
           "expressionEnabled" : null,
           "hidden" : null,
           "label" : null,
-          "metadata" : { },
+          "metadata" : {
+            "responseType" : {
+              "contentType" : "image/png",
+              "type" : "BINARY"
+            }
+          },
           "name" : null,
           "placeholder" : null,
           "properties" : [ {
@@ -18200,13 +18208,18 @@
         "advancedOption" : null,
         "controlType" : "FILE_ENTRY",
         "defaultValue" : null,
-        "description" : "Screenshot that was created.",
+        "description" : null,
         "displayCondition" : null,
         "exampleValue" : null,
         "expressionEnabled" : null,
         "hidden" : null,
         "label" : null,
-        "metadata" : { },
+        "metadata" : {
+          "responseType" : {
+            "contentType" : "image/png",
+            "type" : "BINARY"
+          }
+        },
         "name" : null,
         "placeholder" : null,
         "properties" : [ {
@@ -18299,7 +18312,7 @@
       },
       "sampleOutput" : null
     },
-    "perform" : { },
+    "perform" : null,
     "processErrorResponse" : null,
     "properties" : [ {
       "advancedOption" : null,
@@ -18310,10 +18323,12 @@
       "exampleValue" : null,
       "expressionEnabled" : null,
       "hidden" : null,
-      "label" : "Scan ID",
+      "label" : "Scan Id",
       "languageId" : null,
       "maxLength" : null,
-      "metadata" : { },
+      "metadata" : {
+        "type" : "PATH"
+      },
       "minLength" : null,
       "name" : "scanId",
       "options" : null,
@@ -36406,7 +36421,7 @@
       "required" : false
     }
   }, {
-    "description" : "Use the scan ID to retrieve the screenshot for a scan once the scan has finished.",
+    "description" : "Use the scan UUID to retrieve the screenshot for a scan once the scan has finished.",
     "element" : { },
     "help" : null,
     "name" : "screenshot",
@@ -36417,13 +36432,18 @@
           "advancedOption" : null,
           "controlType" : "FILE_ENTRY",
           "defaultValue" : null,
-          "description" : "Screenshot that was created.",
+          "description" : null,
           "displayCondition" : null,
           "exampleValue" : null,
           "expressionEnabled" : null,
           "hidden" : null,
           "label" : null,
-          "metadata" : { },
+          "metadata" : {
+            "responseType" : {
+              "contentType" : "image/png",
+              "type" : "BINARY"
+            }
+          },
           "name" : null,
           "placeholder" : null,
           "properties" : [ {
@@ -36521,13 +36541,18 @@
         "advancedOption" : null,
         "controlType" : "FILE_ENTRY",
         "defaultValue" : null,
-        "description" : "Screenshot that was created.",
+        "description" : null,
         "displayCondition" : null,
         "exampleValue" : null,
         "expressionEnabled" : null,
         "hidden" : null,
         "label" : null,
-        "metadata" : { },
+        "metadata" : {
+          "responseType" : {
+            "contentType" : "image/png",
+            "type" : "BINARY"
+          }
+        },
         "name" : null,
         "placeholder" : null,
         "properties" : [ {
@@ -36629,10 +36654,12 @@
       "exampleValue" : null,
       "expressionEnabled" : null,
       "hidden" : null,
-      "label" : "Scan ID",
+      "label" : "Scan Id",
       "languageId" : null,
       "maxLength" : null,
-      "metadata" : { },
+      "metadata" : {
+        "type" : "PATH"
+      },
       "minLength" : null,
       "name" : "scanId",
       "options" : null,
