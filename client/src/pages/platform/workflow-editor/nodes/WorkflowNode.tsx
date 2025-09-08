@@ -20,7 +20,7 @@ import {useShallow} from 'zustand/react/shallow';
 import {
     calculateNodeWidth,
     convertNameToCamelCase,
-    getClusterElementTypesCount,
+    getFilteredClusterElementTypes,
     getHandlePosition,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useNodeClickHandler from '../hooks/useNodeClick';
@@ -115,15 +115,20 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             return 0;
         }
 
-        return getClusterElementTypesCount({
+        const filteredClusterElementTypes = getFilteredClusterElementTypes({
             clusterRootComponentDefinition: rootClusterElementDefinition,
+            currentClusterElementsType: data.clusterElementType,
+            isNestedClusterRoot,
             operationName: data.operationName,
         });
+
+        return filteredClusterElementTypes.length;
     }, [
         clusterElementsCanvasOpen,
-        isNestedClusterRoot,
         isMainRootClusterElement,
+        isNestedClusterRoot,
         rootClusterElementDefinition,
+        data.clusterElementType,
         data.operationName,
     ]);
 
