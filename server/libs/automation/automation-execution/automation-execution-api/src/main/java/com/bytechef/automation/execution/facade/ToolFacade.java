@@ -17,18 +17,20 @@
 package com.bytechef.automation.execution.facade;
 
 import com.bytechef.automation.execution.dto.ToolDTO;
-import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.mcp.domain.McpTool;
 import java.util.List;
 import java.util.Map;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 
 /**
  * @author Matija Petanjek
  */
 public interface ToolFacade {
 
-    List<ToolDTO> getTools();
+    FunctionToolCallback<Map<String, Object>, Object> getFunctionToolCallback(ToolDTO toolDTO);
 
-    Object executeTool(
-        String toolName, Map<String, Object> inputParameters, Long connectionId, Environment environment);
+    ToolDTO toToolDTO(McpTool mcpTool);
+
+    List<ToolDTO> getTools();
 
 }
