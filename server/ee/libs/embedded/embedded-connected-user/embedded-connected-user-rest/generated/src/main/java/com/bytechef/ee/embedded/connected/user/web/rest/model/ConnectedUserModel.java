@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUser")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-05T21:43:45.131793+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:45.635782+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectedUserModel {
 
   private @Nullable String createdBy;
