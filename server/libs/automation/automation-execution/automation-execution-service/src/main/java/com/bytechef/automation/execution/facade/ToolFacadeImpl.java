@@ -21,13 +21,15 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.mcp.domain.McpComponent;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.stereotype.Service;
 
 /**
@@ -54,39 +56,38 @@ public class ToolFacadeImpl implements ToolFacade {
     }
 
     @Override
+    public FunctionToolCallback<Map<String, Object>, Object> getFunctionToolCallback(ToolDTO toolDTO) {
+        FunctionToolCallback.Builder<Map<String, Object>, Object> functionToolCallbackBuilder =
+            FunctionToolCallback.builder(
+                toolDTO.name(), getToolCallbackFunction(toolDTO.name(), toolDTO.connectionId()))
+                .inputType(Map.class)
+                .inputSchema(toolDTO.parameters())
+                .description(toolDTO.description());
+
+        return functionToolCallbackBuilder.build();
+    }
+
+    @Override
     public List<ToolDTO> getTools() {
         return mcpToolService.getMcpTools()
             .stream()
-            .map(mcpTool -> {
-                McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
-
-                ClusterElementDefinition clusterElementDefinition =
-                    clusterElementDefinitionService.getClusterElementDefinition(
-                        mcpComponent.getComponentName(), mcpTool.getName());
-
-                return new ToolDTO(
-                    getToolName(mcpComponent.getComponentName(), clusterElementDefinition.getName()),
-                    clusterElementDefinition.getDescription(),
-                    JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()),
-                    mcpComponent.getConnectionId());
-            })
+            .map(this::toToolDTO)
             .toList();
     }
 
     @Override
-    public Object executeTool(
-        String toolName, Map<String, Object> inputParameters, Long connectionId, Environment environment) {
+    public ToolDTO toToolDTO(McpTool mcpTool) {
+        McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
 
-        ComponentClusterElementNameResult result = getComponentClusterElementNames(toolName);
+        ClusterElementDefinition clusterElementDefinition =
+            clusterElementDefinitionService.getClusterElementDefinition(
+                mcpComponent.getComponentName(), mcpTool.getName());
 
-        ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService.getClusterElementDefinition(
-            result.componentName(), result.clusterElementName());
-
-        String componentName = clusterElementDefinition.getComponentName();
-
-        return clusterElementDefinitionFacade.executeTool(
-            componentName, clusterElementDefinition.getComponentVersion(), clusterElementDefinition.getName(),
-            inputParameters, connectionId);
+        return new ToolDTO(
+            getToolName(mcpComponent.getComponentName(), clusterElementDefinition.getName()),
+            clusterElementDefinition.getDescription(),
+            JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()),
+            mcpComponent.getConnectionId());
     }
 
     private String getToolName(String componentName, String clusterElementName) {
@@ -133,6 +134,22 @@ public class ToolFacadeImpl implements ToolFacade {
         }
 
         return new ComponentClusterElementNameResult(componentName, clusterElementName.toString());
+    }
+
+    private Function<Map<String, Object>, Object> getToolCallbackFunction(String toolName, Long connectionId) {
+        return inputParameters -> {
+            ComponentClusterElementNameResult result = getComponentClusterElementNames(toolName);
+
+            ClusterElementDefinition clusterElementDefinition =
+                clusterElementDefinitionService.getClusterElementDefinition(
+                    result.componentName(), result.clusterElementName());
+
+            String componentName = clusterElementDefinition.getComponentName();
+
+            return clusterElementDefinitionFacade.executeTool(
+                componentName, clusterElementDefinition.getComponentVersion(), clusterElementDefinition.getName(),
+                inputParameters, connectionId);
+        };
     }
 
     private record ComponentClusterElementNameResult(String componentName, String clusterElementName) {

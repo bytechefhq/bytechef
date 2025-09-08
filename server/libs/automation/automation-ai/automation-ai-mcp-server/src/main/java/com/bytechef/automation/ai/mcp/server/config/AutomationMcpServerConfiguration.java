@@ -18,7 +18,6 @@ package com.bytechef.automation.ai.mcp.server.config;
 
 import com.bytechef.automation.execution.dto.ToolDTO;
 import com.bytechef.automation.execution.facade.ToolFacade;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpServer;
@@ -28,12 +27,10 @@ import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpServerTransportProvider;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -83,23 +80,11 @@ public class AutomationMcpServerConfiguration {
         List<ToolDTO> toolDTOs = toolFacade.getTools();
 
         for (ToolDTO toolDTO : toolDTOs) {
-            FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
-                .builder(toolDTO.name(), getToolCallbackFunction(toolDTO.name(), toolDTO.connectionId()))
-                .inputType(Map.class)
-                .inputSchema(toolDTO.parameters());
 
-            if (toolDTO.description() != null) {
-                builder.description(toolDTO.description());
-            }
-
-            toolCallbacks.add(builder.build());
+            toolCallbacks.add(toolFacade.getFunctionToolCallback(toolDTO));
         }
 
         return toolCallbacks;
     }
 
-    private Function<Map<String, Object>, Object> getToolCallbackFunction(String toolName, Long connectionId) {
-        return inputParameters -> toolFacade.executeTool(toolName, inputParameters, connectionId,
-            Environment.PRODUCTION);
-    }
 }
