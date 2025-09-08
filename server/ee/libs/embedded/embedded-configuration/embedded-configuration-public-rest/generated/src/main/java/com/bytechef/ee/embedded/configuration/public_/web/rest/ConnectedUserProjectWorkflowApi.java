@@ -9,6 +9,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUs
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendWorkflowConfigurationConnectionRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:45.313225+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:21:26.689053+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Automation Workflow Public API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -614,6 +615,47 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
+     * PUT /automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey} : Update a workflow configuration connection
+     * Update a workflow configuration connection.
+     *
+     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowNodeName The action/trigger name defined in the workflow. (required)
+     * @param workflowConnectionKey The name of a workflow connection key. (required)
+     * @param updateFrontendWorkflowConfigurationConnectionRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "updateFrontendWorkflowConfigurationConnection",
+        summary = "Update a workflow configuration connection",
+        description = "Update a workflow configuration connection.",
+        tags = { "connected-user-project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey}",
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<Void> updateFrontendWorkflowConfigurationConnection(
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "workflowConnectionKey", description = "The name of a workflow connection key.", required = true, in = ParameterIn.PATH) @PathVariable("workflowConnectionKey") String workflowConnectionKey,
+        @Parameter(name = "UpdateFrontendWorkflowConfigurationConnectionRequestModel", description = "", required = true) @Valid @RequestBody UpdateFrontendWorkflowConfigurationConnectionRequestModel updateFrontendWorkflowConfigurationConnectionRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
      * PUT /{externalUserId}/automation/workflows/{workflowReferenceCode} : Update an existing workflow
      * Update an existing workflow.
      *
@@ -645,6 +687,49 @@ public interface ConnectedUserProjectWorkflowApi {
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
         @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /{externalUserId}/automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey} : Update a workflow configuration connection
+     * Update a workflow configuration connection.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowNodeName The action/trigger name defined in the workflow. (required)
+     * @param workflowConnectionKey The name of a workflow connection key. (required)
+     * @param updateFrontendWorkflowConfigurationConnectionRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "updateWorkflowConfigurationConnection",
+        summary = "Update a workflow configuration connection",
+        description = "Update a workflow configuration connection.",
+        tags = { "connected-user-project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey}",
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<Void> updateWorkflowConfigurationConnection(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "workflowConnectionKey", description = "The name of a workflow connection key.", required = true, in = ParameterIn.PATH) @PathVariable("workflowConnectionKey") String workflowConnectionKey,
+        @Parameter(name = "UpdateFrontendWorkflowConfigurationConnectionRequestModel", description = "", required = true) @Valid @RequestBody UpdateFrontendWorkflowConfigurationConnectionRequestModel updateFrontendWorkflowConfigurationConnectionRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

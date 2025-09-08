@@ -17,33 +17,33 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateFrontendProjectWorkflowRequestModel
+ * UpdateFrontendWorkflowConfigurationConnectionRequestModel
  */
 
-@JsonTypeName("createFrontendProjectWorkflow_request")
+@JsonTypeName("updateFrontendWorkflowConfigurationConnection_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:21:26.689053+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
-public class CreateFrontendProjectWorkflowRequestModel {
+public class UpdateFrontendWorkflowConfigurationConnectionRequestModel {
 
-  private @Nullable String definition;
+  private @Nullable Long connectionId;
 
-  public CreateFrontendProjectWorkflowRequestModel definition(@Nullable String definition) {
-    this.definition = definition;
+  public UpdateFrontendWorkflowConfigurationConnectionRequestModel connectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
     return this;
   }
 
   /**
-   * The workflow definition
-   * @return definition
+   * Get connectionId
+   * @return connectionId
    */
   
-  @Schema(name = "definition", description = "The workflow definition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("definition")
-  public @Nullable String getDefinition() {
-    return definition;
+  @Schema(name = "connectionId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionId")
+  public @Nullable Long getConnectionId() {
+    return connectionId;
   }
 
-  public void setDefinition(@Nullable String definition) {
-    this.definition = definition;
+  public void setConnectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
   }
 
   @Override
@@ -54,20 +54,20 @@ public class CreateFrontendProjectWorkflowRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequest = (CreateFrontendProjectWorkflowRequestModel) o;
-    return Objects.equals(this.definition, createFrontendProjectWorkflowRequest.definition);
+    UpdateFrontendWorkflowConfigurationConnectionRequestModel updateFrontendWorkflowConfigurationConnectionRequest = (UpdateFrontendWorkflowConfigurationConnectionRequestModel) o;
+    return Objects.equals(this.connectionId, updateFrontendWorkflowConfigurationConnectionRequest.connectionId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(definition);
+    return Objects.hash(connectionId);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateFrontendProjectWorkflowRequestModel {\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("class UpdateFrontendWorkflowConfigurationConnectionRequestModel {\n");
+    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("}");
     return sb.toString();
   }

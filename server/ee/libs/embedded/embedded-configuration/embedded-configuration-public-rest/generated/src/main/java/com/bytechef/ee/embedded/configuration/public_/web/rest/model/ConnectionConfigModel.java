@@ -24,12 +24,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Contains all required information to open a connection to a service defined by componentName parameter.
+ * The connection configuration
  */
 
-@Schema(name = "ConnectionConfig", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
+@Schema(name = "ConnectionConfig", description = "The connection configuration")
 @JsonTypeName("ConnectionConfig")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:45.313225+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:21:26.689053+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectionConfigModel {
 
   private @Nullable AuthorizationTypeModel authorizationType;
