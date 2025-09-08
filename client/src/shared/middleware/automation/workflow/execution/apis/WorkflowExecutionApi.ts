@@ -30,6 +30,7 @@ export interface GetWorkflowExecutionRequest {
 }
 
 export interface GetWorkflowExecutionsPageRequest {
+    id: number;
     embedded?: boolean;
     environmentId?: number;
     jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
@@ -90,6 +91,13 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get project workflow executions
      */
     async getWorkflowExecutionsPageRaw(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowExecutionsPage().'
+            );
+        }
+
         const queryParameters: any = {};
 
         if (requestParameters['embedded'] != null) {
@@ -131,7 +139,8 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/workflow-executions`;
+        let urlPath = `/workspaces/{id}/workflow-executions`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
         const response = await this.request({
             path: urlPath,
@@ -147,7 +156,7 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get project workflow executions.
      * Get project workflow executions
      */
-    async getWorkflowExecutionsPage(requestParameters: GetWorkflowExecutionsPageRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Page> {
+    async getWorkflowExecutionsPage(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Page> {
         const response = await this.getWorkflowExecutionsPageRaw(requestParameters, initOverrides);
         return await response.value();
     }
