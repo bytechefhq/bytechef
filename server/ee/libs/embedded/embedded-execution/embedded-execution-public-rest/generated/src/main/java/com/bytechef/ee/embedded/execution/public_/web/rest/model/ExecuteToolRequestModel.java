@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeTool_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-05T21:43:45.205041+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:45.709110+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ExecuteToolRequestModel {
 
   private String name;

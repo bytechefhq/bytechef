@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NotificationEvent", description = "A notification event definition.")
 @JsonTypeName("NotificationEvent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-05T21:43:44.442673+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:44.999960+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class NotificationEventModel {
 
   private Long id;

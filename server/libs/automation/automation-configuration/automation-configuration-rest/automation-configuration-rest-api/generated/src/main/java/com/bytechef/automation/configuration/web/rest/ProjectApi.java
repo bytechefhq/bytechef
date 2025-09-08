@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-05T21:43:46.360859+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:46.573431+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "project", description = "The Automation Project Internal API")
 public interface ProjectApi {
@@ -144,6 +144,38 @@ public interface ProjectApi {
                 }
             }
         });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /projects/{id}/export : Export project.
+     * Export project as a zip file.
+     *
+     * @param id The id of a project. (required)
+     * @return The project export file. (status code 200)
+     */
+    @Operation(
+        operationId = "exportProject",
+        summary = "Export project.",
+        description = "Export project as a zip file.",
+        tags = { "project" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The project export file.", content = {
+                @Content(mediaType = "application/octet-stream", schema = @Schema(implementation = org.springframework.core.io.Resource.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/projects/{id}/export",
+        produces = { "application/octet-stream" }
+    )
+    
+    default ResponseEntity<org.springframework.core.io.Resource> exportProject(
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
+    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -279,6 +311,41 @@ public interface ProjectApi {
                 }
             }
         });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * POST /workspaces/{workspaceId}/projects/import : Import project.
+     * Import project from a zip file.
+     *
+     * @param workspaceId The id of the workspace. (required)
+     * @param file  (required)
+     * @return The imported project id. (status code 200)
+     */
+    @Operation(
+        operationId = "importProject",
+        summary = "Import project.",
+        description = "Import project from a zip file.",
+        tags = { "project" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The imported project id.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/workspaces/{workspaceId}/projects/import",
+        produces = { "application/json" },
+        consumes = { "multipart/form-data" }
+    )
+    
+    default ResponseEntity<Long> importProject(
+        @Parameter(name = "workspaceId", description = "The id of the workspace.", required = true, in = ParameterIn.PATH) @PathVariable("workspaceId") Long workspaceId,
+        @Parameter(name = "file", description = "", required = true) @RequestPart(value = "file", required = true) MultipartFile file
+    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
