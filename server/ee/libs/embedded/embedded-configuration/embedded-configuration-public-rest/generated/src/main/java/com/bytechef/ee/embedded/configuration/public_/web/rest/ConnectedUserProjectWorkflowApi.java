@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:21:26.689053+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:25:09.264658+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Automation Workflow Public API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -615,7 +615,7 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * PUT /automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey} : Update a workflow configuration connection
+     * PUT /automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey} : Update a workflow configuration connection
      * Update a workflow configuration connection.
      *
      * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
@@ -639,7 +639,7 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey}",
+        value = "/automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey}",
         consumes = { "application/json" }
     )
     
@@ -695,7 +695,7 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * PUT /{externalUserId}/automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey} : Update a workflow configuration connection
+     * PUT /{externalUserId}/automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connections/{workflowConnectionKey} : Update a workflow configuration connection
      * Update a workflow configuration connection.
      *
      * @param externalUserId The external user id. (required)
@@ -720,7 +720,7 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey}",
+        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connections/{workflowConnectionKey}",
         consumes = { "application/json" }
     )
     
