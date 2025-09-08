@@ -61,8 +61,7 @@ public class McpToolGraphQlController {
 
     @MutationMapping
     public McpTool createMcpTool(@Argument McpToolInput input) {
-        return mcpToolService.create(
-            new McpTool(input.name(), input.parameters(), input.mcpComponentId()));
+        return mcpToolService.create(new McpTool(input.name(), input.parameters(), input.mcpComponentId()));
     }
 
     @SuppressFBWarnings("EI")
