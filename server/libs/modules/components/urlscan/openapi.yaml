@@ -997,27 +997,27 @@ paths:
                     properties:
                       country:
                         type: "string"
-#  /screenshots/{scanId}.png:
-#    get:
-#      summary: "Screenshot"
-#      description: "Use the scan UUID to retrieve the screenshot for a scan once the scan has finished."
-#      operationId: "screenshot"
-#      x-ai-agent-tool: true
-#      parameters:
-#        - name: "scanId"
-#          description: "UUID of scan result."
-#          in: "path"
-#          required: true
-#          schema:
-#            type: "string"
-#      responses:
-#        200:
-#          description: "Successful response"
-#          content:
-#            image/png:
-#              schema:
-#                type: "string"
-#                format: "binary"
+  /screenshots/{scanId}.png:
+    get:
+      summary: "Screenshot"
+      description: "Use the scan UUID to retrieve the screenshot for a scan once the scan has finished."
+      operationId: "screenshot"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "scanId"
+          description: "UUID of scan result."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            image/png:
+              schema:
+                type: "string"
+                format: "binary"
 
 components:
   securitySchemes:

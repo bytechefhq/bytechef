@@ -23,6 +23,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.urlscan.action.UrlscanResultAction;
 import com.bytechef.component.urlscan.action.UrlscanScanAction;
+import com.bytechef.component.urlscan.action.UrlscanScreenshotAction;
 import com.bytechef.component.urlscan.connection.UrlscanConnection;
 
 /**
@@ -36,10 +37,11 @@ public abstract class AbstractUrlscanComponentHandler implements OpenApiComponen
             .title("Urlscan.io")
             .description(
                 "Urlscan.io is an online service that allows you to safely analyze websites and URLs to determine potential security threats and risks."))
-                    .actions(modifyActions(UrlscanScanAction.ACTION_DEFINITION, UrlscanResultAction.ACTION_DEFINITION))
+                    .actions(modifyActions(UrlscanScanAction.ACTION_DEFINITION, UrlscanResultAction.ACTION_DEFINITION,
+                        UrlscanScreenshotAction.ACTION_DEFINITION))
                     .connection(modifyConnection(UrlscanConnection.CONNECTION_DEFINITION))
                     .clusterElements(modifyClusterElements(tool(UrlscanScanAction.ACTION_DEFINITION),
-                        tool(UrlscanResultAction.ACTION_DEFINITION)))
+                        tool(UrlscanResultAction.ACTION_DEFINITION), tool(UrlscanScreenshotAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

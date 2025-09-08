@@ -16,46 +16,41 @@
 
 package com.bytechef.component.urlscan.action;
 
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.urlscan.constant.UrlscanConstants.SCAN_ID;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.ComponentDsl;
+import java.util.Map;
 
 /**
- * @author Marija Horvat
+ * Provides a list of the component actions.
+ *
+ * @generated
  */
 public class UrlscanScreenshotAction {
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("screenshot")
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("screenshot")
         .title("Screenshot")
-        .description("Use the scan ID to retrieve the screenshot for a scan once the scan has finished.")
-        .properties(
-            string(SCAN_ID)
-                .label("Scan ID")
-                .description("UUID of scan result.")
-                .required(true))
-        .output(
-            outputSchema(
-                fileEntry()
-                    .description("Screenshot that was created.")))
-        .perform(UrlscanScreenshotAction::perform);
+        .description("Use the scan UUID to retrieve the screenshot for a scan once the scan has finished.")
+        .metadata(
+            Map.of(
+                "method", "GET",
+                "path", "/screenshots/{scanId}.png"
+
+            ))
+        .properties(string("scanId").label("Scan Id")
+            .description("UUID of scan result.")
+            .required(true)
+            .metadata(
+                Map.of(
+                    "type", PropertyType.PATH)))
+        .output(outputSchema(fileEntry().metadata(
+            Map.of(
+                "responseType", ResponseType.binary("image/png")))));
 
     private UrlscanScreenshotAction() {
-    }
-
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        return context.http(
-            http -> http.get("/screenshots/%s.png".formatted(inputParameters.getRequiredString(SCAN_ID))))
-            .configuration(responseType(ResponseType.binary("image/png")))
-            .execute()
-            .getBody();
     }
 }

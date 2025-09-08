@@ -16,32 +16,16 @@
 
 package com.bytechef.component.urlscan;
 
-import static com.bytechef.component.definition.ComponentDsl.tool;
-
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
-import com.bytechef.component.urlscan.action.UrlscanScreenshotAction;
 import com.google.auto.service.AutoService;
-import java.util.List;
 
 /**
  * This class will not be overwritten on the subsequent calls of the generator.
  */
 @AutoService(OpenApiComponentHandler.class)
 public class UrlscanComponentHandler extends AbstractUrlscanComponentHandler {
-
-    @Override
-    public List<? extends ModifiableActionDefinition> getCustomActions() {
-        return List.of(UrlscanScreenshotAction.ACTION_DEFINITION);
-    }
-
-    @Override
-    public List<ClusterElementDefinition<?>> getCustomClusterElements() {
-        return List.of(tool(UrlscanScreenshotAction.ACTION_DEFINITION));
-    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
