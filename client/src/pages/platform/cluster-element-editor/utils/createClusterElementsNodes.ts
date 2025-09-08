@@ -3,12 +3,13 @@ import {ClusterElementsType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import {createMultipleElementsNode, createPlaceholderNode, createSingleElementsNode} from './clusterElementsNodesUtils';
-import {convertNameToCamelCase, getClusterElementTypesCount, isPlainObject} from './clusterElementsUtils';
+import {convertNameToCamelCase, getFilteredClusterElementTypes, isPlainObject} from './clusterElementsUtils';
 
 interface CreateClusterElementNodesProps {
     clusterElements: ClusterElementsType;
-    currentRootComponentDefinition: ComponentDefinition;
     clusterRootId: string;
+    currentRootComponentDefinition: ComponentDefinition;
+    nestedClusterRootElementType?: string;
     nestedClusterRootsDefinitions: Record<string, ComponentDefinition>;
     operationName?: string;
 }
@@ -17,6 +18,7 @@ export default function createClusterElementNodes({
     clusterElements,
     clusterRootId,
     currentRootComponentDefinition,
+    nestedClusterRootElementType,
     nestedClusterRootsDefinitions,
     operationName = '',
 }: CreateClusterElementNodesProps) {
@@ -26,29 +28,16 @@ export default function createClusterElementNodes({
 
     const createdNodes: Node[] = [];
 
-    /**
-     * If current cluster root component has actionClusterElementTypes object in its definition,
-     * filter cluster element types based on the action (operationName) chosen by the user in the operations popover menu,
-     * if not then return all cluster element types from definition
-     */
-    const filteredClusterElementTypes = currentRootComponentDefinition.clusterElementTypes.filter((elementType) => {
-        if (!operationName) {
-            return true;
-        }
+    const nestedClusterRootRequirementMet =
+        nestedClusterRootElementType &&
+        nestedClusterRootsDefinitions &&
+        Object.keys(nestedClusterRootsDefinitions).length > 0;
 
-        const actionTypes = currentRootComponentDefinition.actionClusterElementTypes;
-
-        if (!actionTypes || Object.keys(actionTypes).length === 0) {
-            return true;
-        }
-
-        const operationElementTypes = actionTypes[operationName];
-
-        if (!operationElementTypes || operationElementTypes.length === 0) {
-            return true;
-        }
-
-        return operationElementTypes.includes(elementType.name || '');
+    const filteredClusterElementTypes = getFilteredClusterElementTypes({
+        clusterRootComponentDefinition: currentRootComponentDefinition,
+        currentClusterElementsType: nestedClusterRootElementType,
+        isNestedClusterRoot: !!nestedClusterRootRequirementMet,
+        operationName,
     });
 
     const parentClusterRootElementsTypeCount = filteredClusterElementTypes.length;
@@ -62,8 +51,10 @@ export default function createClusterElementNodes({
         if (isMultipleClusterElementsNode) {
             if (Array.isArray(clusterElementValue) && clusterElementValue.length) {
                 clusterElementValue.forEach((element) => {
-                    const clusterElementTypesCount = getClusterElementTypesCount({
+                    const clusterElementTypesCount = getFilteredClusterElementTypes({
                         clusterRootComponentDefinition: nestedClusterRootsDefinitions[element.type?.split('/')[0]],
+                        currentClusterElementsType: element.type?.split('/')[2] || '',
+                        isNestedClusterRoot: !!element.clusterElements,
                     });
 
                     // Create the multiple element node
@@ -71,7 +62,7 @@ export default function createClusterElementNodes({
                         clusterElementTypeName,
                         clusterRootId,
                         currentNestedRootElementTypesCount: element.clusterElements
-                            ? clusterElementTypesCount
+                            ? clusterElementTypesCount.length
                             : undefined,
                         element,
                         isMultipleClusterElementsNode,
@@ -94,6 +85,7 @@ export default function createClusterElementNodes({
                                 clusterElements: element.clusterElements,
                                 clusterRootId: element.name,
                                 currentRootComponentDefinition: nestedClusterRootDefinition,
+                                nestedClusterRootElementType: clusterElementTypeName,
                                 nestedClusterRootsDefinitions,
                             });
 
@@ -116,9 +108,11 @@ export default function createClusterElementNodes({
             createdNodes.push(placeholderNode);
         } else {
             if (clusterElementValue && isPlainObject(clusterElementValue)) {
-                const clusterElementTypesCount = getClusterElementTypesCount({
+                const clusterElementTypesCount = getFilteredClusterElementTypes({
                     clusterRootComponentDefinition:
                         nestedClusterRootsDefinitions[clusterElementValue.type?.split('/')[0]],
+                    currentClusterElementsType: clusterElementValue.type?.split('/')[2] || '',
+                    isNestedClusterRoot: !!clusterElementValue.clusterElements,
                 });
 
                 // Create the single element node
@@ -128,7 +122,7 @@ export default function createClusterElementNodes({
                     clusterElementTypeName,
                     clusterRootId,
                     currentNestedRootElementTypesCount: clusterElementValue.clusterElements
-                        ? clusterElementTypesCount
+                        ? clusterElementTypesCount.length
                         : undefined,
                 });
 
@@ -149,6 +143,7 @@ export default function createClusterElementNodes({
                             clusterElements: clusterElementValue.clusterElements,
                             clusterRootId: clusterElementValue.name,
                             currentRootComponentDefinition: nestedClusterRootDefinition,
+                            nestedClusterRootElementType: clusterElementTypeName,
                             nestedClusterRootsDefinitions,
                         });
 
