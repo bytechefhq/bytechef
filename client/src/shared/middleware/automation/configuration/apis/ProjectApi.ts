@@ -43,6 +43,10 @@ export interface DuplicateProjectRequest {
     id: number;
 }
 
+export interface ExportProjectRequest {
+    id: number;
+}
+
 export interface GetProjectRequest {
     id: number;
 }
@@ -59,6 +63,11 @@ export interface GetWorkspaceProjectsRequest {
     projectDeployments?: boolean;
     status?: ProjectStatus;
     tagId?: number;
+}
+
+export interface ImportProjectRequest {
+    workspaceId: number;
+    file: Blob;
 }
 
 export interface PublishProjectOperationRequest {
@@ -195,6 +204,45 @@ export class ProjectApi extends runtime.BaseAPI {
      */
     async duplicateProject(requestParameters: DuplicateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Project> {
         const response = await this.duplicateProjectRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Export project as a zip file.
+     * Export project.
+     */
+    async exportProjectRaw(requestParameters: ExportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling exportProject().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/projects/{id}/export`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.BlobApiResponse(response);
+    }
+
+    /**
+     * Export project as a zip file.
+     * Export project.
+     */
+    async exportProject(requestParameters: ExportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+        const response = await this.exportProjectRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -336,6 +384,77 @@ export class ProjectApi extends runtime.BaseAPI {
      */
     async getWorkspaceProjects(requestParameters: GetWorkspaceProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Project>> {
         const response = await this.getWorkspaceProjectsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Import project from a zip file.
+     * Import project.
+     */
+    async importProjectRaw(requestParameters: ImportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        if (requestParameters['workspaceId'] == null) {
+            throw new runtime.RequiredError(
+                'workspaceId',
+                'Required parameter "workspaceId" was null or undefined when calling importProject().'
+            );
+        }
+
+        if (requestParameters['file'] == null) {
+            throw new runtime.RequiredError(
+                'file',
+                'Required parameter "file" was null or undefined when calling importProject().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
+
+        let urlPath = `/workspaces/{workspaceId}/projects/import`;
+        urlPath = urlPath.replace(`{${"workspaceId"}}`, encodeURIComponent(String(requestParameters['workspaceId'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     * Import project from a zip file.
+     * Import project.
+     */
+    async importProject(requestParameters: ImportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
+        const response = await this.importProjectRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
