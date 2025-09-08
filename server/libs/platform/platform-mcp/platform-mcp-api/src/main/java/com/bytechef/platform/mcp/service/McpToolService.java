@@ -46,9 +46,9 @@ public interface McpToolService {
     /**
      * Deletes an MCP tool by ID.
      *
-     * @param mcpToolId the ID of the MCP tool to delete
+     * @param mcpTool the MCP tool to delete
      */
-    void delete(long mcpToolId);
+    void delete(McpTool mcpTool);
 
     /**
      * Fetches an MCP tool by ID.

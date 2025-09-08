@@ -110,7 +110,7 @@ public class McpToolServiceIntTest {
     public void testDelete() {
         McpTool mcpTool = mcpToolRepository.save(getMcpTool());
 
-        mcpToolService.delete(Validate.notNull(mcpTool.getId(), "id"));
+        mcpToolService.delete(Validate.notNull(mcpTool, "mcpTool"));
 
         assertThat(mcpToolRepository.findById(mcpTool.getId()))
             .isNotPresent();

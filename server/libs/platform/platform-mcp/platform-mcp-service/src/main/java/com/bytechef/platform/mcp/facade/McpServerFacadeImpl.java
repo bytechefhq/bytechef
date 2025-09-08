@@ -78,7 +78,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     @Override
     public void deleteMcpComponent(long mcpComponentId) {
         mcpToolService.getMcpComponentMcpTools(mcpComponentId)
-            .forEach(existingTool -> mcpToolService.delete(existingTool.getId()));
+            .forEach(existingTool -> mcpToolService.delete(existingTool));
 
         mcpComponentService.delete(mcpComponentId);
     }
@@ -88,7 +88,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
         mcpComponentService.getMcpServerMcpComponents(mcpServerId)
             .forEach(mcpComponent -> {
                 mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
-                    .forEach(mcpTool -> mcpToolService.delete(mcpTool.getId()));
+                    .forEach(mcpTool -> mcpToolService.delete(mcpTool));
 
                 mcpComponentService.delete(mcpComponent.getId());
             });
@@ -141,7 +141,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
         McpComponent updatedComponent = mcpComponentService.update(mcpComponent);
 
         mcpToolService.getMcpComponentMcpTools(updatedComponent.getId())
-            .forEach(existingTool -> mcpToolService.delete(existingTool.getId()));
+            .forEach(existingTool -> mcpToolService.delete(existingTool));
 
         if (mcpTools != null && !mcpTools.isEmpty()) {
             for (McpTool mcpTool : mcpTools) {

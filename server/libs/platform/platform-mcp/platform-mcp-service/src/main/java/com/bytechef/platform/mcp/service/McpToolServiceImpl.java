@@ -56,8 +56,8 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
-    public void delete(long mcpToolId) {
-        mcpToolRepository.deleteById(mcpToolId);
+    public void delete(McpTool mcpTool) {
+        mcpToolRepository.delete(mcpTool);
     }
 
     @Override
