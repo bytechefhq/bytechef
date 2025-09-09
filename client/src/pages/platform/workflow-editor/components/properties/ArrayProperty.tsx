@@ -72,6 +72,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             ...matchingItem,
             controlType,
             custom: true,
+            expressionEnabled: true,
             label: `${matchingItem?.label ?? 'Item'} ${arrayItems.length.toString()}`,
             name: `${matchingItem?.label ?? name}__${arrayItems.length.toString()}`,
             path: newItemPath,
