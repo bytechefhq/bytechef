@@ -538,20 +538,22 @@ public class ComponentTools {
                         if (action.isOutputSchemaDefined()) {
                             outputResponse = action.getOutputResponse();
                         } else if (action.isOutputFunctionDefined()) {
-                            outputResponse = actionDefinitionFacade.executeOutput(componentDefinition.getName(),
-                                componentDefinition.getVersion(), action.getName(), Map.of(), null);
-                        }
-                        if (outputResponse == null) {
                             try {
-                                var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
-                                    componentDefinition.getVersion(), action.getName(), null, null, null, null, null,
-                                    null, null, null, true);
-                                if (output != null) {
-                                    outputResponse = SchemaUtils.toOutput(output,
-                                        PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+                                outputResponse = actionDefinitionFacade.executeOutput(componentDefinition.getName(),
+                                    componentDefinition.getVersion(), action.getName(), Map.of(), null);
+                            }
+                            catch (Exception e) {
+                                try {
+                                    var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
+                                        componentDefinition.getVersion(), action.getName(), null, null, null, null, null,
+                                        null, null, null, true);
+                                    if (output != null) {
+                                        outputResponse = SchemaUtils.toOutput(output,
+                                            PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+                                    }
+                                } catch (Exception e2) {
+                                    throw new Exception("Please make a " + componentDefinition.getName() + " connector");
                                 }
-                            } catch (Exception e) {
-                                throw new Exception("Please make a " + componentDefinition.getName() + " connector");
                             }
                         }
                     }
