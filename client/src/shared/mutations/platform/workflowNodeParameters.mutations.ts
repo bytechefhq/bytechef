@@ -2,7 +2,6 @@ import {
     DeleteClusterElementParameter200Response,
     DeleteClusterElementParameterOperationRequest,
     DeleteWorkflowNodeParameterRequest,
-    UpdateClusterElementParameter200Response,
     UpdateClusterElementParameterOperationRequest,
     UpdateWorkflowNodeParameterRequest,
     WorkflowNodeParameterApi,
@@ -45,7 +44,7 @@ export const useDeleteClusterElementParameterMutation = (mutationProps?: DeleteC
 
 interface UpdateWorkflowNodeParameterProps {
     onSuccess?: (
-        result: UpdateClusterElementParameter200Response,
+        result: DeleteClusterElementParameter200Response,
         variables: UpdateWorkflowNodeParameterRequest
     ) => void;
     onError?: (error: Error, variables: UpdateWorkflowNodeParameterRequest) => void;
@@ -62,7 +61,7 @@ export const useUpdateWorkflowNodeParameterMutation = (mutationProps?: UpdateWor
 
 interface UpdateClusterElementParameterProps {
     onSuccess?: (
-        result: UpdateClusterElementParameter200Response,
+        result: DeleteClusterElementParameter200Response,
         variables: UpdateClusterElementParameterOperationRequest
     ) => void;
     onError?: (error: Error, variables: UpdateClusterElementParameterOperationRequest) => void;

@@ -1,6 +1,6 @@
 import {environmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {
-    UpdateClusterElementParameter200Response,
+    DeleteClusterElementParameter200Response,
     UpdateClusterElementParameterOperationRequest,
     UpdateWorkflowNodeParameterRequest,
 } from '@/shared/middleware/platform/configuration';
@@ -16,13 +16,13 @@ interface SavePropertyProps {
     successCallback?: () => void;
     type: string;
     updateClusterElementParameterMutation?: UseMutationResult<
-        UpdateClusterElementParameter200Response & {workflowNodeName?: string},
+        DeleteClusterElementParameter200Response & {workflowNodeName?: string},
         Error,
         UpdateClusterElementParameterOperationRequest,
         unknown
     >;
     updateWorkflowNodeParameterMutation: UseMutationResult<
-        UpdateClusterElementParameter200Response & {workflowNodeName?: string},
+        DeleteClusterElementParameter200Response & {workflowNodeName?: string},
         Error,
         UpdateWorkflowNodeParameterRequest,
         unknown

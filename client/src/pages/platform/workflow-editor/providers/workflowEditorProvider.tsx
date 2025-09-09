@@ -6,7 +6,6 @@ import {
     DeleteClusterElementParameterOperationRequest,
     DeleteWorkflowNodeParameterRequest,
     Tag,
-    UpdateClusterElementParameter200Response,
     UpdateClusterElementParameterOperationRequest,
     UpdateWorkflowNodeParameterRequest,
 } from '@/shared/middleware/platform/configuration';
@@ -103,13 +102,13 @@ export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     invalidateWorkflowQueries: () => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     updateWorkflowNodeParameterMutation: UseMutationResult<
-        UpdateClusterElementParameter200Response,
+        DeleteClusterElementParameter200Response,
         Error,
         UpdateWorkflowNodeParameterRequest,
         unknown
     >;
     updateClusterElementParameterMutation: UseMutationResult<
-        UpdateClusterElementParameter200Response,
+        DeleteClusterElementParameter200Response,
         Error,
         UpdateClusterElementParameterOperationRequest,
         unknown
