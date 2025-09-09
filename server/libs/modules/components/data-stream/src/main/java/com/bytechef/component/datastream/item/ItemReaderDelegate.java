@@ -19,7 +19,7 @@ package com.bytechef.component.datastream.item;
 import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
 
 import com.bytechef.component.definition.datastream.ItemReader;
-import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.tenant.util.TenantUtils;
 import java.util.Map;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.component.context;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
@@ -31,7 +31,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public final class TempFilesFileStorage implements FilesFileStorage {
+final class TempFilesFileStorage implements FilesFileStorage {
 
     private final FilesFileStorage filesFileStorage;
 

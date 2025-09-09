@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.component.context;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-class ContextFactoryImpl implements ContextFactory {
+public class ContextFactoryImpl implements ContextFactory {
 
     private final ApplicationContext applicationContext;
     private final CacheManager cacheManager;

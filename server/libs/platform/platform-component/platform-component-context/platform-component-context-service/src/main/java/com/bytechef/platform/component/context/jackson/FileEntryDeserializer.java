@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.jackson;
+package com.bytechef.platform.component.context.jackson;
 
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.platform.component.definition.FileEntryImpl;
+import com.bytechef.platform.component.context.FileEntryImpl;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.component.context;
 
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 

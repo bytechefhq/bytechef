@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.component.context;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
