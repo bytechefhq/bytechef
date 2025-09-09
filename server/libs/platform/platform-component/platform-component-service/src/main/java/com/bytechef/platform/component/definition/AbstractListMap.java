@@ -26,7 +26,7 @@ import java.util.OptionalLong;
 /**
  * @author Ivica Cardic
  */
-public class AbstractListMap extends HashMap<String, List<String>> {
+class AbstractListMap extends HashMap<String, List<String>> {
 
     public AbstractListMap(Map<String, List<String>> parameters) {
         super(parameters);
