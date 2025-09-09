@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.component.context;
 
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.EncodingUtils;
@@ -27,7 +27,8 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.util.JsonSchemaUtils;
+import com.bytechef.platform.component.context.util.JsonSchemaUtils;
+import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

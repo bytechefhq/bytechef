@@ -18,7 +18,7 @@ package com.bytechef.platform.component.facade;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.util.TokenRefreshHelper;

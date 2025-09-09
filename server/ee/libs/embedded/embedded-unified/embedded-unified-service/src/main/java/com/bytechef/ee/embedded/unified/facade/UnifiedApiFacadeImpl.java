@@ -28,7 +28,7 @@ import com.bytechef.ee.embedded.unified.pagination.CursorPageable;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.UnifiedApiDefinitionService;

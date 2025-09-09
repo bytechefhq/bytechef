@@ -20,7 +20,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.http.client.action.HttpClientGetAction;
 import com.bytechef.platform.component.config.ComponentDefinitionIntTestConfiguration;
 import com.bytechef.platform.component.config.ComponentRegistryConfigurationSharedMocks;
-import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.util.TokenRefreshHelper;

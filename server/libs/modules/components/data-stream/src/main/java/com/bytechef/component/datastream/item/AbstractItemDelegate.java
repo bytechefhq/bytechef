@@ -27,7 +27,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import java.util.Map;
 import java.util.Objects;

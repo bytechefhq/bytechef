@@ -22,7 +22,7 @@ import com.bytechef.component.datastream.item.ItemProcessorDelegate;
 import com.bytechef.component.datastream.item.ItemReaderDelegate;
 import com.bytechef.component.datastream.item.ItemWriterDelegate;
 import com.bytechef.component.datastream.listener.DataStreamJobExecutionListener;
-import com.bytechef.platform.component.definition.ContextFactory;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
