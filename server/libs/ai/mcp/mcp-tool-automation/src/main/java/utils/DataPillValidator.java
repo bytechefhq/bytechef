@@ -166,19 +166,19 @@ public class DataPillValidator {
         Map<String, ToolUtils.PropertyInfo> taskOutput,
         StringBuilder errors, StringBuilder warnings, String text,
         String referencedTaskName, Map<String, JsonNode> allTasksMap, List<ToolUtils.PropertyInfo> taskDefinition) {
-        
+
         // Special handling for loop tasks - they auto-generate 'item' output based on 'items' parameter
-        if (referencedTaskType.startsWith("loop/") && (propertyName.equals("item") || propertyName.startsWith("item."))) {
+        if (referencedTaskType.startsWith("loop/") && propertyName.startsWith("item")) {
             // Get expected type from task definition if available
             String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
-            
+
             validateLoopItemTypes(dataPillExpression, referencedTaskName, expectedType, fieldPath, allTasksMap, errors, text, taskOutput);
             return;
         }
-        
+
         ToolUtils.PropertyInfo outputInfo = taskOutput.get(referencedTaskType);
         if (outputInfo != null) {
-            boolean propertyExists = PropertyNavigator.checkPropertyExists(outputInfo, propertyName);
+            boolean propertyExists = PropertyUtils.checkPropertyExists(outputInfo, propertyName);
 
             if (!propertyExists) {
                 ValidationErrorBuilder.append(warnings,
@@ -200,7 +200,7 @@ public class DataPillValidator {
         String propertyName, String fieldPath,
         ToolUtils.PropertyInfo outputInfo, StringBuilder errors, String text,
         String referencedTaskName, Map<String, JsonNode> allTasksMap, List<ToolUtils.PropertyInfo> taskDefinition) {
-        String actualType = PropertyNavigator.getPropertyType(outputInfo, propertyName);
+        String actualType = PropertyUtils.getPropertyType(outputInfo, propertyName);
 
         // Get expected type from task definition if available
         String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
@@ -311,7 +311,7 @@ public class DataPillValidator {
             // Check each item in the loop against the expected type
             for (int i = 0; i < items.size(); i++) {
                 JsonNode item = items.get(i);
-                String actualType = getJsonNodeType(item);
+                String actualType = JsonUtils.getJsonNodeType(item);
 
                 if (!TypeCompatibilityChecker.isTypeCompatible(expectedType, actualType)) {
                     // Allow any type to be converted to string in interpolation
@@ -354,20 +354,20 @@ public class DataPillValidator {
 
         String sourceTaskName = parts[0];
         String sourcePropertyName = parts.length > 1 ? parts[1] : ""; // e.g., "elements" from "task1.elements"
-        
+
         JsonNode sourceTask = allTasksMap.get(sourceTaskName);
         if (sourceTask == null || !sourceTask.has("type")) {
             return;
         }
-        
+
         // Get the source task's type and find its output definition
         String sourceTaskType = sourceTask.get("type").asText();
         ToolUtils.PropertyInfo sourceTaskOutput = taskOutput.get(sourceTaskType);
-        
+
         if (sourceTaskOutput == null) {
             return;
         }
-        
+
         // Extract the property name from the data pill expression
         // For example, from "loop1.item.propBool" we want "propBool"
         if (dataPillExpression.contains(".item.")) {
@@ -376,16 +376,16 @@ public class DataPillValidator {
                 String propertyName = itemParts[1];
 
                 // Find the array property in the source task output (e.g., "elements")
-                ToolUtils.PropertyInfo arrayProperty = findPropertyByName(sourceTaskOutput, sourcePropertyName);
+                ToolUtils.PropertyInfo arrayProperty = PropertyUtils.findPropertyByName(sourceTaskOutput, sourcePropertyName);
                 if (arrayProperty != null && arrayProperty.nestedProperties() != null && !arrayProperty.nestedProperties().isEmpty()) {
                     // Get the array element definition (first nested property)
                     ToolUtils.PropertyInfo arrayElementProperty = arrayProperty.nestedProperties().get(0);
                     if (arrayElementProperty != null && arrayElementProperty.nestedProperties() != null) {
                         // Find the specific property within the array element
-                        ToolUtils.PropertyInfo targetProperty = findPropertyByName(arrayElementProperty, propertyName);
+                        ToolUtils.PropertyInfo targetProperty = PropertyUtils.findPropertyByName(arrayElementProperty, propertyName);
                         if (targetProperty != null) {
-                            String actualType = mapTypeToString(targetProperty.type());
-                            
+                            String actualType = JsonUtils.mapTypeToString(targetProperty.type());
+
                             if (!TypeCompatibilityChecker.isTypeCompatible(expectedType, actualType)) {
                                 // Generate errors for each array element (simulating 3 elements based on test expectations)
                                 for (int i = 0; i < 3; i++) {
@@ -403,188 +403,6 @@ public class DataPillValidator {
         }
     }
 
-    /**
-     * Finds a property by name in a PropertyInfo structure.
-     */
-    private static ToolUtils.PropertyInfo findPropertyByName(ToolUtils.PropertyInfo parentProperty, String targetName) {
-        if (parentProperty == null || parentProperty.nestedProperties() == null) {
-            return null;
-        }
-        
-        // Check if the parent property itself matches the name
-        if (targetName.equals(parentProperty.name())) {
-            return parentProperty;
-        }
-        
-        // Search in nested properties
-        for (ToolUtils.PropertyInfo nested : parentProperty.nestedProperties()) {
-            if (targetName.equals(nested.name())) {
-                return nested;
-            }
-        }
-        
-        return null;
-    }
-    
-    /**
-     * Maps PropertyInfo type to lowercase string format.
-     */
-    private static String mapTypeToString(String propertyType) {
-        if (propertyType == null) {
-            return "unknown";
-        }
-        
-        return switch (propertyType.toUpperCase()) {
-            case "STRING" -> "string";
-            case "BOOLEAN" -> "boolean";
-            case "NUMBER" -> "number";
-            case "INTEGER" -> "integer";
-            case "OBJECT" -> "object";
-            case "ARRAY" -> "array";
-            default -> propertyType.toLowerCase();
-        };
-    }
-
-
-    /**
-     * Gets the property type from the loop items array elements by analyzing the actual loop task parameters.
-     * This method dynamically inspects the loop task's 'items' parameter to determine the types of the elements.
-     * It can handle both direct item access (${loop1.item}) and nested property access (${loop1.item.propName}).
-     */
-    private static String getPropertyTypeFromLoopItems(String sourceTaskName, String propertyName, Map<String, JsonNode> allTasksMap) {
-        JsonNode sourceTask = allTasksMap.get(sourceTaskName);
-        if (sourceTask == null || !sourceTask.has("parameters")) {
-            return "unknown";
-        }
-
-        JsonNode parameters = sourceTask.get("parameters");
-        if (!parameters.has("items")) {
-            return "unknown";
-        }
-
-        JsonNode items = parameters.get("items");
-        
-        // If items is a data pill (e.g., "${task1.elements}"), we need to resolve it
-        if (items.isTextual() && items.asText().matches("\\$\\{[^}]+}")) {
-            // Extract the referenced task and property from the data pill
-            String dataPill = items.asText();
-            String cleanExpression = dataPill.substring(2, dataPill.length() - 1);
-            String[] parts = cleanExpression.split("\\.", 2);
-            
-            if (parts.length == 2) {
-                String referencedTaskName = parts[0];
-                String referencedProperty = parts[1];
-                JsonNode referencedTask = allTasksMap.get(referencedTaskName);
-                
-                if (referencedTask != null && referencedTask.has("parameters")) {
-                    JsonNode refParameters = referencedTask.get("parameters");
-                    JsonNode arrayValue = refParameters.get(referencedProperty);
-                    
-                    if (arrayValue != null && arrayValue.isArray()) {
-                        // Now analyze the array elements to determine property types
-                        return getPropertyTypeFromArrayElements(arrayValue, propertyName);
-                    }
-                }
-            }
-            return "unknown";
-        } else if (items.isArray()) {
-            // Direct array - analyze its elements
-            return getPropertyTypeFromArrayElements(items, propertyName);
-        }
-        
-        return "unknown";
-    }
-    
-    /**
-     * Analyzes an array of items to determine the type of a specific property within the array elements.
-     * This handles both direct item access (no propertyName) and nested property access.
-     */
-    private static String getPropertyTypeFromArrayElements(JsonNode arrayValue, String propertyName) {
-        if (arrayValue.size() == 0) {
-            return "unknown";
-        }
-        
-        // For direct item access (${loop1.item}), return "mixed" since it could be any type
-        if (propertyName == null || propertyName.isEmpty()) {
-            // Check if all elements are the same type
-            String firstElementType = getJsonNodeType(arrayValue.get(0));
-            boolean allSameType = true;
-            
-            for (int i = 1; i < arrayValue.size(); i++) {
-                if (!firstElementType.equals(getJsonNodeType(arrayValue.get(i)))) {
-                    allSameType = false;
-                    break;
-                }
-            }
-            
-            return allSameType ? firstElementType : "mixed";
-        }
-        
-        // For nested property access (${loop1.item.propName}), look at object elements
-        for (int i = 0; i < arrayValue.size(); i++) {
-            JsonNode element = arrayValue.get(i);
-            if (element.isObject() && element.has(propertyName)) {
-                return getJsonNodeType(element.get(propertyName));
-            }
-        }
-        
-        return "unknown";
-    }
-
-    private static String getLoopItemType(String dataPillExpression, String loopTaskName,
-                                         Map<String, JsonNode> allTasksMap, StringBuilder errors) {
-        JsonNode loopTask = allTasksMap.get(loopTaskName);
-        if (loopTask == null || !loopTask.has("parameters")) {
-            return null;
-        }
-
-        JsonNode parameters = loopTask.get("parameters");
-        if (!parameters.has("items")) {
-            return null;
-        }
-
-        JsonNode items = parameters.get("items");
-
-        // Extract array index from dataPillExpression if present (e.g., "loop1.item[0]")
-        String indexPattern = "\\[(\\d+)\\]";
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(indexPattern);
-        java.util.regex.Matcher matcher = pattern.matcher(dataPillExpression);
-
-        if (matcher.find()) {
-            // Specific array index referenced (e.g., loop1.item[0])
-            int index = Integer.parseInt(matcher.group(1));
-            if (items.isArray() && index >= 0 && index < items.size()) {
-                return getJsonNodeType(items.get(index));
-            }
-        } else {
-            // No specific index, could be referencing the item directly
-            // In this case, we can't determine a specific type error
-            return "object"; // Default to object type for general item reference
-        }
-
-        return null;
-    }
-
-    private static String getJsonNodeType(JsonNode node) {
-        if (node.isTextual()) {
-            return "string";
-        } else if (node.isNumber()) {
-            if (node.isInt()) {
-                return "integer";
-            } else {
-                return "number";
-            }
-        } else if (node.isBoolean()) {
-            return "boolean";
-        } else if (node.isObject()) {
-            return "object";
-        } else if (node.isArray()) {
-            return "array";
-        } else if (node.isNull()) {
-            return "null";
-        }
-        return "unknown";
-    }
 
     static class TaskValidationContext {
         boolean stopProcessing = false;
