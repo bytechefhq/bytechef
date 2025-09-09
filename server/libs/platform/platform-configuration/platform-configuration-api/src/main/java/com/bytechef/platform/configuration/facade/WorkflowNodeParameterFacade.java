@@ -17,19 +17,20 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
-import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
-import java.util.Map;
+import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 
 /**
  * @author Ivica Cardic
  */
 public interface WorkflowNodeParameterFacade {
 
-    Map<String, ?> deleteClusterElementParameter(
+    ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, String path);
+        String clusterElementWorkflowNodeName, String parameterPath, boolean includeInMetadata, long environmentId);
 
-    Map<String, ?> deleteWorkflowNodeParameter(String workflowId, String workflowNodeName, String path);
+    ParameterResultDTO deleteWorkflowNodeParameter(
+        String workflowId, String workflowNodeName, String parameterPath, boolean includeInMetadata,
+        long environmentId);
 
     DisplayConditionResultDTO getClusterElementDisplayConditions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
@@ -38,12 +39,12 @@ public interface WorkflowNodeParameterFacade {
     DisplayConditionResultDTO
         getWorkflowNodeDisplayConditions(String workflowId, String workflowNodeName, long environmentId);
 
-    UpdateParameterResultDTO updateClusterElementParameter(
+    ParameterResultDTO updateClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
         boolean includeInMetadata, long environmentId);
 
-    UpdateParameterResultDTO updateWorkflowNodeParameter(
+    ParameterResultDTO updateWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,
         boolean includeInMetadata, long environmentId);
 }

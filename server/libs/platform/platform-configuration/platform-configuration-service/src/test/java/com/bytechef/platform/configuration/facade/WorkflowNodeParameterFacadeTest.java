@@ -47,7 +47,7 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
-import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
+import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.ArrayList;
@@ -166,8 +166,8 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
 
             // When
-            Map<String, ?> result = workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path);
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false, 0);
 
             // Then
             assertNotNull(result);
@@ -214,7 +214,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When/Then - This should throw a ConfigurationException due to missing cluster element
             assertThrows(ConfigurationException.class, () -> workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path));
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false, 0));
         }
     }
 
@@ -287,8 +287,8 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
 
             // When
-            Map<String, ?> result = workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path);
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false, 0);
 
             // Then
             assertNotNull(result);
@@ -339,8 +339,8 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
 
             // When
-            Map<String, ?> result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
-                workflowId, workflowNodeName, path);
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+                workflowId, workflowNodeName, path, false, 0);
 
             // Then
             assertNotNull(result);
@@ -354,7 +354,7 @@ public class WorkflowNodeParameterFacadeTest {
         // Given
         String workflowId = "workflow1";
         String workflowNodeName = "task1";
-        String path = "items[1].value";
+        String parameterPath = "items[1].value";
 
         // Setup ActionDefinition mock directly
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
@@ -405,8 +405,8 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
 
             // When
-            Map<String, ?> result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
-                workflowId, workflowNodeName, path);
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, false, 0);
 
             // Then
             assertNotNull(result);
@@ -450,7 +450,8 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When/Then
             assertThrows(ConfigurationException.class,
-                () -> workflowNodeParameterFacade.deleteWorkflowNodeParameter(workflowId, workflowNodeName, path));
+                () -> workflowNodeParameterFacade.deleteWorkflowNodeParameter(workflowId, workflowNodeName, path, false,
+                    0));
         }
     }
 
@@ -498,8 +499,8 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(actionDefinition);
 
             // When
-            Map<String, ?> result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
-                workflowId, workflowNodeName, path);
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+                workflowId, workflowNodeName, path, false, 0);
 
             // Then
             assertNotNull(result);
@@ -519,7 +520,8 @@ public class WorkflowNodeParameterFacadeTest {
 
         // When/Then
         assertThrows(RuntimeException.class,
-            () -> workflowNodeParameterFacade.deleteWorkflowNodeParameter(workflowId, workflowNodeName, path));
+            () -> workflowNodeParameterFacade.deleteWorkflowNodeParameter(workflowId, workflowNodeName, path, false,
+                0));
     }
 
     @Test
@@ -1101,7 +1103,7 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(Map.of());
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
                 workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
@@ -1157,7 +1159,7 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(Map.of());
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
                 workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
@@ -1216,7 +1218,7 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
                 workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
@@ -1290,7 +1292,7 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(Map.of());
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
                 parameterPath, value, type, includeInMetadata, 0);
 
@@ -1354,7 +1356,7 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
                 workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
@@ -1533,7 +1535,7 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(Map.of());
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
                 workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
@@ -1609,7 +1611,7 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(Map.of());
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
                 parameterPath, value, type, includeInMetadata, 0);
 
@@ -1672,7 +1674,7 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(Map.of());
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
                 workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
@@ -1729,7 +1731,7 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
                 workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
@@ -1788,7 +1790,7 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(Map.of());
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
                 workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
 
             // Then
@@ -2068,7 +2070,7 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(Map.of());
 
             // When
-            UpdateParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
+            ParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
                 parameterPath, value, type, includeInMetadata, 0);
 
@@ -2239,8 +2241,9 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(clusterElementDefinition);
 
             // When
-            Map<String, ?> result = workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, parameterPath);
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, parameterPath,
+                false, 0);
 
             // Then
             assertNotNull(result);

@@ -995,6 +995,13 @@ paths:
           in: "path"
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:
@@ -1003,6 +1010,10 @@ paths:
               required:
                 - "path"
               properties:
+                includeInMetadata:
+                  description: "If path and value type should be included in metadata "
+                  type: "boolean"
+                  default: false
                 path:
                   description: "The workflow node parameter path."
                   type: "string"
@@ -1015,9 +1026,23 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  parameters:
+                  metadata:
+                    description: "Key-value map of metadata."
                     type: "object"
                     additionalProperties: true
+                  parameters:
+                    description: "Key-value map of parameters."
+                    type: "object"
+                    additionalProperties: true
+                  displayConditions:
+                    description: "Key-value map of display condition rules."
+                    type: "object"
+                    additionalProperties:
+                      type: "boolean"
+                  missingRequiredProperties:
+                    type: "array"
+                    items:
+                      type: "string"
     patch:
       description: "Updates a cluster element parameter."
       summary: "Updates a cluster element parameter"
@@ -1343,6 +1368,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:
@@ -1351,6 +1383,10 @@ paths:
               required:
                 - "path"
               properties:
+                includeInMetadata:
+                  description: "If path and value type should be included in metadata "
+                  type: "boolean"
+                  default: false
                 path:
                   description: "The workflow node parameter path."
                   type: "string"
@@ -1363,9 +1399,23 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  parameters:
+                  metadata:
+                    description: "Key-value map of metadata."
                     type: "object"
                     additionalProperties: true
+                  parameters:
+                    description: "Key-value map of parameters."
+                    type: "object"
+                    additionalProperties: true
+                  displayConditions:
+                    description: "Key-value map of display condition rules."
+                    type: "object"
+                    additionalProperties:
+                      type: "boolean"
+                  missingRequiredProperties:
+                    type: "array"
+                    items:
+                      type: "string"
     patch:
       description: "Updates a workflow node parameter."
       summary: "Updates a workflow node parameter"
