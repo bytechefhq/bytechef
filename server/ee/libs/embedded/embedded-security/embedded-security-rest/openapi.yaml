@@ -1,0 +1,168 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Embedded Signing Key Internal API"
+  version: "1"
+servers:
+  - url: "/api/embedded/internal"
+tags:
+  - name: "signing-key"
+    description: "The Embedded User Signing Key Internal API"
+paths:
+  /signing-keys:
+    get:
+      description: "Get Signing keys."
+      summary: "Get Signing keys"
+      tags:
+        - "signing-key"
+      operationId: "getSigningKeys"
+      parameters:
+      - name: "environmentId"
+        description: "The id of an environment."
+        required: true
+        in: "query"
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "The list of Signing keys."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SigningKey"
+    post:
+      description: "Create a new Signing key."
+      summary: "Create a new Signing key"
+      tags:
+        - "signing-key"
+      operationId: "createSigningKey"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SigningKey"
+        required: true
+      responses:
+        "200":
+          description: "The Signing key object."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  privateKey:
+                    description: "The private key."
+                    type: "string"
+  /signing-keys/{id}:
+    delete:
+      description: "Delete an Signing key."
+      summary: "Delete an Signing key"
+      tags:
+        - "signing-key"
+      operationId: "deleteSigningKey"
+      parameters:
+        - name: "id"
+          description: "The id of an Signing key."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+    get:
+      description: "Get an Signing key by id."
+      summary: "Get an Signing key by id"
+      tags:
+        - "signing-key"
+      operationId: "getSigningKey"
+      parameters:
+        - name: "id"
+          description: "The id of an Signing key."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The Signing key object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SigningKey"
+    put:
+      description: "Update an existing Signing key."
+      summary: "Update an existing Signing key"
+      tags:
+        - "signing-key"
+      operationId: "updateSigningKey"
+      parameters:
+        - name: "id"
+          description: "The id of an Signing key."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SigningKey"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+components:
+  schemas:
+    SigningKey:
+      description: "Contains generated public key used for signing JWT tokens."
+      type: "object"
+      required:
+        - keyId
+        - name
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        environmentId:
+          description: "The id of an environment."
+          type: "integer"
+          format: "int64"
+        id:
+          description: "The id of a public key."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        keyId:
+          description: "The id of a key used for identifying corresponding private key when validating the JWT token."
+          type: "string"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastUsedDate:
+          description: "The last used date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of a public key."
+          type: "string"
