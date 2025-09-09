@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import com.bytechef.ai.mcp.tool.automation.ToolUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -3303,7 +3304,7 @@ class WorkflowValidatorTest {
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) ->
             new ToolUtils.PropertyInfo("result", "STRING", null, false, false, null, null);
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -3325,7 +3326,7 @@ class WorkflowValidatorTest {
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("Missing required field: label", errors.toString());
         assertEquals("", warnings.toString());
@@ -3368,10 +3369,251 @@ class WorkflowValidatorTest {
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("Tasks cannot have repeating names: duplicate_name", errors.toString());
         assertEquals("", warnings.toString());
+    }
+
+    @Test
+    void validateWorkflowTasks_addsNestedTasksToTaskDefinitionsCondition_noErrors() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "triggers": [
+                    {
+                        "label": "Task 1",
+                        "name": "task1",
+                        "type": "component/v1/trigger1",
+                        "parameters": {
+                            "name": "John"
+                        }
+                    }
+                ],
+                "tasks": [
+                    {
+                         "label": "Condition",
+                         "name": "condition_1",
+                         "type": "condition/v1",
+                         "parameters": {
+                             "rawExpression": false,
+                             "conditions": [
+                                [
+                                    {
+                                        "type": "string",
+                                        "value1": "${task1.propString}",
+                                        "operation": "EQUALS",
+                                        "value2": "Mario"
+                                    }
+                                ]
+                             ],
+                             "caseTrue": [
+                                {
+                                    "label": "Task 3",
+                                    "name": "task3",
+                                    "type": "component/v1/action1",
+                                    "parameters": {
+                                        "name": "${task1.propString}"
+                                    }
+                                }
+                             ],
+                             "caseFalse": [
+                                {
+                                    "label": "Task 2",
+                                    "name": "task2",
+                                    "type": "component/v1/action1",
+                                    "parameters": {
+                                        "name": "${task1.propString}"
+                                    }
+                                }
+                             ]
+                         }
+                    }
+                ]
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
+        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
+
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions, taskOutputs, errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+        assertEquals("{component/v1/action1=[], component/v1/trigger1=[], condition/v1=[]}", taskDefinitions.toString());
+        assertEquals("{component/v1/action1=null, component/v1/trigger1=null, condition/v1=null}", taskOutputs.toString());
+    }
+
+    @Test
+    void validateWorkflowTasks_addsNestedTasksToTaskDefinitionsLoop_noErrors() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "triggers": [
+                    {
+                        "label": "Task 1",
+                        "name": "task1",
+                        "type": "component/v1/trigger1",
+                        "parameters": {
+                            "name": "John"
+                        }
+                    }
+                ],
+                "tasks": [
+                    {
+                         "label": "Loop",
+                         "name": "loop1",
+                         "type": "loop/v1",
+                         "parameters": {
+                             "items": "${task1.elements}",
+                             "loopForever": false,
+                             "iteratee": [
+                                {
+                                    "label": "Task 3",
+                                    "name": "task3",
+                                    "type": "component/v1/action1",
+                                    "parameters": {
+                                        "name": "${loop1.item.propNumber}"
+                                    }
+                                },
+                                {
+                                    "label": "Task 2",
+                                    "name": "task2",
+                                    "type": "component/v1/action2",
+                                    "parameters": {
+                                        "age": "${loop1.item.propBool}"
+                                    }
+                                }
+                             ]
+                         }
+                    }
+                ]
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
+        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
+
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions, taskOutputs, errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+        assertEquals("{component/v1/action2=[], component/v1/action1=[], component/v1/trigger1=[], loop/v1=[]}", taskDefinitions.toString());
+        assertEquals("{component/v1/action2=null, component/v1/action1=null, component/v1/trigger1=null, loop/v1=null}", taskOutputs.toString());
+    }
+
+    @Test
+    void validateWorkflowTasks_addsNestedTasksToTaskDefinitionsMultipleFlows_noErrors() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "triggers": [
+                    {
+                        "label": "Task 1",
+                        "name": "task1",
+                        "type": "component/v1/trigger1",
+                        "parameters": {
+                            "name": "John"
+                        }
+                    }
+                ],
+                "tasks": [
+                    {
+                         "label": "Loop",
+                         "name": "loop1",
+                         "type": "loop/v1",
+                         "parameters": {
+                             "items": "${task1.elements}",
+                             "loopForever": false,
+                             "iteratee": [
+                                {
+                                     "label": "Condition",
+                                     "name": "condition_1",
+                                     "type": "condition/v1",
+                                     "parameters": {
+                                         "rawExpression": false,
+                                         "conditions": [
+                                            [
+                                                {
+                                                    "type": "string",
+                                                    "value1": "${task1.propString}",
+                                                    "operation": "EQUALS",
+                                                    "value2": "Mario"
+                                                }
+                                            ]
+                                         ],
+                                         "caseTrue": [
+                                            {
+                                                "label": "Task 3",
+                                                "name": "task3",
+                                                "type": "component/v1/action1",
+                                                "parameters": {
+                                                    "name": "${task1.propString}"
+                                                }
+                                            }
+                                         ],
+                                         "caseFalse": [
+                                            {
+                                                "label": "Task 2",
+                                                "name": "task2",
+                                                "type": "component/v1/action1",
+                                                "parameters": {
+                                                    "name": "${task1.propString}"
+                                                }
+                                            }
+                                         ]
+                                     }
+                                },
+                                {
+                                    "label": "Task 3",
+                                    "name": "task3",
+                                    "type": "component/v1/action1",
+                                    "parameters": {
+                                        "name": "${loop1.item.propNumber}"
+                                    }
+                                },
+                                {
+                                    "label": "Task 2",
+                                    "name": "task2",
+                                    "type": "component/v1/action2",
+                                    "parameters": {
+                                        "age": "${loop1.item.propBool}"
+                                    }
+                                }
+                             ]
+                         }
+                    }
+                ]
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
+        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
+
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions, taskOutputs, errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+        assertEquals("{component/v1/action2=[], component/v1/action1=[], component/v1/trigger1=[], loop/v1=[], condition/v1=[]}", taskDefinitions.toString());
+        assertEquals("{component/v1/action2=null, component/v1/action1=null, component/v1/trigger1=null, loop/v1=null, condition/v1=null}", taskOutputs.toString());
     }
 
     @Test
