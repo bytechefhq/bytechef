@@ -199,6 +199,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:figma"))
     implementation(project(":server:libs:modules:components:file-storage"))
     implementation(project(":server:libs:modules:components:filesystem"))
+    implementation(project(":server:libs:modules:components:form"))
     implementation(project(":server:libs:modules:components:freshdesk"))
     implementation(project(":server:libs:modules:components:freshsales"))
     implementation(project(":server:libs:modules:components:github"))
