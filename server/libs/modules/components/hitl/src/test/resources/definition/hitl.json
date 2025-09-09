@@ -1,0 +1,21 @@
+{
+  "actions" : null,
+  "clusterElements" : null,
+  "componentCategories" : [ {
+    "label" : "Helpers",
+    "name" : "helpers"
+  } ],
+  "connection" : null,
+  "customAction" : null,
+  "customActionHelp" : null,
+  "description" : "Human-in-the-Loop component for manual intervention in workflows.",
+  "icon" : "path:assets/hitl.svg",
+  "metadata" : null,
+  "name" : "hitl",
+  "resources" : null,
+  "tags" : null,
+  "title" : "HITL",
+  "triggers" : null,
+  "unifiedApi" : null,
+  "version" : 1
+}

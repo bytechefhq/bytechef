@@ -146,6 +146,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:gotify"))
     implementation(project(":server:libs:modules:components:graphql-client"))
     implementation(project(":server:libs:modules:components:hacker-news"))
+    implementation(project(":server:libs:modules:components:hitl"))
     implementation(project(":server:libs:modules:components:http-client"))
     implementation(project(":server:libs:modules:components:hubspot"))
     implementation(project(":server:libs:modules:components:hunter"))
