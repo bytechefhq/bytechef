@@ -5,9 +5,9 @@ import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEffect, useState} from 'react';
 
 export default function useFetchInterceptor() {
-    const {clearAuthentication} = useAuthenticationStore();
-    const {clearCurrentEnvironmentId} = useEnvironmentStore();
-    const {clearCurrentWorkspaceId} = useWorkspaceStore();
+    const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
+    const clearCurrentEnvironmentId = useEnvironmentStore((state) => state.clearCurrentEnvironmentId);
+    const clearCurrentWorkspaceId = useWorkspaceStore((state) => state.clearCurrentWorkspaceId);
     const [fetchIntercept, setFetchIntercept] = useState<typeof import('fetch-intercept') | null>(null);
 
     const {toast} = useToast();
