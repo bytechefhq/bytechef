@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
-import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
+import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
-import com.bytechef.platform.configuration.web.rest.model.UpdateClusterElementParameter200ResponseModel;
+import com.bytechef.platform.configuration.web.rest.model.DeleteClusterElementParameter200ResponseModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -26,9 +26,9 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-public interface UpdateWorkflowNodeParameter200ResponseMapper
-    extends Converter<UpdateParameterResultDTO, UpdateClusterElementParameter200ResponseModel> {
+public interface DeleteClusterElementParameter200ResponseMapper
+    extends Converter<ParameterResultDTO, DeleteClusterElementParameter200ResponseModel> {
 
     @Override
-    UpdateClusterElementParameter200ResponseModel convert(UpdateParameterResultDTO updateParameterResultDTO);
+    DeleteClusterElementParameter200ResponseModel convert(ParameterResultDTO parameterResultDTO);
 }

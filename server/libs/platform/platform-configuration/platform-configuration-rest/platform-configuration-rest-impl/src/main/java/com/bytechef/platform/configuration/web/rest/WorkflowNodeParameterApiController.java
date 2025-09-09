@@ -18,15 +18,13 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
-import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
+import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.web.rest.model.DeleteClusterElementParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.DeleteClusterElementParameterRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.GetClusterElementParameterDisplayConditions200ResponseModel;
-import com.bytechef.platform.configuration.web.rest.model.UpdateClusterElementParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateClusterElementParameterRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,28 +50,31 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ResponseEntity<DeleteClusterElementParameter200ResponseModel> deleteClusterElementParameter(
         String id, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
+        Long environmentId,
         DeleteClusterElementParameterRequestModel deleteWorkflowNodeParameterRequestModel) {
 
+        ParameterResultDTO parameterResultDTO = workflowNodeParameterFacade.deleteClusterElementParameter(
+            id, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
+            deleteWorkflowNodeParameterRequestModel.getPath(),
+            deleteWorkflowNodeParameterRequestModel.getIncludeInMetadata(), environmentId);
+
         return ResponseEntity.ok(
-            new DeleteClusterElementParameter200ResponseModel().parameters(
-                (Map<String, Object>) workflowNodeParameterFacade.deleteClusterElementParameter(
-                    id, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
-                    deleteWorkflowNodeParameterRequestModel.getPath())));
+            conversionService.convert(parameterResultDTO, DeleteClusterElementParameter200ResponseModel.class));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ResponseEntity<DeleteClusterElementParameter200ResponseModel> deleteWorkflowNodeParameter(
-        String id, String workflowNodeName,
+        String id, String workflowNodeName, Long environmentId,
         DeleteClusterElementParameterRequestModel deleteWorkflowNodeParameterRequestModel) {
 
+        ParameterResultDTO parameterResultDTO = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+            id, workflowNodeName, deleteWorkflowNodeParameterRequestModel.getPath(),
+            deleteWorkflowNodeParameterRequestModel.getIncludeInMetadata(), environmentId);
+
         return ResponseEntity.ok(
-            new DeleteClusterElementParameter200ResponseModel().parameters(
-                (Map<String, Object>) workflowNodeParameterFacade.deleteWorkflowNodeParameter(
-                    id, workflowNodeName, deleteWorkflowNodeParameterRequestModel.getPath())));
+            conversionService.convert(parameterResultDTO, DeleteClusterElementParameter200ResponseModel.class));
     }
 
     @Override
@@ -106,33 +107,32 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     }
 
     @Override
-    public ResponseEntity<UpdateClusterElementParameter200ResponseModel> updateClusterElementParameter(
+    public ResponseEntity<DeleteClusterElementParameter200ResponseModel> updateClusterElementParameter(
         String id, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
-        Long environmentId,
-        UpdateClusterElementParameterRequestModel updateWorkflowNodeParameterRequestModel) {
+        Long environmentId, UpdateClusterElementParameterRequestModel updateWorkflowNodeParameterRequestModel) {
 
-        UpdateParameterResultDTO updateParameterResultDTO = workflowNodeParameterFacade.updateClusterElementParameter(
+        ParameterResultDTO parameterResultDTO = workflowNodeParameterFacade.updateClusterElementParameter(
             id, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
             updateWorkflowNodeParameterRequestModel.getPath(), updateWorkflowNodeParameterRequestModel.getValue(),
             updateWorkflowNodeParameterRequestModel.getType(),
             updateWorkflowNodeParameterRequestModel.getIncludeInMetadata(), environmentId);
 
         return ResponseEntity.ok(
-            conversionService.convert(updateParameterResultDTO, UpdateClusterElementParameter200ResponseModel.class));
+            conversionService.convert(parameterResultDTO, DeleteClusterElementParameter200ResponseModel.class));
     }
 
     @Override
-    public ResponseEntity<UpdateClusterElementParameter200ResponseModel> updateWorkflowNodeParameter(
+    public ResponseEntity<DeleteClusterElementParameter200ResponseModel> updateWorkflowNodeParameter(
         String id, String workflowNodeName, Long environmentId,
         UpdateClusterElementParameterRequestModel updateWorkflowNodeParameterRequestModel) {
 
-        UpdateParameterResultDTO updateParameterResultDTO = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+        ParameterResultDTO parameterResultDTO = workflowNodeParameterFacade.updateWorkflowNodeParameter(
             id, workflowNodeName,
             updateWorkflowNodeParameterRequestModel.getPath(), updateWorkflowNodeParameterRequestModel.getValue(),
             updateWorkflowNodeParameterRequestModel.getType(),
             updateWorkflowNodeParameterRequestModel.getIncludeInMetadata(), environmentId);
 
         return ResponseEntity.ok(
-            conversionService.convert(updateParameterResultDTO, UpdateClusterElementParameter200ResponseModel.class));
+            conversionService.convert(parameterResultDTO, DeleteClusterElementParameter200ResponseModel.class));
     }
 }

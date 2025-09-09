@@ -39,7 +39,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
-import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
+import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
@@ -103,9 +103,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
-    public Map<String, ?> deleteClusterElementParameter(
+    public ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, String path) {
+        String clusterElementWorkflowNodeName, String parameterPath, boolean includeInMetadata, long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -114,20 +114,46 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
             workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap);
 
-        String[] pathItems = path.split("\\.");
+        Map<String, Object> metadataMap = getMetadataMap(
+            workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap);
 
-        setDynamicPropertyTypeItem(path, null, getMetadataMap(
-            workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap));
-        setParameter(pathItems, null, true, workflowNodeStructure.parameterMap);
+        Map<String, ?> dynamicPropertyTypesMap = getDynamicPropertyTypesMap(metadataMap);
+
+        String[] parameterPathParts = parameterPath.split("\\.");
+
+        setParameter(parameterPathParts, null, true, workflowNodeStructure.parameterMap);
+
+        // For now only check the first, root level of properties on which other properties could depend on
+
+        checkDependOn(
+            parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
+            dynamicPropertyTypesMap);
+
+        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflow.getId(), environmentId);
+
+        Map<String, Boolean> displayConditionMap = checkDisplayConditionsAndParameters(
+            parameterPath, workflowNodeName, workflow, workflowNodeStructure.operationType,
+            workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
+            true, environmentId);
+
+        if (includeInMetadata) {
+            setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
+        }
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
 
-        return workflowNodeStructure.parameterMap;
+        return new ParameterResultDTO(
+            displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
+            workflowNodeStructure.parameterMap);
     }
 
     @Override
-    public Map<String, ?> deleteWorkflowNodeParameter(String workflowId, String workflowNodeName, String path) {
+    public ParameterResultDTO deleteWorkflowNodeParameter(
+        String workflowId, String workflowNodeName, String parameterPath, boolean includeInMetadata,
+        long environmentId) {
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
@@ -135,15 +161,38 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
             workflowNodeName, null, null, definitionMap);
 
-        String[] pathItems = path.split("\\.");
+        Map<String, Object> metadataMap = getMetadataMap(workflowNodeName, null, null, definitionMap);
 
-        setDynamicPropertyTypeItem(path, null, getMetadataMap(workflowNodeName, null, null, definitionMap));
-        setParameter(pathItems, null, true, workflowNodeStructure.parameterMap);
+        Map<String, ?> dynamicPropertyTypesMap = getDynamicPropertyTypesMap(metadataMap);
+
+        String[] parameterPathParts = parameterPath.split("\\.");
+
+        setParameter(parameterPathParts, null, true, workflowNodeStructure.parameterMap);
+
+        // For now only check the first, root level of properties on which other properties could depend on
+
+        checkDependOn(
+            parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
+            dynamicPropertyTypesMap);
+
+        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflow.getId(), environmentId);
+
+        Map<String, Boolean> displayConditionMap = checkDisplayConditionsAndParameters(
+            parameterPath, workflowNodeName, workflow, workflowNodeStructure.operationType,
+            workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
+            true, environmentId);
+
+        if (includeInMetadata) {
+            setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
+        }
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
 
-        return workflowNodeStructure.parameterMap;
+        return new ParameterResultDTO(
+            displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
+            workflowNodeStructure.parameterMap);
     }
 
     @Override
@@ -207,7 +256,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
-    public UpdateParameterResultDTO updateClusterElementParameter(
+    public ParameterResultDTO updateClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
         boolean includeInMetadata, long environmentId) {
@@ -249,13 +298,13 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
 
-        return new UpdateParameterResultDTO(
+        return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
             workflowNodeStructure.parameterMap);
     }
 
     @Override
-    public UpdateParameterResultDTO updateWorkflowNodeParameter(
+    public ParameterResultDTO updateWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,
         boolean includeInMetadata, long environmentId) {
 
@@ -295,7 +344,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
 
-        return new UpdateParameterResultDTO(
+        return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
             workflowNodeStructure.parameterMap);
     }
