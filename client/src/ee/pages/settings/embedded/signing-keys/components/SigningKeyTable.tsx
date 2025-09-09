@@ -11,9 +11,10 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import SigningKeyDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
-import {SigningKey} from '@/ee/shared/middleware/embedded/signing-key';
+import {SigningKey} from '@/ee/shared/middleware/embedded/security';
 import {useDeleteSigningKeyMutation} from '@/ee/shared/mutations/embedded/signingKeys.mutations';
 import {SigningKeyKeys} from '@/ee/shared/queries/embedded/signingKeys.queries';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
@@ -97,6 +98,10 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                     </div>
                 ),
                 header: 'Key Id',
+            }),
+            columnHelper.accessor('environmentId', {
+                cell: (info) => <EnvironmentBadge environmentId={info.getValue()!} />,
+                header: 'Environment',
             }),
             columnHelper.accessor('createdDate', {
                 cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,
