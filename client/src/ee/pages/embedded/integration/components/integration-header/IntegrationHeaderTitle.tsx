@@ -38,7 +38,7 @@ const IntegrationHeaderTitle = ({integration}: {integration: Integration}) => {
 
             {integration && (
                 <Badge className="flex space-x-1" variant="secondary">
-                    <span>V{integration.lastVersion}</span>
+                    <span>V{integration.lastIntegrationVersion}</span>
 
                     <span>{integration.lastStatus}</span>
                 </Badge>
