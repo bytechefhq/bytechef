@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * @see DataPillValidator for data pill expression validation
  * @see FieldValidator for basic field validation
  * @see PropertyValidator for property-specific validation
- * @see JsonProcessingHelper for JSON processing utilities
+ * @see JsonUtils for JSON processing utilities
  */
 @Component
 public class WorkflowValidator {
@@ -51,12 +51,12 @@ public class WorkflowValidator {
      * @return the errors StringBuilder for method chaining
      */
     public static StringBuilder validateWorkflowStructure(String workflow, StringBuilder errors) {
-        JsonNode workflowNode = JsonProcessingHelper.parseJsonWithErrorHandling(workflow, errors);
+        JsonNode workflowNode = JsonUtils.parseJsonWithErrorHandling(workflow, errors);
         if (workflowNode == null) {
             return errors;
         }
 
-        if (!JsonProcessingHelper.validateNodeIsObject(workflowNode, "Workflow", errors)) {
+        if (!JsonUtils.validateNodeIsObject(workflowNode, "Workflow", errors)) {
             return errors;
         }
 
@@ -112,12 +112,12 @@ public class WorkflowValidator {
      * @return the errors StringBuilder for method chaining
      */
     public static StringBuilder validateTaskStructure(String task, StringBuilder errors) {
-        JsonNode taskNode = JsonProcessingHelper.parseJsonWithErrorHandling(task, errors);
+        JsonNode taskNode = JsonUtils.parseJsonWithErrorHandling(task, errors);
         if (taskNode == null) {
             return errors;
         }
 
-        if (!JsonProcessingHelper.validateNodeIsObject(taskNode, "Task", errors)) {
+        if (!JsonUtils.validateNodeIsObject(taskNode, "Task", errors)) {
             return errors;
         }
 
@@ -168,9 +168,9 @@ public class WorkflowValidator {
     public static StringBuilder validateTaskParameters(
         String currentTaskParameters, List<ToolUtils.PropertyInfo> taskDefinition,
         StringBuilder errors, StringBuilder warnings) {
-        JsonNode currentPropsNode = JsonProcessingHelper.parseJsonWithErrorHandling(currentTaskParameters, errors);
+        JsonNode currentPropsNode = JsonUtils.parseJsonWithErrorHandling(currentTaskParameters, errors);
         if (currentPropsNode == null
-            || !JsonProcessingHelper.validateNodeIsObject(currentPropsNode, "Current task parameters", errors)) {
+            || !JsonUtils.validateNodeIsObject(currentPropsNode, "Current task parameters", errors)) {
             return errors;
         }
 
@@ -236,7 +236,7 @@ public class WorkflowValidator {
         StringBuilder errors, StringBuilder warnings, String currentTaskParameters) {
         try {
             JsonNode taskDefNode = WorkflowParser.parseJsonString(processedTaskDefinition);
-            if (!JsonProcessingHelper.validateNodeIsObject(taskDefNode, "Task definition", errors)) {
+            if (!JsonUtils.validateNodeIsObject(taskDefNode, "Task definition", errors)) {
                 return errors;
             }
 
@@ -251,7 +251,7 @@ public class WorkflowValidator {
                 errors, warnings, processedTaskDefinition, originalTaskDefinition, currentTaskParameters);
             return errors;
         } catch (JsonProcessingException e) {
-            JsonProcessingHelper.handleJsonProcessingException(e, processedTaskDefinition, errors);
+            JsonUtils.handleJsonProcessingException(e, processedTaskDefinition, errors);
             return errors;
         }
     }
@@ -262,7 +262,7 @@ public class WorkflowValidator {
         if (e.getMessage() != null && e.getMessage()
             .startsWith("Invalid logic for display condition:")) {
             try {
-                String cleanedTaskDefinition = JsonProcessingHelper.removeObjectsWithInvalidConditions(
+                String cleanedTaskDefinition = JsonUtils.removeObjectsWithInvalidConditions(
                     WorkflowParser.convertPropertyInfoToJson(taskDefinition));
 
                 JsonNode taskDefNode = WorkflowParser.parseJsonString(cleanedTaskDefinition);
