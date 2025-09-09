@@ -4,6 +4,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <property name="uuid_type" value="uuid" dbms="h2"/>
+    <property name="uuid_type" value="uuid" dbms="postgresql"/>
+
     <!-- core -->
     <includeAll path="classpath:config/liquibase/changelog/core/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
 
