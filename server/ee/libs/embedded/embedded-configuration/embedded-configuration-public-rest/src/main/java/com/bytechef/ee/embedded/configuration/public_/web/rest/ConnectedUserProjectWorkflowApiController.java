@@ -15,12 +15,15 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUs
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendWorkflowConfigurationConnectionRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -43,15 +46,17 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConversionService conversionService;
     private final EnvironmentService environmentService;
+    private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowApiController(
         ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService,
-        EnvironmentService environmentService) {
+        EnvironmentService environmentService, WorkflowTestConfigurationFacade workflowTestConfigurationFacade) {
 
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.conversionService = conversionService;
         this.environmentService = environmentService;
+        this.workflowTestConfigurationFacade = workflowTestConfigurationFacade;
     }
 
     @Override
@@ -142,6 +147,26 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         connectedUserProjectFacade.updateProjectWorkflow(
             OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"), workflowReferenceCode,
             createFrontendProjectWorkflowRequestModel.getDefinition(), getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateFrontendWorkflowConfigurationConnection(
+        String workflowReferenceCode, String workflowNodeName, String componentName,
+        UpdateFrontendWorkflowConfigurationConnectionRequestModel updateFrontendWorkflowConfigurationConnectionRequestModel,
+        EnvironmentModel xEnvironment) {
+
+        String externalUserId = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        Environment environment = xEnvironment == null
+            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
+
+        connectedUserProjectFacade.updateWorkflowConfigurationConnection(
+            externalUserId, workflowReferenceCode, workflowNodeName, componentName,
+            Objects.requireNonNull(updateFrontendWorkflowConfigurationConnectionRequestModel.getConnectionId()),
+            environment);
 
         return ResponseEntity.noContent()
             .build();
@@ -253,6 +278,24 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         connectedUserProjectFacade.updateProjectWorkflow(
             externalUserId, workflowReferenceCode,
             createFrontendProjectWorkflowRequestModel.getDefinition(), getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateWorkflowConfigurationConnection(
+        String externalUserId, String workflowReferenceCode, String workflowNodeName, String componentName,
+        UpdateFrontendWorkflowConfigurationConnectionRequestModel updateFrontendWorkflowConfigurationConnectionRequestModel,
+        EnvironmentModel xEnvironment) {
+
+        Environment environment = xEnvironment == null
+            ? Environment.PRODUCTION : environmentService.getEnvironment(xEnvironment.name());
+
+        connectedUserProjectFacade.updateWorkflowConfigurationConnection(
+            externalUserId, workflowReferenceCode, workflowNodeName, componentName,
+            Objects.requireNonNull(updateFrontendWorkflowConfigurationConnectionRequestModel.getConnectionId()),
+            environment);
 
         return ResponseEntity.noContent()
             .build();
