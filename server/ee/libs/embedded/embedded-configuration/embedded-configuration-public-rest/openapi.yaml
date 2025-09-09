@@ -153,7 +153,7 @@ paths:
           description: "Successful operation."
       security:
         - jwtBearerAuth: [ ]
-  /automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey}:
+  /automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey}:
     put:
       description: "Update a workflow configuration connection."
       summary: "Update a workflow configuration connection"
@@ -771,7 +771,7 @@ paths:
           description: "Successful operation."
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/automation/workflows/{workflowReferenceCode}/connections/{workflowNodeName}/{workflowConnectionKey}:
+  /{externalUserId}/automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connections/{workflowConnectionKey}:
     put:
       description: "Update a workflow configuration connection."
       summary: "Update a workflow configuration connection"
