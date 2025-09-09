@@ -53,6 +53,7 @@ import {
     PlusIcon,
     SendIcon,
     Trash2Icon,
+    UploadIcon,
     WorkflowIcon,
 } from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
@@ -82,6 +83,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const {toast} = useToast();
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
+    const ff_2482 = useFeatureFlagsStore()('ff-2482');
 
     const queryClient = useQueryClient();
 
@@ -374,6 +376,17 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 >
                                     <PlusIcon /> New Workflow
                                 </DropdownMenuItem>
+
+                                {ff_2482 && (
+                                    <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() =>
+                                        (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
+                                    }
+                                >
+                                    <UploadIcon /> Export Project
+                                </DropdownMenuItem>
+                                )}
 
                                 <DropdownMenuSeparator className="m-0" />
 
