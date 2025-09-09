@@ -65,15 +65,7 @@ public class JsonUtils {
             return "unknown";
         }
 
-        return switch (propertyType.toUpperCase()) {
-            case "STRING" -> "string";
-            case "BOOLEAN" -> "boolean";
-            case "NUMBER" -> "number";
-            case "INTEGER" -> "integer";
-            case "OBJECT" -> "object";
-            case "ARRAY" -> "array";
-            default -> propertyType.toLowerCase();
-        };
+        return propertyType.toLowerCase();
     }
 
     /**

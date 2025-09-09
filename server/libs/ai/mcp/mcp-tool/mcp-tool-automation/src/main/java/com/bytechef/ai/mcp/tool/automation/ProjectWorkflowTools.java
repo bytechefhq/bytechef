@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -256,6 +257,8 @@ public class ProjectWorkflowTools {
                 workflow,
                 genericTools::getTaskProperties,
                 genericTools::getTaskOutputProperty,
+                new HashMap<>(),
+                new HashMap<>(),
                 errors,
                 warnings
             );
