@@ -7,18 +7,19 @@ import {
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectedUserProjectWorkflowKeys = {
-    connectedUserProjectWorkflow: (workflowReferenceCode: string) => [
+    connectedUserProjectWorkflow: (workflowUuid: string) => [
         ...ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflows,
-        workflowReferenceCode,
+        workflowUuid,
     ],
     connectedUserProjectWorkflows: ['connectedUserProjectWorkflows'] as const,
 };
 
-export const useGetConnectedUserProjectWorkflowQuery = (workflowReferenceCode: string) =>
+export const useGetConnectedUserProjectWorkflowQuery = (workflowUuid: string, enabled = true) =>
     useQuery<ConnectedUserProjectWorkflow, Error>({
-        queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowReferenceCode),
+        queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
         queryFn: () =>
             new ConnectedUserProjectWorkflowApi().getConnectedUserProjectWorkflow({
-                workflowReferenceCode,
+                workflowUuid,
             }),
+        enabled,
     });

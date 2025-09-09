@@ -54,7 +54,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
 
     const {captureProjectPublished, captureProjectWorkflowTested} = useAnalytics();
     const navigate = useNavigate();
-    const {workflowReferenceCode} = useParams();
+    const {workflowUuid} = useParams();
     const [searchParams] = useSearchParams();
 
     const {toast} = useToast();
@@ -65,9 +65,9 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
         onSuccess: () => {
             captureProjectPublished();
 
-            if (workflowReferenceCode) {
+            if (workflowUuid) {
                 queryClient.invalidateQueries({
-                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowReferenceCode),
+                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
                 });
             }
 
@@ -90,7 +90,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
                 publishConnectedUserProjectWorkflowRequest: {
                     description,
                 },
-                workflowReferenceCode: workflowReferenceCode!,
+                workflowUuid: workflowUuid!,
             },
             {
                 onSuccess: onSuccess,

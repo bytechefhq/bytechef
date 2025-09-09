@@ -271,8 +271,7 @@ const IntegrationInstanceConfigurationDialog = ({
                 const integrationInstanceConfigurationWorkflow =
                     integrationInstanceConfiguration?.integrationInstanceConfigurationWorkflows?.find(
                         (integrationInstanceConfigurationWorkflow) =>
-                            integrationInstanceConfigurationWorkflow.workflowReferenceCode ===
-                            workflow.workflowReferenceCode
+                            integrationInstanceConfigurationWorkflow.workflowUuid === workflow.workflowUuid
                     );
 
                 if (integrationInstanceConfigurationWorkflow && integrationInstanceConfigurationWorkflow.enabled) {

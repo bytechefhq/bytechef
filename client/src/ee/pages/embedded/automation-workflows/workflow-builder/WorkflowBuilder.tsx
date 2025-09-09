@@ -1,3 +1,4 @@
+import LoadingDots from '@/components/LoadingDots';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import WorkflowBuilderHeader from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/WorkflowBuilderHeader';
 import {useWorkflowBuilder} from '@/ee/pages/embedded/automation-workflows/workflow-builder/hooks/useWorkflowBuilder';
@@ -37,16 +38,25 @@ const WorkflowBuilder = () => {
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
         includeComponents,
+        initialized,
         projectId,
         sharedConnectionIds,
         updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
-        workflowReferenceCode,
+        workflowUuid,
     } = useWorkflowBuilder();
 
     const {runDisabled} = useRun();
+
+    if (!initialized) {
+        return (
+            <div className="flex size-full items-center justify-center">
+                <LoadingDots />
+            </div>
+        );
+    }
 
     if (!connectedUserProjectWorkflow || !projectId) {
         return <></>;
@@ -79,7 +89,7 @@ const WorkflowBuilder = () => {
                                 updateWorkflowNodeParameterMutation,
                                 useCreateConnectionMutation: getCreateConnectedUserProjectWorkflowConnection(
                                     connectedUserProjectWorkflow.connectedUserId!,
-                                    workflowReferenceCode!
+                                    workflowUuid!
                                 ),
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
                                 useGetConnectionTagsQuery: useGetConnectionTagsQuery,

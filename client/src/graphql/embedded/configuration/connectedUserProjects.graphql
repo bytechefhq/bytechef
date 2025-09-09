@@ -12,7 +12,7 @@ query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
             enabled
             lastExecutionDate
             projectId
-            workflowReferenceCode
+            workflowUuid
             workflowVersion
             workflow {
                 id
