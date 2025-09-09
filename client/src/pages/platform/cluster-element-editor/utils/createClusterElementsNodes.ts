@@ -51,7 +51,7 @@ export default function createClusterElementNodes({
         if (isMultipleClusterElementsNode) {
             if (Array.isArray(clusterElementValue) && clusterElementValue.length) {
                 clusterElementValue.forEach((element) => {
-                    const clusterElementTypesCount = getFilteredClusterElementTypes({
+                    const filteredClusterElementTypes = getFilteredClusterElementTypes({
                         clusterRootComponentDefinition: nestedClusterRootsDefinitions[element.type?.split('/')[0]],
                         currentClusterElementsType: element.type?.split('/')[2] || '',
                         isNestedClusterRoot: !!element.clusterElements,
@@ -62,7 +62,7 @@ export default function createClusterElementNodes({
                         clusterElementTypeName,
                         clusterRootId,
                         currentNestedRootElementTypesCount: element.clusterElements
-                            ? clusterElementTypesCount.length
+                            ? filteredClusterElementTypes.length
                             : undefined,
                         element,
                         isMultipleClusterElementsNode,
@@ -108,7 +108,7 @@ export default function createClusterElementNodes({
             createdNodes.push(placeholderNode);
         } else {
             if (clusterElementValue && isPlainObject(clusterElementValue)) {
-                const clusterElementTypesCount = getFilteredClusterElementTypes({
+                const filteredClusterElementTypes = getFilteredClusterElementTypes({
                     clusterRootComponentDefinition:
                         nestedClusterRootsDefinitions[clusterElementValue.type?.split('/')[0]],
                     currentClusterElementsType: clusterElementValue.type?.split('/')[2] || '',
@@ -122,7 +122,7 @@ export default function createClusterElementNodes({
                     clusterElementTypeName,
                     clusterRootId,
                     currentNestedRootElementTypesCount: clusterElementValue.clusterElements
-                        ? clusterElementTypesCount.length
+                        ? filteredClusterElementTypes.length
                         : undefined,
                 });
 
