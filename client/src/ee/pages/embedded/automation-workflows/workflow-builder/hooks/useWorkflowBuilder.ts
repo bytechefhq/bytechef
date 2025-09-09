@@ -23,6 +23,7 @@ import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
 
 export const useWorkflowBuilder = () => {
+    const [initialized, setInitialized] = useState(false);
     const [includeComponents, setIncludeComponents] = useState<string[] | undefined>(undefined);
     const [sharedConnectionIds, setSharedConnectionIds] = useState<number[] | undefined>(undefined);
 
@@ -39,9 +40,9 @@ export const useWorkflowBuilder = () => {
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
 
-    const {workflowReferenceCode} = useParams();
+    const {workflowUuid} = useParams();
 
-    const {data: connectedUserProjectWorkflow} = useGetConnectedUserProjectWorkflowQuery(workflowReferenceCode!);
+    const {data: connectedUserProjectWorkflow} = useGetConnectedUserProjectWorkflowQuery(workflowUuid!, initialized);
 
     const queryClient = useQueryClient();
 
@@ -63,9 +64,9 @@ export const useWorkflowBuilder = () => {
 
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
-            if (workflowReferenceCode) {
+            if (workflowUuid) {
                 queryClient.invalidateQueries({
-                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowReferenceCode),
+                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
                 });
             }
         },
@@ -76,9 +77,9 @@ export const useWorkflowBuilder = () => {
 
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
-            if (workflowReferenceCode) {
+            if (workflowUuid) {
                 queryClient.invalidateQueries({
-                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowReferenceCode),
+                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
                 });
             }
 
@@ -91,9 +92,9 @@ export const useWorkflowBuilder = () => {
 
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: () => {
-            if (workflowReferenceCode) {
+            if (workflowUuid) {
                 queryClient.invalidateQueries({
-                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowReferenceCode),
+                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
                 });
             }
         },
@@ -101,9 +102,9 @@ export const useWorkflowBuilder = () => {
 
     const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation({
         onSuccess: () => {
-            if (workflowReferenceCode) {
+            if (workflowUuid) {
                 queryClient.invalidateQueries({
-                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowReferenceCode),
+                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
                 });
             }
         },
@@ -125,6 +126,7 @@ export const useWorkflowBuilder = () => {
         }
 
         const listener = (event: MessageEvent) => {
+            console.log('listener');
             if (event.data.type === 'EMBED_INIT') {
                 const sharedConnectionIds = event.data.params.sharedConnectionIds;
                 const connectionDialogAllowed = event.data.params.connectionDialogAllowed ?? false;
@@ -140,6 +142,8 @@ export const useWorkflowBuilder = () => {
                     sessionStorage.setItem('jwtToken', jwtToken);
                     sessionStorage.setItem('environment', environment);
                 }
+
+                setInitialized(true);
             }
         };
 
@@ -160,7 +164,7 @@ export const useWorkflowBuilder = () => {
 
         workflowNodeDetailsPanelStoreReset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowReferenceCode]);
+    }, [workflowUuid]);
 
     useEffect(() => {
         if (connectedUserProjectWorkflow) {
@@ -182,12 +186,13 @@ export const useWorkflowBuilder = () => {
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
         includeComponents,
+        initialized,
         projectId: connectedUserProjectWorkflow?.projectId,
         sharedConnectionIds,
         updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
-        workflowReferenceCode,
+        workflowUuid,
     };
 };

@@ -8,7 +8,7 @@ export const getRouter = () =>
             children: [
                 {
                     element: <WorkflowBuilder />,
-                    path: 'workflow-builder/:workflowReferenceCode',
+                    path: 'workflow-builder/:workflowUuid',
                 },
             ],
             element: <EmbeddedWorkflowBuilderApp />,

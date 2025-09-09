@@ -13,7 +13,7 @@ export const getCreateConnectedUserProjectWorkflowConnection =
                 return new ConnectionApi().createConnectedUserProjectWorkflowConnection({
                     connectedUserId,
                     connection,
-                    workflowReferenceCode,
+                    workflowUuid: workflowReferenceCode,
                 });
             },
             onError: mutationProps?.onError,
