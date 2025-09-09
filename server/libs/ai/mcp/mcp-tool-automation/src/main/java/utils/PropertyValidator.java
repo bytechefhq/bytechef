@@ -42,7 +42,7 @@ public class PropertyValidator {
             currentNode.fieldNames()
                 .forEachRemaining(fieldName -> {
                     if (!definitionNode.has(fieldName)) {
-                        String propertyPath = WorkflowParser.buildPropertyPath(path, fieldName);
+                        String propertyPath = PropertyUtils.buildPropertyPath(path, fieldName);
                         JsonNode currentValue = currentNode.get(fieldName);
 
                         ValidationErrorBuilder.append(warnings, ValidationErrorBuilder.notDefined(propertyPath));
@@ -58,7 +58,7 @@ public class PropertyValidator {
         definitionNode.fieldNames()
             .forEachRemaining(propertyName -> {
                 JsonNode defValue = definitionNode.get(propertyName);
-                String propertyPath = WorkflowParser.buildPropertyPath(path, propertyName);
+                String propertyPath = PropertyUtils.buildPropertyPath(path, propertyName);
 
                 if (defValue.isTextual()) {
                     handleTextualProperty(currentNode, propertyName, defValue, propertyPath,
@@ -84,7 +84,7 @@ public class PropertyValidator {
 
         JsonNode currentValue = currentNode.get(propertyName);
         if (!currentValue.isArray()) {
-            String actualType = WorkflowParser.getJsonNodeType(currentValue);
+            String actualType = JsonUtils.getJsonNodeType(currentValue);
             ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(propertyPath, "array", actualType));
             return;
         }
@@ -148,7 +148,7 @@ public class PropertyValidator {
             validatePropertiesRecursively(currentValue, defValue, propertyPath,
                 errors, warnings, originalTaskDefinition, originalCurrentParams);
         } else {
-            String actualType = WorkflowParser.getJsonNodeType(currentValue);
+            String actualType = JsonUtils.getJsonNodeType(currentValue);
             ValidationErrorBuilder.appendWithNewline(errors,
                 ValidationErrorBuilder.typeError(propertyPath, "object", actualType));
         }
@@ -200,7 +200,7 @@ public class PropertyValidator {
             currentNode.fieldNames()
                 .forEachRemaining(fieldName -> {
                     if (!definitionNode.has(fieldName)) {
-                        String propertyPath = WorkflowParser.buildPropertyPath(path, fieldName);
+                        String propertyPath = PropertyUtils.buildPropertyPath(path, fieldName);
                         JsonNode currentValue = currentNode.get(fieldName);
 
                         ValidationErrorBuilder.append(warnings, ValidationErrorBuilder.notDefined(propertyPath));
@@ -216,7 +216,7 @@ public class PropertyValidator {
         definitionNode.fieldNames()
             .forEachRemaining(propertyName -> {
                 JsonNode defValue = definitionNode.get(propertyName);
-                String propertyPath = WorkflowParser.buildPropertyPath(path, propertyName);
+                String propertyPath = PropertyUtils.buildPropertyPath(path, propertyName);
 
                 if (defValue.isTextual()) {
                     handleTextualProperty(currentNode, propertyName, defValue, propertyPath,
@@ -247,7 +247,7 @@ public class PropertyValidator {
             validatePropertiesRecursively(currentValue, defValue, propertyPath,
                 errors, warnings, originalTaskDefinition, originalTaskDefinitionForArrays, originalCurrentParams);
         } else {
-            String actualType = WorkflowParser.getJsonNodeType(currentValue);
+            String actualType = JsonUtils.getJsonNodeType(currentValue);
             ValidationErrorBuilder.appendWithNewline(errors,
                 ValidationErrorBuilder.typeError(propertyPath, "object", actualType));
         }
@@ -265,7 +265,7 @@ public class PropertyValidator {
 
         JsonNode currentValue = currentNode.get(propertyName);
         if (!currentValue.isArray()) {
-            String actualType = WorkflowParser.getJsonNodeType(currentValue);
+            String actualType = JsonUtils.getJsonNodeType(currentValue);
             ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(propertyPath, "array", actualType));
             return;
         }
@@ -316,7 +316,7 @@ public class PropertyValidator {
                     String subArrayPath = propertyPath + "[" + i + "]";
 
                     if (!subArray.isArray()) {
-                        String actualType = WorkflowParser.getJsonNodeType(subArray);
+                        String actualType = JsonUtils.getJsonNodeType(subArray);
                         ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(subArrayPath, "array", actualType));
                         continue;
                     }
@@ -368,7 +368,7 @@ public class PropertyValidator {
             String elementPath = propertyPath + "[" + i + "]";
 
             if (!taskElement.isObject()) {
-                String actualType = WorkflowParser.getJsonNodeType(taskElement);
+                String actualType = JsonUtils.getJsonNodeType(taskElement);
                 ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(elementPath, "object", actualType));
                 continue;
             }
@@ -386,7 +386,7 @@ public class PropertyValidator {
 
                 // Basic parameter structure validation
                 if (!parameters.isObject()) {
-                    String actualType = WorkflowParser.getJsonNodeType(parameters);
+                    String actualType = JsonUtils.getJsonNodeType(parameters);
                     ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(elementPath + ".parameters", "object", actualType));
                 }
             }
@@ -402,7 +402,7 @@ public class PropertyValidator {
             String elementPath = propertyPath + "[" + i + "]";
 
             if (!element.isObject()) {
-                String actualType = WorkflowParser.getJsonNodeType(element);
+                String actualType = JsonUtils.getJsonNodeType(element);
                 ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(elementPath, "object", actualType));
                 continue;
             }

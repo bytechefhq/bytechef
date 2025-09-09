@@ -160,7 +160,7 @@ public class FieldValidator {
             }
 
             if (!isTypeValid(currentValue, expectedType)) {
-                String actualType = WorkflowParser.getJsonNodeType(currentValue);
+                String actualType = JsonUtils.getJsonNodeType(currentValue);
                 ValidationErrorBuilder.append(errors,
                     ValidationErrorBuilder.typeError(propertyPath, expectedType, actualType));
             }
@@ -177,7 +177,7 @@ public class FieldValidator {
 
         JsonNode currentValue = currentNode.get(propertyName);
         if (!currentValue.isArray()) {
-            String actualType = WorkflowParser.getJsonNodeType(currentValue);
+            String actualType = JsonUtils.getJsonNodeType(currentValue);
             ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(propertyPath, "array", actualType));
             return;
         }
@@ -227,8 +227,8 @@ public class FieldValidator {
 
             if (!matchesAnyType) {
                 String elementValue = WorkflowParser.formatElementValue(element);
-                String propertyName = WorkflowParser.extractPropertyNameFromPath(propertyPath);
-                String actualType = WorkflowParser.getJsonNodeType(element);
+                String propertyName = PropertyUtils.extractPropertyNameFromPath(propertyPath);
+                String actualType = JsonUtils.getJsonNodeType(element);
 
                 // Build expected types string
                 StringBuilder expectedTypes = new StringBuilder();
@@ -252,7 +252,7 @@ public class FieldValidator {
             String elementPath = propertyPath + "[" + i + "]";
 
             if (!element.isObject()) {
-                String actualType = WorkflowParser.getJsonNodeType(element);
+                String actualType = JsonUtils.getJsonNodeType(element);
                 ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(elementPath, "object", actualType));
                 continue;
             }
@@ -273,7 +273,7 @@ public class FieldValidator {
                         JsonNode actualValue = element.get(fieldName);
 
                         if (!isTypeValid(actualValue, expectedType)) {
-                            String actualType = WorkflowParser.getJsonNodeType(actualValue);
+                            String actualType = JsonUtils.getJsonNodeType(actualValue);
                             ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(fieldPath, expectedType, actualType));
                         }
                     }
@@ -294,7 +294,7 @@ public class FieldValidator {
             String elementPath = propertyPath + "[" + i + "]";
 
             if (!element.isObject()) {
-                String actualType = WorkflowParser.getJsonNodeType(element);
+                String actualType = JsonUtils.getJsonNodeType(element);
                 ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(elementPath, "object", actualType));
                 continue;
             }
@@ -359,7 +359,7 @@ public class FieldValidator {
                             JsonNode actualValue = element.get(fieldName);
 
                             if (!isTypeValid(actualValue, expectedType)) {
-                                String actualType = WorkflowParser.getJsonNodeType(actualValue);
+                                String actualType = JsonUtils.getJsonNodeType(actualValue);
                                 ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(fieldPath, expectedType, actualType));
                             }
                         }
@@ -437,7 +437,7 @@ public class FieldValidator {
         defValue.fieldNames()
             .forEachRemaining(fieldName -> {
                 JsonNode fieldDef = defValue.get(fieldName);
-                String fullFieldPath = WorkflowParser.buildPropertyPath(propertyPath, fieldName);
+                String fullFieldPath = PropertyUtils.buildPropertyPath(propertyPath, fieldName);
 
                 if (fieldDef.isTextual() && fieldDef.asText()
                     .contains(REQUIRED_MARKER)) {
