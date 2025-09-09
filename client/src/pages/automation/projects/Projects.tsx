@@ -1,6 +1,7 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import ProjectsLeftSidebarNav from '@/pages/automation/projects/components/ProjectsLeftSidebarNav';
@@ -9,10 +10,12 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
-import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {FolderIcon} from 'lucide-react';
+import {useQueryClient} from '@tanstack/react-query';
+import {DownloadIcon, FolderIcon, PlusIcon} from 'lucide-react';
+import {useRef} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ProjectDialog from './components/ProjectDialog';
@@ -28,8 +31,10 @@ const Projects = () => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const [searchParams] = useSearchParams();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
+    const ff_2482 = useFeatureFlagsStore()('ff-2482');
 
     const categoryId = searchParams.get('categoryId');
     const tagId = searchParams.get('tagId');
@@ -59,6 +64,38 @@ const Projects = () => {
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
 
+    const queryClient = useQueryClient();
+
+    const handleImportProject = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch(`/api/automation/internal/workspaces/${currentWorkspaceId}/projects/import`, {
+                body: formData,
+                method: 'POST',
+            });
+
+            if (response.ok) {
+                queryClient.invalidateQueries({
+                    queryKey: ProjectKeys.projects,
+                });
+            } else {
+                console.error('Failed to import project');
+            }
+        } catch (error) {
+            console.error('Error importing project:', error);
+        }
+
+        // Reset the file input
+        if (event.target) {
+            event.target.value = '';
+        }
+    };
+
     return (
         <LayoutContainer
             header={
@@ -67,7 +104,34 @@ const Projects = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={<ProjectDialog project={undefined} triggerNode={<Button>New Project</Button>} />}
+                        right={
+                            ff_2482 ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button>New Project</Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end">
+                                        <ProjectDialog
+                                            project={undefined}
+                                            triggerNode={
+                                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                    <PlusIcon className="mr-2 size-4" />
+                                                    Create New Project
+                                                </DropdownMenuItem>
+                                            }
+                                        />
+
+                                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                            <DownloadIcon className="mr-2 size-4" />
+                                            Import Project
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <ProjectDialog project={undefined} triggerNode={<Button>New Project</Button>} />
+                            )
+                        }
                         title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
                     />
                 )
@@ -88,13 +152,46 @@ const Projects = () => {
                     />
                 ) : (
                     <EmptyList
-                        button={<ProjectDialog project={undefined} triggerNode={<Button>Create Project</Button>} />}
+                        button={
+                            ff_2482 ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button>Create Project</Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end">
+                                        <ProjectDialog
+                                            project={undefined}
+                                            triggerNode={
+                                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                    <PlusIcon className="mr-2 size-4" /> Create New Project
+                                                </DropdownMenuItem>
+                                            }
+                                        />
+
+                                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                            <DownloadIcon className="mr-2 size-4" /> Import Project
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <ProjectDialog project={undefined} triggerNode={<Button>Create Project</Button>} />
+                            )
+                        }
                         icon={<FolderIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new project."
                         title="No Projects"
                     />
                 )}
             </PageLoader>
+
+            <input
+                accept=".zip"
+                onChange={handleImportProject}
+                ref={fileInputRef}
+                style={{display: 'none'}}
+                type="file"
+            />
         </LayoutContainer>
     );
 };

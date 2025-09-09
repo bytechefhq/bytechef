@@ -11,6 +11,7 @@ import {
     GitPullRequestArrowIcon,
     HistoryIcon,
     Trash2Icon,
+    UploadIcon,
 } from 'lucide-react';
 import {MouseEvent, RefObject} from 'react';
 
@@ -24,6 +25,7 @@ const ProjectTabButtons = ({
     onShowProjectGitConfigurationDialog,
     onShowProjectVersionHistorySheet,
     projectGitConfigurationEnabled,
+    projectId,
 }: {
     hiddenFileInputRef: RefObject<HTMLInputElement>;
     onCloseDropdownMenuClick: () => void;
@@ -34,8 +36,10 @@ const ProjectTabButtons = ({
     onShowProjectGitConfigurationDialog: () => void;
     onShowProjectVersionHistorySheet: () => void;
     projectGitConfigurationEnabled: boolean;
+    projectId: number;
 }) => {
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
+    const ff_2482 = useFeatureFlagsStore()('ff-2482');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
@@ -64,6 +68,24 @@ const ProjectTabButtons = ({
             >
                 <DownloadIcon /> Import Workflow
             </Button>
+
+            <Button
+                className="dropdown-menu-item"
+                onClick={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
+                variant="ghost"
+            >
+                <UploadIcon /> Export Project
+            </Button>
+
+            {ff_2482 && (
+                <Button
+                    className="dropdown-menu-item"
+                    onClick={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
+                    variant="ghost"
+                >
+                    <DownloadIcon /> Export Project
+                </Button>
+            )}
 
             <Separator />
 

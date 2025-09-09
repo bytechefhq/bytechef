@@ -6,7 +6,7 @@ import ProjectGitConfigurationDialog from '@/pages/automation/project/components
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
 import DeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteWorkflowAlertDialog';
-import ProjectTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectTabButtons';
+import ProjectTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectTabButtons/ProjectTabButtons';
 import WorkflowTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/WorkflowTabButtons';
 import {useSettingsMenu} from '@/pages/automation/project/components/project-header/components/settings-menu/hooks/useSettingsMenu';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
@@ -125,6 +125,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                                 onShowProjectGitConfigurationDialog={() => setShowProjectGitConfigurationDialog(true)}
                                 onShowProjectVersionHistorySheet={() => setShowProjectVersionHistorySheet(true)}
                                 projectGitConfigurationEnabled={projectGitConfiguration?.enabled ?? false}
+                                projectId={project.id!}
                             />
                         </TabsContent>
                     </Tabs>
