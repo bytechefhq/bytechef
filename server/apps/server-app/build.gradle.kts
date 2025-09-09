@@ -90,6 +90,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api-key:platform-api-key-rest"))
     implementation(project(":server:libs:platform:platform-api-key:platform-api-key-service"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-service"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))

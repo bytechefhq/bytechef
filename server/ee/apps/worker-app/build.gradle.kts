@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
 

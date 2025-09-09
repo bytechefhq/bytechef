@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-service"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))

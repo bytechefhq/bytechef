@@ -3,6 +3,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
 
