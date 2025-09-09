@@ -1,4 +1,5 @@
-import {CreateSigningKey200Response, SigningKey, SigningKeyApi} from '@/ee/shared/middleware/embedded/signing-key';
+import {CreateSigningKey200Response, SigningKey, SigningKeyApi} from '@/ee/shared/middleware/embedded/security';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateSigningKeyMutationProps {
@@ -6,16 +7,22 @@ interface CreateSigningKeyMutationProps {
     onSuccess?: (result: CreateSigningKey200Response, variables: SigningKey) => void;
 }
 
-export const useCreateSigningKeyMutation = (mutationProps?: CreateSigningKeyMutationProps) =>
-    useMutation<CreateSigningKey200Response, Error, SigningKey>({
+export const useCreateSigningKeyMutation = (mutationProps?: CreateSigningKeyMutationProps) => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    return useMutation<CreateSigningKey200Response, Error, SigningKey>({
         mutationFn: (signingKey: SigningKey) => {
             return new SigningKeyApi().createSigningKey({
-                signingKey,
+                signingKey: {
+                    ...signingKey,
+                    environmentId: currentEnvironmentId!,
+                },
             });
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
     });
+};
 
 interface DeleteSigningKeyMutationProps {
     onError?: (error: Error, variables: number) => void;
@@ -38,14 +45,20 @@ interface UpdateSigningKeyMutationProps {
     onSuccess?: (result: void, variables: SigningKey) => void;
 }
 
-export const useUpdateSigningKeyMutation = (mutationProps?: UpdateSigningKeyMutationProps) =>
-    useMutation<void, Error, SigningKey>({
+export const useUpdateSigningKeyMutation = (mutationProps?: UpdateSigningKeyMutationProps) => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    return useMutation<void, Error, SigningKey>({
         mutationFn: (signingKey: SigningKey) => {
             return new SigningKeyApi().updateSigningKey({
                 id: signingKey.id!,
-                signingKey,
+                signingKey: {
+                    ...signingKey,
+                    environmentId: currentEnvironmentId!,
+                },
             });
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
     });
+};

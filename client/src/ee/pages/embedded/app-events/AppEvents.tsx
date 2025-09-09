@@ -5,12 +5,15 @@ import AppEventDialog from '@/ee/pages/embedded/app-events/components/AppEventDi
 import AppEventList from '@/ee/pages/embedded/app-events/components/AppEventList';
 import AppEventsFilterTitle from '@/ee/pages/embedded/app-events/components/AppEventsFilterTitle';
 import {useGetAppEventsQuery} from '@/ee/shared/queries/embedded/appEvents.queries';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {ZapIcon} from 'lucide-react';
 
 const AppEvents = () => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
     const {data: appEvents, error: appEventsError, isLoading: appEventsIsLoading} = useGetAppEventsQuery();
 
     return (
@@ -24,7 +27,11 @@ const AppEvents = () => {
                             position="main"
                             right={
                                 appEvents &&
-                                appEvents.length > 0 && <AppEventDialog triggerNode={<Button>New App Event</Button>} />
+                                appEvents.length > 0 && (
+                                    <AppEventDialog
+                                        triggerNode={!currentEnvironmentId ? <Button>New App Event</Button> : <></>}
+                                    />
+                                )
                             }
                             title={<AppEventsFilterTitle filterData={{}} workflows={[]} />}
                         />
@@ -52,7 +59,11 @@ const AppEvents = () => {
                     <AppEventList appEvents={appEvents} />
                 ) : (
                     <EmptyList
-                        button={<AppEventDialog triggerNode={<Button>New App Event</Button>} />}
+                        button={
+                            <AppEventDialog
+                                triggerNode={!currentEnvironmentId ? <Button>New App Event</Button> : <></>}
+                            />
+                        }
                         icon={<ZapIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new app event."
                         title="No App Events"
