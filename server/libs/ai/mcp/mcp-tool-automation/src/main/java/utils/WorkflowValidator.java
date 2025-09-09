@@ -297,11 +297,15 @@ public class WorkflowValidator {
         if (task.has("parameters") && task.get("parameters").isObject()) {
             taskParameters = task.get("parameters").toString();
         }
-        validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        if (taskDefinition != null && !taskDefinition.isEmpty()) {
+            validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        }
 
         processNestedTaskValidation(task, taskDefinitions, taskNames, taskNameToTypeMap, taskOutput, errors, warnings, allTasksMap);
 
-        validateTaskDataPills(task, taskOutput, taskNames, taskNameToTypeMap, errors, warnings, allTasksMap, taskDefinition);
+        if (taskDefinition != null && !taskDefinition.isEmpty()) {
+            validateTaskDataPills(task, taskOutput, taskNames, taskNameToTypeMap, errors, warnings, allTasksMap, taskDefinition);
+        }
     }
 
     private static void processNestedTaskValidation(
@@ -390,6 +394,8 @@ public class WorkflowValidator {
             String workflow,
             TaskDefinitionProvider taskDefinitionProvider,
             TaskOutputProvider taskOutputProvider,
+            Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions,
+            Map<String, ToolUtils.PropertyInfo> taskOutputs,
             StringBuilder errors,
             StringBuilder warnings) {
 
@@ -403,8 +409,6 @@ public class WorkflowValidator {
             JsonNode workflowNode = objectMapper.readTree(workflow);
 
             List<JsonNode> tasks = new ArrayList<>();
-            Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
-            Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
 
             // Process triggers
             if (workflowNode.has("triggers") && workflowNode.get("triggers").isArray()) {
@@ -432,7 +436,8 @@ public class WorkflowValidator {
                     taskOutputs.putIfAbsent(taskType, taskOutputProvider.getTaskOutputProperty(taskType, "", warnings));
 
                     // Handle nested TASK type properties by recursively processing them
-                    processNestedTasks(task, taskDefinitions, taskDefinitions, taskOutputs, errors, warnings);
+                    processNestedTasks(task, taskDefinitions, taskDefinitions, taskOutputs,
+                        tasks, taskDefinitionProvider, taskOutputProvider, errors, warnings);
                 });
             }
 
@@ -492,6 +497,9 @@ public class WorkflowValidator {
             Map<String, List<ToolUtils.PropertyInfo>> mainTaskDefinitions,
             Map<String, List<ToolUtils.PropertyInfo>> allTaskDefinitions,
             Map<String, ToolUtils.PropertyInfo> taskOutputs,
+            List<JsonNode> allTasks,
+            TaskDefinitionProvider taskDefinitionProvider,
+            TaskOutputProvider taskOutputProvider,
             StringBuilder errors,
             StringBuilder warnings) {
 
@@ -503,8 +511,78 @@ public class WorkflowValidator {
         String taskType = task.get("type").asText();
         List<ToolUtils.PropertyInfo> taskDef = mainTaskDefinitions.get(taskType);
 
-        if (taskDef != null) {
-            extractNestedTasksFromParameters(parameters, taskDef, allTaskDefinitions, taskOutputs, errors, warnings);
+        if (taskDef != null && !taskDef.isEmpty()) {
+            extractNestedTasksFromParameters(parameters, taskDef, allTaskDefinitions, taskOutputs,
+                allTasks, taskDefinitionProvider, taskOutputProvider, errors, warnings);
+        } else {
+            // If no task definition is available, look for common nested task patterns directly
+            discoverNestedTasksFromJsonStructure(parameters, allTaskDefinitions, taskOutputs, 
+                allTasks, taskDefinitionProvider, taskOutputProvider, errors, warnings);
+        }
+    }
+
+    /**
+     * Discovers nested tasks by looking for common patterns in JSON structure when task definitions are not available.
+     */
+    private static void discoverNestedTasksFromJsonStructure(
+            JsonNode parameters,
+            Map<String, List<ToolUtils.PropertyInfo>> allTaskDefinitions,
+            Map<String, ToolUtils.PropertyInfo> taskOutputs,
+            List<JsonNode> allTasks,
+            TaskDefinitionProvider taskDefinitionProvider,
+            TaskOutputProvider taskOutputProvider,
+            StringBuilder errors,
+            StringBuilder warnings) {
+        
+        // Common nested task property names in different task types
+        String[] nestedTaskProperties = {"caseTrue", "caseFalse", "iteratee", "tasks"};
+        
+        for (String propertyName : nestedTaskProperties) {
+            if (parameters.has(propertyName)) {
+                JsonNode propertyValue = parameters.get(propertyName);
+                
+                if (propertyValue.isArray()) {
+                    // Process each task in the array
+                    for (int i = 0; i < propertyValue.size(); i++) {
+                        JsonNode nestedTask = propertyValue.get(i);
+                        
+                        if (nestedTask.isObject() && nestedTask.has("type")) {
+                            String nestedTaskType = nestedTask.get("type").asText();
+                            
+                            // Add the nested task to the main tasks list for validation
+                            allTasks.add(nestedTask);
+                            
+                            // Add task definition for the nested task if not already present
+                            if (!allTaskDefinitions.containsKey(nestedTaskType)) {
+                                List<ToolUtils.PropertyInfo> nestedTaskDefinition = taskDefinitionProvider.getTaskProperties(nestedTaskType, "");
+                                allTaskDefinitions.put(nestedTaskType, nestedTaskDefinition != null ? nestedTaskDefinition : List.of());
+                            }
+                            
+                            // Add task output for the nested task if not already present
+                            if (!taskOutputs.containsKey(nestedTaskType)) {
+                                ToolUtils.PropertyInfo nestedTaskOutput = taskOutputProvider.getTaskOutputProperty(nestedTaskType, "", warnings);
+                                taskOutputs.put(nestedTaskType, nestedTaskOutput);
+                            }
+                            
+                            // Validate the nested task structure
+                            validateTaskStructure(nestedTask.toString(), errors);
+                            
+                            // Recursively process nested tasks within this task
+                            if (nestedTask.has("parameters")) {
+                                List<ToolUtils.PropertyInfo> nestedTaskDef = allTaskDefinitions.get(nestedTaskType);
+                                if (nestedTaskDef != null && !nestedTaskDef.isEmpty()) {
+                                    extractNestedTasksFromParameters(nestedTask.get("parameters"), nestedTaskDef,
+                                        allTaskDefinitions, taskOutputs, allTasks, taskDefinitionProvider, taskOutputProvider, errors, warnings);
+                                } else {
+                                    // Recursively discover more nested tasks
+                                    discoverNestedTasksFromJsonStructure(nestedTask.get("parameters"), allTaskDefinitions, taskOutputs, 
+                                        allTasks, taskDefinitionProvider, taskOutputProvider, errors, warnings);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -516,6 +594,9 @@ public class WorkflowValidator {
             List<ToolUtils.PropertyInfo> taskDefinition,
             Map<String, List<ToolUtils.PropertyInfo>> allTaskDefinitions,
             Map<String, ToolUtils.PropertyInfo> taskOutputs,
+            List<JsonNode> allTasks,
+            TaskDefinitionProvider taskDefinitionProvider,
+            TaskOutputProvider taskOutputProvider,
             StringBuilder errors,
             StringBuilder warnings) {
 
@@ -538,10 +619,21 @@ public class WorkflowValidator {
                         if (nestedTask.has("type")) {
                             String nestedTaskType = nestedTask.get("type").asText();
 
+                            // Add the nested task to the main tasks list for validation
+                            allTasks.add(nestedTask);
+
                             // Add task definition for the nested task if not already present
                             if (!allTaskDefinitions.containsKey(nestedTaskType)) {
-                                // This would need to be provided by the caller - for now we'll skip detailed validation
-                                // allTaskDefinitions.put(nestedTaskType, getTaskDefinition(nestedTaskType));
+                                List<ToolUtils.PropertyInfo> nestedTaskProperties = taskDefinitionProvider.getTaskProperties(nestedTaskType, "");
+                                // Always add the nested task type to the map, even if the provider returns null or empty
+                                allTaskDefinitions.put(nestedTaskType, nestedTaskProperties != null ? nestedTaskProperties : List.of());
+                            }
+
+                            // Add task output for the nested task if not already present
+                            if (!taskOutputs.containsKey(nestedTaskType)) {
+                                ToolUtils.PropertyInfo nestedTaskOutput = taskOutputProvider.getTaskOutputProperty(nestedTaskType, "", warnings);
+                                // Always add the nested task type to the map, even if the provider returns null
+                                taskOutputs.put(nestedTaskType, nestedTaskOutput);
                             }
 
                             // Validate the nested task structure
@@ -553,7 +645,7 @@ public class WorkflowValidator {
                                     allTaskDefinitions.get(nestedTaskType);
                                 if (nestedTaskDef != null) {
                                     extractNestedTasksFromParameters(nestedTask.get("parameters"), nestedTaskDef,
-                                        allTaskDefinitions, taskOutputs, errors, warnings);
+                                        allTaskDefinitions, taskOutputs, allTasks, taskDefinitionProvider, taskOutputProvider, errors, warnings);
                                 }
                             }
                         }

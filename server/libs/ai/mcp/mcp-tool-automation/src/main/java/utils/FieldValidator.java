@@ -425,6 +425,7 @@ public class FieldValidator {
             case "boolean" -> node.isBoolean();
             case "array" -> node.isArray();
             case "object" -> node.isObject();
+            case "null" -> node.isNull();
             default -> true;
         };
     }
