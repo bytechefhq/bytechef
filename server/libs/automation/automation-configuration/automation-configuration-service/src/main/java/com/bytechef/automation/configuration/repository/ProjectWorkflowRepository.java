@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.repository;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -36,22 +37,12 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
 
     List<ProjectWorkflow> findAllByProjectIdAndProjectVersion(Long projectId, int projectVersion);
 
-    List<ProjectWorkflow> findAllByProjectIdAndWorkflowReferenceCode(Long projectId, String workflowReferenceCode);
+    List<ProjectWorkflow> findAllByProjectIdAndUuid(Long projectId, UUID uuid);
 
     List<ProjectWorkflow> findAllByProjectIdIn(List<Long> projectIds);
 
     Optional<ProjectWorkflow> findByProjectIdAndProjectVersionAndWorkflowId(
         long projectId, int projectVersion, String workflowId);
-
-    @Query("""
-        SELECT project_workflow.* FROM project_workflow
-        WHERE project_workflow.project_id = :projectId
-        AND project_workflow.workflow_reference_code = :workflowReferenceCode
-        ORDER BY project_workflow.project_version DESC
-        LIMIT 1
-        """)
-    Optional<ProjectWorkflow> findByProjectIdAndWorkflowReferenceCode(
-        @Param("projectId") long projectId, @Param("workflowReferenceCode") String workflowReferenceCode);
 
     Optional<ProjectWorkflow> findByWorkflowId(String workflowId);
 
@@ -69,29 +60,35 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
         SELECT project_workflow.* FROM project_workflow
         JOIN project_deployment ON project_deployment.project_id = project_workflow.project_id
         AND project_deployment.project_version = project_workflow.project_version
-        WHERE project_workflow.workflow_reference_code = :workflowReferenceCode
+        WHERE project_workflow.uuid = :uuid
         AND project_deployment.id = :projectDeploymentId
         """)
-    Optional<ProjectWorkflow> findByProjectDeploymentIdAndWorkflowReferenceCode(
-        @Param("projectDeploymentId") long projectDeploymentId,
-        @Param("workflowReferenceCode") String workflowReferenceCode);
+    Optional<ProjectWorkflow> findByProjectDeploymentIdAndUuid(
+        @Param("projectDeploymentId") long projectDeploymentId, @Param("uuid") UUID uuid);
 
     @Query("""
         SELECT project_workflow.* FROM project_workflow
         WHERE project_workflow.project_id = :projectId
         AND project_workflow.project_version = :projectVersion
-        AND project_workflow.workflow_reference_code = :workflowReferenceCode
+        AND project_workflow.uuid = :uuid
         """)
-    Optional<ProjectWorkflow> findByProjectIdAndProjectVersionAndWorkflowReferenceCode(
-        @Param("projectId") long projectId, @Param("projectVersion") int projectVersion,
-        @Param("workflowReferenceCode") String workflowReferenceCode);
+    Optional<ProjectWorkflow> findByProjectIdAndProjectVersionAndUuid(
+        @Param("projectId") long projectId, @Param("projectVersion") int projectVersion, @Param("uuid") UUID uuid);
 
     @Query("""
         SELECT project_workflow.* FROM project_workflow
-        WHERE project_workflow.workflow_reference_code = :workflowReferenceCode
+        WHERE project_workflow.project_id = :projectId
+        AND project_workflow.uuid = :uuid
         ORDER BY project_workflow.project_version DESC
         LIMIT 1
         """)
-    Optional<ProjectWorkflow> findLatestProjectWorkflowByWorkflowReferenceCode(String workflowReferenceCode);
+    Optional<ProjectWorkflow> findLastByProjectIdAndUuid(@Param("projectId") long projectId, @Param("uuid") UUID uuid);
 
+    @Query("""
+        SELECT project_workflow.* FROM project_workflow
+        WHERE project_workflow.uuid = :uuid AS uuid
+        ORDER BY project_workflow.project_version DESC
+        LIMIT 1
+        """)
+    Optional<ProjectWorkflow> findLastByUuid(@Param("uuid") UUID uuid);
 }

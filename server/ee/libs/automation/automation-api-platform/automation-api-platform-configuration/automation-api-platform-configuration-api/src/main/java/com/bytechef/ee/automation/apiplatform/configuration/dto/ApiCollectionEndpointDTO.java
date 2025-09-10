@@ -24,10 +24,10 @@ public record ApiCollectionEndpointDTO(
     long apiCollectionId,
     String createdBy, Instant createdDate, boolean enabled, HttpMethod httpMethod, Long id, String lastModifiedBy,
     Instant lastModifiedDate, String name, String path, long projectDeploymentWorkflowId, int version,
-    String workflowReferenceCode) {
+    String workflowUuid) {
 
     public ApiCollectionEndpointDTO(
-        ApiCollectionEndpoint apiCollectionEndpoint, boolean enabled, String workflowReferenceCode) {
+        ApiCollectionEndpoint apiCollectionEndpoint, boolean enabled, String workflowUuid) {
 
         this(
             apiCollectionEndpoint.getApiCollectionId(), apiCollectionEndpoint.getCreatedBy(),
@@ -36,7 +36,7 @@ public record ApiCollectionEndpointDTO(
             apiCollectionEndpoint.getLastModifiedBy(), apiCollectionEndpoint.getLastModifiedDate(),
             apiCollectionEndpoint.getName(), apiCollectionEndpoint.getPath(),
             apiCollectionEndpoint.getProjectDeploymentWorkflowId(), apiCollectionEndpoint.getVersion(),
-            workflowReferenceCode);
+            workflowUuid);
     }
 
     public ApiCollectionEndpoint toApiCollectionEndpoint() {

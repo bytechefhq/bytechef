@@ -27,19 +27,19 @@ public interface ProjectWorkflowService {
 
     ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId);
 
-    ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, String workflowReferenceCode);
+    ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, String workflowUuid);
 
     void delete(List<Long> ids);
 
     void delete(long projectId, int projectVersion, String workflowId);
 
-    Optional<String> fetchLatestProjectWorkflowId(Long projectId, String workflowReferenceCode);
+    Optional<String> fetchLastProjectWorkflowId(Long projectId, String workflowUuid);
 
-    Optional<ProjectWorkflow> fetchProjectWorkflow(long projectId, int projectVersion, String workflowReferenceCode);
+    Optional<ProjectWorkflow> fetchProjectWorkflow(long projectId, int projectVersion, String workflowUuid);
 
-    ProjectWorkflow getLatestProjectWorkflow(Long projectId, String workflowReferenceCode);
+    ProjectWorkflow getLastProjectWorkflow(long projectId, String workflowUuid);
 
-    String getLatestWorkflowId(String workflowReferenceCode);
+    String getLastWorkflowId(String workflowUuid);
 
     List<Long> getProjectProjectWorkflowIds(long projectId, int projectVersion);
 
@@ -57,13 +57,15 @@ public interface ProjectWorkflowService {
 
     List<ProjectWorkflow> getProjectWorkflows(long projectId, int projectVersion);
 
-    List<ProjectWorkflow> getProjectWorkflows(Long projectId, String workflowReferenceCode);
+    List<ProjectWorkflow> getProjectWorkflows(Long projectId, String workflowUuid);
 
-    String getProjectDeploymentWorkflowId(long projectDeploymentId, String workflowReferenceCode);
+    String getProjectDeploymentWorkflowId(long projectDeploymentId, String workflowUuid);
 
-    String getProjectDeploymentWorkflowReferenceCode(long projectDeploymentId, String workflowId);
+    String getProjectDeploymentWorkflowUuid(long projectDeploymentId, String workflowId);
 
     ProjectWorkflow getWorkflowProjectWorkflow(String workflowId);
+
+    void publishWorkflow(long projectId, int oldProjectVersion, String oldWorkflowId, ProjectWorkflow projectWorkflow);
 
     ProjectWorkflow update(ProjectWorkflow projectWorkflow);
 }

@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -398,7 +399,7 @@ public class ProjectFacadeIntTest {
         projectWorkflowRepository.save(
             new ProjectWorkflow(
                 project.getId(), project.getLastVersion(), Validate.notNull(workflow.getId(), "id"),
-                "workflowReferenceCode"));
+                UUID.randomUUID()));
 
         List<ProjectWorkflowDTO> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
 

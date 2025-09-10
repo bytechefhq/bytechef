@@ -30,5 +30,5 @@ public interface TriggerContextAware extends TriggerContext {
 
     ModeType getType();
 
-    String getWorkflowReferenceCode();
+    String getWorkflowUuid();
 }

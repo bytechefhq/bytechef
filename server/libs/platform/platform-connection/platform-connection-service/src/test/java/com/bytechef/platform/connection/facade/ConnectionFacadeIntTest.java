@@ -339,7 +339,7 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public boolean isWorkflowEnabled(long jobPrincipalId, String workflowReferenceCode) {
+                public boolean isWorkflowEnabled(long jobPrincipalId, String workflowUuid) {
                     return false;
                 }
 
@@ -349,7 +349,7 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public Map<String, ?> getInputMap(long jobPrincipalId, String workflowReferenceCode) {
+                public Map<String, ?> getInputMap(long jobPrincipalId, String workflowUuid) {
                     return Map.of();
                 }
 
@@ -364,17 +364,17 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public String getWorkflowId(long jobPrincipalId, String workflowReferenceCode) {
+                public String getWorkflowId(long jobPrincipalId, String workflowUuid) {
                     return "";
                 }
 
                 @Override
-                public String getLatestWorkflowId(String workflowReferenceCode) {
+                public String getLastWorkflowId(String workflowUuid) {
                     return "";
                 }
 
                 @Override
-                public String getWorkflowReferenceCode(String workflowId) {
+                public String getWorkflowUuid(String workflowId) {
                     return "";
                 }
             };

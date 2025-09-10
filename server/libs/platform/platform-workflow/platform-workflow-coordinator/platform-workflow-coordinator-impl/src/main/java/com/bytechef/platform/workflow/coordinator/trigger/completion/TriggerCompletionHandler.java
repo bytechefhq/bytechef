@@ -137,7 +137,7 @@ public class TriggerCompletionHandler {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
-            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
@@ -145,7 +145,7 @@ public class TriggerCompletionHandler {
             workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
-            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
     private Map<String, ?> getMetadataMap(WorkflowExecutionId workflowExecutionId) {

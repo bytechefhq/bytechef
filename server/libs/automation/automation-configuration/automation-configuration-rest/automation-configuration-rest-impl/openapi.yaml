@@ -1391,8 +1391,8 @@ components:
         workflowId:
           description: "The id of a workflow."
           type: "string"
-        workflowReferenceCode:
-          description: "The workflow reference code"
+        workflowUuid:
+          description: "The workflow uuid"
           type: "string"
           readOnly: true
         __version:
@@ -1478,8 +1478,8 @@ components:
               type: "integer"
               format: "int64"
               readOnly: true
-            workflowReferenceCode:
-              description: "The workflow reference code"
+            workflowUuid:
+              description: "The workflow uuid"
               type: "string"
               readOnly: true
     WorkflowBasic:
@@ -1493,8 +1493,8 @@ components:
               type: "integer"
               format: "int64"
               readOnly: true
-            workflowReferenceCode:
-              description: "The workflow reference code"
+            workflowUuid:
+              description: "The workflow uuid"
               type: "string"
               readOnly: true
     Workspace:

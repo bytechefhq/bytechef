@@ -149,15 +149,15 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
 
-        return projectWorkflow.getWorkflowReferenceCode();
+        return projectWorkflow.getUuid();
     }
 
     @Override
-    public void deleteProjectWorkflow(String externalUserId, String workflowReferenceCode, Environment environment) {
+    public void deleteProjectWorkflow(String externalUserId, String workflowUuid, Environment environment) {
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-            connectedUserProject.getProjectId(), workflowReferenceCode);
+            connectedUserProject.getProjectId(), workflowUuid);
 
         Set<Long> connectionIds = new HashSet<>();
 
@@ -184,7 +184,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public void enableProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, boolean enable, Long environmentId) {
+        String externalUserId, String workflowUuidrenceCode, boolean enable, Long environmentId) {
 
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
@@ -194,7 +194,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         String workflowId = projectWorkflowService
             .getProjectDeploymentWorkflowId(
                 projectDeploymentService.getProjectDeploymentId(connectedUserProject.getProjectId(), environment),
-                workflowReferenceCode);
+                workflowUuidrenceCode);
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(
             connectedUserProject.getProjectId(), workflowId, enable, environment);
@@ -202,15 +202,15 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public ConnectedUserProjectWorkflowDTO getConnectedUserProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, Long environmentId) {
+        String externalUserId, String workflowUuid, Long environmentId) {
 
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getLatestProjectWorkflow(
-            connectedUserProject.getProjectId(), workflowReferenceCode);
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
+            connectedUserProject.getProjectId(), workflowUuid);
 
         ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
             .getConnectedUserProjectWorkflow(connectedUserProject.getId(), projectWorkflow.getId());
@@ -271,7 +271,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public void publishProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, String description, Long environmentId) {
+        String externalUserId, String workflowUuid, String description, Long environmentId) {
 
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
@@ -279,9 +279,9 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         String workflowId = projectWorkflowService
-            .fetchLatestProjectWorkflowId(connectedUserProject.getProjectId(), workflowReferenceCode)
+            .fetchLastProjectWorkflowId(connectedUserProject.getProjectId(), workflowUuid)
             .orElseThrow(() -> new ConfigurationException(
-                "Workflow with workflowReferenceCode: %s not exist".formatted(workflowReferenceCode),
+                "Workflow with workflowUuid: %s not exist".formatted(workflowUuid),
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
@@ -322,7 +322,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             projectDeploymentFacade.createProjectDeployment(projectDeployment, workflowId, connections);
         } else {
             projectDeploymentFacade.updateProjectDeployment(
-                connectedUserProject.getProjectId(), newProjectVersion - 1, workflowReferenceCode, connections,
+                connectedUserProject.getProjectId(), newProjectVersion - 1, workflowUuid, connections,
                 environmentId);
         }
 
@@ -332,12 +332,12 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public void updateProjectWorkflow(
-        String externalUserId, String workflowReferenceCode, String definition, Environment environment) {
+        String externalUserId, String workflowUuid, String definition, Environment environment) {
 
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getLatestProjectWorkflow(
-            connectedUserProject.getProjectId(), workflowReferenceCode);
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
+            connectedUserProject.getProjectId(), workflowUuid);
 
         Workflow oldWorkflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
@@ -346,15 +346,15 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public void updateWorkflowConfigurationConnection(
-        String externalUserId, String workflowReferenceCode, String workflowNodeName, String workflowConnectionKey,
+        String externalUserId, String workflowUuid, String workflowNodeName, String workflowConnectionKey,
         long connectionId, Environment environment) {
 
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         String workflowId = projectWorkflowService
-            .fetchLatestProjectWorkflowId(connectedUserProject.getProjectId(), workflowReferenceCode)
+            .fetchLastProjectWorkflowId(connectedUserProject.getProjectId(), workflowUuid)
             .orElseThrow(() -> new ConfigurationException(
-                "Workflow with workflowReferenceCode: %s not exist".formatted(workflowReferenceCode),
+                "Workflow with workflowUuid: %s not exist".formatted(workflowUuid),
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
@@ -467,8 +467,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         projectWorkflow = projectWorkflowService
             .fetchProjectWorkflow(
-                projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion() - 1,
-                projectWorkflow.getWorkflowReferenceCode())
+                projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion() - 1, projectWorkflow.getUuid())
             .orElse(null);
 
         if (projectWorkflow == null) {

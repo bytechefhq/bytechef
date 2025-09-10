@@ -31,12 +31,12 @@ public record ProjectDeploymentWorkflowDTO(
     List<ProjectDeploymentWorkflowConnection> connections, String createdBy, Instant createdDate,
     Map<String, ?> inputs, boolean enabled, Long id, Instant lastExecutionDate, String lastModifiedBy,
     Instant lastModifiedDate, Long projectDeploymentId, String staticWebhookUrl, int version, String workflowId,
-    String workflowReferenceCode)
+    String workflowUuid)
     implements Comparable<ProjectDeploymentWorkflowDTO> {
 
     public ProjectDeploymentWorkflowDTO(
         ProjectDeploymentWorkflow projectDeploymentWorkflow, Instant lastExecutionDate, String staticWebhookUrl,
-        String workflowReferenceCode) {
+        String workflowUuid) {
 
         this(
             projectDeploymentWorkflow.getConnections(), projectDeploymentWorkflow.getCreatedBy(),
@@ -45,7 +45,7 @@ public record ProjectDeploymentWorkflowDTO(
             lastExecutionDate, projectDeploymentWorkflow.getLastModifiedBy(),
             projectDeploymentWorkflow.getLastModifiedDate(), projectDeploymentWorkflow.getProjectDeploymentId(),
             staticWebhookUrl, projectDeploymentWorkflow.getVersion(), projectDeploymentWorkflow.getWorkflowId(),
-            workflowReferenceCode);
+            workflowUuid);
     }
 
     @Override

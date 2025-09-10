@@ -512,7 +512,7 @@ components:
         - "enabled"
         - "httpMethod"
         - "path"
-        - "workflowReferenceCode"
+        - "workflowUuid"
       properties:
         apiCollectionId:
           description: "The id of an API collection."
@@ -563,8 +563,8 @@ components:
           type: "integer"
           format: "int64"
           readOnly: true
-        workflowReferenceCode:
-          description: "The workflow reference code."
+        workflowUuid:
+          description: "The workflow uuid."
           type: "string"
         __version:
           type: "integer"

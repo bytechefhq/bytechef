@@ -116,7 +116,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, long environmentId) {
 
         String workflowId = getLatestWorkflowId(
-            workflowExecutionId.getWorkflowReferenceCode(), workflowExecutionId.getType());
+            workflowExecutionId.getWorkflowUuid(), workflowExecutionId.getType());
 
         WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId);
 
@@ -134,12 +134,12 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     }
 
     private String executeTrigger(String workflowId, boolean enable, ModeType type, long environmentId) {
-        String workflowReferenceCode = getWorkflowReferenceCode(workflowId, type);
+        String workflowUuid = getWorkflowUuid(workflowId, type);
 
         WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId);
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            type, -1, workflowReferenceCode, workflowTrigger.getName());
+            type, -1, workflowUuid, workflowTrigger.getName());
         WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
         Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
             workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, environmentId), evaluator);
@@ -238,10 +238,10 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         }
     }
 
-    private String getLatestWorkflowId(String workflowReferenceCode, ModeType type) {
+    private String getLatestWorkflowId(String workflowUuid, ModeType type) {
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
 
-        return jobPrincipalAccessor.getLatestWorkflowId(workflowReferenceCode);
+        return jobPrincipalAccessor.getLastWorkflowId(workflowUuid);
     }
 
     private String getWebhookUrl(WorkflowExecutionId workflowExecutionId, long environmentId) {
@@ -249,10 +249,10 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             .replace("{id}", workflowExecutionId.toString());
     }
 
-    private String getWorkflowReferenceCode(String workflowId, ModeType type) {
+    private String getWorkflowUuid(String workflowId, ModeType type) {
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
 
-        return jobPrincipalAccessor.getWorkflowReferenceCode(workflowId);
+        return jobPrincipalAccessor.getWorkflowUuid(workflowId);
     }
 
     private WorkflowTrigger getWorkflowTrigger(String workflowId) {

@@ -70,7 +70,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         ConnectedUserProject connectedUserProject = connectedUserProjectService.getConnectedUserConnectedUserProject(
             connectedUserId);
 
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getLatestProjectWorkflow(
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
             connectedUserProject.getProjectId(), workflowUuid);
 
         connectedUserProjectWorkflowService.addConnection(

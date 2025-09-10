@@ -58,7 +58,7 @@ public interface ProjectDeploymentFacade {
     void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO);
 
     void updateProjectDeployment(
-        long projectId, int projectVersion, String workflowReferenceCode,
+        long projectId, int projectVersion, String workflowUuid,
         List<ProjectDeploymentWorkflowConnection> connections, Long environmentId);
 
     void updateProjectDeployment(

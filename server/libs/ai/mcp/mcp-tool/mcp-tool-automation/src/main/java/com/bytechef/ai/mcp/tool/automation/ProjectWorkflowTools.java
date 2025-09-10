@@ -82,7 +82,7 @@ public class ProjectWorkflowTools {
 
             return new ProjectWorkflowInfo(
                 projectWorkflow.getId(), projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion(),
-                projectWorkflow.getWorkflowId(), projectWorkflow.getWorkflowReferenceCode(),
+                projectWorkflow.getWorkflowId(), projectWorkflow.getUuid(),
                 projectWorkflow.getCreatedDate() != null ? projectWorkflow.getCreatedDate() : null,
                 projectWorkflow.getLastModifiedDate() != null ? projectWorkflow.getLastModifiedDate() : null);
         } catch (Exception e) {
@@ -103,7 +103,7 @@ public class ProjectWorkflowTools {
 
             List<WorkflowInfo> workflowInfos = workflows.stream()
                 .map(workflow -> new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
-                    workflow.getWorkflowReferenceCode(),
+                    workflow.getWorkflowUuid(),
                     workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
                     workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
                     workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
@@ -133,9 +133,9 @@ public class ProjectWorkflowTools {
                 logger.debug("Retrieved workflow {}", workflow.getProjectWorkflowId());
             }
 
-            return new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
-                workflow.getWorkflowReferenceCode(),
-                workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
+            return new WorkflowInfo(
+                workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowUuid(), workflow.getLabel(),
+                workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
                 workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
                 workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null);
         } catch (Exception e) {
@@ -170,9 +170,9 @@ public class ProjectWorkflowTools {
 
                     return name.contains(lowerQuery) || description.contains(lowerQuery);
                 })
-                .map(workflow -> new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
-                    workflow.getWorkflowReferenceCode(),
-                    workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
+                .map(workflow -> new WorkflowInfo(
+                    workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowUuid(), workflow.getLabel(),
+                    workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
                     workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
                     workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
                 .toList();
@@ -221,15 +221,16 @@ public class ProjectWorkflowTools {
 
         try {
             ProjectWorkflowDTO workflow = projectFacade.getProjectWorkflow(workflowId);
+
             projectFacade.updateWorkflow(workflow.getId(), definition, workflow.getVersion());
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Updated workflow {} with name '{}'", workflow.getId(), workflow.getLabel());
             }
 
-            return new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
-                workflow.getWorkflowReferenceCode(),
-                workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
+            return new WorkflowInfo(
+                workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowUuid(), workflow.getLabel(),
+                workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
                 workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
                 workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null);
         } catch (Exception e) {
@@ -248,7 +249,7 @@ public class ProjectWorkflowTools {
         @JsonProperty("project_id") @JsonPropertyDescription("The ID of the project this workflow belongs to") long projectId,
         @JsonProperty("project_version") @JsonPropertyDescription("The version of the project") int projectVersion,
         @JsonProperty("workflow_id") @JsonPropertyDescription("The unique identifier of the workflow") String workflowId,
-        @JsonProperty("workflow_reference_code") @JsonPropertyDescription("The reference code of the workflow") String workflowReferenceCode,
+        @JsonProperty("workflow_uuid") @JsonPropertyDescription("The uuid of the workflow") String workflowUuid,
         @JsonProperty("created_date") @JsonPropertyDescription("When the workflow was created") Instant createdDate,
         @JsonProperty("last_modified_date") @JsonPropertyDescription("When the workflow was last modified") Instant lastModifiedDate) {
     }
@@ -260,7 +261,7 @@ public class ProjectWorkflowTools {
     public record WorkflowInfo(
         @JsonProperty("id") @JsonPropertyDescription("The unique identifier of the workflow") String id,
         @JsonProperty("project_workflow_id") @JsonPropertyDescription("The unique identifier of the project workflow") Long projectWorkflowId,
-        @JsonProperty("workflow_reference_code") @JsonPropertyDescription("The reference code of the workflow") String workflowReferenceCode,
+        @JsonProperty("workflow_uuid") @JsonPropertyDescription("The uuid of the workflow") String workflowUuid,
         @JsonProperty("name") @JsonPropertyDescription("The name of the workflow") String name,
         @JsonProperty("description") @JsonPropertyDescription("The description of the workflow") String description,
         @JsonProperty("definition") @JsonPropertyDescription("The definition of the workflow") String definition,

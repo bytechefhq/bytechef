@@ -99,12 +99,12 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
-    public String getLatestWorkflowId(String workflowUuid) {
+    public String getLastWorkflowId(String workflowUuid) {
         return integrationWorkflowService.getLastWorkflowId(workflowUuid);
     }
 
     @Override
-    public String getWorkflowReferenceCode(String workflowId) {
+    public String getWorkflowUuid(String workflowId) {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
             workflowId);
 

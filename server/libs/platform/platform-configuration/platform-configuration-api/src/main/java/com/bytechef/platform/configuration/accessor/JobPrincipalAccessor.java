@@ -26,19 +26,19 @@ public interface JobPrincipalAccessor {
 
     boolean isConnectionUsed(long connectionId);
 
-    boolean isWorkflowEnabled(long jobPrincipalId, String workflowReferenceCode);
+    boolean isWorkflowEnabled(long jobPrincipalId, String workflowUuid);
 
     long getEnvironmentId(long jobPrincipalId);
 
-    Map<String, ?> getInputMap(long jobPrincipalId, String workflowReferenceCode);
+    Map<String, ?> getInputMap(long jobPrincipalId, String workflowUuid);
 
     Map<String, ?> getMetadataMap(long jobPrincipalId);
 
     ModeType getType();
 
-    String getWorkflowId(long jobPrincipalId, String workflowReferenceCode);
+    String getWorkflowId(long jobPrincipalId, String workflowUuid);
 
-    String getLatestWorkflowId(String workflowReferenceCode);
+    String getLastWorkflowId(String workflowUuid);
 
-    String getWorkflowReferenceCode(String workflowId);
+    String getWorkflowUuid(String workflowId);
 }
