@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -247,9 +246,10 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                         integrationInstanceId, integrationInstanceConfigurationWorkflow.getId());
                 });
 
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        validateInputs(inputs, workflow);
+// TODO Don’t validate inputs as they are currently entered one by one in ConnectDialog, check if it is possible to
+// change the logic and send the all inputs at once
+//        Workflow workflow = workflowService.getWorkflow(workflowId);
+//        validateInputs(inputs, workflow);
 
         integrationInstanceWorkflow.setInputs(inputs);
 
@@ -299,7 +299,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
-        validateInputs(integrationInstanceWorkflow.getInputs(), workflow);
+// TODO Don’t validate inputs as they are currently entered one by one in ConnectDialog, check if it is possible to
+// change the logic and send the all inputs at once
+//        validateInputs(integrationInstanceWorkflow.getInputs(), workflow);
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
@@ -378,12 +380,14 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         return webhookUrl.replace("{id}", workflowExecutionId.toString());
     }
 
-    private void validateInputs(Map<String, ?> inputs, Workflow workflow) {
-        for (Workflow.Input input : workflow.getInputs()) {
-            if (input.required()) {
-                Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
-                Validate.notEmpty((String) inputs.get(input.name()), "Missing required param: " + input.name());
-            }
-        }
-    }
+// TODO Don’t validate inputs as they are currently entered one by one in ConnectDialog, check if it is possible to
+// change the logic and send the all inputs at once
+//    private void validateInputs(Map<String, ?> inputs, Workflow workflow) {
+//        for (Workflow.Input input : workflow.getInputs()) {
+//            if (input.required()) {
+//                Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
+//                Validate.notEmpty((String) inputs.get(input.name()), "Missing required param: " + input.name());
+//            }
+//        }
+//    }
 }
