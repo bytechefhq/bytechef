@@ -62,7 +62,7 @@ function renderApp() {
             .getState()
             .getAccount()
             .then((result) => {
-                if (!result && window.location.pathname != '/login') {
+                if (!result && window.location.pathname !== '/login') {
                     window.location.pathname = '/login';
                 }
             });
