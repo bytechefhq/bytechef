@@ -12,6 +12,7 @@
     "label" : "OpenAI",
     "name" : "openAi_1",
     "parameters" : {
+      "format" : "ADVANCED",
       "response" : {
         "responseFormat" : "TEXT"
       },

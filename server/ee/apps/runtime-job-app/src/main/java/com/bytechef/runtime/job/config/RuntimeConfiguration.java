@@ -14,6 +14,8 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepos
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.platform.scheduler.TriggerScheduler;
+import com.bytechef.runtime.job.platform.scheduler.NoOpTriggerScheduler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
@@ -52,5 +54,10 @@ public class RuntimeConfiguration {
     @Bean
     InMemoryTaskExecutionRepository taskExecutionRepository(CacheManager cacheManager) {
         return new InMemoryTaskExecutionRepository(cacheManager);
+    }
+
+    @Bean
+    TriggerScheduler triggerScheduler() {
+        return new NoOpTriggerScheduler();
     }
 }
