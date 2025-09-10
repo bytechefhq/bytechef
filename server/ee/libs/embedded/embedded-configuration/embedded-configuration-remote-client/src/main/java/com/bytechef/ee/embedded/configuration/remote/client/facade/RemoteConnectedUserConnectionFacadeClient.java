@@ -24,7 +24,7 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
 
     @Override
     public long createConnectedUserProjectWorkflowConnection(
-        long connectedUserId, String workflowReferenceCode, ConnectionDTO connectionDTO) {
+        long connectedUserId, String workflowUuid, ConnectionDTO connectionDTO) {
 
         throw new UnsupportedOperationException();
     }

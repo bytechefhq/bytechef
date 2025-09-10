@@ -24,7 +24,7 @@ type ConnectedUserProjectWorkflow {
     lastExecutionDate: String
     projectId: ID!
     workflow: Workflow!
-    workflowReferenceCode: ID!
+    workflowUuid: ID!
     workflowVersion: Int!
     createdBy: String
     createdDate: String

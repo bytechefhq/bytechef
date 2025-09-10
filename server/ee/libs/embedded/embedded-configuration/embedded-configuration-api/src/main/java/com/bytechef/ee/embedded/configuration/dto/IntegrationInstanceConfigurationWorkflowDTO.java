@@ -25,12 +25,12 @@ public record IntegrationInstanceConfigurationWorkflowDTO(
     List<IntegrationInstanceConfigurationWorkflowConnection> connections, String createdBy, Instant createdDate,
     Map<String, ?> inputs, boolean enabled, Long id, Instant lastExecutionDate, String lastModifiedBy,
     Instant lastModifiedDate, Long integrationInstanceConfigurationId, int version, Workflow workflow,
-    String workflowId, String workflowReferenceCode)
+    String workflowId, String workflowUuid)
     implements Comparable<IntegrationInstanceConfigurationWorkflowDTO> {
 
     public IntegrationInstanceConfigurationWorkflowDTO(
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, Instant lastExecutionDate,
-        Workflow workflow, String workflowReferenceCode) {
+        Workflow workflow, String workflowUuid) {
 
         this(
             integrationInstanceConfigurationWorkflow.getConnections(),
@@ -43,7 +43,7 @@ public record IntegrationInstanceConfigurationWorkflowDTO(
             integrationInstanceConfigurationWorkflow.getLastModifiedDate(),
             integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
             integrationInstanceConfigurationWorkflow.getVersion(), workflow,
-            integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowReferenceCode);
+            integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowUuid);
     }
 
     @Override

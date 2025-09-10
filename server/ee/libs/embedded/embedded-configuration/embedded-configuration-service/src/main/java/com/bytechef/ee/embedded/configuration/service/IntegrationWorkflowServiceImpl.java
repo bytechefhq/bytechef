@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.embedded.configuration.service;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -36,19 +35,8 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
 
     @Override
     public IntegrationWorkflow addWorkflow(long integrationId, int integrationVersion, String workflowId) {
-        return addWorkflow(integrationId, integrationVersion, workflowId, String.valueOf(UUID.randomUUID()));
-    }
-
-    @Override
-    public IntegrationWorkflow addWorkflow(
-        long integrationId, int integrationVersion, String workflowId, String workflowReferenceCode) {
-
-        Assert.notNull(workflowId, "'workflowId' must not be null");
-
-        IntegrationWorkflow integrationWorkflow = new IntegrationWorkflow(
-            integrationId, integrationVersion, workflowId, workflowReferenceCode);
-
-        return integrationWorkflowRepository.save(integrationWorkflow);
+        return integrationWorkflowRepository.save(
+            new IntegrationWorkflow(integrationId, integrationVersion, workflowId));
     }
 
     @Override
@@ -65,7 +53,8 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
 
     @Override
     public IntegrationWorkflow getIntegrationWorkflow(long id) {
-        return OptionalUtils.get(integrationWorkflowRepository.findById(id));
+        return integrationWorkflowRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("IntegrationWorkflow not found for id: " + id));
     }
 
     @Override
@@ -94,27 +83,27 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     }
 
     @Override
-    public String getLatestWorkflowId(String workflowReferenceCode) {
-        return OptionalUtils.get(
-            integrationWorkflowRepository
-                .findLatestIntegrationWorkflowByWorkflowReferenceCode(workflowReferenceCode)
-                .map(IntegrationWorkflow::getWorkflowId));
+    public String getLastWorkflowId(String workflowUuid) {
+        return integrationWorkflowRepository
+            .findLastByUuid(UUID.fromString(workflowUuid))
+            .map(IntegrationWorkflow::getWorkflowId)
+            .orElseThrow(() -> new IllegalArgumentException("Workflow not found for uuid: " + workflowUuid));
     }
 
     @Override
-    public String getLatestWorkflowId(String workflowReferenceCode, Environment environment) {
-        return OptionalUtils.get(
-            integrationWorkflowRepository
-                .findLatestByWorkflowReferenceCodeAndEnvironment(workflowReferenceCode, environment.ordinal())
-                .map(IntegrationWorkflow::getWorkflowId));
+    public String getLastWorkflowId(String workflowUuid, Environment environment) {
+        return integrationWorkflowRepository
+            .findLastByUuidAndEnvironment(workflowUuid, environment.ordinal())
+            .map(IntegrationWorkflow::getWorkflowId)
+            .orElseThrow(() -> new IllegalArgumentException("Workflow not found for uuid: " + workflowUuid));
     }
 
     @Override
-    public String getWorkflowId(long integrationInstanceId, String workflowReferenceCode) {
-        return OptionalUtils.get(
-            integrationWorkflowRepository
-                .findByIntegrationInstanceIdAndWorkflowReferenceCode(integrationInstanceId, workflowReferenceCode)
-                .map(IntegrationWorkflow::getWorkflowId));
+    public String getWorkflowId(long integrationInstanceId, String workflowUuid) {
+        return integrationWorkflowRepository
+            .findByIntegrationInstanceIdAndUuid(integrationInstanceId, UUID.fromString(workflowUuid))
+            .map(IntegrationWorkflow::getWorkflowId)
+            .orElseThrow(() -> new IllegalArgumentException("Workflow not found for uuid: " + workflowUuid));
     }
 
     @Override
@@ -128,7 +117,22 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
 
     @Override
     public IntegrationWorkflow getWorkflowIntegrationWorkflow(String workflowId) {
-        return OptionalUtils.get(integrationWorkflowRepository.findByWorkflowId(workflowId));
+        return integrationWorkflowRepository.findByWorkflowId(workflowId)
+            .orElseThrow(() -> new IllegalArgumentException("Workflow not found for id: " + workflowId));
+    }
+
+    @Override
+    public void publishWorkflow(
+        long integrationId, int oldIntegrationVersion, String oldWorkflowId, IntegrationWorkflow integrationWorkflow) {
+
+        Assert.notNull(integrationWorkflow, "'integrationWorkflow' must not be null");
+
+        update(integrationWorkflow);
+
+        integrationWorkflow = new IntegrationWorkflow(
+            integrationId, oldIntegrationVersion, oldWorkflowId, UUID.fromString(integrationWorkflow.getUuid()));
+
+        integrationWorkflowRepository.save(integrationWorkflow);
     }
 
     @Override
@@ -136,12 +140,13 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
         Assert.notNull(integrationWorkflow, "'IntegrationWorkflow' must not be null");
         Assert.notNull(integrationWorkflow.getId(), "'id' must not be null");
 
-        IntegrationWorkflow curIntegrationWorkflow = OptionalUtils.get(integrationWorkflowRepository.findById(
-            integrationWorkflow.getId()));
+        IntegrationWorkflow curIntegrationWorkflow = integrationWorkflowRepository.findById(integrationWorkflow.getId())
+            .orElseThrow(() -> new IllegalArgumentException(
+                "IntegrationWorkflow not found for id: " + integrationWorkflow.getId()));
 
         curIntegrationWorkflow.setIntegrationVersion(integrationWorkflow.getIntegrationVersion());
         curIntegrationWorkflow.setWorkflowId(integrationWorkflow.getWorkflowId());
-        curIntegrationWorkflow.setWorkflowReferenceCode(integrationWorkflow.getWorkflowReferenceCode());
+        curIntegrationWorkflow.setUuid(integrationWorkflow.getUuid());
 
         return integrationWorkflowRepository.save(curIntegrationWorkflow);
     }

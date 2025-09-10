@@ -87,13 +87,13 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     }
 
     @Override
-    public ResponseEntity<Object> executeWorkflow(String workflowReferenceCode, EnvironmentModel xEnvironment) {
+    public ResponseEntity<Object> executeWorkflow(String workflowUuid, EnvironmentModel xEnvironment) {
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(
             OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), environment);
 
-        String workflowId = integrationWorkflowService.getLatestWorkflowId(workflowReferenceCode, environment);
+        String workflowId = integrationWorkflowService.getLastWorkflowId(workflowUuid, environment);
 
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             connectedUser.getId(), workflowId, environment);
@@ -101,7 +101,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.EMBEDDED, integrationInstance.getId(), workflowReferenceCode, findRequestTriggerName(workflow));
+            ModeType.EMBEDDED, integrationInstance.getId(), workflowUuid, findRequestTriggerName(workflow));
 
         ResponseEntity<Object> responseEntity;
 

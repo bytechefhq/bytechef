@@ -51,12 +51,12 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
-    public boolean isWorkflowEnabled(long jobPrincipalId, String workflowReferenceCode) {
+    public boolean isWorkflowEnabled(long jobPrincipalId, String workflowUuid) {
         boolean workflowEnabled = false;
 
         if (integrationInstanceConfigurationService.isIntegrationInstanceConfigurationEnabled(jobPrincipalId) &&
             integrationInstanceConfigurationWorkflowService.isIntegrationInstanceWorkflowEnabled(
-                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowReferenceCode))) {
+                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowUuid))) {
 
             workflowEnabled = true;
         }
@@ -75,10 +75,10 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
-    public Map<String, ?> getInputMap(long jobPrincipalId, String workflowReferenceCode) {
+    public Map<String, ?> getInputMap(long jobPrincipalId, String workflowUuid) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowReferenceCode));
+                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowUuid));
 
         return integrationInstanceConfigurationWorkflow.getInputs();
     }
@@ -94,20 +94,20 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
-    public String getWorkflowId(long jobPrincipalId, String workflowReferenceCode) {
-        return integrationWorkflowService.getWorkflowId(jobPrincipalId, workflowReferenceCode);
+    public String getWorkflowId(long jobPrincipalId, String workflowUuid) {
+        return integrationWorkflowService.getWorkflowId(jobPrincipalId, workflowUuid);
     }
 
     @Override
-    public String getLatestWorkflowId(String workflowReferenceCode) {
-        return integrationWorkflowService.getLatestWorkflowId(workflowReferenceCode);
+    public String getLatestWorkflowId(String workflowUuid) {
+        return integrationWorkflowService.getLastWorkflowId(workflowUuid);
     }
 
     @Override
     public String getWorkflowReferenceCode(String workflowId) {
-        IntegrationWorkflow workflowIntegrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
             workflowId);
 
-        return workflowIntegrationWorkflow.getWorkflowReferenceCode();
+        return integrationWorkflow.getUuid();
     }
 }

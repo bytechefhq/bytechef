@@ -29,14 +29,12 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
-    public IntegrationWorkflow addWorkflow(
-        long integrationId, int integrationVersion, String workflowId, String workflowReferenceCode) {
-
+    public void delete(List<Long> ids) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void delete(List<Long> ids) {
+    public void delete(long projectId, int projectVersion, String workflowId) {
         throw new UnsupportedOperationException();
     }
 
@@ -47,7 +45,7 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
 
     @Override
     public String getWorkflowId(
-        long integrationInstanceId, String workflowReferenceCode) {
+        long integrationInstanceId, String workflowUuid) {
 
         throw new UnsupportedOperationException();
     }
@@ -73,12 +71,12 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
-    public String getLatestWorkflowId(String workflowReferenceCode) {
+    public String getLastWorkflowId(String workflowUuid) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getLatestWorkflowId(String workflowReferenceCode, Environment environment) {
+    public String getLastWorkflowId(String workflowUuid, Environment environment) {
         throw new UnsupportedOperationException();
     }
 
@@ -93,7 +91,9 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
-    public void delete(long projectId, int projectVersion, String workflowId) {
+    public void publishWorkflow(
+        long integrationId, int oldIntegrationVersion, String oldWorkflowId, IntegrationWorkflow integrationWorkflow) {
+
         throw new UnsupportedOperationException();
     }
 

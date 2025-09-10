@@ -40,6 +40,11 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
     }
 
     @Override
+    public ConnectedUser createConnectedUser(String externalId, long environmentId) {
+        return createConnectedUser(externalId, Environment.values()[(int) environmentId]);
+    }
+
+    @Override
     public ConnectedUser createConnectedUser(String externalId, Environment environment) {
         ConnectedUser connectedUser = new ConnectedUser();
 
@@ -62,6 +67,12 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
         connectedUser.setEnabled(enable);
 
         connectedUserRepository.save(connectedUser);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ConnectedUser> fetchConnectedUser(String externalId, long environmentId) {
+        return connectedUserRepository.findByExternalIdAndEnvironment(externalId, (int) environmentId);
     }
 
     @Override

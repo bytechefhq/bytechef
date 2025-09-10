@@ -23,8 +23,9 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public final class IntegrationWorkflowDTO extends WorkflowDTO {
 
+    private final int integrationVersion;
     private final long integrationWorkflowId;
-    private final String workflowReferenceCode;
+    private final String workflowUuid;
 
     public IntegrationWorkflowDTO(Workflow workflow, IntegrationWorkflow integrationWorkflow) {
         super(
@@ -38,8 +39,9 @@ public final class IntegrationWorkflowDTO extends WorkflowDTO {
                 .toList(),
             List.of(), workflow.getVersion(), workflow);
 
+        this.integrationVersion = integrationWorkflow.getIntegrationVersion();
         this.integrationWorkflowId = integrationWorkflow.getId();
-        this.workflowReferenceCode = integrationWorkflow.getWorkflowReferenceCode();
+        this.workflowUuid = integrationWorkflow.getUuid();
     }
 
     public IntegrationWorkflowDTO(WorkflowDTO workflow, IntegrationWorkflow integrationWorkflow) {
@@ -50,16 +52,21 @@ public final class IntegrationWorkflowDTO extends WorkflowDTO {
             workflow.getSourceType(), workflow.getMaxRetries(), workflow.getTasks(), workflow.getTriggers(),
             workflow.getVersion(), workflow.getWorkflow());
 
+        this.integrationVersion = integrationWorkflow.getIntegrationVersion();
         this.integrationWorkflowId = integrationWorkflow.getId();
-        this.workflowReferenceCode = integrationWorkflow.getWorkflowReferenceCode();
+        this.workflowUuid = integrationWorkflow.getUuid();
+    }
+
+    public int getIntegrationVersion() {
+        return integrationVersion;
     }
 
     public long getIntegrationWorkflowId() {
         return integrationWorkflowId;
     }
 
-    public String getWorkflowReferenceCode() {
-        return workflowReferenceCode;
+    public String getWorkflowUuid() {
+        return workflowUuid;
     }
 
     @Override
@@ -76,20 +83,21 @@ public final class IntegrationWorkflowDTO extends WorkflowDTO {
             return false;
         }
 
-        return integrationWorkflowId == that.integrationWorkflowId &&
-            Objects.equals(workflowReferenceCode, that.workflowReferenceCode);
+        return integrationVersion == that.integrationVersion && integrationWorkflowId == that.integrationWorkflowId &&
+            Objects.equals(workflowUuid, that.workflowUuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), integrationWorkflowId, workflowReferenceCode);
+        return Objects.hash(super.hashCode(), integrationWorkflowId, workflowUuid);
     }
 
     @Override
     public String toString() {
         return "WorkflowDTO{" +
             "integrationWorkflowId=" + integrationWorkflowId +
-            ", workflowReferenceCode='" + workflowReferenceCode + '\'' +
+            ", workflowUuid='" + workflowUuid + '\'' +
+            ", integrationVersion=" + integrationVersion +
             "} " + super.toString();
     }
 }

@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.domain;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -39,8 +40,8 @@ public final class IntegrationWorkflow {
     @Column("workflow_id")
     private String workflowId;
 
-    @Column("workflow_reference_code")
-    private String workflowReferenceCode;
+    @Column("uuid")
+    private UUID uuid;
 
     @CreatedBy
     @Column("created_by")
@@ -64,12 +65,17 @@ public final class IntegrationWorkflow {
     public IntegrationWorkflow() {
     }
 
-    public IntegrationWorkflow(long integrationId, int integrationVersion, String workflowId,
-        String workflowReferenceCode) {
+    public IntegrationWorkflow(long integrationId, int integrationVersion, String workflowId) {
         this.integrationId = integrationId;
         this.integrationVersion = integrationVersion;
         this.workflowId = workflowId;
-        this.workflowReferenceCode = workflowReferenceCode;
+    }
+
+    public IntegrationWorkflow(long integrationId, int integrationVersion, String workflowId, UUID uuid) {
+        this.integrationId = integrationId;
+        this.integrationVersion = integrationVersion;
+        this.workflowId = workflowId;
+        this.uuid = uuid;
     }
 
     public IntegrationWorkflow(long id) {
@@ -112,8 +118,8 @@ public final class IntegrationWorkflow {
         return workflowId;
     }
 
-    public String getWorkflowReferenceCode() {
-        return workflowReferenceCode;
+    public String getUuid() {
+        return uuid.toString();
     }
 
     public String getCreatedBy() {
@@ -144,8 +150,12 @@ public final class IntegrationWorkflow {
         this.workflowId = workflowId;
     }
 
-    public void setWorkflowReferenceCode(String workflowReferenceCode) {
-        this.workflowReferenceCode = workflowReferenceCode;
+    public void setUuid(String uuid) {
+        this.uuid = UUID.fromString(uuid);
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public void setVersion(int version) {
@@ -159,7 +169,7 @@ public final class IntegrationWorkflow {
             ", integrationId=" + integrationId +
             ", integrationVersion=" + integrationVersion +
             ", workflowId='" + workflowId + '\'' +
-            ", workflowReferenceCode='" + workflowReferenceCode + '\'' +
+            ", uuid='" + uuid + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

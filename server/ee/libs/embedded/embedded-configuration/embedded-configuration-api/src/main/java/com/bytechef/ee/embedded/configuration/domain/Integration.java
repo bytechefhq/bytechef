@@ -185,7 +185,7 @@ public final class Integration {
         return getMaxIntegrationVersion().getStatus();
     }
 
-    public int getLastVersion() {
+    public int getLastIntegrationVersion() {
         return getMaxIntegrationVersion().getVersion();
     }
 

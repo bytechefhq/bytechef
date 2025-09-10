@@ -23,6 +23,6 @@ import org.springframework.core.convert.converter.Converter;
 public interface ConnectedUserMapper extends Converter<ConnectedUserDTO, ConnectedUserModel> {
 
     @Override
-    @Mapping(target = "environmentId", expression = "java(Long.valueOf(connectedUserDTO.environment().ordinal()))")
+    @Mapping(target = "environmentId", source = "environment")
     ConnectedUserModel convert(ConnectedUserDTO connectedUserDTO);
 }

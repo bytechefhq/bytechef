@@ -20,9 +20,6 @@ public interface IntegrationWorkflowService {
 
     IntegrationWorkflow addWorkflow(long integrationId, int integrationVersion, String workflowId);
 
-    IntegrationWorkflow addWorkflow(
-        long integrationId, int integrationVersion, String workflowId, String workflowReferenceCode);
-
     void delete(List<Long> ids);
 
     void delete(long integrationId, int integrationVersion, String workflowId);
@@ -37,15 +34,18 @@ public interface IntegrationWorkflowService {
 
     List<IntegrationWorkflow> getIntegrationWorkflows(long integrationId, int integrationVersion);
 
-    String getLatestWorkflowId(String workflowReferenceCode);
+    String getLastWorkflowId(String workflowUuid);
 
-    String getLatestWorkflowId(String workflowReferenceCode, Environment environment);
+    String getLastWorkflowId(String workflowUuid, Environment environment);
 
-    String getWorkflowId(long integrationInstanceId, String workflowReferenceCode);
+    String getWorkflowId(long integrationInstanceId, String workflowUuid);
 
     List<String> getWorkflowIds(long integrationId, int integrationVersion);
 
     IntegrationWorkflow getWorkflowIntegrationWorkflow(String workflowId);
+
+    void publishWorkflow(
+        long integrationId, int oldIntegrationVersion, String oldWorkflowId, IntegrationWorkflow integrationWorkflow);
 
     IntegrationWorkflow update(IntegrationWorkflow integrationWorkflow);
 }

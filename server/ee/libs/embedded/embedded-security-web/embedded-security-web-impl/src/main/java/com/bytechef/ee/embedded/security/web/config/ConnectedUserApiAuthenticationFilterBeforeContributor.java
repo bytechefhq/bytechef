@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.embedded.security.web.config;
 
+import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.filter.ConnectedUserApiAuthenticationFilter;
-import com.bytechef.ee.embedded.signing.key.service.SigningKeyService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.FilterBeforeContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

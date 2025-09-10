@@ -375,7 +375,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Connection"
-  /connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections:
+  /connected-users/{connectedUserId}/workflows/{workflowUuid}/connections:
     post:
       description: "Create a new connection for the connected user's project workflow."
       summary: "Create a new connection for the connected user's project workflow"
@@ -390,8 +390,8 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -410,7 +410,7 @@ paths:
               schema:
                 type: integer
                 format: int64
-  /connected-user-project-workflows/{workflowReferenceCode}:
+  /connected-user-project-workflows/{workflowUuid}:
     get:
       description: "Get connected user project workflow."
       summary: "Get connected user project workflow."
@@ -424,8 +424,8 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -437,7 +437,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
-  /connected-user-project-workflows/{workflowReferenceCode}/publish:
+  /connected-user-project-workflows/{workflowUuid}/publish:
     post:
       description: "Publishes existing connected user project workflow."
       summary: "Publishes existing connected user project workflow"
@@ -451,8 +451,8 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -470,7 +470,7 @@ paths:
       responses:
         "204":
           description: "Successful operation."
-  /connected-user-project-workflows/{workflowReferenceCode}/enable/{enable}:
+  /connected-user-project-workflows/{workflowUuid}/enable/{enable}:
     patch:
       description: "Enable/disable a connected user project workflow."
       summary: "Enable/disable a connected user project workflow"
@@ -484,8 +484,8 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -1520,7 +1520,7 @@ components:
           readOnly: true
         lastStatus:
           $ref: '#/components/schemas/IntegrationStatus'
-        lastVersion:
+        lastIntegrationVersion:
           description: "The last version of an integration."
           type: "integer"
           readOnly: true
@@ -1752,8 +1752,8 @@ components:
         workflowId:
           description: "The id of a workflow."
           type: "string"
-        workflowReferenceCode:
-          description: "The workflow reference code"
+        workflowUuid:
+          description: "The workflow uuid"
           type: "string"
           readOnly: true
         __version:
@@ -1867,8 +1867,8 @@ components:
               type: "integer"
               format: "int64"
               readOnly: true
-            workflowReferenceCode:
-              description: "The workflow reference code"
+            workflowUuid:
+              description: "The workflow uuid"
               type: "string"
               readOnly: true
     WorkflowBasic:
@@ -1882,7 +1882,7 @@ components:
               type: "integer"
               format: "int64"
               readOnly: true
-            workflowReferenceCode:
-              description: "The workflow reference code"
+            workflowUuid:
+              description: "The workflow uuid"
               type: "string"
               readOnly: true

@@ -7,8 +7,9 @@
 
 package com.bytechef.ee.embedded.security.web.filter;
 
+import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
-import com.bytechef.ee.embedded.signing.key.service.SigningKeyService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.web.filter.AbstractApiAuthenticationFilter;
 import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.tenant.util.TenantUtils;
@@ -56,10 +57,11 @@ public class ConnectedUserApiAuthenticationFilter extends AbstractApiAuthenticat
             return null;
         }
 
+        Environment environment = getEnvironment(request);
         Matcher jwtTokenMatcher = JWT_TOKEN_PATTERN.matcher(token);
 
         if (jwtTokenMatcher.find()) {
-            Jws<Claims> jws = getJws(token);
+            Jws<Claims> jws = getJws(token, environment.ordinal());
 
             Claims payload = jws.getPayload();
 
@@ -69,8 +71,7 @@ public class ConnectedUserApiAuthenticationFilter extends AbstractApiAuthenticat
 
             TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
-            return new ConnectedUserAuthenticationToken(
-                externalUserId, getEnvironment(request), tenantKey.getTenantId());
+            return new ConnectedUserAuthenticationToken(externalUserId, environment, tenantKey.getTenantId());
         } else {
             String externalUserId;
             Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
@@ -83,8 +84,7 @@ public class ConnectedUserApiAuthenticationFilter extends AbstractApiAuthenticat
 
             TenantKey tenantKey = TenantKey.parse(token);
 
-            return new ConnectedUserAuthenticationToken(
-                externalUserId, getEnvironment(request), tenantKey.getTenantId());
+            return new ConnectedUserAuthenticationToken(externalUserId, environment, tenantKey.getTenantId());
         }
     }
 
@@ -99,14 +99,20 @@ public class ConnectedUserApiAuthenticationFilter extends AbstractApiAuthenticat
         return token.replace("Bearer ", "");
     }
 
-    private Jws<Claims> getJws(String secretKey) {
+    private Jws<Claims> getJws(String secretKey, long environmentI) {
         return Jwts.parser()
-            .keyLocator(new SigningKeyLocator())
+            .keyLocator(new SigningKeyLocator(environmentI))
             .build()
             .parseSignedClaims(secretKey);
     }
 
     private class SigningKeyLocator implements Locator<Key> {
+
+        private final long environmentId;
+
+        private SigningKeyLocator(long environmentId) {
+            this.environmentId = environmentId;
+        }
 
         @Override
         public Key locate(Header header) {
@@ -115,7 +121,7 @@ public class ConnectedUserApiAuthenticationFilter extends AbstractApiAuthenticat
             TenantKey tenantKey = TenantKey.parse(keyId);
 
             return TenantUtils.callWithTenantId(
-                tenantKey.getTenantId(), () -> signingKeyService.getPublicKey(keyId));
+                tenantKey.getTenantId(), () -> signingKeyService.getPublicKey(keyId, environmentId));
         }
     }
 }

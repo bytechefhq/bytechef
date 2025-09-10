@@ -8,40 +8,28 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.domain.Workflow.Format;
-import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
-import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
-import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
-import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
-import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.facade.WorkflowFacade;
-import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
-import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,60 +43,37 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class IntegrationFacadeImpl implements IntegrationFacade {
 
-    private final EnvironmentService environmentService;
     private final CategoryService categoryService;
     private final ComponentDefinitionService componentDefinitionService;
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
-    private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final TagService tagService;
-    private final WorkflowCacheManager workflowCacheManager;
-    private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
 
     @SuppressFBWarnings("EI2")
     public IntegrationFacadeImpl(
-        EnvironmentService environmentService, CategoryService categoryService,
-        ComponentDefinitionService componentDefinitionService, IntegrationService integrationService,
-        IntegrationWorkflowService integrationWorkflowService,
+        CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
+        IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        TagService tagService, WorkflowCacheManager workflowCacheManager, WorkflowFacade workflowFacade,
-        WorkflowService workflowService,
+        TagService tagService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
-        this.environmentService = environmentService;
         this.categoryService = categoryService;
         this.componentDefinitionService = componentDefinitionService;
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
-        this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.tagService = tagService;
-        this.workflowCacheManager = workflowCacheManager;
-        this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
-    }
-
-    @Override
-    public long addWorkflow(long id, String definition) {
-        Integration integration = integrationService.getIntegration(id);
-
-        Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
-
-        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
-            id, integration.getLastVersion(), workflow.getId());
-
-        return integrationWorkflow.getId();
     }
 
     @Override
@@ -168,140 +133,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public void deleteWorkflow(String workflowId) {
-        Integration integration = integrationService.getWorkflowIntegration(workflowId);
-
-        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
-            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(integration.getId());
-
-        for (IntegrationInstanceConfiguration integrationInstanceConfiguration : integrationInstanceConfigurations) {
-            List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
-                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                    Validate.notNull(integrationInstanceConfiguration.getId(), "id"));
-
-            if (CollectionUtils.anyMatch(
-                integrationInstanceConfigurationWorkflows,
-                integrationInstanceConfigurationWorkflow -> Objects.equals(
-                    integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowId))) {
-
-                integrationInstanceConfigurationWorkflows.stream()
-                    .filter(
-                        integrationInstanceConfigurationWorkflow -> Objects.equals(
-                            integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowId))
-                    .findFirst()
-                    .ifPresent(
-                        integrationInstanceConfigurationWorkflow -> integrationInstanceConfigurationWorkflowService
-                            .delete(integrationInstanceConfigurationWorkflow.getId()));
-            }
-        }
-
-        integrationWorkflowService.delete(
-            integration.getId(), integration.getLastVersion(), workflowId);
-
-        workflowTestConfigurationService.delete(workflowId);
-
-        workflowService.delete(workflowId);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public IntegrationDTO getIntegration(long id) {
         Integration integration = integrationService.getIntegration(id);
 
         return toIntegrationDTO(integration);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Category> getIntegrationCategories() {
-        List<Integration> integrations = integrationService.getIntegrations();
-
-        List<Long> categoryIds = integrations.stream()
-            .map(Integration::getCategoryId)
-            .filter(Objects::nonNull)
-            .toList();
-
-        return categoryService.getCategories(categoryIds);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Tag> getIntegrationTags() {
-        List<Integration> integrations = integrationService.getIntegrations();
-
-        List<Long> tagIds = integrations.stream()
-            .map(Integration::getTagIds)
-            .flatMap(Collection::stream)
-            .toList();
-
-        return tagService.getTags(tagIds);
-    }
-
-    @Override
-    public List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(
-        long id, int integrationVersion, boolean includeAllFields) {
-
-        List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
-            id, integrationVersion);
-
-        if (includeAllFields) {
-            return CollectionUtils.map(
-                integrationWorkflows,
-                integrationWorkflow -> new IntegrationWorkflowDTO(
-                    workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
-        } else {
-            return CollectionUtils.map(
-                integrationWorkflows,
-                integrationWorkflow -> new IntegrationWorkflowDTO(
-                    workflowService.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
-        }
-    }
-
-    @Override
-    public IntegrationWorkflowDTO getIntegrationWorkflow(String workflowId) {
-        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
-
-        return new IntegrationWorkflowDTO(workflowFacade.getWorkflow(workflowId), integrationWorkflow);
-    }
-
-    @Override
-    public IntegrationWorkflowDTO getIntegrationWorkflow(long integrationWorkflowId) {
-        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getIntegrationWorkflow(
-            integrationWorkflowId);
-
-        return new IntegrationWorkflowDTO(
-            workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow);
-    }
-
-    @Override
-    public List<IntegrationWorkflowDTO> getIntegrationWorkflows() {
-        return integrationWorkflowService.getIntegrationWorkflows()
-            .stream()
-            .map(integrationWorkflows -> workflowFacade.fetchWorkflow(integrationWorkflows.getWorkflowId())
-                .map(workflowDTO -> new IntegrationWorkflowDTO(workflowDTO, integrationWorkflows))
-                .orElse(null))
-            .filter(Objects::nonNull)
-            .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<IntegrationWorkflowDTO> getIntegrationWorkflows(long id) {
-        Integration integration = integrationService.getIntegration(id);
-
-        return integrationWorkflowService
-            .getIntegrationWorkflows(integration.getId(), integration.getLastVersion())
-            .stream()
-            .map(integrationWorkflow -> new IntegrationWorkflowDTO(
-                workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow))
-            .sorted(
-                (integrationWorkflow1, integrationWorkflow2) -> {
-                    String label1 = integrationWorkflow1.getLabel();
-                    String label2 = integrationWorkflow2.getLabel();
-
-                    return label1.compareToIgnoreCase(label2);
-                })
-            .toList();
     }
 
     @Override
@@ -353,26 +189,23 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     public void publishIntegration(long id, String description) {
         Integration integration = integrationService.getIntegration(id);
 
-        int oldIntegrationVersion = integration.getLastVersion();
+        int oldIntegrationVersion = integration.getLastIntegrationVersion();
 
         List<IntegrationWorkflow> oldIntegrationWorkflows = integrationWorkflowService
             .getIntegrationWorkflows(integration.getId(), oldIntegrationVersion);
 
         int newIntegrationVersion = integrationService.publishIntegration(id, description);
 
-        for (IntegrationWorkflow integrationWorkflow : oldIntegrationWorkflows) {
-            String oldWorkflowId = integrationWorkflow.getWorkflowId();
+        for (IntegrationWorkflow oldIntegrationWorkflow : oldIntegrationWorkflows) {
+            String oldWorkflowId = oldIntegrationWorkflow.getWorkflowId();
 
             Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
 
-            integrationWorkflow.setIntegrationVersion(newIntegrationVersion);
-            integrationWorkflow.setWorkflowId(duplicatedWorkflow.getId());
+            oldIntegrationWorkflow.setIntegrationVersion(newIntegrationVersion);
+            oldIntegrationWorkflow.setWorkflowId(duplicatedWorkflow.getId());
 
-            integrationWorkflowService.update(integrationWorkflow);
-
-            integrationWorkflowService.addWorkflow(
-                integration.getId(), oldIntegrationVersion, oldWorkflowId,
-                integrationWorkflow.getWorkflowReferenceCode());
+            integrationWorkflowService.publishWorkflow(
+                integration.getId(), integration.getLastIntegrationVersion(), oldWorkflowId, oldIntegrationWorkflow);
 
             workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
             workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
@@ -399,31 +232,13 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         integrationService.update(integration);
     }
 
-    @Override
-    public void updateIntegrationTags(long id, List<Tag> tags) {
-        tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
-
-        integrationService.update(id, CollectionUtils.map(tags, Tag::getId));
-    }
-
-    @Override
-    public void updateWorkflow(String workflowId, String definition, int version) {
-        workflowService.update(workflowId, definition, version);
-
-        for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
-            for (Environment environment : environmentService.getEnvironments()) {
-                workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName, environment.ordinal());
-            }
-        }
-    }
-
     private Category getCategory(Integration integration) {
         return integration.getCategoryId() == null ? null : categoryService.getCategory(integration.getCategoryId());
     }
 
     private List<Long> getIntegrationWorkflowIds(Integration integration) {
         return integrationWorkflowService.getIntegrationWorkflowIds(
-            integration.getId(), integration.getLastVersion());
+            integration.getId(), integration.getLastIntegrationVersion());
     }
 
     private IntegrationDTO toIntegrationDTO(Integration integration) {

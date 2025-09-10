@@ -42,6 +42,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
@@ -77,6 +78,12 @@ public class IntegrationFacadeIntTest {
 
     @Autowired
     private IntegrationRepository integrationRepository;
+
+    @Autowired
+    private IntegrationTagFacade integrationTagFacade;
+
+    @Autowired
+    private IntegrationWorkflowFacade integrationWorkflowFacade;
 
     @Autowired
     private IntegrationWorkflowRepository integrationWorkflowRepository;
@@ -121,8 +128,8 @@ public class IntegrationFacadeIntTest {
                     Workflow.Format.JSON),
                 List.of(), List.of()));
 
-        IntegrationWorkflowDTO workflow = integrationFacade.getIntegrationWorkflow(
-            integrationFacade.addWorkflow(
+        IntegrationWorkflowDTO workflow = integrationWorkflowFacade.getIntegrationWorkflow(
+            integrationWorkflowFacade.addWorkflow(
                 Validate.notNull(integration.getId(), "id"),
                 "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}"));
 
@@ -249,10 +256,11 @@ public class IntegrationFacadeIntTest {
 
         integrationRepository.save(integration);
 
-        assertThat(integrationFacade.getIntegrationTags()
-            .stream()
-            .map(Tag::getName)
-            .collect(Collectors.toSet())).contains("tag1", "tag2");
+        assertThat(
+            integrationTagFacade.getIntegrationTags()
+                .stream()
+                .map(Tag::getName)
+                .collect(Collectors.toSet())).contains("tag1", "tag2");
 
         integration = new Integration();
 
@@ -265,17 +273,19 @@ public class IntegrationFacadeIntTest {
 
         integrationRepository.save(integration);
 
-        assertThat(integrationFacade.getIntegrationTags()
-            .stream()
-            .map(Tag::getName)
-            .collect(Collectors.toSet())).contains("tag1", "tag2", "tag3");
+        assertThat(
+            integrationTagFacade.getIntegrationTags()
+                .stream()
+                .map(Tag::getName)
+                .collect(Collectors.toSet())).contains("tag1", "tag2", "tag3");
 
         integrationRepository.deleteById(Validate.notNull(integration.getId(), "id"));
 
-        assertThat(integrationFacade.getIntegrationTags()
-            .stream()
-            .map(Tag::getName)
-            .collect(Collectors.toSet())).contains("tag1", "tag2");
+        assertThat(
+            integrationTagFacade.getIntegrationTags()
+                .stream()
+                .map(Tag::getName)
+                .collect(Collectors.toSet())).contains("tag1", "tag2");
     }
 
     @Disabled
@@ -295,14 +305,14 @@ public class IntegrationFacadeIntTest {
 
         integrationWorkflowRepository.save(
             new IntegrationWorkflow(
-                integration.getId(), Validate.notNull(integration.getLastVersion(), "lastVersion"),
-                Validate.notNull(workflow.getId(), "id"), "workflowReferenceCode"));
+                integration.getId(), Validate.notNull(integration.getLastIntegrationVersion(), "lastVersion"),
+                Validate.notNull(workflow.getId(), "id"), UUID.randomUUID()));
 
         // TODO remove
         Mockito.when(workflowFacade.getWorkflow(Mockito.anyString()))
             .thenReturn(new com.bytechef.platform.configuration.dto.WorkflowDTO(workflow, List.of(), List.of()));
 
-        List<IntegrationWorkflowDTO> workflows = integrationFacade.getIntegrationWorkflows(
+        List<IntegrationWorkflowDTO> workflows = integrationWorkflowFacade.getIntegrationWorkflows(
             Validate.notNull(integration.getId(), "id"));
 
         assertThat(
