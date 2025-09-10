@@ -1,8 +1,9 @@
 /* eslint-disable sort-keys */
 
-import {ExtractState, createStore} from 'zustand';
-import {useStore} from 'zustand/index';
+import {createStore, useStore} from 'zustand';
 import {devtools} from 'zustand/middleware';
+
+import type {ExtractState} from 'zustand/vanilla';
 
 export type EditionType = 'CE' | 'EE';
 
