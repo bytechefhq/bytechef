@@ -71,7 +71,7 @@ export interface UpdateIntegrationInstanceConfigurationRequest {
 export interface UpdateIntegrationInstanceConfigurationWorkflowRequest {
     id: number;
     workflowId: number;
-    integrationInstanceConfigurationWorkflow: Omit<IntegrationInstanceConfigurationWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'>;
+    integrationInstanceConfigurationWorkflow: Omit<IntegrationInstanceConfigurationWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowUuid'>;
 }
 
 /**

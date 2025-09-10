@@ -94,11 +94,11 @@ export interface IntegrationInstanceConfigurationWorkflow {
      */
     workflowId?: string;
     /**
-     * The workflow reference code
+     * The workflow uuid
      * @type {string}
      * @memberof IntegrationInstanceConfigurationWorkflow
      */
-    readonly workflowReferenceCode?: string;
+    readonly workflowUuid?: string;
     /**
      * 
      * @type {number}
@@ -135,7 +135,7 @@ export function IntegrationInstanceConfigurationWorkflowFromJSONTyped(json: any,
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
-        'workflowReferenceCode': json['workflowReferenceCode'] == null ? undefined : json['workflowReferenceCode'],
+        'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
@@ -144,7 +144,7 @@ export function IntegrationInstanceConfigurationWorkflowToJSON(json: any): Integ
     return IntegrationInstanceConfigurationWorkflowToJSONTyped(json, false);
 }
 
-export function IntegrationInstanceConfigurationWorkflowToJSONTyped(value?: Omit<IntegrationInstanceConfigurationWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceConfigurationWorkflowToJSONTyped(value?: Omit<IntegrationInstanceConfigurationWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowUuid'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -27,7 +27,7 @@ import {
 
 export interface CreateConnectedUserProjectWorkflowConnectionRequest {
     connectedUserId: number;
-    workflowReferenceCode: string;
+    workflowUuid: string;
     connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
@@ -78,10 +78,10 @@ export class ConnectionApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['workflowReferenceCode'] == null) {
+        if (requestParameters['workflowUuid'] == null) {
             throw new runtime.RequiredError(
-                'workflowReferenceCode',
-                'Required parameter "workflowReferenceCode" was null or undefined when calling createConnectedUserProjectWorkflowConnection().'
+                'workflowUuid',
+                'Required parameter "workflowUuid" was null or undefined when calling createConnectedUserProjectWorkflowConnection().'
             );
         }
 
@@ -99,9 +99,9 @@ export class ConnectionApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections`;
+        let urlPath = `/connected-users/{connectedUserId}/workflows/{workflowUuid}/connections`;
         urlPath = urlPath.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId'])));
-        urlPath = urlPath.replace(`{${"workflowReferenceCode"}}`, encodeURIComponent(String(requestParameters['workflowReferenceCode'])));
+        urlPath = urlPath.replace(`{${"workflowUuid"}}`, encodeURIComponent(String(requestParameters['workflowUuid'])));
 
         const response = await this.request({
             path: urlPath,

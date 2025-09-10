@@ -32,6 +32,12 @@ export interface SigningKey {
      */
     readonly createdDate?: Date;
     /**
+     * The id of an environment.
+     * @type {number}
+     * @memberof SigningKey
+     */
+    environmentId?: number;
+    /**
      * The id of a public key.
      * @type {number}
      * @memberof SigningKey
@@ -90,6 +96,7 @@ export function SigningKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'keyId': json['keyId'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -110,6 +117,7 @@ export function SigningKeyToJSONTyped(value?: Omit<SigningKey, 'createdBy'|'crea
 
     return {
         
+        'environmentId': value['environmentId'],
         'name': value['name'],
     };
 }

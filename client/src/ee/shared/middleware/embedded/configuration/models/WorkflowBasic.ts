@@ -74,11 +74,11 @@ export interface WorkflowBasic {
      */
     readonly integrationWorkflowId?: number;
     /**
-     * The workflow reference code
+     * The workflow uuid
      * @type {string}
      * @memberof WorkflowBasic
      */
-    readonly workflowReferenceCode?: string;
+    readonly workflowUuid?: string;
 }
 
 /**
@@ -107,7 +107,7 @@ export function WorkflowBasicFromJSONTyped(json: any, ignoreDiscriminator: boole
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'version': json['__version'] == null ? undefined : json['__version'],
         'integrationWorkflowId': json['integrationWorkflowId'] == null ? undefined : json['integrationWorkflowId'],
-        'workflowReferenceCode': json['workflowReferenceCode'] == null ? undefined : json['workflowReferenceCode'],
+        'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],
     };
 }
 
@@ -115,7 +115,7 @@ export function WorkflowBasicToJSON(json: any): WorkflowBasic {
     return WorkflowBasicToJSONTyped(json, false);
 }
 
-export function WorkflowBasicToJSONTyped(value?: Omit<WorkflowBasic, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'|'integrationWorkflowId'|'workflowReferenceCode'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowBasicToJSONTyped(value?: Omit<WorkflowBasic, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'|'integrationWorkflowId'|'workflowUuid'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
