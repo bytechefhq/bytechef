@@ -72,7 +72,7 @@ export interface UpdateProjectDeploymentRequest {
 export interface UpdateProjectDeploymentWorkflowRequest {
     id: number;
     projectDeploymentWorkflowId: number;
-    projectDeploymentWorkflow: Omit<ProjectDeploymentWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'>;
+    projectDeploymentWorkflow: Omit<ProjectDeploymentWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowUuid'>;
 }
 
 /**

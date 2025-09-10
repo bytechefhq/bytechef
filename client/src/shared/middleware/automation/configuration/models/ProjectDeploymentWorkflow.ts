@@ -100,11 +100,11 @@ export interface ProjectDeploymentWorkflow {
      */
     workflowId?: string;
     /**
-     * The workflow reference code
+     * The workflow uuid
      * @type {string}
      * @memberof ProjectDeploymentWorkflow
      */
-    readonly workflowReferenceCode?: string;
+    readonly workflowUuid?: string;
     /**
      * 
      * @type {number}
@@ -142,7 +142,7 @@ export function ProjectDeploymentWorkflowFromJSONTyped(json: any, ignoreDiscrimi
         'projectDeploymentId': json['projectDeploymentId'] == null ? undefined : json['projectDeploymentId'],
         'staticWebhookUrl': json['staticWebhookUrl'] == null ? undefined : json['staticWebhookUrl'],
         'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
-        'workflowReferenceCode': json['workflowReferenceCode'] == null ? undefined : json['workflowReferenceCode'],
+        'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
@@ -151,7 +151,7 @@ export function ProjectDeploymentWorkflowToJSON(json: any): ProjectDeploymentWor
     return ProjectDeploymentWorkflowToJSONTyped(json, false);
 }
 
-export function ProjectDeploymentWorkflowToJSONTyped(value?: Omit<ProjectDeploymentWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectDeploymentWorkflowToJSONTyped(value?: Omit<ProjectDeploymentWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowUuid'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

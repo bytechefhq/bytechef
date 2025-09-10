@@ -92,7 +92,7 @@ export interface IntegrationBasic {
      * @type {number}
      * @memberof IntegrationBasic
      */
-    readonly lastVersion?: number;
+    readonly lastIntegrationVersion?: number;
     /**
      * If multiple instances of an integration are allowed or not.
      * @type {boolean}
@@ -138,7 +138,7 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : IntegrationStatusFromJSON(json['lastStatus']),
-        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
+        'lastIntegrationVersion': json['lastIntegrationVersion'] == null ? undefined : json['lastIntegrationVersion'],
         'multipleInstances': json['multipleInstances'],
         'name': json['name'] == null ? undefined : json['name'],
     };
@@ -148,7 +148,7 @@ export function IntegrationBasicToJSON(json: any): IntegrationBasic {
     return IntegrationBasicToJSONTyped(json, false);
 }
 
-export function IntegrationBasicToJSONTyped(value?: Omit<IntegrationBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationBasicToJSONTyped(value?: Omit<IntegrationBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -182,11 +182,11 @@ export interface Workflow {
      */
     readonly projectWorkflowId?: number;
     /**
-     * The workflow reference code
+     * The workflow uuid
      * @type {string}
      * @memberof Workflow
      */
-    readonly workflowReferenceCode?: string;
+    readonly workflowUuid?: string;
 }
 
 
@@ -240,7 +240,7 @@ export function WorkflowFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'triggers': json['triggers'] == null ? undefined : ((json['triggers'] as Array<any>).map(WorkflowTriggerFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
         'projectWorkflowId': json['projectWorkflowId'] == null ? undefined : json['projectWorkflowId'],
-        'workflowReferenceCode': json['workflowReferenceCode'] == null ? undefined : json['workflowReferenceCode'],
+        'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],
     };
 }
 
@@ -248,7 +248,7 @@ export function WorkflowToJSON(json: any): Workflow {
     return WorkflowToJSONTyped(json, false);
 }
 
-export function WorkflowToJSONTyped(value?: Omit<Workflow, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputs'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'maxRetries'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'|'tasks'|'triggers'|'projectWorkflowId'|'workflowReferenceCode'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowToJSONTyped(value?: Omit<Workflow, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputs'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'maxRetries'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'|'tasks'|'triggers'|'projectWorkflowId'|'workflowUuid'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

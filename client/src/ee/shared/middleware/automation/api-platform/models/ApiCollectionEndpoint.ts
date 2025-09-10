@@ -100,11 +100,11 @@ export interface ApiCollectionEndpoint {
      */
     readonly projectDeploymentWorkflowId?: number;
     /**
-     * The workflow reference code.
+     * The workflow uuid.
      * @type {string}
      * @memberof ApiCollectionEndpoint
      */
-    workflowReferenceCode: string;
+    workflowUuid: string;
     /**
      * 
      * @type {number}
@@ -122,7 +122,7 @@ export function instanceOfApiCollectionEndpoint(value: object): value is ApiColl
     if (!('enabled' in value) || value['enabled'] === undefined) return false;
     if (!('httpMethod' in value) || value['httpMethod'] === undefined) return false;
     if (!('path' in value) || value['path'] === undefined) return false;
-    if (!('workflowReferenceCode' in value) || value['workflowReferenceCode'] === undefined) return false;
+    if (!('workflowUuid' in value) || value['workflowUuid'] === undefined) return false;
     return true;
 }
 
@@ -148,7 +148,7 @@ export function ApiCollectionEndpointFromJSONTyped(json: any, ignoreDiscriminato
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'path': json['path'],
         'projectDeploymentWorkflowId': json['projectDeploymentWorkflowId'] == null ? undefined : json['projectDeploymentWorkflowId'],
-        'workflowReferenceCode': json['workflowReferenceCode'],
+        'workflowUuid': json['workflowUuid'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
@@ -169,7 +169,7 @@ export function ApiCollectionEndpointToJSONTyped(value?: Omit<ApiCollectionEndpo
         'httpMethod': HttpMethodToJSON(value['httpMethod']),
         'name': value['name'],
         'path': value['path'],
-        'workflowReferenceCode': value['workflowReferenceCode'],
+        'workflowUuid': value['workflowUuid'],
         '__version': value['version'],
     };
 }
