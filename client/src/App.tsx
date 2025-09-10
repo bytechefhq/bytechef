@@ -1,5 +1,6 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -131,6 +132,7 @@ function App() {
         }))
     );
     const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {currentType, setCurrentType} = useModeTypeStore(
         useShallow((state) => ({
             currentType: state.currentType,
@@ -151,6 +153,10 @@ function App() {
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
+        if (currentEnvironmentId !== 0 && navItem.href === '/automation/projects') {
+            return false;
+        }
+
         if (navItem.href === '/automation/api-platform/api-collections') {
             return ff_1023;
         }
@@ -162,19 +168,25 @@ function App() {
         return true;
     });
 
+    const filteredEmbeddedNavigation = embeddedNavigation.filter((navItem) => {
+        if (currentEnvironmentId !== 0 && navItem.href === '/embedded/integrations') {
+            return false;
+        }
+
+        if (
+            (ff_1779 && navItem.href === '/embedded/automation-workflows') ||
+            navItem.href !== '/embedded/automation-workflows'
+        ) {
+            return true;
+        }
+    });
+
     let navigation: NavigationType[] = [];
 
     if (location.pathname.includes('/automation/')) {
         navigation = filteredAutomationNavigation;
     } else if (location.pathname.includes('/embedded/')) {
-        navigation = embeddedNavigation.filter((navItem) => {
-            if (
-                (ff_1779 && navItem.href === '/embedded/automation-workflows') ||
-                navItem.href !== '/embedded/automation-workflows'
-            ) {
-                return true;
-            }
-        });
+        navigation = filteredEmbeddedNavigation;
     }
 
     useFetchInterceptor();

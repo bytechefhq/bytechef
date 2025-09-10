@@ -90,9 +90,9 @@ const DesktopSidebarBottomMenu = () => {
         setCurrentType(selectedType);
 
         if (selectedType === ModeType.AUTOMATION) {
-            navigate('/automation');
+            navigate('/automation' + (currentEnvironmentId === 0 ? '/projects' : '/deployments'));
         } else if (selectedType === ModeType.EMBEDDED) {
-            navigate('/embedded');
+            navigate('/embedded' + (currentEnvironmentId === 0 ? '/integrations' : '/configurations'));
         }
     };
 
@@ -100,9 +100,9 @@ const DesktopSidebarBottomMenu = () => {
         setCurrentEnvironmentId(+value);
 
         if (currentType === ModeType.AUTOMATION) {
-            navigate('/automation');
+            navigate('/automation' + (+value === 0 ? '/projects' : '/deployments'));
         } else if (currentType === ModeType.EMBEDDED) {
-            navigate('/embedded');
+            navigate('/embedded' + (+value === 0 ? '/integrations' : '/configurations'));
         }
     };
 
