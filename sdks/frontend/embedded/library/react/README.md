@@ -10,8 +10,6 @@
 
 - 📚 **Storybook** for live viewing the components.
 
-- 🎨 **PostCSS** for processing our CSS.
-
 - 🖌️ **CSS Modules** in development, compiled CSS for production builds.
 
 - 🧪 Testing with **Vitest** and **React Testing Library**.
