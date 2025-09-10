@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:32:04.372467+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T16:58:52.421247+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "api-collection-endpoint", description = "The Automation API Platform Collection Endpoint Internal API")
 public interface ApiCollectionEndpointApi {
@@ -74,7 +74,7 @@ public interface ApiCollectionEndpointApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"apiCollectionId\" : 6, \"httpMethod\" : \"DELETE\", \"enabled\" : false, \"workflowReferenceCode\" : \"workflowReferenceCode\", \"path\" : \"path\", \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"projectDeploymentWorkflowId\" : 5, \"id\" : 1, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"apiCollectionId\" : 6, \"httpMethod\" : \"DELETE\", \"enabled\" : false, \"path\" : \"path\", \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"projectDeploymentWorkflowId\" : 5, \"id\" : 1, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowUuid\" : \"workflowUuid\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -144,7 +144,7 @@ public interface ApiCollectionEndpointApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"apiCollectionId\" : 6, \"httpMethod\" : \"DELETE\", \"enabled\" : false, \"workflowReferenceCode\" : \"workflowReferenceCode\", \"path\" : \"path\", \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"projectDeploymentWorkflowId\" : 5, \"id\" : 1, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"apiCollectionId\" : 6, \"httpMethod\" : \"DELETE\", \"enabled\" : false, \"path\" : \"path\", \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"projectDeploymentWorkflowId\" : 5, \"id\" : 1, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowUuid\" : \"workflowUuid\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -188,7 +188,7 @@ public interface ApiCollectionEndpointApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"apiCollectionId\" : 6, \"httpMethod\" : \"DELETE\", \"enabled\" : false, \"workflowReferenceCode\" : \"workflowReferenceCode\", \"path\" : \"path\", \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"projectDeploymentWorkflowId\" : 5, \"id\" : 1, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"apiCollectionId\" : 6, \"httpMethod\" : \"DELETE\", \"enabled\" : false, \"path\" : \"path\", \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"projectDeploymentWorkflowId\" : 5, \"id\" : 1, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowUuid\" : \"workflowUuid\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

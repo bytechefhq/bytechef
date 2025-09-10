@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectDeploymentWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:32:01.240198+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T16:58:51.468622+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ProjectDeploymentWorkflowModel {
 
   private @Nullable String createdBy;
@@ -62,7 +62,7 @@ public class ProjectDeploymentWorkflowModel {
 
   private @Nullable String workflowId;
 
-  private @Nullable String workflowReferenceCode;
+  private @Nullable String workflowUuid;
 
   private @Nullable Integer version;
 
@@ -322,24 +322,24 @@ public class ProjectDeploymentWorkflowModel {
     this.workflowId = workflowId;
   }
 
-  public ProjectDeploymentWorkflowModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public ProjectDeploymentWorkflowModel workflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
     return this;
   }
 
   /**
-   * The workflow reference code
-   * @return workflowReferenceCode
+   * The workflow uuid
+   * @return workflowUuid
    */
   
-  @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow reference code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowReferenceCode")
-  public @Nullable String getWorkflowReferenceCode() {
-    return workflowReferenceCode;
+  @Schema(name = "workflowUuid", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow uuid", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowUuid")
+  public @Nullable String getWorkflowUuid() {
+    return workflowUuid;
   }
 
-  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public void setWorkflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
   }
 
   public ProjectDeploymentWorkflowModel version(@Nullable Integer version) {
@@ -383,13 +383,13 @@ public class ProjectDeploymentWorkflowModel {
         Objects.equals(this.projectDeploymentId, projectDeploymentWorkflow.projectDeploymentId) &&
         Objects.equals(this.staticWebhookUrl, projectDeploymentWorkflow.staticWebhookUrl) &&
         Objects.equals(this.workflowId, projectDeploymentWorkflow.workflowId) &&
-        Objects.equals(this.workflowReferenceCode, projectDeploymentWorkflow.workflowReferenceCode) &&
+        Objects.equals(this.workflowUuid, projectDeploymentWorkflow.workflowUuid) &&
         Objects.equals(this.version, projectDeploymentWorkflow.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectDeploymentId, staticWebhookUrl, workflowId, workflowReferenceCode, version);
+    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectDeploymentId, staticWebhookUrl, workflowId, workflowUuid, version);
   }
 
   @Override
@@ -408,7 +408,7 @@ public class ProjectDeploymentWorkflowModel {
     sb.append("    projectDeploymentId: ").append(toIndentedString(projectDeploymentId)).append("\n");
     sb.append("    staticWebhookUrl: ").append(toIndentedString(staticWebhookUrl)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
-    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
+    sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
