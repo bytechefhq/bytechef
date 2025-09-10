@@ -105,24 +105,22 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         clusterElementsCanvasOpen && (!!isMainRootClusterElement || isNestedClusterRoot)
     );
 
-    const clusterElementTypesCount = useMemo(() => {
+    const filteredClusterElementTypes = useMemo(() => {
         const clusterRootRequirementMet =
             clusterElementsCanvasOpen &&
             (isMainRootClusterElement || isNestedClusterRoot) &&
             rootClusterElementDefinition;
 
-        if (!clusterRootRequirementMet) {
-            return 0;
+        if (!rootClusterElementDefinition || !clusterRootRequirementMet) {
+            return [];
         }
 
-        const filteredClusterElementTypes = getFilteredClusterElementTypes({
+        return getFilteredClusterElementTypes({
             clusterRootComponentDefinition: rootClusterElementDefinition,
             currentClusterElementsType: data.clusterElementType,
             isNestedClusterRoot,
             operationName: data.operationName,
         });
-
-        return filteredClusterElementTypes.length;
     }, [
         clusterElementsCanvasOpen,
         isMainRootClusterElement,
@@ -131,6 +129,10 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         data.clusterElementType,
         data.operationName,
     ]);
+
+    const clusterElementTypesCount = useMemo(() => {
+        return filteredClusterElementTypes.length;
+    }, [filteredClusterElementTypes]);
 
     const nodeWidth = useMemo(
         () =>
@@ -358,7 +360,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
             {!isMainRootClusterElement ? (
                 <>
-                    {isNestedClusterRoot && rootClusterElementDefinition?.clusterElementTypes?.length ? (
+                    {isNestedClusterRoot && filteredClusterElementTypes?.length ? (
                         <>
                             <Handle
                                 className={twMerge(`left-${nodeWidth / 2}px`, styles.handle)}
@@ -367,7 +369,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 type="target"
                             />
 
-                            {rootClusterElementDefinition.clusterElementTypes.map((clusterElementType, index) => (
+                            {filteredClusterElementTypes.map((clusterElementType, index) => (
                                 <Handle
                                     className={twMerge(styles.handle)}
                                     id={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
@@ -406,7 +408,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </>
             ) : (
                 <>
-                    {rootClusterElementDefinition?.clusterElementTypes?.map((clusterElementType, index) => (
+                    {filteredClusterElementTypes.map((clusterElementType, index) => (
                         <Handle
                             className={twMerge(styles.handle)}
                             id={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
