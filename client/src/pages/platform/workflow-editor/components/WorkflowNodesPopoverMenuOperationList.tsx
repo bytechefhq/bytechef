@@ -18,7 +18,6 @@ import {useCallback, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useShallow} from 'zustand/react/shallow';
 
-import useClusterElementsDataStore from '../../cluster-element-editor/stores/useClusterElementsDataStore';
 import {
     convertNameToSnakeCase,
     getClusterElementsLabel,
@@ -72,11 +71,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
             nodes: state.nodes,
         }))
     );
-    const {nodes: clusterElementNodes} = useClusterElementsDataStore(
-        useShallow((state) => ({
-            nodes: state.nodes,
-        }))
-    );
+
     const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
         useWorkflowEditorStore(
             useShallow((state) => ({
@@ -195,18 +190,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 return;
             }
 
-            const nodePositions = clusterElementNodes.reduce<Record<string, {x: number; y: number}>>(
-                (accumulator, node) => {
-                    accumulator[node.id] = {
-                        x: node.position.x,
-                        y: node.position.y,
-                    };
-
-                    return accumulator;
-                },
-                {}
-            );
-
             const clusterElements = initializeClusterElementsObject({
                 clusterElementsData: mainClusterRootTask?.clusterElements || {},
                 mainClusterRootTask,
@@ -222,35 +205,20 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 sourceNodeId,
             });
 
-            const mainRootNodePosition = rootClusterElementNodeData?.workflowNodeName
-                ? nodePositions[rootClusterElementNodeData.workflowNodeName]
-                : undefined;
-
-            const metadata = {
-                ...mainClusterRootTask.metadata,
-                ui: {
-                    ...mainClusterRootTask.metadata?.ui,
-                    nodePosition: mainRootNodePosition,
-                },
-            };
-
             const updatedNodeData = {
                 ...mainClusterRootTask,
                 clusterElements: updatedClusterElements.nestedClusterElements,
-                metadata,
             };
 
             setRootClusterElementNodeData({
                 ...rootClusterElementNodeData,
                 clusterElements: updatedClusterElements.nestedClusterElements,
-                metadata,
             } as typeof rootClusterElementNodeData);
 
             if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
                 setCurrentNode({
                     ...currentNode,
                     clusterElements: updatedClusterElements.nestedClusterElements,
-                    metadata,
                 });
             }
 
@@ -270,7 +238,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
         [
             workflow,
             rootClusterElementDefinition,
-            clusterElementNodes,
             rootClusterElementNodeData,
             setRootClusterElementNodeData,
             currentNode,
