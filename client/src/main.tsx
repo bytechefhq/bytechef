@@ -46,7 +46,7 @@ if (process.env.NODE_ENV === 'mock') {
     renderApp();
 }
 
-function renderApp() {
+async function renderApp() {
     const container = document.getElementById('root') as HTMLDivElement;
     const root = createRoot(container);
     const queryClient = new QueryClient();
@@ -55,17 +55,14 @@ function renderApp() {
 
     const router = isEmbeddedWorkflowBuilder ? getEmbeddedRouter() : getMainRouter(queryClient);
 
-    applicationInfoStore.getState().getApplicationInfo();
+    await applicationInfoStore.getState().getApplicationInfo();
 
     if (!authenticationStore.getState().sessionHasBeenFetched) {
-        authenticationStore
-            .getState()
-            .getAccount()
-            .then((result) => {
-                if (!result && window.location.pathname !== '/login') {
-                    window.location.pathname = '/login';
-                }
-            });
+        const result = await authenticationStore.getState().getAccount();
+
+        if (!result && window.location.pathname !== '/login') {
+            window.location.pathname = '/login';
+        }
     }
 
     root.render(
