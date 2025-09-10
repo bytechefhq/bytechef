@@ -1,4 +1,5 @@
-import {ApiKey, ApiKeyApi, type CreateApiKey200Response} from '@/shared/middleware/platform/api-key';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import {ApiKey, ApiKeyApi, type CreateApiKey200Response} from '@/shared/middleware/platform/security';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateApiKeyMutationProps {
@@ -6,16 +7,22 @@ interface CreateApiKeyMutationProps {
     onSuccess?: (result: CreateApiKey200Response, variables: ApiKey) => void;
 }
 
-export const useCreateApiKeyMutation = (mutationProps?: CreateApiKeyMutationProps) =>
-    useMutation<CreateApiKey200Response, Error, ApiKey>({
+export const useCreateApiKeyMutation = (mutationProps?: CreateApiKeyMutationProps) => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    return useMutation<CreateApiKey200Response, Error, ApiKey>({
         mutationFn: (apiKey: ApiKey) => {
             return new ApiKeyApi().createApiKey({
-                apiKey,
+                apiKey: {
+                    ...apiKey,
+                    environmentId: currentEnvironmentId,
+                },
             });
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
     });
+};
 
 interface DeleteApiKeyMutationProps {
     onError?: (error: Error, variables: number) => void;
@@ -38,14 +45,20 @@ interface UpdateApiKeyMutationProps {
     onSuccess?: (result: void, variables: ApiKey) => void;
 }
 
-export const useUpdateApiKeyMutation = (mutationProps?: UpdateApiKeyMutationProps) =>
-    useMutation<void, Error, ApiKey>({
+export const useUpdateApiKeyMutation = (mutationProps?: UpdateApiKeyMutationProps) => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    return useMutation<void, Error, ApiKey>({
         mutationFn: (apiKey: ApiKey) => {
             return new ApiKeyApi().updateApiKey({
-                apiKey,
+                apiKey: {
+                    ...apiKey,
+                    environmentId: currentEnvironmentId,
+                },
                 id: apiKey.id!,
             });
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
     });
+};
