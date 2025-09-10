@@ -17,15 +17,14 @@ export const useProjectsLeftSidebar = ({
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
     projectId: number;
 }) => {
-    const {setShowBottomPanelOpen} = useWorkflowEditorStore();
+    const setShowBottomPanelOpen = useWorkflowEditorStore((state) => state.setShowBottomPanelOpen);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {captureProjectWorkflowCreated} = useAnalytics();
 
     const queryClient = useQueryClient();
 
     const navigate = useNavigate();
-
-    const {currentWorkspaceId} = useWorkspaceStore();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (projectWorkflowId) => {

@@ -8,7 +8,7 @@ interface CreateConnectionMutationProps {
 }
 
 export const useCreateConnectionMutation = (mutationProps?: CreateConnectionMutationProps) => {
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     return useMutation<number, Error, Connection>({
         mutationFn: (connection: Connection) => {

@@ -29,18 +29,31 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 export const useProject = () => {
-    const {setWorkflow, workflow} = useWorkflowDataStore();
-    const {setCopilotPanelOpen} = useCopilotStore();
-    const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {currentEnvironmentId} = useEnvironmentStore();
-    const {setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore();
-    const {setRightSidebarOpen} = useRightSidebarStore();
-    const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
-    const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const {setWorkflow, workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            setWorkflow: state.setWorkflow,
+            workflow: state.workflow,
+        }))
+    );
+    const setCopilotPanelOpen = useCopilotStore((state) => state.setCopilotPanelOpen);
+    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const setProjectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.setProjectLeftSidebarOpen);
+    const setRightSidebarOpen = useRightSidebarStore((state) => state.setRightSidebarOpen);
+    const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            setShowBottomPanelOpen: state.setShowBottomPanelOpen,
+            setShowEditWorkflowDialog: state.setShowEditWorkflowDialog,
+        }))
+    );
+    const setWorkflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
+        (state) => state.setWorkflowNodeDetailsPanelOpen
+    );
+    const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
 

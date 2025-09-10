@@ -7,7 +7,7 @@ import {useNavigate} from 'react-router-dom';
 
 export default function useFetchInterceptor() {
     const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
-    const {clearCurrentWorkspaceId} = useWorkspaceStore();
+    const clearCurrentWorkspaceId = useWorkspaceStore((state) => state.clearCurrentWorkspaceId);
     const [fetchIntercept, setFetchIntercept] = useState<typeof import('fetch-intercept') | null>(null);
 
     const navigate = useNavigate();
