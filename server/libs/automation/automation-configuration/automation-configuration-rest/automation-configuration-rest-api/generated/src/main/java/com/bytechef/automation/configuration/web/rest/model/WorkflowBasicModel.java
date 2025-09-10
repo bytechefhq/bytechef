@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:32:01.240198+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T16:58:51.468622+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowBasicModel {
 
   private @Nullable String createdBy;
@@ -47,7 +47,7 @@ public class WorkflowBasicModel {
 
   private @Nullable Long projectWorkflowId;
 
-  private @Nullable String workflowReferenceCode;
+  private @Nullable String workflowUuid;
 
   public WorkflowBasicModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
@@ -229,24 +229,24 @@ public class WorkflowBasicModel {
     this.projectWorkflowId = projectWorkflowId;
   }
 
-  public WorkflowBasicModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public WorkflowBasicModel workflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
     return this;
   }
 
   /**
-   * The workflow reference code
-   * @return workflowReferenceCode
+   * The workflow uuid
+   * @return workflowUuid
    */
   
-  @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow reference code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowReferenceCode")
-  public @Nullable String getWorkflowReferenceCode() {
-    return workflowReferenceCode;
+  @Schema(name = "workflowUuid", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow uuid", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowUuid")
+  public @Nullable String getWorkflowUuid() {
+    return workflowUuid;
   }
 
-  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public void setWorkflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
   }
 
   @Override
@@ -267,12 +267,12 @@ public class WorkflowBasicModel {
         Objects.equals(this.lastModifiedDate, workflowBasic.lastModifiedDate) &&
         Objects.equals(this.version, workflowBasic.version) &&
         Objects.equals(this.projectWorkflowId, workflowBasic.projectWorkflowId) &&
-        Objects.equals(this.workflowReferenceCode, workflowBasic.workflowReferenceCode);
+        Objects.equals(this.workflowUuid, workflowBasic.workflowUuid);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, label, lastModifiedBy, lastModifiedDate, version, projectWorkflowId, workflowReferenceCode);
+    return Objects.hash(createdBy, createdDate, description, id, label, lastModifiedBy, lastModifiedDate, version, projectWorkflowId, workflowUuid);
   }
 
   @Override
@@ -288,7 +288,7 @@ public class WorkflowBasicModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    projectWorkflowId: ").append(toIndentedString(projectWorkflowId)).append("\n");
-    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
+    sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("}");
     return sb.toString();
   }

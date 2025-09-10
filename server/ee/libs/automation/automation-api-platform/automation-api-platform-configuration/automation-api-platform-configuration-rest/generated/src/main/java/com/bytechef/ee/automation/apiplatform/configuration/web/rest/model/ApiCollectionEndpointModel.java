@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollectionEndpoint", description = "An API collection endpoint.")
 @JsonTypeName("ApiCollectionEndpoint")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:32:04.372467+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T16:58:52.421247+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ApiCollectionEndpointModel {
 
   private @Nullable Long apiCollectionId;
@@ -56,7 +56,7 @@ public class ApiCollectionEndpointModel {
 
   private @Nullable Long projectDeploymentWorkflowId;
 
-  private String workflowReferenceCode;
+  private String workflowUuid;
 
   private @Nullable Integer version;
 
@@ -67,11 +67,11 @@ public class ApiCollectionEndpointModel {
   /**
    * Constructor with only required parameters
    */
-  public ApiCollectionEndpointModel(Boolean enabled, HttpMethodModel httpMethod, String path, String workflowReferenceCode) {
+  public ApiCollectionEndpointModel(Boolean enabled, HttpMethodModel httpMethod, String path, String workflowUuid) {
     this.enabled = enabled;
     this.httpMethod = httpMethod;
     this.path = path;
-    this.workflowReferenceCode = workflowReferenceCode;
+    this.workflowUuid = workflowUuid;
   }
 
   public ApiCollectionEndpointModel apiCollectionId(@Nullable Long apiCollectionId) {
@@ -314,24 +314,24 @@ public class ApiCollectionEndpointModel {
     this.projectDeploymentWorkflowId = projectDeploymentWorkflowId;
   }
 
-  public ApiCollectionEndpointModel workflowReferenceCode(String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public ApiCollectionEndpointModel workflowUuid(String workflowUuid) {
+    this.workflowUuid = workflowUuid;
     return this;
   }
 
   /**
-   * The workflow reference code.
-   * @return workflowReferenceCode
+   * The workflow uuid.
+   * @return workflowUuid
    */
   @NotNull 
-  @Schema(name = "workflowReferenceCode", description = "The workflow reference code.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("workflowReferenceCode")
-  public String getWorkflowReferenceCode() {
-    return workflowReferenceCode;
+  @Schema(name = "workflowUuid", description = "The workflow uuid.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("workflowUuid")
+  public String getWorkflowUuid() {
+    return workflowUuid;
   }
 
-  public void setWorkflowReferenceCode(String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public void setWorkflowUuid(String workflowUuid) {
+    this.workflowUuid = workflowUuid;
   }
 
   public ApiCollectionEndpointModel version(@Nullable Integer version) {
@@ -375,13 +375,13 @@ public class ApiCollectionEndpointModel {
         Objects.equals(this.lastModifiedDate, apiCollectionEndpoint.lastModifiedDate) &&
         Objects.equals(this.path, apiCollectionEndpoint.path) &&
         Objects.equals(this.projectDeploymentWorkflowId, apiCollectionEndpoint.projectDeploymentWorkflowId) &&
-        Objects.equals(this.workflowReferenceCode, apiCollectionEndpoint.workflowReferenceCode) &&
+        Objects.equals(this.workflowUuid, apiCollectionEndpoint.workflowUuid) &&
         Objects.equals(this.version, apiCollectionEndpoint.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(apiCollectionId, createdBy, createdDate, enabled, httpMethod, id, name, lastExecutionDate, lastModifiedBy, lastModifiedDate, path, projectDeploymentWorkflowId, workflowReferenceCode, version);
+    return Objects.hash(apiCollectionId, createdBy, createdDate, enabled, httpMethod, id, name, lastExecutionDate, lastModifiedBy, lastModifiedDate, path, projectDeploymentWorkflowId, workflowUuid, version);
   }
 
   @Override
@@ -400,7 +400,7 @@ public class ApiCollectionEndpointModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
     sb.append("    projectDeploymentWorkflowId: ").append(toIndentedString(projectDeploymentWorkflowId)).append("\n");
-    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
+    sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
