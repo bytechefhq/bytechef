@@ -23,13 +23,13 @@ import com.bytechef.file.storage.domain.FileEntry;
  */
 public interface ApiConnectorFileStorage {
 
-    void deleteApiConnectorDefinition(FileEntry componentFile);
+    void deleteApiConnectorDefinition(FileEntry fileEntry);
 
-    void deleteApiConnectorSpecification(FileEntry specificationFile);
+    void deleteApiConnectorSpecification(FileEntry fileEntry);
 
-    String readApiConnectorDefinition(FileEntry componentFile);
+    String readApiConnectorDefinition(FileEntry fileEntry);
 
-    String readApiConnectorSpecification(FileEntry specificationFile);
+    String readApiConnectorSpecification(FileEntry fileEntry);
 
     FileEntry storeApiConnectorDefinition(String filename, String definition);
 

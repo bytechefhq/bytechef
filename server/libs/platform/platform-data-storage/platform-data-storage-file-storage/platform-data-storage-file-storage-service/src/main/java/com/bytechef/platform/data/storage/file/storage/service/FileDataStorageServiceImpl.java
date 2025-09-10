@@ -17,7 +17,6 @@
 package com.bytechef.platform.data.storage.file.storage.service;
 
 import com.bytechef.commons.util.CompressionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -26,7 +25,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -43,9 +41,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     }
 
     @Override
-    public void delete(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
-
+    public void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         String directoryPath = getDirectoryPath(type);
 
         fileStorageService.deleteFile(
@@ -53,7 +49,6 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
             fileStorageService.getFileEntry(directoryPath, getFilename(componentName, scope, scopeId, key)));
     }
 
-    @NonNull
     @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<T> fetch(
@@ -74,29 +69,26 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         return Optional.ofNullable((T) valueWrapper.value());
     }
 
-    @NonNull
     @Override
     public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
-        return OptionalUtils.get(fetch(componentName, scope, scopeId, key, type));
+        Optional<T> optional = fetch(componentName, scope, scopeId, key, type);
+
+        return optional.orElseThrow(() -> new IllegalArgumentException("No value found for key: " + key));
     }
 
-    @NonNull
     @Override
-    public <T> Map<String, T> getAll(
-        String componentName, DataStorageScope scope, String scopeId,
-        ModeType type) {
-
+    public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, ModeType type) {
         return fileStorageService.getFileEntries(getDirectoryPath(type))
             .stream()
-            .collect(Collectors.toMap(
-                fileEntry -> getKey(fileEntry.getName()),
-                fileEntry -> get(componentName, scope, scopeId, getKey(fileEntry.getName()), type)));
+            .collect(
+                Collectors.toMap(
+                    fileEntry -> getKey(fileEntry.getName()),
+                    fileEntry -> get(componentName, scope, scopeId, getKey(fileEntry.getName()), type)));
     }
 
     @Override
     public void put(
-        String componentName, DataStorageScope scope, String scopeId, String key,
-        ModeType type, Object value) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
 
         ValueWrapper valueWrapper = new ValueWrapper(value);
 

@@ -26,18 +26,13 @@ import java.util.Optional;
  */
 public interface FileDataStorageService {
 
-    void delete(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);
+    void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);
 
-    <T> Optional<T> fetch(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);
+    <T> Optional<T> fetch(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);
 
-    <T> T get(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);
+    <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);
 
-    <T> Map<String, T> getAll(
-        String componentName, DataStorageScope scope, String scopeId, ModeType type);
+    <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, ModeType type);
 
-    void put(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value);
+    void put(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value);
 }

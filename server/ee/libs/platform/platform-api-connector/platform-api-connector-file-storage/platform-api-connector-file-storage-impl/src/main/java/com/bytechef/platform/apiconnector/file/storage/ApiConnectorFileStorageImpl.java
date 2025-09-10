@@ -37,25 +37,25 @@ public class ApiConnectorFileStorageImpl implements ApiConnectorFileStorage {
     }
 
     @Override
-    public void deleteApiConnectorDefinition(FileEntry componentFile) {
-        fileStorageService.deleteFile(API_CONNECTORS_DEFINITIONS_DIR, componentFile);
+    public void deleteApiConnectorDefinition(FileEntry fileEntry) {
+        fileStorageService.deleteFile(API_CONNECTORS_DEFINITIONS_DIR, fileEntry);
     }
 
     @Override
-    public void deleteApiConnectorSpecification(FileEntry specificationFile) {
-        fileStorageService.deleteFile(API_CONNECTORS_SPECIFICATIONS_DIR, specificationFile);
+    public void deleteApiConnectorSpecification(FileEntry fileEntry) {
+        fileStorageService.deleteFile(API_CONNECTORS_SPECIFICATIONS_DIR, fileEntry);
     }
 
     @Override
-    public String readApiConnectorDefinition(FileEntry componentFile) {
+    public String readApiConnectorDefinition(FileEntry fileEntry) {
         return CompressionUtils.decompressToString(
-            fileStorageService.readFileToBytes(API_CONNECTORS_DEFINITIONS_DIR, componentFile));
+            fileStorageService.readFileToBytes(API_CONNECTORS_DEFINITIONS_DIR, fileEntry));
     }
 
     @Override
-    public String readApiConnectorSpecification(FileEntry specificationFile) {
+    public String readApiConnectorSpecification(FileEntry fileEntry) {
         return CompressionUtils.decompressToString(
-            fileStorageService.readFileToBytes(API_CONNECTORS_SPECIFICATIONS_DIR, specificationFile));
+            fileStorageService.readFileToBytes(API_CONNECTORS_SPECIFICATIONS_DIR, fileEntry));
     }
 
     @Override
