@@ -31,8 +31,8 @@ import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.file.storage.FilesFileStorageImpl;
+import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorageImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,7 +63,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Configuration
 public class ComponentRegistryConfiguration {
 
-    public static final FilesFileStorage FILES_FILE_STORAGE = new FilesFileStorageImpl(new Base64FileStorageService());
+    public static final TempFileStorage FILES_FILE_STORAGE = new TempFileStorageImpl(new Base64FileStorageService());
     public static final PetstoreComponentHandler PETSTORE_COMPONENT_HANDLER = new PetstoreComponentHandler() {
 
         @Override
@@ -101,7 +101,7 @@ public class ComponentRegistryConfiguration {
     }
 
     @Bean
-    FilesFileStorage filesFileStorage() {
+    TempFileStorage filesFileStorage() {
         return FILES_FILE_STORAGE;
     }
 

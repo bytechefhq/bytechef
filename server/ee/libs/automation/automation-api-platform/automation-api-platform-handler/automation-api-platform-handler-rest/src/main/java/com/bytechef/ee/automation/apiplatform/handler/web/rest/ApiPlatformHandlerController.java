@@ -27,7 +27,7 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -76,14 +76,15 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     @SuppressFBWarnings("EI")
     public ApiPlatformHandlerController(
         ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
-        ApplicationProperties applicationProperties, FilesFileStorage filesFileStorage,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, ProjectDeploymentService projectDeploymentService,
+        ApplicationProperties applicationProperties, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
-        WebhookWorkflowExecutor webhookWorkflowExecutor, ProjectWorkflowService projectWorkflowService) {
+        ProjectWorkflowService projectWorkflowService, TempFileStorage tempFileStorage,
+        TriggerDefinitionService triggerDefinitionService, WebhookWorkflowExecutor webhookWorkflowExecutor,
+        WorkflowService workflowService) {
 
         super(
-            filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
+            jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(), tempFileStorage,
             triggerDefinitionService, webhookWorkflowExecutor, workflowService);
 
         this.apiCollectionService = apiCollectionService;
@@ -180,12 +181,11 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 webhookRequest.headers(), MapUtils.concat(webhookRequest.parameters(), variables),
                 webhookRequest.body(), webhookRequest.method());
 
-            String workflowReferenceCode = projectWorkflowService.getProjectDeploymentWorkflowReferenceCode(
+            String workflowUuid = projectWorkflowService.getProjectDeploymentWorkflowUuid(
                 projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId());
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                ModeType.AUTOMATION, apiCollection.getProjectDeploymentId(),
-                workflowReferenceCode, "trigger_1");
+                ModeType.AUTOMATION, apiCollection.getProjectDeploymentId(), workflowUuid, "trigger_1");
 
             return doProcessTrigger(workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);
         });

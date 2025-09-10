@@ -25,7 +25,7 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -56,12 +56,11 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     public ActionContextImpl(
         String actionName, String componentName, int componentVersion, @Nullable ComponentConnection connection,
         ContextFactory contextFactory, DataStorage dataStorage, boolean editorEnvironment,
-        ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage,
-        HttpClientExecutor httpClientExecutor, @Nullable Long jobId, @Nullable Long jobPrincipalId,
-        @Nullable Long jobPrincipalWorkflowId, @Nullable ModeType modeType, String publicUrl,
-        @Nullable String workflowId) {
+        ApplicationEventPublisher eventPublisher, HttpClientExecutor httpClientExecutor, @Nullable Long jobId,
+        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable ModeType modeType,
+        String publicUrl, TempFileStorage tempFileStorage, @Nullable String workflowId) {
 
-        super(componentName, componentVersion, actionName, connection, filesFileStorage, httpClientExecutor);
+        super(componentName, componentVersion, actionName, connection, httpClientExecutor, tempFileStorage);
 
         this.actionName = actionName;
         this.contextFactory = contextFactory;

@@ -22,13 +22,13 @@ import java.io.InputStream;
 /**
  * @author Ivica Cardic
  */
-public interface FilesFileStorage {
+public interface TempFileStorage {
 
     InputStream getFileStream(FileEntry fileEntry);
 
     String readFileToString(FileEntry fileEntry);
 
-    FileEntry storeFileContent(String fileName, String data);
+    FileEntry storeFileContent(String filename, String data);
 
-    FileEntry storeFileContent(String submittedFileName, InputStream inputStream);
+    FileEntry storeFileContent(String filename, InputStream inputStream);
 }

@@ -24,34 +24,34 @@ import java.io.InputStream;
 /**
  * @author Ivica Cardic
  */
-public class FilesFileStorageImpl implements FilesFileStorage {
+public class TempFileStorageImpl implements TempFileStorage {
 
-    public static final String FILES_DIR = "files";
+    public static final String TEMP_DIR = "temp";
 
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI")
-    public FilesFileStorageImpl(FileStorageService fileStorageService) {
+    public TempFileStorageImpl(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
     @Override
     public InputStream getFileStream(FileEntry fileEntry) {
-        return fileStorageService.getFileStream(FILES_DIR, fileEntry);
+        return fileStorageService.getFileStream(TEMP_DIR, fileEntry);
     }
 
     @Override
     public String readFileToString(FileEntry fileEntry) {
-        return fileStorageService.readFileToString(FILES_DIR, fileEntry);
+        return fileStorageService.readFileToString(TEMP_DIR, fileEntry);
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, String data) {
-        return fileStorageService.storeFileContent(FILES_DIR, fileName, data);
+    public FileEntry storeFileContent(String filename, String data) {
+        return fileStorageService.storeFileContent(TEMP_DIR, filename, data);
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, InputStream inputStream) {
-        return fileStorageService.storeFileContent(FILES_DIR, fileName, inputStream);
+    public FileEntry storeFileContent(String filename, InputStream inputStream) {
+        return fileStorageService.storeFileContent(TEMP_DIR, filename, inputStream);
     }
 }

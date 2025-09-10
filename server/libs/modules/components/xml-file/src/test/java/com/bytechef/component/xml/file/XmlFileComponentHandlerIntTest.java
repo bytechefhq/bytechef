@@ -26,7 +26,7 @@ import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -46,7 +46,7 @@ public class XmlFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FilesFileStorage filesFileStorage;
+    private TempFileStorage tempFileStorage;
 
     @Autowired
     private ComponentJobTestExecutor componentJobTestExecutor;
@@ -62,7 +62,7 @@ public class XmlFileComponentHandlerIntTest {
             ENCODER.encodeToString("xml-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                filesFileStorage.storeFileContent(
+                tempFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         Assertions.assertThat(job.getStatus())
@@ -107,7 +107,7 @@ public class XmlFileComponentHandlerIntTest {
             .isEqualTo("file.xml");
 
         Assertions
-            .assertThat(XmlUtils.read(filesFileStorage.readFileToString(fileEntry)))
+            .assertThat(XmlUtils.read(tempFileStorage.readFileToString(fileEntry)))
             .isEqualTo(
                 XmlUtils.read(
                     "<root><Flower><id>45</id><petals>9</petals><color>RED</color><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists><name>Poppy</name></Flower></root>"));

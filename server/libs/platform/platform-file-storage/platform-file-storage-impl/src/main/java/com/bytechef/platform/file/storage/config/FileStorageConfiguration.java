@@ -20,8 +20,8 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage;
 import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
-import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.file.storage.FilesFileStorageImpl;
+import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorageImpl;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.file.storage.TriggerFileStorageImpl;
 import org.springframework.context.annotation.Bean;
@@ -34,13 +34,13 @@ import org.springframework.context.annotation.Configuration;
 public class FileStorageConfiguration {
 
     @Bean
-    FilesFileStorage filesFileStorage(
+    TempFileStorage tempFileStorage(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
         FileStorage.Provider provider = applicationProperties.getFileStorage()
             .getProvider();
 
-        return new FilesFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
+        return new TempFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }
 
     @Bean

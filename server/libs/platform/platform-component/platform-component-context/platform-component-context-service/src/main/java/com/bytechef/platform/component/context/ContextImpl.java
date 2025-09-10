@@ -29,7 +29,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.context.util.JsonSchemaUtils;
 import com.bytechef.platform.component.definition.PropertyFactory;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -67,12 +67,12 @@ class ContextImpl implements Context {
     @SuppressFBWarnings("EI")
     public ContextImpl(
         String componentName, int componentVersion, String componentOperationName,
-        @Nullable ComponentConnection connection, FilesFileStorage filesFileStorage,
-        HttpClientExecutor httpClientExecutor) {
+        @Nullable ComponentConnection connection, HttpClientExecutor httpClientExecutor,
+        TempFileStorage tempFileStorage) {
 
         this.convert = new ConvertImpl();
         this.encoder = new EncoderImpl();
-        this.file = new FileImpl(filesFileStorage);
+        this.file = new FileImpl(tempFileStorage);
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
@@ -366,21 +366,21 @@ class ContextImpl implements Context {
         }
     }
 
-    private record FileImpl(FilesFileStorage filesFileStorage) implements File {
+    private record FileImpl(TempFileStorage tempFileStorage) implements File {
 
         @Override
         public InputStream getStream(FileEntry fileEntry) {
-            return filesFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry());
+            return tempFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public String readToString(FileEntry fileEntry) {
-            return filesFileStorage.readFileToString(((FileEntryImpl) fileEntry).getFileEntry());
+            return tempFileStorage.readFileToString(((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public FileEntry storeContent(String fileName, String data) {
-            return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, data));
+            return new FileEntryImpl(tempFileStorage.storeFileContent(fileName, data));
         }
 
         @Override
@@ -398,7 +398,7 @@ class ContextImpl implements Context {
                 tempFilePath = Files.createTempFile("context_", fileEntry.getName());
 
                 Files.copy(
-                    filesFileStorage.getFileStream(toFileEntry(fileEntry)), tempFilePath,
+                    tempFileStorage.getFileStream(toFileEntry(fileEntry)), tempFilePath,
                     StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -417,7 +417,7 @@ class ContextImpl implements Context {
         @Override
         public FileEntry storeContent(String fileName, InputStream inputStream) {
             try {
-                return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, inputStream));
+                return new FileEntryImpl(tempFileStorage.storeFileContent(fileName, inputStream));
             } catch (Exception exception) {
                 throw new RuntimeException("Unable to store file " + fileName, exception);
             }

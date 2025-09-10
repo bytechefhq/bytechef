@@ -37,7 +37,7 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -79,7 +79,7 @@ public abstract class AbstractWebhookTriggerController {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
-    private final FilesFileStorage filesFileStorage;
+    private final TempFileStorage tempFileStorage;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private String publicUrld;
     private final TriggerDefinitionService triggerDefinitionService;
@@ -87,23 +87,23 @@ public abstract class AbstractWebhookTriggerController {
     private final WorkflowService workflowService;
 
     protected AbstractWebhookTriggerController(
-        FilesFileStorage filesFileStorage, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TempFileStorage tempFileStorage,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService) {
 
-        this.filesFileStorage = filesFileStorage;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.tempFileStorage = tempFileStorage;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowService = workflowService;
     }
 
     protected AbstractWebhookTriggerController(
-        FilesFileStorage filesFileStorage, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, String publicUrld,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, String publicUrld, TempFileStorage tempFileStorage,
         TriggerDefinitionService triggerDefinitionService, WebhookWorkflowExecutor webhookWorkflowExecutor,
         WorkflowService workflowService) {
 
-        this.filesFileStorage = filesFileStorage;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.publicUrld = publicUrld;
+        this.tempFileStorage = tempFileStorage;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
         this.workflowService = workflowService;
@@ -183,7 +183,7 @@ public abstract class AbstractWebhookTriggerController {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return !jobPrincipalAccessor.isWorkflowEnabled(
-            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
     private Object checkBody(Object body) {
@@ -221,7 +221,7 @@ public abstract class AbstractWebhookTriggerController {
                         value.add(StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8));
                     }
                 } else {
-                    value.add(filesFileStorage.storeFileContent(part.getSubmittedFileName(), part.getInputStream()));
+                    value.add(tempFileStorage.storeFileContent(part.getSubmittedFileName(), part.getInputStream()));
                 }
 
                 multipartFormDataMap.put(part.getName(), value);
@@ -275,7 +275,7 @@ public abstract class AbstractWebhookTriggerController {
             }
         } else if (contentType.startsWith("application/")) {
             body = new WebhookBodyImpl(
-                filesFileStorage.storeFileContent(
+                tempFileStorage.storeFileContent(
                     getFilename(httpServletRequest.getContentType()), httpServletRequest.getInputStream()),
                 ContentType.BINARY, httpServletRequest.getContentType(), null);
             parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
@@ -336,10 +336,10 @@ public abstract class AbstractWebhookTriggerController {
         String workflowId;
 
         if (workflowExecutionId.getJobPrincipalId() == -1) {
-            workflowId = jobPrincipalAccessor.getLatestWorkflowId(workflowExecutionId.getWorkflowReferenceCode());
+            workflowId = jobPrincipalAccessor.getLastWorkflowId(workflowExecutionId.getWorkflowUuid());
         } else {
             workflowId = jobPrincipalAccessor.getWorkflowId(
-                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
         }
 
         return workflowId;
@@ -414,7 +414,7 @@ public abstract class AbstractWebhookTriggerController {
 
                 bodyBuilder.contentType(MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())));
 
-                responseEntity = bodyBuilder.body(new InputStreamResource(filesFileStorage.getFileStream(fileEntry)));
+                responseEntity = bodyBuilder.body(new InputStreamResource(tempFileStorage.getFileStream(fileEntry)));
 
                 break;
             case JSON:

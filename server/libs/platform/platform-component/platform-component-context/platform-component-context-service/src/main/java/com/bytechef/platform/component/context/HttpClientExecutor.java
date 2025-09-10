@@ -39,7 +39,7 @@ import com.bytechef.platform.component.facade.OperationDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
@@ -88,16 +88,16 @@ class HttpClientExecutor {
 
     private final ApplicationContext applicationContext;
     private final ConnectionDefinitionService connectionDefinitionService;
-    private final FilesFileStorage filesFileStorage;
+    private final TempFileStorage tempFileStorage;
 
     @SuppressFBWarnings("EI")
     public HttpClientExecutor(
         ApplicationContext applicationContext, ConnectionDefinitionService connectionDefinitionService,
-        FilesFileStorage filesFileStorage) {
+        TempFileStorage tempFileStorage) {
 
         this.applicationContext = applicationContext;
         this.connectionDefinitionService = connectionDefinitionService;
-        this.filesFileStorage = filesFileStorage;
+        this.tempFileStorage = tempFileStorage;
     }
 
     public Response execute(
@@ -290,7 +290,7 @@ class HttpClientExecutor {
         builder.formPart(
             name, fileEntry.getName(),
             MoreBodyPublishers.ofMediaType(
-                BodyPublishers.ofInputStream(() -> filesFileStorage.getFileStream(
+                BodyPublishers.ofInputStream(() -> tempFileStorage.getFileStream(
                     ((FileEntryImpl) fileEntry).getFileEntry())),
                 MediaType.parse(fileEntry.getMimeType())));
     }
@@ -337,7 +337,7 @@ class HttpClientExecutor {
     private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
         return MoreBodyPublishers.ofMediaType(
             BodyPublishers.ofInputStream(
-                () -> filesFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry())),
+                () -> tempFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry())),
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
@@ -525,7 +525,7 @@ class HttpClientExecutor {
             }
         }
 
-        return new FileEntryImpl(filesFileStorage.storeFileContent(filename, httpResponseBody));
+        return new FileEntryImpl(tempFileStorage.storeFileContent(filename, httpResponseBody));
     }
 
     private static class ResponseImpl implements Response {

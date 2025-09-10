@@ -22,7 +22,7 @@ import com.bytechef.platform.component.definition.TriggerContextAware;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -38,24 +38,24 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     private final Long jobPrincipalId;
     private final String triggerName;
     private final ModeType type;
-    private final String workflowReferenceCode;
+    private final String workflowUuid;
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
         String componentName, int componentVersion, @Nullable ComponentConnection connection, DataStorage dataStorage,
-        boolean editorEnvironment, FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor,
+        boolean editorEnvironment, TempFileStorage tempFileStorage, HttpClientExecutor httpClientExecutor,
         @Nullable Long jobPrincipalId, String triggerName, @Nullable ModeType type,
-        @Nullable String workflowReferenceCode) {
+        @Nullable String workflowUuid) {
 
-        super(componentName, componentVersion, triggerName, connection, filesFileStorage, httpClientExecutor);
+        super(componentName, componentVersion, triggerName, connection, httpClientExecutor, tempFileStorage);
 
         this.data = new DataImpl(
-            componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorage);
+            componentName, componentVersion, triggerName, type, workflowUuid, dataStorage);
         this.editorEnvironment = editorEnvironment;
         this.jobPrincipalId = jobPrincipalId;
         this.triggerName = triggerName;
         this.type = type;
-        this.workflowReferenceCode = workflowReferenceCode;
+        this.workflowUuid = workflowUuid;
     }
 
     @Override
@@ -83,8 +83,8 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     }
 
     @Override
-    public String getWorkflowReferenceCode() {
-        return workflowReferenceCode;
+    public String getWorkflowUuid() {
+        return workflowUuid;
     }
 
     @Override
@@ -94,7 +94,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
 
     private record DataImpl(
         String componentName, Integer componentVersion, String triggerName, ModeType type,
-        String workflowReferenceCode, DataStorage dataStorage) implements Data {
+        String workflowUuid, DataStorage dataStorage) implements Data {
 
         @Override
         public <T> Optional<T> fetch(Data.Scope scope, String key) {
@@ -134,7 +134,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         private String getScopeId(Data.Scope scope) {
             return Validate.notNull(
                 switch (scope) {
-                    case WORKFLOW -> workflowReferenceCode;
+                    case WORKFLOW -> workflowUuid;
                     case ACCOUNT -> null;
                 }, "scope");
         }
