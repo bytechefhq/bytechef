@@ -35,7 +35,7 @@ export interface ApplicationInfoI {
         enabled: boolean;
     };
 
-    getApplicationInfo: () => void;
+    getApplicationInfo: () => Promise<void>;
 }
 
 const fetchGetActuatorInfo = async (): Promise<Response> => {
