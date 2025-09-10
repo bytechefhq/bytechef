@@ -59,7 +59,7 @@ public class ToolClient {
     public Map<String, List<ToolModel>> getTools(String externalUserId) {
         try (HttpClient httpClient = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("%s/api/embedded/v1/tools?externalUserId=%s".formatted(baseUrl, externalUserId)))
+                .uri(URI.create("%s/api/embedded/v1/%s/tools".formatted(baseUrl, externalUserId)))
                 .header("Authorization", "Bearer " + apiKey)
                 .header("X-Environment", environment.name())
                 .GET()
@@ -81,7 +81,7 @@ public class ToolClient {
                     "parameters", parameters));
 
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/embedded/v1/tools?externalUserId=" + externalUserId))
+                .uri(URI.create(baseUrl + "/api/embedded/v1/%s/tools".formatted(externalUserId)))
                 .header("Authorization", "Bearer " + apiKey)
                 .header("X-Environment", environment.name())
                 .header("Content-Type", "application/json")
