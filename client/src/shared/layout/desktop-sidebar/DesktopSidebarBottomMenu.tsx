@@ -15,6 +15,7 @@ import {
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
@@ -90,9 +91,11 @@ const DesktopSidebarBottomMenu = () => {
         setCurrentType(selectedType);
 
         if (selectedType === ModeType.AUTOMATION) {
-            navigate('/automation');
+            navigate('/automation' + (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'));
         } else if (selectedType === ModeType.EMBEDDED) {
-            navigate('/embedded');
+            navigate(
+                '/embedded' + (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations')
+            );
         }
     };
 
@@ -100,9 +103,9 @@ const DesktopSidebarBottomMenu = () => {
         setCurrentEnvironmentId(+value);
 
         if (currentType === ModeType.AUTOMATION) {
-            navigate('/automation');
+            navigate('/automation' + (+value === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'));
         } else if (currentType === ModeType.EMBEDDED) {
-            navigate('/embedded');
+            navigate('/embedded' + (+value === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'));
         }
     };
 
@@ -175,7 +178,7 @@ const DesktopSidebarBottomMenu = () => {
                             <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
                                 <BlendIcon className="size-5" />
 
-                                <span>Mode: {currentType === 0 ? 'Automation' : 'Embedded'}</span>
+                                <span>Mode: {currentType === ModeType.AUTOMATION ? 'Automation' : 'Embedded'}</span>
                             </DropdownMenuSubTrigger>
 
                             <DropdownMenuPortal>
