@@ -1,27 +1,40 @@
-import {create} from 'zustand';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+
+/* eslint-disable sort-keys */
+
+import {Environment} from '@/shared/middleware/platform/configuration';
+import {createStore, useStore} from 'zustand';
+import {ExtractState} from 'zustand/index';
 import {devtools, persist} from 'zustand/middleware';
 
 interface EnvironmentStateI {
-    clearCurrentEnvironmentId: () => void;
-
     currentEnvironmentId: number;
+    clearCurrentEnvironmentId: () => void;
     setCurrentEnvironmentId: (currentEnvironmentId: number) => void;
+
+    environments: Environment[];
+    setEnvironments: (environments: Environment[]) => void;
 }
 
-export const useEnvironmentStore = create<EnvironmentStateI>()(
+export const environmentStore = createStore<EnvironmentStateI>()(
     devtools(
         persist(
             (set) => ({
+                currentEnvironmentId: 0,
                 clearCurrentEnvironmentId: () => {
                     set(() => ({
-                        currentEnvironmentId: undefined,
+                        currentEnvironmentId: DEVELOPMENT_ENVIRONMENT,
                     }));
                 },
-
-                currentEnvironmentId: 0,
                 setCurrentEnvironmentId: (currentEnvironmentId: number) =>
                     set(() => ({
-                        currentEnvironmentId: currentEnvironmentId,
+                        currentEnvironmentId,
+                    })),
+
+                environments: [],
+                setEnvironments: (environments: Environment[]) =>
+                    set(() => ({
+                        environments,
                     })),
             }),
             {
@@ -30,3 +43,7 @@ export const useEnvironmentStore = create<EnvironmentStateI>()(
         )
     )
 );
+
+export function useEnvironmentStore<U>(selector: (state: ExtractState<typeof environmentStore>) => U): U {
+    return useStore(environmentStore, selector);
+}

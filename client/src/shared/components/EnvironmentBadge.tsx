@@ -1,5 +1,5 @@
 import {Badge} from '@/components/ui/badge';
-import {useGetEnvironmentsQuery} from '@/shared/queries/platform/environments.queries';
+import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 
 const EnvironmentBadge = ({
     environmentId,
@@ -8,7 +8,7 @@ const EnvironmentBadge = ({
     environmentId: number;
     variant?: 'outline' | 'secondary';
 }) => {
-    const {data: environments} = useGetEnvironmentsQuery();
+    const environments = useEnvironmentStore((state) => state.environments);
 
     const environment = environments?.find((environment) => +environment!.id! === environmentId);
 

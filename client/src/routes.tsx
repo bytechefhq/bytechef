@@ -2,6 +2,7 @@ import App from '@/App';
 import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {Connections} from '@/pages/automation/connections/Connections';
+import {environmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
@@ -11,7 +12,9 @@ import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
 import PageNotFound from '@/shared/error/PageNotFound';
 import Settings from '@/shared/layout/Settings';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
+import {EnvironmentApi} from '@/shared/middleware/platform/configuration';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
+import {EnvironmentKeys} from '@/shared/queries/platform/environments.queries';
 import {QueryClient} from '@tanstack/react-query';
 import {lazy} from 'react';
 import {createBrowserRouter, redirect} from 'react-router-dom';
@@ -650,6 +653,14 @@ export const getRouter = (queryClient: QueryClient) =>
             ],
             element: <App />,
             errorElement: <ErrorPage />,
+            loader: async () => {
+                const environments = await queryClient.fetchQuery({
+                    queryFn: () => new EnvironmentApi().getEnvironments(),
+                    queryKey: EnvironmentKeys,
+                });
+
+                environmentStore.getState().setEnvironments(environments);
+            },
             path: '/',
         },
         {

@@ -1,4 +1,4 @@
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import {environmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {
     UpdateClusterElementParameter200Response,
     UpdateClusterElementParameterOperationRequest,
@@ -58,7 +58,7 @@ export default function saveProperty({
             {
                 clusterElementType: currentNode.clusterElementType,
                 clusterElementWorkflowNodeName: currentNode.workflowNodeName,
-                environmentId: useEnvironmentStore.getState().currentEnvironmentId,
+                environmentId: environmentStore.getState().currentEnvironmentId,
                 id: workflowId,
                 updateClusterElementParameterRequest: {
                     includeInMetadata,
@@ -89,7 +89,7 @@ export default function saveProperty({
 
     updateWorkflowNodeParameterMutation.mutate(
         {
-            environmentId: useEnvironmentStore.getState().currentEnvironmentId,
+            environmentId: environmentStore.getState().currentEnvironmentId,
             id: workflowId,
             updateClusterElementParameterRequest: {
                 includeInMetadata,
