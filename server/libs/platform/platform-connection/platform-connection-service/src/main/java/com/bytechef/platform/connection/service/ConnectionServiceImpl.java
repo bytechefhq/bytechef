@@ -84,7 +84,9 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setParameters(parameters);
         connection.setType(type);
 
-        logger.info("Saved..: {}", FormatUtils.toString(parameters));
+        if (logger.isTraceEnabled()) {
+            logger.trace("Saved..: {}", FormatUtils.toString(parameters));
+        }
 
         return create(connection);
     }
