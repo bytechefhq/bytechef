@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.apiplatform.handler.security.web.filter;
 
 import com.bytechef.ee.automation.apiplatform.handler.security.web.authentication.ApiPlatformKeyAuthenticationToken;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.web.filter.AbstractApiAuthenticationFilter;
 import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,10 +29,11 @@ public class ApiPlatformApiAuthenticationFilter extends AbstractApiAuthenticatio
     }
 
     protected Authentication getAuthentication(HttpServletRequest request) {
+        Environment environment = getEnvironment(request);
         String token = getAuthToken(request);
 
         TenantKey tenantKey = TenantKey.parse(token);
 
-        return new ApiPlatformKeyAuthenticationToken(token, tenantKey.getTenantId());
+        return new ApiPlatformKeyAuthenticationToken(environment.ordinal(), token, tenantKey.getTenantId());
     }
 }
