@@ -29,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,7 +187,6 @@ public class ProjectTools {
         @ToolParam(description = "The new name of the project (optional)") String name,
         @ToolParam(description = "The new description of the project (optional)") String description,
         @ToolParam(description = "The new category ID for the project (optional)") Long categoryId,
-        @ToolParam(description = "The new workspace ID for the project (optional)") Long workspaceId,
         @ToolParam(description = "The new tag IDs to associate with the project (optional)") List<Long> tagIds) {
 
         try {
@@ -198,22 +196,15 @@ public class ProjectTools {
                 name = name.trim();
             }
 
-            Project.Builder projectBuilder = Project.builder()
-                .id(existingProject.getId())
-                .name(name != null && !name.isEmpty() ? name : existingProject.getName())
-                .description(description != null ? description : existingProject.getDescription())
-                .categoryId(categoryId != null ? categoryId : existingProject.getCategoryId())
-                .workspaceId(
-                    workspaceId != null ? workspaceId : Objects.requireNonNull(existingProject.getWorkspaceId()))
-                .version(existingProject.getVersion());
+            existingProject.setName(name != null && !name.isEmpty() ? name : existingProject.getName());
+            existingProject.setDescription(description != null ? description : existingProject.getDescription());
+            existingProject.setCategoryId(categoryId != null ? categoryId : existingProject.getCategoryId());
 
             if (tagIds != null) {
-                projectBuilder.tagIds(tagIds);
-            } else {
-                projectBuilder.tagIds(existingProject.getTagIds());
+                existingProject.setTagIds(tagIds);
             }
 
-            Project updatedProject = projectService.update(projectBuilder.build());
+            Project updatedProject = projectService.update(existingProject);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Updated project {} with name '{}'", updatedProject.getId(), updatedProject.getName());
@@ -329,7 +320,8 @@ public class ProjectTools {
 
             Status lastStatus = project.getLastStatus();
             return new ProjectStatusInfo(
-                project.getId(), project.getName(), lastStatus.name(), project.isPublished(), project.getLastVersion(),
+                project.getId(), project.getName(), lastStatus.name(), project.isPublished(),
+                project.getLastVersion(),
                 project.getLastPublishedDate() != null ? project.getLastPublishedDate() : null, deploymentStatuses);
         } catch (Exception e) {
             logger.error("Failed to get status for project {}", projectId, e);
