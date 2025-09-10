@@ -37,6 +37,10 @@ export interface GetApiKeyRequest {
     id: number;
 }
 
+export interface GetApiKeysRequest {
+    environmentId: number;
+}
+
 export interface UpdateApiKeyRequest {
     id: number;
     apiKey: ApiKey;
@@ -162,8 +166,19 @@ export class ApiKeyApi extends runtime.BaseAPI {
     /**
      * Get API Keys
      */
-    async getApiKeysRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiKey>>> {
+    async getApiKeysRaw(requestParameters: GetApiKeysRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiKey>>> {
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getApiKeys().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -183,8 +198,8 @@ export class ApiKeyApi extends runtime.BaseAPI {
     /**
      * Get API Keys
      */
-    async getApiKeys(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ApiKey>> {
-        const response = await this.getApiKeysRaw(initOverrides);
+    async getApiKeys(requestParameters: GetApiKeysRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ApiKey>> {
+        const response = await this.getApiKeysRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
