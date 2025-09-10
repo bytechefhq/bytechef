@@ -27,46 +27,38 @@ import java.util.Set;
  */
 public interface FileStorageService {
 
-    void deleteFile(String directoryPath, FileEntry fileEntry);
+    void deleteFile(String directory, FileEntry fileEntry);
 
-    boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException;
+    boolean fileExists(String directory, FileEntry fileEntry) throws FileStorageException;
 
-    boolean fileExists(String directoryPath, String nonRandomFilename) throws FileStorageException;
+    boolean fileExists(String directory, String filename) throws FileStorageException;
 
-    FileEntry getFileEntry(
-        String directoryPath, String nonRandomFilename) throws FileStorageException;
+    FileEntry getFileEntry(String directory, String filename) throws FileStorageException;
 
-    Set<FileEntry> getFileEntries(String directoryPath) throws FileStorageException;
+    Set<FileEntry> getFileEntries(String directory) throws FileStorageException;
 
-    InputStream getFileStream(String directoryPath, FileEntry fileEntry) throws FileStorageException;
+    InputStream getFileStream(String directory, FileEntry fileEntry) throws FileStorageException;
 
-    URL getFileEntryURL(String directoryPath, FileEntry fileEntry);
+    URL getFileEntryURL(String directory, FileEntry fileEntry);
 
-    byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException;
+    byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException;
 
-    String readFileToString(String directoryPath, FileEntry fileEntry) throws FileStorageException;
+    String readFileToString(String directory, FileEntry fileEntry) throws FileStorageException;
 
     String getType();
 
-    FileEntry storeFileContent(
-        String directoryPath, String filename, byte[] data) throws FileStorageException;
+    FileEntry storeFileContent(String directory, String filename, byte[] data) throws FileStorageException;
 
-    FileEntry storeFileContent(
-        String directoryPath, String filename, byte[] data, boolean randomFilename)
+    FileEntry storeFileContent(String directory, String filename, byte[] data, boolean generateFilename)
         throws FileStorageException;
 
-    FileEntry storeFileContent(
-        String directoryPath, String filename, String data) throws FileStorageException;
+    FileEntry storeFileContent(String directory, String filename, String data) throws FileStorageException;
 
-    FileEntry storeFileContent(
-        String directoryPath, String filename, String data, boolean randomFilename)
+    FileEntry storeFileContent(String directory, String filename, String data, boolean generateFilename)
         throws FileStorageException;
 
-    FileEntry storeFileContent(
-        String directoryPath, String filename, InputStream inputStream)
-        throws FileStorageException;
+    FileEntry storeFileContent(String directory, String filename, InputStream inputStream) throws FileStorageException;
 
-    FileEntry storeFileContent(
-        String directoryPath, String filename, InputStream inputStream,
-        boolean randomFilename) throws FileStorageException;
+    FileEntry storeFileContent(String directory, String filename, InputStream inputStream, boolean generateFilename)
+        throws FileStorageException;
 }
