@@ -60,7 +60,7 @@ class AuthorityApiControllerIntTest {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{name}";
 
     @Autowired
-    private ObjectMapper om;
+    private ObjectMapper objectMapper;
 
     @Autowired
     private AuthorityRepository authorityRepository;
@@ -107,12 +107,12 @@ class AuthorityApiControllerIntTest {
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // Create the Authority
-        var returnedAuthority = om.readValue(
+        var returnedAuthority = objectMapper.readValue(
             restAuthorityMockMvc
                 .perform(
                     post(ENTITY_API_URL).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsBytes(authority)))
+                        .content(objectMapper.writeValueAsBytes(authority)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -137,7 +137,7 @@ class AuthorityApiControllerIntTest {
             .perform(
                 post(ENTITY_API_URL).with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(authority)))
+                    .content(objectMapper.writeValueAsBytes(authority)))
             .andExpect(status().isBadRequest());
 
         // Validate the Authority in the database

@@ -167,7 +167,7 @@ public class AccountController {
 
             user.setId(null);
 
-            TenantUtils.runWithTenantId(tenantId, () -> userService.saveUser(user));
+            TenantUtils.runWithTenantId(tenantId, () -> userService.save(user));
         }
     }
 
@@ -236,7 +236,7 @@ public class AccountController {
             throw new AccountResourceException("User could not be found", AccountErrorType.USER_NOT_FOUND);
         }
 
-        userService.updateUser(
+        userService.update(
             userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(), userDTO.getLangKey(),
             userDTO.getImageUrl());
     }

@@ -80,7 +80,7 @@ public class AdminUserDTO {
 
     public AdminUserDTO(User user, List<Authority> authorities) {
         this.id = user.getId();
-        this.uuid = user.getUuid();
+        this.uuid = user.getUuidAsString();
         this.login = user.getLogin();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
@@ -104,7 +104,7 @@ public class AdminUserDTO {
         return id;
     }
 
-    public String getUuid() {
+    public String getUuidAsString() {
         return uuid;
     }
 

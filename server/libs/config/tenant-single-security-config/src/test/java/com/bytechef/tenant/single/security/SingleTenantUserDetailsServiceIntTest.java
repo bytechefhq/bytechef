@@ -105,7 +105,7 @@ class SingleTenantUserDetailsServiceIntTest {
         userOne.setLastName("doe");
         userOne.setLangKey("en");
 
-        userService.saveUser(userOne);
+        userService.save(userOne);
 
         User userTwo = new User();
 
@@ -117,7 +117,7 @@ class SingleTenantUserDetailsServiceIntTest {
         userTwo.setLastName("doe");
         userTwo.setLangKey("en");
 
-        userService.saveUser(userTwo);
+        userService.save(userTwo);
 
         User userThree = new User();
 
@@ -129,7 +129,7 @@ class SingleTenantUserDetailsServiceIntTest {
         userThree.setLastName("doe");
         userThree.setLangKey("en");
 
-        userService.saveUser(userThree);
+        userService.save(userThree);
     }
 
     @Test

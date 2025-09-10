@@ -140,7 +140,7 @@ class AccountControllerIntTest {
         user.setLangKey("en");
         user.setAuthorities(authorities);
 
-        userService.createUser(user);
+        userService.create(user);
 
         restAccountMockMvc
             .perform(get("/api/account").accept(MediaType.APPLICATION_JSON))
@@ -407,7 +407,7 @@ class AccountControllerIntTest {
         testUser4.orElseThrow()
             .setActivated(true);
 
-        userService.updateUser(
+        userService.update(
             new AdminUserDTO(testUser4.orElseThrow(), List.of(new Authority().id(1L)
                 .name(AuthorityConstants.USER))));
 
