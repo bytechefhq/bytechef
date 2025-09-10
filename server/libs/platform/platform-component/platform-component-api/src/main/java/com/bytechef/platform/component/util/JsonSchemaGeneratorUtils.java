@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.util.json.JsonParser;
 
@@ -107,7 +108,7 @@ public class JsonSchemaGeneratorUtils {
             case com.bytechef.component.definition.Property.Type.STRING -> String.class;
             case com.bytechef.component.definition.Property.Type.DYNAMIC_PROPERTIES,
                 com.bytechef.component.definition.Property.Type.FILE_ENTRY,
-                com.bytechef.component.definition.Property.Type.OBJECT -> Object.class;
+                com.bytechef.component.definition.Property.Type.OBJECT -> Map.class;
             case com.bytechef.component.definition.Property.Type.TIME -> LocalTime.class;
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
