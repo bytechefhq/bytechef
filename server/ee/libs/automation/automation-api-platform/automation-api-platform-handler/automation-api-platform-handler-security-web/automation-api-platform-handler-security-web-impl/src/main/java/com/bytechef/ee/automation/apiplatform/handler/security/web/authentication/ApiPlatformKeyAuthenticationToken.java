@@ -20,8 +20,8 @@ public class ApiPlatformKeyAuthenticationToken extends AbstractPublicApiAuthenti
 
     private String secretKey;
 
-    public ApiPlatformKeyAuthenticationToken(String secretKey, String tenantId) {
-        super(tenantId);
+    public ApiPlatformKeyAuthenticationToken(long environmentId, String secretKey, String tenantId) {
+        super(environmentId, tenantId);
 
         this.secretKey = secretKey;
     }

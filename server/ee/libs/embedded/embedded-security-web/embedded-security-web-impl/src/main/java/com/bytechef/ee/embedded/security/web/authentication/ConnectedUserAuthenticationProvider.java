@@ -9,7 +9,6 @@ package com.bytechef.ee.embedded.security.web.authentication;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -36,11 +35,11 @@ public class ConnectedUserAuthenticationProvider implements AuthenticationProvid
         ConnectedUserAuthenticationToken connectedUserAuthenticationToken =
             (ConnectedUserAuthenticationToken) authentication;
 
-        Environment environment = connectedUserAuthenticationToken.getEnvironment();
+        long environmentId = connectedUserAuthenticationToken.getEnvironmentId();
         String externalUserId = connectedUserAuthenticationToken.getExternalUserId();
 
-        ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(externalUserId, environment)
-            .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environment));
+        ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(externalUserId, environmentId)
+            .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environmentId));
 
         return new ConnectedUserAuthenticationToken(createSpringSecurityUser(externalUserId, connectedUser));
     }

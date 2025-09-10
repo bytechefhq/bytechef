@@ -26,8 +26,8 @@ public class ApiKeyAuthenticationToken extends AbstractPublicApiAuthenticationTo
 
     private String secretKey;
 
-    public ApiKeyAuthenticationToken(String secretKey, String tenantId) {
-        super(tenantId);
+    public ApiKeyAuthenticationToken(long environmentId, String secretKey, String tenantId) {
+        super(environmentId, tenantId);
 
         this.secretKey = secretKey;
     }

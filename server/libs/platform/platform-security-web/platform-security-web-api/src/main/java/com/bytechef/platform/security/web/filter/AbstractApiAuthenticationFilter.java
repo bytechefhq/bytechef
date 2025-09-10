@@ -89,11 +89,12 @@ public abstract class AbstractApiAuthenticationFilter extends OncePerRequestFilt
 
     @Nullable
     protected Authentication getAuthentication(HttpServletRequest request) {
+        Environment environment = getEnvironment(request);
         String token = getAuthToken(request);
 
         TenantKey tenantKey = TenantKey.parse(token);
 
-        return new ApiKeyAuthenticationToken(token, tenantKey.getTenantId());
+        return new ApiKeyAuthenticationToken(environment.ordinal(), token, tenantKey.getTenantId());
     }
 
     protected String getAuthToken(HttpServletRequest request) {
