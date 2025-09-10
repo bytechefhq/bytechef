@@ -25,7 +25,7 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
-import com.bytechef.platform.configuration.web.rest.file.storage.TempFilesFileStorage;
+import com.bytechef.platform.configuration.web.rest.file.storage.TempFileStorageImpl;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.tenant.util.TenantUtils;
@@ -58,7 +58,7 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
         WebhookTriggerTestFacade webhookTriggerTestFacade, WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade,
         WorkflowService workflowService) {
 
-        super(new TempFilesFileStorage(), jobPrincipalAccessorRegistry, triggerDefinitionService, workflowService);
+        super(jobPrincipalAccessorRegistry, new TempFileStorageImpl(), triggerDefinitionService, workflowService);
 
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;

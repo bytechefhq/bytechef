@@ -19,25 +19,25 @@ package com.bytechef.platform.configuration.web.rest.file.storage;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.constant.PlatformConstants;
-import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.file.storage.FilesFileStorageImpl;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import java.io.InputStream;
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public final class TempFilesFileStorage implements FilesFileStorage {
+public final class TempFileStorageImpl implements TempFileStorage {
 
-    private final FilesFileStorage filesFileStorage;
+    private final TempFileStorage tempFileStorage;
 
-    public TempFilesFileStorage() {
-        this.filesFileStorage = new FilesFileStorageImpl(new Base64FileStorageService());
+    public TempFileStorageImpl() {
+        this.tempFileStorage =
+            new com.bytechef.platform.file.storage.TempFileStorageImpl(new Base64FileStorageService());
     }
 
     @Override
     public InputStream getFileStream(FileEntry fileEntry) {
-        return filesFileStorage.getFileStream(fileEntry);
+        return tempFileStorage.getFileStream(fileEntry);
     }
 
     @Override
@@ -46,16 +46,16 @@ public final class TempFilesFileStorage implements FilesFileStorage {
             return "This is a sample file content";
         }
 
-        return filesFileStorage.readFileToString(fileEntry);
+        return tempFileStorage.readFileToString(fileEntry);
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, String data) {
-        return filesFileStorage.storeFileContent(fileName, data);
+    public FileEntry storeFileContent(String filename, String data) {
+        return tempFileStorage.storeFileContent(filename, data);
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, InputStream inputStream) {
-        return filesFileStorage.storeFileContent(fileName, inputStream);
+    public FileEntry storeFileContent(String filename, InputStream inputStream) {
+        return tempFileStorage.storeFileContent(filename, inputStream);
     }
 }

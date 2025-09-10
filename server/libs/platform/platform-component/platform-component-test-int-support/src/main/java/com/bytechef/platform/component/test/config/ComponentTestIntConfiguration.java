@@ -47,8 +47,8 @@ import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.storage.DataStorage;
-import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.file.storage.FilesFileStorageImpl;
+import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorageImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
@@ -137,8 +137,8 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    FilesFileStorage filesFileStorage() {
-        return new FilesFileStorageImpl(new Base64FileStorageService());
+    TempFileStorage filesFileStorage() {
+        return new TempFileStorageImpl(new Base64FileStorageService());
     }
 
     @Bean

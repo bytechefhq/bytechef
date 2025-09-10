@@ -19,8 +19,7 @@ package com.bytechef.platform.component.context;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.constant.PlatformConstants;
-import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.file.storage.FilesFileStorageImpl;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,11 +30,11 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-final class TempFilesFileStorage implements FilesFileStorage {
+final class TempFileStorageImpl implements TempFileStorage {
 
-    private final FilesFileStorage filesFileStorage;
+    private final TempFileStorage tempFileStorage;
 
-    public TempFilesFileStorage() {
+    public TempFileStorageImpl() {
         Path tempDirPath;
 
         try {
@@ -46,12 +45,13 @@ final class TempFilesFileStorage implements FilesFileStorage {
 
         File tempDir = tempDirPath.toFile();
 
-        this.filesFileStorage = new FilesFileStorageImpl(new FilesystemFileStorageService(tempDir.getAbsolutePath()));
+        this.tempFileStorage = new com.bytechef.platform.file.storage.TempFileStorageImpl(
+            new FilesystemFileStorageService(tempDir.getAbsolutePath()));
     }
 
     @Override
     public InputStream getFileStream(FileEntry fileEntry) {
-        return filesFileStorage.getFileStream(fileEntry);
+        return tempFileStorage.getFileStream(fileEntry);
     }
 
     @Override
@@ -60,16 +60,16 @@ final class TempFilesFileStorage implements FilesFileStorage {
             return "This is a sample file content";
         }
 
-        return filesFileStorage.readFileToString(fileEntry);
+        return tempFileStorage.readFileToString(fileEntry);
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, String data) {
-        return filesFileStorage.storeFileContent(fileName, data);
+    public FileEntry storeFileContent(String filename, String data) {
+        return tempFileStorage.storeFileContent(filename, data);
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, InputStream inputStream) {
-        return filesFileStorage.storeFileContent(fileName, inputStream);
+    public FileEntry storeFileContent(String filename, InputStream inputStream) {
+        return tempFileStorage.storeFileContent(filename, inputStream);
     }
 }

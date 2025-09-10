@@ -18,7 +18,7 @@ package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +35,10 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class FileEntryController {
 
-    private final FilesFileStorage filesFileStorage;
+    private final TempFileStorage tempFileStorage;
 
-    public FileEntryController(FilesFileStorage filesFileStorage) {
-        this.filesFileStorage = filesFileStorage;
+    public FileEntryController(TempFileStorage tempFileStorage) {
+        this.tempFileStorage = tempFileStorage;
     }
 
     @GetMapping("/file-entries/{id}/content")
@@ -48,6 +48,6 @@ public class FileEntryController {
 
         return ResponseEntity.ok()
             .contentType(MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())))
-            .body(new InputStreamResource(filesFileStorage.getFileStream(fileEntry)));
+            .body(new InputStreamResource(tempFileStorage.getFileStream(fileEntry)));
     }
 }

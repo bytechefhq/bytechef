@@ -23,7 +23,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class XlsxFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FilesFileStorage filesFileStorage;
+    private TempFileStorage tempFileStorage;
 
     @Autowired
     private ComponentJobTestExecutor componentJobTestExecutor;
@@ -65,7 +65,7 @@ public class XlsxFileComponentHandlerIntTest {
                 ENCODER.encodeToString("xlsx-file_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     FILE_ENTRY,
-                    filesFileStorage.storeFileContent(sampleFile.getAbsolutePath(), fileInputStream)));
+                    tempFileStorage.storeFileContent(sampleFile.getAbsolutePath(), fileInputStream)));
 
             Assertions.assertThat(job.getStatus())
                 .isEqualTo(Job.Status.COMPLETED);
@@ -102,7 +102,7 @@ public class XlsxFileComponentHandlerIntTest {
                 ENCODER.encodeToString("xlsx-file_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     FILE_ENTRY,
-                    filesFileStorage.storeFileContent(sampleFile.getName(), fileInputStream)));
+                    tempFileStorage.storeFileContent(sampleFile.getName(), fileInputStream)));
 
             outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 

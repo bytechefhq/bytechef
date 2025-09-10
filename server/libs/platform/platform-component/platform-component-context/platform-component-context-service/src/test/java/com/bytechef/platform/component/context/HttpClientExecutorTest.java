@@ -32,7 +32,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
@@ -75,7 +75,7 @@ public class HttpClientExecutorTest {
     private final HttpClientExecutor httpClientExecutor =
         new HttpClientExecutor(
             Mockito.mock(ApplicationContext.class), Mockito.mock(ConnectionDefinitionService.class),
-            Mockito.mock(FilesFileStorage.class));
+            Mockito.mock(TempFileStorage.class));
 
     static {
         JacksonConfiguration jacksonConfiguration = new JacksonConfiguration(new JsonComponentModule());

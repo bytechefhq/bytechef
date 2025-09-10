@@ -29,7 +29,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -50,7 +50,7 @@ class CsvFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FilesFileStorage filesFileStorage;
+    private TempFileStorage tempFileStorage;
 
     @Autowired
     private ComponentJobTestExecutor componentJobTestExecutor;
@@ -66,7 +66,7 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                filesFileStorage.storeFileContent(
+                tempFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
                 DELIMITER, ",", HEADER_ROW, false,
                 INCLUDE_EMPTY_CELLS, true));
@@ -92,7 +92,7 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                filesFileStorage.storeFileContent(
+                tempFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
                 DELIMITER, ",",
                 HEADER_ROW, true,
@@ -116,7 +116,7 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                filesFileStorage.storeFileContent(
+                tempFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
                 DELIMITER, ",",
                 HEADER_ROW, true,
@@ -141,7 +141,7 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                filesFileStorage.storeFileContent(
+                tempFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
                 INCLUDE_EMPTY_CELLS, true, DELIMITER, "|",
                 HEADER_ROW, true));
@@ -177,7 +177,7 @@ class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                filesFileStorage.storeFileContent(
+                tempFileStorage.storeFileContent(
                     sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         outputs = taskFileStorage.readJobOutputs(job.getOutputs());

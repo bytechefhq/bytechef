@@ -24,7 +24,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -42,7 +42,7 @@ public class FilesystemComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FilesFileStorage filesFileStorage;
+    private TempFileStorage tempFileStorage;
 
     @Autowired
     private ComponentJobTestExecutor componentJobTestExecutor;
@@ -62,7 +62,7 @@ public class FilesystemComponentHandlerIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        FileEntry fileEntry = filesFileStorage.storeFileContent(
+        FileEntry fileEntry = tempFileStorage.storeFileContent(
             "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
 
         assertThat((Map<?, ?>) outputs.get("readLocalFile"))
@@ -81,7 +81,7 @@ public class FilesystemComponentHandlerIntTest {
             ENCODER.encodeToString("filesystem_v1_writeFile".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                filesFileStorage.storeFileContent(
+                tempFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(getFile(), StandardCharsets.UTF_8)),
                 "filename", tempFile.getAbsolutePath()));
 

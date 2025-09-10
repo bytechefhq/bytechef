@@ -24,7 +24,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
-import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -50,7 +50,7 @@ public class JsonFileComponentHandlerIntTest {
     private ComponentJobTestExecutor componentJobTestExecutor;
 
     @Autowired
-    private FilesFileStorage filesFileStorage;
+    private TempFileStorage tempFileStorage;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
@@ -63,7 +63,7 @@ public class JsonFileComponentHandlerIntTest {
             ENCODER.encodeToString("json-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
-                filesFileStorage
+                tempFileStorage
                     .storeFileContent(
                         sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
@@ -97,7 +97,7 @@ public class JsonFileComponentHandlerIntTest {
 
         JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
-            new JSONArray(filesFileStorage.readFileToString(fileEntry)),
+            new JSONArray(tempFileStorage.readFileToString(fileEntry)),
             true);
     }
 
