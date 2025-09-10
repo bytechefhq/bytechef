@@ -282,7 +282,7 @@ describe('useConnectDialog - Navigation', () => {
                 workflows: [
                     {
                         label: 'Test Workflow',
-                        workflowReferenceCode: 'workflow-123',
+                        workflowUuid: 'workflow-123',
                     },
                 ],
             }),

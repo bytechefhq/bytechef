@@ -25,7 +25,7 @@ describe('ConnectDialog', () => {
             workflows: [
                 {
                     label: 'Test Workflow',
-                    workflowReferenceCode: 'workflow-123',
+                    workflowUuid: 'workflow-123',
                     inputs: [],
                 },
             ],
@@ -36,7 +36,7 @@ describe('ConnectDialog', () => {
             credentialStatus: 'VALID',
             workflows: [
                 {
-                    workflowReferenceCode: 'workflow-123',
+                    workflowUuid: 'workflow-123',
                     enabled: true,
                     inputs: {
                         input1: 'test value',
@@ -47,7 +47,7 @@ describe('ConnectDialog', () => {
         mergedWorkflows: [
             {
                 label: 'Test Workflow',
-                workflowReferenceCode: 'workflow-123',
+                workflowUuid: 'workflow-123',
                 enabled: true,
                 inputs: [
                     {

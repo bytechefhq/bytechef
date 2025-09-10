@@ -7,13 +7,13 @@ interface CreateConnectionMutationProps {
 }
 
 export const getCreateConnectedUserProjectWorkflowConnection =
-    (connectedUserId: number, workflowReferenceCode: string) => (mutationProps?: CreateConnectionMutationProps) =>
+    (connectedUserId: number, workflowUuid: string) => (mutationProps?: CreateConnectionMutationProps) =>
         useMutation<number, Error, Connection>({
             mutationFn: (connection: Connection) => {
                 return new ConnectionApi().createConnectedUserProjectWorkflowConnection({
                     connectedUserId,
                     connection,
-                    workflowUuid: workflowReferenceCode,
+                    workflowUuid,
                 });
             },
             onError: mutationProps?.onError,

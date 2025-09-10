@@ -220,8 +220,7 @@ const ProjectDeploymentDialog = ({
                 const workflow = workflows[i];
 
                 const projectDeploymentWorkflow = projectDeployment?.projectDeploymentWorkflows?.find(
-                    (projectDeploymentWorkflow) =>
-                        projectDeploymentWorkflow.workflowReferenceCode === workflow.workflowReferenceCode
+                    (projectDeploymentWorkflow) => projectDeploymentWorkflow.workflowUuid === workflow.workflowUuid
                 );
 
                 if (projectDeploymentWorkflow && projectDeploymentWorkflow.enabled) {

@@ -142,7 +142,7 @@ export default function useConnectDialog({
 
         const mergedWorkflows: MergedWorkflowType[] = integration.workflows.map((integrationWorkflow) => {
             const instanceWorkflow = integrationInstance.workflows.find(
-                (instance) => instance.workflowReferenceCode === integrationWorkflow.workflowReferenceCode
+                (instance) => instance.workflowUuid === integrationWorkflow.workflowUuid
             );
 
             if (instanceWorkflow) {
@@ -429,19 +429,19 @@ export default function useConnectDialog({
     const debouncedFetchesRef = useRef<Record<string, (...args: unknown[]) => void>>({});
 
     const handleWorkflowInputChange = useCallback(
-        (workflowReferenceCode: string, inputName: string, value: string) => {
+        (workflowUuid: string, inputName: string, value: string) => {
             const body = {
                 inputs: {
                     [inputName]: value,
                 },
             };
 
-            const debouncedFetchKey = `${workflowReferenceCode}_${inputName}`;
+            const debouncedFetchKey = `${workflowUuid}_${inputName}`;
 
             if (!debouncedFetchesRef.current[debouncedFetchKey]) {
                 debouncedFetchesRef.current[debouncedFetchKey] = debounce((payload) => {
                     fetch(
-                        `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/workflows/${workflowReferenceCode}`,
+                        `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/workflows/${workflowUuid}`,
                         {
                             body: payload as object,
                             method: 'PUT',
