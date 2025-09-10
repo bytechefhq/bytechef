@@ -128,7 +128,6 @@ function App() {
             account: state.account,
             authenticated: state.authenticated,
             reset: state.reset,
-            sessionHasBeenFetched: state.sessionHasBeenFetched,
         }))
     );
     const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
