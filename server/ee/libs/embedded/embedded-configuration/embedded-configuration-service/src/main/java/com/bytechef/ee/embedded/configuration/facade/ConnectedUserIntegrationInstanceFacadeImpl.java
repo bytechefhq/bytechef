@@ -79,7 +79,7 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
     }
 
     private void enableIntegrationInstanceWorkflow(
-        String externalUserId, long id, String workflowUuid, boolean enabled) {
+        String externalUserId, long id, String workflowUuid, boolean enable) {
 
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(id);
 
@@ -90,7 +90,7 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
             .ifPresent(connectedUser -> {
                 if (Objects.equals(connectedUser.getExternalId(), externalUserId)) {
                     integrationInstanceFacade.enableIntegrationInstanceWorkflow(
-                        id, integrationWorkflowService.getWorkflowId(id, workflowUuid), enabled);
+                        id, integrationWorkflowService.getWorkflowId(id, workflowUuid), enable);
                 }
             });
     }
