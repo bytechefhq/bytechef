@@ -43,12 +43,12 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
 
     @Override
     @CrossOrigin
-    public ResponseEntity<Void> disableFrontendIntegrationInstanceWorkflow(Long id, String workflowReferenceCode) {
+    public ResponseEntity<Void> disableFrontendIntegrationInstanceWorkflow(Long id, String workflowUuid) {
         String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         connectedUserIntegrationInstanceFacade.disableIntegrationInstanceWorkflow(
-            externalUserId, id, workflowReferenceCode);
+            externalUserId, id, workflowUuid);
 
         return ResponseEntity.noContent()
             .build();
@@ -56,12 +56,12 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
 
     @Override
     @CrossOrigin
-    public ResponseEntity<Void> enableFrontendIntegrationInstanceWorkflow(Long id, String workflowReferenceCode) {
+    public ResponseEntity<Void> enableFrontendIntegrationInstanceWorkflow(Long id, String workflowUuid) {
         String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
-            externalUserId, id, workflowReferenceCode);
+            externalUserId, id, workflowUuid);
 
         return ResponseEntity.noContent()
             .build();
@@ -69,10 +69,10 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
 
     @Override
     public ResponseEntity<Void> disableIntegrationInstanceWorkflow(
-        String externalUserId, Long id, String workflowReferenceCode) {
+        String externalUserId, Long id, String workflowUuid) {
 
         connectedUserIntegrationInstanceFacade.disableIntegrationInstanceWorkflow(
-            externalUserId, id, workflowReferenceCode);
+            externalUserId, id, workflowUuid);
 
         return ResponseEntity.noContent()
             .build();
@@ -85,10 +85,10 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
 
     @Override
     public ResponseEntity<Void> enableIntegrationInstanceWorkflow(
-        String externalUserId, Long id, String workflowReferenceCode) {
+        String externalUserId, Long id, String workflowUuid) {
 
         connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
-            externalUserId, id, workflowReferenceCode);
+            externalUserId, id, workflowUuid);
 
         return ResponseEntity.noContent()
             .build();
@@ -97,14 +97,14 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     @Override
     @CrossOrigin
     public ResponseEntity<Void> updateFrontendIntegrationInstanceWorkflow(
-        Long id, String workflowReferenceCode,
+        Long id, String workflowUuid,
         UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
 
         String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         connectedUserIntegrationInstanceFacade.updateIntegrationInstanceWorkflow(
-            externalUserId, id, workflowReferenceCode,
+            externalUserId, id, workflowUuid,
             updateFrontendIntegrationInstanceWorkflowRequestModel.getInputs());
 
         return ResponseEntity.noContent()
@@ -113,11 +113,11 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
 
     @Override
     public ResponseEntity<Void> updateIntegrationInstanceWorkflow(
-        String externalUserId, Long id, String workflowReferenceCode,
+        String externalUserId, Long id, String workflowUuid,
         @NonNull UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
 
         connectedUserIntegrationInstanceFacade.updateIntegrationInstanceWorkflow(
-            externalUserId, id, workflowReferenceCode,
+            externalUserId, id, workflowUuid,
             updateFrontendIntegrationInstanceWorkflowRequestModel.getInputs());
 
         return ResponseEntity.noContent()

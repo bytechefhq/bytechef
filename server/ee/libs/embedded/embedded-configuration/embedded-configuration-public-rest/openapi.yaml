@@ -63,14 +63,14 @@ paths:
         required: true
       responses:
         "200":
-          description: "The workflow reference code."
+          description: "The workflow uuid."
           content:
             application/json:
               schema:
                 type: "string"
       security:
         - jwtBearerAuth: [ ]
-  /automation/workflows/{workflowReferenceCode}:
+  /automation/workflows/{workflowUuid}:
     delete:
       description: "Delete a workflow."
       summary: "Delete a workflow"
@@ -84,7 +84,7 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -106,7 +106,7 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -132,7 +132,7 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -153,7 +153,7 @@ paths:
           description: "Successful operation."
       security:
         - jwtBearerAuth: [ ]
-  /automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey}:
+  /automation/workflows/{workflowUuid}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey}:
     put:
       description: "Update a workflow configuration connection."
       summary: "Update a workflow configuration connection"
@@ -167,7 +167,7 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -200,7 +200,7 @@ paths:
           description: "Successful operation."
       security:
         - jwtBearerAuth: [ ]
-  /automation/workflows/{workflowReferenceCode}/enable:
+  /automation/workflows/{workflowUuid}/enable:
     post:
       description: "Enable a workflow."
       summary: "Enable a workflow"
@@ -214,8 +214,8 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -238,8 +238,8 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -249,7 +249,7 @@ paths:
           description: "Successful operation."
       security:
         - jwtBearerAuth: [ ]
-  /automation/workflows/{workflowReferenceCode}/publish:
+  /automation/workflows/{workflowUuid}/publish:
     post:
       description: "Publishes existing workflow."
       summary: "Publishes existing workflow"
@@ -263,8 +263,8 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -371,7 +371,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - jwtBearerAuth: [ ]
-  /integration-instances/{id}/workflows/{workflowReferenceCode}:
+  /integration-instances/{id}/workflows/{workflowUuid}:
     put:
       description: "Update a workflow for a specific integration instance."
       summary: "Update integration instance workflow"
@@ -386,7 +386,7 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -410,7 +410,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - jwtBearerAuth: [ ]
-  /integration-instances/{id}/workflows/{workflowReferenceCode}/enable:
+  /integration-instances/{id}/workflows/{workflowUuid}/enable:
     post:
       description: "Enable a workflow."
       summary: "Enable a workflow"
@@ -425,7 +425,7 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -452,7 +452,7 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -663,14 +663,14 @@ paths:
         required: true
       responses:
         "200":
-          description: "The workflow reference code."
+          description: "The workflow uuid."
           content:
             application/json:
               schema:
                 type: "string"
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/automation/workflows/{workflowReferenceCode}:
+  /{externalUserId}/automation/workflows/{workflowUuid}:
     delete:
       description: "Delete a workflow."
       summary: "Delete a workflow"
@@ -690,7 +690,7 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -718,7 +718,7 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -750,7 +750,7 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -771,7 +771,7 @@ paths:
           description: "Successful operation."
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connections/{workflowConnectionKey}:
+  /{externalUserId}/automation/workflows/{workflowUuid}/workflow-nodes/{workflowNodeName}/connections/{workflowConnectionKey}:
     put:
       description: "Update a workflow configuration connection."
       summary: "Update a workflow configuration connection"
@@ -791,7 +791,7 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -824,7 +824,7 @@ paths:
           description: "Successful operation."
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/automation/workflows/{workflowReferenceCode}/enable:
+  /{externalUserId}/automation/workflows/{workflowUuid}/enable:
     post:
       description: "Enable a workflow."
       summary: "Enable a workflow"
@@ -844,8 +844,8 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -874,8 +874,8 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -885,7 +885,7 @@ paths:
           description: "Successful operation."
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/automation/workflows/{workflowReferenceCode}/publish:
+  /{externalUserId}/automation/workflows/{workflowUuid}/publish:
     post:
       description: "Publishes existing workflow."
       summary: "Publishes existing workflow"
@@ -905,8 +905,8 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:
@@ -1000,7 +1000,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}:
+  /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}:
     put:
       description: "Update a workflow for a specific integration instance."
       summary: "Update integration instance workflow"
@@ -1021,7 +1021,7 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -1045,7 +1045,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable:
+  /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/enable:
     post:
       description: "Enable a workflow."
       summary: "Enable a workflow"
@@ -1066,7 +1066,7 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -1099,7 +1099,7 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowReferenceCode"
+        - name: "workflowUuid"
           description: "The workflow reference of the workflow to delete."
           in: "path"
           required: true
@@ -1258,7 +1258,7 @@ components:
         label:
           description: "The label of a workflow."
           type: "string"
-        workflowReferenceCode:
+        workflowUuid:
           description: "The reference code of a workflow."
           type: "string"
         workflowVersion:
@@ -1381,7 +1381,7 @@ components:
         inputs:
           type: "object"
           additionalProperties: true
-        workflowReferenceCode:
+        workflowUuid:
           description: "The reference code of a workflow."
           type: "string"
     IntegrationWorkflow:
@@ -1401,7 +1401,7 @@ components:
         label:
           description: "The label of a workflow."
           type: "string"
-        workflowReferenceCode:
+        workflowUuid:
           description: "The reference code of a workflow."
           type: "string"
     Input:
@@ -1469,7 +1469,7 @@ components:
         label:
           description: "The label of a workflow."
           type: "string"
-        workflowReferenceCode:
+        workflowUuid:
           description: "The reference code of a workflow."
           type: "string"
   responses:

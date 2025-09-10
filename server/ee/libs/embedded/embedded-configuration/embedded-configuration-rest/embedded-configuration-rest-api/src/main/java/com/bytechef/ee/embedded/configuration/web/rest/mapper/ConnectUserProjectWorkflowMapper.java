@@ -34,7 +34,7 @@ public interface ConnectUserProjectWorkflowMapper
     @Mapping(target = "connectionsCount", ignore = true)
     @Mapping(target = "inputsCount", ignore = true)
     @Mapping(target = "integrationWorkflowId", ignore = true)
-    @Mapping(target = "workflowReferenceCode", ignore = true)
+    @Mapping(target = "workflowUuid", ignore = true)
     @Mapping(target = "workflowTaskComponentNames", ignore = true)
     @Mapping(target = "workflowTriggerComponentNames", ignore = true)
     WorkflowModel map(WorkflowDTO workflowDTO);

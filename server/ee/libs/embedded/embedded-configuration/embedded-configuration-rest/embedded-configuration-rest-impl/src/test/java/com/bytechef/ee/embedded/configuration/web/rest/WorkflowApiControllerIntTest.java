@@ -16,6 +16,10 @@
 
 package com.bytechef.ee.embedded.configuration.web.rest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -27,6 +31,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
@@ -97,6 +102,9 @@ public class WorkflowApiControllerIntTest {
     @MockitoBean
     private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
 
+    @MockitoBean
+    private IntegrationWorkflowFacade integrationWorkflowFacade;
+
     private WebTestClient webTestClient;
 
     @MockitoBean
@@ -118,7 +126,7 @@ public class WorkflowApiControllerIntTest {
     @Test
     public void testGetWorkflow() {
         try {
-            when(integrationFacade.getIntegrationWorkflow("1"))
+            when(integrationWorkflowFacade.getIntegrationWorkflow("1"))
                 .thenReturn(getWorkflowDTO());
 
             this.webTestClient
@@ -132,6 +140,67 @@ public class WorkflowApiControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+
+        verify(integrationWorkflowFacade).getIntegrationWorkflow("1");
+    }
+
+    @Test
+    public void testGetIntegrationWorkflows() {
+        try {
+            IntegrationWorkflow integrationWorkflow = createTestIntegrationWorkflow(1L, "workflow1");
+
+            IntegrationWorkflowDTO workflow = new IntegrationWorkflowDTO(
+                new Workflow("workflow1", "{}", Workflow.Format.JSON), integrationWorkflow);
+
+            when(integrationWorkflowFacade.getIntegrationWorkflows(1L))
+                .thenReturn(List.of(workflow));
+
+            this.webTestClient
+                .get()
+                .uri("/internal/integrations/1/workflows")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.[0].id")
+                .isEqualTo("workflow1");
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+
+        verify(integrationWorkflowFacade).getIntegrationWorkflows(1L);
+    }
+
+    @Test
+    public void testPostIntegrationWorkflows() {
+        String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
+
+        WorkflowModel workflowModel = new WorkflowModel().definition(definition);
+        IntegrationWorkflowDTO integrationWorkflowDTO =
+            new IntegrationWorkflowDTO(new Workflow("id", definition, Workflow.Format.JSON),
+                createTestIntegrationWorkflow(1L, "id"));
+
+        when(integrationWorkflowFacade.addWorkflow(anyLong(), any()))
+            .thenReturn(integrationWorkflowDTO.getIntegrationWorkflowId());
+
+        try {
+            this.webTestClient
+                .post()
+                .uri("/internal/integrations/1/workflows")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(workflowModel)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Long.class)
+                .isEqualTo(integrationWorkflowDTO.getIntegrationWorkflowId());
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+
+        verify(integrationWorkflowFacade).addWorkflow(anyLong(), eq(definition));
     }
 
     @Test
@@ -153,6 +222,8 @@ public class WorkflowApiControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+
+        verify(integrationWorkflowFacade).updateWorkflow("1", DEFINITION, 0);
     }
 
     private IntegrationWorkflowDTO getWorkflowDTO() {
@@ -163,6 +234,22 @@ public class WorkflowApiControllerIntTest {
         return new IntegrationWorkflowDTO(
             new com.bytechef.platform.configuration.dto.WorkflowDTO(
                 workflow, List.of(new WorkflowTaskDTO(tasks.getFirst(), false, null, List.of())), List.of()),
-            new IntegrationWorkflow(1));
+            createTestIntegrationWorkflow(1L, "1"));
+    }
+
+    private IntegrationWorkflow createTestIntegrationWorkflow(Long id, String workflowId) {
+        IntegrationWorkflow integrationWorkflow =
+            new IntegrationWorkflow(1L, 1, workflowId, java.util.UUID.randomUUID());
+
+        // Use reflection to set the id field since there's no setter
+        try {
+            java.lang.reflect.Field idField = IntegrationWorkflow.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(integrationWorkflow, id);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set id field", e);
+        }
+
+        return integrationWorkflow;
     }
 }

@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationTagFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -31,19 +31,19 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 public class IntegrationTagApiController implements IntegrationTagApi {
 
-    private final IntegrationFacade integrationFacade;
     private final ConversionService conversionService;
+    private final IntegrationTagFacade integrationTagFacade;
 
     @SuppressFBWarnings("EI2")
-    public IntegrationTagApiController(IntegrationFacade integrationFacade, ConversionService conversionService) {
-        this.integrationFacade = integrationFacade;
+    public IntegrationTagApiController(ConversionService conversionService, IntegrationTagFacade integrationTagFacade) {
         this.conversionService = conversionService;
+        this.integrationTagFacade = integrationTagFacade;
     }
 
     @Override
     public ResponseEntity<List<TagModel>> getIntegrationTags() {
         return ResponseEntity.ok(
-            integrationFacade.getIntegrationTags()
+            integrationTagFacade.getIntegrationTags()
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());
@@ -55,7 +55,7 @@ public class IntegrationTagApiController implements IntegrationTagApi {
 
         List<TagModel> tagModels = updateIntegrationTagsRequestModel.getTags();
 
-        integrationFacade.updateIntegrationTags(
+        integrationTagFacade.updateIntegrationTags(
             id,
             tagModels.stream()
                 .map(tagModel -> conversionService.convert(tagModel, Tag.class))

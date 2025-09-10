@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:rest:rest-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-api"))
 
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
 

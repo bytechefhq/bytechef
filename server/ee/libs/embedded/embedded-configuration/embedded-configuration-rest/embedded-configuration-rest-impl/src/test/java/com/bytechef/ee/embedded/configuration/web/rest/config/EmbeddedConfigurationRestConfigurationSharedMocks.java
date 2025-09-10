@@ -17,6 +17,8 @@
 package com.bytechef.ee.embedded.configuration.web.rest.config;
 
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationCategoryFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationTagFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -33,7 +35,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     ComponentDefinitionService.class, ConnectionFacade.class, ConnectedUserConnectionFacade.class,
-    WebhookTriggerTestFacade.class
+    IntegrationCategoryFacade.class, IntegrationTagFacade.class, WebhookTriggerTestFacade.class
 })
 public @interface EmbeddedConfigurationRestConfigurationSharedMocks {
 }

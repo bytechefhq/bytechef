@@ -33,7 +33,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -80,11 +80,11 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     private final EnvironmentService environmentService;
     private final Evaluator evaluator;
     private final PrincipalJobService principalJobService;
-    private final IntegrationFacade integrationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationService integrationService;
+    private final IntegrationWorkflowFacade integrationWorkflowFacade;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final JobService jobService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -98,13 +98,12 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     public IntegrationWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
         EnvironmentService environmentService, Evaluator evaluator, PrincipalJobService principalJobService,
-        IntegrationFacade integrationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
-        JobService jobService, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        TaskExecutionService taskExecutionService,
+        IntegrationService integrationService, IntegrationWorkflowFacade integrationWorkflowFacade,
+        IntegrationWorkflowService integrationWorkflowService, JobService jobService,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage, TriggerExecutionService triggerExecutionService,
         TriggerFileStorage triggerFileStorage, WorkflowService workflowService) {
 
@@ -113,9 +112,9 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         this.environmentService = environmentService;
         this.evaluator = evaluator;
         this.principalJobService = principalJobService;
-        this.integrationFacade = integrationFacade;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
+        this.integrationWorkflowFacade = integrationWorkflowFacade;
         this.integrationWorkflowService = integrationWorkflowService;
         this.jobService = jobService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -171,7 +170,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             workflowIds.addAll(getWorkflowIds(integration));
         } else {
             workflowIds.addAll(
-                CollectionUtils.map(integrationFacade.getIntegrationWorkflows(), IntegrationWorkflowDTO::getId));
+                CollectionUtils.map(
+                    integrationWorkflowFacade.getIntegrationWorkflows(), IntegrationWorkflowDTO::getId));
         }
 
         if (workflowIds.isEmpty()) {
@@ -280,7 +280,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     }
 
     private List<String> getWorkflowIds(Integration integration) {
-        return integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastVersion());
+        return integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastIntegrationVersion());
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(

@@ -16,10 +16,10 @@ import java.util.Map;
  */
 public interface ConnectedUserIntegrationInstanceFacade {
 
-    void disableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowReferenceCode);
+    void disableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowUuid);
 
-    void enableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowReferenceCode);
+    void enableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowUuid);
 
     void updateIntegrationInstanceWorkflow(
-        String externalUserId, long id, String workflowReferenceCode, Map<String, Object> inputs);
+        String externalUserId, long id, String workflowUuid, Map<String, Object> inputs);
 }

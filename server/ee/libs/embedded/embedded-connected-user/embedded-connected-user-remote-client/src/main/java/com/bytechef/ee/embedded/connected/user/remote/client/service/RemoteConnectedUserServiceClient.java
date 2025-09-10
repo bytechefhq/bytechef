@@ -27,8 +27,13 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectedUserServiceClient implements ConnectedUserService {
 
     @Override
+    public ConnectedUser createConnectedUser(String externalId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ConnectedUser createConnectedUser(String externalId, Environment environment) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -38,6 +43,11 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
 
     @Override
     public void enableConnectedUser(long id, boolean enable) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<ConnectedUser> fetchConnectedUser(String externalId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

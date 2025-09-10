@@ -49,10 +49,10 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     @Override
     public ResponseEntity<Void> enableConnectedUserProjectWorkflow(
-        String workflowReferenceCode, Boolean enable, EnvironmentModel xEnvironment) {
+        String workflowUuid, Boolean enable, EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.enableProjectWorkflow(
-            SecurityUtils.getCurrentUserLogin(), workflowReferenceCode, enable,
+            SecurityUtils.getCurrentUserLogin(), workflowUuid, enable,
             (long) getEnvironment(xEnvironment).ordinal());
 
         return ResponseEntity.noContent()
@@ -61,24 +61,24 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     @Override
     public ResponseEntity<ConnectedUserProjectWorkflowModel> getConnectedUserProjectWorkflow(
-        String workflowReferenceCode, EnvironmentModel xEnvironment) {
+        String workflowUuid, EnvironmentModel xEnvironment) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 connectedUserProjectFacade.getConnectedUserProjectWorkflow(
-                    SecurityUtils.getCurrentUserLogin(), workflowReferenceCode,
+                    SecurityUtils.getCurrentUserLogin(), workflowUuid,
                     (long) getEnvironment(xEnvironment).ordinal()),
                 ConnectedUserProjectWorkflowModel.class));
     }
 
     @Override
     public ResponseEntity<Void> publishConnectedUserProjectWorkflow(
-        String workflowReferenceCode,
+        String workflowUuid,
         PublishConnectedUserProjectWorkflowRequestModel publishConnectedUserProjectWorkflowRequestModel,
         EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.publishProjectWorkflow(
-            SecurityUtils.getCurrentUserLogin(), workflowReferenceCode,
+            SecurityUtils.getCurrentUserLogin(), workflowUuid,
             publishConnectedUserProjectWorkflowRequestModel.getDescription(),
             (long) getEnvironment(xEnvironment).ordinal());
 

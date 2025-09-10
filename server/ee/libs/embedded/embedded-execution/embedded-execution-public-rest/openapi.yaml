@@ -392,7 +392,7 @@ paths:
           $ref: "#/components/responses/internalServerError"
         "501":
           $ref: "#/components/responses/notImplemented"
-  /workflows/{workflowReferenceCode}:
+  /workflows/{workflowUuid}:
     post:
       description: "Execute workflows."
       summary: "Execute workflows"
@@ -400,8 +400,8 @@ paths:
         - "request-trigger"
       operationId: "executeWorkflow"
       parameters:
-        - name: "workflowReferenceCode"
-          description: "The workflow reference code."
+        - name: "workflowUuid"
+          description: "The workflow uuid."
           in: "path"
           required: true
           schema:

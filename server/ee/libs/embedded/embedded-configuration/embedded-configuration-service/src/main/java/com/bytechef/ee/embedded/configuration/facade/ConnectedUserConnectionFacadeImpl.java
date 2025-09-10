@@ -63,7 +63,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
 
     @Override
     public long createConnectedUserProjectWorkflowConnection(
-        long connectedUserId, String workflowReferenceCode, ConnectionDTO connectionDTO) {
+        long connectedUserId, String workflowUuid, ConnectionDTO connectionDTO) {
 
         long connectionId = connectionFacade.create(connectionDTO, ModeType.EMBEDDED);
 
@@ -71,7 +71,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
             connectedUserId);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getLatestProjectWorkflow(
-            connectedUserProject.getProjectId(), workflowReferenceCode);
+            connectedUserProject.getProjectId(), workflowUuid);
 
         connectedUserProjectWorkflowService.addConnection(
             connectedUserProject.getId(), projectWorkflow.getId(), connectionId);

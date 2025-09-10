@@ -77,20 +77,21 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     @SuppressFBWarnings("EI")
     public AppEventTriggerApiController(
         ApplicationProperties applicationProperties, ConnectedUserService connectedUserService,
-        FilesFileStorage filesFileStorage, HttpServletRequest httpServletRequest,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
-        WebhookWorkflowExecutor webhookWorkflowExecutor, HttpServletResponse httpServletResponse,
+        EnvironmentService environmentService, HttpServletRequest httpServletRequest,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, HttpServletResponse httpServletResponse,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
-        IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService,
-        EnvironmentService environmentService) {
+        IntegrationWorkflowService integrationWorkflowService, FilesFileStorage filesFileStorage,
+        TriggerDefinitionService triggerDefinitionService, WebhookWorkflowExecutor webhookWorkflowExecutor,
+        WorkflowService workflowService) {
 
         super(
             filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
             triggerDefinitionService, webhookWorkflowExecutor, workflowService);
 
         this.connectedUserService = connectedUserService;
+        this.environmentService = environmentService;
         this.httpServletRequest = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
@@ -98,7 +99,6 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.workflowService = workflowService;
-        this.environmentService = environmentService;
     }
 
     public ResponseEntity<Void> executeWorkflows(EnvironmentModel xEnvironment) {
@@ -135,7 +135,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
                     workflowId);
 
                 WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                    ModeType.EMBEDDED, integrationInstance.getId(), integrationWorkflow.getWorkflowReferenceCode(),
+                    ModeType.EMBEDDED, integrationInstance.getId(), integrationWorkflow.getUuid(),
                     appEventTriggerName);
 
                 try {

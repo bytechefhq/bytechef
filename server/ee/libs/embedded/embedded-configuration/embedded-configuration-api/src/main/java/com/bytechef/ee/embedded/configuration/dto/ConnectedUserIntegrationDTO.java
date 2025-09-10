@@ -84,7 +84,7 @@ public record ConnectedUserIntegrationDTO(
     }
 
     public record ConnectedUserIntegrationInstanceWorkflow(
-        IntegrationInstanceWorkflow integrationInstanceWorkflow, String workflowReferenceCode) {
+        IntegrationInstanceWorkflow integrationInstanceWorkflow, String workflowUuid) {
     }
 
     public record ConnectionConfig(AuthorizationType authorizationType, List<Input> inputs, OAuth2 oauth2) {
@@ -132,7 +132,7 @@ public record ConnectedUserIntegrationDTO(
             .orElseThrow();
     }
 
-    private static String getWorkflowReferenceCode(
+    private static String getWorkflowUuid(
         List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflowDTOs,
         IntegrationInstanceWorkflow integrationInstanceWorkflow) {
 
@@ -141,7 +141,7 @@ public record ConnectedUserIntegrationDTO(
             .filter(integrationInstanceConfigurationWorkflowDTO -> Objects.equals(
                 integrationInstanceConfigurationWorkflowDTO.id(),
                 integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()))
-            .map(IntegrationInstanceConfigurationWorkflowDTO::workflowReferenceCode)
+            .map(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
             .findFirst()
             .orElseThrow();
     }
@@ -155,7 +155,7 @@ public record ConnectedUserIntegrationDTO(
                 integrationInstanceWorkflow.getIntegrationInstanceId(), integrationInstanceId))
             .map(integrationInstanceWorkflow -> new ConnectedUserIntegrationInstanceWorkflow(
                 integrationInstanceWorkflow,
-                getWorkflowReferenceCode(integrationInstanceConfigurationWorkflowDTOs, integrationInstanceWorkflow)))
+                getWorkflowUuid(integrationInstanceConfigurationWorkflowDTOs, integrationInstanceWorkflow)))
             .toList();
     }
 }

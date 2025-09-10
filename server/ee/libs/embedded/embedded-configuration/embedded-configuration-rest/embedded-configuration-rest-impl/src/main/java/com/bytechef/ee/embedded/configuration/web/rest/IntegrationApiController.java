@@ -11,6 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationStatusModel;
@@ -40,15 +41,17 @@ public class IntegrationApiController implements IntegrationApi {
     private final ConversionService conversionService;
     private final IntegrationService integrationService;
     private final IntegrationFacade integrationFacade;
+    private final IntegrationWorkflowFacade integrationWorkflowFacade;
 
     @SuppressFBWarnings("EI2")
     public IntegrationApiController(
         ConversionService conversionService, IntegrationService integrationService,
-        IntegrationFacade integrationFacade) {
+        IntegrationFacade integrationFacade, IntegrationWorkflowFacade integrationWorkflowFacade) {
 
         this.conversionService = conversionService;
         this.integrationService = integrationService;
         this.integrationFacade = integrationFacade;
+        this.integrationWorkflowFacade = integrationWorkflowFacade;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class IntegrationApiController implements IntegrationApi {
 
     @Override
     public ResponseEntity<Long> createIntegrationWorkflow(Long id, WorkflowModel workflowModel) {
-        return ResponseEntity.ok(integrationFacade.addWorkflow(id, workflowModel.getDefinition()));
+        return ResponseEntity.ok(integrationWorkflowFacade.addWorkflow(id, workflowModel.getDefinition()));
     }
 
     @Override

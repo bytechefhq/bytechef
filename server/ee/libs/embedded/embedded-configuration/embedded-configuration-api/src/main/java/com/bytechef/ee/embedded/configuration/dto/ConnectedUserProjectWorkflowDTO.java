@@ -19,7 +19,7 @@ import java.time.Instant;
  */
 public record ConnectedUserProjectWorkflowDTO(
     long id, long connectedUserId, boolean enabled, Instant lastExecutionDate, long projectId, WorkflowDTO workflow,
-    String workflowReferenceCode, Integer workflowVersion) {
+    String workflowUuid, Integer workflowVersion) {
 
     public ConnectedUserProjectWorkflowDTO(
         long connectedUserId, ConnectedUserProjectWorkflow connectedUserProjectWorkflow,

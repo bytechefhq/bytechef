@@ -161,7 +161,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 IntegrationInstanceConfigurationErrorType.INTEGRATION_NOT_PUBLISHED);
         }
 
-        if (integration.getLastVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
+        if (integration.getLastIntegrationVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
             throw new ConfigurationException(
                 "Integration version v=%s cannot be in DRAFT".formatted(
                     integrationInstanceConfiguration.getIntegrationVersion()),
@@ -482,12 +482,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             IntegrationInstanceConfigurationWorkflow oldIntegrationInstanceConfigurationWorkflow = null;
 
             if (oldIntegrationVersion != -1) {
-                String workflowReferenceCode = allIntegrationWorkflows.stream()
+                String workflowUuid = allIntegrationWorkflows.stream()
                     .filter(curIntegrationWorkflow -> Objects.equals(
                         curIntegrationWorkflow.getWorkflowId(),
                         integrationInstanceConfigurationWorkflow.getWorkflowId()))
                     .findFirst()
-                    .map(IntegrationWorkflow::getWorkflowReferenceCode)
+                    .map(IntegrationWorkflow::getUuid)
                     .orElseThrow(() -> new ConfigurationException(
                         "Integration workflow with workflowId=%s not found".formatted(
                             integrationInstanceConfigurationWorkflow.getWorkflowId()),
@@ -495,7 +495,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
                 String oldWorkflowId = allIntegrationWorkflows.stream()
                     .filter(curIntegrationWorkflow -> Objects.equals(
-                        curIntegrationWorkflow.getWorkflowReferenceCode(), workflowReferenceCode) &&
+                        curIntegrationWorkflow.getUuid(), workflowUuid) &&
                         curIntegrationWorkflow.getIntegrationVersion() == oldIntegrationVersion)
                     .map(IntegrationWorkflow::getWorkflowId)
                     .findFirst()
@@ -571,12 +571,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         for (IntegrationInstanceConfigurationWorkflow oldIntegrationInstanceConfigurationWorkflow : oldIntegrationInstanceConfigurationWorkflows) {
 
-            String workflowReferenceCode = allIntegrationWorkflows.stream()
+            String workflowUuid = allIntegrationWorkflows.stream()
                 .filter(curIntegrationWorkflow -> Objects.equals(
                     curIntegrationWorkflow.getWorkflowId(),
                     oldIntegrationInstanceConfigurationWorkflow.getWorkflowId()))
                 .findFirst()
-                .map(IntegrationWorkflow::getWorkflowReferenceCode)
+                .map(IntegrationWorkflow::getUuid)
                 .orElseThrow(() -> new ConfigurationException(
                     "Integration workflow with workflowId=%s not found".formatted(
                         oldIntegrationInstanceConfigurationWorkflow.getWorkflowId()),
@@ -584,7 +584,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
             String workflowId = allIntegrationWorkflows.stream()
                 .filter(curIntegrationWorkflow -> Objects.equals(
-                    curIntegrationWorkflow.getWorkflowReferenceCode(), workflowReferenceCode) &&
+                    curIntegrationWorkflow.getUuid(), workflowUuid) &&
                     curIntegrationWorkflow.getIntegrationVersion() == integrationInstanceConfiguration
                         .getIntegrationVersion())
                 .findFirst()
@@ -742,7 +742,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     private List<Long> getIntegrationWorkflowIds(Integration integration) {
-        return integrationWorkflowService.getIntegrationWorkflowIds(integration.getId(), integration.getLastVersion());
+        return integrationWorkflowService.getIntegrationWorkflowIds(integration.getId(),
+            integration.getLastIntegrationVersion());
     }
 
     private List<Tag> getTags(List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
@@ -768,7 +769,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowIds), Job::getEndDate, null);
     }
 
-    private String getWorkflowReferenceCode(
+    private String getWorkflowUuid(
         String workflowId, Integer integrationVersion, List<IntegrationWorkflow> integrationWorkflows) {
 
         if (integrationVersion == null) {
@@ -779,7 +780,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .filter(integrationWorkflow -> Objects.equals(integrationWorkflow.getWorkflowId(), workflowId) &&
                 integrationWorkflow.getIntegrationVersion() == integrationVersion)
             .findFirst()
-            .map(IntegrationWorkflow::getWorkflowReferenceCode)
+            .map(IntegrationWorkflow::getUuid)
             .orElseThrow();
     }
 
@@ -824,21 +825,21 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             CollectionUtils.map(
                 integrationInstanceWorkflows,
                 integrationInstanceConfigurationWorkflow -> {
-                    String workflowReferenceCode = getWorkflowReferenceCode(
+                    String workflowUuid = getWorkflowUuid(
                         integrationInstanceConfigurationWorkflow.getWorkflowId(),
                         integrationInstanceConfiguration.getIntegrationVersion(), integrationWorkflows);
 
-                    List<String> workflowReferenceCodeWorkflowIds = integrationWorkflows.stream()
+                    List<String> workflowUuidWorkflowIds = integrationWorkflows.stream()
                         .filter(projectWorkflow -> Objects.equals(
-                            projectWorkflow.getWorkflowReferenceCode(), workflowReferenceCode))
+                            projectWorkflow.getUuid(), workflowUuid))
                         .map(IntegrationWorkflow::getWorkflowId)
                         .toList();
 
                     return new IntegrationInstanceConfigurationWorkflowDTO(
                         integrationInstanceConfigurationWorkflow,
-                        getWorkflowLastExecutionDate(workflowReferenceCodeWorkflowIds),
+                        getWorkflowLastExecutionDate(workflowUuidWorkflowIds),
                         workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId()),
-                        workflowReferenceCode);
+                        workflowUuid);
                 }),
             integrationDTO,
             tags);

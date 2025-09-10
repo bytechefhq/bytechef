@@ -24,8 +24,6 @@ import org.springframework.core.convert.converter.Converter;
 public interface ConnectionMapper extends Converter<ConnectionDTO, ConnectionModel> {
 
     @Override
-    @Mapping(
-        target = "environment",
-        expression = "java(com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel.values()[source.environmentId()])")
+    @Mapping(target = "environment", source = "environmentId")
     ConnectionModel convert(ConnectionDTO source);
 }

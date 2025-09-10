@@ -30,8 +30,7 @@ public class IntegrationInstanceConfigurationMapper {
         extends Converter<IntegrationInstanceConfiguration, IntegrationInstanceConfigurationBasicModel> {
 
         @Override
-        @Mapping(
-            target = "environmentId", expression = "java(Long.valueOf(integrationInstance.getEnvironment().ordinal()))")
+        @Mapping(target = "environmentId", source = "environment")
         IntegrationInstanceConfigurationBasicModel convert(IntegrationInstanceConfiguration integrationInstance);
     }
 
@@ -41,8 +40,7 @@ public class IntegrationInstanceConfigurationMapper {
 
         @Mapping(target = "connectionAuthorizationParameters", ignore = true)
         @Mapping(target = "connectionConnectionParameters", ignore = true)
-        @Mapping(
-            target = "environmentId", expression = "java(Long.valueOf(integrationInstance.getEnvironment().ordinal()))")
+        @Mapping(target = "environmentId", source = "environment")
         @Mapping(target = "integration", ignore = true)
         @Mapping(target = "integrationInstanceConfigurationWorkflows", ignore = true)
         @Mapping(target = "tags", ignore = true)
@@ -55,18 +53,14 @@ public class IntegrationInstanceConfigurationMapper {
         extends Converter<IntegrationInstanceConfigurationDTO, IntegrationInstanceConfigurationModel> {
 
         @Override
-        @Mapping(
-            target = "environmentId",
-            expression = "java(Long.valueOf(integrationInstanceConfigurationDTO.environment().ordinal()))")
+        @Mapping(target = "environmentId", source = "environment")
         IntegrationInstanceConfigurationModel convert(
             IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO);
 
         @InheritInverseConfiguration
         @DelegatingConverter
 
-        @Mapping(
-            target = "environment",
-            expression = "java(integrationInstanceConfigurationModel.getEnvironmentId() == null ? null : com.bytechef.platform.configuration.domain.Environment.values()[integrationInstanceConfigurationModel.getEnvironmentId().intValue()])")
+        @Mapping(target = "environment", source = "environmentId")
         @Mapping(target = "integration", ignore = true)
         IntegrationInstanceConfigurationDTO invertConvert(
             IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel);

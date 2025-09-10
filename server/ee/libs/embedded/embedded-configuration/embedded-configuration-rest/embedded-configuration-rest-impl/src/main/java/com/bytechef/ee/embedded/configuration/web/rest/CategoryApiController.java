@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationCategoryFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CategoryModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,22 +29,23 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 public class CategoryApiController implements CategoryApi {
 
-    private final IntegrationFacade integrationFacade;
     private final ConversionService conversionService;
+    private final IntegrationCategoryFacade integrationCategoryFacade;
 
     @SuppressFBWarnings("EI2")
     public CategoryApiController(
-        IntegrationFacade integrationFacade, ConversionService conversionService) {
+        ConversionService conversionService, IntegrationCategoryFacade integrationCategoryFacade) {
 
-        this.integrationFacade = integrationFacade;
         this.conversionService = conversionService;
+        this.integrationCategoryFacade = integrationCategoryFacade;
     }
 
     @Override
     public ResponseEntity<List<CategoryModel>> getIntegrationCategories() {
-        return ResponseEntity.ok(integrationFacade.getIntegrationCategories()
-            .stream()
-            .map(category -> conversionService.convert(category, CategoryModel.class))
-            .toList());
+        return ResponseEntity.ok(
+            integrationCategoryFacade.getIntegrationCategories()
+                .stream()
+                .map(category -> conversionService.convert(category, CategoryModel.class))
+                .toList());
     }
 }
