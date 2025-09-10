@@ -157,8 +157,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
             workflowExecutionId.getType());
 
-        String workflowId = jobPrincipalAccessor.getLatestWorkflowId(
-            workflowExecutionId.getWorkflowReferenceCode());
+        String workflowId = jobPrincipalAccessor.getLastWorkflowId(workflowExecutionId.getWorkflowUuid());
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -187,7 +186,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
             triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
             triggerWorkflowNodeType.operation(), workflowExecutionId.getType(), null,
-            workflowExecutionId.getWorkflowReferenceCode(), triggerParameters, Map.of(), webhookRequest,
+            workflowExecutionId.getWorkflowUuid(), triggerParameters, Map.of(), webhookRequest,
             connectionId, true);
 
         if (triggerOutput != null && triggerOutput.value() != null) {

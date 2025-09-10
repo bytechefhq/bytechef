@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.domain;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -45,8 +46,8 @@ public final class ProjectWorkflow {
     @Column("workflow_id")
     private String workflowId;
 
-    @Column("workflow_reference_code")
-    private String workflowReferenceCode;
+    @Column("uuid")
+    private UUID uuid;
 
     @CreatedBy
     @Column("created_by")
@@ -74,11 +75,17 @@ public final class ProjectWorkflow {
         this.id = id;
     }
 
-    public ProjectWorkflow(long projectId, int projectVersion, String workflowId, String workflowReferenceCode) {
+    public ProjectWorkflow(long projectId, int projectVersion, String workflowId) {
         this.projectId = projectId;
         this.projectVersion = projectVersion;
         this.workflowId = workflowId;
-        this.workflowReferenceCode = workflowReferenceCode;
+    }
+
+    public ProjectWorkflow(long projectId, int projectVersion, String workflowId, UUID uuid) {
+        this.projectId = projectId;
+        this.projectVersion = projectVersion;
+        this.workflowId = workflowId;
+        this.uuid = uuid;
     }
 
     @Override
@@ -117,8 +124,8 @@ public final class ProjectWorkflow {
         return workflowId;
     }
 
-    public String getWorkflowReferenceCode() {
-        return workflowReferenceCode;
+    public String getUuid() {
+        return uuid == null ? null : uuid.toString();
     }
 
     public String getCreatedBy() {
@@ -149,8 +156,12 @@ public final class ProjectWorkflow {
         this.workflowId = workflowId;
     }
 
-    public void setWorkflowReferenceCode(String workflowReferenceCode) {
-        this.workflowReferenceCode = workflowReferenceCode;
+    public void setUuid(String uuid) {
+        this.uuid = UUID.fromString(uuid);
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public void setVersion(int version) {
@@ -164,7 +175,7 @@ public final class ProjectWorkflow {
             ", projectId=" + projectId +
             ", projectVersion=" + projectVersion +
             ", workflowId='" + workflowId + '\'' +
-            ", workflowReferenceCode='" + workflowReferenceCode + '\'' +
+            ", uuid='" + uuid + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

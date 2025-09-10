@@ -61,7 +61,7 @@ public abstract class AbstractTriggerHandler implements TriggerHandler {
             return triggerDefinitionFacade.executeTrigger(
                 componentName, componentVersion, triggerName,
                 workflowExecutionId.getType(), workflowExecutionId.getJobPrincipalId(),
-                workflowExecutionId.getWorkflowReferenceCode(), triggerExecution.getParameters(),
+                workflowExecutionId.getWorkflowUuid(), triggerExecution.getParameters(),
                 triggerExecution.getState(),
                 MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null),

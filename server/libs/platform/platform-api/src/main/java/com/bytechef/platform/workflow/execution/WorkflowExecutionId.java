@@ -35,7 +35,7 @@ public class WorkflowExecutionId implements Serializable {
     private ModeType type;
 
     @Nullable
-    private String workflowReferenceCode;
+    private String workflowUuid;
 
     @Nullable
     private String tenantId;
@@ -48,23 +48,23 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     private WorkflowExecutionId(
-        String tenantId, ModeType type, long jobPrincipalId, String workflowReferenceCode, String triggerName) {
+        String tenantId, ModeType type, long jobPrincipalId, String workflowUuid, String triggerName) {
 
         this.jobPrincipalId = jobPrincipalId;
         this.tenantId = tenantId;
         this.triggerName = triggerName;
         this.type = type;
-        this.workflowReferenceCode = workflowReferenceCode;
+        this.workflowUuid = workflowUuid;
     }
 
     public static WorkflowExecutionId of(
-        ModeType type, long jobPrincipalId, String workflowReferenceCode, String triggerName) {
+        ModeType type, long jobPrincipalId, String workflowUuid, String triggerName) {
 
-        Assert.hasText(workflowReferenceCode, "'workflowReferenceCode' must not be blank");
+        Assert.hasText(workflowUuid, "'workflowUuid' must not be blank");
         Assert.hasText(triggerName, "'triggerName' must not be blank");
 
         return new WorkflowExecutionId(
-            TenantContext.getCurrentTenantId(), type, jobPrincipalId, workflowReferenceCode, triggerName);
+            TenantContext.getCurrentTenantId(), type, jobPrincipalId, workflowUuid, triggerName);
     }
 
     public static WorkflowExecutionId parse(String id) {
@@ -84,8 +84,8 @@ public class WorkflowExecutionId implements Serializable {
         return Objects.requireNonNull(type);
     }
 
-    public String getWorkflowReferenceCode() {
-        return Objects.requireNonNull(workflowReferenceCode);
+    public String getWorkflowUuid() {
+        return Objects.requireNonNull(workflowUuid);
     }
 
     public String getTenantId() {
@@ -108,7 +108,7 @@ public class WorkflowExecutionId implements Serializable {
                 ":" +
                 jobPrincipalId +
                 ":" +
-                workflowReferenceCode +
+                workflowUuid +
                 ":" +
                 triggerName);
     }

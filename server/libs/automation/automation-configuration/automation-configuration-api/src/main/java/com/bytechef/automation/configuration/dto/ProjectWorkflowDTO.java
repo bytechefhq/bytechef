@@ -29,8 +29,9 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public final class ProjectWorkflowDTO extends WorkflowDTO {
 
+    private final int projectVersion;
     private final long projectWorkflowId;
-    private final String workflowReferenceCode;
+    private final String workflowUuid;
 
     public ProjectWorkflowDTO(Workflow workflow, ProjectWorkflow projectWorkflow) {
         super(
@@ -39,8 +40,9 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
             workflow.getLastModifiedBy(), workflow.getLastModifiedDate(), workflow.getOutputs(),
             workflow.getSourceType(), workflow.getMaxRetries(), List.of(), List.of(), workflow.getVersion(), workflow);
 
+        this.projectVersion = projectWorkflow.getProjectVersion();
         this.projectWorkflowId = projectWorkflow.getId();
-        this.workflowReferenceCode = projectWorkflow.getWorkflowReferenceCode();
+        this.workflowUuid = projectWorkflow.getUuid();
     }
 
     public ProjectWorkflowDTO(WorkflowDTO workflowDTO, ProjectWorkflow projectWorkflow) {
@@ -51,16 +53,21 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
             workflowDTO.getOutputs(), workflowDTO.getSourceType(), workflowDTO.getMaxRetries(), workflowDTO.getTasks(),
             workflowDTO.getTriggers(), workflowDTO.getVersion(), workflowDTO.getWorkflow());
 
+        this.projectVersion = projectWorkflow.getProjectVersion();
         this.projectWorkflowId = projectWorkflow.getId();
-        this.workflowReferenceCode = projectWorkflow.getWorkflowReferenceCode();
+        this.workflowUuid = projectWorkflow.getUuid();
+    }
+
+    public int getProjectVersion() {
+        return projectVersion;
     }
 
     public long getProjectWorkflowId() {
         return projectWorkflowId;
     }
 
-    public String getWorkflowReferenceCode() {
-        return workflowReferenceCode;
+    public String getWorkflowUuid() {
+        return workflowUuid;
     }
 
     @Override
@@ -77,20 +84,21 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
             return false;
         }
 
-        return projectWorkflowId == that.projectWorkflowId &&
-            Objects.equals(workflowReferenceCode, that.workflowReferenceCode);
+        return projectVersion == that.projectVersion && projectWorkflowId == that.projectWorkflowId &&
+            Objects.equals(workflowUuid, that.workflowUuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), projectWorkflowId, workflowReferenceCode);
+        return Objects.hash(super.hashCode(), projectWorkflowId, workflowUuid);
     }
 
     @Override
     public String toString() {
         return "WorkflowDTO{" +
             "projectWorkflowId=" + projectWorkflowId +
-            ", workflowReferenceCode='" + workflowReferenceCode + '\'' +
+            ", workflowUuid='" + workflowUuid + '\'' +
+            ", projectVersion=" + projectVersion +
             "} " + super.toString();
     }
 }

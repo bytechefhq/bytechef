@@ -39,6 +39,6 @@ public interface ContextFactory {
 
     TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, @Nullable ModeType type,
-        @Nullable Long jobPrincipalId, @Nullable String workflowReferenceCode, @Nullable ComponentConnection connection,
+        @Nullable Long jobPrincipalId, @Nullable String workflowUuid, @Nullable ComponentConnection connection,
         boolean editorEnvironment);
 }

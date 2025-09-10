@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowService {
 
     @Override
@@ -28,7 +30,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public ProjectWorkflow addWorkflow(
-        long projectId, int projectVersion, String workflowId, String workflowReferenceCode) {
+        long projectId, int projectVersion, String workflowId, String workflowUuid) {
 
         throw new UnsupportedOperationException();
     }
@@ -39,23 +41,24 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public Optional<String> fetchLatestProjectWorkflowId(Long projectId, String workflowReferenceCode) {
+    public Optional<String> fetchLastProjectWorkflowId(Long projectId, String workflowUuid) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<ProjectWorkflow>
-        fetchProjectWorkflow(long projectId, int projectVersion, String workflowReferenceCode) {
+    public Optional<ProjectWorkflow> fetchProjectWorkflow(
+        long projectId, int projectVersion, String workflowUuid) {
+
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getLatestWorkflowId(String workflowReferenceCode) {
+    public String getLastWorkflowId(String workflowUuid) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ProjectWorkflow getLatestProjectWorkflow(Long projectId, String workflowReferenceCode) {
+    public ProjectWorkflow getLastProjectWorkflow(long projectId, String workflowUuid) {
         throw new UnsupportedOperationException();
     }
 
@@ -65,7 +68,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public String getProjectDeploymentWorkflowId(long projectDeploymentId, String workflowReferenceCode) {
+    public String getProjectDeploymentWorkflowId(long projectDeploymentId, String workflowUuid) {
         throw new UnsupportedOperationException();
     }
 
@@ -75,7 +78,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public String getProjectDeploymentWorkflowReferenceCode(long projectDeploymentId, String workflowId) {
+    public String getProjectDeploymentWorkflowUuid(long projectDeploymentId, String workflowId) {
         throw new UnsupportedOperationException();
     }
 
@@ -110,7 +113,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public List<ProjectWorkflow> getProjectWorkflows(Long projectId, String workflowReferenceCode) {
+    public List<ProjectWorkflow> getProjectWorkflows(Long projectId, String workflowUuid) {
         throw new UnsupportedOperationException();
     }
 
@@ -121,6 +124,13 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public void delete(long projectId, int projectVersion, String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void publishWorkflow(
+        long projectId, int oldProjectVersion, String oldWorkflowId, ProjectWorkflow projectWorkflow) {
+
         throw new UnsupportedOperationException();
     }
 

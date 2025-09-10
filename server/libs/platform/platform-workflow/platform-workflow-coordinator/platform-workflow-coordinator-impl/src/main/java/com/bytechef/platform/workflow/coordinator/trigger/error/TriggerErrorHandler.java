@@ -106,7 +106,7 @@ public class TriggerErrorHandler {
             workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
-            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
@@ -114,7 +114,7 @@ public class TriggerErrorHandler {
             workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
-            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
     private Map<String, ?> getMetadataMap(WorkflowExecutionId workflowExecutionId) {

@@ -281,7 +281,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
                 String fileName = String.format(
                     "workflow-%s.%s.json",
-                    projectWorkflow.getWorkflowReferenceCode(), StringUtils.sanitize(name.toLowerCase(), 100));
+                    projectWorkflow.getUuid(), StringUtils.sanitize(name.toLowerCase(), 100));
 
                 ZipEntry workflowEntry = new ZipEntry(fileName);
 
@@ -493,7 +493,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             projectWorkflowService.update(oldProjectWorkflow);
 
             projectWorkflowService.addWorkflow(
-                project.getId(), oldProjectVersion, oldWorkflowId, oldProjectWorkflow.getWorkflowReferenceCode());
+                project.getId(), oldProjectVersion, oldWorkflowId, oldProjectWorkflow.getUuid());
 
             workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
             workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());

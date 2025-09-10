@@ -22,12 +22,12 @@ public record ConnectedUserProjectWorkflowDTO(
     String workflowUuid, Integer workflowVersion) {
 
     public ConnectedUserProjectWorkflowDTO(
-        long connectedUserId, ConnectedUserProjectWorkflow connectedUserProjectWorkflow,
-        boolean enabled, Instant lastExecutionDate, ProjectWorkflow projectWorkflow, WorkflowDTO workflow) {
+        long connectedUserId, ConnectedUserProjectWorkflow connectedUserProjectWorkflow, boolean enabled,
+        Instant lastExecutionDate, ProjectWorkflow projectWorkflow, WorkflowDTO workflow) {
 
         this(
             connectedUserProjectWorkflow.getId(), connectedUserId, enabled, lastExecutionDate,
-            projectWorkflow.getProjectId(),
-            workflow, projectWorkflow.getWorkflowReferenceCode(), connectedUserProjectWorkflow.getWorkflowVersion());
+            projectWorkflow.getProjectId(), workflow, projectWorkflow.getUuid(),
+            connectedUserProjectWorkflow.getWorkflowVersion());
     }
 }

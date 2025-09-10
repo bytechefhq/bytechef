@@ -56,7 +56,7 @@ public class ConnecteduserProjectTriggerDispatcherPreSendProcessor
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
         String workflowId = projectWorkflowService.getProjectDeploymentWorkflowId(
-            triggerExecution.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+            triggerExecution.getInstanceId(), workflowExecutionId.getWorkflowUuid());
 
         Map<String, Long> connectionIdMap = getConnectionIdMap(
             workflowExecutionId.getJobPrincipalId(), workflowId, triggerExecution.getName());
