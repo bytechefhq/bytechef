@@ -60,7 +60,7 @@ public interface IntegrationWorkflowRepository extends ListCrudRepository<Integr
     @Query("""
         SELECT integration_workflow.* FROM integration_workflow
         WHERE integration_workflow.uuid = :uuid
-        ORDER BY integration_workflow.pintegration_version DESC
+        ORDER BY integration_workflow.integration_version DESC
         LIMIT 1
         """)
     Optional<IntegrationWorkflow> findLastByUuid(@Param("uuid") UUID uuid);
