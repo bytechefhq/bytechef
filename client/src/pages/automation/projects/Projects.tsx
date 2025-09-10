@@ -68,9 +68,13 @@ const Projects = () => {
 
     const handleImportProject = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (!file) return;
+
+        if (!file) {
+            return;
+        }
 
         const formData = new FormData();
+
         formData.append('file', file);
 
         try {
@@ -90,7 +94,6 @@ const Projects = () => {
             console.error('Error importing project:', error);
         }
 
-        // Reset the file input
         if (event.target) {
             event.target.value = '';
         }
@@ -115,7 +118,7 @@ const Projects = () => {
                                         <ProjectDialog
                                             project={undefined}
                                             triggerNode={
-                                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                                                     <PlusIcon className="mr-2 size-4" />
                                                     Create New Project
                                                 </DropdownMenuItem>
@@ -163,7 +166,7 @@ const Projects = () => {
                                         <ProjectDialog
                                             project={undefined}
                                             triggerNode={
-                                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                                                     <PlusIcon className="mr-2 size-4" /> Create New Project
                                                 </DropdownMenuItem>
                                             }
@@ -175,7 +178,7 @@ const Projects = () => {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <ProjectDialog project={undefined} triggerNode={<Button>Create Project</Button>} />
+                                <ProjectDialog triggerNode={<Button>Create Project</Button>} />
                             )
                         }
                         icon={<FolderIcon className="size-24 text-gray-300" />}

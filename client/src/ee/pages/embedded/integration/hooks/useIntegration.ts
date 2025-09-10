@@ -63,6 +63,11 @@ export const useIntegration = ({
     });
 
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: IntegrationWorkflowKeys.integrationWorkflows(+integrationId!),
+            });
+        },
         useUpdateWorkflowMutation: useUpdateWorkflowMutation,
         workflowId: workflow.id!,
         workflowKeys: WorkflowKeys,

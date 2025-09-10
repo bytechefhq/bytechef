@@ -21,6 +21,7 @@ import {
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -76,6 +77,7 @@ const IntegrationLabel = ({integration}: {integration: Integration}) => (
 
 export const WorkflowExecutions = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const [searchParams] = useSearchParams();
 
@@ -127,7 +129,7 @@ export const WorkflowExecutions = () => {
     const {connectedUserProjects, workflowExecutionPage, workflowExecutionsError, workflowExecutionsIsLoading} =
         useWorkflowExecutions(filterAutomations, {
             environmentId: currentEnvironmentId,
-            id: 1049, // Default workspace id
+            id: currentWorkspaceId!,
             integrationId: filterIntegrationId,
             integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
             jobEndDate: filterEndDate,

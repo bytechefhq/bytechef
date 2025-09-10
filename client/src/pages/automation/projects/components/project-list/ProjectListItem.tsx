@@ -379,13 +379,13 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                 {ff_2482 && (
                                     <DropdownMenuItem
-                                    className="dropdown-menu-item"
-                                    onClick={() =>
-                                        (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
-                                    }
-                                >
-                                    <UploadIcon /> Export Project
-                                </DropdownMenuItem>
+                                        className="dropdown-menu-item"
+                                        onClick={() =>
+                                            (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
+                                        }
+                                    >
+                                        <UploadIcon /> Export Project
+                                    </DropdownMenuItem>
                                 )}
 
                                 <DropdownMenuSeparator className="m-0" />

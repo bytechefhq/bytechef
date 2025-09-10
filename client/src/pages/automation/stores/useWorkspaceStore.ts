@@ -4,7 +4,7 @@ import {devtools, persist} from 'zustand/middleware';
 interface WorkspaceStateI {
     clearCurrentWorkspaceId: () => void;
 
-    currentWorkspaceId: number | undefined;
+    currentWorkspaceId: number;
     setCurrentWorkspaceId: (currentWorkspaceId: number) => void;
 }
 
@@ -18,7 +18,7 @@ export const useWorkspaceStore = create<WorkspaceStateI>()(
                     }));
                 },
 
-                currentWorkspaceId: undefined,
+                currentWorkspaceId: 1049, // Default workspace id,
                 setCurrentWorkspaceId: (currentWorkspaceId: number) =>
                     set(() => ({
                         currentWorkspaceId,
