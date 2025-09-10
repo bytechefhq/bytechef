@@ -117,7 +117,6 @@ function App() {
     const {ai} = useApplicationInfoStore(
         useShallow((state) => ({
             ai: state.ai,
-            loading: state.loading,
         }))
     );
     const {
