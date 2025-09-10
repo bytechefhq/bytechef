@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.security.web.authentication;
 
-import com.bytechef.platform.api.key.domain.ApiKey;
-import com.bytechef.platform.api.key.service.ApiKeyService;
+import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
+import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -55,14 +55,14 @@ public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
 
-        Optional<ApiKey> apiKeyOptional = apiKeyService.fetchApiKey(
-            apiKeyAuthenticationToken.getSecretKey());
+        ApiKey apiKey;
 
-        if (apiKeyOptional.isEmpty()) {
-            throw new BadCredentialsException("Unknown API secret key");
+        try {
+            apiKey = apiKeyService.getApiKey(
+                apiKeyAuthenticationToken.getSecretKey(), apiKeyAuthenticationToken.getEnvironmentId());
+        } catch (IllegalArgumentException e) {
+            throw new BadCredentialsException("Unknown API secret key", e);
         }
-
-        ApiKey apiKey = apiKeyOptional.get();
 
         org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())
             .map(curUser -> createSpringSecurityUser(apiKeyAuthenticationToken.getSecretKey(), curUser))
