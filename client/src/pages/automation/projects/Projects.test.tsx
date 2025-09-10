@@ -19,7 +19,7 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => () => false,
+    useFeatureFlagsStore: () => (flag: string) => flag === 'ff-2482',
 }));
 
 // Mock the API queries
