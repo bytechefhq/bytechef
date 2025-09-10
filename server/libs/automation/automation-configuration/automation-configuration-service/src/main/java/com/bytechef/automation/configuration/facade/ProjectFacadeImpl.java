@@ -117,7 +117,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
 
-        return projectWorkflowService.addWorkflow(id, project.getLastVersion(), workflow.getId());
+        return projectWorkflowService.addWorkflow(id, project.getLastProjectVersion(), workflow.getId());
     }
 
     @Override
@@ -219,12 +219,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
         newProject.setWorkspaceId(project.getWorkspaceId());
 
         List<String> workflowIds = copyWorkflowIds(
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion()));
+            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()));
 
         newProject = projectService.create(newProject);
 
         for (String workflowId : workflowIds) {
-            projectWorkflowService.addWorkflow(newProject.getId(), newProject.getLastVersion(), workflowId);
+            projectWorkflowService.addWorkflow(newProject.getId(), newProject.getLastProjectVersion(), workflowId);
         }
 
         return toProjectDTO(newProject);
@@ -244,7 +244,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             Validate.notNull(workflow.getId(), "id"), JsonUtils.writeWithDefaultPrettyPrinter(definitionMap),
             workflow.getVersion());
 
-        projectWorkflowService.addWorkflow(id, project.getLastVersion(), workflow.getId());
+        projectWorkflowService.addWorkflow(id, project.getLastProjectVersion(), workflow.getId());
 
         return workflow.getId();
     }
@@ -253,7 +253,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public byte[] exportProject(long id) {
         Project project = projectService.getProject(id);
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-            id, project.getLastVersion());
+            id, project.getLastProjectVersion());
 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ZipOutputStream zos = new ZipOutputStream(baos)) {
@@ -359,7 +359,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Project project = projectService.getProject(projectId);
 
         return projectWorkflowService
-            .getProjectWorkflows(project.getId(), project.getLastVersion())
+            .getProjectWorkflows(project.getId(), project.getLastProjectVersion())
             .stream()
             .map(projectWorkflow -> new ProjectWorkflowDTO(
                 workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
@@ -475,7 +475,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = projectService.getProject(id);
 
-        int oldProjectVersion = project.getLastVersion();
+        int oldProjectVersion = project.getLastProjectVersion();
 
         List<ProjectWorkflow> oldProjectWorkflows = projectWorkflowService.getProjectWorkflows(
             project.getId(), oldProjectVersion);
@@ -597,7 +597,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
                         category -> Objects.equals(project.getCategoryId(), category.getId()),
                         null),
                     project,
-                    projectWorkflowService.getProjectProjectWorkflowIds(project.getId(), project.getLastVersion()),
+                    projectWorkflowService.getProjectProjectWorkflowIds(
+                        project.getId(), project.getLastProjectVersion()),
                     CollectionUtils.filter(
                         tagService.getTags(
                             projects.stream()
@@ -613,7 +614,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private ProjectDTO toProjectDTO(Project project) {
         return new ProjectDTO(
             getCategory(project), project,
-            projectWorkflowService.getProjectProjectWorkflowIds(project.getId(), project.getLastVersion()),
+            projectWorkflowService.getProjectProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
             tagService.getTags(project.getTagIds()));
     }
 }
