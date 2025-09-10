@@ -37,6 +37,10 @@ export interface GetSigningKeyRequest {
     id: number;
 }
 
+export interface GetSigningKeysRequest {
+    environmentId: number;
+}
+
 export interface UpdateSigningKeyRequest {
     id: number;
     signingKey: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
@@ -169,8 +173,19 @@ export class SigningKeyApi extends runtime.BaseAPI {
      * Get Signing keys.
      * Get Signing keys
      */
-    async getSigningKeysRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SigningKey>>> {
+    async getSigningKeysRaw(requestParameters: GetSigningKeysRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SigningKey>>> {
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getSigningKeys().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -191,8 +206,8 @@ export class SigningKeyApi extends runtime.BaseAPI {
      * Get Signing keys.
      * Get Signing keys
      */
-    async getSigningKeys(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<SigningKey>> {
-        const response = await this.getSigningKeysRaw(initOverrides);
+    async getSigningKeys(requestParameters: GetSigningKeysRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<SigningKey>> {
+        const response = await this.getSigningKeysRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
