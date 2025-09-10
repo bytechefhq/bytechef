@@ -10,8 +10,10 @@ import {Edge, Node} from '@xyflow/react';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import useDataPillPanelStore from '../../workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '../../workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {getLayoutedElements} from '../../workflow-editor/utils/layoutUtils';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 import {isPlainObject} from '../utils/clusterElementsUtils';
@@ -23,12 +25,30 @@ const useClusterElementsLayout = () => {
         Record<string, ComponentDefinition>
     >({});
 
-    const {rootClusterElementNodeData} = useWorkflowEditorStore();
-    const {workflow} = useWorkflowDataStore();
+    const {rootClusterElementNodeData} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+        }))
+    );
+    const {workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            workflow: state.workflow,
+        }))
+    );
     const {isNodeDragging, isPositionSaving} = useClusterElementsDataStore(
         useShallow((state) => ({
             isNodeDragging: state.isNodeDragging,
             isPositionSaving: state.isPositionSaving,
+        }))
+    );
+    const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+        }))
+    );
+    const {dataPillPanelOpen} = useDataPillPanelStore(
+        useShallow((state) => ({
+            dataPillPanelOpen: state.dataPillPanelOpen,
         }))
     );
 
@@ -60,7 +80,17 @@ const useClusterElementsLayout = () => {
         }))
     );
 
-    const canvasWidth = window.innerWidth - 80;
+    let canvasWidth = window.innerWidth;
+
+    if (workflowNodeDetailsPanelOpen) {
+        canvasWidth -= 460;
+
+        if (dataPillPanelOpen) {
+            canvasWidth -= 400;
+        }
+    } else {
+        canvasWidth -= 80;
+    }
 
     const workflowDefinitionTasks = useMemo(() => {
         if (!workflow.definition) {
@@ -85,7 +115,7 @@ const useClusterElementsLayout = () => {
         const mainRootClusterElementNode = {
             data: rootClusterElementNodeData,
             id: rootClusterElementNodeData.workflowNodeName,
-            position: rootClusterElementNodeData.metadata?.ui?.nodePosition || DEFAULT_NODE_POSITION,
+            position: DEFAULT_NODE_POSITION,
             type: 'workflow',
         };
 
