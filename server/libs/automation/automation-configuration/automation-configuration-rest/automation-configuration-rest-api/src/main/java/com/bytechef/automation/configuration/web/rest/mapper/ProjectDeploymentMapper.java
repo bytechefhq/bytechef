@@ -36,8 +36,7 @@ public class ProjectDeploymentMapper {
     public interface ProjectDeploymentBasicToProjectDeploymentModelMapper
         extends Converter<ProjectDeployment, ProjectDeploymentBasicModel> {
 
-        @Mapping(
-            target = "environmentId", expression = "java(Long.valueOf(projectInstance.getEnvironment().ordinal()))")
+        @Mapping(target = "environmentId", source = "environment")
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Override
         ProjectDeploymentBasicModel convert(ProjectDeployment projectInstance);
@@ -47,8 +46,7 @@ public class ProjectDeploymentMapper {
     public interface ProjectDeploymentToProjectDeploymentModelMapper
         extends Converter<ProjectDeployment, ProjectDeploymentModel> {
 
-        @Mapping(
-            target = "environmentId", expression = "java(Long.valueOf(projectDeployment.getEnvironment().ordinal()))")
+        @Mapping(target = "environmentId", source = "environment")
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "project", ignore = true)
         @Mapping(target = "projectDeploymentWorkflows", ignore = true)
@@ -62,16 +60,13 @@ public class ProjectDeploymentMapper {
         extends Converter<ProjectDeploymentDTO, ProjectDeploymentModel> {
 
         @Override
-        @Mapping(
-            target = "environmentId", expression = "java(Long.valueOf(projectDeploymentDTO.environment().ordinal()))")
+        @Mapping(target = "environmentId", source = "environment")
         ProjectDeploymentModel convert(ProjectDeploymentDTO projectDeploymentDTO);
 
         @InheritInverseConfiguration
         @DelegatingConverter
         @Mapping(target = "project", ignore = true)
-        @Mapping(
-            target = "environment",
-            expression = "java(projectDeploymentModel.getEnvironmentId() == null ? null : com.bytechef.platform.configuration.domain.Environment.values()[projectDeploymentModel.getEnvironmentId().intValue()])")
+        @Mapping(target = "environment", source = "environmentId")
         ProjectDeploymentDTO invertConvert(ProjectDeploymentModel projectDeploymentModel);
     }
 }

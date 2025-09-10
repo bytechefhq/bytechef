@@ -71,7 +71,8 @@ public class ConnectedUserApiAuthenticationFilter extends AbstractApiAuthenticat
 
             TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
-            return new ConnectedUserAuthenticationToken(externalUserId, environment, tenantKey.getTenantId());
+            return new ConnectedUserAuthenticationToken(
+                environment.ordinal(), externalUserId, tenantKey.getTenantId());
         } else {
             String externalUserId;
             Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
@@ -84,7 +85,7 @@ public class ConnectedUserApiAuthenticationFilter extends AbstractApiAuthenticat
 
             TenantKey tenantKey = TenantKey.parse(token);
 
-            return new ConnectedUserAuthenticationToken(externalUserId, environment, tenantKey.getTenantId());
+            return new ConnectedUserAuthenticationToken(environment.ordinal(), externalUserId, tenantKey.getTenantId());
         }
     }
 

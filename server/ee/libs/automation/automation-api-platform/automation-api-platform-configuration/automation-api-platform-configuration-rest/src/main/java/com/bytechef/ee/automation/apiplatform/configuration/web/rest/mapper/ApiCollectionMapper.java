@@ -29,24 +29,20 @@ import org.springframework.core.convert.converter.Converter;
 public interface ApiCollectionMapper extends Converter<ApiCollectionDTO, ApiCollectionModel> {
 
     @Override
-    @Mapping(target = "environmentId", expression = "java(Long.valueOf(apiCollectionDTO.environment().ordinal()))")
+    @Mapping(target = "environmentId", source = "environment")
     @Mapping(target = "workspaceId", ignore = true)
     ApiCollectionModel convert(ApiCollectionDTO apiCollectionDTO);
 
     @InheritInverseConfiguration
     @DelegatingConverter
-    @Mapping(
-        target = "environment",
-        expression = "java(apiCollectionModel.getEnvironmentId() == null ? null : com.bytechef.platform.configuration.domain.Environment.values()[apiCollectionModel.getEnvironmentId().intValue()])")
+    @Mapping(target = "environment", source = "environmentId")
     ApiCollectionDTO invertConvert(ApiCollectionModel apiCollectionModel);
 
-    @Mapping(target = "environmentId", expression = "java(Long.valueOf(projectDeployment.getEnvironment().ordinal()))")
+    @Mapping(target = "environmentId", source = "environment")
     @Mapping(target = "lastExecutionDate", ignore = true)
     ProjectDeploymentBasicModel mapToProjectDeploymentModel(ProjectDeployment projectDeployment);
 
-    @Mapping(
-        target = "environment",
-        expression = "java(projectDeploymentBasicModel.getEnvironmentId() == null ? null : com.bytechef.platform.configuration.domain.Environment.values()[projectDeploymentBasicModel.getEnvironmentId().intValue()])")
+    @Mapping(target = "environment", source = "environmentId")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "tagIds", ignore = true)

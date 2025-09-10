@@ -26,12 +26,14 @@ import org.springframework.security.core.userdetails.User;
  */
 public abstract class AbstractPublicApiAuthenticationToken extends AbstractAuthenticationToken {
 
+    private long environmentId;
     private String tenantId;
     private User user;
 
-    public AbstractPublicApiAuthenticationToken(String tenantId) {
+    public AbstractPublicApiAuthenticationToken(long environmentId, String tenantId) {
         super(List.of());
 
+        this.environmentId = environmentId;
         this.tenantId = tenantId;
     }
 
@@ -58,5 +60,9 @@ public abstract class AbstractPublicApiAuthenticationToken extends AbstractAuthe
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    public long getEnvironmentId() {
+        return environmentId;
     }
 }
