@@ -22,13 +22,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -95,8 +95,7 @@ public class User {
     private String resetKey;
 
     @Column("uuid")
-    @ReadOnlyProperty
-    private String uuid;
+    private UUID uuid;
 
     @Override
     public boolean equals(Object o) {
@@ -183,8 +182,12 @@ public class User {
         return resetKey;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
+    }
+
+    public String getUuidAsString() {
+        return uuid == null ? null : uuid.toString();
     }
 
     public boolean isActivated() {
@@ -257,6 +260,14 @@ public class User {
 
     public void setResetDate(Instant resetDate) {
         this.resetDate = resetDate;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = UUID.fromString(uuid);
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     @Override

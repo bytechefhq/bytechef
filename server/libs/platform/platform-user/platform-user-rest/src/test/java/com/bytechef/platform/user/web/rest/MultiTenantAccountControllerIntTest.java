@@ -270,7 +270,7 @@ class MultiTenantAccountControllerIntTest {
             updatedUser.setResetDate(now.plusSeconds(60));
             updatedUser.setResetKey("reset key");
 
-            userService.saveUser(updatedUser);
+            userService.save(updatedUser);
 
             return updatedUser.getResetKey();
         });

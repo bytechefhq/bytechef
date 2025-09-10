@@ -35,11 +35,9 @@ public interface UserService {
 
     long countActiveUsers();
 
-    User createUser(AdminUserDTO userDTO);
+    User create(AdminUserDTO userDTO);
 
-    void deleteUser(String login);
-
-    Page<User> getAllActiveUsers(Pageable pageable);
+    void delete(String login);
 
     Optional<User> fetchCurrentUser();
 
@@ -49,13 +47,13 @@ public interface UserService {
 
     Optional<User> fetchUserByLogin(String login);
 
+    Page<User> getAllActiveUsers(Pageable pageable);
+
     Page<User> getAllManagedUsers(Pageable pageable);
 
     User getCurrentUser();
 
     User getUser(long id);
-
-    void saveUser(User user);
 
     User registerUser(AdminUserDTO userDTO, String password);
 
@@ -65,7 +63,9 @@ public interface UserService {
 
     Optional<User> requestPasswordReset(String email);
 
-    Optional<User> updateUser(AdminUserDTO userDTO);
+    void save(User user);
 
-    void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl);
+    Optional<User> update(AdminUserDTO userDTO);
+
+    void update(String firstName, String lastName, String email, String langKey, String imageUrl);
 }
