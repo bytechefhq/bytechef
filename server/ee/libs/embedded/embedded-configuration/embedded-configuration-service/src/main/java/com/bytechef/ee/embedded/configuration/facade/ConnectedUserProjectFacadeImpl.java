@@ -184,7 +184,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public void enableProjectWorkflow(
-        String externalUserId, String workflowUuidrenceCode, boolean enable, Long environmentId) {
+        String externalUserId, String workflowUuid, boolean enable, Long environmentId) {
 
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
@@ -194,7 +194,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         String workflowId = projectWorkflowService
             .getProjectDeploymentWorkflowId(
                 projectDeploymentService.getProjectDeploymentId(connectedUserProject.getProjectId(), environment),
-                workflowUuidrenceCode);
+                workflowUuid);
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(
             connectedUserProject.getProjectId(), workflowId, enable, environment);
