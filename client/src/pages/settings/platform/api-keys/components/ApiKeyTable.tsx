@@ -11,7 +11,8 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ApiKeyDialog from '@/pages/settings/platform/api-keys/components/ApiKeyDialog';
-import {ApiKey} from '@/shared/middleware/platform/api-key';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import {ApiKey} from '@/shared/middleware/platform/security';
 import {useDeleteApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
 import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -80,6 +81,10 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
             columnHelper.accessor('secretKey', {
                 cell: (info) => info.getValue() ?? '',
                 header: 'Secret Key',
+            }),
+            columnHelper.accessor('environmentId', {
+                cell: (info) => <EnvironmentBadge environmentId={info.getValue()!} />,
+                header: 'Environment',
             }),
             columnHelper.accessor('createdDate', {
                 cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,

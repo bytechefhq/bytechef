@@ -12,7 +12,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useToast} from '@/hooks/use-toast';
-import {ApiKey} from '@/shared/middleware/platform/api-key';
+import {ApiKey} from '@/shared/middleware/platform/security';
 import {useCreateApiKeyMutation, useUpdateApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
 import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
