@@ -321,7 +321,7 @@ public class ProjectTools {
             Status lastStatus = project.getLastStatus();
             return new ProjectStatusInfo(
                 project.getId(), project.getName(), lastStatus.name(), project.isPublished(),
-                project.getLastVersion(),
+                project.getLastProjectVersion(),
                 project.getLastPublishedDate() != null ? project.getLastPublishedDate() : null, deploymentStatuses);
         } catch (Exception e) {
             logger.error("Failed to get status for project {}", projectId, e);

@@ -32,14 +32,14 @@ import java.util.List;
 public record ProjectDTO(
     Category category, String createdBy, Instant createdDate, String description, Long id, String name,
     String lastModifiedBy, Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus,
-    int lastVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds,
-    List<Tag> tags, int version, Long workspaceId) {
+    int lastProjectVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds, List<Tag> tags,
+    int version, Long workspaceId) {
 
     public ProjectDTO(Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags) {
         this(
             category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
-            project.getLastPublishedDate(), project.getLastStatus(), project.getLastVersion(),
+            project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
             project.getProjectVersions(), projectWorkflowIds, tags, project.getVersion(), project.getWorkspaceId());
     }
 
@@ -48,7 +48,7 @@ public record ProjectDTO(
             project.getCategoryId() == null ? null : new Category(project.getCategoryId()), project.getCreatedBy(),
             project.getCreatedDate(), project.getDescription(), project.getId(), project.getName(),
             project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastPublishedDate(),
-            project.getLastStatus(), project.getLastVersion(), project.getProjectVersions(), List.of(),
+            project.getLastStatus(), project.getLastProjectVersion(), project.getProjectVersions(), List.of(),
             List.of(), project.getVersion(), project.getWorkspaceId());
     }
 
@@ -83,7 +83,7 @@ public record ProjectDTO(
         private Instant lastModifiedDate;
         private Instant lastPublishedDate;
         private Status lastStatus = Status.DRAFT;
-        private int lastVersion;
+        private int lastProjectVersion;
         private List<Tag> tags;
         private int version;
         private List<ProjectVersion> projectVersions;
@@ -141,8 +141,8 @@ public record ProjectDTO(
             return this;
         }
 
-        public Builder lastVersion(int lastVersion) {
-            this.lastVersion = lastVersion;
+        public Builder lastProjectVersion(int lastProjectVersion) {
+            this.lastProjectVersion = lastProjectVersion;
 
             return this;
         }
@@ -192,7 +192,7 @@ public record ProjectDTO(
         public ProjectDTO build() {
             return new ProjectDTO(
                 category, createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate,
-                lastPublishedDate, lastStatus, lastVersion, projectVersions, projectWorkflowIds, tags, version,
+                lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, projectWorkflowIds, tags, version,
                 workspaceId);
         }
     }
