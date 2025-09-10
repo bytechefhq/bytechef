@@ -1,6 +1,7 @@
 /* eslint-disable sort-keys */
 
-import {create} from 'zustand';
+import {ExtractState, createStore} from 'zustand';
+import {useStore} from 'zustand/index';
 import {devtools} from 'zustand/middleware';
 
 export type EditionType = 'CE' | 'EE';
@@ -43,7 +44,7 @@ const fetchGetActuatorInfo = async (): Promise<Response> => {
     }).then((response) => response);
 };
 
-export const useApplicationInfoStore = create<ApplicationInfoI>()(
+export const applicationInfoStore = createStore<ApplicationInfoI>()(
     devtools(
         (set, get) => {
             return {
@@ -117,3 +118,7 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
         }
     )
 );
+
+export function useApplicationInfoStore<U>(selector: (state: ExtractState<typeof applicationInfoStore>) => U): U {
+    return useStore(applicationInfoStore, selector);
+}

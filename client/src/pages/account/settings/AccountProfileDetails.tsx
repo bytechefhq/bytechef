@@ -52,8 +52,6 @@ const AccountProfileDetails = () => {
     };
 
     useEffect(() => {
-        getAccount();
-
         return () => {
             reset();
         };
