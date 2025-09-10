@@ -8,7 +8,7 @@ interface CreateApiCollectionMutationProps {
 }
 
 export const useCreateApiCollectionMutation = (mutationProps?: CreateApiCollectionMutationProps) => {
-    const {currentWorkspaceId} = useWorkspaceStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     return useMutation<ApiCollection, Error, ApiCollection>({
         mutationFn: (apiCollection: ApiCollection) => {
