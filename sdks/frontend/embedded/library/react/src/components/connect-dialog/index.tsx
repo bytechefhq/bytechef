@@ -496,10 +496,6 @@ export default function useConnectDialog({
 
         // Always render with current state
         if (rootRef.current) {
-            const integrationInstance: IntegrationInstanceType | undefined = integration?.integrationInstances?.find(
-                (instance: IntegrationInstanceType) => instance.id === currentIntegrationInstanceId
-            );
-
             rootRef.current.render(
                 <ConnectDialog
                     closeDialog={closeDialog}
@@ -508,7 +504,6 @@ export default function useConnectDialog({
                     handleWorkflowInputChange={handleWorkflowInputChange}
                     handleClick={handleClick}
                     integration={integration}
-                    integrationInstance={integrationInstance}
                     isOAuth2={isOAuth2}
                     isOpen={isOpen}
                     properties={integration?.connectionConfig?.inputs}

@@ -9,7 +9,6 @@ import {
     PropertyType,
     RegisterFormSubmitFunction,
     WorkflowInputType,
-    IntegrationInstanceType,
     MergedWorkflowType,
 } from './types';
 
@@ -42,7 +41,6 @@ const Toggle = ({id, pressed, onPressedChange}: ToggleProps) => (
 );
 
 interface DialogProps {
-    integrationInstance?: IntegrationInstanceType;
     closeDialog: () => void;
     workflowsView?: boolean;
     form?: FormType;
@@ -59,7 +57,6 @@ interface DialogProps {
 }
 
 const ConnectDialog = ({
-    integrationInstance,
     closeDialog,
     workflowsView = false,
     form,
@@ -107,7 +104,6 @@ const ConnectDialog = ({
                         handleWorkflowToggle={handleWorkflowToggle}
                         handleWorkflowInputChange={handleWorkflowInputChange}
                         integration={integration}
-                        integrationInstance={integrationInstance}
                         properties={properties}
                         registerFormSubmit={registerFormSubmit}
                         selectedWorkflows={selectedWorkflows}
@@ -244,7 +240,6 @@ interface DialogContentProps {
 }
 
 const DialogContent = ({
-    integrationInstance,
     workflowsView = false,
     form,
     handleWorkflowToggle,
@@ -289,7 +284,7 @@ const DialogContent = ({
                 </form>
             )}
 
-            {workflowsView && !!integrationInstance?.workflows?.length && (
+            {workflowsView && (
                 <DialogWorkflowsContainer
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
