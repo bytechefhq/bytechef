@@ -1,4 +1,4 @@
-package com.bytechef.ee.embedded.unified.web.rest.crm.model;
+package com.bytechef.platform.security.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -17,44 +17,33 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreatedModel
+ * CreateApiKey200ResponseModel
  */
 
-@JsonTypeName("created")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-11T14:05:31.285357+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
-public class CreatedModel {
+@JsonTypeName("CreateApiKey200Response")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T23:16:06.020476+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+public class CreateApiKey200ResponseModel {
 
-  private String id;
+  private @Nullable String secretKey;
 
-  public CreatedModel() {
-    super();
-  }
-
-  /**
-   * Constructor with only required parameters
-   */
-  public CreatedModel(String id) {
-    this.id = id;
-  }
-
-  public CreatedModel id(String id) {
-    this.id = id;
+  public CreateApiKey200ResponseModel secretKey(@Nullable String secretKey) {
+    this.secretKey = secretKey;
     return this;
   }
 
   /**
-   * Get id
-   * @return id
+   * Get secretKey
+   * @return secretKey
    */
-  @NotNull 
-  @Schema(name = "id", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("id")
-  public String getId() {
-    return id;
+  
+  @Schema(name = "secretKey", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("secretKey")
+  public @Nullable String getSecretKey() {
+    return secretKey;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setSecretKey(@Nullable String secretKey) {
+    this.secretKey = secretKey;
   }
 
   @Override
@@ -65,20 +54,20 @@ public class CreatedModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreatedModel created = (CreatedModel) o;
-    return Objects.equals(this.id, created.id);
+    CreateApiKey200ResponseModel createApiKey200Response = (CreateApiKey200ResponseModel) o;
+    return Objects.equals(this.secretKey, createApiKey200Response.secretKey);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(secretKey);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreatedModel {\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("class CreateApiKey200ResponseModel {\n");
+    sb.append("    secretKey: ").append(toIndentedString(secretKey)).append("\n");
     sb.append("}");
     return sb.toString();
   }
