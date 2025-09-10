@@ -44,12 +44,12 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
-    public User createUser(AdminUserDTO userDTO) {
+    public User create(AdminUserDTO userDTO) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void deleteUser(String login) {
+    public void delete(String login) {
         throw new UnsupportedOperationException();
     }
 
@@ -94,11 +94,6 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
-    public void saveUser(User user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public User registerUser(AdminUserDTO userDTO, String password) {
         throw new UnsupportedOperationException();
     }
@@ -119,12 +114,17 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
-    public Optional<User> updateUser(AdminUserDTO userDTO) {
+    public void save(User user) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public Optional<User> update(AdminUserDTO userDTO) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void update(String firstName, String lastName, String email, String langKey, String imageUrl) {
         throw new UnsupportedOperationException();
     }
 }

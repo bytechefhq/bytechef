@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
@@ -131,6 +132,151 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public void changePassword(String currentClearTextPassword, String newPassword) {
+        SecurityUtils.fetchCurrentUserLogin()
+            .flatMap(userRepository::findByLogin)
+            .ifPresent(user -> {
+                String currentEncryptedPassword = user.getPassword();
+
+                if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
+                    throw new InvalidPasswordException();
+                }
+
+                String encryptedPassword = passwordEncoder.encode(newPassword);
+
+                user.setPassword(encryptedPassword);
+
+                user = userRepository.save(user);
+
+                this.clearUserCaches(user);
+
+                logger.debug("Changed password for User: {}", user);
+            });
+    }
+
+    @Override
+    public User create(AdminUserDTO userDTO) {
+        User user = new User();
+
+        String login = userDTO.getLogin();
+
+        user.setLogin(login.toLowerCase());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+
+        String email = userDTO.getEmail();
+
+        if (email != null) {
+            if (!EMAIL_VALIDATOR.isValid(userDTO.getEmail())) {
+                throw new InvalidEmailException(email.toLowerCase());
+            }
+
+            user.setEmail(email.toLowerCase());
+        }
+
+        user.setImageUrl(userDTO.getImageUrl());
+
+        if (userDTO.getLangKey() == null) {
+            user.setLangKey(UserConstants.DEFAULT_LANGUAGE); // default language
+        } else {
+            user.setLangKey(userDTO.getLangKey());
+        }
+
+        String encryptedPassword = passwordEncoder.encode(RandomUtils.generatePassword());
+
+        user.setPassword(encryptedPassword);
+        user.setResetKey(RandomUtils.generateResetKey());
+        user.setResetDate(Instant.now());
+        user.setActivated(true);
+        user.setUuid(String.valueOf(UUID.randomUUID()));
+
+        if (userDTO.getAuthorities() != null) {
+            Set<Authority> authorities = userDTO.getAuthorities()
+                .stream()
+                .map(authorityRepository::findByName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+
+            user.setAuthorities(authorities);
+        }
+
+        userRepository.save(user);
+
+        this.clearUserCaches(user);
+
+        logger.debug("Created User: {}", user);
+
+        return user;
+    }
+
+    @Override
+    public void delete(String login) {
+        userRepository.findByLogin(login)
+            .ifPresent(user -> {
+                userRepository.delete(user);
+
+                this.clearUserCaches(user);
+
+                logger.debug("Deleted User: {}", user);
+            });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<User> fetchCurrentUser() {
+        return SecurityUtils.fetchCurrentUserLogin()
+            .flatMap(userRepository::findByLogin);
+    }
+
+    @Override
+    public Optional<User> fetchUser(long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public Optional<User> fetchUserByEmail(String email) {
+        return userRepository.findByEmailIgnoreCase(email);
+    }
+
+    @Override
+    public Optional<User> fetchUserByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<User> getAllManagedUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        return fetchCurrentUser()
+            .orElseThrow(UserNotFoundException::new);
+    }
+
+    /**
+     * Persistent Token are used for providing automatic authentication, they should be automatically deleted after 30
+     * days.
+     * <p>
+     * This is scheduled to get fired everyday, at midnight.
+     */
+    @Override
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void removeOldPersistentTokens() {
+        LocalDate now = LocalDate.now();
+
+        persistentTokenRepository.findAllByTokenDateBefore(now.minusMonths(1))
+            .forEach(token -> {
+                logger.debug("Deleting token {}", token.getSeries());
+
+                persistentTokenRepository.delete(token);
+            });
+    }
+
+    @Override
     public Optional<User> requestPasswordReset(String email) {
         return userRepository.findByEmailIgnoreCase(email)
             .filter(User::isActivated)
@@ -144,11 +290,6 @@ public class UserServiceImpl implements UserService {
 
                 return user;
             });
-    }
-
-    @Override
-    public void saveUser(User user) {
-        userRepository.save(user);
     }
 
     @Override
@@ -198,6 +339,7 @@ public class UserServiceImpl implements UserService {
         newUser.setActivated(false);
         // new user gets registration key
         newUser.setActivationKey(RandomUtils.generateActivationKey());
+        newUser.setUuid(String.valueOf(UUID.randomUUID()));
 
         Set<Authority> authorities = new HashSet<>();
 
@@ -215,61 +357,6 @@ public class UserServiceImpl implements UserService {
         return newUser;
     }
 
-    @Override
-    public User createUser(AdminUserDTO userDTO) {
-        User user = new User();
-
-        String login = userDTO.getLogin();
-
-        user.setLogin(login.toLowerCase());
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-
-        String email = userDTO.getEmail();
-
-        if (email != null) {
-            if (!EMAIL_VALIDATOR.isValid(userDTO.getEmail())) {
-                throw new InvalidEmailException(email.toLowerCase());
-            }
-
-            user.setEmail(email.toLowerCase());
-        }
-
-        user.setImageUrl(userDTO.getImageUrl());
-
-        if (userDTO.getLangKey() == null) {
-            user.setLangKey(UserConstants.DEFAULT_LANGUAGE); // default language
-        } else {
-            user.setLangKey(userDTO.getLangKey());
-        }
-
-        String encryptedPassword = passwordEncoder.encode(RandomUtils.generatePassword());
-
-        user.setPassword(encryptedPassword);
-        user.setResetKey(RandomUtils.generateResetKey());
-        user.setResetDate(Instant.now());
-        user.setActivated(true);
-
-        if (userDTO.getAuthorities() != null) {
-            Set<Authority> authorities = userDTO.getAuthorities()
-                .stream()
-                .map(authorityRepository::findByName)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
-
-            user.setAuthorities(authorities);
-        }
-
-        userRepository.save(user);
-
-        this.clearUserCaches(user);
-
-        logger.debug("Created User: {}", user);
-
-        return user;
-    }
-
     /**
      * Update all information for a specific user, and return the modified user.
      *
@@ -277,7 +364,7 @@ public class UserServiceImpl implements UserService {
      * @return updated user.
      */
     @Override
-    public Optional<User> updateUser(AdminUserDTO userDTO) {
+    public Optional<User> update(AdminUserDTO userDTO) {
         return Optional.of(userRepository.findById(userDTO.getId()))
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -317,23 +404,6 @@ public class UserServiceImpl implements UserService {
             });
     }
 
-    @Override
-    public void deleteUser(String login) {
-        userRepository.findByLogin(login)
-            .ifPresent(user -> {
-                userRepository.delete(user);
-
-                this.clearUserCaches(user);
-
-                logger.debug("Deleted User: {}", user);
-            });
-    }
-
-    @Override
-    public Optional<User> fetchUserByEmail(String email) {
-        return userRepository.findByEmailIgnoreCase(email);
-    }
-
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *
@@ -344,7 +414,7 @@ public class UserServiceImpl implements UserService {
      * @param imageUrl  image URL of user.
      */
     @Override
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public void update(String firstName, String lastName, String email, String langKey, String imageUrl) {
         if (!EMAIL_VALIDATOR.isValid(email)) {
             throw new InvalidEmailException(email);
         }
@@ -372,75 +442,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public void changePassword(String currentClearTextPassword, String newPassword) {
-        SecurityUtils.fetchCurrentUserLogin()
-            .flatMap(userRepository::findByLogin)
-            .ifPresent(user -> {
-                String currentEncryptedPassword = user.getPassword();
-
-                if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
-                    throw new InvalidPasswordException();
-                }
-
-                String encryptedPassword = passwordEncoder.encode(newPassword);
-
-                user.setPassword(encryptedPassword);
-
-                user = userRepository.save(user);
-
-                this.clearUserCaches(user);
-
-                logger.debug("Changed password for User: {}", user);
-            });
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<User> getAllManagedUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
-    }
-
-    @Override
-    public User getCurrentUser() {
-        return fetchCurrentUser()
-            .orElseThrow(UserNotFoundException::new);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public Page<User> getAllActiveUsers(Pageable pageable) {
         return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<User> fetchCurrentUser() {
-        return SecurityUtils.fetchCurrentUserLogin()
-            .flatMap(userRepository::findByLogin);
+    public User getUser(long id) {
+        return userRepository.findById(id)
+            .orElseThrow();
     }
 
     @Override
-    public Optional<User> fetchUser(long id) {
-        return userRepository.findById(id);
-    }
-
-    /**
-     * Persistent Token are used for providing automatic authentication, they should be automatically deleted after 30
-     * days.
-     * <p>
-     * This is scheduled to get fired everyday, at midnight.
-     */
-    @Override
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void removeOldPersistentTokens() {
-        LocalDate now = LocalDate.now();
-        persistentTokenRepository.findAllByTokenDateBefore(now.minusMonths(1))
-            .forEach(token -> {
-                logger.debug("Deleting token {}", token.getSeries());
-
-                persistentTokenRepository.delete(token);
-            });
+    public void save(User user) {
+        userRepository.save(user);
     }
 
     /**
@@ -463,17 +478,6 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
             });
-    }
-
-    @Override
-    public Optional<User> fetchUserByLogin(String login) {
-        return userRepository.findByLogin(login);
-    }
-
-    @Override
-    public User getUser(long id) {
-        return userRepository.findById(id)
-            .orElseThrow();
     }
 
     @SuppressFBWarnings("NP")

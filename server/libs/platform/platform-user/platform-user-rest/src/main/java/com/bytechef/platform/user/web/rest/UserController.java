@@ -133,7 +133,7 @@ public class UserController {
         } else if (emailExists(userDTO.getEmail())) {
             throw new EmailAlreadyUsedException();
         } else {
-            User newUser = userService.createUser(userDTO);
+            User newUser = userService.create(userDTO);
 
             mailService.sendCreationEmail(newUser);
 
@@ -181,7 +181,7 @@ public class UserController {
 
         List<Authority> authorities = authorityService.getAuthorities();
 
-        Optional<AdminUserDTO> updatedUser = userService.updateUser(userDTO)
+        Optional<AdminUserDTO> updatedUser = userService.update(userDTO)
             .map(user -> new AdminUserDTO(user, authorities));
 
         return updatedUser
@@ -258,7 +258,7 @@ public class UserController {
 
         logger.debug("REST request to delete User: {}", login);
 
-        userService.deleteUser(login);
+        userService.delete(login);
 
         return ResponseEntity.noContent()
             .build();
