@@ -86,7 +86,7 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
 
     @Query("""
         SELECT project_workflow.* FROM project_workflow
-        WHERE project_workflow.uuid = :uuid AS uuid
+        WHERE project_workflow.uuid = :uuid
         ORDER BY project_workflow.project_version DESC
         LIMIT 1
         """)
