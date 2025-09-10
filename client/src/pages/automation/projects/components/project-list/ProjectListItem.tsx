@@ -263,10 +263,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
                             <div className="flex items-center space-x-2">
-                                {project.lastPublishedDate && project.lastVersion ? (
+                                {project.lastPublishedDate && project.lastProjectVersion ? (
                                     <>
                                         <Badge className="flex space-x-1" variant="success">
-                                            <span>V{project.lastVersion - 1}</span>
+                                            <span>V{project.lastProjectVersion - 1}</span>
 
                                             <span>PUBLISHED</span>
                                         </Badge>
@@ -289,7 +289,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     </>
                                 ) : (
                                     <Badge className="flex space-x-1" variant="secondary">
-                                        <span>V{project.lastVersion}</span>
+                                        <span>V{project.lastProjectVersion}</span>
 
                                         <span>{project.lastStatus}</span>
                                     </Badge>
@@ -354,7 +354,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         }
                                     }}
                                 >
-                                    <DownloadIcon /> Import Workflow
+                                    <UploadIcon /> Import Workflow
                                 </DropdownMenuItem>
 
                                 {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
@@ -384,7 +384,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
                                         }
                                     >
-                                        <UploadIcon /> Export Project
+                                        <DownloadIcon /> Export Project
                                     </DropdownMenuItem>
                                 )}
 

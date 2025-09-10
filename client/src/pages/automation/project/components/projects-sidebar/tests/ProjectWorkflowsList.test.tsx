@@ -6,9 +6,9 @@ import {expect, it, vi} from 'vitest';
 
 const mockProject: Project = {
     id: 1050,
+    lastProjectVersion: 5,
     lastPublishedDate: new Date('2025-03-03T12:38:37Z'),
     lastStatus: 'DRAFT',
-    lastVersion: 5,
     name: 'Project 1',
     projectWorkflowIds: [1001, 1002],
     workspaceId: 1000,
@@ -60,9 +60,9 @@ it('should show a "PUBLISHED" badge for a published project', () => {
 it('should show a "DRAFT" badge for an unpublished project', () => {
     const mockUnpublishedProject: Project = {
         id: 1050,
+        lastProjectVersion: 2,
         lastPublishedDate: undefined,
         lastStatus: 'DRAFT',
-        lastVersion: 2,
         name: 'Project 1',
         projectWorkflowIds: [1001, 1002],
         workspaceId: 1000,

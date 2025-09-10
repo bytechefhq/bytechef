@@ -6,8 +6,8 @@ import {expect, it} from 'vitest';
 
 it('should render the correct project title', () => {
     const mockProject = {
+        lastProjectVersion: 3,
         lastStatus: ProjectStatus.Draft,
-        lastVersion: 3,
         name: 'Test Project',
         workspaceId: 1,
     };
