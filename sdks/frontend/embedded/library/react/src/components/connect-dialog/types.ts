@@ -59,6 +59,7 @@ export interface WorkflowInputType {
     type: 'string' | 'number' | 'boolean' | 'object' | 'array';
     required?: boolean;
     defaultValue?: unknown;
+    value?: string | number | readonly string[] | undefined;
 }
 
 export interface FormType {

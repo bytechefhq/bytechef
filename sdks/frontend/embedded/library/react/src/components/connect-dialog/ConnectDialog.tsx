@@ -262,7 +262,9 @@ const DialogContent = ({
             {!workflowsView && <p>{integration.description}</p>}
 
             {!workflowsView && form && (
-                <form id="form" onSubmit={form.handleSubmit}>
+                <form id="form" onSubmit={(event) => {
+                    form.handleSubmit(() => {})(event);
+                }}>
                     {properties?.map((property) => {
                         const field = form.register(property.name);
 
