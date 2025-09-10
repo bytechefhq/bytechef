@@ -3,8 +3,11 @@ import {getCookie} from '@/shared/util/cookie-utils';
 
 /* eslint-disable sort-keys */
 
-import {create} from 'zustand';
+import {createStore} from 'zustand';
+import {useStore} from 'zustand/index';
 import {devtools} from 'zustand/middleware';
+
+import type {ExtractState} from 'zustand/vanilla';
 
 export interface AuthenticationI {
     account: UserI | undefined;
@@ -58,7 +61,7 @@ const fetchLogout = async (): Promise<Response> => {
     }).then((response) => response);
 };
 
-export const useAuthenticationStore = create<AuthenticationI>()(
+export const authenticationStore = createStore<AuthenticationI>()(
     devtools(
         (set, get) => ({
             account: undefined,
@@ -164,3 +167,7 @@ export const useAuthenticationStore = create<AuthenticationI>()(
         }
     )
 );
+
+export function useAuthenticationStore<U>(selector: (state: ExtractState<typeof authenticationStore>) => U): U {
+    return useStore(authenticationStore, selector);
+}

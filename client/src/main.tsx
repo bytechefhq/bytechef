@@ -8,6 +8,8 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import {getRouter as getEmbeddedRouter} from '@/embeddedWorkflowBuilderRoutes';
 import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog-provider';
 import {ThemeProvider} from '@/shared/providers/theme-provider';
+import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
@@ -52,6 +54,19 @@ function renderApp() {
     const isEmbeddedWorkflowBuilder = window.location.pathname.includes('/embedded/workflow-builder');
 
     const router = isEmbeddedWorkflowBuilder ? getEmbeddedRouter() : getMainRouter(queryClient);
+
+    applicationInfoStore.getState().getApplicationInfo();
+
+    if (!authenticationStore.getState().sessionHasBeenFetched) {
+        authenticationStore
+            .getState()
+            .getAccount()
+            .then((result) => {
+                if (!result && window.location.pathname != '/login') {
+                    window.location.pathname = '/login';
+                }
+            });
+    }
 
     root.render(
         <StrictMode>

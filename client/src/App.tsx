@@ -1,4 +1,3 @@
-import LoadingDots from '@/components/LoadingDots';
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
@@ -115,24 +114,20 @@ const platformNavigation = [
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const {ai, getApplicationInfo, loading} = useApplicationInfoStore(
+    const {ai} = useApplicationInfoStore(
         useShallow((state) => ({
             ai: state.ai,
-            getApplicationInfo: state.getApplicationInfo,
             loading: state.loading,
         }))
     );
     const {
         account,
         authenticated,
-        getAccount,
         reset: resetAuthentication,
-        sessionHasBeenFetched,
     } = useAuthenticationStore(
         useShallow((state) => ({
             account: state.account,
             authenticated: state.authenticated,
-            getAccount: state.getAccount,
             reset: state.reset,
             sessionHasBeenFetched: state.sessionHasBeenFetched,
         }))
@@ -152,10 +147,6 @@ function App() {
     const location = useLocation();
 
     const queryClient = useQueryClient();
-
-    useEffect(() => {
-        getApplicationInfo();
-    }, [getApplicationInfo]);
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
@@ -213,13 +204,6 @@ function App() {
     }, [location]);
 
     useEffect(() => {
-        if (!sessionHasBeenFetched) {
-            getAccount();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sessionHasBeenFetched]);
-
-    useEffect(() => {
         if (!authenticated) {
             analytics.reset();
             helpHub.shutdown();
@@ -242,14 +226,6 @@ function App() {
             setCurrentType(type);
         }
     }, [currentType, location, setCurrentType]);
-
-    if (loading || !sessionHasBeenFetched) {
-        return (
-            <div className="flex min-h-screen min-w-full items-center justify-center p-5">
-                <LoadingDots />
-            </div>
-        );
-    }
 
     return authenticated ? (
         <div className="flex h-full">
