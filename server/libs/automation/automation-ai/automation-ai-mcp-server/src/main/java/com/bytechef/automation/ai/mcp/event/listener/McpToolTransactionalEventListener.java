@@ -24,7 +24,6 @@ import io.modelcontextprotocol.server.McpSyncServer;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.data.relational.core.mapping.event.AfterDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -43,7 +42,6 @@ public class McpToolTransactionalEventListener {
         this.toolFacade = toolFacade;
     }
 
-    @Async
     @TransactionalEventListener
     public void handleEvent(AfterSaveEvent<McpTool> mcpToolSaveEvent) {
         mcpSyncServer.addTool(
@@ -53,7 +51,6 @@ public class McpToolTransactionalEventListener {
         mcpSyncServer.notifyToolsListChanged();
     }
 
-    @Async
     @TransactionalEventListener
     public void handleEvent(AfterDeleteEvent<McpTool> mcpToolDeleteEvent) {
         ToolDTO toolDTO = toolFacade.toToolDTO(mcpToolDeleteEvent.getEntity());
