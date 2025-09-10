@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:45.709110+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:32:00.460286+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "request-trigger", description = "The Embedded Request Trigger Public API")
 public interface RequestTriggerApi {
@@ -45,10 +45,10 @@ public interface RequestTriggerApi {
     }
 
     /**
-     * POST /workflows/{workflowReferenceCode} : Execute workflows
+     * POST /workflows/{workflowUuid} : Execute workflows
      * Execute workflows.
      *
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return The list of active integrations. (status code 200)
      *         or Bad request (status code 400)
@@ -101,12 +101,12 @@ public interface RequestTriggerApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/workflows/{workflowReferenceCode}",
+        value = "/workflows/{workflowUuid}",
         produces = { "application/json" }
     )
     
     default ResponseEntity<Object> executeWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {

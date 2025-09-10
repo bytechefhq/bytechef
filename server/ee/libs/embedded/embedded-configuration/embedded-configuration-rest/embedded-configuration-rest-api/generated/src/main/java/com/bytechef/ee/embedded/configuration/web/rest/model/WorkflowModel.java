@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:48.987812+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:32:04.722447+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WorkflowModel implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
   private @Nullable String createdBy;
@@ -124,7 +124,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
 
   private @Nullable Long integrationWorkflowId;
 
-  private @Nullable String workflowReferenceCode;
+  private @Nullable String workflowUuid;
 
   public WorkflowModel createdBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
@@ -594,24 +594,24 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     this.integrationWorkflowId = integrationWorkflowId;
   }
 
-  public WorkflowModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public WorkflowModel workflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
     return this;
   }
 
   /**
-   * The workflow reference code
-   * @return workflowReferenceCode
+   * The workflow uuid
+   * @return workflowUuid
    */
   
-  @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow reference code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowReferenceCode")
-  public @Nullable String getWorkflowReferenceCode() {
-    return workflowReferenceCode;
+  @Schema(name = "workflowUuid", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow uuid", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowUuid")
+  public @Nullable String getWorkflowUuid() {
+    return workflowUuid;
   }
 
-  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public void setWorkflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
   }
 
   @Override
@@ -644,12 +644,12 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
         Objects.equals(this.triggers, workflow.triggers) &&
         Objects.equals(this.version, workflow.version) &&
         Objects.equals(this.integrationWorkflowId, workflow.integrationWorkflowId) &&
-        Objects.equals(this.workflowReferenceCode, workflow.workflowReferenceCode);
+        Objects.equals(this.workflowUuid, workflow.workflowUuid);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, connectionsCount, definition, description, format, id, inputs, inputsCount, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, maxRetries, workflowTaskComponentNames, workflowTriggerComponentNames, tasks, triggers, version, integrationWorkflowId, workflowReferenceCode);
+    return Objects.hash(createdBy, createdDate, connectionsCount, definition, description, format, id, inputs, inputsCount, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, maxRetries, workflowTaskComponentNames, workflowTriggerComponentNames, tasks, triggers, version, integrationWorkflowId, workflowUuid);
   }
 
   @Override
@@ -677,7 +677,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     sb.append("    triggers: ").append(toIndentedString(triggers)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    integrationWorkflowId: ").append(toIndentedString(integrationWorkflowId)).append("\n");
-    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
+    sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("}");
     return sb.toString();
   }

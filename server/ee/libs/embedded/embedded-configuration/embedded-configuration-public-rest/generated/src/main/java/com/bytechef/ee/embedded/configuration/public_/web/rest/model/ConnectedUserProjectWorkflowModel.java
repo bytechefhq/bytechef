@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:25:09.264658+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:31:59.920490+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable String description;
@@ -33,7 +33,7 @@ public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable String label;
 
-  private @Nullable String workflowReferenceCode;
+  private @Nullable String workflowUuid;
 
   private @Nullable Integer workflowVersion;
 
@@ -117,24 +117,24 @@ public class ConnectedUserProjectWorkflowModel {
     this.label = label;
   }
 
-  public ConnectedUserProjectWorkflowModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public ConnectedUserProjectWorkflowModel workflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
     return this;
   }
 
   /**
    * The reference code of a workflow.
-   * @return workflowReferenceCode
+   * @return workflowUuid
    */
   
-  @Schema(name = "workflowReferenceCode", description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowReferenceCode")
-  public @Nullable String getWorkflowReferenceCode() {
-    return workflowReferenceCode;
+  @Schema(name = "workflowUuid", description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowUuid")
+  public @Nullable String getWorkflowUuid() {
+    return workflowUuid;
   }
 
-  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public void setWorkflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
   }
 
   public ConnectedUserProjectWorkflowModel workflowVersion(@Nullable Integer workflowVersion) {
@@ -170,13 +170,13 @@ public class ConnectedUserProjectWorkflowModel {
         Objects.equals(this.definition, connectedUserProjectWorkflow.definition) &&
         Objects.equals(this.enabled, connectedUserProjectWorkflow.enabled) &&
         Objects.equals(this.label, connectedUserProjectWorkflow.label) &&
-        Objects.equals(this.workflowReferenceCode, connectedUserProjectWorkflow.workflowReferenceCode) &&
+        Objects.equals(this.workflowUuid, connectedUserProjectWorkflow.workflowUuid) &&
         Objects.equals(this.workflowVersion, connectedUserProjectWorkflow.workflowVersion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, definition, enabled, label, workflowReferenceCode, workflowVersion);
+    return Objects.hash(description, definition, enabled, label, workflowUuid, workflowVersion);
   }
 
   @Override
@@ -187,7 +187,7 @@ public class ConnectedUserProjectWorkflowModel {
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
-    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
+    sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("    workflowVersion: ").append(toIndentedString(workflowVersion)).append("\n");
     sb.append("}");
     return sb.toString();

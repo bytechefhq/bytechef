@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "A workflow data for particular integration instance.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:25:09.264658+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:31:59.920490+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationInstanceWorkflowModel {
 
   private @Nullable Boolean enabled;
@@ -32,7 +32,7 @@ public class IntegrationInstanceWorkflowModel {
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
-  private @Nullable String workflowReferenceCode;
+  private @Nullable String workflowUuid;
 
   public IntegrationInstanceWorkflowModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
@@ -82,24 +82,24 @@ public class IntegrationInstanceWorkflowModel {
     this.inputs = inputs;
   }
 
-  public IntegrationInstanceWorkflowModel workflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public IntegrationInstanceWorkflowModel workflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
     return this;
   }
 
   /**
    * The reference code of a workflow.
-   * @return workflowReferenceCode
+   * @return workflowUuid
    */
   
-  @Schema(name = "workflowReferenceCode", description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowReferenceCode")
-  public @Nullable String getWorkflowReferenceCode() {
-    return workflowReferenceCode;
+  @Schema(name = "workflowUuid", description = "The reference code of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowUuid")
+  public @Nullable String getWorkflowUuid() {
+    return workflowUuid;
   }
 
-  public void setWorkflowReferenceCode(@Nullable String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
+  public void setWorkflowUuid(@Nullable String workflowUuid) {
+    this.workflowUuid = workflowUuid;
   }
 
   @Override
@@ -113,12 +113,12 @@ public class IntegrationInstanceWorkflowModel {
     IntegrationInstanceWorkflowModel integrationInstanceWorkflow = (IntegrationInstanceWorkflowModel) o;
     return Objects.equals(this.enabled, integrationInstanceWorkflow.enabled) &&
         Objects.equals(this.inputs, integrationInstanceWorkflow.inputs) &&
-        Objects.equals(this.workflowReferenceCode, integrationInstanceWorkflow.workflowReferenceCode);
+        Objects.equals(this.workflowUuid, integrationInstanceWorkflow.workflowUuid);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(enabled, inputs, workflowReferenceCode);
+    return Objects.hash(enabled, inputs, workflowUuid);
   }
 
   @Override
@@ -127,7 +127,7 @@ public class IntegrationInstanceWorkflowModel {
     sb.append("class IntegrationInstanceWorkflowModel {\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
-    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
+    sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("}");
     return sb.toString();
   }
