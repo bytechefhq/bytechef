@@ -32,6 +32,12 @@ export interface ApiKey {
      */
     createdDate?: Date;
     /**
+     * The id of an environment.
+     * @type {number}
+     * @memberof ApiKey
+     */
+    environmentId?: number;
+    /**
      * 
      * @type {number}
      * @memberof ApiKey
@@ -94,6 +100,7 @@ export function ApiKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ap
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
@@ -117,6 +124,7 @@ export function ApiKeyToJSONTyped(value?: ApiKey | null, ignoreDiscriminator: bo
         
         'createdBy': value['createdBy'],
         'createdDate': value['createdDate'] == null ? undefined : ((value['createdDate']).toISOString()),
+        'environmentId': value['environmentId'],
         'id': value['id'],
         'lastModifiedBy': value['lastModifiedBy'],
         'lastModifiedDate': value['lastModifiedDate'] == null ? undefined : ((value['lastModifiedDate']).toISOString()),
