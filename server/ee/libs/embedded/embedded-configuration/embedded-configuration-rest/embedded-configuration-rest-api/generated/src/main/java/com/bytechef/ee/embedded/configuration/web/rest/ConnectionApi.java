@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:48.987812+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:32:04.722447+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "connection", description = "The Embedded Connection Internal API")
 public interface ConnectionApi {
@@ -45,11 +45,11 @@ public interface ConnectionApi {
     }
 
     /**
-     * POST /connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections : Create a new connection for the connected user&#39;s project workflow
+     * POST /connected-users/{connectedUserId}/workflows/{workflowUuid}/connections : Create a new connection for the connected user&#39;s project workflow
      * Create a new connection for the connected user&#39;s project workflow.
      *
      * @param connectedUserId The id of a connected user. (required)
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param connectionModel  (required)
      * @return The connection id. (status code 200)
      */
@@ -66,14 +66,14 @@ public interface ConnectionApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connected-users/{connectedUserId}/workflows/{workflowReferenceCode}/connections",
+        value = "/connected-users/{connectedUserId}/workflows/{workflowUuid}/connections",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Long> createConnectedUserProjectWorkflowConnection(
         @Parameter(name = "connectedUserId", description = "The id of a connected user.", required = true, in = ParameterIn.PATH) @PathVariable("connectedUserId") Long connectedUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody ConnectionModel connectionModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

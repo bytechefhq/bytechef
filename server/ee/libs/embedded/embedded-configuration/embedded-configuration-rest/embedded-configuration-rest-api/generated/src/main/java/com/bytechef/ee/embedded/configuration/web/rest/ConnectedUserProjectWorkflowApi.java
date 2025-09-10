@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:48.987812+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:32:04.722447+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Connected User Project Workflow Internal API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -46,10 +46,10 @@ public interface ConnectedUserProjectWorkflowApi {
     }
 
     /**
-     * PATCH /connected-user-project-workflows/{workflowReferenceCode}/enable/{enable} : Enable/disable a connected user project workflow
+     * PATCH /connected-user-project-workflows/{workflowUuid}/enable/{enable} : Enable/disable a connected user project workflow
      * Enable/disable a connected user project workflow.
      *
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param enable Enable/disable the project deployment. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
@@ -65,11 +65,11 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PATCH,
-        value = "/connected-user-project-workflows/{workflowReferenceCode}/enable/{enable}"
+        value = "/connected-user-project-workflows/{workflowUuid}/enable/{enable}"
     )
     
     default ResponseEntity<Void> enableConnectedUserProjectWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "enable", description = "Enable/disable the project deployment.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
@@ -79,10 +79,10 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * GET /connected-user-project-workflows/{workflowReferenceCode} : Get connected user project workflow.
+     * GET /connected-user-project-workflows/{workflowUuid} : Get connected user project workflow.
      * Get connected user project workflow.
      *
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return The connected user project workflow object. (status code 200)
      */
@@ -99,18 +99,18 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connected-user-project-workflows/{workflowReferenceCode}",
+        value = "/connected-user-project-workflows/{workflowUuid}",
         produces = { "application/json" }
     )
     
     default ResponseEntity<ConnectedUserProjectWorkflowModel> getConnectedUserProjectWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"connectedUserId\" : 0, \"workflow\" : { \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"string\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"string\", \"required\" : false } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"format\" : \"JSON\", \"description\" : \"description\", \"workflowTaskComponentNames\" : [ \"workflowTaskComponentNames\", \"workflowTaskComponentNames\" ], \"label\" : \"label\", \"inputsCount\" : 5, \"triggers\" : [ { \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true } ], \"timeout\" : \"timeout\" }, { \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true } ], \"timeout\" : \"timeout\" } ], \"connectionsCount\" : 5, \"workflowReferenceCode\" : \"workflowReferenceCode\", \"__version\" : 9, \"maxRetries\" : 2, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"workflowTriggerComponentNames\" : [ \"workflowTriggerComponentNames\", \"workflowTriggerComponentNames\" ], \"integrationWorkflowId\" : 3, \"definition\" : \"definition\", \"id\" : \"id\", \"tasks\" : [ { \"metadata\" : { \"key\" : \"\" }, \"pre\" : [ null, null ], \"clusterRoot\" : false, \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"timeout\" : \"timeout\", \"node\" : \"node\", \"post\" : [ null, null ], \"clusterElements\" : { \"key\" : \"\" }, \"name\" : \"name\", \"finalize\" : [ null, null ], \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true } ] }, { \"metadata\" : { \"key\" : \"\" }, \"pre\" : [ null, null ], \"clusterRoot\" : false, \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"timeout\" : \"timeout\", \"node\" : \"node\", \"post\" : [ null, null ], \"clusterElements\" : { \"key\" : \"\" }, \"name\" : \"name\", \"finalize\" : [ null, null ], \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true } ] } ] }, \"workflowVersion\" : 1, \"projectId\" : 6 }";
+                    String exampleString = "{ \"connectedUserId\" : 0, \"workflow\" : { \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"string\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"string\", \"required\" : false } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"format\" : \"JSON\", \"description\" : \"description\", \"workflowTaskComponentNames\" : [ \"workflowTaskComponentNames\", \"workflowTaskComponentNames\" ], \"label\" : \"label\", \"inputsCount\" : 5, \"triggers\" : [ { \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true } ], \"timeout\" : \"timeout\" }, { \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true } ], \"timeout\" : \"timeout\" } ], \"connectionsCount\" : 5, \"__version\" : 9, \"maxRetries\" : 2, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"workflowTriggerComponentNames\" : [ \"workflowTriggerComponentNames\", \"workflowTriggerComponentNames\" ], \"integrationWorkflowId\" : 3, \"definition\" : \"definition\", \"id\" : \"id\", \"tasks\" : [ { \"metadata\" : { \"key\" : \"\" }, \"pre\" : [ null, null ], \"clusterRoot\" : false, \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"timeout\" : \"timeout\", \"node\" : \"node\", \"post\" : [ null, null ], \"clusterElements\" : { \"key\" : \"\" }, \"name\" : \"name\", \"finalize\" : [ null, null ], \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true } ] }, { \"metadata\" : { \"key\" : \"\" }, \"pre\" : [ null, null ], \"clusterRoot\" : false, \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"timeout\" : \"timeout\", \"node\" : \"node\", \"post\" : [ null, null ], \"clusterElements\" : { \"key\" : \"\" }, \"name\" : \"name\", \"finalize\" : [ null, null ], \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 7, \"key\" : \"key\", \"required\" : true } ] } ], \"workflowUuid\" : \"workflowUuid\" }, \"workflowVersion\" : 1, \"projectId\" : 6 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -122,10 +122,10 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * POST /connected-user-project-workflows/{workflowReferenceCode}/publish : Publishes existing connected user project workflow
+     * POST /connected-user-project-workflows/{workflowUuid}/publish : Publishes existing connected user project workflow
      * Publishes existing connected user project workflow.
      *
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param publishConnectedUserProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
@@ -141,12 +141,12 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connected-user-project-workflows/{workflowReferenceCode}/publish",
+        value = "/connected-user-project-workflows/{workflowUuid}/publish",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> publishConnectedUserProjectWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "PublishConnectedUserProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody PublishConnectedUserProjectWorkflowRequestModel publishConnectedUserProjectWorkflowRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {

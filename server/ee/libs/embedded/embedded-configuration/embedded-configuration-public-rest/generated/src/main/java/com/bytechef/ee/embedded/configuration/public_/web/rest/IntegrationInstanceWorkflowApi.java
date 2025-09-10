@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:25:09.264658+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:31:59.920490+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "integration-instance-workflow", description = "The Embedded Integration Instance Workflow Public API")
 public interface IntegrationInstanceWorkflowApi {
@@ -44,11 +44,11 @@ public interface IntegrationInstanceWorkflowApi {
     }
 
     /**
-     * DELETE /integration-instances/{id}/workflows/{workflowReferenceCode}/enable : Disable a workflow
+     * DELETE /integration-instances/{id}/workflows/{workflowUuid}/enable : Disable a workflow
      * Disable a workflow.
      *
      * @param id The id of an integration instance. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -67,12 +67,12 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/integration-instances/{id}/workflows/{workflowReferenceCode}/enable"
+        value = "/integration-instances/{id}/workflows/{workflowUuid}/enable"
     )
     
     default ResponseEntity<Void> disableFrontendIntegrationInstanceWorkflow(
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -80,12 +80,12 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * DELETE /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable : Disable a workflow
+     * DELETE /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/enable : Disable a workflow
      * Disable a workflow.
      *
      * @param externalUserId The external user id. (required)
      * @param id The id of an integration instance. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -104,13 +104,13 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable"
+        value = "/{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/enable"
     )
     
     default ResponseEntity<Void> disableIntegrationInstanceWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -118,11 +118,11 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * POST /integration-instances/{id}/workflows/{workflowReferenceCode}/enable : Enable a workflow
+     * POST /integration-instances/{id}/workflows/{workflowUuid}/enable : Enable a workflow
      * Enable a workflow.
      *
      * @param id The id of an integration instance. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -141,12 +141,12 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/integration-instances/{id}/workflows/{workflowReferenceCode}/enable"
+        value = "/integration-instances/{id}/workflows/{workflowUuid}/enable"
     )
     
     default ResponseEntity<Void> enableFrontendIntegrationInstanceWorkflow(
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -154,12 +154,12 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * POST /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable : Enable a workflow
+     * POST /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/enable : Enable a workflow
      * Enable a workflow.
      *
      * @param externalUserId The external user id. (required)
      * @param id The id of an integration instance. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -178,13 +178,13 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}/enable"
+        value = "/{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/enable"
     )
     
     default ResponseEntity<Void> enableIntegrationInstanceWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -192,11 +192,11 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * PUT /integration-instances/{id}/workflows/{workflowReferenceCode} : Update integration instance workflow
+     * PUT /integration-instances/{id}/workflows/{workflowUuid} : Update integration instance workflow
      * Update a workflow for a specific integration instance.
      *
      * @param id The id of an integration instance. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (required)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
@@ -216,13 +216,13 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/integration-instances/{id}/workflows/{workflowReferenceCode}",
+        value = "/integration-instances/{id}/workflows/{workflowUuid}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateFrontendIntegrationInstanceWorkflow(
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "", required = true) @Valid @RequestBody UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -231,12 +231,12 @@ public interface IntegrationInstanceWorkflowApi {
 
 
     /**
-     * PUT /{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode} : Update integration instance workflow
+     * PUT /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid} : Update integration instance workflow
      * Update a workflow for a specific integration instance.
      *
      * @param externalUserId The external user id. (required)
      * @param id The id of an integration instance. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param updateFrontendIntegrationInstanceWorkflowRequestModel  (required)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
@@ -256,14 +256,14 @@ public interface IntegrationInstanceWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/{externalUserId}/integration-instances/{id}/workflows/{workflowReferenceCode}",
+        value = "/{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateIntegrationInstanceWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "UpdateFrontendIntegrationInstanceWorkflowRequestModel", description = "", required = true) @Valid @RequestBody UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

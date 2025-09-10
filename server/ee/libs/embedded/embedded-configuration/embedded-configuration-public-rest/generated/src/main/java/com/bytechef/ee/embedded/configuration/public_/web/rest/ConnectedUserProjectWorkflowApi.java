@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:25:09.264658+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:31:59.920490+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Automation Workflow Public API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -53,7 +53,7 @@ public interface ConnectedUserProjectWorkflowApi {
      *
      * @param createFrontendProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
-     * @return The workflow reference code. (status code 200)
+     * @return The workflow uuid. (status code 200)
      */
     @Operation(
         operationId = "createFrontendProjectWorkflow",
@@ -61,7 +61,7 @@ public interface ConnectedUserProjectWorkflowApi {
         description = "Create new workflow and adds it to an existing integration.",
         tags = { "connected-user-project-workflow" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The workflow reference code.", content = {
+            @ApiResponse(responseCode = "200", description = "The workflow uuid.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
             })
         },
@@ -92,7 +92,7 @@ public interface ConnectedUserProjectWorkflowApi {
      * @param externalUserId The external user id. (required)
      * @param createFrontendProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
-     * @return The workflow reference code. (status code 200)
+     * @return The workflow uuid. (status code 200)
      */
     @Operation(
         operationId = "createProjectWorkflow",
@@ -100,7 +100,7 @@ public interface ConnectedUserProjectWorkflowApi {
         description = "Create new workflow and adds it to an existing integration.",
         tags = { "connected-user-project-workflow" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The workflow reference code.", content = {
+            @ApiResponse(responseCode = "200", description = "The workflow uuid.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
             })
         },
@@ -126,10 +126,10 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * DELETE /automation/workflows/{workflowReferenceCode} : Delete a workflow
+     * DELETE /automation/workflows/{workflowUuid} : Delete a workflow
      * Delete a workflow.
      *
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -144,11 +144,11 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/automation/workflows/{workflowReferenceCode}"
+        value = "/automation/workflows/{workflowUuid}"
     )
     
     default ResponseEntity<Void> deleteFrontendProjectWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -157,11 +157,11 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * DELETE /{externalUserId}/automation/workflows/{workflowReferenceCode} : Delete a workflow
+     * DELETE /{externalUserId}/automation/workflows/{workflowUuid} : Delete a workflow
      * Delete a workflow.
      *
      * @param externalUserId The external user id. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -176,12 +176,12 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}"
+        value = "/{externalUserId}/automation/workflows/{workflowUuid}"
     )
     
     default ResponseEntity<Void> deleteProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -190,10 +190,10 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * DELETE /automation/workflows/{workflowReferenceCode}/enable : Disable a workflow
+     * DELETE /automation/workflows/{workflowUuid}/enable : Disable a workflow
      * Disable a workflow.
      *
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -211,11 +211,11 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/automation/workflows/{workflowReferenceCode}/enable"
+        value = "/automation/workflows/{workflowUuid}/enable"
     )
     
     default ResponseEntity<Void> disableFrontendProjectWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -224,11 +224,11 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * DELETE /{externalUserId}/automation/workflows/{workflowReferenceCode}/enable : Disable a workflow
+     * DELETE /{externalUserId}/automation/workflows/{workflowUuid}/enable : Disable a workflow
      * Disable a workflow.
      *
      * @param externalUserId The external user id. (required)
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -246,12 +246,12 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/enable"
+        value = "/{externalUserId}/automation/workflows/{workflowUuid}/enable"
     )
     
     default ResponseEntity<Void> disableProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -260,10 +260,10 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * POST /automation/workflows/{workflowReferenceCode}/enable : Enable a workflow
+     * POST /automation/workflows/{workflowUuid}/enable : Enable a workflow
      * Enable a workflow.
      *
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -281,11 +281,11 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/automation/workflows/{workflowReferenceCode}/enable"
+        value = "/automation/workflows/{workflowUuid}/enable"
     )
     
     default ResponseEntity<Void> enableFrontendProjectWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -294,11 +294,11 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * POST /{externalUserId}/automation/workflows/{workflowReferenceCode}/enable : Enable a workflow
+     * POST /{externalUserId}/automation/workflows/{workflowUuid}/enable : Enable a workflow
      * Enable a workflow.
      *
      * @param externalUserId The external user id. (required)
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -316,12 +316,12 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/enable"
+        value = "/{externalUserId}/automation/workflows/{workflowUuid}/enable"
     )
     
     default ResponseEntity<Void> enableProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -330,10 +330,10 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * GET /automation/workflows/{workflowReferenceCode} : Get a workflow by workflow reference code
+     * GET /automation/workflows/{workflowUuid} : Get a workflow by workflow reference code
      * Get a workflow by workflow reference code.
      *
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param xEnvironment The environment. (optional)
      * @return The workflow object. (status code 200)
      */
@@ -350,18 +350,18 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/automation/workflows/{workflowReferenceCode}",
+        value = "/automation/workflows/{workflowUuid}",
         produces = { "application/json" }
     )
     
     default ResponseEntity<ConnectedUserProjectWorkflowModel> getFrontendProjectWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
+                    String exampleString = "{ \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowUuid\" : \"workflowUuid\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -402,7 +402,7 @@ public interface ConnectedUserProjectWorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
+                    String exampleString = "[ { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowUuid\" : \"workflowUuid\" }, { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowUuid\" : \"workflowUuid\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -414,11 +414,11 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * GET /{externalUserId}/automation/workflows/{workflowReferenceCode} : Get a workflow by workflow reference code
+     * GET /{externalUserId}/automation/workflows/{workflowUuid} : Get a workflow by workflow reference code
      * Get a workflow by workflow reference code.
      *
      * @param externalUserId The external user id. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param xEnvironment The environment. (optional)
      * @return The workflow object. (status code 200)
      */
@@ -435,19 +435,19 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}",
+        value = "/{externalUserId}/automation/workflows/{workflowUuid}",
         produces = { "application/json" }
     )
     
     default ResponseEntity<ConnectedUserProjectWorkflowModel> getProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" }";
+                    String exampleString = "{ \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowUuid\" : \"workflowUuid\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -490,7 +490,7 @@ public interface ConnectedUserProjectWorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\" } ]";
+                    String exampleString = "[ { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowUuid\" : \"workflowUuid\" }, { \"description\" : \"description\", \"definition\" : \"definition\", \"label\" : \"label\", \"workflowVersion\" : 0, \"enabled\" : true, \"workflowUuid\" : \"workflowUuid\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -502,10 +502,10 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * POST /automation/workflows/{workflowReferenceCode}/publish : Publishes existing workflow
+     * POST /automation/workflows/{workflowUuid}/publish : Publishes existing workflow
      * Publishes existing workflow.
      *
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param publishFrontendProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
@@ -524,12 +524,12 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/automation/workflows/{workflowReferenceCode}/publish",
+        value = "/automation/workflows/{workflowUuid}/publish",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> publishFrontendProjectWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "PublishFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
@@ -539,11 +539,11 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * POST /{externalUserId}/automation/workflows/{workflowReferenceCode}/publish : Publishes existing workflow
+     * POST /{externalUserId}/automation/workflows/{workflowUuid}/publish : Publishes existing workflow
      * Publishes existing workflow.
      *
      * @param externalUserId The external user id. (required)
-     * @param workflowReferenceCode The workflow reference code. (required)
+     * @param workflowUuid The workflow uuid. (required)
      * @param publishFrontendProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
@@ -562,13 +562,13 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/publish",
+        value = "/{externalUserId}/automation/workflows/{workflowUuid}/publish",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> publishProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "PublishFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
@@ -578,10 +578,10 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * PUT /automation/workflows/{workflowReferenceCode} : Update an existing workflow
+     * PUT /automation/workflows/{workflowUuid} : Update an existing workflow
      * Update an existing workflow.
      *
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param createFrontendProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
@@ -600,12 +600,12 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/automation/workflows/{workflowReferenceCode}",
+        value = "/automation/workflows/{workflowUuid}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateFrontendProjectWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
@@ -615,10 +615,10 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * PUT /automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey} : Update a workflow configuration connection
+     * PUT /automation/workflows/{workflowUuid}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey} : Update a workflow configuration connection
      * Update a workflow configuration connection.
      *
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param workflowNodeName The action/trigger name defined in the workflow. (required)
      * @param workflowConnectionKey The name of a workflow connection key. (required)
      * @param updateFrontendWorkflowConfigurationConnectionRequestModel  (required)
@@ -639,12 +639,12 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey}",
+        value = "/automation/workflows/{workflowUuid}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateFrontendWorkflowConfigurationConnection(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "workflowConnectionKey", description = "The name of a workflow connection key.", required = true, in = ParameterIn.PATH) @PathVariable("workflowConnectionKey") String workflowConnectionKey,
         @Parameter(name = "UpdateFrontendWorkflowConfigurationConnectionRequestModel", description = "", required = true) @Valid @RequestBody UpdateFrontendWorkflowConfigurationConnectionRequestModel updateFrontendWorkflowConfigurationConnectionRequestModel,
@@ -656,11 +656,11 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * PUT /{externalUserId}/automation/workflows/{workflowReferenceCode} : Update an existing workflow
+     * PUT /{externalUserId}/automation/workflows/{workflowUuid} : Update an existing workflow
      * Update an existing workflow.
      *
      * @param externalUserId The external user id. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param createFrontendProjectWorkflowRequestModel  (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
@@ -679,13 +679,13 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}",
+        value = "/{externalUserId}/automation/workflows/{workflowUuid}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
@@ -695,11 +695,11 @@ public interface ConnectedUserProjectWorkflowApi {
 
 
     /**
-     * PUT /{externalUserId}/automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connections/{workflowConnectionKey} : Update a workflow configuration connection
+     * PUT /{externalUserId}/automation/workflows/{workflowUuid}/workflow-nodes/{workflowNodeName}/connections/{workflowConnectionKey} : Update a workflow configuration connection
      * Update a workflow configuration connection.
      *
      * @param externalUserId The external user id. (required)
-     * @param workflowReferenceCode The workflow reference of the workflow to delete. (required)
+     * @param workflowUuid The workflow reference of the workflow to delete. (required)
      * @param workflowNodeName The action/trigger name defined in the workflow. (required)
      * @param workflowConnectionKey The name of a workflow connection key. (required)
      * @param updateFrontendWorkflowConfigurationConnectionRequestModel  (required)
@@ -720,13 +720,13 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/{externalUserId}/automation/workflows/{workflowReferenceCode}/workflow-nodes/{workflowNodeName}/connections/{workflowConnectionKey}",
+        value = "/{externalUserId}/automation/workflows/{workflowUuid}/workflow-nodes/{workflowNodeName}/connections/{workflowConnectionKey}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateWorkflowConfigurationConnection(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "workflowConnectionKey", description = "The name of a workflow connection key.", required = true, in = ParameterIn.PATH) @PathVariable("workflowConnectionKey") String workflowConnectionKey,
         @Parameter(name = "UpdateFrontendWorkflowConfigurationConnectionRequestModel", description = "", required = true) @Valid @RequestBody UpdateFrontendWorkflowConfigurationConnectionRequestModel updateFrontendWorkflowConfigurationConnectionRequestModel,

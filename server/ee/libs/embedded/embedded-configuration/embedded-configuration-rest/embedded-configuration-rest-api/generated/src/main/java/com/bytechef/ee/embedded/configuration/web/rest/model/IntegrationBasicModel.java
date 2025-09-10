@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T21:19:48.987812+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-10T05:32:04.722447+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class IntegrationBasicModel {
 
   private String componentName;
@@ -52,7 +52,7 @@ public class IntegrationBasicModel {
 
   private @Nullable IntegrationStatusModel lastStatus;
 
-  private @Nullable Integer lastVersion;
+  private @Nullable Integer lastIntegrationVersion;
 
   private Boolean multipleInstances = false;
 
@@ -270,24 +270,24 @@ public class IntegrationBasicModel {
     this.lastStatus = lastStatus;
   }
 
-  public IntegrationBasicModel lastVersion(@Nullable Integer lastVersion) {
-    this.lastVersion = lastVersion;
+  public IntegrationBasicModel lastIntegrationVersion(@Nullable Integer lastIntegrationVersion) {
+    this.lastIntegrationVersion = lastIntegrationVersion;
     return this;
   }
 
   /**
    * The last version of an integration.
-   * @return lastVersion
+   * @return lastIntegrationVersion
    */
   
-  @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("lastVersion")
-  public @Nullable Integer getLastVersion() {
-    return lastVersion;
+  @Schema(name = "lastIntegrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastIntegrationVersion")
+  public @Nullable Integer getLastIntegrationVersion() {
+    return lastIntegrationVersion;
   }
 
-  public void setLastVersion(@Nullable Integer lastVersion) {
-    this.lastVersion = lastVersion;
+  public void setLastIntegrationVersion(@Nullable Integer lastIntegrationVersion) {
+    this.lastIntegrationVersion = lastIntegrationVersion;
   }
 
   public IntegrationBasicModel multipleInstances(Boolean multipleInstances) {
@@ -349,14 +349,14 @@ public class IntegrationBasicModel {
         Objects.equals(this.lastModifiedDate, integrationBasic.lastModifiedDate) &&
         Objects.equals(this.lastPublishedDate, integrationBasic.lastPublishedDate) &&
         Objects.equals(this.lastStatus, integrationBasic.lastStatus) &&
-        Objects.equals(this.lastVersion, integrationBasic.lastVersion) &&
+        Objects.equals(this.lastIntegrationVersion, integrationBasic.lastIntegrationVersion) &&
         Objects.equals(this.multipleInstances, integrationBasic.multipleInstances) &&
         Objects.equals(this.name, integrationBasic.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastVersion, multipleInstances, name);
+    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name);
   }
 
   @Override
@@ -373,7 +373,7 @@ public class IntegrationBasicModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
-    sb.append("    lastVersion: ").append(toIndentedString(lastVersion)).append("\n");
+    sb.append("    lastIntegrationVersion: ").append(toIndentedString(lastIntegrationVersion)).append("\n");
     sb.append("    multipleInstances: ").append(toIndentedString(multipleInstances)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
