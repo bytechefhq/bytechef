@@ -33,7 +33,7 @@ const formSchema = z.object({
         message: 'Name must be at least 2 characters.',
     }),
     path: z.string(),
-    workflowReferenceCode: z.string().min(1),
+    workflowUuid: z.string().min(1),
 });
 
 interface ApiEndpointDialogProps {
@@ -65,7 +65,7 @@ const ApiCollectionEndpointDialog = ({
             httpMethod: apiEndpoint?.httpMethod,
             name: apiEndpoint?.name || '',
             path: apiEndpoint?.path || '',
-            workflowReferenceCode: apiEndpoint?.workflowReferenceCode || '',
+            workflowUuid: apiEndpoint?.workflowUuid || '',
         } as ApiCollectionEndpoint,
         resolver: zodResolver(formSchema),
     });
@@ -143,7 +143,7 @@ const ApiCollectionEndpointDialog = ({
 
                         <FormField
                             control={control}
-                            name="workflowReferenceCode"
+                            name="workflowUuid"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Workflow</FormLabel>
@@ -157,13 +157,12 @@ const ApiCollectionEndpointDialog = ({
                                                 if (!getValues('name')) {
                                                     setValue(
                                                         'name',
-                                                        workflows?.find(
-                                                            (workflow) => workflow.workflowReferenceCode === value
-                                                        )?.label ?? ''
+                                                        workflows?.find((workflow) => workflow.workflowUuid === value)
+                                                            ?.label ?? ''
                                                     );
                                                 }
                                             }}
-                                            value={apiEndpoint?.workflowReferenceCode}
+                                            value={apiEndpoint?.workflowUuid}
                                         >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Select Workflow" />
@@ -173,8 +172,8 @@ const ApiCollectionEndpointDialog = ({
                                                 {workflows &&
                                                     workflows.map((workflow) => (
                                                         <SelectItem
-                                                            key={workflow.workflowReferenceCode!}
-                                                            value={workflow.workflowReferenceCode!}
+                                                            key={workflow.workflowUuid!}
+                                                            value={workflow.workflowUuid!}
                                                         >
                                                             {workflow.label}
                                                         </SelectItem>

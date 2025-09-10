@@ -47,9 +47,7 @@ const ApiCollectionEndpointListItem = ({
 
     const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
 
-    const workflow = workflows.filter(
-        (workflow) => workflow.workflowReferenceCode === apiCollectionEndpoint.workflowReferenceCode
-    )[0];
+    const workflow = workflows.filter((workflow) => workflow.workflowUuid === apiCollectionEndpoint.workflowUuid)[0];
 
     const queryClient = useQueryClient();
 

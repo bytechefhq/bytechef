@@ -45,8 +45,8 @@ interface DialogProps {
     workflowsView?: boolean;
     form?: FormType;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-    handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
-    handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
+    handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
+    handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
     integration?: IntegrationType;
     isOAuth2?: boolean;
     isOpen: boolean;
@@ -153,8 +153,8 @@ const DialogHeader = ({closeDialog, integration}: DialogHeaderProps) => (
 );
 
 interface DialogWorkflowsContainerProps {
-    handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
-    handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
+    handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
+    handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
     selectedWorkflows: string[];
     mergedWorkflows: MergedWorkflowType[];
 }
@@ -175,21 +175,21 @@ const DialogWorkflowsContainer = ({
 
             <ul className={styles.workflowsList}>
                 {mergedWorkflows.map((mergedWorkflow) => {
-                    const {inputs, workflowReferenceCode, label} = mergedWorkflow;
+                    const {inputs, workflowUuid, label} = mergedWorkflow;
 
                     return (
-                        <li key={workflowReferenceCode}>
+                        <li key={workflowUuid}>
                             <div>
                                 <span>{label}</span>
 
                                 <Toggle
-                                    id={workflowReferenceCode}
-                                    pressed={selectedWorkflows.includes(workflowReferenceCode)}
-                                    onPressedChange={(pressed) => handleWorkflowToggle(workflowReferenceCode, pressed)}
+                                    id={workflowUuid}
+                                    pressed={selectedWorkflows.includes(workflowUuid)}
+                                    onPressedChange={(pressed) => handleWorkflowToggle(workflowUuid, pressed)}
                                 />
                             </div>
 
-                            {selectedWorkflows.includes(workflowReferenceCode) && (
+                            {selectedWorkflows.includes(workflowUuid) && (
                                 <div className={styles.workflowInputsContainer}>
                                     <span>INPUTS</span>
 
@@ -202,7 +202,7 @@ const DialogWorkflowsContainer = ({
                                                     <DialogInputField
                                                         onChange={(event) =>
                                                             handleWorkflowInputChange(
-                                                                workflowReferenceCode,
+                                                                workflowUuid,
                                                                 input.name,
                                                                 event.target.value
                                                             )
@@ -227,11 +227,10 @@ const DialogWorkflowsContainer = ({
 
 interface DialogContentProps {
     closeDialog: () => void;
-    integrationInstance?: IntegrationInstanceType;
     workflowsView?: boolean;
     form?: FormType;
-    handleWorkflowToggle: (workflowReferenceCode: string, pressed: boolean) => void;
-    handleWorkflowInputChange: (workflowReferenceCode: string, inputName: string, value: string) => void;
+    handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
+    handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
     integration: IntegrationType;
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;

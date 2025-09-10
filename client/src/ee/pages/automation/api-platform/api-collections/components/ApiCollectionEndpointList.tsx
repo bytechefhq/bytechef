@@ -57,8 +57,8 @@ const ApiCollectionEndpointList = ({
                                             projectDeploymentWorkflow={
                                                 projectDeployment.projectDeploymentWorkflows.find(
                                                     (projectDeploymentWorkflow) =>
-                                                        projectDeploymentWorkflow.workflowReferenceCode ===
-                                                        apiCollectionEndpoint.workflowReferenceCode
+                                                        projectDeploymentWorkflow.workflowUuid ===
+                                                        apiCollectionEndpoint.workflowUuid
                                                 )!
                                             }
                                             projectId={projectId}

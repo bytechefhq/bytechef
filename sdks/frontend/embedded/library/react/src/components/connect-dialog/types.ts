@@ -22,7 +22,7 @@ export interface MergedWorkflowType {
     inputs?: WorkflowInputType[];
     enabled?: boolean;
     label?: string;
-    workflowReferenceCode: string;
+    workflowUuid: string;
 }
 
 export interface IntegrationInstanceType {
@@ -35,13 +35,13 @@ export interface IntegrationInstanceType {
 export interface IntegrationInstanceWorkflowType {
     enabled?: boolean;
     inputs?: Record<string, unknown>;
-    workflowReferenceCode: string;
+    workflowUuid: string;
 }
 
 export interface IntegrationWorkflowType {
     inputs?: WorkflowInputType[];
     label?: string;
-    workflowReferenceCode: string;
+    workflowUuid: string;
 }
 
 export interface PropertyType {
