@@ -73,7 +73,12 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         Optional<T> optional = fetch(componentName, scope, scopeId, key, type);
 
-        return optional.orElseThrow(() -> new IllegalArgumentException("No value found for key: " + key));
+        return optional.orElseThrow(() -> new IllegalArgumentException(
+            "No value found for component: " + componentName +
+                ", scope: " + scope +
+                ", scopeId: " + scopeId +
+                ", key: " + key +
+                ", type: " + type));
     }
 
     @Override
