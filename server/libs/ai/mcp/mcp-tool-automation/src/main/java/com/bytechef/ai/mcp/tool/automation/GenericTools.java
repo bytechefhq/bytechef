@@ -200,13 +200,13 @@ public class GenericTools {
         @ToolParam(description = "The search query to match against task names and descriptions") String query,
         @ToolParam(
             description = "Type filter: 'action', 'trigger', 'flow', or null for all types (optional)") String type,
-        @ToolParam(description = "Limit on number of results returned (optional, defaults to 20)") Integer limit) {
+        @ToolParam(description = "Limit on number of results returned (optional, defaults to 30)") Integer limit) {
 
         try {
             List<TaskMinimalInfo> matchingTasks = new ArrayList<>();
             String normalizedType = type != null ? type.toLowerCase()
                 .trim() : null;
-            int effectiveLimit = limit != null ? limit : 20;
+            int effectiveLimit = limit != null ? limit : 30;
 
             // Determine which types to include
             boolean includeActions = normalizedType == null || "action".equals(normalizedType);
@@ -252,6 +252,12 @@ public class GenericTools {
                         "flow",
                         null));
                 }
+            }
+
+            // sort
+            if (normalizedType == null) {
+                matchingTasks.sort((task1, task2) -> ToolUtils.compareTasks(task1.name, task1.description,
+                    task1.componentName, task2.name, task2.description, task2.componentName, query.toLowerCase()));
             }
 
             // Apply limit (default 20 if not specified)
@@ -376,8 +382,8 @@ public class GenericTools {
             StringBuilder warnings = new StringBuilder("[");
 
             // Create a task definition provider that gets the task properties for validation
-            WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> 
-                getTaskProperties(type, name, componentName, version);
+            WorkflowValidator.TaskDefinitionProvider taskDefProvider =
+                (taskType, kind) -> getTaskProperties(type, name, componentName, version);
 
             // Use the refactored WorkflowValidator for single task validation
             WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);

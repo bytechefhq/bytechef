@@ -143,11 +143,21 @@ public class FlowTools {
                 .filter(flow -> ToolUtils.matchesQuery(
                     flow.getName(),
                     flow.getDescription(),
+                    null,
+                    null,
                     lowerQuery))
                 .map(flow -> new FlowMinimalInfo(
                     flow.getName(),
                     flow.getDescription(),
                     flow.getVersion()))
+                .sorted((flow1, flow2) -> ToolUtils.compareTasks(
+                    flow1.name(),
+                    flow1.description(),
+                    null,
+                    flow2.name(),
+                    flow2.description(),
+                    null,
+                    lowerQuery))
                 .toList();
 
             if (logger.isDebugEnabled()) {
