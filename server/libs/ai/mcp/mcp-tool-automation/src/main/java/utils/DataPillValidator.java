@@ -36,18 +36,21 @@ public class DataPillValidator {
     }
 
     /**
-     * Validates data pills in a task's parameters, with access to all tasks for loop type validation and task definition for type checking.
+     * Validates data pills in a task's parameters, with access to all tasks for loop type validation and task
+     * definition for type checking.
      */
     public static boolean validateTaskDataPills(
         JsonNode task, Map<String, ToolUtils.PropertyInfo> taskOutput,
         List<String> taskNames, Map<String, String> taskNameToTypeMap,
         StringBuilder errors, StringBuilder warnings, Map<String, JsonNode> allTasksMap,
         List<ToolUtils.PropertyInfo> taskDefinition) {
-        return validateTaskDataPills(task, taskOutput, taskNames, taskNameToTypeMap, errors, warnings, allTasksMap, taskDefinition, false);
+        return validateTaskDataPills(task, taskOutput, taskNames, taskNameToTypeMap, errors, warnings, allTasksMap,
+            taskDefinition, false);
     }
 
     /**
-     * Validates data pills in a task's parameters, with access to all tasks for loop type validation and task definition for type checking.
+     * Validates data pills in a task's parameters, with access to all tasks for loop type validation and task
+     * definition for type checking.
      */
     public static boolean validateTaskDataPills(
         JsonNode task, Map<String, ToolUtils.PropertyInfo> taskOutput,
@@ -75,7 +78,8 @@ public class DataPillValidator {
         JsonNode node, String currentPath, String currentTaskName,
         Map<String, ToolUtils.PropertyInfo> taskOutput, List<String> taskNames,
         Map<String, String> taskNameToTypeMap, StringBuilder errors,
-        StringBuilder warnings, TaskValidationContext context, Map<String, JsonNode> allTasksMap, List<ToolUtils.PropertyInfo> taskDefinition) {
+        StringBuilder warnings, TaskValidationContext context, Map<String, JsonNode> allTasksMap,
+        List<ToolUtils.PropertyInfo> taskDefinition) {
         if (node.isObject()) {
             node.fields()
                 .forEachRemaining(entry -> {
@@ -107,7 +111,8 @@ public class DataPillValidator {
         String text, String fieldPath, String currentTaskName,
         Map<String, ToolUtils.PropertyInfo> taskOutput, List<String> taskNames,
         Map<String, String> taskNameToTypeMap, StringBuilder errors,
-        StringBuilder warnings, TaskValidationContext context, Map<String, JsonNode> allTasksMap, List<ToolUtils.PropertyInfo> taskDefinition) {
+        StringBuilder warnings, TaskValidationContext context, Map<String, JsonNode> allTasksMap,
+        List<ToolUtils.PropertyInfo> taskDefinition) {
         Matcher matcher = DATA_PILL_PATTERN.matcher(text);
 
         while (matcher.find()) {
@@ -128,7 +133,8 @@ public class DataPillValidator {
         String dataPillExpression, String fieldPath, String currentTaskName,
         Map<String, ToolUtils.PropertyInfo> taskOutput, List<String> taskNames,
         Map<String, String> taskNameToTypeMap, StringBuilder errors,
-        StringBuilder warnings, TaskValidationContext context, String text, Map<String, JsonNode> allTasksMap, List<ToolUtils.PropertyInfo> taskDefinition) {
+        StringBuilder warnings, TaskValidationContext context, String text, Map<String, JsonNode> allTasksMap,
+        List<ToolUtils.PropertyInfo> taskDefinition) {
         String[] parts = dataPillExpression.split("\\.", 2);
         String referencedTaskName = parts[0];
         String propertyName = parts[1];
@@ -142,8 +148,7 @@ public class DataPillValidator {
             // Special case: allow loop tasks to reference their own 'item' output within their iteratee
             // This handles the case where nested tasks inside a loop's iteratee can reference loop.item
             boolean isLoopItemReference = (propertyName.equals("item") || propertyName.startsWith("item.")) &&
-                                        isLoopTask(referencedTaskName, taskNameToTypeMap);
-
+                isLoopTask(referencedTaskName, taskNameToTypeMap);
 
             if (referencedTaskIndex == -1 || (referencedTaskIndex >= currentTaskIndex && !isLoopItemReference)) {
                 ValidationErrorBuilder.append(errors,
@@ -172,7 +177,8 @@ public class DataPillValidator {
             // Get expected type from task definition if available
             String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
 
-            validateLoopItemTypes(dataPillExpression, referencedTaskName, expectedType, fieldPath, allTasksMap, errors, text, taskOutput);
+            validateLoopItemTypes(dataPillExpression, referencedTaskName, expectedType, fieldPath, allTasksMap, errors,
+                text, taskOutput);
             return;
         }
 
@@ -286,10 +292,11 @@ public class DataPillValidator {
         return taskType != null && taskType.startsWith("loop/");
     }
 
-    private static void validateLoopItemTypes(String dataPillExpression, String loopTaskName,
-                                             String expectedType, String fieldPath,
-                                             Map<String, JsonNode> allTasksMap, StringBuilder errors, String text,
-                                             Map<String, ToolUtils.PropertyInfo> taskOutput) {
+    private static void validateLoopItemTypes(
+        String dataPillExpression, String loopTaskName,
+        String expectedType, String fieldPath,
+        Map<String, JsonNode> allTasksMap, StringBuilder errors, String text,
+        Map<String, ToolUtils.PropertyInfo> taskOutput) {
         JsonNode loopTask = allTasksMap.get(loopTaskName);
         if (loopTask == null || !loopTask.has("parameters")) {
             return;
@@ -324,7 +331,8 @@ public class DataPillValidator {
                         + actualType.toLowerCase() + ", not " + expectedType.toLowerCase();
 
                     // Avoid duplicate errors
-                    if (!errors.toString().contains(errorMessage)) {
+                    if (!errors.toString()
+                        .contains(errorMessage)) {
                         ValidationErrorBuilder.append(errors, errorMessage);
                     }
                 }
@@ -339,10 +347,11 @@ public class DataPillValidator {
         }
     }
 
-    private static void validateLoopItemTypesFromDataPill(String dataPillExpression, String itemsDataPill,
-                                                         String expectedType, String fieldPath,
-                                                         Map<String, JsonNode> allTasksMap, StringBuilder errors, String text,
-                                                         Map<String, ToolUtils.PropertyInfo> taskOutput) {
+    private static void validateLoopItemTypesFromDataPill(
+        String dataPillExpression, String itemsDataPill,
+        String expectedType, String fieldPath,
+        Map<String, JsonNode> allTasksMap, StringBuilder errors, String text,
+        Map<String, ToolUtils.PropertyInfo> taskOutput) {
         // Extract the data pill content (e.g., "task1.items" from "${task1.items}")
         String dataPillContent = itemsDataPill.substring(2, itemsDataPill.length() - 1);
 
@@ -361,7 +370,8 @@ public class DataPillValidator {
         }
 
         // Get the source task's type and find its output definition
-        String sourceTaskType = sourceTask.get("type").asText();
+        String sourceTaskType = sourceTask.get("type")
+            .asText();
         ToolUtils.PropertyInfo sourceTaskOutput = taskOutput.get(sourceTaskType);
 
         if (sourceTaskOutput == null) {
@@ -376,23 +386,28 @@ public class DataPillValidator {
                 String propertyName = itemParts[1];
 
                 // Find the array property in the source task output (e.g., "elements")
-                ToolUtils.PropertyInfo arrayProperty = PropertyUtils.findPropertyByName(sourceTaskOutput, sourcePropertyName);
-                if (arrayProperty != null && arrayProperty.nestedProperties() != null && !arrayProperty.nestedProperties().isEmpty()) {
+                ToolUtils.PropertyInfo arrayProperty =
+                    PropertyUtils.findPropertyByName(sourceTaskOutput, sourcePropertyName);
+                if (arrayProperty != null && arrayProperty.nestedProperties() != null
+                    && !arrayProperty.nestedProperties()
+                        .isEmpty()) {
                     // Get the array element definition (first nested property)
-                    ToolUtils.PropertyInfo arrayElementProperty = arrayProperty.nestedProperties().get(0);
+                    ToolUtils.PropertyInfo arrayElementProperty = arrayProperty.nestedProperties()
+                        .get(0);
                     if (arrayElementProperty != null && arrayElementProperty.nestedProperties() != null) {
                         // Find the specific property within the array element
-                        ToolUtils.PropertyInfo targetProperty = PropertyUtils.findPropertyByName(arrayElementProperty, propertyName);
+                        ToolUtils.PropertyInfo targetProperty =
+                            PropertyUtils.findPropertyByName(arrayElementProperty, propertyName);
                         if (targetProperty != null) {
                             String actualType = JsonUtils.mapTypeToString(targetProperty.type());
 
                             if (!TypeCompatibilityChecker.isTypeCompatible(expectedType, actualType)) {
-                                // Generate errors for each array element (simulating 3 elements based on test expectations)
+                                // Generate errors for each array element (simulating 3 elements based on test
+                                // expectations)
                                 for (int i = 0; i < 3; i++) {
                                     String errorMessage = String.format(
                                         "Property 'loop1.item[%d].%s' in output of 'loop/v1' is of type %s, not %s",
-                                        i, propertyName, actualType, expectedType.toLowerCase()
-                                    );
+                                        i, propertyName, actualType, expectedType.toLowerCase());
                                     ValidationErrorBuilder.append(errors, errorMessage);
                                 }
                             }
@@ -402,7 +417,6 @@ public class DataPillValidator {
             }
         }
     }
-
 
     static class TaskValidationContext {
         boolean stopProcessing = false;

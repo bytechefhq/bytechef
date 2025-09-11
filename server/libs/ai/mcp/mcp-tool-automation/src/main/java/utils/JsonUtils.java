@@ -20,8 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * Centralized utility class for JSON operations and type utilities.
- * Consolidates common JSON operations that were duplicated across multiple classes.
+ * Centralized utility class for JSON operations and type utilities. Consolidates common JSON operations that were
+ * duplicated across multiple classes.
  */
 public class JsonUtils {
 
@@ -30,8 +30,8 @@ public class JsonUtils {
     }
 
     /**
-     * Gets the type of a JsonNode as a lowercase string.
-     * Centralized implementation to replace duplicated getJsonNodeType methods.
+     * Gets the type of a JsonNode as a lowercase string. Centralized implementation to replace duplicated
+     * getJsonNodeType methods.
      */
     public static String getJsonNodeType(JsonNode node) {
         if (node == null) {
@@ -91,7 +91,8 @@ public class JsonUtils {
         }
 
         if (!node.isObject()) {
-            errors.append(nodeType).append(" must be an object");
+            errors.append(nodeType)
+                .append(" must be an object");
             return false;
         }
 
