@@ -19,8 +19,8 @@ package com.bytechef.component.spotify;
 import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction;
 import com.google.auto.service.AutoService;
@@ -33,12 +33,12 @@ import java.util.List;
 public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
 
     @Override
-    public List<? extends ModifiableActionDefinition> getCustomActions() {
+    public List<ModifiableActionDefinition> getCustomActions() {
         return List.of(SpotifyCreatePlaylistAction.ACTION_DEFINITION);
     }
 
     @Override
-    public List<ClusterElementDefinition<?>> getCustomClusterElements() {
+    public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
         return List.of(tool(SpotifyCreatePlaylistAction.ACTION_DEFINITION));
     }
 

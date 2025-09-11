@@ -19,7 +19,7 @@ package com.bytechef.component.approval.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class ApprovalLinkCreateApprovalLinksAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("createApprovalLinks")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createApprovalLinks")
         .title("Create Approval Links")
         .description("Creates approval/disapproval links.")
         .properties()

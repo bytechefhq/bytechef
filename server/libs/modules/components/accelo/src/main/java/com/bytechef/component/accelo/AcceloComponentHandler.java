@@ -39,7 +39,7 @@ import java.util.List;
 public class AcceloComponentHandler extends AbstractAcceloComponentHandler {
 
     @Override
-    public List<? extends ModifiableActionDefinition> getCustomActions() {
+    public List<ModifiableActionDefinition> getCustomActions() {
         return List.of(AcceloCreateTaskAction.ACTION_DEFINITION);
     }
 

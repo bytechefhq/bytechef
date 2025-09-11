@@ -20,9 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.apify.action.ApifyStartActorAction;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 import java.util.List;
@@ -34,12 +34,12 @@ import java.util.List;
 public class ApifyComponentHandler extends AbstractApifyComponentHandler {
 
     @Override
-    public List<? extends ModifiableActionDefinition> getCustomActions() {
+    public List<ModifiableActionDefinition> getCustomActions() {
         return List.of(ApifyStartActorAction.ACTION_DEFINITION);
     }
 
     @Override
-    public List<ClusterElementDefinition<?>> getCustomClusterElements() {
+    public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
         return List.of(tool(ApifyStartActorAction.ACTION_DEFINITION));
     }
 

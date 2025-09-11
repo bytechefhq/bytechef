@@ -21,8 +21,8 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_PRO
 
 import com.bytechef.component.csv.file.util.CsvFileReadUtils;
 import com.bytechef.component.csv.file.util.ReadConfiguration;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.ItemReader;
@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class CsvFileItemReader implements ItemReader {
 
-    public static final ClusterElementDefinition<CsvFileItemReader> CLUSTER_ELEMENT_DEFINITION =
+    public static final ModifiableClusterElementDefinition<CsvFileItemReader> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<CsvFileItemReader>clusterElement("reader")
             .title("Read CSV file row")
             .type(SOURCE)

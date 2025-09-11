@@ -27,9 +27,9 @@ import com.bytechef.component.bitbucket.action.BitbucketListProjectsAction;
 import com.bytechef.component.bitbucket.action.BitbucketListRepositoriesAction;
 import com.bytechef.component.bitbucket.trigger.BitbucketRepositoryPushTrigger;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -43,7 +43,7 @@ import java.util.List;
 public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler {
 
     @Override
-    public List<? extends ModifiableActionDefinition> getCustomActions() {
+    public List<ModifiableActionDefinition> getCustomActions() {
         return List.of(
             BitbucketListProjectsAction.ACTION_DEFINITION,
             BitbucketListRepositoriesAction.ACTION_DEFINITION);
@@ -55,8 +55,9 @@ public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler
     }
 
     @Override
-    public List<ClusterElementDefinition<?>>
-        modifyClusterElements(ClusterElementDefinition<?>... clusterElementDefinitions) {
+    public List<ModifiableClusterElementDefinition<?>> modifyClusterElements(
+        ModifiableClusterElementDefinition<?>... clusterElementDefinitions) {
+
         return List.of(
             tool(BitbucketListProjectsAction.ACTION_DEFINITION),
             tool(BitbucketListRepositoriesAction.ACTION_DEFINITION));
@@ -71,8 +72,8 @@ public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler
     }
 
     @Override
-    public ModifiableConnectionDefinition
-        modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://api.bitbucket.org/2.0")

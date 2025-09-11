@@ -28,8 +28,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import org.springframework.ai.chat.model.ChatModel;
@@ -39,7 +39,7 @@ import org.springframework.ai.chat.model.ChatModel;
  */
 public class AzureOpenAiChatModel {
 
-    public static final ClusterElementDefinition<ModelFunction> CLUSTER_ELEMENT_DEFINITION =
+    public static final ModifiableClusterElementDefinition<ModelFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ModelFunction>clusterElement("model")
             .title("Azure OpenAI Model")
             .description("OpenAI model.")

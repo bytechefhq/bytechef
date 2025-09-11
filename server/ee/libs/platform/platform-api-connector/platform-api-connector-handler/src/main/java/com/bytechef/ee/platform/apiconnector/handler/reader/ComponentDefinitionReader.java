@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.platform.apiconnector.handler.util;
+package com.bytechef.ee.platform.apiconnector.handler.reader;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -31,6 +38,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +50,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class ComponentDefinitionHelper {
+public class ComponentDefinitionReader {
 
     private static final Function<ActionDefinition, ActionDefinition.SingleConnectionPerformFunction> PERFORM_FUNCTION_FUNCTION =
         actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
@@ -55,13 +63,16 @@ public class ComponentDefinitionHelper {
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public ComponentDefinitionHelper(
-        ApiConnectorFileStorage apiConnectorFileStorage, ObjectMapper objectMapper) {
-
+    public ComponentDefinitionReader(ApiConnectorFileStorage apiConnectorFileStorage, ObjectMapper objectMapper) {
         this.apiConnectorFileStorage = apiConnectorFileStorage;
         this.objectMapper = objectMapper.copy()
             .addMixIn(Property.class, PropertyMixIn.class)
             .addMixIn(BaseProperty.BaseValueProperty.class, PropertyMixIn.class);
+
+        registerAbstractTypeMapping(ActionDefinition.class, ModifiableActionDefinition.class);
+        registerAbstractTypeMapping(ConnectionDefinition.class, ModifiableConnectionDefinition.class);
+        registerAbstractTypeMapping(ClusterElementDefinition.class, ModifiableClusterElementDefinition.class);
+        registerAbstractTypeMapping(TriggerDefinition.class, ModifiableTriggerDefinition.class);
     }
 
     public ComponentDefinitionWrapper readComponentDefinition(ApiConnector apiConnector) {
@@ -83,6 +94,14 @@ public class ComponentDefinitionHelper {
                         actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition)))
                     .toList())
                 .orElse(List.of()));
+    }
+
+    private <T> void registerAbstractTypeMapping(Class<T> abstractType, Class<? extends T> concreteType) {
+        SimpleModule simpleModule = new SimpleModule();
+
+        simpleModule.addAbstractTypeMapping(abstractType, concreteType);
+
+        objectMapper.registerModule(simpleModule);
     }
 
     @JsonTypeInfo(

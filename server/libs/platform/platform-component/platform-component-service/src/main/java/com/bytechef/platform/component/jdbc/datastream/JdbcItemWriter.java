@@ -19,7 +19,7 @@ package com.bytechef.platform.component.jdbc.datastream;
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.ItemWriter;
@@ -46,7 +46,7 @@ public class JdbcItemWriter implements ItemWriter {
         this.insertJdbcOperation = new InsertJdbcOperation();
     }
 
-    public static ClusterElementDefinition<?> clusterElementDefinition(
+    public static ModifiableClusterElementDefinition<?> clusterElementDefinition(
         String databaseJdbcName, String jdbcDriverClassName) {
 
         return clusterElement("writer")

@@ -17,8 +17,8 @@
 package com.bytechef.component;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
@@ -47,7 +47,7 @@ public interface OpenApiComponentHandler extends ComponentHandler {
      *
      * @return
      */
-    default List<? extends ModifiableActionDefinition> getCustomActions() {
+    default List<ModifiableActionDefinition> getCustomActions() {
         return List.of();
     }
 
@@ -55,7 +55,7 @@ public interface OpenApiComponentHandler extends ComponentHandler {
      *
      * @return
      */
-    default List<ClusterElementDefinition<?>> getCustomClusterElements() {
+    default List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
         return List.of();
     }
 
@@ -72,7 +72,7 @@ public interface OpenApiComponentHandler extends ComponentHandler {
      * @param actionDefinitions
      * @return
      */
-    default List<? extends ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+    default List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         return Stream.concat(Arrays.stream(actionDefinitions), getCustomActions().stream())
             .map(this::modifyAction)
             .map(actionDefinition -> {
@@ -102,8 +102,8 @@ public interface OpenApiComponentHandler extends ComponentHandler {
      * @param clusterElementDefinitions
      * @return
      */
-    default List<ClusterElementDefinition<?>> modifyClusterElements(
-        ClusterElementDefinition<?>... clusterElementDefinitions) {
+    default List<ModifiableClusterElementDefinition<?>> modifyClusterElements(
+        ModifiableClusterElementDefinition<?>... clusterElementDefinitions) {
 
         return Stream.concat(Stream.of(clusterElementDefinitions), getCustomClusterElements().stream())
             .toList();
