@@ -18,14 +18,14 @@ package com.bytechef.atlas.execution.repository.jdbc.config;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.FileEntryToStringConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
+import com.bytechef.commons.data.jdbc.converter.ExecutionErrorToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
