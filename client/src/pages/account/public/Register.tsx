@@ -68,9 +68,7 @@ const Register = () => {
         }))
     );
 
-    const {
-        signUp: {activationRequired},
-    } = useApplicationInfoStore();
+    const activationRequired = useApplicationInfoStore((state) => state.signUp);
 
     const ff_1874 = useFeatureFlagsStore()('ff-1874');
 
