@@ -667,8 +667,7 @@ class WorkflowValidatorTest {
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
             new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)
-            )),
+                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null))),
             new ToolUtils.PropertyInfo("config", "OBJECT", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
@@ -695,8 +694,7 @@ class WorkflowValidatorTest {
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
             new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)
-            )));
+                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -731,9 +729,7 @@ class WorkflowValidatorTest {
             new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
                 new ToolUtils.PropertyInfo("ignoredName", "OBJECT", null, false, true, null, List.of(
                     new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null)
-                ))
-            )));
+                    new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -770,8 +766,7 @@ class WorkflowValidatorTest {
             new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
                 new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("adult", "BOOLEAN", null, true, true, "items[index].age >= 18", null)
-            )));
+                new ToolUtils.PropertyInfo("adult", "BOOLEAN", null, true, true, "items[index].age >= 18", null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1777,7 +1772,7 @@ class WorkflowValidatorTest {
             }
             """;
 
-       List<ToolUtils.PropertyInfo> taskDefinition = List.of(
+        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
             new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
             new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
                 new ToolUtils.PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
@@ -1785,36 +1780,29 @@ class WorkflowValidatorTest {
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null)
-                    )),
+                        new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
                     new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null)
-                    )),
+                        new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
                     new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true, "conditions[index][index].operation != 'EMPTY'", null)
-                    )),
+                        new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
+                            "conditions[index][index].operation != 'EMPTY'", null))),
                     new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "STRING", null, true, true, "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null)
-                    ))
-                ))
-            )),
+                        new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
+                            "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
             new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
             new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)
-            )),
+                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))),
             new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)
-            ))
-        );
+                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1852,36 +1840,29 @@ class WorkflowValidatorTest {
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null)
-                    )),
+                        new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
                     new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null)
-                    )),
+                        new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
                     new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true, "conditions[index][index].operation != 'EMPTY'", null)
-                    )),
+                        new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
+                            "conditions[index][index].operation != 'EMPTY'", null))),
                     new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "STRING", null, true, true, "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null)
-                    ))
-                ))
-            )),
+                        new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
+                            "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
             new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
             new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)
-            )),
+                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))),
             new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)
-            ))
-        );
+                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1933,36 +1914,29 @@ class WorkflowValidatorTest {
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null)
-                    )),
+                        new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
                     new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null)
-                    )),
+                        new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
                     new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true, "conditions[index][index].operation != 'EMPTY'", null)
-                    )),
+                        new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
+                            "conditions[index][index].operation != 'EMPTY'", null))),
                     new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
                         new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                         new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
                         new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "STRING", null, true, true, "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null)
-                    ))
-                ))
-            )),
+                        new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
+                            "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
             new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
             new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)
-            )),
+                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))),
             new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)
-            ))
-        );
+                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1972,7 +1946,7 @@ class WorkflowValidatorTest {
         assertEquals("", warnings.toString());
     }
 
-    //same name tasks error, maybe workflow_struct
+    // same name tasks error, maybe workflow_struct
 
     @Test
     void validateWorkflowTasks_validTasks_noErrors() {
@@ -2002,12 +1976,10 @@ class WorkflowValidatorTest {
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action1);
@@ -2085,8 +2057,7 @@ class WorkflowValidatorTest {
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1);
@@ -2142,8 +2113,7 @@ class WorkflowValidatorTest {
                 new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null))
-        );
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action1);
@@ -2198,8 +2168,7 @@ class WorkflowValidatorTest {
                 new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null))
-        );
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action1);
@@ -2267,8 +2236,7 @@ class WorkflowValidatorTest {
                 new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)),
             "component/v1/action2", List.of(
                 new ToolUtils.PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null))
-        );
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action3, "component/v1/action1", action1);
@@ -2284,8 +2252,10 @@ class WorkflowValidatorTest {
 
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
-            assertEquals("Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2", errors.toString());
-            assertEquals("Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'", warnings.toString());
+            assertEquals("Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2",
+                errors.toString());
+            assertEquals("Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'",
+                warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception for valid tasks: " + e.getMessage());
         }
@@ -2353,11 +2323,9 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1,
@@ -2408,11 +2376,9 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1);
@@ -2468,12 +2434,10 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1,
@@ -2524,12 +2488,10 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1);
@@ -2577,11 +2539,9 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of();
 
@@ -2631,13 +2591,11 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
                 new ToolUtils.PropertyInfo("height", "NUMBER", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", actionObj);
@@ -2687,13 +2645,11 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
                 new ToolUtils.PropertyInfo("height", "NUMBER", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", actionArr);
@@ -2750,14 +2706,11 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("configs", "ARRAY", null, false, true, null, List.of(
                     new ToolUtils.PropertyInfo("setting", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("enabled", "BOOLEAN", null, false, true, null, null)
-                ))
-            ));
+                    new ToolUtils.PropertyInfo("enabled", "BOOLEAN", null, false, true, null, null)))));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1);
@@ -2808,13 +2761,11 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
                 new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("value", "STRING", null, false, true, null, null)
-            ));
+                new ToolUtils.PropertyInfo("value", "STRING", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1);
@@ -2887,22 +2838,16 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "loop/v1", List.of(
                 new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
                 new ToolUtils.PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
                 new ToolUtils.PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK",null, false, true, null, null)
-                ))
-            ),
+                    new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action2", List.of(
-                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null)
-            )
-        );
+                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", actionArr,
@@ -2972,22 +2917,16 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "loop/v1", List.of(
                 new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
                 new ToolUtils.PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
                 new ToolUtils.PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK",null, false, true, null, null)
-                ))
-            ),
+                    new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action2", List.of(
-                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null)
-            )
-        );
+                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", actionArr,
@@ -3007,7 +2946,8 @@ class WorkflowValidatorTest {
             assertEquals("""
                 Property 'loop1.item[0].propBool' in output of 'loop/v1' is of type boolean, not number
                 Property 'loop1.item[1].propBool' in output of 'loop/v1' is of type boolean, not number
-                Property 'loop1.item[2].propBool' in output of 'loop/v1' is of type boolean, not number""", errors.toString());
+                Property 'loop1.item[2].propBool' in output of 'loop/v1' is of type boolean, not number""",
+                errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -3069,8 +3009,7 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "condition/v1", List.of(
                 new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
                 new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
@@ -3079,40 +3018,31 @@ class WorkflowValidatorTest {
                             new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                             new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
                             new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null)
-                        )),
+                            new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
                         new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
                             new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                             new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
                             new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null)
-                        )),
+                            new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
                         new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
                             new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                             new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
                             new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true, "conditions[index][index].operation != 'EMPTY'", null)
-                        )),
+                            new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
+                                "conditions[index][index].operation != 'EMPTY'", null))),
                         new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
                             new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                             new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
                             new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "STRING", null, true, true, "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null)
-                        ))
-                    ))
-                )),
+                            new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
+                                "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
                 new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
                 new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)
-                )),
+                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null))),
                 new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)
-                ))
-            ),
+                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            )
-        );
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1,
@@ -3197,8 +3127,7 @@ class WorkflowValidatorTest {
 
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-            ),
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "condition/v1", List.of(
                 new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
                 new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
@@ -3207,40 +3136,31 @@ class WorkflowValidatorTest {
                             new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                             new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
                             new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null)
-                        )),
+                            new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
                         new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
                             new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                             new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
                             new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null)
-                        )),
+                            new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
                         new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
                             new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                             new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
                             new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true, "conditions[index][index].operation != 'EMPTY'", null)
-                        )),
+                            new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
+                                "conditions[index][index].operation != 'EMPTY'", null))),
                         new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
                             new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
                             new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
                             new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "STRING", null, true, true, "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null)
-                        ))
-                    ))
-                )),
+                            new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
+                                "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
                 new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
                 new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)
-                )),
+                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null))),
                 new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)
-                ))
-            ),
+                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)
-            )
-        );
+                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1,
@@ -3260,7 +3180,121 @@ class WorkflowValidatorTest {
             assertEquals("Missing required property: name", errors.toString());
             assertEquals("""
                 Property 'age' is not defined in task definition
-                Property 'task1.propNumber' might not exist in the output of 'component/v1/trigger1'""", warnings.toString());
+                Property 'task1.propNumber' might not exist in the output of 'component/v1/trigger1'""",
+                warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    // TODO
+    @Test
+    void validateWorkflowTasks_flowConditionAndLoop_noErrors() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                     "label": "Condition",
+                     "name": "condition_1",
+                     "type": "condition/v1",
+                     "parameters": {
+                         "rawExpression": false,
+                         "conditions": [
+                            [
+                                {
+                                    "type": "string",
+                                    "value1": "${task1.propString}",
+                                    "operation": "EQUALS",
+                                    "value2": "Mario"
+                                }
+                            ]
+                         ],
+                         "caseTrue": [
+                            {
+                                "label": "Task 3",
+                                "name": "task3",
+                                "type": "component/v1/action1",
+                                "parameters": {
+                                    "name": "${task1.propString}"
+                                }
+                            }
+                         ],
+                         "caseFalse": [
+                            {
+                                "label": "Task 2",
+                                "name": "task2",
+                                "type": "component/v1/action1",
+                                "parameters": {
+                                    "name": "${task1.propString}"
+                                }
+                            }
+                         ]
+                     }
+                }
+            ]
+            """;
+
+        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+            "component/v1/trigger1", List.of(
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+            "condition/v1", List.of(
+                new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+                new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
+                    new ToolUtils.PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
+                        new ToolUtils.PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
+                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
+                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
+                        new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
+                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
+                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
+                        new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
+                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
+                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
+                                "conditions[index][index].operation != 'EMPTY'", null))),
+                        new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
+                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
+                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
+                                "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
+                new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
+                new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
+                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null))),
+                new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
+                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)))),
+            "component/v1/action1", List.of(
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)));
+
+        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+            "component/v1/trigger1", trigger1,
+            "component/v1/action1", action1);
+
+        try {
+            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
+            List<JsonNode> tasks = new ArrayList<>();
+            for (JsonNode taskNode : tasksNode) {
+                tasks.add(taskNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -3298,13 +3332,14 @@ class WorkflowValidatorTest {
 
         // Mock task definition and output providers
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null));
 
-        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) ->
-            new ToolUtils.PropertyInfo("result", "STRING", null, false, false, null, null);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> new ToolUtils.PropertyInfo("result", "STRING", null, false, false,
+                null, null);
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(), new HashMap<>(), errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(),
+            new HashMap<>(), errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -3326,7 +3361,8 @@ class WorkflowValidatorTest {
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(), new HashMap<>(), errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(),
+            new HashMap<>(), errors, warnings);
 
         assertEquals("Missing required field: label", errors.toString());
         assertEquals("", warnings.toString());
@@ -3369,7 +3405,8 @@ class WorkflowValidatorTest {
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(), new HashMap<>(), errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(),
+            new HashMap<>(), errors, warnings);
 
         assertEquals("Tasks cannot have repeating names: duplicate_name", errors.toString());
         assertEquals("", warnings.toString());
@@ -3442,12 +3479,15 @@ class WorkflowValidatorTest {
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
         Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions, taskOutputs, errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions,
+            taskOutputs, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
-        assertEquals("{component/v1/action1=[], component/v1/trigger1=[], condition/v1=[]}", taskDefinitions.toString());
-        assertEquals("{component/v1/action1=null, component/v1/trigger1=null, condition/v1=null}", taskOutputs.toString());
+        assertEquals("{component/v1/action1=[], component/v1/trigger1=[], condition/v1=[]}",
+            taskDefinitions.toString());
+        assertEquals("{component/v1/action1=null, component/v1/trigger1=null, condition/v1=null}",
+            taskOutputs.toString());
     }
 
     @Test
@@ -3506,12 +3546,15 @@ class WorkflowValidatorTest {
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
         Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions, taskOutputs, errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions,
+            taskOutputs, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
-        assertEquals("{component/v1/action2=[], component/v1/action1=[], component/v1/trigger1=[], loop/v1=[]}", taskDefinitions.toString());
-        assertEquals("{component/v1/action2=null, component/v1/action1=null, component/v1/trigger1=null, loop/v1=null}", taskOutputs.toString());
+        assertEquals("{component/v1/action2=[], component/v1/action1=[], component/v1/trigger1=[], loop/v1=[]}",
+            taskDefinitions.toString());
+        assertEquals("{component/v1/action2=null, component/v1/action1=null, component/v1/trigger1=null, loop/v1=null}",
+            taskOutputs.toString());
     }
 
     @Test
@@ -3608,12 +3651,17 @@ class WorkflowValidatorTest {
         Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
         Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions, taskOutputs, errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions,
+            taskOutputs, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
-        assertEquals("{component/v1/action2=[], component/v1/action1=[], component/v1/trigger1=[], loop/v1=[], condition/v1=[]}", taskDefinitions.toString());
-        assertEquals("{component/v1/action2=null, component/v1/action1=null, component/v1/trigger1=null, loop/v1=null, condition/v1=null}", taskOutputs.toString());
+        assertEquals(
+            "{component/v1/action2=[], component/v1/action1=[], component/v1/trigger1=[], loop/v1=[], condition/v1=[]}",
+            taskDefinitions.toString());
+        assertEquals(
+            "{component/v1/action2=null, component/v1/action1=null, component/v1/trigger1=null, loop/v1=null, condition/v1=null}",
+            taskOutputs.toString());
     }
 
     @Test
@@ -3635,8 +3683,7 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of(
             new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null));
 
         WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);
 
@@ -3683,8 +3730,7 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of(
             new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null));
 
         WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);
 
@@ -3703,7 +3749,8 @@ class WorkflowValidatorTest {
 
         List<ToolUtils.PropertyInfo> result = provider.getTaskProperties("test/v1", "action");
         assertEquals(1, result.size());
-        assertEquals("test", result.get(0).name());
+        assertEquals("test", result.get(0)
+            .name());
 
         List<ToolUtils.PropertyInfo> emptyResult = provider.getTaskProperties("unknown/v1", "action");
         assertTrue(emptyResult.isEmpty());
@@ -3715,7 +3762,8 @@ class WorkflowValidatorTest {
             if ("test/v1".equals(taskType)) {
                 return new ToolUtils.PropertyInfo("output", "STRING", null, false, false, null, null);
             }
-            warnings.append("Unknown task type: ").append(taskType);
+            warnings.append("Unknown task type: ")
+                .append(taskType);
             return null;
         };
 
@@ -3727,6 +3775,7 @@ class WorkflowValidatorTest {
 
         ToolUtils.PropertyInfo nullResult = provider.getTaskOutputProperty("unknown/v1", "action", warnings);
         assertNull(nullResult);
-        assertTrue(warnings.toString().contains("Unknown task type: unknown/v1"));
+        assertTrue(warnings.toString()
+            .contains("Unknown task type: unknown/v1"));
     }
 }

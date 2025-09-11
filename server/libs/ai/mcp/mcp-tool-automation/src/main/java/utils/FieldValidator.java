@@ -89,7 +89,8 @@ public class FieldValidator {
                 ValidationErrorBuilder.appendWithNewline(errors, "Field 'triggers' must be an array");
             } else if (triggers.size() > 1) {
                 ValidationErrorBuilder.appendWithNewline(errors, "Field 'triggers' must contain one or less objects");
-            } else if (triggers.size() ==1 && !triggers.get(0).isObject()) {
+            } else if (triggers.size() == 1 && !triggers.get(0)
+                .isObject()) {
                 ValidationErrorBuilder.appendWithNewline(errors, "Trigger must be an object");
             }
         }
@@ -191,7 +192,8 @@ public class FieldValidator {
             // Check if all elements are simple text types (union)
             isUnionType = true;
             for (int i = 0; i < defValue.size(); i++) {
-                if (!defValue.get(i).isTextual()) {
+                if (!defValue.get(i)
+                    .isTextual()) {
                     isUnionType = false;
                     break;
                 }
@@ -211,14 +213,16 @@ public class FieldValidator {
     /**
      * Validates array elements that can be one of multiple simple types (union types).
      */
-    private static void validateUnionArrayElements(JsonNode arrayValue, JsonNode allowedTypes, String propertyPath, StringBuilder errors) {
+    private static void validateUnionArrayElements(
+        JsonNode arrayValue, JsonNode allowedTypes, String propertyPath, StringBuilder errors) {
         for (int i = 0; i < arrayValue.size(); i++) {
             JsonNode element = arrayValue.get(i);
             boolean matchesAnyType = false;
 
             // Check if element matches any of the allowed types
             for (int j = 0; j < allowedTypes.size(); j++) {
-                String allowedType = allowedTypes.get(j).asText();
+                String allowedType = allowedTypes.get(j)
+                    .asText();
                 if (isTypeValid(element, allowedType)) {
                     matchesAnyType = true;
                     break;
@@ -233,8 +237,10 @@ public class FieldValidator {
                 // Build expected types string
                 StringBuilder expectedTypes = new StringBuilder();
                 for (int j = 0; j < allowedTypes.size(); j++) {
-                    if (j > 0) expectedTypes.append(" or ");
-                    expectedTypes.append(allowedTypes.get(j).asText());
+                    if (j > 0)
+                        expectedTypes.append(" or ");
+                    expectedTypes.append(allowedTypes.get(j)
+                        .asText());
                 }
 
                 ValidationErrorBuilder.append(errors, ValidationErrorBuilder.arrayElementError(
@@ -246,46 +252,52 @@ public class FieldValidator {
     /**
      * Validates array elements that are objects with defined properties.
      */
-    private static void validateObjectArrayElements(JsonNode arrayValue, JsonNode objectDef, String propertyPath, StringBuilder errors) {
+    private static void validateObjectArrayElements(
+        JsonNode arrayValue, JsonNode objectDef, String propertyPath, StringBuilder errors) {
         for (int i = 0; i < arrayValue.size(); i++) {
             JsonNode element = arrayValue.get(i);
             String elementPath = propertyPath + "[" + i + "]";
 
             if (!element.isObject()) {
                 String actualType = JsonUtils.getJsonNodeType(element);
-                ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(elementPath, "object", actualType));
+                ValidationErrorBuilder.append(errors,
+                    ValidationErrorBuilder.typeError(elementPath, "object", actualType));
                 continue;
             }
 
             // Validate each required property in the object
-            objectDef.fieldNames().forEachRemaining(fieldName -> {
-                JsonNode fieldDef = objectDef.get(fieldName);
-                String fieldPath = elementPath + "." + fieldName;
+            objectDef.fieldNames()
+                .forEachRemaining(fieldName -> {
+                    JsonNode fieldDef = objectDef.get(fieldName);
+                    String fieldPath = elementPath + "." + fieldName;
 
-                if (fieldDef.isTextual()) {
-                    String fieldDefText = fieldDef.asText();
-                    boolean isRequired = fieldDefText.contains("(required)");
+                    if (fieldDef.isTextual()) {
+                        String fieldDefText = fieldDef.asText();
+                        boolean isRequired = fieldDefText.contains("(required)");
 
-                    if (isRequired && !element.has(fieldName)) {
-                        ValidationErrorBuilder.append(errors, "Missing required property: " + fieldPath);
-                    } else if (element.has(fieldName)) {
-                        String expectedType = fieldDefText.replace("(required)", "").trim();
-                        JsonNode actualValue = element.get(fieldName);
+                        if (isRequired && !element.has(fieldName)) {
+                            ValidationErrorBuilder.append(errors, "Missing required property: " + fieldPath);
+                        } else if (element.has(fieldName)) {
+                            String expectedType = fieldDefText.replace("(required)", "")
+                                .trim();
+                            JsonNode actualValue = element.get(fieldName);
 
-                        if (!isTypeValid(actualValue, expectedType)) {
-                            String actualType = JsonUtils.getJsonNodeType(actualValue);
-                            ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(fieldPath, expectedType, actualType));
+                            if (!isTypeValid(actualValue, expectedType)) {
+                                String actualType = JsonUtils.getJsonNodeType(actualValue);
+                                ValidationErrorBuilder.append(errors,
+                                    ValidationErrorBuilder.typeError(fieldPath, expectedType, actualType));
+                            }
                         }
                     }
-                }
-            });
+                });
         }
     }
 
     /**
      * Validates array elements that are objects and generates warnings for undefined properties.
      */
-    public static void validateObjectArrayElementsWithWarnings(JsonNode arrayValue, JsonNode objectDef, String propertyPath, StringBuilder errors, StringBuilder warnings) {
+    public static void validateObjectArrayElementsWithWarnings(
+        JsonNode arrayValue, JsonNode objectDef, String propertyPath, StringBuilder errors, StringBuilder warnings) {
         // Get the root parameters for display condition evaluation
         JsonNode rootParameters = findRootParameters(arrayValue, propertyPath);
 
@@ -295,77 +307,87 @@ public class FieldValidator {
 
             if (!element.isObject()) {
                 String actualType = JsonUtils.getJsonNodeType(element);
-                ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(elementPath, "object", actualType));
+                ValidationErrorBuilder.append(errors,
+                    ValidationErrorBuilder.typeError(elementPath, "object", actualType));
                 continue;
             }
 
             // Check for extra properties (warnings) - considering display conditions
             final int currentIndex = i;
-            element.fieldNames().forEachRemaining(fieldName -> {
-                JsonNode fieldDef = objectDef.get(fieldName);
-                if (fieldDef == null) {
-                    // Property not defined in schema at all
-                    String fieldPath = elementPath + "." + fieldName;
-                    ValidationErrorBuilder.append(warnings, "Property '" + propertyPath + "[index]." + fieldName + "' is not defined in task definition");
-                } else if (fieldDef.isTextual()) {
-                    // Property is defined but check if it should be visible based on display condition
-                    String fieldDefText = fieldDef.asText();
-                    if (hasDisplayCondition(fieldDefText)) {
-                        String condition = extractDisplayCondition(fieldDefText);
-                        String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
+            element.fieldNames()
+                .forEachRemaining(fieldName -> {
+                    JsonNode fieldDef = objectDef.get(fieldName);
+                    if (fieldDef == null) {
+                        // Property not defined in schema at all
+                        String fieldPath = elementPath + "." + fieldName;
+                        ValidationErrorBuilder.append(warnings, "Property '" + propertyPath + "[index]." + fieldName
+                            + "' is not defined in task definition");
+                    } else if (fieldDef.isTextual()) {
+                        // Property is defined but check if it should be visible based on display condition
+                        String fieldDefText = fieldDef.asText();
+                        if (hasDisplayCondition(fieldDefText)) {
+                            String condition = extractDisplayCondition(fieldDefText);
+                            String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
 
-                        try {
-                            boolean shouldShowProperty = WorkflowParser.extractAndEvaluateCondition("@" + resolvedCondition + "@", rootParameters);
-                            if (!shouldShowProperty) {
-                                // Property exists but display condition is false - generate warning
-                                ValidationErrorBuilder.append(warnings, "Property '" + propertyPath + "[" + currentIndex + "]." + fieldName + "' is not defined in task definition");
+                            try {
+                                boolean shouldShowProperty = WorkflowParser
+                                    .extractAndEvaluateCondition("@" + resolvedCondition + "@", rootParameters);
+                                if (!shouldShowProperty) {
+                                    // Property exists but display condition is false - generate warning
+                                    ValidationErrorBuilder.append(warnings, "Property '" + propertyPath + "["
+                                        + currentIndex + "]." + fieldName + "' is not defined in task definition");
+                                }
+                            } catch (Exception e) {
+                                // If condition evaluation fails, assume property should be shown
                             }
-                        } catch (Exception e) {
-                            // If condition evaluation fails, assume property should be shown
                         }
                     }
-                }
-            });
+                });
 
             // Validate each property in the object definition
-            objectDef.fieldNames().forEachRemaining(fieldName -> {
-                JsonNode fieldDef = objectDef.get(fieldName);
-                String fieldPath = elementPath + "." + fieldName;
+            objectDef.fieldNames()
+                .forEachRemaining(fieldName -> {
+                    JsonNode fieldDef = objectDef.get(fieldName);
+                    String fieldPath = elementPath + "." + fieldName;
 
-                if (fieldDef.isTextual()) {
-                    String fieldDefText = fieldDef.asText();
-                    boolean isRequired = fieldDefText.contains("(required)");
-                    boolean shouldValidateProperty = true;
+                    if (fieldDef.isTextual()) {
+                        String fieldDefText = fieldDef.asText();
+                        boolean isRequired = fieldDefText.contains("(required)");
+                        boolean shouldValidateProperty = true;
 
-                    // Check display condition
-                    if (hasDisplayCondition(fieldDefText)) {
-                        String condition = extractDisplayCondition(fieldDefText);
-                        String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
+                        // Check display condition
+                        if (hasDisplayCondition(fieldDefText)) {
+                            String condition = extractDisplayCondition(fieldDefText);
+                            String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
 
-                        try {
-                            shouldValidateProperty = WorkflowParser.extractAndEvaluateCondition("@" + resolvedCondition + "@", rootParameters);
-                        } catch (Exception e) {
-                            // If condition evaluation fails, assume property should be validated
-                            shouldValidateProperty = true;
+                            try {
+                                shouldValidateProperty = WorkflowParser
+                                    .extractAndEvaluateCondition("@" + resolvedCondition + "@", rootParameters);
+                            } catch (Exception e) {
+                                // If condition evaluation fails, assume property should be validated
+                                shouldValidateProperty = true;
+                            }
                         }
-                    }
 
-                    if (shouldValidateProperty) {
-                        // Property should be validated based on display condition
-                        if (isRequired && !element.has(fieldName)) {
-                            ValidationErrorBuilder.append(errors, "Missing required property: " + fieldPath);
-                        } else if (element.has(fieldName)) {
-                            String expectedType = fieldDefText.replaceAll("@[^@]*@", "").replace("(required)", "").trim();
-                            JsonNode actualValue = element.get(fieldName);
+                        if (shouldValidateProperty) {
+                            // Property should be validated based on display condition
+                            if (isRequired && !element.has(fieldName)) {
+                                ValidationErrorBuilder.append(errors, "Missing required property: " + fieldPath);
+                            } else if (element.has(fieldName)) {
+                                String expectedType = fieldDefText.replaceAll("@[^@]*@", "")
+                                    .replace("(required)", "")
+                                    .trim();
+                                JsonNode actualValue = element.get(fieldName);
 
-                            if (!isTypeValid(actualValue, expectedType)) {
-                                String actualType = JsonUtils.getJsonNodeType(actualValue);
-                                ValidationErrorBuilder.append(errors, ValidationErrorBuilder.typeError(fieldPath, expectedType, actualType));
+                                if (!isTypeValid(actualValue, expectedType)) {
+                                    String actualType = JsonUtils.getJsonNodeType(actualValue);
+                                    ValidationErrorBuilder.append(errors,
+                                        ValidationErrorBuilder.typeError(fieldPath, expectedType, actualType));
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
         }
     }
 
@@ -383,7 +405,8 @@ public class FieldValidator {
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("@([^@]+)@");
         java.util.regex.Matcher matcher = pattern.matcher(fieldDefText);
         if (matcher.find()) {
-            return matcher.group(1).trim();
+            return matcher.group(1)
+                .trim();
         }
         return "";
     }
