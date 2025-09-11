@@ -69,17 +69,134 @@ public final class ToolUtils {
     }
 
     /**
-     * Checks if the given name or description matches the search query.
+     * Checks if the given name or description matches the search query. Splits the query into individual words and
+     * matches if any word is found.
      *
-     * @param name        the name to search in
-     * @param description the description to search in
-     * @param query       the search query (should be lowercase)
-     * @return true if either name or description contains the query
+     * @param name                 the name to search in
+     * @param description          the description to search in
+     * @param componentName        the component name to search in
+     * @param componentDescription the component description to search in
+     * @param query                the search query (should be lowercase)
+     * @return true if any word from the query is found in any of the fields
      */
-    public static boolean matchesQuery(String name, String description, String query) {
+    public static boolean
+        matchesQuery(String name, String description, String componentName, String componentDescription, String query) {
         String lowerName = safeToLowerCase(name);
         String lowerDescription = safeToLowerCase(description);
-        return lowerName.contains(query) || lowerDescription.contains(query);
+        String lowerComponentName = safeToLowerCase(componentName);
+        String lowerComponentDescription = safeToLowerCase(componentDescription);
+
+        String[] queryWords = query.toLowerCase()
+            .trim()
+            .split("\\s+");
+
+        for (String word : queryWords) {
+            if (word.isEmpty())
+                continue;
+
+            if (lowerName.contains(word) ||
+                lowerDescription.contains(word) ||
+                lowerComponentName.contains(word) ||
+                lowerComponentDescription.contains(word)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Compares two tasks for sorting based on search query relevance. First compares by total word match count, then by
+     * priority of where matches are found: 1. Name matches (highest priority) 2. Component name matches 3. Description
+     * matches (lowest priority)
+     *
+     * @param name1          first task name
+     * @param description1   first task description
+     * @param componentName1 first component name
+     * @param name2          second task name
+     * @param description2   second task description
+     * @param componentName2 second component name
+     * @param lowerQuery     the search query (should be lowercase)
+     * @return comparison result for sorting
+     */
+    public static int compareTasks(
+        String name1, String description1, String componentName1, String name2, String description2,
+        String componentName2, String lowerQuery) {
+        String lowerName1 = safeToLowerCase(name1);
+        String lowerDescription1 = safeToLowerCase(description1);
+        String lowerComponentName1 = safeToLowerCase(componentName1);
+        String lowerName2 = safeToLowerCase(name2);
+        String lowerDescription2 = safeToLowerCase(description2);
+        String lowerComponentName2 = safeToLowerCase(componentName2);
+
+        String[] queryWords = lowerQuery.trim()
+            .split("\\s+");
+
+        // Count matches for task 1
+        TaskMatchInfo match1 = countMatches(lowerName1, lowerDescription1, lowerComponentName1, queryWords);
+
+        // Count matches for task 2
+        TaskMatchInfo match2 = countMatches(lowerName2, lowerDescription2, lowerComponentName2, queryWords);
+
+        // First compare by total match count (more matches = better)
+        int totalMatchComparison = Integer.compare(match2.totalMatches(), match1.totalMatches());
+        if (totalMatchComparison != 0) {
+            return totalMatchComparison;
+        }
+
+        // If total matches are equal, compare by match location priority
+        // Name matches have highest priority (3), component matches (2), description matches (1)
+        int priority1 = calculatePriority(match1);
+        int priority2 = calculatePriority(match2);
+
+        int priorityComparison = Integer.compare(priority2, priority1);
+        if (priorityComparison != 0) {
+            return priorityComparison;
+        }
+
+        // If still equal, sort alphabetically by name
+        return lowerName1.compareToIgnoreCase(lowerName2);
+    }
+
+    /**
+     * Counts matches for each field and returns match information.
+     */
+    private static TaskMatchInfo
+        countMatches(String name, String description, String componentName, String[] queryWords) {
+        int nameMatches = 0;
+        int componentMatches = 0;
+        int descriptionMatches = 0;
+
+        for (String word : queryWords) {
+            if (word.isEmpty())
+                continue;
+
+            if (name.contains(word))
+                nameMatches++;
+            if (componentName.contains(word))
+                componentMatches++;
+            if (description.contains(word))
+                descriptionMatches++;
+        }
+
+        return new TaskMatchInfo(nameMatches, componentMatches, descriptionMatches);
+    }
+
+    /**
+     * Calculates priority score based on where matches are found. Name matches get highest weight, followed by
+     * component, then description.
+     */
+    private static int calculatePriority(TaskMatchInfo matchInfo) {
+        return matchInfo.nameMatches * 3 + matchInfo.componentMatches * 2 + matchInfo.descriptionMatches;
+    }
+
+    /**
+     * Record to hold match information for a task.
+     */
+    private record TaskMatchInfo(int nameMatches, int componentMatches, int descriptionMatches) {
+        int totalMatches() {
+            return nameMatches + componentMatches + descriptionMatches;
+        }
     }
 
     /**
@@ -380,8 +497,10 @@ public final class ToolUtils {
             case PropertyDecorator.Type.DYNAMIC_PROPERTIES -> "{}" + displayCondition + required;
             case PropertyDecorator.Type.INTEGER -> "\"integer" + displayCondition + required;
             case PropertyDecorator.Type.NUMBER -> "\"float" + displayCondition + required;
-            case PropertyDecorator.Type.OBJECT -> generateObjectValue(property.getObjectProperties(), displayCondition, required);
-            case PropertyDecorator.Type.FILE_ENTRY -> generateObjectValue(property.getFileEntryProperties(), displayCondition, required);
+            case PropertyDecorator.Type.OBJECT ->
+                generateObjectValue(property.getObjectProperties(), displayCondition, required);
+            case PropertyDecorator.Type.FILE_ENTRY ->
+                generateObjectValue(property.getFileEntryProperties(), displayCondition, required);
             case PropertyDecorator.Type.TIME -> "\"time" + displayCondition + required;
             case PropertyDecorator.Type.TASK -> "\"task" + displayCondition + required;
             default -> "\"string" + displayCondition + required;

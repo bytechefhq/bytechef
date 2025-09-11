@@ -100,8 +100,11 @@ public class WorkflowParser {
             .isEmpty()) {
             if ("ARRAY".equalsIgnoreCase(propertyInfo.type())) {
                 // Special case: Check if this is a TASK type array
-                if (propertyInfo.nestedProperties().size() == 1 && 
-                    "TASK".equalsIgnoreCase(propertyInfo.nestedProperties().get(0).type())) {
+                if (propertyInfo.nestedProperties()
+                    .size() == 1 &&
+                    "TASK".equalsIgnoreCase(propertyInfo.nestedProperties()
+                        .get(0)
+                        .type())) {
                     // For TASK types, skip JSON schema generation and use object validation
                     json.append("[ \"object\" ]");
                     return json.toString();
@@ -110,88 +113,115 @@ public class WorkflowParser {
                 json.append("[ ");
 
                 // Check if we have nested properties that represent an object structure
-                boolean hasComplexItemStructure = propertyInfo.nestedProperties().stream()
-                    .anyMatch(prop -> prop.nestedProperties() != null && !prop.nestedProperties().isEmpty());
-                
-                // Check if this is a union type (multiple simple types, all non-required) vs object array
-                boolean isUnionType = propertyInfo.nestedProperties().size() > 1 &&
-                    propertyInfo.nestedProperties().stream()
-                        .allMatch(prop -> (prop.nestedProperties() == null || prop.nestedProperties().isEmpty()) 
-                                 && !prop.required());
+                boolean hasComplexItemStructure = propertyInfo.nestedProperties()
+                    .stream()
+                    .anyMatch(prop -> prop.nestedProperties() != null && !prop.nestedProperties()
+                        .isEmpty());
 
-                if (hasComplexItemStructure || (propertyInfo.nestedProperties().size() > 1 && !isUnionType)) {
+                // Check if this is a union type (multiple simple types, all non-required) vs object array
+                boolean isUnionType = propertyInfo.nestedProperties()
+                    .size() > 1 &&
+                    propertyInfo.nestedProperties()
+                        .stream()
+                        .allMatch(prop -> (prop.nestedProperties() == null || prop.nestedProperties()
+                            .isEmpty())
+                            && !prop.required());
+
+                if (hasComplexItemStructure || (propertyInfo.nestedProperties()
+                    .size() > 1 && !isUnionType)) {
                     // Check for special case: single object with nested properties (unwrap it)
-                    if (propertyInfo.nestedProperties().size() == 1) {
-                        ToolUtils.PropertyInfo singleProperty = propertyInfo.nestedProperties().get(0);
-                        if ("OBJECT".equalsIgnoreCase(singleProperty.type()) && 
-                            singleProperty.nestedProperties() != null && !singleProperty.nestedProperties().isEmpty()) {
+                    if (propertyInfo.nestedProperties()
+                        .size() == 1) {
+                        ToolUtils.PropertyInfo singleProperty = propertyInfo.nestedProperties()
+                            .get(0);
+                        if ("OBJECT".equalsIgnoreCase(singleProperty.type()) &&
+                            singleProperty.nestedProperties() != null && !singleProperty.nestedProperties()
+                                .isEmpty()) {
                             // Unwrap the single object - use its nested properties directly
                             json.append("{ ");
-                            for (int i = 0; i < singleProperty.nestedProperties().size(); i++) {
+                            for (int i = 0; i < singleProperty.nestedProperties()
+                                .size(); i++) {
                                 if (i > 0) {
                                     json.append(", ");
                                 }
-                                json.append(convertSinglePropertyToJson(singleProperty.nestedProperties().get(i)));
+                                json.append(convertSinglePropertyToJson(singleProperty.nestedProperties()
+                                    .get(i)));
                             }
                             json.append(" }");
-                        } else if ("ARRAY".equalsIgnoreCase(singleProperty.type()) && 
-                                   singleProperty.nestedProperties() != null && !singleProperty.nestedProperties().isEmpty()) {
+                        } else if ("ARRAY".equalsIgnoreCase(singleProperty.type()) &&
+                            singleProperty.nestedProperties() != null && !singleProperty.nestedProperties()
+                                .isEmpty()) {
                             // Handle nested array case (array of arrays) - recursively process the nested array
                             json.append("[ ");
-                            
+
                             // Process the nested array structure
-                            boolean hasNestedComplexStructure = singleProperty.nestedProperties().stream()
-                                .anyMatch(prop -> prop.nestedProperties() != null && !prop.nestedProperties().isEmpty());
-                            
+                            boolean hasNestedComplexStructure = singleProperty.nestedProperties()
+                                .stream()
+                                .anyMatch(prop -> prop.nestedProperties() != null && !prop.nestedProperties()
+                                    .isEmpty());
+
                             if (hasNestedComplexStructure) {
                                 // Multiple object types in the nested array
                                 json.append("{ ");
-                                for (int i = 0; i < singleProperty.nestedProperties().size(); i++) {
+                                for (int i = 0; i < singleProperty.nestedProperties()
+                                    .size(); i++) {
                                     if (i > 0) {
                                         json.append(", ");
                                     }
-                                    json.append(convertSinglePropertyToJson(singleProperty.nestedProperties().get(i)));
+                                    json.append(convertSinglePropertyToJson(singleProperty.nestedProperties()
+                                        .get(i)));
                                 }
                                 json.append(" }");
                             } else {
                                 // Simple types in nested array
-                                for (int i = 0; i < singleProperty.nestedProperties().size(); i++) {
+                                for (int i = 0; i < singleProperty.nestedProperties()
+                                    .size(); i++) {
                                     if (i > 0) {
                                         json.append(", ");
                                     }
-                                    ToolUtils.PropertyInfo itemInfo = singleProperty.nestedProperties().get(i);
+                                    ToolUtils.PropertyInfo itemInfo = singleProperty.nestedProperties()
+                                        .get(i);
                                     String typeString = buildTypeString(itemInfo);
-                                    json.append("\"").append(typeString).append("\"");
+                                    json.append("\"")
+                                        .append(typeString)
+                                        .append("\"");
                                 }
                             }
                             json.append(" ]");
                         } else {
                             // Regular single property
                             json.append("{ ");
-                            json.append(convertSinglePropertyToJson(propertyInfo.nestedProperties().get(0)));
+                            json.append(convertSinglePropertyToJson(propertyInfo.nestedProperties()
+                                .get(0)));
                             json.append(" }");
                         }
                     } else {
                         // Array of objects - create object structure
                         json.append("{ ");
-                        for (int i = 0; i < propertyInfo.nestedProperties().size(); i++) {
+                        for (int i = 0; i < propertyInfo.nestedProperties()
+                            .size(); i++) {
                             if (i > 0) {
                                 json.append(", ");
                             }
-                            json.append(convertSinglePropertyToJson(propertyInfo.nestedProperties().get(i)));
+                            json.append(convertSinglePropertyToJson(propertyInfo.nestedProperties()
+                                .get(i)));
                         }
                         json.append(" }");
                     }
                 } else {
                     // Array of simple types
-                    for (int i = 0; i < propertyInfo.nestedProperties().size(); i++) {
+                    for (int i = 0; i < propertyInfo.nestedProperties()
+                        .size(); i++) {
                         if (i > 0) {
                             json.append(", ");
                         }
                         // For array items, just generate the type string without property name
-                        ToolUtils.PropertyInfo itemInfo = propertyInfo.nestedProperties().get(i);
+                        ToolUtils.PropertyInfo itemInfo = propertyInfo.nestedProperties()
+                            .get(i);
                         String typeString = buildTypeString(itemInfo);
-                        json.append("\"").append(typeString).append("\"");
+                        json.append("\"")
+                            .append(typeString)
+                            .append("\"");
                     }
                 }
 
@@ -279,23 +309,23 @@ public class WorkflowParser {
             if (current == null) {
                 return null;
             }
-            
+
             // Check if part contains array index like "items[1]" or nested indices like "items[1][2]"
             if (part.contains("[") && part.contains("]")) {
                 String remainingPart = part;
-                
+
                 // Handle multiple array indices like "conditions[index][index]"
                 while (remainingPart.contains("[") && remainingPart.contains("]")) {
                     int bracketStart = remainingPart.indexOf('[');
                     int bracketEnd = remainingPart.indexOf(']');
-                    
+
                     if (bracketStart < 0 || bracketEnd <= bracketStart) {
                         return null;
                     }
-                    
+
                     String fieldName = remainingPart.substring(0, bracketStart);
                     String indexStr = remainingPart.substring(bracketStart + 1, bracketEnd);
-                    
+
                     // If this is the first array access and fieldName is not empty
                     if (!fieldName.isEmpty()) {
                         if (!current.isObject() || !current.has(fieldName)) {
@@ -303,28 +333,28 @@ public class WorkflowParser {
                         }
                         current = current.get(fieldName);
                     }
-                    
+
                     // Handle array access
                     try {
                         // Handle placeholder values like "index" by returning null
                         if ("index".equals(indexStr)) {
                             return null;
                         }
-                        
+
                         int index = Integer.parseInt(indexStr);
-                        
+
                         if (current == null || !current.isArray() || index < 0 || index >= current.size()) {
                             return null;
                         }
-                        
+
                         current = current.get(index);
                     } catch (NumberFormatException e) {
                         return null;
                     }
-                    
+
                     // Move to the remaining part after this bracket pair
                     remainingPart = remainingPart.substring(bracketEnd + 1);
-                    
+
                     // If there are more brackets, continue with the current node
                     if (remainingPart.startsWith("[")) {
                         // Continue to process the next array index

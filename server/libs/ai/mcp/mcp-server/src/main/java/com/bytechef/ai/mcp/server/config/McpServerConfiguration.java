@@ -16,8 +16,6 @@
 
 package com.bytechef.ai.mcp.server.config;
 
-import com.bytechef.ai.mcp.tool.automation.ComponentTools;
-import com.bytechef.ai.mcp.tool.automation.FlowTools;
 import com.bytechef.ai.mcp.tool.automation.GenericTools;
 import com.bytechef.ai.mcp.server.security.web.config.McpServerAuthorizeHttpRequestContributor;
 import com.bytechef.ai.mcp.server.security.web.config.McpServerCsrfContributor;

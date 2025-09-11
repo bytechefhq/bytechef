@@ -171,11 +171,21 @@ public class ComponentTools {
                 .filter(component -> ToolUtils.matchesQuery(
                     component.getName(),
                     component.getDescription(),
+                    null,
+                    null,
                     lowerQuery))
                 .map(component -> new ComponentMinimalInfo(
                     component.getName(),
                     component.getDescription(),
                     component.getVersion()))
+                .sorted((component1, component2) -> ToolUtils.compareTasks(
+                    component1.name(),
+                    component1.description(),
+                    null,
+                    component2.name(),
+                    component2.description(),
+                    null,
+                    lowerQuery))
                 .toList();
 
             if (logger.isDebugEnabled()) {
@@ -274,11 +284,21 @@ public class ComponentTools {
                     .filter(trigger -> ToolUtils.matchesQuery(
                         trigger.getName(),
                         trigger.getDescription(),
+                        component.getName(),
+                        component.getDescription(),
                         lowerQuery))
                     .map(trigger -> new TriggerMinimalInfo(
                         trigger.getName(),
                         trigger.getDescription(),
                         component.getName())))
+                .sorted((trigger1, trigger2) -> ToolUtils.compareTasks(
+                    trigger1.name(),
+                    trigger1.description(),
+                    trigger1.componentName(),
+                    trigger2.name(),
+                    trigger2.description(),
+                    trigger2.componentName(),
+                    lowerQuery))
                 .toList();
 
             if (logger.isDebugEnabled()) {
@@ -417,11 +437,21 @@ public class ComponentTools {
                     .filter(action -> ToolUtils.matchesQuery(
                         action.getName(),
                         action.getDescription(),
+                        component.getName(),
+                        component.getDescription(),
                         lowerQuery))
                     .map(action -> new ActionMinimalInfo(
                         action.getName(),
                         action.getDescription(),
                         component.getName())))
+                .sorted((action1, action2) -> ToolUtils.compareTasks(
+                    action1.name(),
+                    action1.description(),
+                    action1.componentName(),
+                    action2.name(),
+                    action2.description(),
+                    action2.componentName(),
+                    lowerQuery))
                 .toList();
 
             if (logger.isDebugEnabled()) {
@@ -541,18 +571,19 @@ public class ComponentTools {
                             try {
                                 outputResponse = actionDefinitionFacade.executeOutput(componentDefinition.getName(),
                                     componentDefinition.getVersion(), action.getName(), Map.of(), null);
-                            }
-                            catch (Exception e) {
+                            } catch (Exception e) {
                                 try {
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
-                                        componentDefinition.getVersion(), action.getName(), null, null, null, null, null,
+                                        componentDefinition.getVersion(), action.getName(), null, null, null, null,
+                                        null,
                                         null, null, null, true);
                                     if (output != null) {
                                         outputResponse = SchemaUtils.toOutput(output,
                                             PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
                                     }
                                 } catch (Exception e2) {
-                                    throw new Exception("Please make a " + componentDefinition.getName() + " connector");
+                                    throw new Exception(
+                                        "Please make a " + componentDefinition.getName() + " connector");
                                 }
                             }
                         }

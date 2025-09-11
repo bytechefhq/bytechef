@@ -260,8 +260,7 @@ public class ProjectWorkflowTools {
                 new HashMap<>(),
                 new HashMap<>(),
                 errors,
-                warnings
-            );
+                warnings);
 
             String errorMessages = errors.append("]")
                 .toString()
