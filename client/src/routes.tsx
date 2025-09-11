@@ -1,6 +1,7 @@
 import App from '@/App';
 import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import {Connections} from '@/pages/automation/connections/Connections';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
@@ -52,9 +53,6 @@ const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfil
 const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
 
-const AutomationConnections = lazy(() =>
-    import('@/pages/automation/connections/Connections').then((module) => ({default: module.Connections}))
-);
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const ProjectDeployments = lazy(() => import('@/pages/automation/project-deployments/ProjectDeployments'));
 const Project = lazy(() => import('@/pages/automation/project/Project'));
@@ -448,9 +446,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <AutomationConnections />
-                                            </LazyLoadWrapper>
+                                            <Connections />
                                         </PrivateRoute>
                                     ),
                                     path: 'connections',

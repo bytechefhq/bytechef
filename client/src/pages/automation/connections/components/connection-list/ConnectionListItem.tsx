@@ -36,7 +36,7 @@ import {
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
-import {useState} from 'react';
+import {memo, useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';
 
@@ -46,7 +46,7 @@ interface ConnectionListItemProps {
     remainingTags?: Tag[];
 }
 
-const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: ConnectionListItemProps) => {
+const ConnectionListItem = memo(({componentDefinitions, connection, remainingTags}: ConnectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -226,6 +226,8 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
             </>
         </li>
     );
-};
+});
+
+ConnectionListItem.displayName = 'ConnectionListItem';
 
 export default ConnectionListItem;

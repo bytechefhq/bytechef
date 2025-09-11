@@ -36,7 +36,6 @@ import {
     useGetConnectionDefinitionQuery,
     useGetConnectionDefinitionsQuery,
 } from '@/shared/queries/platform/connectionDefinitions.queries';
-import {useGetEnvironmentsQuery} from '@/shared/queries/platform/environments.queries';
 import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
@@ -46,7 +45,7 @@ import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tans
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ClipboardIcon} from 'lucide-react';
-import {ReactNode, useEffect, useMemo, useState} from 'react';
+import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 import ComponentSelectionInput from './ComponentSelectionInput';
@@ -128,19 +127,23 @@ const ConnectionDialog = ({
 
     const {control, formState, getValues, handleSubmit, reset: formReset, setValue} = form;
 
-    const {data: environments} = useGetEnvironmentsQuery();
-
     const {
         data: connectionDefinition,
         error: connectionDefinitionError,
         isLoading: connectionDefinitionLoading,
-    } = useGetConnectionDefinitionQuery({
-        componentName: (selectedComponentDefinition?.name as string) || (connection?.componentName as string),
-    });
+    } = useGetConnectionDefinitionQuery(
+        {
+            componentName: (selectedComponentDefinition?.name as string) || (connection?.componentName as string),
+        },
+        !!selectedComponentDefinition?.name || !!connection?.componentName
+    );
 
-    const {data: connectionDefinitions} = useGetConnectionDefinitionsQuery({
-        componentName: selectedComponentDefinition?.name as string,
-    });
+    const {data: connectionDefinitions} = useGetConnectionDefinitionsQuery(
+        {
+            componentName: selectedComponentDefinition?.name as string,
+        },
+        !!selectedComponentDefinition?.name
+    );
 
     const {
         data: oAuth2AuthorizationParameters,
@@ -367,23 +370,28 @@ const ConnectionDialog = ({
         }
     }
 
-    const handleComponentDefinitionChange = (componentDefinition?: ComponentDefinitionBasic) => {
-        if (componentDefinition) {
-            setValue('componentName', componentDefinition.name);
-            setAuthorizationType(undefined);
-            setSelectedComponentDefinition(componentDefinition);
+    const handleComponentDefinitionChange = useCallback(
+        (componentDefinition?: ComponentDefinitionBasic) => {
+            if (componentDefinition) {
+                setValue('componentName', componentDefinition.name);
+                setAuthorizationType(undefined);
+                setSelectedComponentDefinition(componentDefinition);
 
-            if (oAuth2Properties?.predefinedApps) {
-                setUsePredefinedOAuthApp(oAuth2Properties?.predefinedApps?.includes(componentDefinition?.name || ''));
+                if (oAuth2Properties?.predefinedApps) {
+                    setUsePredefinedOAuthApp(
+                        oAuth2Properties?.predefinedApps?.includes(componentDefinition?.name || '')
+                    );
+                }
+
+                if (!getValues('name') && componentDefinition.title) {
+                    setValue('name', componentDefinition.title);
+                }
+
+                setWizardStep('configuration_step');
             }
-
-            if (!getValues('name') && componentDefinition.title) {
-                setValue('name', componentDefinition.title);
-            }
-
-            setWizardStep('configuration_step');
-        }
-    };
+        },
+        [getValues, oAuth2Properties?.predefinedApps, setValue]
+    );
 
     useEffect(() => {
         setAuthorizationType(

@@ -20,16 +20,19 @@ export const ConnectDefinitionKeys = {
     ],
 };
 
-export const useGetConnectionDefinitionQuery = (request: GetComponentConnectionDefinitionRequest) =>
+export const useGetConnectionDefinitionQuery = (request: GetComponentConnectionDefinitionRequest, enabled?: boolean) =>
     useQuery<ConnectionDefinition, Error>({
+        enabled: enabled === undefined ? true : enabled,
         queryKey: ConnectDefinitionKeys.connectionDefinition(request),
         queryFn: () => new ConnectionDefinitionApi().getComponentConnectionDefinition(request),
-        enabled: !!request?.componentName,
     });
 
-export const useGetConnectionDefinitionsQuery = (request: GetComponentConnectionDefinitionsRequest) =>
+export const useGetConnectionDefinitionsQuery = (
+    request: GetComponentConnectionDefinitionsRequest,
+    enabled?: boolean
+) =>
     useQuery<ConnectionDefinition[], Error>({
+        enabled: enabled === undefined ? true : enabled,
         queryKey: ConnectDefinitionKeys.filteredConnectionDefinitions(request),
         queryFn: () => new ConnectionDefinitionApi().getComponentConnectionDefinitions(request),
-        enabled: !!request?.componentName,
     });
