@@ -14,36 +14,36 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.execution.repository.jdbc.converter;
+package com.bytechef.commons.data.jdbc.converter;
 
-import com.bytechef.error.ExecutionError;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.WritingConverter;
 
 /**
  * @author Ivica Cardic
  */
-@WritingConverter
-public class ExecutionErrorToStringConverter implements Converter<ExecutionError, String> {
+public class StringToFileEntryConverter implements Converter<String, FileEntry> {
 
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public ExecutionErrorToStringConverter(ObjectMapper objectMapper) {
+    public StringToFileEntryConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public String convert(ExecutionError executionError) {
-        return write(objectMapper, executionError);
+    public FileEntry convert(String json) {
+        return json == null ? null : read(objectMapper, json);
     }
 
-    private String write(ObjectMapper objectMapper, Object object) {
+    private FileEntry read(ObjectMapper objectMapper, String json) {
         try {
-            return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
+            return objectMapper.readValue(json, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }

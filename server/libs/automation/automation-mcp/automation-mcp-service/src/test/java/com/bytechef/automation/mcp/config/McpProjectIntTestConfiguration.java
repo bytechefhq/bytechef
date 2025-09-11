@@ -20,7 +20,9 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
@@ -106,7 +108,9 @@ public class McpProjectIntTestConfiguration {
         @Override
         protected List<?> userConverters() {
             return Arrays.asList(
+                new FileEntryToStringConverter(objectMapper),
                 new MapWrapperToStringConverter(objectMapper),
+                new StringToFileEntryConverter(objectMapper),
                 new StringToMapWrapperConverter(objectMapper));
         }
     }
